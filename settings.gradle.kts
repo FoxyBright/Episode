@@ -1,3 +1,8 @@
+@file:Suppress("UnstableApiUsage")
+
+include(":mylibrary")
+
+
 pluginManagement {
     repositories {
         google()
@@ -13,4 +18,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "gilty"
-include ':app'
+include(":app")
