@@ -33,4 +33,6 @@ android {
 dependencies {
     base()
     compose()
+
+    implementation(project(":base"))
 }

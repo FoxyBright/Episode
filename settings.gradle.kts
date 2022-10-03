@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":mylibrary")
+include(":base")
+
 
 
 pluginManagement {

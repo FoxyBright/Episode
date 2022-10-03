@@ -7,4 +7,5 @@ baseConfig()
 
 dependencies {
     base()
+    compose()
 }
