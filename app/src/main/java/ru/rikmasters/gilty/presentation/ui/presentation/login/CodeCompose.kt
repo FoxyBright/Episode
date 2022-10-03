@@ -3,18 +3,23 @@ package ru.rikmasters.gilty.presentation.ui.presentation.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.rxjava3.subscribeAsState
-import io.reactivex.rxjava3.core.Observable
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
@@ -78,11 +83,12 @@ fun CodeContent() {
 @Composable
 private fun ButtonTimer(
     modifier: Modifier = Modifier,
-    timer: Observable<Int>,
+    //timer: Observable<Int>,
     onResend: () -> Unit,
 ) {
 
-    val sec by timer.subscribeAsState(180)
+    // TODO
+    val sec = 0 //by timer.subscribeAsState(180)
 
     Button(
         onResend,

@@ -39,6 +39,7 @@ private val phoneMaxLength = phoneMask.count { it=='#' }
 private val transformation = visualTransformationOf(phoneMask)
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneTextField(
     value: String,
@@ -77,6 +78,7 @@ fun PhoneTextField(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun colors() = TextFieldDefaults.textFieldColors(
     containerColor = ThemeExtra.colors.cardBackground,
