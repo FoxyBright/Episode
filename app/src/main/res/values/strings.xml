@@ -1,3 +1,57 @@
 <resources>
     <string name="app_name">gilty</string>
+
+    <!-- Login -->
+
+    <string name="phone_number">Номер телефона</string>
+    <string name="google_login">Войти через Google</string>
+    <string name="next_button">Далее</string>
+    <string name="ops_agree">Продолжая, вы соглашаетесь с</string>
+    <string name="privacy_police">Политикой конфиденциальности</string>
+    <string name="application">приложения</string>
+
+    <!-- Create Profile -->
+    <string name="create_profile_title">Заполните профиль</string>
+    <string name="user_name">Имя пользователя</string>
+    <string name="user_image">Фото профиля</string>
+    <string name="hidden_image">Скрытые фото</string>
+    <string name="observers">Наблюдели</string>
+    <string name="observe">Наблюдает</string>
+    <string name="about_me">О себе</string>
+    <string name="about_me_placeholder">Расскажите кратко о себе</string>
+
+    <!-- Code -->
+    <string name="confirm_number_title">Подтвердите номер</string>
+    <string name="confirm_number_subtitle">Введите последние 4 цифры с номера со звонка</string>
+    <string name="call_again">Позвонить повторно</string>
+
+    <!-- Personal Info -->
+    <string name="personal_info_title">Личная информация</string>
+    <string name="how_old_are_you">Сколько вам лет</string>
+    <string name="save_button">Сохранить</string>
+
+    <string name="sex">Пол</string>
+
+    <string name="male_sex">Мужской</string>
+    <string name="female_sex">Женский</string>
+    <string name="others_sex">Другое</string>
+    
+    <!-- Recommendation -->
+    
+    <string name="not_interesting">Не интересно</string>
+    <string name="meeting_respond">Откликнуться</string>
+    <string name="meeting_terms">Условия</string>
+
+    <!-- Meeting -->
+    <string name="meeting_personal_type">Персональная встреча</string>
+    <string name="meeting_group_type">Групповая встреча</string>
+    <string name="meeting_anon_type">Анонимная встреча</string>
+    <string name="members">Участники</string>
+
+    <string name="condition_free">Вход свободный</string>
+    <string name="condition_divide">Сумма делиться</string>
+    <string name="condition_organizer_pay">Платит организатор</string>
+    <string name="condition_member_pay">Платят участники</string>
+    <string name="condition_no_matter">Не важно</string>
+
 </resources>
