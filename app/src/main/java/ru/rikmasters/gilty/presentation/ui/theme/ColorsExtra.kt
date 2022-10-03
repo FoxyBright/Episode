@@ -15,6 +15,9 @@ data class ExtraColors(
     val gradientColor1: Color = Color.Unspecified,
     val gradientColor2: Color = Color.Unspecified,
     val grayButton: Color = Color.Unspecified,
+    val elementsBack: Color = Color.Unspecified,
+    val primary: Color = Color.Unspecified,
+    val white: Color = Color.Unspecified,
     val divider: Color = Color.Unspecified
     // Добавить новый цвет в схему = Color.Unspecified
 )
@@ -23,6 +26,9 @@ data class ExtraColors(
     ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
 val LightExtraColors = ExtraColors(
     myExtraColor = Colors.Purple40,
+    primary = Colors.Primary,
+    white = Color.White,
+    elementsBack = Color.White,
     mainTextColor = Colors.PrimaryTextDay,
     secondaryTextColor = Colors.SecondaryTextDay,
     notActive = Colors.NotActiveDay,
@@ -40,6 +46,9 @@ val LightExtraColors = ExtraColors(
     ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
 val DarkExtraColors = ExtraColors(
     myExtraColor = Colors.Purple80,
+    primary = Colors.Primary,
+    white = Color.White,
+    elementsBack = Colors.PrimaryTextDay,
     mainTextColor = Colors.PrimaryTextNight,
     secondaryTextColor = Colors.SecondaryTextNight,
     notActive = Colors.NotActiveNight,

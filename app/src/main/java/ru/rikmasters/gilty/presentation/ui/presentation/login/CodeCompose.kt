@@ -41,13 +41,16 @@ fun CodeContent() {
     Surface(
         Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)) {
+            .background(MaterialTheme.colorScheme.background)
+    ) {
 
-        Column(Modifier
-            .fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+        ) {
 
             Image(
-                painterResource(id =  R.drawable.ic_back),
+                painterResource(id = R.drawable.ic_back),
                 contentDescription = "button back",
                 Modifier
                     .padding(start = 16.dp, top = 32.dp)
@@ -60,7 +63,8 @@ fun CodeContent() {
                     .padding(top = 16.dp)
                     .fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
-                color = ThemeExtra.colors.mainTextColor )
+                color = ThemeExtra.colors.mainTextColor
+            )
 
             Text(
                 text = stringResource(R.string.confirm_number_subtitle),
@@ -69,11 +73,14 @@ fun CodeContent() {
                     .padding(top = 12.dp)
                     .padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.labelSmall,
-                color = ThemeExtra.colors.secondaryTextColor)
+                color = ThemeExtra.colors.secondaryTextColor
+            )
 
             DigitCode(
-                Modifier.padding(top = 32.dp)
-                .padding(horizontal = 50.dp), 4, { })
+                Modifier
+                    .padding(top = 32.dp)
+                    .padding(horizontal = 50.dp), 4
+            ) { }
 
 
         }
@@ -103,7 +110,7 @@ private fun ButtonTimer(
     ) {
         Text(
             (
-                    if(sec > 0) stringResource(R.string.call_again, "${sec/60}:${sec%60}")
+                    if (sec > 0) stringResource(R.string.call_again, "${sec / 60}:${sec % 60}")
                     else stringResource(R.string.call_again)
                     ).uppercase(),
             style = MaterialTheme.typography.bodyMedium,

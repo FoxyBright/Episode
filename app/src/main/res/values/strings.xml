@@ -2,13 +2,28 @@
     <string name="app_name">gilty</string>
 
     <!-- Login -->
-
     <string name="phone_number">Номер телефона</string>
     <string name="google_login">Войти через Google</string>
     <string name="next_button">Далее</string>
     <string name="ops_agree">Продолжая, вы соглашаетесь с</string>
     <string name="privacy_police">Политикой конфиденциальности</string>
     <string name="application">приложения</string>
+
+    <!-- Select Categories -->
+    <string name="interested_you">Что вам интересно?</string>
+    <string name="interested_you_details">Выберите какие категории встреч вам интересны</string>
+
+    <!-- Give Permissions -->
+    <string name="find_more">Находите больше</string>
+    <string name="find_more_details">Узнайте о самых актуальных встречах недалеко от вас</string>
+    <string name="permissions">Разрешения</string>
+    <string name="geoposition">Геопозиция</string>
+    <string name="notifications">Уведомления</string>
+    <string name="finish">Завершить</string>
+    <string name="answer_permission">Разрешить Guilty доступ к местоположению этого устройства?</string>
+    <string name="when_using">При использовании</string>
+    <string name="once">Однократно</string>
+    <string name="prohibit">Запретить</string>
 
     <!-- Create Profile -->
     <string name="create_profile_title">Заполните профиль</string>
@@ -29,15 +44,12 @@
     <string name="personal_info_title">Личная информация</string>
     <string name="how_old_are_you">Сколько вам лет</string>
     <string name="save_button">Сохранить</string>
-
     <string name="sex">Пол</string>
-
     <string name="male_sex">Мужской</string>
     <string name="female_sex">Женский</string>
     <string name="others_sex">Другое</string>
-    
+
     <!-- Recommendation -->
-    
     <string name="not_interesting">Не интересно</string>
     <string name="meeting_respond">Откликнуться</string>
     <string name="meeting_terms">Условия</string>
@@ -47,7 +59,6 @@
     <string name="meeting_group_type">Групповая встреча</string>
     <string name="meeting_anon_type">Анонимная встреча</string>
     <string name="members">Участники</string>
-
     <string name="condition_free">Вход свободный</string>
     <string name="condition_divide">Сумма делиться</string>
     <string name="condition_organizer_pay">Платит организатор</string>

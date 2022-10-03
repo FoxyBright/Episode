@@ -17,6 +17,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
@@ -25,7 +26,6 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HiddenPhotoContent() {
-
     Surface(
         onClick = {},
         modifier = Modifier
@@ -92,7 +92,7 @@ fun ProfileStatContent() {
         shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .clip(MaterialTheme.shapes.large)
-            .height(93.dp)
+            .height(100.dp)
             .wrapContentWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -177,6 +177,23 @@ private fun ImageCardBottom(
             )
         }
     }
+}
 
+@Preview
+@Composable
+fun ImageCardBottomPreview(){
+    ImageCardBottom(
+        Modifier, "ANY NEXT")
+}
 
+@Preview
+@Composable
+fun ProfileStatContentPreview(){
+    ProfileStatContent()
+}
+
+@Preview
+@Composable
+fun HiddenPhotoContentPreview(){
+    HiddenPhotoContent()
 }

@@ -1,10 +1,19 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.login
 
-import android.content.res.Resources
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -14,8 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.core.visualTransformationOf
-import ru.rikmasters.gilty.presentation.ui.theme.ExtraShapes
-import ru.rikmasters.gilty.presentation.ui.theme.Shapes
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -23,7 +30,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PhoneTextFieldPreview() {
-    GiltyTheme() {
+    GiltyTheme {
 
         var value by remember { mutableStateOf("") }
 
@@ -35,7 +42,7 @@ private fun PhoneTextFieldPreview() {
 }
 
 private const val phoneMask = "### ###-##-##"
-private val phoneMaxLength = phoneMask.count { it=='#' }
+private val phoneMaxLength = phoneMask.count { it == '#' }
 private val transformation = visualTransformationOf(phoneMask)
 
 
@@ -48,7 +55,7 @@ fun PhoneTextField(
 ) {
     TextField(
         value,
-        { if(it.length <= phoneMaxLength) onValueChanged(it) },
+        { if (it.length <= phoneMaxLength) onValueChanged(it) },
         modifier,
         shape = MaterialTheme.shapes.large,
         colors = colors(),
@@ -60,15 +67,16 @@ fun PhoneTextField(
         },
 
         trailingIcon = {
-                       IconButton(onClick = {}) {
-                           if (value.isNotEmpty()) {
-                               Icon(
-                                   painterResource(id = R.drawable.ic_close ),
-                                   "clear",
-                               tint = ThemeExtra.colors.grayIcon)
-                           }
+            IconButton(onClick = {}) {
+                if (value.isNotEmpty()) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_close),
+                        "clear",
+                        tint = ThemeExtra.colors.grayIcon
+                    )
+                }
 
-                       }
+            }
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
