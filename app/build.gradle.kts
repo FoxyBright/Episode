@@ -33,6 +33,7 @@ android {
 dependencies {
     base()
     compose()
-
     implementation(project(":base"))
+    // коил для подтягивания картинки
+    implementation("io.coil-kt:coil-compose:2.2.1")
 }

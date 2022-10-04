@@ -17,15 +17,19 @@ private val baseFontFamily = FontFamily(
     Font(R.font.gilroy_bold, FontWeight.Bold)
 )
 
-@Deprecated("Надо использовать тему",
-    ReplaceWith("MaterialTheme.typography", "androidx.compose.material3.MaterialTheme"))
+@Deprecated(
+    "Надо использовать тему",
+    ReplaceWith("MaterialTheme.typography", "androidx.compose.material3.MaterialTheme")
+)
 val baseTextStyle = TextStyle(
     fontFamily = baseFontFamily
     // Настроить
 )
 
-@Deprecated("Надо использовать тему",
-    ReplaceWith("MaterialTheme.typography", "androidx.compose.material3.MaterialTheme"))
+@Deprecated(
+    "Надо использовать тему",
+    ReplaceWith("MaterialTheme.typography", "androidx.compose.material3.MaterialTheme")
+)
 val Typography = Typography(
     bodyLarge = baseTextStyle.copy(
         fontWeight = FontWeight.Normal,
@@ -46,6 +50,10 @@ val Typography = Typography(
     ),
     bodyMedium = baseTextStyle.copy(
         fontSize = 16.sp,
+        lineHeight = 20.sp
+    ),
+    labelLarge = baseTextStyle.copy(
+        fontSize = 20.sp,
         lineHeight = 20.sp
     )
     // Добавить другие шрифты

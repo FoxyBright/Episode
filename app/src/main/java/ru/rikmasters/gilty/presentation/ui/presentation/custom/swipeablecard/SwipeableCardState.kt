@@ -34,12 +34,6 @@ class SwipeableCardState(
     internal val maxHeight: Float,
 ) {
     val offset = Animatable(offset(0f, 0f), Offset.VectorConverter)
-
-    /**
-     * The [Direction] the card was swiped at.
-     *
-     * Null value means the card has not been swiped fully yet.
-     */
     var swipedDirection: Direction? by mutableStateOf(null)
         private set
 
@@ -51,10 +45,10 @@ class SwipeableCardState(
         val endX = maxWidth * 1.5f
         val endY = maxHeight
         when (direction) {
-            Direction.Left -> offset.animateTo(offset(x = -endX), animationSpec)
-            Direction.Right -> offset.animateTo(offset(x = endX), animationSpec)
-            Direction.Up -> offset.animateTo(offset(y = -endY), animationSpec)
-            Direction.Down -> offset.animateTo(offset(y = endY), animationSpec)
+            Direction.Left -> offset.animateTo(offset(-endX), animationSpec)
+            Direction.Right -> offset.animateTo(offset(endX), animationSpec)
+            Direction.Up -> offset.animateTo(offset(-endY), animationSpec)
+            Direction.Down -> offset.animateTo(offset(endY), animationSpec)
         }
         this.swipedDirection = direction
     }

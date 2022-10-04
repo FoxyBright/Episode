@@ -12,9 +12,6 @@ import ru.rikmasters.gilty.presentation.ui.theme.Colors.NotActiveNight
 import ru.rikmasters.gilty.presentation.ui.theme.Colors.Pink40
 import ru.rikmasters.gilty.presentation.ui.theme.Colors.Pink80
 import ru.rikmasters.gilty.presentation.ui.theme.Colors.Primary
-import ru.rikmasters.gilty.presentation.ui.theme.Colors.PrimaryTextDay
-import ru.rikmasters.gilty.presentation.ui.theme.Colors.Purple40
-import ru.rikmasters.gilty.presentation.ui.theme.Colors.Purple80
 import ru.rikmasters.gilty.presentation.ui.theme.Colors.PurpleGrey40
 import ru.rikmasters.gilty.presentation.ui.theme.Colors.PurpleGrey80
 

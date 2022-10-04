@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,18 +31,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.CheckBox
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
+import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
-
-interface PermissionsContentCallback {
-    fun onBack()
-    fun onFinish()
-}
 
 @Composable
 @ExperimentalMaterial3Api
-fun PermissionsContent(modifier: Modifier, callback: PermissionsContentCallback) {
+fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null) {
     Box(
         modifier
             .fillMaxSize()
@@ -53,46 +51,29 @@ fun PermissionsContent(modifier: Modifier, callback: PermissionsContentCallback)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Image(
-                painterResource(R.drawable.ic_back),
-                "button back",
-                Modifier
-                    .padding(top = 32.dp)
-                    .clickable { callback.onBack() })
-            Text(
+            LoginActionBar(
                 stringResource(R.string.find_more),
-                Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth(),
-                ThemeExtra.colors.mainTextColor,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
                 stringResource(R.string.find_more_details),
-                Modifier.padding(),
-                ThemeExtra.colors.secondaryTextColor,
-                14.sp
-            )
+            ) { callback?.onBack() }
             Image(
                 painterResource(R.drawable.map),
-                "map",
+                stringResource(R.string.map),
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 22.dp, horizontal = 38.dp),
+                    .padding(38.dp, 22.dp),
                 contentScale = ContentScale.Crop
             )
             Text(
                 stringResource(R.string.permissions),
                 Modifier.padding(bottom = 12.dp),
                 ThemeExtra.colors.mainTextColor,
-                20.sp,
-                fontWeight = FontWeight.Bold
+                style = ThemeExtra.typography.H3
             )
             Box(
                 Modifier
-                    .background(ThemeExtra.colors.elementsBack)
-                    .clip(RoundedCornerShape(14.dp))
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(ThemeExtra.colors.elementsBack)
             ) {
                 Column {
                     Row(
@@ -103,11 +84,11 @@ fun PermissionsContent(modifier: Modifier, callback: PermissionsContentCallback)
                         Text(
                             stringResource(R.string.geoposition),
                             color = ThemeExtra.colors.mainTextColor,
-                            fontSize = 16.sp
+                            style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(Modifier, true)
+                        CheckBox(true)
                     }
-                    ViewLine(Modifier.padding(start = 20.dp))
+                    Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -116,33 +97,23 @@ fun PermissionsContent(modifier: Modifier, callback: PermissionsContentCallback)
                         Text(
                             stringResource(R.string.notifications),
                             color = ThemeExtra.colors.mainTextColor,
-                            fontSize = 16.sp
+                            style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(Modifier, false)
+                        CheckBox(false)
                     }
                 }
             }
         }
         GradientButton(
-            callback::onFinish,
+            { callback?.onNext() },
             Modifier
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            text = stringResource(R.string.finish),
-            enabled = true
+            stringResource(R.string.finish),
+            true
         )
     }
-}
-
-@Composable
-private fun ViewLine(modifier: Modifier) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(ThemeExtra.colors.divider)
-    )
 }
 
 @Composable
@@ -151,13 +122,13 @@ fun PermissionConfirmationWindow() {
     Box(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
             .background(ThemeExtra.colors.elementsBack)
+            .clip(RoundedCornerShape(14.dp))
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painterResource(R.drawable.geolocation_icon),
-                "geolocation icon",
+                stringResource(R.string.geolocation_icon),
                 Modifier
                     .size(60.dp)
                     .padding(18.dp)
@@ -166,33 +137,32 @@ fun PermissionConfirmationWindow() {
                 stringResource(R.string.answer_permission),
                 Modifier.padding(bottom = 20.dp),
                 ThemeExtra.colors.mainTextColor,
-                20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                style = ThemeExtra.typography.H3
             )
-            ViewLine(Modifier)
+            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
             Text(
                 stringResource(R.string.when_using),
                 Modifier.padding(vertical = 20.dp),
                 ThemeExtra.colors.primary,
-                14.sp,
                 fontWeight = FontWeight.Bold,
+                style = ThemeExtra.typography.MediumText
             )
-            ViewLine(Modifier)
+            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
             Text(
                 stringResource(R.string.once),
                 Modifier.padding(vertical = 20.dp),
                 ThemeExtra.colors.primary,
-                14.sp,
                 fontWeight = FontWeight.Bold,
+                style = ThemeExtra.typography.MediumText
             )
-            ViewLine(Modifier)
+            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
             Text(
                 stringResource(R.string.prohibit),
                 Modifier.padding(vertical = 20.dp),
                 ThemeExtra.colors.primary,
-                14.sp,
                 fontWeight = FontWeight.Bold,
+                style = ThemeExtra.typography.MediumText
             )
         }
     }
@@ -209,9 +179,8 @@ fun PermissionConfirmationWindowPreview() {
 @ExperimentalMaterial3Api
 @Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
 fun PermissionsContentPreview() {
-    PermissionsContent(Modifier, object : PermissionsContentCallback {
-        override fun onBack() {}
-        override fun onFinish() {}
-    })
+    GiltyTheme {
+        PermissionsContent(Modifier)
+    }
 }
 

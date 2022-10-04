@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.login
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,73 +14,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
+import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
-import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun CodePreview() {
-
     GiltyTheme {
         CodeContent()
     }
 }
 
-
 @Composable
-fun CodeContent() {
-
+fun CodeContent(callback: NavigationInterface? = null) {
     Surface(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-
         Column(
             Modifier
                 .fillMaxSize()
+                .padding(16.dp)
         ) {
-
-            Image(
-                painterResource(id = R.drawable.ic_back),
-                contentDescription = "button back",
-                Modifier
-                    .padding(start = 16.dp, top = 32.dp)
-                    .clickable { })
-
-            Text(
-                text = stringResource(id = R.string.confirm_number_title),
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp)
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
-                color = ThemeExtra.colors.mainTextColor
-            )
-
-            Text(
-                text = stringResource(R.string.confirm_number_subtitle),
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp)
-                    .padding(horizontal = 16.dp),
-                style = MaterialTheme.typography.labelSmall,
-                color = ThemeExtra.colors.secondaryTextColor
-            )
-
+            LoginActionBar(
+                stringResource(R.string.confirm_number_title),
+                stringResource(R.string.confirm_number_subtitle)
+            ) { callback?.onBack() }
             DigitCode(
                 Modifier
                     .padding(top = 32.dp)
                     .padding(horizontal = 50.dp), 4
-            ) { }
-
-
+            ) {
+                if (it.length == 4) callback?.onNext()
+            }
         }
     }
 }
@@ -93,25 +63,22 @@ private fun ButtonTimer(
     //timer: Observable<Int>,
     onResend: () -> Unit,
 ) {
-
-    // TODO
+    // TODO таймер на повторную отправку кода
     val sec = 0 //by timer.subscribeAsState(180)
-
     Button(
         onResend,
         modifier
             .fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        enabled = sec <= 0,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-        ),
+        sec <= 0,
+        MaterialTheme.shapes.large,
+        ButtonDefaults.buttonColors(Color.Transparent),
         contentPadding = PaddingValues(vertical = 18.dp)
     ) {
         Text(
-            (
-                    if (sec > 0) stringResource(R.string.call_again, "${sec / 60}:${sec % 60}")
-                    else stringResource(R.string.call_again)
+            (if (sec > 0)
+                stringResource(R.string.call_again, "${sec / 60}:${sec % 60}")
+            else
+                stringResource(R.string.call_again)
                     ).uppercase(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary

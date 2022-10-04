@@ -11,6 +11,6 @@ data class EmojiModel(
 val DemoEmojiModel = EmojiModel(
 
     type = "type",
-    path = "path"
+    path = "https://serverspace.ru/wp-content/uploads/2019/06/backup-i-snapshot.png"
 
 )

@@ -5,6 +5,7 @@
     <string name="phone_number">Номер телефона</string>
     <string name="google_login">Войти через Google</string>
     <string name="next_button">Далее</string>
+    <string name="or">или</string>
     <string name="ops_agree">Продолжая, вы соглашаетесь с</string>
     <string name="privacy_police">Политикой конфиденциальности</string>
     <string name="application">приложения</string>
@@ -64,5 +65,13 @@
     <string name="condition_organizer_pay">Платит организатор</string>
     <string name="condition_member_pay">Платят участники</string>
     <string name="condition_no_matter">Не важно</string>
+
+    <!-- Image Descriptions -->
+    <string name="category_icon">Иконка категории</string>
+    <string name="button_back">Кнопка назад</string>
+    <string name="logo">Логотип</string>
+    <string name="geolocation_icon">Иконка геолокации</string>
+    <string name="map">Карта</string>
+    <string name="clear">Очистить</string>
 
 </resources>

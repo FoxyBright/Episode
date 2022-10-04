@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.presentation.model.meeting
 
 import ru.rikmasters.gilty.presentation.model.profile.DemoEmojiModel
 import ru.rikmasters.gilty.presentation.model.profile.EmojiModel
+import kotlin.random.Random
 
 data class CategoryModel(
 
@@ -15,10 +16,27 @@ data class CategoryModel(
 )
 
 val DemoCategoryModel = CategoryModel(
-
-    id = "test",
+    id = "id",
     name = "Название категории",
-    color = "R.color.primary",
+    color = "#FF4745",
     emoji = DemoEmojiModel
-
 )
+
+val DemoCategoryModelList: List<CategoryModel>
+    get() {
+        val categories = arrayListOf<CategoryModel>()
+        repeat(20) {
+            val rand = Random.nextInt(1, 4)
+            categories.add(
+                CategoryModel(
+                    "$it", "Cinema $it", when {
+                        rand % 3 == 0 -> "#FF4745"
+                        rand % 2 == 0 -> "#FFCC00"
+                        else -> "#D70015"
+                    }, DemoEmojiModel
+                )
+            )
+        }
+        return categories
+    }
+

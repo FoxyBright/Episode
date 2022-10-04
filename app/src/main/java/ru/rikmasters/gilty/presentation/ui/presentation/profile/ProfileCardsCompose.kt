@@ -27,8 +27,8 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 fun HiddenPhotoContent() {
     Surface(
-        onClick = {},
-        modifier = Modifier
+        {},
+        Modifier
             .height(93.dp)
             .wrapContentWidth()
             .clip(MaterialTheme.shapes.large),

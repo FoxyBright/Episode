@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.profile
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,10 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
+import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
-
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -46,15 +45,15 @@ fun ProfilePreview() {
         CreateProfile(Modifier, "", object : CreateProfileCallback {
             override fun profileImage() {}
             override fun hiddenImages() {}
-            override fun back() {}
+            override fun onBack() {}
+            override fun onNext() {}
         })
     }
 }
 
-interface CreateProfileCallback {
-    fun profileImage()
-    fun hiddenImages()
-    fun back()
+interface CreateProfileCallback : NavigationInterface {
+    fun profileImage() {}
+    fun hiddenImages() {}
 }
 
 @Composable
@@ -69,101 +68,83 @@ fun Screen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateProfile(
-    modifier: Modifier = Modifier, value: String, callback: CreateProfileCallback
+    modifier: Modifier = Modifier,
+    value: String,
+    callback: CreateProfileCallback
 ) {
-
     Box(Modifier.fillMaxSize()) {
-
-        Column {
-            Image(painterResource(id = R.drawable.ic_back),
-                contentDescription = "button back",
-                Modifier
-                    .padding(start = 16.dp, top = 32.dp)
-                    .clickable { callback.back() })
-
-            Text(
-                text = stringResource(id = R.string.create_profile_title),
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp)
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
-                color = ThemeExtra.colors.mainTextColor
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            LoginActionBar(
+                stringResource(R.string.create_profile_title)
             )
-
+            { callback.onBack() }
             Card(
-                modifier = Modifier
+                Modifier
                     .padding(top = 24.dp)
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
                     .fillMaxSize(),
-                shape = RoundedCornerShape(30.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
+                RoundedCornerShape(30.dp),
+                CardDefaults.cardColors(MaterialTheme.colorScheme.background),
                 border = BorderStroke(6.dp, Color.White)
             ) {
-
                 Column(
                     Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
                 ) {
                     TextField(
-                        value = "",
-                        onValueChange = {},
-                        colors = colors(),
-                        modifier = Modifier
+                        "",
+                        {},
+                        Modifier
                             .padding(top = 54.dp)
                             .fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
+                            focusedLabelColor = ThemeExtra.colors.mainTextColor,
+                            focusedIndicatorColor = Color.Transparent
+                        ),
                         placeholder = {
-
                             Row(horizontalArrangement = Arrangement.Center) {
-
                                 Text(
                                     stringResource(R.string.user_name),
                                     Modifier.padding(end = 8.dp),
-                                    color = ThemeExtra.colors.secondaryTextColor,
-                                    fontSize = 23.sp,
+                                    ThemeExtra.colors.secondaryTextColor,
+                                    23.sp,
                                     lineHeight = 32.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-
                                 Icon(
-                                    painterResource(id = R.drawable.ic_edit),
+                                    painterResource(R.drawable.ic_edit),
                                     "edit",
                                     Modifier.padding(top = 4.dp),
-                                    tint = ThemeExtra.colors.grayIcon
+                                    ThemeExtra.colors.grayIcon
                                 )
-
                             }
-
                         },
                         singleLine = true
                     )
-
                     Row {
-
-                        ProfileImageContent(createProfileCallback = callback)
-
-                        Spacer(modifier = Modifier.width(14.dp))
+                        ProfileImageContent(callback)
+                        Spacer(Modifier.width(14.dp))
                         Column {
-
                             ProfileStatContent()
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
+                            Spacer(Modifier.height(14.dp))
                             HiddenPhotoContent()
                         }
                     }
-
                     Text(
-                        text = stringResource(R.string.about_me),
+                        stringResource(R.string.about_me),
                         Modifier.padding(top = 20.dp),
-                        fontSize = 17.sp,
-                        color = Color.Black,
+                        Color.Black,
+                        17.sp,
                         fontWeight = FontWeight.Bold
                     )
-
                     TextField(
                         "",
                         { },
@@ -188,27 +169,14 @@ fun CreateProfile(
                 }
             }
         }
-
         GradientButton(
-            modifier = Modifier
+            callback::onNext,
+            Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
-            onClick = { /*TODO*/ },
-            text = stringResource(R.string.next_button),
-            enabled = true
+            stringResource(R.string.next_button),
+            true
         )
     }
-
 }
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun colors() = TextFieldDefaults.textFieldColors(
-    containerColor = Color.Transparent,
-    unfocusedIndicatorColor = Color.Transparent,
-    unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-    focusedLabelColor = ThemeExtra.colors.mainTextColor,
-    focusedIndicatorColor = Color.Transparent,
-)

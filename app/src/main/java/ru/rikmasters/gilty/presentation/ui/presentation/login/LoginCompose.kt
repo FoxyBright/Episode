@@ -37,20 +37,14 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 fun LoginPreview() {
     GiltyTheme {
-        LoginContent(
-            Modifier,
-            object : LoginCallback {
-                override fun onNext() {}
-                override fun googleLogin() {}
-                override fun onOps() {}
-            })
+        LoginContent(Modifier)
     }
 }
 
 interface LoginCallback {
-    fun onNext()
-    fun googleLogin()
-    fun onOps()
+    fun onNext() {}
+    fun googleLogin() {}
+//    fun onOps(){}
 }
 
 @Composable
@@ -58,31 +52,30 @@ fun LoginContent(
     modifier: Modifier = Modifier,
     loginCallback: LoginCallback? = null
 ) {
-
     Content(modifier) {
         Image(
             painterResource(R.drawable.ic_logo),
-            "Logo",
+            stringResource(R.string.logo),
             Modifier.padding(top = 132.dp)
         )
-
-        var phone by remember { mutableStateOf("+7") }
+        var phone by remember { mutableStateOf("") }
+        val region by remember { mutableStateOf("+7") }
         PhoneTextField(
             phone,
+            region,
             Modifier
                 .fillMaxWidth()
-                .padding(top = 80.dp)
+                .padding(top = 80.dp), { phone = it }
         ) { phone = it }
-
         Button(
             { loginCallback?.onNext() },
             Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp),
-            shape = MaterialTheme.shapes.large,
-            enabled = true,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
+            true,
+            MaterialTheme.shapes.large,
+            ButtonDefaults.buttonColors(
+                MaterialTheme.colorScheme.primary,
                 disabledContainerColor = ThemeExtra.colors.notActive
             ),
             contentPadding = PaddingValues(vertical = 18.dp)
@@ -92,29 +85,24 @@ fun LoginContent(
                 style = ThemeExtra.typography.button
             )
         }
-
         Text(
-            text = "или",
+            stringResource(R.string.or),
             Modifier.padding(top = 20.dp),
             style = MaterialTheme.typography.labelSmall,
             color = ThemeExtra.colors.secondaryTextColor
         )
-
         Button(
-            onClick = { loginCallback?.googleLogin() },
+            { loginCallback?.googleLogin() },
             Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
-            )
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = "",
+                painterResource(R.drawable.ic_google),
+                stringResource(R.string.google_login),
                 Modifier.padding(end = 8.dp)
             )
-
             Text(
-                text = stringResource(R.string.google_login),
+                stringResource(R.string.google_login),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = ThemeExtra.colors.transparentBtnTextColor
@@ -143,9 +131,10 @@ fun Content(
 @Composable
 @ReadOnlyComposable
 private fun createOpsAnnotatedString() = buildAnnotatedString {
-    append(stringResource(id = R.string.ops_agree))
-
+    append(stringResource(R.string.ops_agree))
     append(' ')
-
-    pushStringAnnotation("privacy_police", "privacy_police")
+    pushStringAnnotation(
+        stringResource(R.string.privacy_police),
+        stringResource(R.string.privacy_police)
+    )
 }

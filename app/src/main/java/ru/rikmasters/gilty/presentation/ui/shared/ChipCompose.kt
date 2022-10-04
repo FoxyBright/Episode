@@ -31,7 +31,6 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 private fun ChipsPreview() {
     GiltyTheme() {
         val list = remember { mutableStateListOf(true, false, false) }
-
         LazyRow(Modifier.fillMaxWidth()) {
             itemsIndexed(list) { i, it ->
                 GiltyChip(

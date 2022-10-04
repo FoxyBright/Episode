@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.login
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -25,16 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
-
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview
 @Composable
 private fun DigitCodePreview() {
     GiltyTheme {
-
         DigitCode(
-            Modifier.padding(32.dp),
-            4,
-        ) { Log.d("no_tag", "Code: $it") }
+            Modifier.padding(32.dp), 4
+        ) {}
     }
 }
 
@@ -44,18 +40,14 @@ fun DigitCode(
     length: Int,
     onCodeComplete: (String) -> Unit
 ) {
-
     var code by remember { mutableStateOf("") }
-
     val requesters = remember {
         Array(length) { FocusRequester() }
     }
-
     val onChange = { i: Int, char: String ->
         if (char.length == length) {
             code = char
         } else if (char.length < 2) {
-
             if (char == "") {
                 code = code.substring(0, code.lastIndex)
                 if (i - 1 >= 0)
@@ -66,11 +58,9 @@ fun DigitCode(
                     requesters[i + 1].requestFocus()
             }
         }
-
         if (code.length == length)
             onCodeComplete(code)
     }
-
     Row(
         modifier
             .fillMaxWidth(),
@@ -101,7 +91,7 @@ private fun Digit(
                 RoundedCornerShape(14.dp)
             )
             .focusRequester(requester)
-            .padding(vertical = 11.dp, horizontal = 20.dp),
+            .padding(20.dp, 11.dp),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
         ),

@@ -10,10 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -31,51 +27,60 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 private fun PhoneTextFieldPreview() {
     GiltyTheme {
-
-        var value by remember { mutableStateOf("") }
-
         PhoneTextField(
-            value,
+            "9105152312",
+            "+7",
             Modifier.padding(32.dp)
-        ) { value = it.trim() }
+        )
     }
 }
 
-private const val phoneMask = "### ###-##-##"
+private var regionMask = "+7"
+private val phoneMask = "$regionMask ### ###-##-##"
 private val phoneMaxLength = phoneMask.count { it == '#' }
 private val transformation = visualTransformationOf(phoneMask)
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneTextField(
     value: String,
+    region: String,
     modifier: Modifier = Modifier,
-    onValueChanged: (String) -> Unit
+    onClear: ((String) -> Unit)? = null,
+    onValueChanged: ((String) -> Unit)? = null
 ) {
+    regionMask = region
     TextField(
         value,
-        { if (it.length <= phoneMaxLength) onValueChanged(it) },
+        {
+            if (it.length <= phoneMaxLength)
+                if (onValueChanged != null)
+                    onValueChanged(it)
+        },
         modifier,
         shape = MaterialTheme.shapes.large,
-        colors = colors(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = ThemeExtra.colors.cardBackground,
+            unfocusedIndicatorColor = Color.Transparent,
+            unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
+            focusedLabelColor = ThemeExtra.colors.mainTextColor,
+            focusedIndicatorColor = Color.Transparent
+        ),
         label = {
             Text(
                 stringResource(R.string.phone_number),
                 color = ThemeExtra.colors.secondaryTextColor
             )
         },
-
         trailingIcon = {
-            IconButton(onClick = {}) {
+            IconButton({ if (onClear != null) onClear("") }) {
                 if (value.isNotEmpty()) {
                     Icon(
-                        painterResource(id = R.drawable.ic_close),
-                        "clear",
+                        painterResource(R.drawable.ic_close),
+                        stringResource(R.string.clear),
                         tint = ThemeExtra.colors.grayIcon
                     )
                 }
-
             }
         },
         singleLine = true,
@@ -85,13 +90,3 @@ fun PhoneTextField(
         visualTransformation = transformation
     )
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun colors() = TextFieldDefaults.textFieldColors(
-    containerColor = ThemeExtra.colors.cardBackground,
-    unfocusedIndicatorColor = Color.Transparent,
-    unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-    focusedLabelColor = ThemeExtra.colors.mainTextColor,
-    focusedIndicatorColor = Color.Transparent
-)

@@ -10,7 +10,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-
 fun Modifier.swipeableCard(
     state: SwipeableCardState,
     onSwiped: (Direction) -> Unit,
@@ -19,30 +18,15 @@ fun Modifier.swipeableCard(
 ) = pointerInput(Unit) {
     coroutineScope {
         detectDragGestures(
-            onDragCancel = {
-                launch {
-                    state.reset()
-                    onSwipeCancel()
-                }
-            },
-            onDrag = { change, dragAmount ->
-                launch {
-                    val original = state.offset.targetValue
-                    val summed = original + dragAmount
-                    val newValue = Offset(
-                        x = summed.x.coerceIn(-state.maxWidth, state.maxWidth),
-                        y = summed.y.coerceIn(-state.maxHeight, state.maxHeight)
-                    )
-                    if (change.positionChange() != Offset.Zero) change.consume()
-                    state.drag(newValue.x, newValue.y)
-                }
-            },
-            onDragEnd = {
+            {},
+            {
                 launch {
                     val coercedOffset = state.offset.targetValue
-                        .coerceIn(blockedDirections,
-                            maxHeight = state.maxHeight,
-                            maxWidth = state.maxWidth)
+                        .coerceIn(
+                            blockedDirections,
+                            state.maxHeight,
+                            state.maxWidth
+                        )
 
                     if (hasNotTravelledEnough(state, coercedOffset)) {
                         state.reset()
@@ -70,6 +54,24 @@ fun Modifier.swipeableCard(
                         }
                     }
                 }
+            },
+            {
+                launch {
+                    state.reset()
+                    onSwipeCancel()
+                }
+            },
+            { change, dragAmount ->
+                launch {
+                    val original = state.offset.targetValue
+                    val summed = original + dragAmount
+                    val newValue = Offset(
+                        summed.x.coerceIn(-state.maxWidth, state.maxWidth),
+                        summed.y.coerceIn(-state.maxHeight, state.maxHeight)
+                    )
+                    if (change.positionChange() != Offset.Zero) change.consume()
+                    state.drag(newValue.x, newValue.y)
+                }
             }
         )
     }
@@ -85,7 +87,7 @@ private fun Offset.coerceIn(
     maxWidth: Float,
 ): Offset {
     return copy(
-        x = x.coerceIn(
+        x.coerceIn(
             if (blockedDirections.contains(Direction.Left)) {
                 0f
             } else {
@@ -97,11 +99,12 @@ private fun Offset.coerceIn(
                 maxWidth
             }
         ),
-        y = y.coerceIn(if (blockedDirections.contains(Direction.Up)) {
-            0f
-        } else {
-            -maxHeight
-        },
+        y.coerceIn(
+            if (blockedDirections.contains(Direction.Up)) {
+                0f
+            } else {
+                -maxHeight
+            },
             if (blockedDirections.contains(Direction.Down)) {
                 0f
             } else {

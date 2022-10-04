@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.ui.presentation.core
+package ru.rikmasters.gilty.presentation.ui.shared
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -73,45 +73,7 @@ fun <T> ListItemPicker(
 
 
     Layout(
-        modifier = modifier
-            .draggable(
-                orientation = Orientation.Vertical,
-                state = rememberDraggableState { deltaY ->
-                    coroutineScope.launch {
-                        animatedOffset.snapTo(animatedOffset.value + deltaY)
-                    }
-                },
-                onDragStopped = { velocity ->
-                    coroutineScope.launch {
-                        val endValue = animatedOffset.fling(
-                            initialVelocity = velocity,
-                            animationSpec = exponentialDecay(frictionMultiplier = 20f),
-                            adjustTarget = { target ->
-                                val coercedTarget = target % halfNumbersColumnHeightPx
-                                val coercedAnchors =
-                                    listOf(
-                                        -halfNumbersColumnHeightPx,
-                                        0f,
-                                        halfNumbersColumnHeightPx
-                                    )
-                                val coercedPoint =
-                                    coercedAnchors.minByOrNull { abs(it - coercedTarget) }!!
-                                val base =
-                                    halfNumbersColumnHeightPx * (target / halfNumbersColumnHeightPx).toInt()
-                                coercedPoint + base
-                            }
-                        ).endState.value
-
-                        val result = list.elementAt(
-                            getItemIndexForOffset(list, value, endValue, halfNumbersColumnHeightPx)
-                        )
-                        onValueChange(result)
-                        animatedOffset.snapTo(0f)
-                    }
-                }
-            )
-            .padding(vertical = numbersColumnHeight / 3 + verticalMargin * 2),
-        content = {
+        {
             Box(
                 Modifier
                     .width(dividersWidth)
@@ -167,7 +129,45 @@ fun <T> ListItemPicker(
                     .height(2.dp)
                     .background(color = dividersColor)
             )
-        }
+        },
+        modifier
+            .draggable(
+                rememberDraggableState { deltaY ->
+                    coroutineScope.launch {
+                        animatedOffset.snapTo(animatedOffset.value + deltaY)
+                    }
+                },
+                Orientation.Vertical,
+                onDragStopped = { velocity ->
+                    coroutineScope.launch {
+                        val endValue = animatedOffset.fling(
+                            initialVelocity = velocity,
+                            animationSpec = exponentialDecay(frictionMultiplier = 20f),
+                            adjustTarget = { target ->
+                                val coercedTarget = target % halfNumbersColumnHeightPx
+                                val coercedAnchors =
+                                    listOf(
+                                        -halfNumbersColumnHeightPx,
+                                        0f,
+                                        halfNumbersColumnHeightPx
+                                    )
+                                val coercedPoint =
+                                    coercedAnchors.minByOrNull { abs(it - coercedTarget) }!!
+                                val base =
+                                    halfNumbersColumnHeightPx * (target / halfNumbersColumnHeightPx).toInt()
+                                coercedPoint + base
+                            }
+                        ).endState.value
+
+                        val result = list.elementAt(
+                            getItemIndexForOffset(list, value, endValue, halfNumbersColumnHeightPx)
+                        )
+                        onValueChange(result)
+                        animatedOffset.snapTo(0f)
+                    }
+                }
+            )
+            .padding(vertical = numbersColumnHeight / 3 + verticalMargin * 2)
     ) { measurables, constraints ->
         // Don't constrain child views further, measure them with given constraints
         // List of measured children
@@ -207,12 +207,12 @@ fun <T> ListItemPicker(
 @Composable
 private fun Label(text: String, modifier: Modifier) {
     Text(
-        modifier = modifier.pointerInput(Unit) {
+        text,
+        modifier.pointerInput(Unit) {
             detectTapGestures(onLongPress = {
                 // FIXME: Empty to disable text selection
             })
         },
-        text = text,
         textAlign = TextAlign.Center,
     )
 }
@@ -227,7 +227,7 @@ private suspend fun Animatable<Float, AnimationVector1D>.fling(
     val adjustedTarget = adjustTarget?.invoke(targetValue)
     return if (adjustedTarget != null) {
         animateTo(
-            targetValue = adjustedTarget,
+            adjustedTarget,
             initialVelocity = initialVelocity,
             block = block
         )

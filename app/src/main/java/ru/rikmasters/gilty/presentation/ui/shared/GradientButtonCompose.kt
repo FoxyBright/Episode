@@ -33,11 +33,11 @@ private fun GradientButtonPreview() {
 fun GradientButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    text: String,
+    enabled: Boolean,
     gradientColors: List<Color> = listOf(ThemeExtra.colors.gradientColor1, ThemeExtra.colors.gradientColor2),
     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),
-    text: String,
-    enabled: Boolean,
 ) {
 
     Button(

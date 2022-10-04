@@ -1,19 +1,16 @@
-package ru.rikmasters.gilty.presentation.ui.presentation.core
+package ru.rikmasters.gilty.presentation.ui.shared
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-fun NumberPickerPreview() {
-
+private fun NumberPickerPreview() {
     GiltyTheme {
         var pickerValue by remember { mutableStateOf(18) }
         NumberPicker(
@@ -38,7 +35,6 @@ fun NumberPicker(
     dividerColor: Color = ThemeExtra.colors.grayIcon,
     range: Iterable<Int>
 ) {
-
     ListItemPicker(
         modifier = modifier,
         label = label,
