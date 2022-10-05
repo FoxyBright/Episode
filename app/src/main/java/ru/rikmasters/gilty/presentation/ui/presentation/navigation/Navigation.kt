@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModelList
+import ru.rikmasters.gilty.presentation.ui.presentation.login.CategoriesListSeparator
 import ru.rikmasters.gilty.presentation.ui.presentation.login.CodeContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.LoginCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.LoginContent
@@ -38,7 +39,7 @@ fun Navigation() {
         composable("select") {
             SelectCategories(
                 Modifier,
-                SelectCategoriesState(DemoCategoryModelList),
+                SelectCategoriesState(CategoriesListSeparator(DemoCategoryModelList)),
                 object : NavigationInterface {
                     override fun onBack() {
                         navController.navigate("personalInformation")

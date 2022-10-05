@@ -25,7 +25,7 @@ val DemoCategoryModel = CategoryModel(
 val DemoCategoryModelList: List<CategoryModel>
     get() {
         val categories = arrayListOf<CategoryModel>()
-        repeat(20) {
+        repeat(21) {
             val rand = Random.nextInt(1, 4)
             categories.add(
                 CategoryModel(

@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.presentation.ui.presentation.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -35,13 +36,13 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModelList
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
-import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 data class SelectCategoriesState(
-    val categoryList: List<CategoryModel>
+    val categoryList: List<List<CategoryModel>>
 )
 
 @Composable
@@ -51,7 +52,6 @@ fun SelectCategories(
     state: SelectCategoriesState,
     callback: NavigationInterface? = null
 ) {
-    val list = listSeparator(state.categoryList)
     Box(
         modifier
             .fillMaxSize()
@@ -66,14 +66,67 @@ fun SelectCategories(
                 stringResource(R.string.interested_you),
                 stringResource(R.string.interested_you_details)
             ) { callback?.onBack() }
-            Column(
+            LazyHorizontalGrid(
+                GridCells.Fixed(3),
                 Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .padding(vertical = 20.dp)
+                    .height(550.dp)
+                    .padding(top = 10.dp)
             ) {
-                CategoryRow(list[1])
-                CategoryRow(list[2])
-                CategoryRow(list[0])
+                items(state.categoryList.size) {
+                    Row {
+                        for (item in state.categoryList[it]) {
+                            val iconState = remember { mutableStateOf(false) }
+                            Box(
+                                Modifier
+                                    .width(150.dp)
+                                    .height(170.dp),
+                                if (state.categoryList[it].indexOf(item) % 2 == 0) Alignment.TopCenter
+                                else Alignment.BottomCenter
+                            ) {
+                                Box {
+                                    Box(
+                                        Modifier
+                                            .width(140.dp)
+                                            .height(140.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (iconState.value) Color(item.color.toColorInt())
+                                                else ThemeExtra.colors.grayIcon
+                                            )
+                                            .align(Alignment.BottomCenter)
+                                            .clickable { iconState.value = !iconState.value },
+                                        Alignment.Center
+                                    ) {
+                                        Text(
+                                            item.name,
+                                            Modifier,
+                                            ThemeExtra.colors.white,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center,
+                                            style = ThemeExtra.typography.MediumText
+                                        )
+                                    }
+                                    Box(
+                                        Modifier
+                                            .width(50.dp)
+                                            .height(50.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White)
+                                            .align(Alignment.BottomStart),
+                                        Alignment.Center
+                                    ) {
+                                        AsyncImage(
+                                            item.emoji.path,
+                                            stringResource(R.string.next_button),
+                                            Modifier.size(22.dp),
+                                            painterResource(R.drawable.cinema)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         GradientButton(
@@ -88,82 +141,13 @@ fun SelectCategories(
 }
 
 @Composable
-private fun CategoryRow(items: List<CategoryModel>) {
-    Row {
-        for (item in items) {
-            val iconState = remember { mutableStateOf(false) }
-            val stateColor = if (iconState.value) Color(item.color.toColorInt())
-            else ThemeExtra.colors.grayIcon
-            val position = if (items.indexOf(item) % 2 == 0) Alignment.TopCenter
-            else Alignment.BottomCenter
-            Box(
-                Modifier
-                    .width(150.dp)
-                    .height(170.dp), position
-            ) {
-                Box {
-                    Box(
-                        Modifier
-                            .width(140.dp)
-                            .height(140.dp)
-                            .clip(CircleShape)
-                            .background(stateColor)
-                            .align(Alignment.BottomCenter)
-                            .clickable { iconState.value = !iconState.value },
-                        Alignment.Center
-                    ) {
-                        Text(
-                            item.name,
-                            Modifier,
-                            ThemeExtra.colors.white,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            style = ThemeExtra.typography.MediumText
-                        )
-                    }
-                    Box(
-                        Modifier
-                            .width(50.dp)
-                            .height(50.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .align(Alignment.BottomStart),
-                        Alignment.Center
-                    ) {
-                        AsyncImage(
-                            item.emoji.path,
-                            stringResource(R.string.next_button),
-                            Modifier.size(22.dp),
-                            painterResource(R.drawable.cinema)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private fun listSeparator(categories: List<CategoryModel>): List<List<CategoryModel>> {
-    // Сепаратор разделяет список категорий на три строки
-    val first = arrayListOf<CategoryModel>()
-    val second = arrayListOf<CategoryModel>()
-    val third = arrayListOf<CategoryModel>()
-    for (category in categories) when {
-        categories.indexOf(category) % 3 == 0 -> first.add(category)
-        categories.indexOf(category) % 2 == 0 -> second.add(category)
-        else -> third.add(category)
-    }
-    return listOf(first, second, third)
-}
-
-@Composable
 @ExperimentalMaterial3Api
 @Preview(showBackground = true)
 private fun SelectCategoriesPreview() {
     GiltyTheme {
         SelectCategories(
             Modifier,
-            SelectCategoriesState(DemoCategoryModelList)
+            SelectCategoriesState(CategoriesListSeparator(DemoCategoryModelList))
         )
     }
 }
