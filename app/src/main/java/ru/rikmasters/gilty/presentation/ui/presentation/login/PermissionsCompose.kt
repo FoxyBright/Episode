@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.presentation.ui.presentation.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +15,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.CheckBox
@@ -41,6 +40,8 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 @ExperimentalMaterial3Api
 fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null) {
+    val geopositionState = remember { mutableStateOf(true) }
+    val notificationState = remember { mutableStateOf(false) }
     Box(
         modifier
             .fillMaxSize()
@@ -86,7 +87,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(true)
+                        CheckBox(geopositionState.value) { geopositionState.value = it }
                     }
                     Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
                     Row(
@@ -99,7 +100,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(false)
+                        CheckBox(notificationState.value) { notificationState.value = it }
                     }
                 }
             }

@@ -5,6 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +28,16 @@ fun LoginActionBar(
     onBack: (() -> Unit)? = null
 ) {
     Column(modifier.fillMaxWidth()) {
-        Image(
-            painterResource(R.drawable.ic_back),
-            stringResource(R.string.button_back),
-            Modifier
-                .padding(top = 32.dp)
-                .clickable { if (onBack != null) onBack() })
+        IconButton({ if (onBack != null) onBack() }, Modifier.padding(top = 16.dp)) {
+            Icon(
+                painterResource(
+                    R.drawable.ic_back
+                ),
+                stringResource(R.string.button_back),
+                Modifier.padding(end = 16.dp).size(24.dp),
+                ThemeExtra.colors.mainTextColor
+            )
+        }
         Text(
             title,
             Modifier

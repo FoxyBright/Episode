@@ -21,7 +21,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCal
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "login") {
+    NavHost(navController, "personalInformation") {
 
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {

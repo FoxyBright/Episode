@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
@@ -31,7 +32,7 @@ private fun CheckBoxPreview(){
 fun CheckBox(
     checked: Boolean = false,
     modifier: Modifier = Modifier,
-    onCheckedChange: (() -> Unit)? = null
+    onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     var check by remember { mutableStateOf(checked) }
     var imageResource by remember { mutableStateOf(0) }
@@ -40,15 +41,17 @@ fun CheckBox(
         imageResource = R.drawable.enabled_check_box
         click = {
             check = !check
+            if (onCheckedChange != null) onCheckedChange(check)
         }
     } else {
         imageResource = R.drawable.disabled_check_box
         click = {
             check = !check
+            if (onCheckedChange != null) onCheckedChange(check)
         }
     }
     Image(
-        painterResource(imageResource), "check image",
+        painterResource(imageResource), stringResource(R.string.check_image),
         modifier
             .size(24.dp)
             .clip(CircleShape)

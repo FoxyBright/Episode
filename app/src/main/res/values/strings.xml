@@ -73,5 +73,6 @@
     <string name="geolocation_icon">Иконка геолокации</string>
     <string name="map">Карта</string>
     <string name="clear">Очистить</string>
+    <string name="check_image">Иконка чекбокса</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,9 +18,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.core.GiltyChip
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetCompose
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetComposeCallback
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
@@ -43,6 +49,8 @@ fun PersonalInfoPreview() {
 @Composable
 @ExperimentalMaterial3Api
 fun PersonalInfoContent(callback: NavigationInterface? = null) {
+    val bottomSheetState = remember { mutableStateOf(false) }
+    val ageTextFieldValue = remember { mutableStateOf("") }
     Box(
         Modifier
             .fillMaxSize()
@@ -63,20 +71,20 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 style = ThemeExtra.typography.H3
             )
             TextField(
-                "",
-                { },
+                ageTextFieldValue.value, {},
                 Modifier
                     .padding(top = 12.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { bottomSheetState.value = !bottomSheetState.value },
                 shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = ThemeExtra.colors.cardBackground,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-                    focusedLabelColor = ThemeExtra.colors.mainTextColor,
-                    focusedIndicatorColor = Color.Transparent
+                    disabledIndicatorColor = Color.Transparent,
+                    disabledLabelColor = ThemeExtra.colors.secondaryTextColor,
+                    disabledTextColor = ThemeExtra.colors.mainTextColor
                 ),
                 singleLine = true,
+                enabled = false
             )
             Text(
                 stringResource(R.string.sex),
@@ -110,7 +118,6 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                     }
                 }
             }
-
         }
         GradientButton(
             { callback?.onNext() },
@@ -120,6 +127,21 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
             true
+        )
+        AgeBottomSheetCompose(
+            Modifier
+                .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                .align(Alignment.BottomCenter),
+            bottomSheetState.value,
+            object : AgeBottomSheetComposeCallback {
+                override fun onSaveClick(value: Int) {
+                    bottomSheetState.value = !bottomSheetState.value
+                    ageTextFieldValue.value = value.toString()
+                }
+                override fun onDownDrag() {
+                    bottomSheetState.value = false
+                }
+            }
         )
     }
 }

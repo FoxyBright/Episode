@@ -26,8 +26,6 @@ data class ExtraColors(
     ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
 val LightExtraColors = ExtraColors(
     myExtraColor = Colors.Purple40,
-    primary = Colors.Primary,
-    white = Color.White,
     elementsBack = Color.White,
     mainTextColor = Colors.PrimaryTextDay,
     secondaryTextColor = Colors.SecondaryTextDay,
@@ -46,8 +44,6 @@ val LightExtraColors = ExtraColors(
     ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
 val DarkExtraColors = ExtraColors(
     myExtraColor = Colors.Purple80,
-    primary = Colors.Primary,
-    white = Color.White,
     elementsBack = Colors.PrimaryTextDay,
     mainTextColor = Colors.PrimaryTextNight,
     secondaryTextColor = Colors.SecondaryTextNight,
@@ -57,6 +53,6 @@ val DarkExtraColors = ExtraColors(
     transparentBtnTextColor = Color.White,
     gradientColor1 = Colors.Gradient2,
     grayButton = Colors.Gray,
-    divider = Colors.Divider
+    divider = Colors.Gray2
     // Добавить в схему цвета из файла Colors
 )
