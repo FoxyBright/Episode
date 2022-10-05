@@ -33,7 +33,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInt
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetCompose
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetComposeCallback
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
-import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -60,7 +60,7 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            LoginActionBar(
+            ActionBar(
                 stringResource(R.string.personal_info_title)
             )
             { callback?.onBack() }
@@ -125,8 +125,7 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button),
-            true
+            stringResource(R.string.next_button)
         )
         AgeBottomSheetCompose(
             Modifier

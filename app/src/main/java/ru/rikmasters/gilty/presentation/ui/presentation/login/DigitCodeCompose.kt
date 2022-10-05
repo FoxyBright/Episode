@@ -28,9 +28,10 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 @Composable
 private fun DigitCodePreview() {
     GiltyTheme {
+        val code by remember { mutableStateOf("123") }
         DigitCode(
-            Modifier.padding(32.dp), 4
-        ) {}
+            Modifier.padding(32.dp), 4, code
+        )
     }
 }
 
@@ -38,9 +39,10 @@ private fun DigitCodePreview() {
 fun DigitCode(
     modifier: Modifier = Modifier,
     length: Int,
-    onCodeComplete: (String) -> Unit
+    enteredCode: String,
+    onCodeComplete: ((String) -> Unit)? = null
 ) {
-    var code by remember { mutableStateOf("") }
+    var code by remember { mutableStateOf(enteredCode) }
     val requesters = remember {
         Array(length) { FocusRequester() }
     }
@@ -58,7 +60,7 @@ fun DigitCode(
                     requesters[i + 1].requestFocus()
             }
         }
-        if (code.length == length)
+        if (code.length == length && onCodeComplete != null)
             onCodeComplete(code)
     }
     Row(
@@ -91,7 +93,7 @@ private fun Digit(
                 RoundedCornerShape(14.dp)
             )
             .focusRequester(requester)
-            .padding(20.dp, 11.dp),
+            .padding(20.dp, 12.dp),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
         ),

@@ -13,12 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,16 +33,17 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.CheckBox
+import ru.rikmasters.gilty.presentation.ui.shared.Divider
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
-import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Composable
 @ExperimentalMaterial3Api
 fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null) {
-    val geopositionState = remember { mutableStateOf(true) }
-    val notificationState = remember { mutableStateOf(false) }
+    var geopositionState by remember { mutableStateOf(true) }
+    var notificationState by remember { mutableStateOf(false) }
     Box(
         modifier
             .fillMaxSize()
@@ -52,7 +54,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            LoginActionBar(
+            ActionBar(
                 stringResource(R.string.find_more),
                 stringResource(R.string.find_more_details),
             ) { callback?.onBack() }
@@ -87,9 +89,9 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(geopositionState.value) { geopositionState.value = it }
+                        CheckBox(geopositionState){ geopositionState = it }
                     }
-                    Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
+                    Divider(Modifier.padding(start = 16.dp))
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -100,7 +102,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(notificationState.value) { notificationState.value = it }
+                        CheckBox(notificationState){ notificationState = it }
                     }
                 }
             }
@@ -111,8 +113,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.finish),
-            true
+            stringResource(R.string.finish)
         )
     }
 }
@@ -141,7 +142,7 @@ fun PermissionConfirmationWindow() {
                 textAlign = TextAlign.Center,
                 style = ThemeExtra.typography.H3
             )
-            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
+            Divider()
             Text(
                 stringResource(R.string.when_using),
                 Modifier.padding(vertical = 20.dp),
@@ -149,7 +150,7 @@ fun PermissionConfirmationWindow() {
                 fontWeight = FontWeight.Bold,
                 style = ThemeExtra.typography.MediumText
             )
-            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
+            Divider()
             Text(
                 stringResource(R.string.once),
                 Modifier.padding(vertical = 20.dp),
@@ -157,7 +158,7 @@ fun PermissionConfirmationWindow() {
                 fontWeight = FontWeight.Bold,
                 style = ThemeExtra.typography.MediumText
             )
-            Divider(Modifier.padding(start = 20.dp), 1.dp, ThemeExtra.colors.divider)
+            Divider()
             Text(
                 stringResource(R.string.prohibit),
                 Modifier.padding(vertical = 20.dp),
@@ -171,14 +172,17 @@ fun PermissionConfirmationWindow() {
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 fun PermissionConfirmationWindowPreview() {
-    PermissionConfirmationWindow()
+    GiltyTheme{
+        PermissionConfirmationWindow()
+    }
+
 }
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 fun PermissionsContentPreview() {
     GiltyTheme {
         PermissionsContent(Modifier)

@@ -68,11 +68,12 @@
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
-    <string name="button_back">Кнопка назад</string>
-    <string name="logo">Логотип</string>
+    <string name="action_bar_button_back">Кнопка назад</string>
+    <string name="gilty_logo">Логотип Gilty</string>
     <string name="geolocation_icon">Иконка геолокации</string>
     <string name="map">Карта</string>
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
+    <string name="edit">Изменить</string>
 
 </resources>

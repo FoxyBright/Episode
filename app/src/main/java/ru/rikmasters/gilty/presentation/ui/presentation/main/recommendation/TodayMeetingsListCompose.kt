@@ -34,7 +34,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 import ru.rikmasters.gilty.utility.extentions.format
 
 
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 @Composable
 private fun MeetingCardPreview() {
 
@@ -43,7 +43,7 @@ private fun MeetingCardPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 @Composable
 private fun RecommendationComposePreview() {
 

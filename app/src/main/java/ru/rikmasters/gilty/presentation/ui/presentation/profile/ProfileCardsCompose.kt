@@ -2,9 +2,23 @@ package ru.rikmasters.gilty.presentation.ui.presentation.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,9 +48,10 @@ fun HiddenPhotoContent() {
             .wrapContentWidth()
             .clip(MaterialTheme.shapes.large),
         shape = MaterialTheme.shapes.large,
-        color = Color.White) {
+        color = Color.White
+    ) {
 
-        Column() {
+        Column{
 
             Box(
                 Modifier
@@ -65,7 +81,8 @@ fun HiddenPhotoContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileImageContent(
-    createProfileCallback: CreateProfileCallback ) {
+    createProfileCallback: CreateProfileCallback
+) {
 
     Surface(
         onClick = {},
@@ -74,7 +91,8 @@ fun ProfileImageContent(
             .wrapContentWidth()
             .clip(MaterialTheme.shapes.large),
         shape = MaterialTheme.shapes.large,
-        color = Color.White) {
+        color = Color.White
+    ) {
 
         Box(contentAlignment = Alignment.BottomCenter) {
             ImageCardBottom(text = stringResource(id = R.string.user_image))
@@ -84,7 +102,7 @@ fun ProfileImageContent(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun ProfileStatContent() {
 
@@ -96,64 +114,90 @@ fun ProfileStatContent() {
             .wrapContentWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        )) {
+        )
+    ) {
 
         val gradientColor = Brush.horizontalGradient(
             0f to ThemeExtra.colors.gradientColor1,
-            1000f to ThemeExtra.colors.gradientColor2)
+            1000f to ThemeExtra.colors.gradientColor2
+        )
 
-        Column() {
+        Column{
 
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 8.dp)
-                    .wrapContentHeight()) {
-                
+                    .wrapContentHeight()
+            ) {
+
                 Text(
                     text = "4.9",
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
-                    style = TextStyle(brush = gradientColor))
+                    style = TextStyle(brush = gradientColor)
+                )
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_emoji),
-                    contentDescription = null, Modifier.padding(top = 14.dp))
+                    contentDescription = null, Modifier.padding(top = 14.dp)
+                )
             }
 
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp)) {
-                
+                    .padding(bottom = 8.dp)
+            ) {
+
                 Column(Modifier.weight(1f)) {
-                    Text(text = "0", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 12.sp)
-                    
-                    Text(text = stringResource(R.string.observers), fontSize = 8.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                    Text(
+                        text = "0",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 12.sp
+                    )
+
+                    Text(
+                        text = stringResource(R.string.observers),
+                        fontSize = 8.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
                 }
-                
+
                 Column(Modifier.weight(1f)) {
 
-                    Text(text = "0", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 12.sp)
+                    Text(
+                        text = "0",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 12.sp
+                    )
 
-                    Text(text = stringResource(R.string.observe), fontSize = 8.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                    Text(
+                        text = stringResource(R.string.observe),
+                        fontSize = 8.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
                 }
 
             }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ImageCardBottom(
     modifier: Modifier = Modifier,
-    text: String) {
+    text: String
+) {
 
     Row(
         modifier
             .padding(horizontal = 8.dp)
-            .padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            .padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
 
         Text(
             text = text,
@@ -161,7 +205,8 @@ private fun ImageCardBottom(
             fontSize = 12.sp,
             lineHeight = 13.sp,
             fontWeight = FontWeight.SemiBold,
-            color = ThemeExtra.colors.secondaryTextColor)
+            color = ThemeExtra.colors.secondaryTextColor
+        )
 
         Box(
             Modifier
@@ -181,19 +226,26 @@ private fun ImageCardBottom(
 
 @Preview
 @Composable
-fun ImageCardBottomPreview(){
-    ImageCardBottom(
-        Modifier, "ANY NEXT")
+fun ImageCardBottomPreview() {
+    GiltyTheme {
+        ImageCardBottom(
+            Modifier, "ANY NEXT"
+        )
+    }
 }
 
 @Preview
 @Composable
-fun ProfileStatContentPreview(){
-    ProfileStatContent()
+fun ProfileStatContentPreview() {
+    GiltyTheme {
+        ProfileStatContent()
+    }
 }
 
 @Preview
 @Composable
-fun HiddenPhotoContentPreview(){
-    HiddenPhotoContent()
+fun HiddenPhotoContentPreview() {
+    GiltyTheme {
+        HiddenPhotoContent()
+    }
 }

@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,11 +29,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
-import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.TextFieldColors
+import ru.rikmasters.gilty.presentation.ui.shared.TransparentTextFieldColors
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -78,7 +78,7 @@ fun CreateProfile(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            LoginActionBar(
+            ActionBar(
                 stringResource(R.string.create_profile_title)
             )
             { callback.onBack() }
@@ -102,26 +102,18 @@ fun CreateProfile(
                         Modifier
                             .padding(top = 54.dp)
                             .fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-                            focusedLabelColor = ThemeExtra.colors.mainTextColor,
-                            focusedIndicatorColor = Color.Transparent
-                        ),
+                        colors = TransparentTextFieldColors(),
                         placeholder = {
                             Row(horizontalArrangement = Arrangement.Center) {
                                 Text(
                                     stringResource(R.string.user_name),
                                     Modifier.padding(end = 8.dp),
                                     ThemeExtra.colors.secondaryTextColor,
-                                    23.sp,
-                                    lineHeight = 32.sp,
-                                    fontWeight = FontWeight.Bold
+                                    style = ThemeExtra.typography.ExtraHeader
                                 )
                                 Icon(
                                     painterResource(R.drawable.ic_edit),
-                                    "edit",
+                                    stringResource(R.string.edit),
                                     Modifier.padding(top = 4.dp),
                                     ThemeExtra.colors.grayIcon
                                 )
@@ -142,7 +134,6 @@ fun CreateProfile(
                         stringResource(R.string.about_me),
                         Modifier.padding(top = 20.dp),
                         Color.Black,
-                        17.sp,
                         fontWeight = FontWeight.Bold
                     )
                     TextField(
@@ -150,13 +141,7 @@ fun CreateProfile(
                         { },
                         Modifier.padding(top = 12.dp),
                         shape = MaterialTheme.shapes.large,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = ThemeExtra.colors.cardBackground,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-                            focusedLabelColor = ThemeExtra.colors.mainTextColor,
-                            focusedIndicatorColor = Color.Transparent
-                        ),
+                        colors = TextFieldColors(),
                         placeholder = {
                             Text(
                                 stringResource(R.string.about_me_placeholder),
@@ -180,3 +165,4 @@ fun CreateProfile(
         )
     }
 }
+

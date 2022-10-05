@@ -46,7 +46,7 @@ fun PhoneTextField(
     value: String,
     region: String,
     modifier: Modifier = Modifier,
-    onClear: ((String) -> Unit)? = null,
+    onClear: (() -> Unit)? = null,
     onValueChanged: ((String) -> Unit)? = null
 ) {
     regionMask = region
@@ -73,7 +73,7 @@ fun PhoneTextField(
             )
         },
         trailingIcon = {
-            IconButton({ if (onClear != null) onClear("") }) {
+            IconButton({ if (onClear != null) onClear() }) {
                 if (value.isNotEmpty()) {
                     Icon(
                         painterResource(R.drawable.ic_close),

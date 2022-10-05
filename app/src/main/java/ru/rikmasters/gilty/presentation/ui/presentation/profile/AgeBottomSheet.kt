@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.shared.DividerBold
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.NumberPicker
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
@@ -62,14 +62,12 @@ fun AgeBottomSheetCompose(
                 }
             }
     ) {
-        Divider(
+        DividerBold(
             Modifier
                 .width(40.dp)
                 .align(Alignment.TopCenter)
                 .padding(vertical = 10.dp)
-                .clip(CircleShape),
-            5.dp,
-            ThemeExtra.colors.divider
+                .clip(CircleShape)
         )
         var pickerValue by remember { mutableStateOf(18) }
         NumberPicker(

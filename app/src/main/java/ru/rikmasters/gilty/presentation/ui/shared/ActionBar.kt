@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.presentation.ui.shared
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,9 +19,9 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Composable
-fun LoginActionBar(
+fun ActionBar(
     title: String,
-    details: String = "",
+    details: String? = null,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null
 ) {
@@ -33,7 +31,7 @@ fun LoginActionBar(
                 painterResource(
                     R.drawable.ic_back
                 ),
-                stringResource(R.string.button_back),
+                stringResource(R.string.action_bar_button_back),
                 Modifier.padding(end = 16.dp).size(24.dp),
                 ThemeExtra.colors.mainTextColor
             )
@@ -46,22 +44,24 @@ fun LoginActionBar(
             style = MaterialTheme.typography.titleLarge,
             color = ThemeExtra.colors.mainTextColor
         )
-        Text(
-            details,
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = ThemeExtra.colors.secondaryTextColor
-        )
+        details?.let {
+            Text(
+                it,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                style = MaterialTheme.typography.labelSmall,
+                color = ThemeExtra.colors.secondaryTextColor
+            )
+        }
     }
 }
 
 @Composable
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 private fun LoginActionBarPreview() {
     GiltyTheme {
-        LoginActionBar(
+        ActionBar(
             "Заголовок",
             "Подробности просиходящего на экране",
             Modifier.padding(16.dp)

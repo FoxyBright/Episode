@@ -12,6 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -19,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
-import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
 @Preview
@@ -32,6 +35,7 @@ private fun CodePreview() {
 
 @Composable
 fun CodeContent(callback: NavigationInterface? = null) {
+    val enteredCode by remember { mutableStateOf("") }
     Surface(
         Modifier
             .fillMaxSize()
@@ -42,17 +46,15 @@ fun CodeContent(callback: NavigationInterface? = null) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            LoginActionBar(
+            ActionBar(
                 stringResource(R.string.confirm_number_title),
                 stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
             DigitCode(
                 Modifier
                     .padding(top = 32.dp)
-                    .padding(horizontal = 50.dp), 4
-            ) {
-                if (it.length == 4) callback?.onNext()
-            }
+                    .padding(horizontal = 50.dp), 4, enteredCode
+            ) { if (it.length == 4) callback?.onNext() }
         }
     }
 }

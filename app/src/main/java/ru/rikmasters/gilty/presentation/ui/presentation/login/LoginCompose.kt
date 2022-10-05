@@ -33,7 +33,7 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
     GiltyTheme {
@@ -55,7 +55,7 @@ fun LoginContent(
     Content(modifier) {
         Image(
             painterResource(R.drawable.ic_logo),
-            stringResource(R.string.logo),
+            stringResource(R.string.gilty_logo),
             Modifier.padding(top = 132.dp)
         )
         var phone by remember { mutableStateOf("") }
@@ -65,8 +65,9 @@ fun LoginContent(
             region,
             Modifier
                 .fillMaxWidth()
-                .padding(top = 80.dp), { phone = it }
-        ) { phone = it }
+                .padding(top = 80.dp),
+            onClear = { phone = "" },
+            onValueChanged = { phone = it })
         Button(
             { loginCallback?.onNext() },
             Modifier

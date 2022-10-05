@@ -34,7 +34,7 @@ fun GradientButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String,
-    enabled: Boolean,
+    enabled: Boolean = true,
     gradientColors: List<Color> = listOf(ThemeExtra.colors.gradientColor1, ThemeExtra.colors.gradientColor2),
     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),

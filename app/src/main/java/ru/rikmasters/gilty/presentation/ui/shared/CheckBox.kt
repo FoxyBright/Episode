@@ -19,12 +19,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview(showBackground = true)
 @Composable
-private fun CheckBoxPreview(){
-    Row{
-        CheckBox(true, Modifier.padding(10.dp))
-        CheckBox(false, Modifier.padding(10.dp))
+private fun CheckBoxPreviewEnabled() {
+    var checkBoxState by remember { mutableStateOf(true) }
+    CheckBox(checkBoxState, Modifier.padding(10.dp)){
+        checkBoxState = it
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CheckBoxPreview() {
+    var checkBoxState by remember { mutableStateOf(false) }
+    CheckBox(checkBoxState, Modifier.padding(10.dp)){
+        checkBoxState = it
     }
 }
 
@@ -32,29 +41,18 @@ private fun CheckBoxPreview(){
 fun CheckBox(
     checked: Boolean = false,
     modifier: Modifier = Modifier,
-    onCheckedChange: ((Boolean) -> Unit)? = null
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var check by remember { mutableStateOf(checked) }
-    var imageResource by remember { mutableStateOf(0) }
-    val click: () -> Unit
-    if (check) {
-        imageResource = R.drawable.enabled_check_box
-        click = {
-            check = !check
-            if (onCheckedChange != null) onCheckedChange(check)
-        }
+    val imageResource: Int = if (checked) {
+        R.drawable.enabled_check_box
     } else {
-        imageResource = R.drawable.disabled_check_box
-        click = {
-            check = !check
-            if (onCheckedChange != null) onCheckedChange(check)
-        }
+        R.drawable.disabled_check_box
     }
     Image(
         painterResource(imageResource), stringResource(R.string.check_image),
         modifier
             .size(24.dp)
             .clip(CircleShape)
-            .clickable { click() }
+            .clickable { onCheckedChange(!checked) }
     )
 }

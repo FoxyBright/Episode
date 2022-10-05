@@ -36,7 +36,8 @@ import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModelList
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
-import ru.rikmasters.gilty.presentation.ui.shared.LoginActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
+import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 data class SelectCategoriesState(
@@ -61,7 +62,7 @@ fun SelectCategories(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            LoginActionBar(
+            ActionBar(
                 stringResource(R.string.interested_you),
                 stringResource(R.string.interested_you_details)
             ) { callback?.onBack() }
@@ -81,8 +82,7 @@ fun SelectCategories(
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button),
-            true
+            stringResource(R.string.next_button)
         )
     }
 }
@@ -126,7 +126,7 @@ private fun CategoryRow(items: List<CategoryModel>) {
                             .width(50.dp)
                             .height(50.dp)
                             .clip(CircleShape)
-                            .background(ThemeExtra.colors.white)
+                            .background(Color.White)
                             .align(Alignment.BottomStart),
                         Alignment.Center
                     ) {
@@ -158,10 +158,12 @@ private fun listSeparator(categories: List<CategoryModel>): List<List<CategoryMo
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true, backgroundColor = 0xFFE8E8E8)
+@Preview(showBackground = true)
 private fun SelectCategoriesPreview() {
-    SelectCategories(
-        Modifier,
-        SelectCategoriesState(DemoCategoryModelList)
-    )
+    GiltyTheme {
+        SelectCategories(
+            Modifier,
+            SelectCategoriesState(DemoCategoryModelList)
+        )
+    }
 }
