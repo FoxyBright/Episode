@@ -8,10 +8,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.core.visualTransformationOf
+import ru.rikmasters.gilty.presentation.ui.shared.TextFieldColors
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -35,11 +37,6 @@ private fun PhoneTextFieldPreview() {
     }
 }
 
-private var regionMask = "+7"
-private val phoneMask = "$regionMask ### ###-##-##"
-private val phoneMaxLength = phoneMask.count { it == '#' }
-private val transformation = visualTransformationOf(phoneMask)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneTextField(
@@ -49,23 +46,17 @@ fun PhoneTextField(
     onClear: (() -> Unit)? = null,
     onValueChanged: ((String) -> Unit)? = null
 ) {
-    regionMask = region
+    val phoneMask = "$region ### ###-##-##"
+    val transformation by remember{ mutableStateOf(visualTransformationOf(phoneMask)) }
     TextField(
         value,
-        {
-            if (it.length <= phoneMaxLength)
-                if (onValueChanged != null)
-                    onValueChanged(it)
+        { text ->
+            if (text.length <= phoneMask.count { it == '#' } && onValueChanged != null)
+                onValueChanged(text)
         },
         modifier,
         shape = MaterialTheme.shapes.large,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = ThemeExtra.colors.cardBackground,
-            unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = ThemeExtra.colors.secondaryTextColor,
-            focusedLabelColor = ThemeExtra.colors.mainTextColor,
-            focusedIndicatorColor = Color.Transparent
-        ),
+        colors = TextFieldColors(),
         label = {
             Text(
                 stringResource(R.string.phone_number),

@@ -40,7 +40,7 @@ object Colors {
     val CardBackgroundDay = Color.White
     val PrimaryTextDay = Color(0xFF1C1B1F)
     val SecondaryTextDay = Color(0xFFAEAAAE)
-
+    val searchCardBackgroundDay = Color(0xFFF6F6F6)
 
     //Night mod colors
     val BackgroundNight = Color(0xFF1F1F1F)
@@ -48,6 +48,7 @@ object Colors {
     val CardBackgroundNight = Color(0xFF353535)
     val PrimaryTextNight = Color.White
     val SecondaryTextNight = Color(0xFFE6E1E5)
+    val searchCardBackgroundNight = Color(0x1FE3E3E3)
 
     // Добавить новые цвета
 }

@@ -10,6 +10,7 @@ data class ExtraColors(
     val notActive: Color = Color.Unspecified,
     val secondaryTextColor: Color = Color.Unspecified,
     val cardBackground: Color = Color.Unspecified,
+    val searchCardBackground: Color = Color.Unspecified,
     val grayIcon: Color = Color.Unspecified,
     val transparentBtnTextColor: Color = Color.Unspecified,
     val gradientColor1: Color = Color.Unspecified,
@@ -36,7 +37,9 @@ val LightExtraColors = ExtraColors(
     gradientColor1 = Colors.Gradient1,
     gradientColor2 = Colors.Gradient2,
     grayButton = Colors.Gray,
-    divider = Colors.Divider
+    divider = Colors.Divider,
+    searchCardBackground = Colors.searchCardBackgroundDay
+
     // Добавить в схему цвета из файла Colors
 )
 
@@ -53,6 +56,7 @@ val DarkExtraColors = ExtraColors(
     transparentBtnTextColor = Color.White,
     gradientColor1 = Colors.Gradient2,
     grayButton = Colors.Gray,
-    divider = Colors.Gray2
+    divider = Colors.Gray2,
+    searchCardBackground = Colors.searchCardBackgroundNight
     // Добавить в схему цвета из файла Colors
 )

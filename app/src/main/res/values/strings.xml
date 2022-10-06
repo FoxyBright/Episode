@@ -5,10 +5,12 @@
     <string name="phone_number">Номер телефона</string>
     <string name="google_login">Войти через Google</string>
     <string name="next_button">Далее</string>
-    <string name="or">или</string>
+    <string name="login_alternative_separator">или</string>
     <string name="ops_agree">Продолжая, вы соглашаетесь с</string>
     <string name="privacy_police">Политикой конфиденциальности</string>
     <string name="application">приложения</string>
+    <string name="login_select_country">Страна</string>
+    <string name="login_search_placeholder">Поиск</string>
 
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>
@@ -75,5 +77,4 @@
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
     <string name="edit">Изменить</string>
-
 </resources>
