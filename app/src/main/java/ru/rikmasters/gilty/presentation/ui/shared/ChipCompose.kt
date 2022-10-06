@@ -74,7 +74,7 @@ fun GiltyChip(
     Surface(
         onClick,
         modifier = modifier.wrapContentSize(),
-        shape = RoundedCornerShape(10.dp),
+        shape = MaterialTheme.shapes.large,
         color = backgroundColor,
         border = BorderStroke(1.dp, borderColor),
         tonalElevation = 0.dp,

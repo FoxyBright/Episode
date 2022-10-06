@@ -88,7 +88,7 @@ fun TodayMeetingGridCard(
     Card(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = Color.White))
     {
 
@@ -133,7 +133,7 @@ private fun TimeCardCompose(
             .height(31.dp)
             .background(
                 brush = Brush.linearGradient(gradientColors),
-                shape = RoundedCornerShape(14.dp)
+                shape = MaterialTheme.shapes.large
             ),
     ) {
 

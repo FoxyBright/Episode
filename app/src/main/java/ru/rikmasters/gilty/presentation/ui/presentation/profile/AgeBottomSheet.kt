@@ -46,10 +46,10 @@ fun AgeBottomSheetCompose(
             MutableTransitionState(state).apply {
                 targetState = !state
             }
-        }, "Transition"
+        }, ""
     ).animateDp(
         { tween(durationMillis = 500) },
-        "SizeTransition",
+        "",
         { if (state) 320.dp else 0.dp },
     ).value
     Box(

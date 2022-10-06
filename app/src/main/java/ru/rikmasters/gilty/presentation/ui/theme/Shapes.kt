@@ -11,8 +11,9 @@ import androidx.compose.ui.unit.dp
     ReplaceWith("MaterialTheme.shapes", "androidx.compose.material3.MaterialTheme"))
 val Shapes = Shapes(
     small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp),
+    extraSmall = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(14.dp),
     extraLarge = RoundedCornerShape(20.dp)
     // Добавить новые формы
 )

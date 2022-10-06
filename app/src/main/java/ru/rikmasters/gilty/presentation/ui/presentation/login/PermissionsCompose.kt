@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import ru.rikmasters.gilty.presentation.ui.shared.CheckBox
 import ru.rikmasters.gilty.presentation.ui.shared.Divider
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
+import ru.rikmasters.gilty.presentation.ui.theme.Shapes
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -75,7 +77,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(MaterialTheme.shapes.large)
                     .background(ThemeExtra.colors.elementsBack)
             ) {
                 Column {
@@ -125,7 +127,7 @@ fun PermissionConfirmationWindow() {
         Modifier
             .fillMaxWidth()
             .background(ThemeExtra.colors.elementsBack)
-            .clip(RoundedCornerShape(14.dp))
+            .clip(MaterialTheme.shapes.large)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(

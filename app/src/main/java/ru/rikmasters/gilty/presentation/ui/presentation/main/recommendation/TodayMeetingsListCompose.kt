@@ -97,7 +97,7 @@ fun MeetingCardCompose(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(14.dp)) {
+        shape = MaterialTheme.shapes.large) {
 
         Box() {
 
@@ -107,7 +107,7 @@ fun MeetingCardCompose(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .clip(
-                        RoundedCornerShape(14.dp)
+                        MaterialTheme.shapes.large
                     )
                     .fillMaxWidth())
             
@@ -115,7 +115,7 @@ fun MeetingCardCompose(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .wrapContentHeight(),
-                shape = RoundedCornerShape(14.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
                     containerColor = ThemeExtra.colors.cardBackground )) {
 
@@ -140,7 +140,7 @@ fun MeetingCardCompose(
                                 Modifier
                                     .padding(end = 4.dp)
                                     .height(31.dp),
-                                shape = RoundedCornerShape(14.dp),
+                                shape = MaterialTheme.shapes.large,
                                 colors = CardDefaults.cardColors(
                                     containerColor = colorResource(R.color.primary))) {
 
@@ -161,7 +161,7 @@ fun MeetingCardCompose(
                                 Modifier
                                     .height(31.dp)
                                     .fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
+                                shape = MaterialTheme.shapes.medium,
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.background
                                 )
@@ -221,7 +221,7 @@ private fun CardButtonCompose(
     Button(
         modifier = modifier,
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = ThemeExtra.colors.grayButton)) {

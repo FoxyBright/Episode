@@ -44,7 +44,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 private fun ProfileMeetingBottomSheetPreview() {
 
-    GiltyTheme() {
+    GiltyTheme {
         ProfileMeetingBottomSheet(
             meetingModel = DemoFullMeetingModel, memberList = listOf(DemoMemberModel))
     }
@@ -84,7 +84,7 @@ fun ProfileMeetingBottomSheet(
                 contentDescription = "avatar",
                 modifier = Modifier
                     .size(150.dp, 155.dp)
-                    .clip(RoundedCornerShape(14.dp)),
+                    .clip(MaterialTheme.shapes.large),
                 contentScale = ContentScale.Crop)
             
             Spacer(modifier = Modifier.width(18.dp))
@@ -126,7 +126,7 @@ fun ProfileMeetingBottomSheet(
             Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp),
+            shape = MaterialTheme.shapes.extraSmall,
             colors = CardDefaults.cardColors(
                 containerColor = ThemeExtra.colors.cardBackground)) {
             
@@ -177,7 +177,7 @@ fun ProfileMeetingBottomSheet(
 
             Card(onClick = { /*TODO*/ },
                 Modifier.padding(top = 12.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(
                     containerColor = ThemeExtra.colors.cardBackground)) {
 

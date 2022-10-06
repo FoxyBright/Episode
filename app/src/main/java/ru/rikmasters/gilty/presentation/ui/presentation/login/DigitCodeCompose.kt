@@ -90,7 +90,7 @@ private fun Digit(
             .size(57.dp, 60.dp)
             .background(
                 Color.White,
-                RoundedCornerShape(14.dp)
+                MaterialTheme.shapes.large
             )
             .focusRequester(requester)
             .padding(20.dp, 12.dp),
