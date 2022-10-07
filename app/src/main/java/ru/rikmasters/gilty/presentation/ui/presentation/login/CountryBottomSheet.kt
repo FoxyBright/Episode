@@ -42,15 +42,15 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.profile.Country
 import ru.rikmasters.gilty.presentation.model.profile.CountryList
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetComposeCallback
 import ru.rikmasters.gilty.presentation.ui.shared.Divider
 import ru.rikmasters.gilty.presentation.ui.shared.DividerBold
 import ru.rikmasters.gilty.presentation.ui.shared.TransparentTextFieldColors
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-interface CountryBottomSheetComposeCallback {
+interface CountryBottomSheetComposeCallback: AgeBottomSheetComposeCallback {
     fun onCountryClick(value: Country)
-    fun onDownDrag()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

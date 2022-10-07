@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoConten
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
+import ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation.AgeBottomSheetPreview
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
 
@@ -26,7 +27,9 @@ import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCal
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "login") {
+    NavHost(navController, "testScreen") {
+        // На тетсовом окне просмотр верстки на реальном устройстве
+        composable("testScreen") {AgeBottomSheetPreview() }
 
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
@@ -49,6 +52,7 @@ fun Navigation() {
                     override fun onBack() {
                         navController.navigate("personalInformation")
                     }
+
                     override fun onCategoryClick(category: CategoryModel) {
                         if (selectCategories.contains(category)) selectCategories.remove(category)
                         else selectCategories.add(category)
