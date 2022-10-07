@@ -31,8 +31,8 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 interface AgeBottomSheetComposeCallback {
-    fun onSaveClick(value: Int)
-    fun onDownDrag()
+    fun onSaveClick(value: Int){}
+    fun onDownDrag(){}
 }
 
 @Composable

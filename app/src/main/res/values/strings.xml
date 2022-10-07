@@ -11,6 +11,7 @@
     <string name="application">приложения</string>
     <string name="login_select_country">Страна</string>
     <string name="login_search_placeholder">Поиск</string>
+    <string name="login_search_name">Страна и регион</string>
 
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>

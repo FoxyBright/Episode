@@ -17,9 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,10 +32,11 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.core.GiltyChip
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
-import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetCompose
-import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetComposeCallback
-import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
+import ru.rikmasters.gilty.presentation.ui.shared.BottomSheetCompose
+import ru.rikmasters.gilty.presentation.ui.shared.BottomSheetComposeState
+import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
+import ru.rikmasters.gilty.presentation.ui.shared.NumberPicker
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -51,6 +54,7 @@ fun PersonalInfoPreview() {
 fun PersonalInfoContent(callback: NavigationInterface? = null) {
     val bottomSheetState = remember { mutableStateOf(false) }
     val ageTextFieldValue = remember { mutableStateOf("") }
+    var pickerValue by remember { mutableStateOf(18) }
     Box(
         Modifier
             .fillMaxSize()
@@ -127,20 +131,32 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
         )
-        AgeBottomSheetCompose(
-            Modifier
+        BottomSheetCompose(
+            BottomSheetComposeState(320.dp, bottomSheetState) {
+                NumberPicker(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 40.dp),
+                    value = pickerValue,
+                    onValueChange = { pickerValue = it },
+                    range = 18..100
+                )
+                GradientButton(
+                    {
+                        ageTextFieldValue.value = pickerValue.toString()
+                        bottomSheetState.value = false
+                    },
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 40.dp),
+                    stringResource(R.string.save_button), true
+                )
+            }, Modifier
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
-                .align(Alignment.BottomCenter),
-            bottomSheetState.value,
-            object : AgeBottomSheetComposeCallback {
-                override fun onSaveClick(value: Int) {
-                    bottomSheetState.value = !bottomSheetState.value
-                    ageTextFieldValue.value = value.toString()
-                }
-                override fun onDownDrag() {
-                    bottomSheetState.value = false
-                }
-            }
-        )
+                .align(Alignment.BottomCenter)
+        ) {
+            bottomSheetState.value = false
+        }
     }
 }

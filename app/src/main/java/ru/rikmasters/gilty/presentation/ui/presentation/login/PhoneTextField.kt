@@ -74,6 +74,7 @@ fun PhoneTextField(
                 }
             }
         },
+        textStyle = ThemeExtra.typography.Body1Medium,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone
