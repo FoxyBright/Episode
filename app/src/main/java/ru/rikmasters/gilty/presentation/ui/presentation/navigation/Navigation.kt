@@ -17,17 +17,17 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.LoginContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.PermissionsContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
-import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
+import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemCallback
 
 @Composable
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "personalInformation") {
-
+    NavHost(navController, "select") {
+        composable("test") { }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {
@@ -45,10 +45,11 @@ fun Navigation() {
             SelectCategories(
                 Modifier,
                 SelectCategoriesState(DemoCategoryModelList, selectCategories),
-                object : SelectCategoriesCallback {
+                object : CategoryItemCallback {
                     override fun onBack() {
                         navController.navigate("personalInformation")
                     }
+
                     override fun onCategoryClick(category: CategoryModel) {
                         if (selectCategories.contains(category)) selectCategories.remove(category)
                         else selectCategories.add(category)
