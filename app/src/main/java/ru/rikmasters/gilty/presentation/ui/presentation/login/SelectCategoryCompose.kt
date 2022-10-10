@@ -52,7 +52,7 @@ interface SelectCategoriesCallback : NavigationInterface {
     fun onCategoryClick(category: CategoryModel)
 }
 
-private const val ELEMENT_SIZE = 135
+private const val ELEMENT_SIZE = 120
 
 @Composable
 @ExperimentalMaterial3Api
@@ -140,7 +140,7 @@ fun CategoryItem(
             Text(
                 item.name,
                 Modifier,
-                ThemeExtra.colors.white,
+                Color.White,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 style = ThemeExtra.typography.MediumText

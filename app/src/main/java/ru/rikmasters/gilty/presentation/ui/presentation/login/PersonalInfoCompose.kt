@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.ui.presentation.core.GiltyChip
+import ru.rikmasters.gilty.presentation.ui.shared.GiltyChip
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.BottomSheetCompose
@@ -87,6 +87,13 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                     disabledLabelColor = ThemeExtra.colors.secondaryTextColor,
                     disabledTextColor = ThemeExtra.colors.mainTextColor
                 ),
+                placeholder = {
+                    Text(
+                        stringResource(R.string.personal_info_age_placeholder),
+                        color = ThemeExtra.colors.secondaryTextColor,
+                        style = ThemeExtra.typography.Body1Bold
+                    )
+                },
                 singleLine = true,
                 enabled = false
             )
@@ -97,7 +104,7 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 style = ThemeExtra.typography.H3
             )
             val chipsTitle =
-                remember { listOf(R.string.male_sex, R.string.female_sex, R.string.others_sex) }
+                remember { listOf(R.string.female_sex, R.string.male_sex, R.string.others_sex) }
             Card(
                 Modifier.padding(top = 12.dp),
                 MaterialTheme.shapes.large,

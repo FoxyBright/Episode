@@ -6,25 +6,28 @@
     <string name="google_login">Войти через Google</string>
     <string name="next_button">Далее</string>
     <string name="login_alternative_separator">или</string>
-    <string name="ops_agree">Продолжая, вы соглашаетесь с</string>
-    <string name="privacy_police">Политикой конфиденциальности</string>
-    <string name="application">приложения</string>
+    <string name="login_privacy_police_agree">"Продолжая, вы соглашаетесь с "</string>
+    <string name="login_privacy_police"> Политикой конфиденциальности</string>
+    <string name="login_connector_terms_and_privacy_police">" и "</string>
+    <string name="login_terms">Условиями</string>
+    <string name="login_application">" приложения"</string>
+    <string name="login_link_stub">Здесь должна быть ссылка на политику конфиденциальности</string>
     <string name="login_select_country">Страна</string>
     <string name="login_search_placeholder">Поиск</string>
     <string name="login_search_name">Страна и регион</string>
 
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>
-    <string name="interested_you_details">Выберите какие категории встреч вам интересны</string>
+    <string name="interested_you_details">Выберите какие категории встреч\nвам интересны</string>
 
     <!-- Give Permissions -->
     <string name="find_more">Находите больше</string>
-    <string name="find_more_details">Узнайте о самых актуальных встречах недалеко от вас</string>
+    <string name="find_more_details">Узнайте о самых актуальных встречах\nнедалеко от вас</string>
     <string name="permissions">Разрешения</string>
     <string name="geoposition">Геопозиция</string>
     <string name="notifications">Уведомления</string>
     <string name="finish">Завершить</string>
-    <string name="answer_permission">Разрешить Guilty доступ к местоположению этого устройства?</string>
+    <string name="answer_permission">Разрешить Guilty доступ к\nместоположению этого\nустройства?</string>
     <string name="when_using">При использовании</string>
     <string name="once">Однократно</string>
     <string name="prohibit">Запретить</string>
@@ -52,6 +55,7 @@
     <string name="male_sex">Мужской</string>
     <string name="female_sex">Женский</string>
     <string name="others_sex">Другое</string>
+    <string name="personal_info_age_placeholder">Возраст</string>
 
     <!-- Recommendation -->
     <string name="not_interesting">Не интересно</string>

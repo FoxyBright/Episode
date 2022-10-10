@@ -47,7 +47,7 @@ fun BottomSheetCompose(
         modifier
             .fillMaxWidth()
             .height(Expand(state.expand.value, state.width))
-            .background(ThemeExtra.colors.cardBackground)
+            .background(ThemeExtra.colors.searchCardBackground)
             .pointerInput(Unit) {
                 detectVerticalDragGestures { _, dragAmount ->
                     if (dragAmount < 6 && onDownDrag != null) onDownDrag()

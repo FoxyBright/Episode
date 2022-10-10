@@ -15,13 +15,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
@@ -58,13 +61,14 @@ fun LoginPreview() {
 interface LoginCallback {
     fun onNext() {}
     fun googleLogin() {}
-//    fun onOps(){}
+    fun privatePolicy() {}
+    fun termsOfApp() {}
 }
 
 @Composable
 fun LoginContent(
     modifier: Modifier = Modifier,
-    loginCallback: LoginCallback? = null
+    callback: LoginCallback? = null
 ) {
     val bottomSheetState = remember { mutableStateOf(false) }
     val searchCountry = remember { mutableStateOf("") }
@@ -114,7 +118,7 @@ fun LoginContent(
                 }
             }
             Button(
-                { loginCallback?.onNext() },
+                { callback?.onNext() },
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 32.dp),
@@ -138,7 +142,7 @@ fun LoginContent(
                 color = ThemeExtra.colors.secondaryTextColor
             )
             Button(
-                { loginCallback?.googleLogin() },
+                { callback?.googleLogin() },
                 Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(Color.Transparent)
             ) {
@@ -155,6 +159,13 @@ fun LoginContent(
                 )
             }
         }
+        ConfirmationPolicy(
+            Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(start = 16.dp, end = 60.dp, bottom = 60.dp),
+            callback
+        )
         val searchState = remember { mutableStateOf(false) }
         BottomSheetCompose(
             BottomSheetComposeState(
@@ -180,13 +191,39 @@ fun LoginContent(
 }
 
 @Composable
+private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCallback? = null) {
+    val textStyle = SpanStyle(ThemeExtra.colors.policyAgreeColor)
+    val linkStyle = SpanStyle(
+        ThemeExtra.colors.mainTextColor,
+        textDecoration = TextDecoration.Underline
+    )
+    val annotatedText = buildAnnotatedString {
+        withStyle(textStyle) { append(stringResource(R.string.login_privacy_police_agree)) }
+        pushStringAnnotation("terms", "")
+        withStyle(linkStyle) { append(stringResource(R.string.login_terms)) }; pop()
+        withStyle(textStyle) { append(stringResource(R.string.login_connector_terms_and_privacy_police)) }
+        pushStringAnnotation("policy", "")
+        withStyle(linkStyle) { append(stringResource(R.string.login_privacy_police)) }; pop()
+        withStyle(textStyle) { append(stringResource(R.string.login_application)) }
+    }
+    ClickableText(annotatedText, modifier, ThemeExtra.typography.SubHeadSb) {
+        annotatedText.getStringAnnotations(
+            "terms", it, it
+        ).firstOrNull()?.let { callback?.privatePolicy() }
+        annotatedText.getStringAnnotations(
+            "policy", it, it
+        ).firstOrNull()?.let { callback?.termsOfApp() }
+    }
+}
+
+@Composable
 private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
     LazyColumn(
         Modifier
             .padding(horizontal = 16.dp)
             .padding(top = 10.dp)
             .clip(MaterialTheme.shapes.medium)
-            .background(ThemeExtra.colors.searchCardBackground)
+            .background(ThemeExtra.colors.cardBackground)
     ) {
         itemsIndexed(CountryList) { index, item ->
             Row(
@@ -210,16 +247,4 @@ private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
             if (index < CountryList.size - 1) Divider(Modifier.padding(start = 54.dp))
         }
     }
-}
-
-
-@Composable
-@ReadOnlyComposable
-private fun createOpsAnnotatedString() = buildAnnotatedString {
-    append(stringResource(R.string.ops_agree))
-    append(' ')
-    pushStringAnnotation(
-        stringResource(R.string.privacy_police),
-        stringResource(R.string.privacy_police)
-    )
 }

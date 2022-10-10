@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.ui.presentation.core
+package ru.rikmasters.gilty.presentation.ui.shared
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,15 +28,19 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Preview(showBackground = true, backgroundColor = 0xFFF6F6F6)
 @Composable
 private fun ChipsPreview() {
-    GiltyTheme() {
+    GiltyTheme {
         val list = remember { mutableStateListOf(true, false, false) }
         LazyRow(Modifier.fillMaxWidth()) {
             itemsIndexed(list) { i, it ->
                 GiltyChip(
                     Modifier.padding(end = 12.dp),
                     "Чип ", it
-                ) { for (i1 in 0..list.lastIndex) { list[i1] = false }
-                    list[i] = true }
+                ) {
+                    for (i1 in 0..list.lastIndex) {
+                        list[i1] = false
+                    }
+                    list[i] = true
+                }
             }
         }
     }
@@ -52,17 +55,17 @@ fun GiltyChip(
     onClick: () -> Unit
 ) {
 
-    val backgroundColorTarget = if(isSelected)
+    val backgroundColorTarget = if (isSelected)
         MaterialTheme.colorScheme.primary
     else
         ThemeExtra.colors.cardBackground
 
-    val borderColorTarget = if(isSelected)
+    val borderColorTarget = if (isSelected)
         MaterialTheme.colorScheme.primary
     else
-        ThemeExtra.colors.grayIcon
+        ThemeExtra.colors.chipGray
 
-    val textColorTarget = if(isSelected)
+    val textColorTarget = if (isSelected)
         Color.White
     else
         ThemeExtra.colors.mainTextColor

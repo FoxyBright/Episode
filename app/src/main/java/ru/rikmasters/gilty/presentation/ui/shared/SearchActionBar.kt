@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.ui.theme.Colors
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -71,12 +72,12 @@ fun SearchActionBar(
                 .align(Alignment.CenterEnd)
                 .padding(horizontal = 16.dp)
                 .clip(MaterialTheme.shapes.extraSmall)
-                .background(ThemeExtra.colors.searchCardBackground)
+                .background(ThemeExtra.colors.cardBackground)
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(ThemeExtra.colors.searchCardBackground),
+                    .background(ThemeExtra.colors.cardBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton({
@@ -87,7 +88,7 @@ fun SearchActionBar(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),
                         Modifier.size(20.dp),
-                        ThemeExtra.colors.mainTextColor
+                        ThemeExtra.colors.policyAgreeColor
                     )
                 }
                 TextField(
