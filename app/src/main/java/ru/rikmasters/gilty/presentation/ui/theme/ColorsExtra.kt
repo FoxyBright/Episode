@@ -21,12 +21,18 @@ data class ExtraColors(
     val white: Color = Color.Unspecified,
     val divider: Color = Color.Unspecified,
     val chipGray: Color = Color.Unspecified,
-    val policyAgreeColor: Color = Color.Unspecified
+    val policyAgreeColor: Color = Color.Unspecified,
+
+    val mainTrackCheckBox: Color = Color.Unspecified,
+    val secondaryTrackCheckBox: Color = Color.Unspecified,
+
     // Добавить новый цвет в схему = Color.Unspecified
 )
 
-@Deprecated("Надо использовать тему",
-    ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
+@Deprecated(
+    "Надо использовать тему",
+    ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
+)
 val LightExtraColors = ExtraColors(
     myExtraColor = Colors.Purple40,
     elementsBack = Color.White,
@@ -42,14 +48,18 @@ val LightExtraColors = ExtraColors(
     grayButton = Colors.Gray,
     divider = Colors.Divider,
     searchCardBackground = Colors.searchCardBackgroundDay,
-    policyAgreeColor = Colors.SecondaryTextDay
+    policyAgreeColor = Colors.SecondaryTextDay,
+    mainTrackCheckBox = Colors.Gray2,
+    secondaryTrackCheckBox = Colors.Border
 
 
     // Добавить в схему цвета из файла Colors
 )
 
-@Deprecated("Надо использовать тему",
-    ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"))
+@Deprecated(
+    "Надо использовать тему",
+    ReplaceWith("ThemeExtra.colors", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
+)
 val DarkExtraColors = ExtraColors(
     myExtraColor = Colors.Purple80,
     elementsBack = Colors.PrimaryTextDay,
@@ -64,6 +74,8 @@ val DarkExtraColors = ExtraColors(
     grayButton = Colors.Gray,
     divider = Colors.Gray2,
     searchCardBackground = Colors.searchCardBackgroundNight,
-    policyAgreeColor = Colors.SecondaryTextDay
+    policyAgreeColor = Colors.SecondaryTextDay,
+    mainTrackCheckBox = Colors.Border,
+    secondaryTrackCheckBox = Colors.Gray2
     // Добавить в схему цвета из файла Colors
 )

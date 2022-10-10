@@ -34,6 +34,7 @@ object Colors {
     val Gradient1 = Color(0xFFFF6645)
     val Gradient2 = Color(0xFFDF2B4B)
     val Gray = Color(0xFFE9E9EA)
+    val Border = Color(0xFFB0B0B0)
     val Divider = Color(0xFFDFDFDF)
 
     val BackgroundDay = Color(0xFFF6F6F6)

@@ -74,7 +74,7 @@ fun SelectCategories(
                                     CategoryItemState(
                                         state.selectCategories.contains(element)
                                     ),
-                                    callback
+                                    callback = callback
                                 )
                         }
                     }
