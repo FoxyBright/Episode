@@ -18,6 +18,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.PermissionsContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoContent
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
+import ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation.SendReactionBottomCompose
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemCallback
@@ -26,8 +27,8 @@ import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemCallback
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "select") {
-        composable("test") { }
+    NavHost(navController, "test") {
+        composable("test") { SendReactionBottomCompose() }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {

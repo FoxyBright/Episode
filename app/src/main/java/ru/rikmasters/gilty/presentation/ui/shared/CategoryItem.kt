@@ -8,7 +8,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +38,10 @@ const val CATEGORY_ELEMENT_SIZE = 120
 @Preview(showBackground = true)
 private fun CategoryItemTopPreview() {
     GiltyTheme {
-        CategoryItem(DemoCategoryModel, CategoryItemState(true))
+        CategoryItem(
+            DemoCategoryModel,
+            CategoryItemState(itemState = true, false)
+        )
     }
 }
 
@@ -44,7 +50,7 @@ private fun CategoryItemTopPreview() {
 @Preview(showBackground = true)
 private fun CategoryItemBottomPreview() {
     GiltyTheme {
-        CategoryItem(DemoCategoryModel, CategoryItemState(true))
+        CategoryItem(DemoCategoryModel, CategoryItemState(false))
     }
 }
 
@@ -61,12 +67,12 @@ data class CategoryItemState(
 fun CategoryItem(
     item: CategoryModel,
     state: CategoryItemState,
+    modifier: Modifier = Modifier,
     callback: CategoryItemCallback? = null
 ) {
-    var iconState = remember { state.itemState }
+    var iconState by remember { mutableStateOf(state.itemState) }
     Box(
-        Modifier
-            .size((CATEGORY_ELEMENT_SIZE + 10).dp)
+        modifier.size((CATEGORY_ELEMENT_SIZE + 10).dp)
     ) {
         Box(
             Modifier
