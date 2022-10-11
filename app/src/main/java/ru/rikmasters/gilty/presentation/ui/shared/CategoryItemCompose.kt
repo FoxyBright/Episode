@@ -8,10 +8,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +25,6 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModel
-import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -38,39 +35,36 @@ const val CATEGORY_ELEMENT_SIZE = 120
 @Preview(showBackground = true)
 private fun CategoryItemTopPreview() {
     GiltyTheme {
+        val iconState = remember { mutableStateOf(true) }
         CategoryItem(
             DemoCategoryModel,
-            CategoryItemState(itemState = true, false)
-        )
+            iconState.value,
+            iconBottomState = false
+        ) { iconState.value = !it }
     }
 }
 
 @Composable
 @ExperimentalMaterial3Api
 @Preview(showBackground = true)
-private fun CategoryItemBottomPreview() {
+fun CategoryItemBottomPreview() {
     GiltyTheme {
-        CategoryItem(DemoCategoryModel, CategoryItemState(false))
+        val iconState = remember { mutableStateOf(true) }
+        CategoryItem(
+            DemoCategoryModel,
+            iconState.value
+        ) { iconState.value = it }
     }
 }
-
-interface CategoryItemCallback : NavigationInterface {
-    fun onCategoryClick(category: CategoryModel)
-}
-
-data class CategoryItemState(
-    val itemState: Boolean,
-    val categoryIconBottomState: Boolean = true
-)
 
 @Composable
 fun CategoryItem(
     item: CategoryModel,
-    state: CategoryItemState,
+    state: Boolean,
     modifier: Modifier = Modifier,
-    callback: CategoryItemCallback? = null
+    iconBottomState: Boolean = true,
+    onClick: ((Boolean) -> Unit)? = null
 ) {
-    var iconState by remember { mutableStateOf(state.itemState) }
     Box(
         modifier.size((CATEGORY_ELEMENT_SIZE + 10).dp)
     ) {
@@ -79,13 +73,12 @@ fun CategoryItem(
                 .size(CATEGORY_ELEMENT_SIZE.dp)
                 .clip(CircleShape)
                 .background(
-                    if (iconState) Color(item.color.toColorInt())
+                    if (state) Color(item.color.toColorInt())
                     else ThemeExtra.colors.grayIcon
                 )
                 .align(Alignment.BottomCenter)
                 .clickable {
-                    iconState = !iconState
-                    callback?.onCategoryClick(item)
+                    if (onClick != null) onClick(!state)
                 },
             Alignment.Center
         ) {
@@ -104,7 +97,7 @@ fun CategoryItem(
                 .clip(CircleShape)
                 .background(Color.White)
                 .align(
-                    if (state.categoryIconBottomState) Alignment.BottomStart
+                    if (iconBottomState) Alignment.BottomStart
                     else Alignment.TopEnd
                 ),
             Alignment.Center

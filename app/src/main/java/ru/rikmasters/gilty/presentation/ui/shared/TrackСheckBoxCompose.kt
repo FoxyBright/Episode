@@ -33,9 +33,7 @@ private fun GreenTrackCheckBoxActivePreview() {
         checkBoxState,
         Modifier.padding(10.dp),
         Color(0xFF35C65A)
-    ) {
-        checkBoxState = it
-    }
+    ) { checkBoxState = it }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

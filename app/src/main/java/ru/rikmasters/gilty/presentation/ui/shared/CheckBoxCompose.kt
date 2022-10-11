@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.presentation.ui.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,7 +22,7 @@ import ru.rikmasters.gilty.R
 @Composable
 private fun CheckBoxPreviewEnabled() {
     var checkBoxState by remember { mutableStateOf(true) }
-    CheckBox(checkBoxState, Modifier.padding(10.dp)){
+    CheckBox(checkBoxState, Modifier.padding(10.dp)) {
         checkBoxState = it
     }
 }
@@ -32,7 +31,7 @@ private fun CheckBoxPreviewEnabled() {
 @Composable
 private fun CheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(false) }
-    CheckBox(checkBoxState, Modifier.padding(10.dp)){
+    CheckBox(checkBoxState, Modifier.padding(10.dp)) {
         checkBoxState = it
     }
 }

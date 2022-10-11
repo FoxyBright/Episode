@@ -20,11 +20,10 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModelList
+import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
-import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemCallback
-import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemState
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
@@ -33,12 +32,16 @@ data class SelectCategoriesState(
     val selectCategories: List<CategoryModel>
 )
 
+interface SelectCategoriesCallback : NavigationInterface {
+    fun onCategoryClick(category: CategoryModel){}
+}
+
 @Composable
 @ExperimentalMaterial3Api
 fun SelectCategories(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     state: SelectCategoriesState,
-    callback: CategoryItemCallback? = null
+    callback: SelectCategoriesCallback? = null
 ) {
     Box(
         modifier
@@ -71,11 +74,8 @@ fun SelectCategories(
                             for (element in item)
                                 CategoryItem(
                                     element,
-                                    CategoryItemState(
-                                        state.selectCategories.contains(element)
-                                    ),
-                                    callback = callback
-                                )
+                                    state.selectCategories.contains(element)
+                                ) { callback?.onCategoryClick(element) }
                         }
                     }
                 }

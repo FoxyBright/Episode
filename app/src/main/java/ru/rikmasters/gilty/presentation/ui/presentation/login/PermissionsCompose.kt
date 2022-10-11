@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -33,11 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
+import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.CheckBox
 import ru.rikmasters.gilty.presentation.ui.shared.Divider
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
-import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
-import ru.rikmasters.gilty.presentation.ui.theme.Shapes
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -91,7 +89,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(geopositionState){ geopositionState = it }
+                        CheckBox(geopositionState) { geopositionState = it }
                     }
                     Divider(Modifier.padding(start = 16.dp))
                     Row(
@@ -104,7 +102,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )
-                        CheckBox(notificationState){ notificationState = it }
+                        CheckBox(notificationState) { notificationState = it }
                     }
                 }
             }
@@ -176,7 +174,7 @@ fun PermissionConfirmationWindow() {
 @ExperimentalMaterial3Api
 @Preview(showBackground = true)
 fun PermissionConfirmationWindowPreview() {
-    GiltyTheme{
+    GiltyTheme {
         PermissionConfirmationWindow()
     }
 

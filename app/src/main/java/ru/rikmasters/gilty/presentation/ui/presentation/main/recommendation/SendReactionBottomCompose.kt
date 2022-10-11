@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.presentation.ui.shared.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
-import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemState
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -51,7 +50,7 @@ fun SendReactionBottomCompose(modifier: Modifier = Modifier) {
         }
         CategoryItem(
             DemoCategoryModel,
-            CategoryItemState(true),
+            true,
             Modifier
                 .align(Alignment.TopEnd)
                 .offset((CATEGORY_ELEMENT_SIZE / 6).dp, (-CATEGORY_ELEMENT_SIZE / 6).dp)
