@@ -1,17 +1,17 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -36,18 +36,21 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingList
+import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.presentation.ui.presentation.custom.swipeablecard.Direction
 import ru.rikmasters.gilty.presentation.ui.presentation.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.presentation.ui.presentation.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.presentation.ui.presentation.custom.swipeablecard.swipeableCard
+import ru.rikmasters.gilty.presentation.ui.shared.DateTimeCard
+import ru.rikmasters.gilty.presentation.ui.shared.categoriesListCard
+import ru.rikmasters.gilty.presentation.ui.theme.Gradients
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
-import ru.rikmasters.gilty.utility.extentions.format
 
 @Preview(showBackground = true)
 @Composable
-private fun RecommendationComposePreview() {
+fun TodayMeetingsListComposePreview() {
     GiltyTheme {
         TodayMeetingsListCompose(DemoMeetingList)
     }
@@ -71,7 +74,8 @@ fun TodayMeetingsListCompose(
                                     listOf(Direction.Down, Direction.Up)
                                 ) {},
                             meeting,
-                            state
+                            state,
+                            false
                         )
                     }
                 }
@@ -84,7 +88,8 @@ fun TodayMeetingsListCompose(
 fun MeetingCardCompose(
     modifier: Modifier = Modifier,
     model: ShortMeetingModel,
-    state: SwipeableCardState
+    state: SwipeableCardState,
+    today: Boolean
 ) {
     Card(
         modifier,
@@ -96,8 +101,8 @@ fun MeetingCardCompose(
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(MaterialTheme.shapes.large)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Fit
+                    .fillMaxHeight(),
+                contentScale = ContentScale.FillBounds
             )
             Card(
                 Modifier
@@ -106,47 +111,45 @@ fun MeetingCardCompose(
                 MaterialTheme.shapes.large,
                 CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
             ) {
-                Column(Modifier.padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth()) {
+                val scope = rememberCoroutineScope()
+                LazyVerticalGrid(
+                    GridCells.Fixed(2),
+                    Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    item {
                         Text(
                             model.title,
-                            Modifier.weight(1f),
                             style = ThemeExtra.typography.H3
                         )
-                        Row(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                        ) {
-                            Card(
-                                Modifier
-                                    .padding(end = 4.dp)
-                                    .height(31.dp),
-                                MaterialTheme.shapes.large,
-                                CardDefaults.cardColors(colorResource(R.color.primary))
-                            ) {
-                                Text(
-                                    model.dateTime.format("HH:mm"),
-                                    Modifier.padding(vertical = 5.dp, horizontal = 12.dp),
-                                    style = ThemeExtra.typography.SubHeadBold,
-                                    color = ThemeExtra.colors.mainTextColor
-                                )
+                    }
+                    item {
+                        Box {
+                            Row(Modifier.align(Alignment.CenterEnd)) {
+                                Column(horizontalAlignment = Alignment.End) {
+                                    DateTimeCard(
+                                        DemoMeetingModel.dateTime,
+                                        Gradients().green(),
+                                        today
+                                    )
+                                    if (!today)
+                                        categoriesListCard(
+                                            Modifier.padding(top = 8.dp),
+                                            DemoMeetingModel,
+                                            false
+                                        )
+                                }
+                                if (today)
+                                    categoriesListCard(
+                                        Modifier.padding(start = 4.dp),
+                                        DemoMeetingModel,
+                                        false
+                                    )
                             }
-                            Card(
-                                Modifier
-                                    .height(31.dp)
-                                    .fillMaxWidth(),
-                                MaterialTheme.shapes.medium,
-                                CardDefaults.cardColors(MaterialTheme.colorScheme.background)
-                            ) {}
                         }
                     }
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 13.dp)
-                    ) {
-                        val scope = rememberCoroutineScope()
+                    item {
                         CardButtonCompose(
                             Modifier.weight(1f),
                             stringResource(R.string.not_interesting),
@@ -157,7 +160,8 @@ fun MeetingCardCompose(
                                 state.swipe(Direction.Left)
                             }
                         }
-                        Spacer(Modifier.width(13.dp))
+                    }
+                    item {
                         CardButtonCompose(
                             Modifier.weight(1f),
                             stringResource(R.string.meeting_respond),
@@ -180,7 +184,7 @@ private fun CardButtonCompose(
     color: Color,
     icon: Int,
     onClick: () -> Unit,
-    ) {
+) {
     Button(
         onClick,
         modifier,
