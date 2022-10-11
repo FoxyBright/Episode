@@ -29,11 +29,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.R
@@ -47,20 +45,11 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 import ru.rikmasters.gilty.utility.extentions.format
 
-
-@Preview(showBackground = true)
-@Composable
-private fun MeetingCardPreview() {
-    GiltyTheme {
-//        MeetingCardCompose(Modifier.padding(32.dp), model = DemoMeetingModel, )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun RecommendationComposePreview() {
-    GiltyTheme{
-        TodayMeetingsListCompose(meetings = DemoMeetingList)
+    GiltyTheme {
+        TodayMeetingsListCompose(DemoMeetingList)
     }
 }
 
@@ -68,34 +57,26 @@ private fun RecommendationComposePreview() {
 fun TodayMeetingsListCompose(
     meetings: List<ShortMeetingModel>
 ) {
-
     Box(Modifier.fillMaxSize()) {
-
         val states = meetings.map { it to rememberSwipeableCardState() }
-
         Box(Modifier.padding(16.dp)) {
-
             states.forEach { (meeting, state) ->
                 run {
                     if (state.swipedDirection == null) {
-
                         MeetingCardCompose(
                             Modifier
                                 .fillMaxSize()
                                 .swipeableCard(
-                                    state = state,
-                                    blockedDirections = listOf(Direction.Down, Direction.Up),
-                                    onSwiped = {},
-                                    onSwipeCancel = {}
-                                ),
-                            model = meeting,
-                            state = state)
+                                    state,
+                                    listOf(Direction.Down, Direction.Up)
+                                ) {},
+                            meeting,
+                            state
+                        )
                     }
                 }
-
             }
         }
-
     }
 }
 
@@ -105,114 +86,87 @@ fun MeetingCardCompose(
     model: ShortMeetingModel,
     state: SwipeableCardState
 ) {
-
     Card(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large) {
-
-        Box{
-
+        modifier,
+        MaterialTheme.shapes.large
+    ) {
+        Box {
             AsyncImage(
-                model = model.organizer.avatar.id,
-                contentDescription = "avatar",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .clip(
-                        MaterialTheme.shapes.large
-                    )
-                    .fillMaxWidth())
-            
+                model.organizer.avatar.id,
+                stringResource(R.string.meeting_avatar),
+                Modifier
+                    .clip(MaterialTheme.shapes.large)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Fit
+            )
             Card(
-                modifier = Modifier
+                Modifier
                     .align(Alignment.BottomCenter)
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = ThemeExtra.colors.cardBackground )) {
-
+                MaterialTheme.shapes.large,
+                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+            ) {
                 Column(Modifier.padding(16.dp)) {
-
-                    Row(modifier = Modifier.fillMaxWidth()) {
-
-                        Text(text = model.title,
-                            modifier = Modifier.weight(1f),
-                            style = TextStyle(
-                                color = ThemeExtra.colors.mainTextColor,
-                                fontSize = 20.sp,
-                                lineHeight = 26.sp,
-                                fontWeight = FontWeight.Bold
-                        ))
-
-                        Row(modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()) {
-
+                    Row(Modifier.fillMaxWidth()) {
+                        Text(
+                            model.title,
+                            Modifier.weight(1f),
+                            style = ThemeExtra.typography.H3
+                        )
+                        Row(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                        ) {
                             Card(
                                 Modifier
                                     .padding(end = 4.dp)
                                     .height(31.dp),
-                                shape = MaterialTheme.shapes.large,
-                                colors = CardDefaults.cardColors(
-                                    containerColor = colorResource(R.color.primary))) {
-
-                                Text(text = model.dateTime.format("HH:mm"),
-                                    modifier =
-                                    Modifier.padding(
-                                        vertical = 5.dp,
-                                        horizontal = 12.dp),
-                                    style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 15.sp,
-                                        lineHeight = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    ))
+                                MaterialTheme.shapes.large,
+                                CardDefaults.cardColors(colorResource(R.color.primary))
+                            ) {
+                                Text(
+                                    model.dateTime.format("HH:mm"),
+                                    Modifier.padding(vertical = 5.dp, horizontal = 12.dp),
+                                    style = ThemeExtra.typography.SubHeadBold,
+                                    color = ThemeExtra.colors.mainTextColor
+                                )
                             }
-
                             Card(
                                 Modifier
                                     .height(31.dp)
                                     .fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium,
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.background
-                                )
-                            ) {
-
-
-                            }
+                                MaterialTheme.shapes.medium,
+                                CardDefaults.cardColors(MaterialTheme.colorScheme.background)
+                            ) {}
                         }
-
                     }
-
-                    Row(Modifier.fillMaxWidth().padding(top = 13.dp)) {
-
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 13.dp)
+                    ) {
                         val scope = rememberCoroutineScope()
-
                         CardButtonCompose(
-                            modifier = Modifier
-                                .weight(1f),
-                            text = stringResource(id = R.string.not_interesting),
-                            color = colorResource(id = R.color.primary),
-                            icon = R.drawable.ic_cancel) {
+                            Modifier.weight(1f),
+                            stringResource(R.string.not_interesting),
+                            colorResource(R.color.primary),
+                            R.drawable.ic_cancel
+                        ) {
                             scope.launch {
                                 state.swipe(Direction.Left)
                             }
                         }
-                        
-                        Spacer(modifier = Modifier.width(13.dp))
-
+                        Spacer(Modifier.width(13.dp))
                         CardButtonCompose(
-                            modifier = Modifier
-                                .weight(1f),
-                            text = stringResource(id = R.string.meeting_respond),
-                            color = colorResource(id = R.color.primary),
-                            icon = R.drawable.ic_heart) {
-                            scope.launch {
-                                state.swipe(Direction.Right)
-                            }
+                            Modifier.weight(1f),
+                            stringResource(R.string.meeting_respond),
+                            colorResource(R.color.primary),
+                            R.drawable.ic_heart
+                        ) {
+                            scope.launch { state.swipe(Direction.Right) }
                         }
                     }
-
                 }
             }
         }
@@ -226,32 +180,27 @@ private fun CardButtonCompose(
     color: Color,
     icon: Int,
     onClick: () -> Unit,
-    
-) {
-    
+    ) {
     Button(
-        modifier = modifier,
-        onClick = onClick,
+        onClick,
+        modifier,
         shape = MaterialTheme.shapes.extraLarge,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ThemeExtra.colors.grayButton)) {
-
-        Row{
-            
+        colors = ButtonDefaults.buttonColors(ThemeExtra.colors.grayButton)
+    ) {
+        Row {
             Image(
-                painter = painterResource(id = icon),
-                contentDescription = null,
+                painterResource(icon),
+                null,
                 Modifier.padding(end = 3.dp),
-                colorFilter = ColorFilter.tint(color))
-            
+                colorFilter = ColorFilter.tint(color)
+            )
             Text(
-                text = text,
+                text,
                 Modifier.padding(top = 2.dp),
                 color = color,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold))
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
+            )
         }
-
     }
-    
 }

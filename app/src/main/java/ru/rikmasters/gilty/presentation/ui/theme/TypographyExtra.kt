@@ -21,6 +21,7 @@ data class ExtraTypography(
     val Body1Sb: TextStyle = baseTextStyle,
     val SubHeadSb: TextStyle = baseTextStyle,
     val SubHeadMedium: TextStyle = baseTextStyle,
+    val SubHeadEb: TextStyle = baseTextStyle,
     val SubHeadBold: TextStyle = baseTextStyle
     // Добавить новый шрифт в схему = baseTextStyle
 )
@@ -79,6 +80,10 @@ val DefaultExtraTypography = ExtraTypography(
 
     SubHeadSb = baseTextStyle.copy(
         fontSize = 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.SemiBold
+    ),
+
+    SubHeadEb = baseTextStyle.copy(
+        fontSize = 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.ExtraBold
     ),
 
     SubHeadMedium = baseTextStyle.copy(

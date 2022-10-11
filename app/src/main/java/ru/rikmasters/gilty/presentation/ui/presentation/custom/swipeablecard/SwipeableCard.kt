@@ -12,9 +12,9 @@ import kotlin.math.abs
 
 fun Modifier.swipeableCard(
     state: SwipeableCardState,
-    onSwiped: (Direction) -> Unit,
-    onSwipeCancel: () -> Unit = {},
     blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
+    onSwipeCancel: (() -> Unit)? = null,
+    onSwiped: (Direction) -> Unit,
 ) = pointerInput(Unit) {
     coroutineScope {
         detectDragGestures(
@@ -30,7 +30,7 @@ fun Modifier.swipeableCard(
 
                     if (hasNotTravelledEnough(state, coercedOffset)) {
                         state.reset()
-                        onSwipeCancel()
+                        if (onSwipeCancel != null) onSwipeCancel()
                     } else {
                         val horizontalTravel = abs(state.offset.targetValue.x)
                         val verticalTravel = abs(state.offset.targetValue.y)
@@ -58,7 +58,7 @@ fun Modifier.swipeableCard(
             {
                 launch {
                     state.reset()
-                    onSwipeCancel()
+                    if (onSwipeCancel != null) onSwipeCancel()
                 }
             },
             { change, dragAmount ->

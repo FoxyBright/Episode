@@ -17,14 +17,13 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCa
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
-import ru.rikmasters.gilty.presentation.ui.shared.CategoryItemBottomPreview
 
 @Composable
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "select") {
-        composable("test") { CategoryItemBottomPreview() }
+    NavHost(navController, "test") {
+        composable("test") {  }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {
