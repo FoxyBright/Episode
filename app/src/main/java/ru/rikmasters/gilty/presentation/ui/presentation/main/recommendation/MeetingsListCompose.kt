@@ -50,7 +50,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview(showBackground = true)
 @Composable
-fun TodayMeetingsListComposePreview() {
+private fun TodayMeetingsListComposePreview() {
     GiltyTheme {
         TodayMeetingsListCompose(DemoMeetingList)
     }

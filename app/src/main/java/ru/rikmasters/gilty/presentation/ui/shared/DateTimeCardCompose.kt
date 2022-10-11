@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.presentation.ui.theme.Gradients
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 import ru.rikmasters.gilty.utility.extentions.format
 
@@ -27,6 +27,7 @@ fun DateTimeCard(
                 Brush.linearGradient(color),
                 MaterialTheme.shapes.large
             ),
+        Alignment.Center
     ) {
         Text(
             dateTime.format(if (today) "HH:mm" else "dd MMMM"),

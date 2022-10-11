@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoConten
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
-import ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation.TodayMeetingsListComposePreview
+import ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation.ProfileMeetingBottomSheetPreview
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
 
@@ -24,7 +24,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCal
 fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController, "test") {
-        composable("test") { TodayMeetingsListComposePreview() }
+        composable("test") { ProfileMeetingBottomSheetPreview() }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {

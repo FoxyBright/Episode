@@ -66,6 +66,7 @@
     <string name="meeting_personal_type">Персональная встреча</string>
     <string name="meeting_group_type">Групповая встреча</string>
     <string name="meeting_anon_type">Анонимная встреча</string>
+    <string name="meeting_profile_bottom_today_label">Сегодня</string>
     <string name="meeting_avatar">Аватар</string>
     <string name="members">Участники</string>
     <string name="condition_free">Вход свободный</string>

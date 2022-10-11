@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import ru.rikmasters.gilty.R
 
-class Gradients{
+class Gradients() {
     @Composable
     fun green(): List<Color> {
         return listOf(
@@ -18,7 +18,7 @@ class Gradients{
 
     @Composable
     fun primary(): List<Color> {
-        return listOf(MaterialTheme.colorScheme.primary)
+        return listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary)
     }
 }
 
