@@ -77,7 +77,14 @@
     <string name="meeting_join_button_name">Присоединиться</string>
     <string name="meeting_only_organizer_label">Только для организатора</string>
     <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
+    <string name="meeting_only_online_meetings_button">Только онлайн встречи</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
+    <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>
+    <string name="meeting_filter_clear">Сбросить</string>
+    <string name="meeting_filter_radius_of_search_label">Радиус поиска</string>
+    <string name="meeting_filter_select_meeting_type_personal">Личные</string>
+    <string name="meeting_filter_select_meeting_type_grouped">Групповые</string>
+    <string name="meeting_filter_select_meeting_type_anonymous">Анонимные</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
 
     <!-- Image Descriptions -->

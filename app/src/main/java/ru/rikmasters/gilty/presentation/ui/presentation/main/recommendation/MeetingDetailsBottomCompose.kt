@@ -33,7 +33,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-fun MeetingDetailsBottomComposePreview() {
+private fun MeetingDetailsBottomComposePreview() {
     GiltyTheme {
         var hiddenPhoto by remember { mutableStateOf(false) }
         var commentText by remember { mutableStateOf("") }
@@ -118,7 +118,7 @@ fun MeetingDetailsBottomCompose(
                 .padding(top = 4.dp),
             ThemeExtra.colors.secondaryTextColor,
             textAlign = TextAlign.End,
-            style = ThemeExtra.typography.labelText
+            style = ThemeExtra.typography.LabelText
         )
         Card(
             Modifier
@@ -142,7 +142,7 @@ fun MeetingDetailsBottomCompose(
             stringResource(R.string.meeting_only_organizer_label),
             Modifier.padding(top = 4.dp, start = 16.dp),
             color = ThemeExtra.colors.secondaryTextColor,
-            style = ThemeExtra.typography.labelText
+            style = ThemeExtra.typography.LabelText
         )
         GradientButton(
             { callback?.onRespondClick() },

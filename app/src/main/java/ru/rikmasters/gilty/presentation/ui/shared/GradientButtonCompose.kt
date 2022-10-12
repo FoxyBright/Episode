@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.presentation.ui.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 private fun GradientButtonPreview() {
     GiltyTheme() {
-        GradientButton(onClick = { }, text = "test", enabled = false)
+        GradientButton({ }, text = "Далее", smallText = "Подробности")
     }
 }
 
@@ -35,11 +36,14 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     text: String,
     enabled: Boolean = true,
-    gradientColors: List<Color> = listOf(ThemeExtra.colors.gradientColor1, ThemeExtra.colors.gradientColor2),
+    gradientColors: List<Color> = listOf(
+        ThemeExtra.colors.gradientColor1,
+        ThemeExtra.colors.gradientColor2
+    ),
     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
+    smallText: String? = null,
     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),
 ) {
-
     Button(
         modifier = modifier
             .fillMaxWidth(),
@@ -51,7 +55,6 @@ fun GradientButton(
         shape = shape,
         enabled = enabled,
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,10 +65,14 @@ fun GradientButton(
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = text,
-                style = ThemeExtra.typography.button
-            )
+            Column {
+                Text(
+                    text = text,
+                    style = ThemeExtra.typography.button
+                )
+                if (smallText != null)
+                    Text(smallText, style = ThemeExtra.typography.ButtonLabelText)
+            }
         }
     }
 }
