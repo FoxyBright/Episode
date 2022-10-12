@@ -6,6 +6,5 @@ plugins {
 baseConfig()
 
 dependencies {
-    base()
-    compose()
+    androidBase()
 }

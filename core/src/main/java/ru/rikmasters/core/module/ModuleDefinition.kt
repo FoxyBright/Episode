@@ -1,4 +1,4 @@
-package ru.rikmasters.base.di
+package ru.rikmasters.core.module
 
 import org.koin.core.module.Module
 import org.koin.dsl.module

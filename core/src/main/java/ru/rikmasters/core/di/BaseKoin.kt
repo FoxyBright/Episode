@@ -1,4 +1,4 @@
-package ru.rikmasters.base.di
+package ru.rikmasters.core.di
 
 import android.content.Context
 import org.koin.android.ext.koin.androidContext
@@ -14,4 +14,3 @@ fun startBaseKoin(context: Context) {
         modules()
     }
 }
-
