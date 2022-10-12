@@ -74,6 +74,11 @@
     <string name="condition_organizer_pay">Платит организатор</string>
     <string name="condition_member_pay">Платят участники</string>
     <string name="condition_no_matter">Не важно</string>
+    <string name="meeting_join_button_name">Присоединиться</string>
+    <string name="meeting_only_organizer_label">Только для организатора</string>
+    <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
+    <string name="meeting_comment_text_holder">Комментарий</string>
+    <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
