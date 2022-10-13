@@ -35,4 +35,5 @@ dependencies {
     compose()
 
     implementation(project(":core"))
+    implementation(project(":example"))
 }

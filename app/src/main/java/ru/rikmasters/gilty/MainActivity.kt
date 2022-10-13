@@ -3,13 +3,17 @@ package ru.rikmasters.gilty
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.example.ExampleModule
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
 @ExperimentalMaterial3Api
@@ -30,8 +34,10 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
 
         Scaffold {
-            NavHost(navController, startDestination = "") {
-
+            NavHost(navController, startDestination = "start") {
+                composable("start") {
+                    Greeting(name = "SomeName")
+                }
             }
         }
     }
@@ -40,6 +46,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String) {
     Text(text = "Hello $name!")
+    Button(
+        { log.d("Hi"); ExampleModule.navigation() }
+    ) {
+        Text("Click me")
+    }
 }
 
 @Preview(showBackground = true)

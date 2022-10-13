@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":core")
-
 
 pluginManagement {
     repositories {
@@ -20,3 +18,5 @@ dependencyResolutionManagement {
 rootProject.name = "gilty"
 
 include(":app", ":core")
+
+include(":example")

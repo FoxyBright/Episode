@@ -9,24 +9,24 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
-fun Project.baseConfig() {
+fun Project.baseConfig(name: String = project.name) {
 
     (this as ExtensionAware).extensions.run {
 
         findByType<BaseAppModuleExtension>()?.apply {
-            baseConfig()
+            baseConfig(name)
             baseAppModuleConfig()
             return@run
         }
 
         findByType<LibraryExtension>()?.apply {
-            baseConfig()
+            baseConfig(name)
             libraryConfig()
             return@run
         }
 
         findByType<DynamicFeatureExtension>()?.apply {
-            baseConfig()
+            baseConfig(name)
             dynamicFeatureConfig()
             return@run
         }
@@ -58,9 +58,10 @@ fun DynamicFeatureExtension.dynamicFeatureConfig() {
 
 }
 
-fun BaseExtension.baseConfig() {
+fun BaseExtension.baseConfig(name: String) {
 
-    namespace = Config.namespace
+    namespace = if(name == "app") Config.applicationId
+    else "${Config.namespacePrefix}.$name"
 
     defaultConfig {
         minSdk = Config.minSdk

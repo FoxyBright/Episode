@@ -9,7 +9,7 @@ object Config {
     const val versionName = "1.0"
 
     const val applicationId = "ru.rikmasters.gilty"
-    const val namespace = applicationId
+    const val namespacePrefix = applicationId
 
     const val jvmTarget = "1.8"
 
