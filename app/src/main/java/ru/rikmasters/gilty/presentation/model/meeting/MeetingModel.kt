@@ -12,7 +12,7 @@ sealed interface MeetingModel{
 
     val condition: ConditionType
 
-    val category: CategoryModel
+    val category: ShortCategoryModel
 
     val dateTime: String
 
@@ -29,7 +29,7 @@ data class ShortMeetingModel(
 
     override val condition: ConditionType,
 
-    override val category: CategoryModel,
+    override val category: ShortCategoryModel,
 
     override val dateTime: String,
 
@@ -47,7 +47,7 @@ data class FullMeetingModel(
 
     override val condition: ConditionType,
 
-    override val category: CategoryModel,
+    override val category: ShortCategoryModel,
 
     val type: MeetType,
 
@@ -79,7 +79,7 @@ val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),
     title = "Поход в кино",
     condition = ConditionType.FREE,
-    category = DemoCategoryModel,
+    category = DemoShortCategoryModel,
     type = MeetType.GROUP,
     dateTime = "2022-09-16T08:35:54.140Z",
     organizer = DemoOrganizerModel,
@@ -98,7 +98,7 @@ val DemoMeetingModel = ShortMeetingModel(
     id = UUID.randomUUID(),
     title = "R1, клубы, вечеринки",
     condition = ConditionType.MEMBER_PAY,
-    category = DemoCategoryModel,
+    category = DemoShortCategoryModel,
     dateTime = "2022-09-16T08:35:54.140Z",
     organizer = DemoOrganizerModel,
     true

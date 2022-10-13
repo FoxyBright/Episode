@@ -85,6 +85,14 @@
     <string name="meeting_filter_select_meeting_type_personal">Личные</string>
     <string name="meeting_filter_select_meeting_type_grouped">Групповые</string>
     <string name="meeting_filter_select_meeting_type_anonymous">Анонимные</string>
+    <string name="meeting_filter_select_meeting_type_free">Бесплатно</string>
+    <string name="meeting_filter_select_meeting_type_divide_amount">Сумма делится</string>
+    <string name="meeting_filter_select_meeting_type_organizer_pays">Платит организатор</string>
+    <string name="meeting_filter_select_meeting_type_paid">Платно</string>
+    <string name="meeting_filter_select_meeting_type_does_not_matter">Не важно</string>
+    <string name="meeting_filter_label_distance">%s км</string>
+    <string name="meeting_filter_delete_tag_label">Удалить</string>
+    <string name="meeting_filter_meeting_find">найдено %s встреч</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
 
     <!-- Image Descriptions -->

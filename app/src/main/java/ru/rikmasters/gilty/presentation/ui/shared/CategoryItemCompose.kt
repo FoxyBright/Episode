@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
-import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
+import ru.rikmasters.gilty.presentation.model.meeting.ShortCategoryModel
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -37,7 +37,7 @@ private fun CategoryItemTopPreview() {
     GiltyTheme {
         val iconState = remember { mutableStateOf(true) }
         CategoryItem(
-            DemoCategoryModel,
+            DemoShortCategoryModel,
             iconState.value,
             iconBottomState = false
         ) { iconState.value = !it }
@@ -51,7 +51,7 @@ fun CategoryItemBottomPreview() {
     GiltyTheme {
         val iconState = remember { mutableStateOf(true) }
         CategoryItem(
-            DemoCategoryModel,
+            DemoShortCategoryModel,
             iconState.value
         ) { iconState.value = it }
     }
@@ -59,7 +59,7 @@ fun CategoryItemBottomPreview() {
 
 @Composable
 fun CategoryItem(
-    item: CategoryModel,
+    item: ShortCategoryModel,
     state: Boolean,
     modifier: Modifier = Modifier,
     iconBottomState: Boolean = true,

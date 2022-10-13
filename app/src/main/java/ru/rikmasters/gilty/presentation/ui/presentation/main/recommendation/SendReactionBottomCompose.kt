@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.ui.shared.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
@@ -49,7 +49,7 @@ fun SendReactionBottomCompose(modifier: Modifier = Modifier) {
             )
         }
         CategoryItem(
-            DemoCategoryModel,
+            DemoShortCategoryModel,
             true,
             Modifier
                 .align(Alignment.TopEnd)

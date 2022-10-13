@@ -18,8 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.CategoryModel
-import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModelList
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModelList
+import ru.rikmasters.gilty.presentation.model.meeting.ShortCategoryModel
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.CATEGORY_ELEMENT_SIZE
@@ -28,12 +28,12 @@ import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
 data class SelectCategoriesState(
-    val categoryList: List<CategoryModel>,
-    val selectCategories: List<CategoryModel>
+    val categoryList: List<ShortCategoryModel>,
+    val selectCategories: List<ShortCategoryModel>
 )
 
 interface SelectCategoriesCallback : NavigationInterface {
-    fun onCategoryClick(category: CategoryModel){}
+    fun onCategoryClick(category: ShortCategoryModel){}
 }
 
 @Composable
@@ -99,7 +99,7 @@ private fun SelectCategoriesPreview() {
     GiltyTheme {
         SelectCategories(
             Modifier,
-            SelectCategoriesState(DemoCategoryModelList, arrayListOf())
+            SelectCategoriesState(DemoShortCategoryModelList, arrayListOf())
         )
     }
 }

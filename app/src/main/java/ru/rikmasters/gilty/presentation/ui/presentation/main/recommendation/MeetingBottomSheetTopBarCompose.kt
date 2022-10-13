@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel
@@ -100,7 +100,7 @@ fun MeetingBottomSheetTopBarCompose(
                     Modifier.fillMaxSize()
                 ) {
                     CategoryItem(
-                        DemoCategoryModel,
+                        DemoShortCategoryModel,
                         true,
                         Modifier
                             .align(Alignment.TopEnd)
