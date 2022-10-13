@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,9 +42,9 @@ import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-fun CategoryListPreview() {
+private fun CategoryListPreview() {
     GiltyTheme {
         val list = remember { mutableStateListOf<Boolean>() }
         repeat(DemoFullCategoryModelList.size) { list.add(false) }
@@ -129,7 +130,9 @@ fun CategoryList(
                         }
                         if (it.subcategories != null)
                             Icon(
-                                Icons.Filled.KeyboardArrowRight,
+                                if (!state.categoryListState[index])
+                                    Icons.Filled.KeyboardArrowRight
+                                else Icons.Filled.KeyboardArrowDown,
                                 stringResource(R.string.next_button),
                                 tint = ThemeExtra.colors.secondaryTextColor
                             )
