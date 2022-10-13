@@ -34,6 +34,5 @@ dependencies {
     androidBase()
     compose()
 
-    implementation(project(":core"))
     implementation(project(":example"))
 }

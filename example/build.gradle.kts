@@ -8,6 +8,4 @@ baseConfig()
 dependencies {
     androidBase()
     compose()
-
-    implementation(project(":core"))
 }
