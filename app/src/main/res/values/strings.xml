@@ -93,6 +93,7 @@
     <string name="meeting_filter_label_distance">%s км</string>
     <string name="meeting_filter_delete_tag_label">Удалить</string>
     <string name="meeting_filter_meeting_find">найдено %s встреч</string>
+    <string name="meeting_filter_complete_button">Готово</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
 
     <!-- Image Descriptions -->

@@ -28,7 +28,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-fun MeetingFilterBottomPreview() {
+private fun MeetingFilterBottomPreview() {
     GiltyTheme {
         val distanceState = remember { mutableStateOf(false) }
         val distance = remember { mutableStateOf(25) }
@@ -96,10 +96,9 @@ fun MeetingFilterBottom(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null
 ) {
-    val list = filterList(state, callback)
     Box(modifier.fillMaxSize()) {
         LazyColumn(Modifier.fillMaxSize()) {
-            items(list) {
+            items(filterList(state, callback)) {
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -167,7 +166,6 @@ interface MeetingFilterBottomCallback {
     fun onConditionSelect(it: Int, status: Boolean)
 }
 
-@Composable
 private fun filterList(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null

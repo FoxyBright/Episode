@@ -79,7 +79,7 @@ fun Category(
                     tint = ThemeExtra.colors.secondaryTextColor
                 )
             }
-            if (categoryStatus[index]) {
+            if (category.subcategories != null && categoryStatus[index]) {
                 Divider()
                 Surface {
                     FlowLayout(
@@ -88,10 +88,10 @@ fun Category(
                             .padding(top = 16.dp)
                             .padding(horizontal = 16.dp), 8.dp, 8.dp
                     ) {
-                        category.subcategories.forEachIndexed { it, item ->
+                        category.subcategories.forEach {
                             GiltyChip(
                                 Modifier,
-                                item,
+                                it,
                                 false
                             ) {
                                 //TODO: Выбор подкатегорий
@@ -187,7 +187,9 @@ fun TagSearch(
                                 Icon(
                                     Icons.Filled.Close,
                                     stringResource(R.string.meeting_filter_delete_tag_label),
-                                    Modifier.clickable { onDeleteTag(index) })
+                                    Modifier.clickable { onDeleteTag(index) },
+                                    Color.White
+                                )
                             }
                         }
                     }

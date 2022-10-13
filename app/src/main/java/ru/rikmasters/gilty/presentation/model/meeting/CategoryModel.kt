@@ -23,7 +23,7 @@ data class FullCategoryModel(
     override val name: String,
     override val color: String,
     override val emoji: EmojiModel,
-    val subcategories: List<String>
+    val subcategories: List<String>? = null
 ) : CategoryModel
 
 val DemoFullCategoryModel = FullCategoryModel(
@@ -49,6 +49,7 @@ val DemoFullCategoryModelList: List<FullCategoryModel> by lazy {
             )
         )
     }
+    categories.add(FullCategoryModel("4", "18+", "#D70015", DemoEmojiModel))
     return@lazy categories
 }
 
