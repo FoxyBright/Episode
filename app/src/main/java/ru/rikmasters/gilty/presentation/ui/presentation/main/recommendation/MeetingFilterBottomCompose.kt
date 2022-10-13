@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.DemoFullCategoryModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.presentation.model.meeting.FilterModel
 import ru.rikmasters.gilty.presentation.model.meeting.FullCategoryModel
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
@@ -37,10 +37,9 @@ fun MeetingFilterBottomPreview() {
         val genderList = remember { mutableStateListOf(false, false, false) }
         val conditionList = remember { mutableStateListOf(false, false, false, false, false) }
         val tagList = remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
-        val categoryList =
-            remember { mutableStateListOf(DemoFullCategoryModel, DemoFullCategoryModel) }
+        val categoryList = remember { mutableStateOf(DemoFullCategoryModelList) }
         val categoryStateList = remember { mutableStateListOf<Boolean>() }
-        repeat(categoryList.size) { categoryStateList.add(false) }
+        repeat(categoryList.value.size) { categoryStateList.add(false) }
         val state = FilterListState(
             distanceState.value,
             distance.value,
@@ -49,7 +48,7 @@ fun MeetingFilterBottomPreview() {
             genderList,
             conditionList,
             tagList,
-            categoryList,
+            categoryList.value,
             categoryStateList
         )
         MeetingFilterBottom(Modifier, 26, state, object : MeetingFilterBottomCallback {

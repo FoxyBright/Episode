@@ -85,7 +85,8 @@ fun Category(
                     FlowLayout(
                         Modifier
                             .background(ThemeExtra.colors.cardBackground)
-                            .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
+                            .padding(top = 16.dp)
+                            .padding(horizontal = 16.dp), 8.dp, 8.dp
                     ) {
                         category.subcategories.forEachIndexed { it, item ->
                             GiltyChip(
@@ -364,7 +365,8 @@ fun GenderAndConditions(
             FlowLayout(
                 Modifier
                     .background(ThemeExtra.colors.cardBackground)
-                    .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp), 8.dp, 8.dp
             ) {
                 selectedGenders.forEachIndexed { index, item ->
                     GiltyChip(

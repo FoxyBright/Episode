@@ -36,16 +36,16 @@ val DemoFullCategoryModel = FullCategoryModel(
 
 val DemoFullCategoryModelList: List<FullCategoryModel> by lazy {
     val categories = arrayListOf<FullCategoryModel>()
-    repeat(21) {
+    repeat(3) {
         val rand = Random.nextInt(1, 4)
         categories.add(
             FullCategoryModel(
-                "$it", "Category $it", when {
+                "$it", "Развлечения $it", when {
                     rand % 3 == 0 -> "#FF4745"
                     rand % 2 == 0 -> "#FFCC00"
                     else -> "#D70015"
                 }, DemoEmojiModel,
-                listOf("Subcategory", "Subcategory", "Subcategory", "Subcategory")
+                listOf("Ресторан $it", "Кино $it", "Кафе $it", "Прогулки $it")
             )
         )
     }
@@ -54,7 +54,7 @@ val DemoFullCategoryModelList: List<FullCategoryModel> by lazy {
 
 val DemoShortCategoryModel = ShortCategoryModel(
     id = "id",
-    name = "Category",
+    name = "Развлечения",
     color = "#FF4745",
     emoji = DemoEmojiModel
 )
@@ -65,7 +65,7 @@ val DemoShortCategoryModelList: List<ShortCategoryModel> by lazy {
         val rand = Random.nextInt(1, 4)
         categories.add(
             ShortCategoryModel(
-                "$it", "Category $it", when {
+                "$it", "Развлечения $it", when {
                     rand % 3 == 0 -> "#FF4745"
                     rand % 2 == 0 -> "#FFCC00"
                     else -> "#D70015"
