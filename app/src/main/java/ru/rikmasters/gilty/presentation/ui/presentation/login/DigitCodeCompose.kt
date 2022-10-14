@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -18,11 +17,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
+import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview
 @Composable
@@ -89,14 +88,12 @@ private fun Digit(
         modifier
             .size(57.dp, 60.dp)
             .background(
-                Color.White,
+                ThemeExtra.colors.cardBackground,
                 MaterialTheme.shapes.large
             )
             .focusRequester(requester)
             .padding(20.dp, 12.dp),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = MaterialTheme.typography.titleLarge,
         singleLine = true
     )
