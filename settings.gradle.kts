@@ -6,9 +6,6 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
-    plugins {
-        id("com.google.devtools.ksp") version "1.7.10-1.0.6"
-    }
 }
 
 dependencyResolutionManagement {
@@ -20,6 +17,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "gilty"
 
-include(":app", ":core", ":core:annotation")
+include(":app", ":core")
 
 include(":example")

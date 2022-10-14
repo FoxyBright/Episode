@@ -1,7 +1,6 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    id("com.google.devtools.ksp")
 }
 
 baseConfig()
@@ -14,7 +13,4 @@ kotlin {
 
 dependencies {
     androidBase(true)
-
-    implementation(project(":core:annotation"))
-    ksp(project(":core:annotation"))
 }
