@@ -37,11 +37,11 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 data class SearchState(
-    val name: String,
+    val name: String = "",
     var state: Boolean,
     val text: String,
     val onChangeText: (it: String) -> Unit,
-    val onExpandSearch: (Boolean) -> Unit
+    val onExpandSearch: ((Boolean) -> Unit)? = null
 )
 
 @Preview
@@ -60,16 +60,16 @@ private fun SearchActionBarPreview() {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun SearchActionBar(
-    state: SearchState
+    state: SearchState,
+    modifier: Modifier = Modifier
 ) {
     val width = SearchExpand(state.state)
     Box(Modifier.fillMaxWidth()) {
         Box(
-            Modifier
+            modifier
                 .height(60.dp)
                 .width(width)
                 .align(Alignment.CenterEnd)
-                .padding(horizontal = 16.dp)
                 .clip(MaterialTheme.shapes.extraSmall)
                 .background(ThemeExtra.colors.cardBackground)
         ) {
@@ -81,7 +81,7 @@ fun SearchActionBar(
             ) {
                 IconButton({
                     state.state = false
-                    state.onExpandSearch(false)
+                    state.onExpandSearch?.let { it(false) }
                 }) {
                     Icon(
                         painterResource(R.drawable.ic_back),
@@ -119,7 +119,7 @@ fun SearchActionBar(
                 Text(state.name, style = ThemeExtra.typography.H3)
                 IconButton({
                     state.state = true
-                    state.onExpandSearch(true)
+                    state.onExpandSearch?.let { it(true) }
                 }) {
                     Icon(
                         painterResource(R.drawable.magnifier),

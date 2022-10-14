@@ -2,7 +2,7 @@ package ru.rikmasters.gilty.presentation.model.meeting
 
 import ru.rikmasters.gilty.presentation.model.enumeration.ConditionType
 import ru.rikmasters.gilty.presentation.model.enumeration.MeetType
-import java.util.*
+import java.util.UUID
 
 sealed interface MeetingModel{
 

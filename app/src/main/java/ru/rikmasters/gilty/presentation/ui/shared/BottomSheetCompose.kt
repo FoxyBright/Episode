@@ -80,7 +80,7 @@ fun BottomSheetCompose(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (state.search != null)
-                    SearchActionBar(state.search)
+                    SearchActionBar(state.search, Modifier.padding(horizontal = 16.dp))
                 state.content()
             }
         }
