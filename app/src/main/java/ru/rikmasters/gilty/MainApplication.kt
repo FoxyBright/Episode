@@ -7,6 +7,6 @@ class MainApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initApplication(this)
+        initApplication(this, AppModule)
     }
 }

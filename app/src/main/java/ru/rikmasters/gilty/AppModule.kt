@@ -1,15 +1,12 @@
 package ru.rikmasters.gilty
 
 import org.koin.core.module.Module
+import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
 
-object AppModule: ModuleDefinition() {
+object AppModule: FeatureDefinition() {
 
-    override fun koin(): Module {
-        TODO("Not yet implemented")
-    }
+    override fun Module.koin() {
 
-    override fun navigation() {
-        TODO("Not yet implemented")
     }
 }

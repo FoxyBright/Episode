@@ -12,12 +12,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
+import org.koin.android.ext.android.inject
+import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.log.log
-import ru.rikmasters.gilty.example.ExampleModule
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
+
+    private val env: Environment by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,22 +45,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-    Button(
-        { log.d("Hi"); ExampleModule.navigation() }
-    ) {
-        Text("Click me")
+    @Composable
+    fun Greeting(name: String) {
+        Text(text = "Hello $name!")
+        Button(
+            { env["button"] = env.get<Boolean>("button")?.not() ?: true }
+        ) {
+            Text("Click me")
+        }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    GiltyTheme {
-        Greeting("Android")
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        GiltyTheme {
+            Greeting("Android")
+        }
     }
 }
