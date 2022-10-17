@@ -2,7 +2,9 @@
 
 package ru.rikmasters.gilty.presentation.ui.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -25,10 +27,14 @@ data class ExtraTypography(
     val SubHeadBold: TextStyle = baseTextStyle,
     val ButtonLabelText: TextStyle = baseTextStyle,
     val Body2Bold: TextStyle = baseTextStyle,
-    val LabelText: TextStyle = baseTextStyle
+    val LabelText: TextStyle = baseTextStyle,
+    val ProfileLabelText: TextStyle = baseTextStyle,
+    val ProfileObserversText: TextStyle = baseTextStyle,
+    val RatingText: TextStyle = baseTextStyle
     // Добавить новый шрифт в схему = baseTextStyle
 )
 
+@OptIn(ExperimentalTextApi::class)
 @Deprecated(
     "Надо использовать тему",
     ReplaceWith(
@@ -49,7 +55,7 @@ val DefaultExtraTypography = ExtraTypography(
     ),
 
     buttonText = baseTextStyle.copy(
-        fontSize = 16.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal
+        fontSize = 16.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal,
     ),
 
     ExtraHeader = baseTextStyle.copy(
@@ -109,6 +115,20 @@ val DefaultExtraTypography = ExtraTypography(
         fontSize = 13.sp, lineHeight = 15.sp, fontWeight = FontWeight.Medium, color = Color.White
     ),
 
+    ProfileLabelText = baseTextStyle.copy(
+        fontSize = 12.sp, lineHeight = 13.sp, fontWeight = FontWeight.SemiBold
+    ),
+
+    ProfileObserversText = baseTextStyle.copy(
+        fontSize = 9.sp, lineHeight = 9.sp, fontWeight = FontWeight.Medium
+    ),
+
+    RatingText = baseTextStyle.copy(
+        fontSize = 38.sp,
+        lineHeight = 46.sp,
+        fontWeight = FontWeight.Bold,
+        brush = Brush.horizontalGradient(0f to Colors.Gradient1, 1000f to Colors.Gradient2)
+    ),
 
 
     // Добавить в схему шрифты

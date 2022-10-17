@@ -24,14 +24,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.ui.presentation.profile.AgeBottomSheetComposeCallback
 import ru.rikmasters.gilty.presentation.ui.shared.DividerBold
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.ScrollTimePicker
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-interface TimeBottomSheetComposeCallback : AgeBottomSheetComposeCallback {
+interface TimeBottomSheetComposeCallback {
     fun onSaveClick(value: String)
 }
 
@@ -61,7 +60,8 @@ fun AgeBottomSheetCompose(
             .background(ThemeExtra.colors.cardBackground)
             .pointerInput(Unit) {
                 detectVerticalDragGestures { _, dragAmount ->
-                    if (dragAmount < 6) callback?.onDownDrag()
+                    //Здесь событие на свертывание
+                    if (dragAmount < 6) callback?.onSaveClick("")
                 }
             }
     ) {

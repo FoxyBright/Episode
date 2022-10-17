@@ -15,15 +15,16 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoConten
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
-import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
-import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfileCallback
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.Profile
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.ProfileCallback
+import ru.rikmasters.gilty.presentation.ui.presentation.profile.ProfileState
 
 @Composable
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController, "test") {
-        composable("test") {  }
+        composable("test") { }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {
@@ -59,8 +60,8 @@ fun Navigation() {
             })
         }
 
-        composable("profile") {
-            CreateProfile(Modifier, "", object : CreateProfileCallback {
+        composable("createProfile") {
+            Profile(ProfileState(), Modifier, object : ProfileCallback {
                 override fun onBack() {
                     navController.navigate("login")
                 }

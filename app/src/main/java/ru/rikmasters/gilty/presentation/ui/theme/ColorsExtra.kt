@@ -3,7 +3,6 @@
 package ru.rikmasters.gilty.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import ru.rikmasters.gilty.presentation.ui.theme.Colors.BackgroundDay
 
 data class ExtraColors(
     val myExtraColor: Color = Color.Unspecified,
@@ -26,7 +25,9 @@ data class ExtraColors(
     val borderColor: Color = Color.Unspecified,
     val mainTrackCheckBox: Color = Color.Unspecified,
     val secondaryTrackCheckBox: Color = Color.Unspecified,
-    val meetingCardBackBackground: Color = Color.Unspecified
+    val meetingCardBackBackground: Color = Color.Unspecified,
+    val lockColors: Color = Color.Unspecified,
+    val lockColorsBackground: Color = Color.Unspecified,
 
     // Добавить новый цвет в схему = Color.Unspecified
 )
@@ -54,6 +55,8 @@ val LightExtraColors = ExtraColors(
     mainTrackCheckBox = Colors.Gray2,
     secondaryTrackCheckBox = Colors.Border,
     borderColor = Color.White,
+    lockColors = Color.White,
+    lockColorsBackground = Colors.lockColorsBackgroundDay,
     meetingCardBackBackground = Colors.meetingCardBackBackgroundDay
 
 
@@ -82,6 +85,8 @@ val DarkExtraColors = ExtraColors(
     mainTrackCheckBox = Colors.Border,
     secondaryTrackCheckBox = Colors.Gray2,
     borderColor = Colors.meetingCardBackBackgroundNight,
+    lockColors = Colors.lockColors,
+    lockColorsBackground = Colors.lockColorsBackgroundNight,
     meetingCardBackBackground = Colors.meetingCardBackBackgroundNight
     // Добавить в схему цвета из файла Colors
 )

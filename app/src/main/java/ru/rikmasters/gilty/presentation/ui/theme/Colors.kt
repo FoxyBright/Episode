@@ -36,6 +36,8 @@ object Colors {
     val Gray = Color(0xFFE9E9EA)
     val Border = Color(0xFFB0B0B0)
     val Divider = Color(0xFFDFDFDF)
+    val lockColors = Color(0xFF787579)
+
 
     val BackgroundDay = Color(0xFFF6F6F6)
     val CardBackgroundDay = Color.White
@@ -43,6 +45,7 @@ object Colors {
     val SecondaryTextDay = Color(0xFFAEAAAE)
     val searchCardBackgroundDay = Color(0xFFF6F6F6)
     val meetingCardBackBackgroundDay = Color(0xFFFFFFFF)
+    val lockColorsBackgroundDay = Color(0xFFB3B3B3)
 
     //Night mod colors
     val BackgroundNight = Color(0xFF1F1F1F)
@@ -52,6 +55,7 @@ object Colors {
     val SecondaryTextNight = Color(0xFFE6E1E5)
     val searchCardBackgroundNight = Color(0x1FE3E3E3)
     val meetingCardBackBackgroundNight = Color(0xFF303030)
+    val lockColorsBackgroundNight = Color(0xFF222222)
 
     // Добавить новые цвета
 }
