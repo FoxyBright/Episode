@@ -76,16 +76,23 @@ fun CreateProfile(
                 RoundedCornerShape(30.dp),
                 CardDefaults.cardColors(MaterialTheme.colorScheme.background),
                 border = BorderStroke(6.dp, ThemeExtra.colors.cardBackground)
-            ) { Profile(state, Modifier, callback) }
+            ) {
+                Profile(
+                    state,
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 50.dp),
+                    callback
+                )
+            }
         }
         GradientButton(
-            { callback?.onNext() },
             Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
-        )
+        ) { callback?.onNext() }
     }
 }
 

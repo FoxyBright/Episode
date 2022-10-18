@@ -161,7 +161,9 @@ fun ProfileMeetingBottomSheet(
         ) {
             itemsIndexed(state.memberList) { index, member ->
                 Row(
-                    Modifier.fillMaxWidth().clickable { callback?.onMemberClick() },
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { callback?.onMemberClick() },
                     verticalAlignment = CenterVertically
                 ) {
                     AsyncImage(
@@ -185,12 +187,10 @@ fun ProfileMeetingBottomSheet(
             }
         }
         GradientButton(
-            { callback?.onConfirm() },
             Modifier
                 .padding(16.dp, 28.dp)
                 .align(Alignment.CenterHorizontally),
             stringResource(R.string.meeting_join_button_name)
-        )
-
+        ) { callback?.onConfirm() }
     }
 }

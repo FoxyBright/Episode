@@ -108,13 +108,12 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
             }
         }
         GradientButton(
-            { callback?.onNext() },
             Modifier
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.finish)
-        )
+        ) { callback?.onNext() }
     }
 }
 

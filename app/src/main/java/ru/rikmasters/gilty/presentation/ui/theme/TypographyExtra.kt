@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 data class ExtraTypography(
@@ -30,6 +31,7 @@ data class ExtraTypography(
     val LabelText: TextStyle = baseTextStyle,
     val ProfileLabelText: TextStyle = baseTextStyle,
     val ProfileObserversText: TextStyle = baseTextStyle,
+    val CodeText: TextStyle = baseTextStyle,
     val RatingText: TextStyle = baseTextStyle
     // Добавить новый шрифт в схему = baseTextStyle
 )
@@ -130,6 +132,13 @@ val DefaultExtraTypography = ExtraTypography(
         brush = Brush.horizontalGradient(0f to Colors.Gradient1, 1000f to Colors.Gradient2)
     ),
 
+    CodeText = baseTextStyle.copy(
+        fontSize = 22.sp,
+        lineHeight = 38.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center
+    ),
 
-    // Добавить в схему шрифты
+
+// Добавить в схему шрифты
 )

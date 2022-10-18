@@ -74,7 +74,9 @@ fun LoginContent(
     val searchCountry = remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     val country = remember { mutableStateOf(DemoCountry) }
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier.fillMaxSize()
+    ) {
         Column(
             modifier
                 .fillMaxSize()
@@ -186,6 +188,7 @@ fun LoginContent(
             Modifier
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                 .align(Alignment.BottomCenter)
+                .background(ThemeExtra.colors.cardBackground)
         ) { bottomSheetState.value = false }
     }
 }

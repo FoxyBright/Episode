@@ -41,7 +41,9 @@ import ru.rikmasters.gilty.presentation.ui.shared.SearchState
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview
+private val allTags = listOf("Здесь", "Должен", "Быть", "Список", "Всех", "Доступных", "Тегов")
+
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun MeetingTagSearchPreview() {
     GiltyTheme {
@@ -53,7 +55,7 @@ private fun MeetingTagSearchPreview() {
             remember { mutableStateListOf("Бэтмэн", "Кингсмен", "Лобби", "Lorem", "Lolly") },
             popularTagsListVisible.value,
             searchText.value,
-            listOf("Здесь", "Должен", "Быть", "Список", "Всех", "Доступных", "Тегов")
+            allTags
         )
         MeetingTagSearch(state, Modifier.padding(16.dp), object : MeetingTagSearchCallback {
             override fun searchTextChange(text: String) {
@@ -191,9 +193,8 @@ fun MeetingTagSearch(
                 }
             }
         GradientButton(
-            { callback?.onNext() },
             Modifier.padding(top = 28.dp),
             stringResource(R.string.meeting_filter_complete_button)
-        )
+        ) { callback?.onNext() }
     }
 }

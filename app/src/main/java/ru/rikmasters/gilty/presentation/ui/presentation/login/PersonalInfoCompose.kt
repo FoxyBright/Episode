@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.presentation.ui.presentation.login
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,11 +31,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.ui.shared.GiltyChip
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.ActionBar
 import ru.rikmasters.gilty.presentation.ui.shared.BottomSheetCompose
 import ru.rikmasters.gilty.presentation.ui.shared.BottomSheetComposeState
+import ru.rikmasters.gilty.presentation.ui.shared.GiltyChip
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.NumberPicker
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
@@ -103,8 +104,6 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 ThemeExtra.colors.mainTextColor,
                 style = ThemeExtra.typography.H3
             )
-            val chipsTitle =
-                remember { listOf(R.string.female_sex, R.string.male_sex, R.string.others_sex) }
             Card(
                 Modifier.padding(top = 12.dp),
                 MaterialTheme.shapes.large,
@@ -119,11 +118,15 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                     itemsIndexed(list) { index, it ->
                         GiltyChip(
                             Modifier.padding(end = 12.dp),
-                            stringResource(chipsTitle[index]), it
+                            stringResource(
+                                listOf(
+                                    R.string.female_sex,
+                                    R.string.male_sex,
+                                    R.string.others_sex
+                                )[index]
+                            ), it
                         ) {
-                            for (i in 0..list.lastIndex) {
-                                list[i] = false
-                            }
+                            for (i in 0..list.lastIndex) list[i] = false
                             list[index] = true
                         }
                     }
@@ -131,13 +134,12 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
             }
         }
         GradientButton(
-            { callback?.onNext() },
             Modifier
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
-        )
+        ) { callback?.onNext() }
         BottomSheetCompose(
             BottomSheetComposeState(320.dp, bottomSheetState) {
                 NumberPicker(
@@ -149,21 +151,19 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                     range = 18..100
                 )
                 GradientButton(
-                    {
-                        ageTextFieldValue.value = pickerValue.toString()
-                        bottomSheetState.value = false
-                    },
                     Modifier
                         .align(Alignment.BottomCenter)
                         .padding(horizontal = 16.dp)
                         .padding(top = 40.dp),
                     stringResource(R.string.save_button), true
-                )
+                ) {
+                    ageTextFieldValue.value = pickerValue.toString()
+                    bottomSheetState.value = false
+                }
             }, Modifier
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                 .align(Alignment.BottomCenter)
-        ) {
-            bottomSheetState.value = false
-        }
+                .background(ThemeExtra.colors.cardBackground)
+        ) { bottomSheetState.value = false }
     }
 }

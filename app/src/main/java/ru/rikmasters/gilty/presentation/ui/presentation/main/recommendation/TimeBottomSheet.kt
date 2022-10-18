@@ -83,13 +83,12 @@ fun AgeBottomSheetCompose(
             ) { h, m -> time = "$h:$m" }
         }
         GradientButton(
-            { callback?.onSaveClick(time) },
             Modifier
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 32.dp),
             stringResource(R.string.save_button), true
-        )
+        ) { callback?.onSaveClick(time) }
     }
 }
 

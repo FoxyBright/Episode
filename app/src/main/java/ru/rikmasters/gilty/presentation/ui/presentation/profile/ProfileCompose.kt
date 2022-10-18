@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -52,7 +51,7 @@ interface ProfileCallback : NavigationInterface {
     fun onDescriptionChange(text: String) {}
 }
 
-@Preview
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ProfilePreview() {
     GiltyTheme {
@@ -88,16 +87,11 @@ fun Profile(
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null
 ) {
-    Column(
-        Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxSize()
-    ) {
+    Column(modifier) {
         TextField(
             state.name,
             { callback?.onNameChange(it) },
             Modifier
-                .padding(top = 54.dp)
                 .offset((-16).dp)
                 .fillMaxWidth(),
             colors = TransparentTextFieldColors(),

@@ -25,14 +25,13 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun GradientButtonPreview() {
-    GiltyTheme{
-        GradientButton({ }, text = "Далее", smallText = "Подробности")
+    GiltyTheme {
+        GradientButton(text = "Далее", smallText = "Подробности") {}
     }
 }
 
 @Composable
 fun GradientButton(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String,
     enabled: Boolean = true,
@@ -43,35 +42,29 @@ fun GradientButton(
     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
     smallText: String? = null,
     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),
+    onClick: () -> Unit,
 ) {
     Button(
-        modifier = modifier
-            .fillMaxWidth(),
-        onClick = onClick,
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        ButtonDefaults.buttonColors(Color.Transparent),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent
-        ),
-        shape = shape,
-        enabled = enabled,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            Modifier
                 .background(
-                    brush = Brush.linearGradient(colors = if (enabled) gradientColors else disabledColors),
-                    shape = shape
+                    Brush.linearGradient(if (enabled) gradientColors else disabledColors),
+                    shape
                 )
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(16.dp),
+            Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = text,
-                    style = ThemeExtra.typography.button
-                )
-                if (smallText != null)
-                    Text(smallText, style = ThemeExtra.typography.ButtonLabelText)
+                Text(text, style = ThemeExtra.typography.button)
+                smallText?.let { Text(smallText, style = ThemeExtra.typography.ButtonLabelText) }
             }
         }
     }

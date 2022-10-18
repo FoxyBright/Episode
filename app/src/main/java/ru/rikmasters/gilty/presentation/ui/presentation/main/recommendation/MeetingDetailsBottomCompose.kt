@@ -145,9 +145,8 @@ fun MeetingDetailsBottomCompose(
             style = ThemeExtra.typography.LabelText
         )
         GradientButton(
-            { callback?.onRespondClick() },
             Modifier.padding(16.dp, 28.dp),
             stringResource(R.string.meeting_respond)
-        )
+        ) { callback?.onRespondClick() }
     }
 }

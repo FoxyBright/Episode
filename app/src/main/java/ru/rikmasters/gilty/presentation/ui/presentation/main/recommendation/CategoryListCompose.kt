@@ -163,12 +163,11 @@ fun CategoryList(
             }
             item {
                 GradientButton(
-                    { callback?.onNext() },
                     Modifier
                         .padding(horizontal = 16.dp)
                         .padding(top = 28.dp),
                     stringResource(R.string.meeting_filter_complete_button)
-                )
+                ) { callback?.onNext() }
             }
             item {
                 Text(

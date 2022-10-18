@@ -33,7 +33,7 @@ data class SelectCategoriesState(
 )
 
 interface SelectCategoriesCallback : NavigationInterface {
-    fun onCategoryClick(category: ShortCategoryModel){}
+    fun onCategoryClick(category: ShortCategoryModel) {}
 }
 
 @Composable
@@ -82,13 +82,12 @@ fun SelectCategories(
             }
         }
         GradientButton(
-            { callback?.onNext() },
             Modifier
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
-        )
+        ) { callback?.onNext() }
     }
 }
 

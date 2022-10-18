@@ -40,7 +40,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview
 @Composable
-fun HiddenPhotoContentPreview() {
+private fun HiddenPhotoContentPreview() {
     GiltyTheme {
         var lookState by remember { mutableStateOf(true) }
         HiddenPhotoContent(Modifier.width(160.dp), lookState, null, {}) {
@@ -51,13 +51,13 @@ fun HiddenPhotoContentPreview() {
 
 @Preview
 @Composable
-fun ProfileImageContentPreview() {
+private fun ProfileImageContentPreview() {
     GiltyTheme { ProfileImageContent(Modifier.width(160.dp), null) {} }
 }
 
 @Preview
 @Composable
-fun ProfileStatisticContentPreview() {
+private fun ProfileStatisticContentPreview() {
     GiltyTheme {
         ProfileStatisticContent(
             Modifier.width(160.dp),
@@ -82,13 +82,14 @@ fun HiddenPhotoContent(
             .background(ThemeExtra.colors.cardBackground)
             .clickable { onCardClick() }, Alignment.BottomCenter
     ) {
-        if (image != null)
+        image?.let {
             Image(
-                painterResource(image),
+                painterResource(it),
                 stringResource(R.string.hidden_image),
                 Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds
             )
+        }
         Box(
             Modifier
                 .padding(start = 8.dp, top = 8.dp)
@@ -180,13 +181,14 @@ fun ProfileImageContent(modifier: Modifier, image: Int?, onClick: () -> Unit) {
             .background(ThemeExtra.colors.cardBackground)
             .clickable { onClick() }, Alignment.BottomCenter
     ) {
-        if (image != null)
+        image?.let {
             Image(
-                painterResource(image),
+                painterResource(it),
                 stringResource(R.string.meeting_avatar),
                 Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds
             )
+        }
         CardRow(stringResource(R.string.user_image))
     }
 }

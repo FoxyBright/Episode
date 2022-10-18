@@ -22,6 +22,7 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.presentation.model.meeting.FilterModel
 import ru.rikmasters.gilty.presentation.model.meeting.FullCategoryModel
+import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
@@ -115,7 +116,6 @@ fun MeetingFilterBottom(
             }
             item {
                 GradientButton(
-                    {},
                     Modifier
                         .padding(horizontal = 16.dp)
                         .padding(top = 28.dp),
@@ -123,7 +123,7 @@ fun MeetingFilterBottom(
                     smallText = find?.let {
                         stringResource(R.string.meeting_filter_meeting_find, it)
                     }
-                )
+                ) { callback?.onNext() }
             }
             item {
                 Text(
@@ -153,7 +153,7 @@ data class FilterListState(
     val categoryStateList: List<Boolean>
 )
 
-interface MeetingFilterBottomCallback {
+interface MeetingFilterBottomCallback : NavigationInterface {
     fun onCategoryClick(index: Int)
     fun onAllCategoryClick()
     fun onFilterClick()
