@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun MeetingFilterBottomPreview() {
+fun MeetingFilterBottomPreview() {
     GiltyTheme {
         val distanceState = remember { mutableStateOf(false) }
         val distance = remember { mutableStateOf(25) }

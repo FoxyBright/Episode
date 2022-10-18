@@ -32,8 +32,6 @@ fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController, "login") {
 
-        composable("test") { }
-
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {
@@ -74,7 +72,7 @@ fun Navigation() {
             val name = remember { mutableStateOf("") }
             val description = remember { mutableStateOf("") }
             val profileState = ProfileState(
-                name.value,
+                name = name.value,
                 lockState = lockState.value,
                 description = description.value,
                 enabled = true

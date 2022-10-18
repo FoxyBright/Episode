@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.shared.TextFieldColors
 import ru.rikmasters.gilty.presentation.ui.shared.TrackCheckBox
@@ -38,13 +37,8 @@ private fun MeetingDetailsBottomComposePreview() {
         var hiddenPhoto by remember { mutableStateOf(false) }
         var commentText by remember { mutableStateOf("") }
         MeetingDetailsBottomCompose(
-            Modifier,
-            MeetingDetailsBottomComposeState(
-                DemoFullMeetingModel,
-                "2 часа",
-                hiddenPhoto,
-                commentText
-            ),
+            Modifier.padding(16.dp),
+            MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
             object : MeetingDetailsBottomCallback {
                 override fun onHiddenPhotoActive(hidden: Boolean) {
                     hiddenPhoto = hidden
@@ -60,9 +54,20 @@ private fun MeetingDetailsBottomComposePreview() {
     }
 }
 
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Composable
+private fun MeetingDetailsBottomComposeFullPreview() {
+    GiltyTheme {
+        MeetingDetailsBottomCompose(
+            Modifier.padding(16.dp),
+            MeetingDetailsBottomComposeState(
+                true, DemoFullMeetingModel.description
+            )
+        )
+    }
+}
+
 data class MeetingDetailsBottomComposeState(
-    val meetingModel: FullMeetingModel,
-    val eventDuration: String,
     val hiddenPhoto: Boolean,
     val comment: String
 )
@@ -81,19 +86,10 @@ fun MeetingDetailsBottomCompose(
     state: MeetingDetailsBottomComposeState,
     callback: MeetingDetailsBottomCallback? = null
 ) {
-    Column(
-        modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-    ) {
-        MeetingBottomSheetTopBarCompose(
-            Modifier,
-            state.meetingModel,
-            state.eventDuration
-        )
+    Column(modifier.fillMaxWidth()) {
         Text(
             stringResource(R.string.meeting_question_comment_or_assess),
-            Modifier.padding(top = 30.dp),
+            Modifier,
             style = ThemeExtra.typography.H3
         )
         TextField(
@@ -145,7 +141,7 @@ fun MeetingDetailsBottomCompose(
             style = ThemeExtra.typography.LabelText
         )
         GradientButton(
-            Modifier.padding(16.dp, 28.dp),
+            Modifier.padding(top = 28.dp),
             stringResource(R.string.meeting_respond)
         ) { callback?.onRespondClick() }
     }

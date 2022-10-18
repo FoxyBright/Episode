@@ -32,7 +32,7 @@
     <string name="once">Однократно</string>
     <string name="prohibit">Запретить</string>
 
-    <!-- Create Profile -->
+    <!-- Profile -->
     <string name="create_profile_title">Заполните профиль</string>
     <string name="user_name">Имя пользователя</string>
     <string name="user_image">Фото профиля</string>
@@ -40,7 +40,12 @@
     <string name="observers">Наблюдели</string>
     <string name="observe">Наблюдает</string>
     <string name="about_me">О себе</string>
+    <string name="profile_responds_label">Отклики</string>
     <string name="about_me_placeholder">Расскажите кратко о себе</string>
+    <string name="profile_actual_meetings_label">Актуальные встречи</string>
+    <string name="profile_meeting_history_label">История</string>
+    <string name="profile_menu_settings_button">Настройки</string>
+    <string name="profile_menu_watch_photo_button">Смотреть фото</string>
 
     <!-- Code -->
     <string name="confirm_number_title">Подтвердите номер</string>

@@ -9,7 +9,7 @@ data class OrientationModel(
     val name: String
 )
 
-val OrientationModelDemo = OrientationModel(
+val DemoOrientationModel = OrientationModel(
 
     UUID.randomUUID(),
 

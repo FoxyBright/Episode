@@ -1,26 +1,17 @@
 package ru.rikmasters.gilty.presentation.model.profile
 
-
-data class CreateProfileModel(
-
-    val username: String,
-
-    val genderId: String,
-
-    val age: Int,
-
-    val orientationId: String?,
-
-    val aboutMe: String?
-
-)
-
-val DemoCreateAccountModel = CreateProfileModel(
-    "angelika.aeom",
-    "2",
-    18,
-    null,
-    null
+val DemoProfileModel = ProfileModel(
+    "0",
+    "+7 910 524-12-12",
+    "alina.loon",
+    DemoEmojiModel,
+    DemoGenderModel,
+    DemoOrientationModel,
+    27,
+    "Instagram @cristi",
+    DemoAvatarModel,
+    DemoRatingModel,
+    true
 )
 
 data class ProfileModel(

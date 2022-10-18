@@ -7,8 +7,7 @@ data class GenderModel(
     val name: String
 )
 
-val GenderModelDemo = GenderModel(
-
+val DemoGenderModel = GenderModel(
     "id",
     "Гендер"
 )

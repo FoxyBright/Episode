@@ -21,10 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.model.profile.DemoProfileModel
+import ru.rikmasters.gilty.presentation.model.profile.EmojiModel
 import ru.rikmasters.gilty.presentation.ui.presentation.navigation.NavigationInterface
 import ru.rikmasters.gilty.presentation.ui.shared.TextFieldColors
 import ru.rikmasters.gilty.presentation.ui.shared.TransparentTextFieldColors
@@ -33,13 +34,15 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 data class ProfileState(
     val name: String = "",
-    val hiddenPhoto: Int? = null,
-    val ProfilePhoto: Int? = null,
+    val hiddenPhoto: String? = null,
+    val profilePhoto: String? = null,
     val lockState: Boolean = false,
     val description: String = "",
     val rating: String = "0",
     val observers: Int = 0,
     val observed: Int = 0,
+    val emoji: EmojiModel? = null,
+    val isCreate: Boolean = true,
     val enabled: Boolean = true
 )
 
@@ -53,16 +56,16 @@ interface ProfileCallback : NavigationInterface {
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun ProfilePreview() {
+private fun EditProfilePreview() {
     GiltyTheme {
         val lockState = remember { mutableStateOf(false) }
-        val name = remember { mutableStateOf("alina.loon, 27") }
-        val description = remember { mutableStateOf("instagram @cristy") }
+        val name = remember { mutableStateOf("") }
+        val description = remember { mutableStateOf("") }
         val profileState = ProfileState(
             name.value,
             lockState = lockState.value,
             description = description.value,
-            enabled = false
+            enabled = true
         )
         Profile(profileState, Modifier, object : ProfileCallback {
             override fun onNameChange(text: String) {
@@ -77,6 +80,22 @@ private fun ProfilePreview() {
                 description.value = text
             }
         })
+    }
+}
+
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Composable
+private fun OrganizerProfilePreview() {
+    GiltyTheme {
+        val user = DemoProfileModel
+        Profile(
+            ProfileState(
+                "${user.username}, ${user.age}",
+                lockState = false,
+                description = user.aboutMe,
+                enabled = false
+            )
+        )
     }
 }
 
@@ -102,7 +121,7 @@ fun Profile(
                         stringResource(R.string.user_name),
                         Modifier.padding(end = 8.dp),
                         ThemeExtra.colors.secondaryTextColor,
-                        style = ThemeExtra.typography.ExtraHeader
+                        style = ThemeExtra.typography.H1
                     )
                     Icon(
                         painterResource(R.drawable.ic_edit),
@@ -116,7 +135,7 @@ fun Profile(
             singleLine = true
         )
         Row {
-            ProfileImageContent(Modifier, state.ProfilePhoto)
+            ProfileImageContent(Modifier, state.profilePhoto ?: "", state.isCreate)
             { callback?.profileImage() }
             Spacer(Modifier.width(14.dp))
             Column {
@@ -124,13 +143,15 @@ fun Profile(
                     Modifier,
                     state.rating,
                     state.observers,
-                    state.observed
+                    state.observed,
+                    state.emoji?.path
                 )
                 Spacer(Modifier.height(14.dp))
                 HiddenPhotoContent(
                     Modifier,
                     state.lockState,
                     state.hiddenPhoto,
+                    state.isCreate,
                     { callback?.hiddenImages() },
                     { callback?.onLockClick(it) })
             }
@@ -139,7 +160,7 @@ fun Profile(
             stringResource(R.string.about_me),
             Modifier.padding(top = 20.dp),
             ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.Body1Bold
+            style = ThemeExtra.typography.H3
         )
         TextField(
             state.description,
@@ -155,8 +176,7 @@ fun Profile(
                 Text(
                     stringResource(R.string.about_me_placeholder),
                     color = ThemeExtra.colors.secondaryTextColor,
-                    style = ThemeExtra.typography.LabelText,
-                    fontWeight = FontWeight.Medium
+                    style = ThemeExtra.typography.Body1Medium
                 )
             }
         )

@@ -47,6 +47,7 @@ fun MeetingCard(
     meeting: ShortMeetingModel,
     modifier: Modifier = Modifier,
     today: Boolean = false,
+    active: Boolean = true,
     onClick: () -> Unit
 ) {
     Card(

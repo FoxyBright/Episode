@@ -31,9 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
 import ru.rikmasters.gilty.presentation.ui.shared.DateTimeCard
@@ -46,7 +46,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 private fun MeetingBottomSheetTopBarComposePreview() {
     GiltyTheme {
         MeetingBottomSheetTopBarCompose(
-            Modifier,
+            Modifier.padding(16.dp),
             DemoFullMeetingModel,
             "2 часа"
         )
@@ -57,7 +57,8 @@ private fun MeetingBottomSheetTopBarComposePreview() {
 fun MeetingBottomSheetTopBarCompose(
     modifier: Modifier = Modifier,
     meetingModel: FullMeetingModel,
-    eventDuration: String
+    eventDuration: String,
+    menu: (() -> Unit)? = null
 ) {
     Column(modifier) {
         Row(
@@ -69,11 +70,12 @@ fun MeetingBottomSheetTopBarCompose(
                 color = ThemeExtra.colors.mainTextColor,
                 style = ThemeExtra.typography.H3
             )
-            IconButton({  }) {
+            IconButton({ menu?.let { it() } }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,
-                    tint = ThemeExtra.colors.grayIcon
+                    Modifier,
+                    ThemeExtra.colors.grayIcon
                 )
             }
         }
@@ -104,7 +106,7 @@ fun MeetingBottomSheetTopBarCompose(
                         true,
                         Modifier
                             .align(Alignment.TopEnd)
-                            .offset(25.dp, -(25).dp)
+                            .offset(20.dp, (-20).dp)
                     )
                     Column(
                         Modifier
