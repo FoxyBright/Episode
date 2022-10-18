@@ -1,26 +1,16 @@
 package ru.rikmasters.gilty.core.env
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newCoroutineContext
 import kotlinx.coroutines.runBlocking
 import org.koin.core.KoinApplication
 import ru.rikmasters.gilty.core.log.Loggable
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
 import java.lang.ClassCastException
-import java.lang.ref.WeakReference
-import java.util.WeakHashMap
 
 class Environment
 internal constructor(
@@ -56,7 +46,7 @@ internal constructor(
 
     // Корутины
 
-    private val envScope = CoroutineScope(SupervisorJob())
+    val scope = CoroutineScope(SupervisorJob())
 
     // Переменные среды
 

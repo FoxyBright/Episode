@@ -4,13 +4,15 @@ plugins {
 }
 
 baseConfig()
+compose()
 
-kotlin {
+/*kotlin {
     sourceSets.forEach {
         it.kotlin.srcDirs += File("build/generated/ksp/${it.name}/kotlin")
     }
-}
+}*/
 
 dependencies {
     androidBase(true)
+    compose()
 }

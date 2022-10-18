@@ -6,6 +6,8 @@ import ru.rikmasters.gilty.core.module.ModuleDefinition
 
 object AppModule: FeatureDefinition() {
 
+
+
     override fun Module.koin() {
 
     }
