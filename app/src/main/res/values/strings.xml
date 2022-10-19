@@ -79,6 +79,11 @@
     <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
     <string name="meeting_only_online_meetings_button">Только онлайн встречи</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
+    <string name="meeting_distance_from_user">"От вас "</string>
+    <string name="meeting_watch_on_mup_button">Посмотреть на карте</string>
+    <string name="meeting_shared_button">Поделиться</string>
+    <string name="meeting_watch_all_members_in_meet">Смотреть всех</string>
+    <string name="meeting_close_button">Закрыть</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
 
     <!--Meeting Filters-->

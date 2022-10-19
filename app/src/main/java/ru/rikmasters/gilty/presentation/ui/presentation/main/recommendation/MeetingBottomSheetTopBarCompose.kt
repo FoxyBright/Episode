@@ -26,14 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
-import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.presentation.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
 import ru.rikmasters.gilty.presentation.ui.shared.DateTimeCard
@@ -69,7 +68,7 @@ fun MeetingBottomSheetTopBarCompose(
                 color = ThemeExtra.colors.mainTextColor,
                 style = ThemeExtra.typography.H3
             )
-            IconButton({  }) {
+            IconButton({ }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,
@@ -147,8 +146,8 @@ fun MeetingBottomSheetTopBarCompose(
         Text(
             "${meetingModel.organizer.username}, ${meetingModel.organizer.age}",
             Modifier.padding(top = 9.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
+            ThemeExtra.colors.mainTextColor,
+            style = ThemeExtra.typography.Body1Bold,
         )
     }
 }

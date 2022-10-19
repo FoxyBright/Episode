@@ -4,26 +4,25 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -38,17 +37,15 @@ import ru.rikmasters.gilty.presentation.model.enumeration.ConditionType
 import ru.rikmasters.gilty.presentation.model.enumeration.MeetType
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.presentation.model.meeting.MemberModel
 import ru.rikmasters.gilty.presentation.ui.shared.GradientButton
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun ProfileMeetingBottomSheetPreview() {
+private fun MyMeetingPreview() {
     GiltyTheme {
-        ProfileMeetingBottomSheet(
+        MyMeeting(
             Modifier,
             ProfileMeetingBottomSheetState(
                 DemoFullMeetingModel,
@@ -59,25 +56,17 @@ private fun ProfileMeetingBottomSheetPreview() {
     }
 }
 
-data class ProfileMeetingBottomSheetState(
-    val meetingModel: FullMeetingModel,
-    val memberList: List<MemberModel>,
-    val distance: Int,
-    val eventDuration: String
-)
 
-interface ProfileMeetingBottomSheetCallback {
-    fun onConfirm()
-    fun onMemberClick()
-    fun openMap()
+interface MyMeetingCallback : ProfileMeetingBottomSheetCallback {
+    fun onCloseClick()
+    fun onAllWatchClick()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileMeetingBottomSheet(
+fun MyMeeting(
     modifier: Modifier = Modifier,
     state: ProfileMeetingBottomSheetState,
-    callback: ProfileMeetingBottomSheetCallback? = null
+    callback: MyMeetingCallback? = null
 ) {
     LazyColumn(
         modifier
@@ -164,82 +153,90 @@ fun ProfileMeetingBottomSheet(
                         if (state.meetingModel.isPrivate) R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
                     ), null,
-                    Modifier.padding(start = 8.dp, bottom = 16.dp)
+                    Modifier.padding(start = 8.dp)
                 )
             }
         }
-        itemsIndexed(state.memberList) { index, member ->
-            Card(
-                Modifier.fillMaxWidth(),
-                when (index) {
-                    0 -> ThemeExtra.shapes.largeTopRoundedShape
-                    state.memberList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape
-                    else -> RoundedCornerShape(0.dp)
-                }, CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+        item {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(ThemeExtra.colors.cardBackground)
             ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { callback?.onMemberClick() },
-                    verticalAlignment = CenterVertically
-                ) {
-                    AsyncImage(
-                        member.avatar.id,
-                        stringResource(R.string.meeting_avatar),
-                        Modifier
-                            .padding(12.dp, 8.dp)
-                            .clip(CircleShape)
-                            .size(40.dp),
-                        painterResource(R.drawable.gb),
-                        contentScale = ContentScale.FillBounds
-                    )
-                    Text(
-                        "${member.username}, ${member.age}",
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb,
-                        fontWeight = FontWeight.Bold
-                    )
+                state.memberList.forEachIndexed { index, member ->
+                    if (index < 3) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { callback?.onMemberClick() },
+                            Arrangement.SpaceBetween,
+                            Alignment.CenterVertically
+                        ) {
+                            Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
+                                AsyncImage(
+                                    member.avatar.id,
+                                    stringResource(R.string.meeting_avatar),
+                                    Modifier
+                                        .padding(12.dp, 8.dp)
+                                        .clip(CircleShape)
+                                        .size(40.dp),
+                                    painterResource(R.drawable.gb),
+                                    contentScale = ContentScale.FillBounds
+                                )
+                                Text(
+                                    "${member.username}, ${member.age}",
+                                    color = ThemeExtra.colors.mainTextColor,
+                                    style = ThemeExtra.typography.Body1Sb,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Icon(
+                                Icons.Filled.KeyboardArrowRight,
+                                null,
+                                Modifier.padding(end = 16.dp),
+                                ThemeExtra.colors.mainTextColor
+                            )
+                        }
+                        if (state.memberList.size <= 3 && index + 1 < state.memberList.size) {
+                            Divider(Modifier.padding(start = 60.dp))
+                        } else if (index + 1 < 3) Divider(Modifier.padding(start = 60.dp))
+                    }
                 }
-                if (index < state.memberList.size - 1) Divider(Modifier.padding(start = 60.dp))
             }
         }
         item {
-            Row(Modifier.padding(top = 28.dp, bottom = 14.dp)) {
-                Text(
-                    stringResource(R.string.meeting_distance_from_user),
-                    Modifier.padding(end = 4.dp),
-                    ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
-                )
-                Text(
-                    stringResource(R.string.meeting_filter_label_distance, state.distance),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = ThemeExtra.typography.H3
-                )
-            }
-        }
-        item {
-            Card({ callback?.openMap() }, Modifier.fillMaxWidth()) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp), Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        stringResource(R.string.meeting_watch_on_mup_button),
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb
-                    )
-                    Icon(Icons.Filled.KeyboardArrowRight, null)
-                }
-            }
+            Text(
+                stringResource(R.string.meeting_watch_all_members_in_meet),
+                Modifier
+                    .padding(top = 12.dp)
+                    .clip(CircleShape)
+                    .clickable { callback?.onAllWatchClick() },
+                MaterialTheme.colorScheme.primary,
+                style = ThemeExtra.typography.Body1Sb,
+            )
         }
         item {
             GradientButton(
                 { callback?.onConfirm() },
-                Modifier.padding(vertical = 28.dp),
-                stringResource(R.string.meeting_join_button_name)
+                Modifier.padding(top = 20.dp, bottom = 12.dp),
+                stringResource(R.string.meeting_shared_button),
+                icon = R.drawable.ic_shared
             )
+        }
+        item {
+            Box(Modifier.fillMaxWidth(), Alignment.Center) {
+                Text(
+                    stringResource(R.string.meeting_close_button),
+                    Modifier
+                        .padding(bottom = 28.dp)
+                        .clip(CircleShape)
+                        .clickable { callback?.onCloseClick() },
+                    ThemeExtra.colors.mainTextColor,
+                    style = ThemeExtra.typography.button,
+                )
+            }
         }
     }
 }
