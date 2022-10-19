@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.presentation.ui.shared
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -9,6 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,7 +34,9 @@ fun ActionBar(
                     R.drawable.ic_back
                 ),
                 stringResource(R.string.action_bar_button_back),
-                Modifier.padding(end = 16.dp).size(24.dp),
+                Modifier
+                    .padding(end = 16.dp)
+                    .size(24.dp),
                 ThemeExtra.colors.mainTextColor
             )
         }
@@ -54,6 +58,49 @@ fun ActionBar(
                 color = ThemeExtra.colors.secondaryTextColor
             )
         }
+    }
+}
+
+@Composable
+fun RowActionBar(
+    title: String,
+    details: String? = null,
+    modifier: Modifier = Modifier,
+    onBack: (() -> Unit)? = null
+) {
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        IconButton({ onBack?.let { it() } }, Modifier.padding(end = 16.dp)) {
+            Icon(
+                painterResource(R.drawable.ic_back),
+                stringResource(R.string.action_bar_button_back),
+                Modifier.size(24.dp),
+                ThemeExtra.colors.mainTextColor
+            )
+        }
+        Text(
+            title,
+            Modifier.padding(end = 4.dp),
+            ThemeExtra.colors.mainTextColor,
+            style = ThemeExtra.typography.H3
+        )
+        details?.let {
+            Text(
+                details, style = ThemeExtra.typography.H3,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun RowActionBarPreview() {
+    GiltyTheme {
+        RowActionBar(
+            "Заголовок",
+            "Детали",
+            Modifier.padding(16.dp)
+        )
     }
 }
 

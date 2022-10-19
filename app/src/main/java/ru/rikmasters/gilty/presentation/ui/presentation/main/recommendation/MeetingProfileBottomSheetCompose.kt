@@ -134,7 +134,7 @@ fun ProfileMeetingBottomSheet(
         }
         Row(Modifier.padding(top = 28.dp)) {
             Text(
-                stringResource(R.string.members),
+                stringResource(R.string.meeting_members),
                 style = ThemeExtra.typography.H3
             )
             Text(

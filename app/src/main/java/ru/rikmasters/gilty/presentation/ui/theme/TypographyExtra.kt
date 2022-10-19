@@ -64,7 +64,6 @@ val DefaultExtraTypography = ExtraTypography(
         fontSize = 23.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold
     ),
 
-    //Шрифты с макета в Figma
     H1 = baseTextStyle.copy(
         fontSize = 28.sp, lineHeight = 37.sp, fontWeight = FontWeight.Bold
     ),
