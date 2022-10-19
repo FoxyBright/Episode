@@ -4,9 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +49,14 @@ private fun SquareCheckBoxPreview() {
 @Composable
 private fun LockerCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }
-    SquareCheckBox(checkBoxState, Modifier.padding(10.dp)) { checkBoxState = it }
+    LockerCheckBox((checkBoxState), Modifier.padding(10.dp)) { checkBoxState = it }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ObserveCheckBoxPreview() {
+    var checkBoxState by remember { mutableStateOf(true) }
+    ObserveCheckBox((checkBoxState), Modifier.padding(10.dp)) { checkBoxState = it }
 }
 
 @Composable
@@ -56,13 +70,9 @@ fun CheckBox(
         ),
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val imageResource: Int = if (checked) {
-        changedImages.first()
-    } else {
-        changedImages.last()
-    }
     Image(
-        painterResource(imageResource), null,
+        painterResource(if (checked) changedImages.first() else changedImages.last()),
+        null,
         modifier
             .size(24.dp)
             .clip(CircleShape)
@@ -76,11 +86,6 @@ fun SquareCheckBox(
     modifier: Modifier = Modifier,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val imageResource: Int = if (checked) {
-        R.drawable.ic_grid_screen_button
-    } else {
-        R.drawable.ic_swipe_screen_button
-    }
     Box(
         modifier
             .size(56.dp)
@@ -91,7 +96,36 @@ fun SquareCheckBox(
         Alignment.Center
     ) {
         Image(
-            painterResource(imageResource), null,
+            painterResource(
+                if (checked) R.drawable.ic_grid_screen_button
+                else R.drawable.ic_swipe_screen_button
+            ),
+            null,
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun ObserveCheckBox(
+    checked: Boolean = false,
+    modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Card(
+        { onCheckedChange(!checked) },
+        modifier
+            .width(136.dp)
+            .height(26.dp),
+        colors = CardDefaults.cardColors(Color.Transparent)
+    ) {
+        Image(
+            painterResource(
+                if (checked) R.drawable.off_observe_checkbox
+                else R.drawable.on_observe_checkbox
+            ),
+            null,
+            Modifier.fillMaxSize()
         )
     }
 }
@@ -102,17 +136,13 @@ fun LockerCheckBox(
     modifier: Modifier = Modifier,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val imageResource: Int = if (checked) {
-        R.drawable.ic_lock_open
-    } else {
-        R.drawable.ic_lock_close
-    }
     IconButton({ onCheckedChange(!checked) }) {
         Icon(
-            painterResource(imageResource),
+            painterResource(if (checked) R.drawable.ic_lock_open else R.drawable.ic_lock_close),
             null,
             modifier.size(24.dp),
             ThemeExtra.colors.lockColors
         )
     }
 }
+

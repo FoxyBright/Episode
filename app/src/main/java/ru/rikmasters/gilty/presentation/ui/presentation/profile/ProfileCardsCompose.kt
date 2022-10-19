@@ -36,8 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.model.enumeration.ProfileType
 import ru.rikmasters.gilty.presentation.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.presentation.ui.shared.LockerCheckBox
+import ru.rikmasters.gilty.presentation.ui.shared.ObserveCheckBox
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
@@ -46,7 +48,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 private fun HiddenPhotoContentPreview() {
     GiltyTheme {
         var lookState by remember { mutableStateOf(true) }
-        HiddenPhotoContent(Modifier.width(160.dp), lookState, null, true, {}) {
+        HiddenPhotoContent(Modifier.width(160.dp), lookState, null, ProfileType.CREATE, {}) {
             lookState = !lookState
         }
     }
@@ -55,7 +57,15 @@ private fun HiddenPhotoContentPreview() {
 @Preview
 @Composable
 private fun ProfileImageContentPreview() {
-    GiltyTheme { ProfileImageContent(Modifier.width(160.dp), "", true) {} }
+    GiltyTheme {
+        val observeState = remember { mutableStateOf(false) }
+        ProfileImageContent(
+            Modifier.width(160.dp),
+            "",
+            ProfileType.ORGANIZER,
+            false,
+            { observeState.value = it }) {}
+    }
 }
 
 @Preview
@@ -74,7 +84,7 @@ fun HiddenPhotoContent(
     modifier: Modifier,
     lockState: Boolean,
     image: String?,
-    isCreate: Boolean,
+    profileType: ProfileType,
     onCardClick: () -> Unit,
     onLockClick: (Boolean) -> Unit
 ) {
@@ -88,7 +98,7 @@ fun HiddenPhotoContent(
     ) {
         AsyncImage(
             image,
-            stringResource(R.string.hidden_image),
+            stringResource(R.string.profile_hidden_photo),
             Modifier.fillMaxSize(),
             placeholder = painterResource(R.drawable.ic_image_empty),
             contentScale = ContentScale.Crop
@@ -101,7 +111,98 @@ fun HiddenPhotoContent(
                 .align(Alignment.TopStart)
                 .alpha(50f)
         ) { LockerCheckBox(lockState, Modifier.padding(4.dp)) { onLockClick(it) } }
-        CreateProfileCardRow(stringResource(R.string.hidden_image), Modifier, isCreate)
+        if (profileType == ProfileType.ORGANIZER)
+            CreateProfileCardRow(
+                stringResource(R.string.profile_hidden_photo),
+                ProfileType.USERPROFILE
+            )
+        else CreateProfileCardRow(stringResource(R.string.profile_hidden_photo), profileType)
+    }
+}
+
+@Composable
+fun ProfileImageContent(
+    modifier: Modifier,
+    image: String,
+    profileType: ProfileType,
+    observeState: Boolean,
+    onObserveChange: (Boolean) -> Unit,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier
+            .height(214.dp)
+            .fillMaxWidth(0.45f)
+            .clip(MaterialTheme.shapes.large)
+            .background(ThemeExtra.colors.cardBackground)
+            .clickable { onClick() }, Alignment.BottomCenter
+    ) {
+        AsyncImage(
+            image,
+            stringResource(R.string.meeting_avatar),
+            Modifier.fillMaxSize(),
+            placeholder = painterResource(R.drawable.ic_image_empty),
+            contentScale = ContentScale.Crop
+        )
+        when (profileType) {
+            ProfileType.CREATE -> {
+                CreateProfileCardRow(stringResource(R.string.profile_user_photo), profileType)
+            }
+
+            ProfileType.ORGANIZER -> {
+                CreateProfileCardRow(
+                    stringResource(R.string.profile_organizer_observe),
+                    profileType,
+                    observeState,
+                ) { onObserveChange(it) }
+            }
+
+            ProfileType.USERPROFILE -> {}
+        }
+    }
+}
+
+@Composable
+private fun CreateProfileCardRow(
+    text: String,
+    profileType: ProfileType,
+    observeState: Boolean = false,
+    onClick: ((Boolean) -> Unit)? = null
+) {
+    Row(
+        Modifier
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 8.dp),
+        Arrangement.Center, Alignment.CenterVertically
+    ) {
+        if (profileType != ProfileType.ORGANIZER)
+            Text(
+                text,
+                Modifier.padding(end = 4.dp),
+                ThemeExtra.colors.secondaryTextColor,
+                style = ThemeExtra.typography.ProfileLabelText,
+            )
+        when (profileType) {
+            ProfileType.CREATE -> {
+                Box(
+                    Modifier
+                        .size(26.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                ) {
+                    Image(
+                        painterResource(R.drawable.ic_image_box),
+                        null,
+                        Modifier
+                            .fillMaxSize()
+                            .padding(4.dp)
+                    )
+                }
+            }
+
+            ProfileType.ORGANIZER -> ObserveCheckBox(observeState) { bool -> onClick?.let { it(bool) } }
+
+            ProfileType.USERPROFILE -> {}
+        }
     }
 }
 
@@ -154,7 +255,7 @@ fun ProfileStatisticContent(
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        stringResource(R.string.observers),
+                        stringResource(R.string.profile_observers),
                         Modifier.fillMaxWidth(),
                         ThemeExtra.colors.mainTextColor,
                         style = ThemeExtra.typography.ProfileObserversText,
@@ -170,7 +271,7 @@ fun ProfileStatisticContent(
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        stringResource(R.string.observe),
+                        stringResource(R.string.profile_observe),
                         Modifier.fillMaxWidth(),
                         ThemeExtra.colors.mainTextColor,
                         style = ThemeExtra.typography.ProfileObserversText,
@@ -179,57 +280,6 @@ fun ProfileStatisticContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ProfileImageContent(modifier: Modifier, image: String, isCreate: Boolean, onClick: () -> Unit) {
-    Box(
-        modifier
-            .height(214.dp)
-            .fillMaxWidth(0.45f)
-            .clip(MaterialTheme.shapes.large)
-            .background(ThemeExtra.colors.cardBackground)
-            .clickable { onClick() }, Alignment.BottomCenter
-    ) {
-        AsyncImage(
-            image,
-            stringResource(R.string.meeting_avatar),
-            Modifier.fillMaxSize(),
-            placeholder = painterResource(R.drawable.ic_image_empty),
-            contentScale = ContentScale.Crop
-        )
-        if (isCreate) CreateProfileCardRow(stringResource(R.string.user_image), Modifier, true)
-    }
-}
-
-@Composable
-private fun CreateProfileCardRow(text: String, modifier: Modifier = Modifier, isCreate: Boolean) {
-    Row(
-        modifier
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 8.dp), Arrangement.Center, Alignment.CenterVertically
-    ) {
-        Text(
-            text,
-            Modifier.padding(end = 4.dp),
-            ThemeExtra.colors.secondaryTextColor,
-            style = ThemeExtra.typography.ProfileLabelText,
-        )
-        if (isCreate)
-            Box(
-                Modifier
-                    .size(26.dp)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
-            ) {
-                Image(
-                    painterResource(R.drawable.ic_image_box),
-                    null,
-                    Modifier
-                        .fillMaxSize()
-                        .padding(4.dp)
-                )
-            }
     }
 }
 

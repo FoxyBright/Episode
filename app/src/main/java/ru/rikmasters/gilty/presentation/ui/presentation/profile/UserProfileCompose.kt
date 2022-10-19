@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.R
+import ru.rikmasters.gilty.presentation.model.enumeration.ProfileType
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.MeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.ShortMeetingModel
@@ -62,7 +63,7 @@ data class UserProfileState(
     val menuExpanded: Boolean
 )
 
-interface UserProfileCallback {
+interface UserProfileCallback : ProfileCallback {
     fun menu(state: Boolean) {}
     fun openHistory(state: Boolean) {}
     fun onMeetingClick(meet: MeetingModel) {}
@@ -80,7 +81,7 @@ private fun UserProfilePreview() {
         UserProfile(
             UserProfileState(
                 DemoProfileModel,
-                ProfileState(isCreate = false, observers = 13500, observed = 128),
+                ProfileState(observers = 13500, observed = 128),
                 listOf(DemoMeetingModel, DemoMeetingModel, DemoMeetingModel),
                 listOf(DemoMeetingModel, DemoMeetingModel),
                 DemoMeetingModel,
@@ -164,7 +165,7 @@ fun UserProfile(
                     state.profileState.observers,
                     state.profileState.observed,
                     state.profileModel.emoji,
-                    state.profileState.isCreate,
+                    ProfileType.USERPROFILE,
                     false,
                 )
             )

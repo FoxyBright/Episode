@@ -78,11 +78,7 @@ fun CodeEnter(
     modifier: Modifier = Modifier,
     callback: CodeEnterCallback? = null
 ) {
-    Surface(
-        modifier
-
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+    Surface(modifier.background(MaterialTheme.colorScheme.background)) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -115,7 +111,6 @@ fun DigitCode(
                     .padding(10.dp)
                     .clip(MaterialTheme.shapes.large)
                     .size(60.dp)
-                    .background(ThemeExtra.colors.cardBackground)
                     .focusRequester(focus),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 textStyle = ThemeExtra.typography.CodeText,
