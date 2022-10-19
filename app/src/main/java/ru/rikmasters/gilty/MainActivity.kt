@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,7 +17,8 @@ import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.core.app.appEntrypoint
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
-import ru.rikmasters.gilty.ui.DefaultSnackbar
+import ru.rikmasters.gilty.ui.GBottomSheetBackground
+import ru.rikmasters.gilty.ui.GSnackbar
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
@@ -28,7 +31,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             appEntrypoint(
                 GiltyTheme,
-                { DefaultSnackbar(it) }
+                { GBottomSheetBackground(it) },
+                { GSnackbar(it) }
             )
         }
     }

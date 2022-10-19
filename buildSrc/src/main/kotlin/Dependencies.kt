@@ -7,10 +7,10 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) = implement
     "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
 )and koin() and implementationIf(!excludeCore, project(":core"))
 
-const val composeVer = "1.2.1"
+const val composeVer = "1.3.0-rc01"
 fun DependencyHandlerScope.compose() = implementation(
     "androidx.activity:activity-compose:1.6.0",
-    "androidx.compose.material3:material3:1.0.0-beta03",
+    "androidx.compose.material3:material3:1.0.0-rc01",
     "androidx.navigation:navigation-compose:2.5.2",
     "io.coil-kt:coil-compose:2.2.2",
     "androidx.compose.ui:ui:$composeVer",
