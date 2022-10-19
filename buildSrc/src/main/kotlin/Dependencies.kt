@@ -18,13 +18,18 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and debugImplementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer"
+) and accompanist()
+
+const val accompanistVer = "0.26.5-rc"
+fun DependencyHandlerScope.accompanist() = implementation(
+    "com.google.accompanist:accompanist-systemuicontroller:$accompanistVer"
 )
 
-const val koinVersion= "3.2.1"
+const val koinVer = "3.2.1"
 fun DependencyHandlerScope.koin() = implementation(
-    "io.insert-koin:koin-core:$koinVersion",
-    "io.insert-koin:koin-android:$koinVersion",
-    "io.insert-koin:koin-androidx-compose:$koinVersion"
+    "io.insert-koin:koin-core:$koinVer",
+    "io.insert-koin:koin-android:$koinVer",
+    "io.insert-koin:koin-androidx-compose:$koinVer"
 )
 
 @Suppress("UNUSED_PARAMETER")

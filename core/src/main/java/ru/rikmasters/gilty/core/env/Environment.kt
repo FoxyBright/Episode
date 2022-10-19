@@ -7,6 +7,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.koin.core.KoinApplication
+import org.koin.core.component.KoinComponent
+import org.koin.core.module.Module
 import ru.rikmasters.gilty.core.log.Loggable
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
@@ -16,7 +18,7 @@ class Environment
 internal constructor(
     context: Context,
     root: FeatureDefinition
-): Loggable {
+): Loggable, KoinComponent {
 
     // Работа с модулями
 
@@ -24,7 +26,7 @@ internal constructor(
 
     private fun includeRecursive(node: ModuleDefinition) {
         if(!modules.add(node))
-            throw IllegalStateException("Модуль ${node.name} дублируется. Цикличная зависимость?")
+            throw IllegalStateException("Модуль ${node.name} дублируется. Циклическая зависимость?")
         else
             logV("Добавлен модуль ${node.name}")
         node.include().forEach(::includeRecursive)
@@ -34,14 +36,19 @@ internal constructor(
         includeRecursive(root)
     }
 
-    // Инициализация Koin
+    // Koin
 
     private fun collectKoinModules() =
         modules.map { it.koin() }
 
     internal fun onKoinStarted(koin: KoinApplication) {
-        logV("Koin инициализирован")
         koin.modules(collectKoinModules())
+        logV("Koin инициализирован")
+    }
+
+    fun loadModules(vararg modules: Module, reason: String? = null, allowOverride: Boolean = true) {
+        getKoin().loadModules(modules.asList(), allowOverride)
+        logV("Koin модули загружены: ${modules.size} (${reason ?: "неизвестные модули"})")
     }
 
     // Корутины

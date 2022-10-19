@@ -4,6 +4,7 @@ plugins {
 }
 
 baseConfig()
+compose()
 
 dependencies {
     androidBase()
