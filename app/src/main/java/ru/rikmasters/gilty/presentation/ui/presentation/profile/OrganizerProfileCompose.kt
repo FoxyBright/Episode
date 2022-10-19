@@ -84,23 +84,25 @@ fun OrganizerProfile(
                 )
             ) { callback?.onObserveChange(it) }
         }
-        item {
-            Text(
-                stringResource(R.string.profile_actual_meetings_label),
-                Modifier.padding(top = 28.dp, bottom = 14.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
-            )
-        }
-        item {
-            LazyRow {
-                itemsIndexed(state.currentMeetings) { index, it ->
-                    MeetingCard(
-                        it,
-                        Modifier.padding(
-                            end = if (index <= state.currentMeetings.size - 2) 8.dp else 0.dp
-                        )
-                    ) { /*callback?.onMeetingClick(it)*/ }
+        if (state.currentMeetings.isNotEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.profile_actual_meetings_label),
+                    Modifier.padding(top = 28.dp, bottom = 14.dp),
+                    ThemeExtra.colors.mainTextColor,
+                    style = ThemeExtra.typography.H3
+                )
+            }
+            item {
+                LazyRow {
+                    itemsIndexed(state.currentMeetings) { index, it ->
+                        MeetingCard(
+                            it,
+                            Modifier.padding(
+                                end = if (index <= state.currentMeetings.size - 2) 8.dp else 0.dp
+                            )
+                        ) { callback?.onMeetingClick(it) }
+                    }
                 }
             }
         }

@@ -231,51 +231,55 @@ fun UserProfile(
                 }
             }
         }
-        item {
-            LazyRow {
-                itemsIndexed(state.currentMeetings) { index, it ->
-                    MeetingCard(
-                        it,
-                        Modifier.padding(
-                            end = if (index <= state.currentMeetings.size - 2) 8.dp else 0.dp
-                        )
-                    ) { callback?.onMeetingClick(it) }
-                }
-            }
-        }
-        item {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 28.dp)
-                    .clip(CircleShape)
-                    .clickable { callback?.openHistory(state.historyState) },
-                Arrangement.Start, Alignment.CenterVertically
-            ) {
-                Text(
-                    stringResource(R.string.profile_meeting_history_label),
-                    Modifier.padding(8.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
-                )
-                Icon(
-                    if (!state.historyState) Icons.Filled.KeyboardArrowRight
-                    else Icons.Filled.KeyboardArrowDown,
-                    stringResource(R.string.profile_responds_label),
-                    tint = ThemeExtra.colors.secondaryTextColor
-                )
-            }
-            if (state.historyState)
+        if (state.currentMeetings.isNotEmpty()) {
+            item {
                 LazyRow {
-                    itemsIndexed(state.meetingsHistory) { index, it ->
+                    itemsIndexed(state.currentMeetings) { index, it ->
                         MeetingCard(
                             it,
                             Modifier.padding(
-                                end = if (index <= state.meetingsHistory.size - 2) 8.dp else 0.dp
+                                end = if (index <= state.currentMeetings.size - 2) 8.dp else 0.dp
                             )
                         ) { callback?.onMeetingClick(it) }
                     }
                 }
+            }
+        }
+        if (state.meetingsHistory.isNotEmpty()) {
+            item {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 28.dp)
+                        .clip(CircleShape)
+                        .clickable { callback?.openHistory(state.historyState) },
+                    Arrangement.Start, Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.profile_meeting_history_label),
+                        Modifier.padding(8.dp),
+                        color = ThemeExtra.colors.mainTextColor,
+                        style = ThemeExtra.typography.H3
+                    )
+                    Icon(
+                        if (!state.historyState) Icons.Filled.KeyboardArrowRight
+                        else Icons.Filled.KeyboardArrowDown,
+                        stringResource(R.string.profile_responds_label),
+                        tint = ThemeExtra.colors.secondaryTextColor
+                    )
+                }
+                if (state.historyState)
+                    LazyRow {
+                        itemsIndexed(state.meetingsHistory) { index, it ->
+                            MeetingCard(
+                                it,
+                                Modifier.padding(
+                                    end = if (index <= state.meetingsHistory.size - 2) 8.dp else 0.dp
+                                )
+                            ) { callback?.onMeetingClick(it) }
+                        }
+                    }
+            }
         }
     }
 }
