@@ -25,7 +25,6 @@
     <string name="find_more_details">Узнайте о самых актуальных встречах\nнедалеко от вас</string>
     <string name="permissions">Разрешения</string>
     <string name="geoposition">Геопозиция</string>
-    <string name="notifications">Уведомления</string>
     <string name="finish">Завершить</string>
     <string name="answer_permission">Разрешить Guilty доступ к\nместоположению этого\nустройства?</string>
     <string name="when_using">При использовании</string>
@@ -67,6 +66,15 @@
     <string name="not_interesting">Не интересно</string>
     <string name="meeting_respond">Откликнуться</string>
     <string name="meeting_terms">Условия</string>
+
+    <!-- Notifications -->
+    <string name="notification_screen_name">Уведомления</string>
+    <string name="notification_meeting_took_place">Состоялась встреча</string>
+    <string name="notification_words_connector">" c "</string>
+    <string name="notification_leave_impressions">Оставьте эмоции от встречи</string>
+    <string name="notification_meet_is_accept">"принял(а) ваш отклик на встречу"</string>
+    <string name="notification_earlier_label">Ранее</string>
+    <string name="notification_on_this_week_label">На этой неделе</string>
 
     <!-- Meeting -->
     <string name="meeting_personal_type">Персональная встреча</string>

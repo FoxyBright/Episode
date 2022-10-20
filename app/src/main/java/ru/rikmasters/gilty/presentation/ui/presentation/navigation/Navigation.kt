@@ -22,6 +22,7 @@ import ru.rikmasters.gilty.presentation.ui.presentation.login.PersonalInfoConten
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategories
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.login.SelectCategoriesState
+import ru.rikmasters.gilty.presentation.ui.presentation.notification.NotificationsComposePreview
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.CreateProfile
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.ProfileCallback
 import ru.rikmasters.gilty.presentation.ui.presentation.profile.ProfileState
@@ -30,8 +31,8 @@ import ru.rikmasters.gilty.presentation.ui.presentation.profile.ProfileState
 @ExperimentalMaterial3Api
 fun Navigation() {
     val navController = rememberNavController()
-    NavHost(navController, "login") {
-
+    NavHost(navController, "test") {
+        composable("test") { NotificationsComposePreview() }
         composable("personalInformation") {
             PersonalInfoContent(object : NavigationInterface {
                 override fun onBack() {

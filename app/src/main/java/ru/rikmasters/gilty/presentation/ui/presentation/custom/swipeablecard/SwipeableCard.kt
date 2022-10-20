@@ -10,27 +10,43 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+
 fun Modifier.swipeableCard(
     state: SwipeableCardState,
-    blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
-    onSwipeCancel: (() -> Unit)? = null,
     onSwiped: (Direction) -> Unit,
+    onSwipeCancel: () -> Unit = {},
+    blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
 ) = pointerInput(Unit) {
     coroutineScope {
         detectDragGestures(
-            {},
-            {
+            onDragCancel = {
+                launch {
+                    state.reset()
+                    onSwipeCancel()
+                }
+            },
+            onDrag = { change, dragAmount ->
+                launch {
+                    val original = state.offset.targetValue
+                    val summed = original + dragAmount
+                    val newValue = Offset(
+                        x = summed.x.coerceIn(-state.maxWidth, state.maxWidth),
+                        y = summed.y.coerceIn(-state.maxHeight, state.maxHeight)
+                    )
+                    if (change.positionChange() != Offset.Zero) change.consume()
+                    state.drag(newValue.x, newValue.y)
+                }
+            },
+            onDragEnd = {
                 launch {
                     val coercedOffset = state.offset.targetValue
-                        .coerceIn(
-                            blockedDirections,
-                            state.maxHeight,
-                            state.maxWidth
-                        )
+                        .coerceIn(blockedDirections,
+                            maxHeight = state.maxHeight,
+                            maxWidth = state.maxWidth)
 
                     if (hasNotTravelledEnough(state, coercedOffset)) {
                         state.reset()
-                        if (onSwipeCancel != null) onSwipeCancel()
+                        onSwipeCancel()
                     } else {
                         val horizontalTravel = abs(state.offset.targetValue.x)
                         val verticalTravel = abs(state.offset.targetValue.y)
@@ -54,24 +70,6 @@ fun Modifier.swipeableCard(
                         }
                     }
                 }
-            },
-            {
-                launch {
-                    state.reset()
-                    if (onSwipeCancel != null) onSwipeCancel()
-                }
-            },
-            { change, dragAmount ->
-                launch {
-                    val original = state.offset.targetValue
-                    val summed = original + dragAmount
-                    val newValue = Offset(
-                        summed.x.coerceIn(-state.maxWidth, state.maxWidth),
-                        summed.y.coerceIn(-state.maxHeight, state.maxHeight)
-                    )
-                    if (change.positionChange() != Offset.Zero) change.consume()
-                    state.drag(newValue.x, newValue.y)
-                }
             }
         )
     }
@@ -87,7 +85,7 @@ private fun Offset.coerceIn(
     maxWidth: Float,
 ): Offset {
     return copy(
-        x.coerceIn(
+        x = x.coerceIn(
             if (blockedDirections.contains(Direction.Left)) {
                 0f
             } else {
@@ -99,12 +97,11 @@ private fun Offset.coerceIn(
                 maxWidth
             }
         ),
-        y.coerceIn(
-            if (blockedDirections.contains(Direction.Up)) {
-                0f
-            } else {
-                -maxHeight
-            },
+        y = y.coerceIn(if (blockedDirections.contains(Direction.Up)) {
+            0f
+        } else {
+            -maxHeight
+        },
             if (blockedDirections.contains(Direction.Down)) {
                 0f
             } else {

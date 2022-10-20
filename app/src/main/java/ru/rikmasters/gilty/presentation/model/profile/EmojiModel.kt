@@ -14,3 +14,14 @@ val DemoEmojiModel = EmojiModel(
     path = "https://serverspace.ru/wp-content/uploads/2019/06/backup-i-snapshot.png"
 
 )
+
+val AllEmojiList = listOf(
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel,
+    DemoEmojiModel
+)

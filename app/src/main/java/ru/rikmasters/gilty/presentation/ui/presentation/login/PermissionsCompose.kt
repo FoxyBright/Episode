@@ -98,7 +98,7 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                             .padding(24.dp), Arrangement.SpaceBetween
                     ) {
                         Text(
-                            stringResource(R.string.notifications),
+                            stringResource(R.string.notification_screen_name),
                             color = ThemeExtra.colors.mainTextColor,
                             style = ThemeExtra.typography.buttonText
                         )

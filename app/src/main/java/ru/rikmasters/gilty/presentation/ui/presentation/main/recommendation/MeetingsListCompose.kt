@@ -71,8 +71,10 @@ fun TodayMeetingsListCompose(
                                 .fillMaxSize()
                                 .swipeableCard(
                                     state,
+                                    {},
+                                    {},
                                     listOf(Direction.Down, Direction.Up)
-                                ) {},
+                                ),
                             meeting,
                             state,
                             false
