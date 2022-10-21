@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.model.profile.notification
+package ru.rikmasters.gilty.presentation.model.notification
 
 import ru.rikmasters.gilty.presentation.model.enumeration.NotificationType
 import ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel
@@ -26,7 +26,7 @@ val DemoNotificationMeetingOverModel = NotificationModel(
 val DemoTodayNotificationRespondAccept = NotificationModel(
     1, DemoFullMeetingModel,
     NotificationType.RESPOND_ACCEPT,
-    "2022-10-21T07:35:54.140Z"
+    "2022-10-21T17:40:54.140Z"
 )
 
 val DemoTodayNotificationMeetingOver = NotificationModel(

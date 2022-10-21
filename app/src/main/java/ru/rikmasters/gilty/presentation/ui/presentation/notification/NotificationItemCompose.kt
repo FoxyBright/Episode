@@ -35,8 +35,8 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.enumeration.NotificationType
 import ru.rikmasters.gilty.presentation.model.profile.DemoEmojiList
 import ru.rikmasters.gilty.presentation.model.profile.EmojiModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoNotificationLeaveEmotionModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.NotificationModel
+import ru.rikmasters.gilty.presentation.model.notification.DemoNotificationLeaveEmotionModel
+import ru.rikmasters.gilty.presentation.model.notification.NotificationModel
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 @Preview

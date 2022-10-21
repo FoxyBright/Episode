@@ -44,11 +44,11 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.presentation.model.profile.EmojiModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoNotificationLeaveEmotionModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoNotificationMeetingOverModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoTodayNotificationMeetingOver
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoTodayNotificationRespondAccept
-import ru.rikmasters.gilty.presentation.model.profile.notification.NotificationModel
+import ru.rikmasters.gilty.presentation.model.notification.DemoNotificationLeaveEmotionModel
+import ru.rikmasters.gilty.presentation.model.notification.DemoNotificationMeetingOverModel
+import ru.rikmasters.gilty.presentation.model.notification.DemoTodayNotificationMeetingOver
+import ru.rikmasters.gilty.presentation.model.notification.DemoTodayNotificationRespondAccept
+import ru.rikmasters.gilty.presentation.model.notification.NotificationModel
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 

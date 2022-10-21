@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.presentation.model.profile.notification.NotificationModel
+import ru.rikmasters.gilty.presentation.model.notification.NotificationModel
 import ru.rikmasters.gilty.utility.extentions.format
 import ru.rikmasters.gilty.utility.extentions.toEpochMillis
 import java.time.DayOfWeek
@@ -27,22 +27,38 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import java.util.Calendar
 import kotlin.math.abs
 
 private const val FORMAT = "yyyy-MM-dd"
+private const val FULL_FORMAT = "yyyy-MM-dd-HH-mm-ss"
+//  Проблема с часовым поясом, часы при фоматировании даты дает на 3 часа больше
 
 fun getDifferenceOfTime(date: String): String {
     val now = LocalDate.now()
-    val dateList = date.format(FORMAT).split("-")
+    val dateList = date.format(FULL_FORMAT).split("-")
     val localDate = LocalDate.of(
-        dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
+        dateList[0].toInt(),
+        dateList[1].toInt(),
+        dateList[2].toInt()
     )
+    val c = Calendar.getInstance()
+    val localHour = c.get(Calendar.HOUR_OF_DAY)
+    val localMinute = c.get(Calendar.MINUTE)
+    val localSecond = c.get(Calendar.SECOND)
+    val dateHour = dateList[3].toInt()
+    val dateMinute = dateList[4].toInt()
+    val dateSecond = dateList[5].toInt()
+    return if (todayControl(date))
+        if (localHour - dateHour >= 1) "${localHour - dateHour} ч"
+        else if (localMinute - dateMinute >= 1) "${localMinute - dateMinute} м"
+        else "${localSecond - dateSecond} с"
+    else "${now.dayOfYear - localDate.dayOfYear} д"
 
-    return when {
-        now == localDate -> "10 ч"
-        now != localDate -> "11 ч"
-        else -> ""
-    }
+}
+
+private fun todayControl(date: String): Boolean {
+    return date.format(FORMAT) == LocalDateTime.now().format(FORMAT)
 }
 
 class NotificationsByDateSeparator(private val notifications: List<NotificationModel>) {
@@ -84,10 +100,6 @@ class NotificationsByDateSeparator(private val notifications: List<NotificationM
             }
         }
         return list
-    }
-
-    private fun todayControl(date: String): Boolean {
-        return date.format(FORMAT) == LocalDateTime.now().format(FORMAT)
     }
 
     private fun weekControl(date: String): Boolean {

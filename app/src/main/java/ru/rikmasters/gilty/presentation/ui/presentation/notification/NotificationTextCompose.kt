@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.model.enumeration.NotificationType
 import ru.rikmasters.gilty.presentation.model.meeting.MeetingModel
 import ru.rikmasters.gilty.presentation.model.meeting.OrganizerModel
-import ru.rikmasters.gilty.presentation.model.profile.notification.DemoNotificationMeetingOverModel
+import ru.rikmasters.gilty.presentation.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 import ru.rikmasters.gilty.utility.extentions.format
