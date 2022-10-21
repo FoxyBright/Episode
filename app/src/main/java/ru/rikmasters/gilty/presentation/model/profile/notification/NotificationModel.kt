@@ -11,26 +11,26 @@ data class NotificationModel(
     val date: String,
 )
 
-val DemoNotificationRespondAcceptModel = NotificationModel(
+val DemoNotificationLeaveEmotionModel = NotificationModel(
     1, DemoFullMeetingModel,
-    NotificationType.RESPOND_ACCEPT,
-    "2022-10-13T08:35:54.140Z"
+    NotificationType.LEAVE_EMOTIONS,
+    "2022-10-16T08:35:54.140Z"
 )
 
 val DemoNotificationMeetingOverModel = NotificationModel(
     1, DemoFullMeetingModel,
     NotificationType.MEETING_OVER,
-    "2022-10-19T08:35:54.140Z"
+    "2022-10-17T08:35:54.140Z"
 )
 
 val DemoTodayNotificationRespondAccept = NotificationModel(
     1, DemoFullMeetingModel,
     NotificationType.RESPOND_ACCEPT,
-    "2022-10-20T08:35:54.140Z"
+    "2022-10-21T07:35:54.140Z"
 )
 
 val DemoTodayNotificationMeetingOver = NotificationModel(
     1, DemoFullMeetingModel,
     NotificationType.MEETING_OVER,
-    "2022-10-20T08:35:54.140Z"
+    "2022-10-21T00:00:00.140Z"
 )

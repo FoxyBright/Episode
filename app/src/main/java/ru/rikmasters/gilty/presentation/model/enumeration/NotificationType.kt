@@ -4,6 +4,8 @@ enum class NotificationType {
 
     MEETING_OVER,
 
-    RESPOND_ACCEPT
+    RESPOND_ACCEPT,
+
+    LEAVE_EMOTIONS,
 
 }

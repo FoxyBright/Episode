@@ -8,20 +8,6 @@ data class EmojiModel(
 
 )
 
-val DemoEmojiModel = EmojiModel(
+val DemoEmojiModel = EmojiModel("type", "https://placekitten.com/1200/800")
 
-    type = "type",
-    path = "https://serverspace.ru/wp-content/uploads/2019/06/backup-i-snapshot.png"
-
-)
-
-val AllEmojiList = listOf(
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel,
-    DemoEmojiModel
-)
+val DemoEmojiList = listOf(DemoEmojiModel, DemoEmojiModel, DemoEmojiModel)

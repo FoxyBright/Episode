@@ -71,9 +71,12 @@
     <string name="notification_screen_name">Уведомления</string>
     <string name="notification_meeting_took_place">Состоялась встреча</string>
     <string name="notification_words_connector">" c "</string>
+    <string name="notification_organizer_label">Организатор</string>
     <string name="notification_leave_impressions">Оставьте эмоции от встречи</string>
-    <string name="notification_meet_is_accept">"принял(а) ваш отклик на встречу"</string>
+    <string name="notification_meet_is_accept">принял(а) ваш отклик на встречу</string>
+    <string name="notification_leave_emotion">Вы оставили эмоции от встречи</string>
     <string name="notification_earlier_label">Ранее</string>
+    <string name="notification_responds_on_user_meetings">Отклики на ваши встречи</string>
     <string name="notification_on_this_week_label">На этой неделе</string>
 
     <!-- Meeting -->
