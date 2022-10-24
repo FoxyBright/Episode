@@ -1,9 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":base")
-
-
-
 pluginManagement {
     repositories {
         google()
@@ -11,6 +7,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -19,4 +16,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "gilty"
-include(":app")
+
+include(":app", ":core")
+
+include(":example")

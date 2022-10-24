@@ -9,10 +9,12 @@ object Config {
     const val versionName = "1.0"
 
     const val applicationId = "ru.rikmasters.gilty"
-    const val namespace = applicationId
+    const val namespacePrefix = applicationId
 
     const val jvmTarget = "1.8"
 
     val sourceCompatibility = JavaVersion.VERSION_1_8
     val targetCompatibility = sourceCompatibility
+
+    const val kotlinCompilerExtensionVersion = "1.3.1"
 }
