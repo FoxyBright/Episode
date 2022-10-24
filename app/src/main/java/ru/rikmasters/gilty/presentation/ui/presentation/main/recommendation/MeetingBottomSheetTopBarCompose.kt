@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -46,7 +45,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 private fun MeetingBottomSheetTopBarComposePreview() {
     GiltyTheme {
         MeetingBottomSheetTopBarCompose(
-            Modifier.padding(16.dp),
+            Modifier,
             DemoFullMeetingModel,
             "2 часа"
         )
@@ -57,8 +56,7 @@ private fun MeetingBottomSheetTopBarComposePreview() {
 fun MeetingBottomSheetTopBarCompose(
     modifier: Modifier = Modifier,
     meetingModel: FullMeetingModel,
-    eventDuration: String,
-    menu: (() -> Unit)? = null
+    eventDuration: String
 ) {
     Column(modifier) {
         Row(
@@ -70,12 +68,11 @@ fun MeetingBottomSheetTopBarCompose(
                 color = ThemeExtra.colors.mainTextColor,
                 style = ThemeExtra.typography.H3
             )
-            IconButton({ menu?.let { it() } }) {
+            IconButton({ }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,
-                    Modifier,
-                    ThemeExtra.colors.grayIcon
+                    tint = ThemeExtra.colors.grayIcon
                 )
             }
         }
@@ -106,7 +103,7 @@ fun MeetingBottomSheetTopBarCompose(
                         true,
                         Modifier
                             .align(Alignment.TopEnd)
-                            .offset(20.dp, (-20).dp)
+                            .offset(25.dp, -(25).dp)
                     )
                     Column(
                         Modifier
@@ -149,8 +146,8 @@ fun MeetingBottomSheetTopBarCompose(
         Text(
             "${meetingModel.organizer.username}, ${meetingModel.organizer.age}",
             Modifier.padding(top = 9.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
+            ThemeExtra.colors.mainTextColor,
+            style = ThemeExtra.typography.Body1Bold,
         )
     }
 }
