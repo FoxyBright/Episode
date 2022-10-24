@@ -2,21 +2,7 @@ package ru.rikmasters.gilty.presentation.model.profile
 
 import ru.rikmasters.gilty.presentation.model.enumeration.PhotoType
 
-sealed interface ImageModel {
-    val id: String
-    val albumId: String
-    val ownerId: String
-    val type: PhotoType
-    val mimeType: String
-    val fileSize: Int
-    val width: Int
-    val height: Int
-    val resolutionX: Int
-    val resolutionY: Int
-    val playtime: Number
-}
-
-data class AvatarModel(
+data class HiddenPhotoModel(
     override val id: String,
     override val albumId: String,
     override val ownerId: String,
@@ -27,10 +13,11 @@ data class AvatarModel(
     override val height: Int,
     override val resolutionX: Int,
     override val resolutionY: Int,
-    override val playtime: Number
+    override val playtime: Number,
+    val access: Boolean
 ) : ImageModel
 
-val DemoAvatarModel = AvatarModel(
+val DemoHiddenPhotoModel = HiddenPhotoModel(
     "https://placekitten.com/1200/800",
     "test",
     "test",
@@ -41,5 +28,6 @@ val DemoAvatarModel = AvatarModel(
     800,
     400,
     800,
-    0
+    0,
+    true
 )

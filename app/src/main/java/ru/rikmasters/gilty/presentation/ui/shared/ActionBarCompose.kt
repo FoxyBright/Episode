@@ -93,7 +93,7 @@ fun RowActionBar(
 }
 
 @Composable
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 private fun RowActionBarPreview() {
     GiltyTheme {
         RowActionBar(
@@ -105,7 +105,7 @@ private fun RowActionBarPreview() {
 }
 
 @Composable
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 private fun LoginActionBarPreview() {
     GiltyTheme {
         ActionBar(

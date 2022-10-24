@@ -20,7 +20,7 @@ import ru.rikmasters.gilty.presentation.ui.shared.CategoryItem
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 fun SendReactionBottomComposePreview() {
     GiltyTheme {

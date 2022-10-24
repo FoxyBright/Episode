@@ -14,6 +14,8 @@ data class ExtraShapes(
     val largeBottomRoundedShape: Shape = RectangleShape,
     val mediumTopRoundedShape: Shape = RectangleShape,
     val mediumBottomRoundedShape: Shape = RectangleShape,
+    val ExtraLargeStartRoundedShape: Shape = RectangleShape,
+    val ExtraLargeEndRoundedShape: Shape = RectangleShape,
 
     // Добавить новую форму в схему = RectangleShape
 )
@@ -22,11 +24,14 @@ data class ExtraShapes(
     "Надо использовать тему",
     ReplaceWith("ThemeExtra.shapes", "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
 )
+
 val DefaultExtraShapes = ExtraShapes(
     cardShape = RoundedCornerShape(14.dp),
     largeTopRoundedShape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp),
     largeBottomRoundedShape = RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp),
     mediumTopRoundedShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-    mediumBottomRoundedShape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+    mediumBottomRoundedShape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
+    ExtraLargeStartRoundedShape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
+    ExtraLargeEndRoundedShape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp)
 // Добавить в схему формы
 )

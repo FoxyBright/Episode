@@ -171,7 +171,7 @@ fun PermissionConfirmationWindow() {
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 fun PermissionConfirmationWindowPreview() {
     GiltyTheme {
         PermissionConfirmationWindow()
@@ -181,7 +181,7 @@ fun PermissionConfirmationWindowPreview() {
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 fun PermissionsContentPreview() {
     GiltyTheme {
         PermissionsContent(Modifier)

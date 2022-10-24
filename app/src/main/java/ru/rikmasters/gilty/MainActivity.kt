@@ -35,7 +35,7 @@ fun Greeting(name: String) {
     Text(text = "Hello $name!")
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 fun DefaultPreview() {
     GiltyTheme {

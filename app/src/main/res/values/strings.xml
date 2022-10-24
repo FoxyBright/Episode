@@ -78,6 +78,8 @@
     <string name="notification_earlier_label">Ранее</string>
     <string name="notification_responds_on_user_meetings">Отклики на ваши встречи</string>
     <string name="notification_on_this_week_label">На этой неделе</string>
+    <string name="notification_respond_cancel_button">Отменить</string>
+    <string name="notification_respond_accept_button">Принять</string>
 
     <!-- Meeting -->
     <string name="meeting_personal_type">Персональная встреча</string>

@@ -22,7 +22,7 @@ private const val TIMES_START = "00"
 private const val MINUTES_END = "59"
 private const val HOURS_END = "23"
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ScrollTimePickerPreview() {
     val time = remember { mutableStateOf("00:00") }

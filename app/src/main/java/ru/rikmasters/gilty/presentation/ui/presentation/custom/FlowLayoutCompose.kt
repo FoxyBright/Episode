@@ -48,7 +48,7 @@ fun FlowLayout(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun PreviewFlowRow() {
     GiltyTheme {

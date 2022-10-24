@@ -32,7 +32,7 @@ const val CATEGORY_ELEMENT_SIZE = 120
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 private fun CategoryItemTopPreview() {
     GiltyTheme {
         val iconState = remember { mutableStateOf(true) }
@@ -46,7 +46,7 @@ private fun CategoryItemTopPreview() {
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 fun CategoryItemBottomPreview() {
     GiltyTheme {
         val iconState = remember { mutableStateOf(true) }

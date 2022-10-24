@@ -25,7 +25,7 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
 
-@Preview(showBackground = true, backgroundColor = 0xFFF6F6F6)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ChipsPreview() {
     GiltyTheme {

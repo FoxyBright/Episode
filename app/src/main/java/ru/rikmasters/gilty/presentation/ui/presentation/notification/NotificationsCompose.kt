@@ -49,10 +49,11 @@ import ru.rikmasters.gilty.presentation.model.notification.DemoNotificationMeeti
 import ru.rikmasters.gilty.presentation.model.notification.DemoTodayNotificationMeetingOver
 import ru.rikmasters.gilty.presentation.model.notification.DemoTodayNotificationRespondAccept
 import ru.rikmasters.gilty.presentation.model.notification.NotificationModel
+import ru.rikmasters.gilty.presentation.ui.shared.LazyItemsShapes
 import ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 fun NotificationsComposePreview() {
     GiltyTheme {
@@ -184,7 +185,7 @@ fun NotificationsCompose(
                     NotificationItem(
                         NotificationItemState(
                             notification.first, notification.second,
-                            shape(index, todayList.size),
+                            LazyItemsShapes(index, todayList.size),
                             getDifferenceOfTime(notification.first.date)
                         ), Modifier, onClick = { callback?.onClick(notification.first) },
                         onEmojiClick = { callback?.onEmojiClick(it) },
@@ -197,7 +198,7 @@ fun NotificationsCompose(
                     NotificationItem(
                         NotificationItemState(
                             notification.first, notification.second,
-                            shape(index, weekList.size),
+                            LazyItemsShapes(index, weekList.size),
                             getDifferenceOfTime(notification.first.date)
                         ), Modifier, onClick = { callback?.onClick(notification.first) },
                         onEmojiClick = { callback?.onEmojiClick(it) },
@@ -210,7 +211,7 @@ fun NotificationsCompose(
                     NotificationItem(
                         NotificationItemState(
                             notification.first, notification.second,
-                            shape(index, earlierList.size),
+                            LazyItemsShapes(index, earlierList.size),
                             getDifferenceOfTime(notification.first.date)
                         ), Modifier, onClick = { callback?.onClick(notification.first) },
                         onEmojiClick = { callback?.onEmojiClick(it) },
@@ -228,14 +229,4 @@ private fun label(text: String) {
         ThemeExtra.colors.mainTextColor,
         style = ThemeExtra.typography.H3
     )
-}
-
-@Composable
-private fun shape(index: Int, size: Int): Shape {
-    return if (size != 1)
-        return when (index) {
-            0 -> ThemeExtra.shapes.mediumTopRoundedShape
-            size - 1 -> ThemeExtra.shapes.mediumBottomRoundedShape
-            else -> RoundedCornerShape(0.dp)
-        } else MaterialTheme.shapes.medium
 }

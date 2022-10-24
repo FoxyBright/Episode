@@ -93,7 +93,7 @@ fun SelectCategories(
 
 @Composable
 @ExperimentalMaterial3Api
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 private fun SelectCategoriesPreview() {
     GiltyTheme {
         SelectCategories(

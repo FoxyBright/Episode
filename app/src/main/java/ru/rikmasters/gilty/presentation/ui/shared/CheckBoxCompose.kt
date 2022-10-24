@@ -31,28 +31,28 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.R
 import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun CheckBoxPreviewEnabled() {
     var checkBoxState by remember { mutableStateOf(true) }
     CheckBox(checkBoxState, Modifier.padding(10.dp)) { checkBoxState = it }
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun SquareCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }
     SquareCheckBox(checkBoxState, Modifier.padding(10.dp)) { checkBoxState = it }
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun LockerCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }
     LockerCheckBox((checkBoxState), Modifier.padding(10.dp)) { checkBoxState = it }
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ObserveCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }

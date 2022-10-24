@@ -72,7 +72,7 @@ interface UserProfileCallback : ProfileCallback {
     fun onRespondsClick() {}
 }
 
-@Preview(showBackground = true)
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun UserProfilePreview() {
     GiltyTheme {
