@@ -18,7 +18,7 @@ class AppStateModel internal constructor(
 
     val snackbarHostState: SnackbarHostState,
 
-    internal val bottomSheetState: BottomSheetState,
+    val bottomSheetState: BottomSheetState,
 
     ): Loggable {
 

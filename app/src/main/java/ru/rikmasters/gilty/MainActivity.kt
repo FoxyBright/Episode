@@ -36,14 +36,4 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-
-    @Composable
-    fun MyScreen(entry: NavBackStackEntry, onClick: () -> Unit) {
-        Column(Modifier.fillMaxSize()) {
-            Text(text = "Screen ${entry.destination.route ?: "null"}")
-            Button(onClick) {
-                Text("Click me")
-            }
-        }
-    }
 }

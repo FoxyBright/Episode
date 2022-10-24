@@ -10,36 +10,48 @@ import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
 import org.koin.core.module.Module
 import ru.rikmasters.gilty.core.log.Loggable
+import ru.rikmasters.gilty.core.module.BusinessDefinition
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
+import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import java.lang.ClassCastException
 
 class Environment
 internal constructor(
     context: Context,
-    root: FeatureDefinition
+    private val root: FeatureDefinition
 ): Loggable, KoinComponent {
 
     // Работа с модулями
 
-    private val modules = mutableSetOf<ModuleDefinition>()
+    private val businessModules: MutableMap<String, BusinessDefinition> = hashMapOf()
 
-    private fun includeRecursive(node: ModuleDefinition) {
-        if(!modules.add(node))
-            throw IllegalStateException("Модуль ${node.name} дублируется. Циклическая зависимость?")
-        else
-            logV("Добавлен модуль ${node.name}")
-        node.include().forEach(::includeRecursive)
+    private fun checkModules() {
+        val modules = mutableSetOf<ModuleDefinition>()
+        root.forEach { module ->
+            if(!modules.add(module))
+                throw IllegalStateException("Модуль ${module.name} дублируется. Циклическая зависимость?")
+            else
+                logV("Обнаружен модуль ${module.name}")
+            module.include().filterIsInstance<BusinessDefinition>().let { list ->
+                if(list.isEmpty())
+                    logW("В модуле ${module.name} не указаны зависимости от бизнес-модулей")
+                list.forEach {
+                    if(businessModules.put(it.name, it) == null)
+                        logV("Обнаружен бизнес-модуль ${it.name}")
+                }
+            }
+        }
     }
 
-    init {
-        includeRecursive(root)
-    }
+    init { checkModules() }
+
+    fun buildNavigation(builder: DeepNavGraphBuilder) = root.buildNavigation(builder)
 
     // Koin
 
     private fun collectKoinModules() =
-        modules.map { it.koin() }
+        (root + businessModules.values).map { it.koin() }
 
     internal fun onKoinStarted(koin: KoinApplication) {
         koin.modules(collectKoinModules())

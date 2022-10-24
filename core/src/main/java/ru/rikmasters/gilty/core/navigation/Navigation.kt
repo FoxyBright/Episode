@@ -1,27 +1,29 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import kotlinx.coroutines.runBlocking
 
 fun NavGraphBuilder.deepNavGraphBuilder(
+    state: NavState,
     builder: DeepNavGraphBuilder.() -> Unit
-) = DeepNavGraphBuilder().apply(builder).build(this)
+) = DeepNavGraphBuilder(state).apply(builder).build(this)
 
 @Composable
 fun DeepNavHost(
-    navController: NavHostController,
-    startDestination: String,
+    state: NavState,
     modifier: Modifier = Modifier,
     route: String? = null,
     builder: DeepNavGraphBuilder.() -> Unit
 ) {
     NavHost(
-        navController,
-        startDestination,
+        state.navHostController,
+        state.startDestination,
         modifier,
         route
-    ) { deepNavGraphBuilder(builder) }
+    ) { deepNavGraphBuilder(state, builder) }
 }

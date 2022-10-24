@@ -1,35 +1,33 @@
 package ru.rikmasters.gilty.core.app
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getKoin
 import org.koin.dsl.module
 import ru.rikmasters.gilty.core.app.ui.BottomSheetLayout
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
 import ru.rikmasters.gilty.core.env.Environment
+import ru.rikmasters.gilty.core.navigation.DeepNavHost
+import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.util.composable.getOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +51,20 @@ fun appEntrypoint(
         )
     }
 
-    val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
+    val entrypointResolver = getOrNull<EntrypointResolver>()
+    val startDestination = remember(entrypointResolver) {
+        runBlocking { entrypointResolver?.resolve() ?: "entrypoint" }
+    }
+
+    val navState = remember(startDestination) {
+        NavState(
+            navController,
+            startDestination
+        )
+    }
+
+    val env: Environment = get()
 
     theme.apply(
         asm.darkMode,
@@ -66,24 +77,8 @@ fun appEntrypoint(
                 bottomSheetBackground,
             ) {
                 Scaffold() {
-                    Column(Modifier.background(Color.Cyan)) {
-                        TestButton("Switch dark mode") { asm.darkMode = !asm.darkMode }
-                        TestButton("Switch dynamic color") { asm.dynamicColor = !asm.dynamicColor }
-                        TestButton("Show snackbar") { scope.launch { asm.snackbarHostState.showSnackbar("Message") } }
-                        TestButton("Show bottom sheet") {
-                            scope.launch {
-                                asm.bottomSheetState.halfExpand {
-                                    LazyColumn(
-                                        Modifier
-                                            .background(Color.Yellow)
-                                    ) {
-                                        items(150) {
-                                            Text("#$it Hello world")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    DeepNavHost(navState) {
+                        env.buildNavigation(this)
                     }
                 }
             }
@@ -95,18 +90,17 @@ fun appEntrypoint(
         }
     }
 
-    val env: Environment = get()
-
     LaunchedEffect(env, asm) {
-        env.loadModules(
-            module { single { asm } },
-            reason = asm::class.simpleName
-        )
+        loadAsModule(env, asm)
+    }
+    LaunchedEffect(env, navState) {
+        loadAsModule(env, navState)
     }
 }
-@Composable
-private fun TestButton(name: String, onClick: () -> Unit) {
-    Button(onClick) {
-        Text(name, color = MaterialTheme.colorScheme.background)
-    }
+
+private inline fun <reified T> loadAsModule(env: Environment, module: T) {
+    env.loadModules(
+        module { single { module } },
+        reason = T::class.simpleName
+    )
 }

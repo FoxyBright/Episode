@@ -1,4 +1,4 @@
 package ru.rikmasters.gilty.core.module
 
-abstract class DomainDefinition: ModuleDefinition() {
+abstract class DomainDefinition: BusinessDefinition() {
 }
