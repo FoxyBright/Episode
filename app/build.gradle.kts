@@ -6,6 +6,7 @@ plugins {
 }
 
 baseConfig()
+compose()
 
 android {
 
@@ -13,14 +14,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.1"
     }
 
     packagingOptions {
@@ -31,7 +24,8 @@ android {
 }
 
 dependencies {
-    base()
+    androidBase()
     compose()
-    implementation(project(":base"))
+
+    implementation(project(":example"))
 }

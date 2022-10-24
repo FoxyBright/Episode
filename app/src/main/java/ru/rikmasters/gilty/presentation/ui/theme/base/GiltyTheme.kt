@@ -2,30 +2,49 @@
 
 package ru.rikmasters.gilty.presentation.ui.theme.base
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.ViewCompat
-import ru.rikmasters.gilty.presentation.ui.theme.*
+import ru.rikmasters.gilty.core.app.AppTheme
+import ru.rikmasters.gilty.presentation.ui.theme.DarkColorScheme
+import ru.rikmasters.gilty.presentation.ui.theme.DarkExtraColors
+import ru.rikmasters.gilty.presentation.ui.theme.DefaultExtraShapes
+import ru.rikmasters.gilty.presentation.ui.theme.DefaultExtraTypography
+import ru.rikmasters.gilty.presentation.ui.theme.ExtraColors
+import ru.rikmasters.gilty.presentation.ui.theme.ExtraShapes
+import ru.rikmasters.gilty.presentation.ui.theme.ExtraTypography
+import ru.rikmasters.gilty.presentation.ui.theme.LightColorScheme
+import ru.rikmasters.gilty.presentation.ui.theme.LightExtraColors
+import ru.rikmasters.gilty.presentation.ui.theme.Shapes
+import ru.rikmasters.gilty.presentation.ui.theme.Typography
+
+object GiltyTheme: AppTheme {
+    @Composable
+    override fun apply(
+        darkMode: Boolean,
+        dynamicColor: Boolean,
+        content: @Composable () -> Unit
+    ) = GiltyTheme(darkMode, dynamicColor, content)
+}
 
 @Composable
 fun GiltyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkMode: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val (colorScheme, extraColors) = resolveColors(
-        LocalContext.current, darkTheme, dynamicColor,
+        LocalContext.current, darkMode, dynamicColor,
     )
-
-    //paintStatusBar(colorScheme, darkTheme)
 
     CompositionLocalProvider(
         LocalExtraColors provides extraColors,
@@ -34,7 +53,7 @@ fun GiltyTheme(
     ) {
 
         MaterialTheme(
-            colorScheme = colorScheme,
+            colorScheme = colorScheme.switch(),
             typography = Typography,
             shapes = Shapes,
             content = content
@@ -54,18 +73,6 @@ private fun resolveColors(
     }
     darkTheme -> DarkColorScheme to DarkExtraColors
     else -> LightColorScheme to LightExtraColors
-}
-
-@SuppressLint("ComposableNaming")
-@Composable
-private fun paintStatusBar(colorScheme: ColorScheme, darkTheme: Boolean) {
-    val view = LocalView.current
-    if(!view.isInEditMode) {
-        SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
-        }
-    }
 }
 
 object ThemeExtra {
