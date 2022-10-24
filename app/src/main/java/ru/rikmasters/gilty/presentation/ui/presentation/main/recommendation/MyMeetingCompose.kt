@@ -138,7 +138,7 @@ fun MyMeeting(
         item {
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
-                    stringResource(R.string.members),
+                    stringResource(R.string.meeting_members),
                     color = ThemeExtra.colors.mainTextColor,
                     style = ThemeExtra.typography.H3
                 )
@@ -219,11 +219,10 @@ fun MyMeeting(
         }
         item {
             GradientButton(
-                { callback?.onConfirm() },
                 Modifier.padding(top = 20.dp, bottom = 12.dp),
                 stringResource(R.string.meeting_shared_button),
                 icon = R.drawable.ic_shared
-            )
+            ) { callback?.onConfirm() }
         }
         item {
             Box(Modifier.fillMaxWidth(), Alignment.Center) {

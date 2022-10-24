@@ -149,7 +149,7 @@ fun ProfileMeetingBottomSheet(
         item {
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
-                    stringResource(R.string.members),
+                    stringResource(R.string.meeting_members),
                     color = ThemeExtra.colors.mainTextColor,
                     style = ThemeExtra.typography.H3
                 )
@@ -219,7 +219,11 @@ fun ProfileMeetingBottomSheet(
             }
         }
         item {
-            Card({ callback?.openMap() }, Modifier.fillMaxWidth()) {
+            Card(
+                { callback?.openMap() },
+                Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+            ) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -230,16 +234,19 @@ fun ProfileMeetingBottomSheet(
                         color = ThemeExtra.colors.mainTextColor,
                         style = ThemeExtra.typography.Body1Sb
                     )
-                    Icon(Icons.Filled.KeyboardArrowRight, null)
+                    Icon(
+                        Icons.Filled.KeyboardArrowRight,
+                        null, Modifier,
+                        ThemeExtra.colors.mainTextColor
+                    )
                 }
             }
         }
         item {
             GradientButton(
-                { callback?.onConfirm() },
                 Modifier.padding(vertical = 28.dp),
                 stringResource(R.string.meeting_join_button_name)
-            )
+            ) { callback?.onConfirm() }
         }
     }
 }

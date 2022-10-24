@@ -30,13 +30,12 @@ import ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra
 @Composable
 private fun GradientButtonPreview() {
     GiltyTheme {
-        GradientButton({ }, text = "Далее", smallText = "Подробности", icon = R.drawable.ic_shared)
+        GradientButton(text = "Далее", smallText = "Подробности", icon = R.drawable.ic_shared) {}
     }
 }
 
 @Composable
 fun GradientButton(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String,
     enabled: Boolean = true,
@@ -51,6 +50,7 @@ fun GradientButton(
         ThemeExtra.colors.notActive,
         ThemeExtra.colors.notActive
     ),
+    onClick: () -> Unit
 ) {
     Button(
         modifier = modifier
