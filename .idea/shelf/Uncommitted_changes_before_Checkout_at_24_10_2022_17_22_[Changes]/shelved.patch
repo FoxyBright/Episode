@@ -1,0 +1,126 @@
+Index: app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/MeetingProfileBottomSheetCompose.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.rikmasters.gilty.presentation.ui.presentation.main.recommendation\r\n\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.itemsIndexed\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.KeyboardArrowRight\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.Divider\r\nimport androidx.compose.material3.ExperimentalMaterial3Api\r\nimport androidx.compose.material3.Icon\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment.Companion.CenterVertically\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.layout.ContentScale\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.res.stringResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport coil.compose.AsyncImage\r\nimport ru.rikmasters.gilty.R\r\nimport ru.rikmasters.gilty.presentation.model.enumeration.ConditionType\r\nimport ru.rikmasters.gilty.presentation.model.enumeration.MeetType\r\nimport ru.rikmasters.gilty.presentation.model.meeting.DemoFullMeetingModel\r\nimport ru.rikmasters.gilty.presentation.model.meeting.DemoMemberModel\r\nimport ru.rikmasters.gilty.presentation.model.meeting.FullMeetingModel\r\nimport ru.rikmasters.gilty.presentation.model.meeting.MemberModel\r\nimport ru.rikmasters.gilty.presentation.ui.shared.GradientButton\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra\r\n\r\n@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)\r\n@Composable\r\nprivate fun ProfileMeetingBottomSheetPreview() {\r\n    GiltyTheme {\r\n        ProfileMeetingBottomSheet(\r\n            Modifier,\r\n            ProfileMeetingBottomSheetState(\r\n                DemoFullMeetingModel,\r\n                listOf(DemoMemberModel, DemoMemberModel, DemoMemberModel, DemoMemberModel),\r\n                18, \"2 часа\"\r\n            )\r\n        )\r\n    }\r\n}\r\n\r\ndata class ProfileMeetingBottomSheetState(\r\n    val meetingModel: FullMeetingModel,\r\n    val memberList: List<MemberModel>,\r\n    val distance: Int,\r\n    val eventDuration: String\r\n)\r\n\r\ninterface ProfileMeetingBottomSheetCallback {\r\n    fun onConfirm()\r\n    fun onMemberClick()\r\n    fun openMap()\r\n}\r\n\r\n@OptIn(ExperimentalMaterial3Api::class)\r\n@Composable\r\nfun ProfileMeetingBottomSheet(\r\n    modifier: Modifier = Modifier,\r\n    state: ProfileMeetingBottomSheetState,\r\n    callback: ProfileMeetingBottomSheetCallback? = null\r\n) {\r\n    LazyColumn(\r\n        modifier\r\n            .background(MaterialTheme.colorScheme.background)\r\n            .fillMaxSize()\r\n    ) {\r\n        item { MeetingBottomSheetTopBarCompose(Modifier, state.meetingModel, state.eventDuration) }\r\n        item {\r\n            Card(\r\n                Modifier\r\n                    .padding(top = 13.dp)\r\n                    .fillMaxWidth(),\r\n                MaterialTheme.shapes.large,\r\n                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)\r\n            ) {\r\n                Text(\r\n                    state.meetingModel.title,\r\n                    Modifier.padding(14.dp),\r\n                    color = ThemeExtra.colors.mainTextColor,\r\n                    style = ThemeExtra.typography.Body1Medium\r\n                )\r\n            }\r\n        }\r\n        item {\r\n            Text(\r\n                stringResource(R.string.meeting_terms),\r\n                Modifier.padding(top = 28.dp),\r\n                color = ThemeExtra.colors.mainTextColor,\r\n                style = ThemeExtra.typography.H3\r\n            )\r\n        }\r\n        item {\r\n            Card(\r\n                Modifier\r\n                    .padding(top = 12.dp)\r\n                    .fillMaxWidth(),\r\n                MaterialTheme.shapes.extraSmall,\r\n                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)\r\n            ) {\r\n                Text(\r\n                    when (state.meetingModel.type) {\r\n                        MeetType.GROUP -> stringResource(id = R.string.meeting_group_type)\r\n                        MeetType.ANONYMOUS -> stringResource(id = R.string.meeting_anon_type)\r\n                        MeetType.PERSONAL -> stringResource(id = R.string.meeting_personal_type)\r\n                    },\r\n                    Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(16.dp),\r\n                    color = ThemeExtra.colors.mainTextColor,\r\n                    style = ThemeExtra.typography.Body1Medium\r\n                )\r\n                Divider(Modifier.padding(start = 16.dp))\r\n                Text(\r\n                    when (state.meetingModel.condition) {\r\n                        ConditionType.FREE -> stringResource(R.string.condition_free)\r\n                        ConditionType.DIVIDE -> stringResource(R.string.condition_divide)\r\n                        ConditionType.MEMBER_PAY -> stringResource(R.string.condition_member_pay)\r\n                        ConditionType.NO_MATTER -> stringResource(R.string.condition_no_matter)\r\n                        ConditionType.ORGANIZER_PAY -> stringResource(R.string.condition_organizer_pay)\r\n                    },\r\n                    Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(16.dp),\r\n                    color = ThemeExtra.colors.mainTextColor,\r\n                    style = ThemeExtra.typography.Body1Medium\r\n                )\r\n            }\r\n        }\r\n        item {\r\n            Row(Modifier.padding(top = 28.dp)) {\r\n                Text(\r\n                    stringResource(R.string.members),\r\n                    color = ThemeExtra.colors.mainTextColor,\r\n                    style = ThemeExtra.typography.H3\r\n                )\r\n                Text(\r\n                    \"${state.memberList.size}/${state.meetingModel.memberCount}\",\r\n                    Modifier.padding(start = 8.dp),\r\n                    MaterialTheme.colorScheme.primary,\r\n                    style = ThemeExtra.typography.H3\r\n                )\r\n                Image(\r\n                    painterResource(\r\n                        if (state.meetingModel.isPrivate) R.drawable.ic_lock_close\r\n                        else R.drawable.ic_lock_open\r\n                    ), null,\r\n                    Modifier.padding(start = 8.dp, bottom = 16.dp)\r\n                )\r\n            }\r\n        }\r\n        itemsIndexed(state.memberList) { index, member ->\r\n            Card(\r\n                Modifier.fillMaxWidth(),\r\n                when (index) {\r\n                    0 -> ThemeExtra.shapes.largeTopRoundedShape\r\n                    state.memberList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape\r\n                    else -> RoundedCornerShape(0.dp)\r\n                }, CardDefaults.cardColors(ThemeExtra.colors.cardBackground)\r\n            ) {\r\n                Row(\r\n                    Modifier\r\n                        .fillMaxWidth()\r\n                        .clickable { callback?.onMemberClick() },\r\n                    verticalAlignment = CenterVertically\r\n                ) {\r\n                    AsyncImage(\r\n                        member.avatar.id,\r\n                        stringResource(R.string.meeting_avatar),\r\n                        Modifier\r\n                            .padding(12.dp, 8.dp)\r\n                            .clip(CircleShape)\r\n                            .size(40.dp),\r\n                        painterResource(R.drawable.gb),\r\n                        contentScale = ContentScale.FillBounds\r\n                    )\r\n                    Text(\r\n                        \"${member.username}, ${member.age}\",\r\n                        color = ThemeExtra.colors.mainTextColor,\r\n                        style = ThemeExtra.typography.Body1Sb,\r\n                        fontWeight = FontWeight.Bold\r\n                    )\r\n                }\r\n                if (index < state.memberList.size - 1) Divider(Modifier.padding(start = 60.dp))\r\n            }\r\n        }\r\n        item {\r\n            Row(Modifier.padding(top = 28.dp, bottom = 14.dp)) {\r\n                Text(\r\n                    stringResource(R.string.meeting_distance_from_user),\r\n                    Modifier.padding(end = 4.dp),\r\n                    ThemeExtra.colors.mainTextColor,\r\n                    style = ThemeExtra.typography.H3\r\n                )\r\n                Text(\r\n                    stringResource(R.string.meeting_filter_label_distance, state.distance),\r\n                    color = MaterialTheme.colorScheme.primary,\r\n                    style = ThemeExtra.typography.H3\r\n                )\r\n            }\r\n        }\r\n        item {\r\n            Card({ callback?.openMap() }, Modifier.fillMaxWidth()) {\r\n                Row(\r\n                    Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(16.dp), Arrangement.SpaceBetween\r\n                ) {\r\n                    Text(\r\n                        stringResource(R.string.meeting_watch_on_mup_button),\r\n                        color = ThemeExtra.colors.mainTextColor,\r\n                        style = ThemeExtra.typography.Body1Sb\r\n                    )\r\n                    Icon(Icons.Filled.KeyboardArrowRight, null)\r\n                }\r\n            }\r\n        }\r\n        item {\r\n            GradientButton(\r\n                { callback?.onConfirm() },\r\n                Modifier.padding(vertical = 28.dp),\r\n                stringResource(R.string.meeting_join_button_name)\r\n            )\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/MeetingProfileBottomSheetCompose.kt b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/MeetingProfileBottomSheetCompose.kt
+--- a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/MeetingProfileBottomSheetCompose.kt	(revision 3938059e7fc253d5a60aecfb107c706079e6b7da)
++++ b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/MeetingProfileBottomSheetCompose.kt	(date 1666620885454)
+@@ -149,7 +149,7 @@
+         item {
+             Row(Modifier.padding(top = 28.dp)) {
+                 Text(
+-                    stringResource(R.string.members),
++                    stringResource(R.string.meeting_members),
+                     color = ThemeExtra.colors.mainTextColor,
+                     style = ThemeExtra.typography.H3
+                 )
+@@ -206,7 +206,7 @@
+         item {
+             Row(Modifier.padding(top = 28.dp, bottom = 14.dp)) {
+                 Text(
+-                    stringResource(R.string.meeting_distance_from_user),
++                    "stringResource(R.string.meeting_distance_from_user)",
+                     Modifier.padding(end = 4.dp),
+                     ThemeExtra.colors.mainTextColor,
+                     style = ThemeExtra.typography.H3
+@@ -226,7 +226,7 @@
+                         .padding(16.dp), Arrangement.SpaceBetween
+                 ) {
+                     Text(
+-                        stringResource(R.string.meeting_watch_on_mup_button),
++                       "stringResource(R.string.meeting_watch_on_mup_button)",
+                         color = ThemeExtra.colors.mainTextColor,
+                         style = ThemeExtra.typography.Body1Sb
+                     )
+@@ -237,8 +237,8 @@
+         item {
+             GradientButton(
+                 { callback?.onConfirm() },
+-                Modifier.padding(vertical = 28.dp),
+-                stringResource(R.string.meeting_join_button_name)
++                stringResource(R.string.meeting_join_button_name),
++                Modifier.padding(vertical = 28.dp)
+             )
+         }
+     }
+Index: app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.rikmasters.gilty.presentation.ui.shared\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.shape.CornerBasedShape\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.ButtonDefaults\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Brush\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra\r\n\r\n\r\n@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)\r\n@Composable\r\nprivate fun GradientButtonPreview() {\r\n    GiltyTheme {\r\n        GradientButton(text = \"Далее\", smallText = \"Подробности\") {}\r\n    }\r\n}\r\n\r\n@Composable\r\nfun GradientButton(\r\n    modifier: Modifier = Modifier,\r\n    text: String,\r\n    enabled: Boolean = true,\r\n    gradientColors: List<Color> = listOf(\r\n        ThemeExtra.colors.gradientColor1,\r\n        ThemeExtra.colors.gradientColor2\r\n    ),\r\n    shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,\r\n    smallText: String? = null,\r\n    disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),\r\n    onClick: () -> Unit,\r\n) {\r\n    Button(\r\n        onClick,\r\n        modifier,\r\n        enabled,\r\n        shape,\r\n        ButtonDefaults.buttonColors(Color.Transparent),\r\n        contentPadding = PaddingValues(),\r\n    ) {\r\n        Box(\r\n            Modifier\r\n                .background(\r\n                    Brush.linearGradient(if (enabled) gradientColors else disabledColors),\r\n                    shape\r\n                )\r\n                .fillMaxWidth()\r\n                .padding(16.dp),\r\n            Alignment.Center\r\n        ) {\r\n            Column(horizontalAlignment = Alignment.CenterHorizontally) {\r\n                Text(text, style = ThemeExtra.typography.button)\r\n                smallText?.let { Text(smallText, style = ThemeExtra.typography.ButtonLabelText) }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt
+--- a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt	(revision 3938059e7fc253d5a60aecfb107c706079e6b7da)
++++ b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt	(date 1666620871748)
+@@ -25,13 +25,14 @@
+ @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+ @Composable
+ private fun GradientButtonPreview() {
+-    GiltyTheme {
+-        GradientButton(text = "Далее", smallText = "Подробности") {}
++    GiltyTheme{
++        GradientButton({ }, text = "Далее", smallText = "Подробности")
+     }
+ }
+ 
+ @Composable
+ fun GradientButton(
++    onClick: () -> Unit,
+     modifier: Modifier = Modifier,
+     text: String,
+     enabled: Boolean = true,
+@@ -42,29 +43,35 @@
+     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
+     smallText: String? = null,
+     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),
+-    onClick: () -> Unit,
+ ) {
+     Button(
+-        onClick,
+-        modifier,
+-        enabled,
+-        shape,
+-        ButtonDefaults.buttonColors(Color.Transparent),
++        modifier = modifier
++            .fillMaxWidth(),
++        onClick = onClick,
+         contentPadding = PaddingValues(),
++        colors = ButtonDefaults.buttonColors(
++            containerColor = Color.Transparent
++        ),
++        shape = shape,
++        enabled = enabled,
+     ) {
+         Box(
+-            Modifier
+-                .background(
+-                    Brush.linearGradient(if (enabled) gradientColors else disabledColors),
+-                    shape
+-                )
++            modifier = Modifier
+                 .fillMaxWidth()
+-                .padding(16.dp),
+-            Alignment.Center
++                .background(
++                    brush = Brush.linearGradient(colors = if (enabled) gradientColors else disabledColors),
++                    shape = shape
++                )
++                .padding(horizontal = 16.dp, vertical = 16.dp),
++            contentAlignment = Alignment.Center
+         ) {
+             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+-                Text(text, style = ThemeExtra.typography.button)
+-                smallText?.let { Text(smallText, style = ThemeExtra.typography.ButtonLabelText) }
++                Text(
++                    text = text,
++                    style = ThemeExtra.typography.button
++                )
++                if (smallText != null)
++                    Text(smallText, style = ThemeExtra.typography.ButtonLabelText)
+             }
+         }
+     }

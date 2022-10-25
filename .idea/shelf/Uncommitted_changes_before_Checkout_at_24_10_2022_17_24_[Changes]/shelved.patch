@@ -1,0 +1,78 @@
+Index: app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.rikmasters.gilty.presentation.ui.shared\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.shape.CornerBasedShape\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.ButtonDefaults\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Brush\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.GiltyTheme\r\nimport ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra\r\n\r\n\r\n@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)\r\n@Composable\r\nprivate fun GradientButtonPreview() {\r\n    GiltyTheme {\r\n        GradientButton(text = \"Далее\", smallText = \"Подробности\") {}\r\n    }\r\n}\r\n\r\n@Composable\r\nfun GradientButton(\r\n    modifier: Modifier = Modifier,\r\n    text: String,\r\n    enabled: Boolean = true,\r\n    gradientColors: List<Color> = listOf(\r\n        ThemeExtra.colors.gradientColor1,\r\n        ThemeExtra.colors.gradientColor2\r\n    ),\r\n    shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,\r\n    smallText: String? = null,\r\n    disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),\r\n    onClick: () -> Unit,\r\n) {\r\n    Button(\r\n        onClick,\r\n        modifier,\r\n        enabled,\r\n        shape,\r\n        ButtonDefaults.buttonColors(Color.Transparent),\r\n        contentPadding = PaddingValues(),\r\n    ) {\r\n        Box(\r\n            Modifier\r\n                .background(\r\n                    Brush.linearGradient(if (enabled) gradientColors else disabledColors),\r\n                    shape\r\n                )\r\n                .fillMaxWidth()\r\n                .padding(16.dp),\r\n            Alignment.Center\r\n        ) {\r\n            Column(horizontalAlignment = Alignment.CenterHorizontally) {\r\n                Text(text, style = ThemeExtra.typography.button)\r\n                smallText?.let { Text(smallText, style = ThemeExtra.typography.ButtonLabelText) }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt
+--- a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt	(revision e6f672d73b32d485bbc559832b66a5a532d34603)
++++ b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/shared/GradientButtonCompose.kt	(date 1666621378808)
+@@ -25,13 +25,14 @@
+ @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+ @Composable
+ private fun GradientButtonPreview() {
+-    GiltyTheme {
+-        GradientButton(text = "Далее", smallText = "Подробности") {}
++    GiltyTheme{
++        GradientButton({ }, text = "Далее", smallText = "Подробности")
+     }
+ }
+ 
+ @Composable
+ fun GradientButton(
++    onClick: () -> Unit,
+     modifier: Modifier = Modifier,
+     text: String,
+     enabled: Boolean = true,
+@@ -42,29 +43,35 @@
+     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
+     smallText: String? = null,
+     disabledColors: List<Color> = listOf(ThemeExtra.colors.notActive, ThemeExtra.colors.notActive),
+-    onClick: () -> Unit,
+ ) {
+     Button(
+-        onClick,
+-        modifier,
+-        enabled,
+-        shape,
+-        ButtonDefaults.buttonColors(Color.Transparent),
++        modifier = modifier
++            .fillMaxWidth(),
++        onClick = onClick,
+         contentPadding = PaddingValues(),
++        colors = ButtonDefaults.buttonColors(
++            containerColor = Color.Transparent
++        ),
++        shape = shape,
++        enabled = enabled,
+     ) {
+         Box(
+-            Modifier
+-                .background(
+-                    Brush.linearGradient(if (enabled) gradientColors else disabledColors),
+-                    shape
+-                )
++            modifier = Modifier
+                 .fillMaxWidth()
+-                .padding(16.dp),
+-            Alignment.Center
++                .background(
++                    brush = Brush.linearGradient(colors = if (enabled) gradientColors else disabledColors),
++                    shape = shape
++                )
++                .padding(horizontal = 16.dp, vertical = 16.dp),
++            contentAlignment = Alignment.Center
+         ) {
+             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+-                Text(text, style = ThemeExtra.typography.button)
+-                smallText?.let { Text(smallText, style = ThemeExtra.typography.ButtonLabelText) }
++                Text(
++                    text = text,
++                    style = ThemeExtra.typography.button
++                )
++                if (smallText != null)
++                    Text(smallText, style = ThemeExtra.typography.ButtonLabelText)
+             }
+         }
+     }

@@ -1,5 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":shared")
+
+
+
 pluginManagement {
     repositories {
         google()
@@ -20,3 +24,6 @@ rootProject.name = "gilty"
 include(":app", ":core")
 
 include(":example")
+
+include(":feature")
+include(":feature:login")

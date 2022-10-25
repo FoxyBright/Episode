@@ -28,4 +28,6 @@ dependencies {
     compose()
 
     implementation(project(":example"))
+    implementation(project(":feature:login"))
+    implementation(project(":shared"))
 }

@@ -1,0 +1,14 @@
+Index: app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/TimeBottomSheet.kt
+===================================================================
+diff --git a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/TimeBottomSheet.kt b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/TimeBottomSheet.kt
+--- a/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/TimeBottomSheet.kt	
++++ b/app/src/main/java/ru/rikmasters/gilty/presentation/ui/presentation/main/recommendation/TimeBottomSheet.kt	
+@@ -95,7 +95,7 @@
+ 
+ @Preview
+ @Composable
+-fun AgeBottomSheetPreview() {
++private fun AgeBottomSheetPreview() {
+     GiltyTheme {
+         AgeBottomSheetCompose(state = true)
+     }
