@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:notifications")
+
+
 include(":feature:mainscreen")
 
 

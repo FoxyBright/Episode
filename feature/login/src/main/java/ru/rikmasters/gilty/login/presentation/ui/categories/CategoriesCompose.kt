@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.categories
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,20 +27,20 @@ import ru.rikmasters.gilty.shared.shared.CategoryItem
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-data class SelectCategoriesState(
+data class CategoriesState(
     val categoryList: List<ShortCategoryModel>,
     val selectCategories: List<ShortCategoryModel>
 )
 
-interface SelectCategoriesCallback : NavigationInterface {
+interface CategoriesCallback : NavigationInterface {
     fun onCategoryClick(category: ShortCategoryModel) {}
 }
 
 @Composable
-fun SelectCategories(
+fun CategoriesContent(
     modifier: Modifier = Modifier,
-    state: SelectCategoriesState,
-    callback: SelectCategoriesCallback? = null
+    state: CategoriesState,
+    callback: CategoriesCallback? = null
 ) {
     Box(
         modifier
@@ -93,11 +93,11 @@ fun SelectCategories(
 @Composable
 @ExperimentalMaterial3Api
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-private fun SelectCategoriesPreview() {
+private fun CategoriesPreview() {
     GiltyTheme {
-        SelectCategories(
+        CategoriesContent(
             Modifier,
-            SelectCategoriesState(DemoShortCategoryModelList, arrayListOf())
+            CategoriesState(DemoShortCategoryModelList, arrayListOf())
         )
     }
 }

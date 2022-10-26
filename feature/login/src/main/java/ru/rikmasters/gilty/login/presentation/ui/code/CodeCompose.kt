@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.code
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -12,10 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -30,40 +26,28 @@ import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun CodePreview() {
     GiltyTheme {
-        var text by remember { mutableStateOf("") }
-        val focuses = remember { Array(4) { FocusRequester() } }
-        CodeEnter(CodeEnterState(text, focuses), Modifier, object : CodeEnterCallback {
-            override fun onCodeChange(index: Int, it: String) {
-                if (text.length <= focuses.size) {
-                    if (it.length == focuses.size) {
-                        text = it
-                    } else if (it.length < 2) {
-                        if (it == "") {
-                            text = text.substring(0, text.lastIndex)
-                            if (index - 1 >= 0) focuses[index - 1].requestFocus()
-                        } else {
-                            text += it
-                            if (index + 1 < focuses.size) focuses[index + 1].requestFocus()
-                        }
-                    }
-                }
-            }
-        })
+        CodeContent(
+            CodeState(
+                "1234",
+                Array(4)
+                { FocusRequester() }
+            )
+        )
     }
 }
 
-data class CodeEnterState(
+data class CodeState(
     val code: String,
     val focuses: Array<FocusRequester>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        other as CodeEnterState
+        other as CodeState
         if (!focuses.contentEquals(other.focuses)) return false
         return true
     }
@@ -73,15 +57,15 @@ data class CodeEnterState(
     }
 }
 
-interface CodeEnterCallback : NavigationInterface {
+interface CodeCallback : NavigationInterface {
     fun onCodeChange(index: Int, it: String)
 }
 
 @Composable
-fun CodeEnter(
-    state: CodeEnterState,
+fun CodeContent(
+    state: CodeState,
     modifier: Modifier = Modifier,
-    callback: CodeEnterCallback? = null
+    callback: CodeCallback? = null
 ) {
     Surface(modifier.background(MaterialTheme.colorScheme.background)) {
         Column(
@@ -101,7 +85,7 @@ fun CodeEnter(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun DigitCode(
+private fun DigitCode(
     modifier: Modifier = Modifier,
     code: String,
     focuses: Array<FocusRequester>,

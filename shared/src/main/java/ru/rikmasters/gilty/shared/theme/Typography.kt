@@ -37,6 +37,7 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
         // Настроить
     ),
+
     titleLarge = baseTextStyle.copy(
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,

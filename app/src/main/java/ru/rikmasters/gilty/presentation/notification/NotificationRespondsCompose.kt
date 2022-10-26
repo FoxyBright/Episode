@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.responds
+package ru.rikmasters.gilty.presentation.notification
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.RespondsCompose
+import ru.rikmasters.gilty.shared.common.RespondsComposeCallback
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel

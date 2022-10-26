@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.CountryList
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
+import ru.rikmasters.gilty.login.presentation.ui.PhoneTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.BottomSheetCompose
 import ru.rikmasters.gilty.shared.shared.BottomSheetComposeState
@@ -52,7 +53,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-fun LoginPreview() {
+private fun LoginPreview() {
     GiltyTheme {
         LoginContent(Modifier)
     }

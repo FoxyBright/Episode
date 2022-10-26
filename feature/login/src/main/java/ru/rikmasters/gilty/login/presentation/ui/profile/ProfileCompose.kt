@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
@@ -28,7 +28,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun CreateProfilePreview() {
+private fun ProfilePreview() {
     GiltyTheme {
         val lockState = remember { mutableStateOf(false) }
         val name = remember { mutableStateOf("") }
@@ -39,7 +39,7 @@ private fun CreateProfilePreview() {
             description = description.value,
             enabled = true
         )
-        CreateProfile(profileState, Modifier, object : ProfileCallback {
+        ProfileContent(profileState, Modifier, object : ProfileCallback {
             override fun onNameChange(text: String) {
                 name.value = text
             }
@@ -56,7 +56,7 @@ private fun CreateProfilePreview() {
 }
 
 @Composable
-fun CreateProfile(
+fun ProfileContent(
     state: ProfileState,
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null

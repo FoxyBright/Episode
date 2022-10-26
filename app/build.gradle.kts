@@ -30,4 +30,5 @@ dependencies {
     implementation(project(":example"))
     implementation(project(":feature:login"))
     implementation(project(":feature:mainscreen"))
+    implementation(project(":feature:notifications"))
 }

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.responds
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
