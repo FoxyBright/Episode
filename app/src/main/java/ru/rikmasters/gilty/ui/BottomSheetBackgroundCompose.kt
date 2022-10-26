@@ -7,7 +7,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
 fun GBottomSheetBackground(

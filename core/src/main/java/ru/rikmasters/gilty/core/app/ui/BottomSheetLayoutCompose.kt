@@ -111,8 +111,8 @@ fun BottomSheetLayout(
                 screenHeight to BottomSheetSwipeState.COLLAPSED
             )
 
-            state.swipeableState.minBound = anchors.keys.min()
-            state.swipeableState.maxBound = anchors.keys.max()
+//            state.swipeableState.minBound = anchors.keys.min()
+//            state.swipeableState.maxBound = anchors.keys.max()
             anchors
         }
 

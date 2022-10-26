@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":example"))
     implementation(project(":feature:login"))
+    implementation(project(":feature:profile"))
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:notifications"))
 }
