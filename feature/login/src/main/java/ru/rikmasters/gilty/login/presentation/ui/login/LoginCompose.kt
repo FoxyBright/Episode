@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -25,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,14 +39,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.CountryList
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.login.presentation.ui.PhoneTextField
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.BottomSheetCompose
-import ru.rikmasters.gilty.shared.shared.BottomSheetComposeState
 import ru.rikmasters.gilty.shared.shared.Divider
+import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -55,7 +58,11 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun LoginPreview() {
     GiltyTheme {
-        LoginContent(Modifier)
+        LoginContent(
+            LoginState(
+                rememberCoroutineScope(), "9543422455", DemoCountry
+            )
+        )
     }
 }
 
@@ -64,17 +71,22 @@ interface LoginCallback {
     fun googleLogin() {}
     fun privatePolicy() {}
     fun termsOfApp() {}
+    fun onPhoneChange(text: String) {}
+    fun onCountryChange(country: Country) {}
 }
+
+data class LoginState(
+    val scope: CoroutineScope,
+    val phone: String,
+    val country: Country
+)
 
 @Composable
 fun LoginContent(
+    state: LoginState,
     modifier: Modifier = Modifier,
-    callback: LoginCallback? = null
+    callback: LoginCallback? = null,
 ) {
-    val bottomSheetState = remember { mutableStateOf(false) }
-    val searchCountry = remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    val country = remember { mutableStateOf(DemoCountry) }
     Box(
         Modifier.fillMaxSize()
     ) {
@@ -103,21 +115,31 @@ fun LoginContent(
                         .background(ThemeExtra.colors.cardBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val asm = get<AppStateModel>()
                     Image(
-                        painterResource(country.value.flag),
+                        painterResource(state.country.flag),
                         stringResource(R.string.login_select_country),
                         Modifier
                             .padding(start = 10.dp)
                             .size(20.dp)
                             .clickable
-                            { bottomSheetState.value = !bottomSheetState.value }
+                            {
+                                state.scope.launch {
+                                    asm.bottomSheetState.expand {
+                                        CountryBottomSheetContent {
+                                            callback?.onCountryChange(it)
+                                            state.scope.launch { asm.bottomSheetState.collapse() }
+                                        }
+                                    }
+                                }
+                            }
                     )
                     PhoneTextField(
-                        phone,
-                        country.value.code,
+                        state.phone,
+                        state.country.code,
                         Modifier.fillMaxWidth(),
-                        onClear = { phone = "" },
-                        onValueChanged = { phone = it })
+                        onClear = { callback?.onPhoneChange("") },
+                        onValueChanged = { callback?.onPhoneChange(it) })
                 }
             }
             Button(
@@ -169,28 +191,6 @@ fun LoginContent(
                 .padding(start = 16.dp, end = 60.dp, bottom = 60.dp),
             callback
         )
-        val searchState = remember { mutableStateOf(false) }
-        BottomSheetCompose(
-            BottomSheetComposeState(
-                600.dp,
-                bottomSheetState,
-                SearchState(
-                    stringResource(R.string.login_search_name),
-                    searchState.value, searchCountry.value,
-                    onChangeText = { searchCountry.value = it },
-                    onExpandSearch = { searchState.value = it }
-                ))
-            {
-                CountryBottomSheetContent {
-                    country.value = it
-                    bottomSheetState.value = !bottomSheetState.value
-                }
-            },
-            Modifier
-                .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
-                .align(Alignment.BottomCenter)
-                .background(ThemeExtra.colors.cardBackground)
-        ) { bottomSheetState.value = false }
     }
 }
 
@@ -222,33 +222,41 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
 
 @Composable
 private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
-    LazyColumn(
-        Modifier
-            .padding(horizontal = 16.dp)
-            .padding(top = 10.dp)
-            .clip(MaterialTheme.shapes.medium)
-            .background(ThemeExtra.colors.cardBackground)
-    ) {
-        itemsIndexed(CountryList) { index, item ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .clickable { onSelect(item) },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painterResource(item.flag),
-                    item.country,
-                    Modifier.size(24.dp)
-                )
-                Text(
-                    item.country,
-                    Modifier.padding(start = 16.dp),
-                    style = ThemeExtra.typography.Body1Medium
-                )
+    var searchState by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
+    Column(Modifier.padding(16.dp, 20.dp)) {
+        SearchActionBar(SearchState(
+            stringResource(R.string.login_search_name),
+            searchState, searchText, { searchText = it },
+            { searchState = it }
+        ))
+        LazyColumn(
+            Modifier
+                .padding(top = 10.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .background(ThemeExtra.colors.cardBackground)
+        ) {
+            itemsIndexed(CountryList) { index, item ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clickable { onSelect(item) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painterResource(item.flag),
+                        item.country,
+                        Modifier.size(24.dp)
+                    )
+                    Text(
+                        item.country,
+                        Modifier.padding(start = 16.dp),
+                        style = ThemeExtra.typography.Body1Medium
+                    )
+                }
+                if (index < CountryList.size - 1) Divider(Modifier.padding(start = 54.dp))
             }
-            if (index < CountryList.size - 1) Divider(Modifier.padding(start = 54.dp))
         }
     }
 }

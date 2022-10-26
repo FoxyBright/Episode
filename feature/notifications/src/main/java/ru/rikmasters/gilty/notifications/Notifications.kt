@@ -6,9 +6,10 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 
 object Notifications : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        nested("notifications", "leaveemotions") {
-            screen("leaveemotions") {}
-            screen("photosviewing") {}
+        nested("notifications", "list") {
+            screen("list") {}
+            screen("emoji") {}
+            screen("photos") {}
         }
     }
 
