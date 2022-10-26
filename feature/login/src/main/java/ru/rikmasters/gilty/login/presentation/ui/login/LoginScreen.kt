@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,13 +10,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
-import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 
 @Composable
 fun LoginScreen(nav: NavState = get()) {
     var phone by remember { mutableStateOf("") }
-    var selectCountry by remember { mutableStateOf(DemoCountry) }
+    var selectCountry by remember { mutableStateOf(Country("", "", 1)) }
     LoginContent(LoginState(rememberCoroutineScope(), phone, selectCountry),
         Modifier, object : LoginCallback {
             override fun onPhoneChange(text: String) {
