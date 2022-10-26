@@ -26,8 +26,8 @@ android {
 dependencies {
     androidBase()
     compose()
-
+    implementation(project(":shared"))
     implementation(project(":example"))
     implementation(project(":feature:login"))
-    implementation(project(":shared"))
+    implementation(project(":feature:mainscreen"))
 }
