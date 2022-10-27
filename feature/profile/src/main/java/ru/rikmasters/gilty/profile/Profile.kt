@@ -6,7 +6,7 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 
 object Profile : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        screen("userprofile") {}
+//        screen("profile") {}
     }
 
     override fun Module.koin() {}

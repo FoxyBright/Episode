@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,9 +47,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
+import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.login.presentation.ui.PhoneTextField
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -56,7 +64,7 @@ private fun LoginPreview() {
     GiltyTheme {
         LoginContent(
             LoginState(
-                rememberCoroutineScope(), "9543422455", Country("", "", 1)
+                rememberCoroutineScope(), "9543422455", DemoCountry
             )
         )
     }
@@ -82,6 +90,7 @@ fun LoginContent(
     state: LoginState,
     modifier: Modifier = Modifier,
     callback: LoginCallback? = null,
+    asm: AppStateModel = get()
 ) {
     Box(
         Modifier.fillMaxSize()
@@ -111,9 +120,8 @@ fun LoginContent(
                         .background(ThemeExtra.colors.cardBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val asm = get<AppStateModel>()
                     Image(
-                        painterResource(R.drawable.gb),
+                        painterResource(state.country.flag),
                         stringResource(R.string.login_select_country),
                         Modifier
                             .padding(start = 10.dp)
@@ -220,7 +228,7 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
 private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
     var searchState by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
-//    val countries = Countries()
+    val countries = Countries()
     Column(Modifier.padding(16.dp, 20.dp)) {
         SearchActionBar(SearchState(
             stringResource(R.string.login_search_name),
@@ -233,27 +241,44 @@ private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
                 .clip(MaterialTheme.shapes.medium)
                 .background(ThemeExtra.colors.cardBackground)
         ) {
-//            itemsIndexed(countries) { index, item ->
-//                Row(
-//                    Modifier
-//                        .fillMaxWidth()
-//                        .padding(16.dp)
-//                        .clickable { onSelect(item) },
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Image(
-//                        painterResource(item.flag),
-//                        item.country,
-//                        Modifier.size(24.dp)
-//                    )
-//                    Text(
-//                        item.country,
-//                        Modifier.padding(start = 16.dp),
-//                        style = ThemeExtra.typography.Body1Medium
-//                    )
-//                }
-//                if (index < countries.size - 1) Divider(Modifier.padding(start = 54.dp))
-//            }
+            itemsIndexed(countries) { index, item ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(item) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        Arrangement.SpaceBetween,
+                        Alignment.CenterVertically
+                    ) {
+                        Row(Modifier.weight(1f)) {
+                            Image(
+                                painterResource(item.flag),
+                                item.country,
+                                Modifier.size(24.dp)
+                            )
+                            Text(
+                                item.country,
+                                Modifier.padding(start = 16.dp),
+                                style = ThemeExtra.typography.Body1Medium
+                            )
+                        }
+                        Row {
+                            Text(
+                                item.code,
+                                Modifier.padding(start = 16.dp, end = 8.dp),
+                                style = ThemeExtra.typography.Body1Medium
+                            )
+                            Icon(Icons.Filled.KeyboardArrowRight, null)
+                        }
+                    }
+                }
+                if (index < countries.size - 1) Divider(Modifier.padding(start = 54.dp))
+            }
         }
     }
 }

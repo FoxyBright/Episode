@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.shared
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,11 @@ import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
-fun categoriesListCard(modifier: Modifier, meeting: ShortMeetingModel, border: Boolean) {
+fun categoriesListCard(
+    modifier: Modifier,
+    meeting: ShortMeetingModel,
+    border: Boolean
+) {
     Surface(
         modifier,
         MaterialTheme.shapes.medium,

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.mainscreen.presentation.ui.tagsearch
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -10,11 +10,17 @@ import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.MainScreen
 
 object Login : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
 
-        screen("authorization") { LoginScreen() }
+        //TODO Проверка на авторизованность пользователя
+        val userLogged = false
+
+        screen("authorization") {
+            if (userLogged) MainScreen() else LoginScreen()
+        }
 
         nested("registration", "code") {
             screen("code") { CodeScreen() }

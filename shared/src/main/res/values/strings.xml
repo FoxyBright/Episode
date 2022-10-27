@@ -86,6 +86,7 @@
     <string name="meeting_group_type">Групповая встреча</string>
     <string name="meeting_anon_type">Анонимная встреча</string>
     <string name="meeting_profile_bottom_today_label">Сегодня</string>
+    <string name="meeting_profile_bottom_latest_label">Потом</string>
     <string name="meeting_avatar">Аватар</string>
     <string name="meeting_members">Участники</string>
     <string name="condition_free">Вход свободный</string>
@@ -125,6 +126,7 @@
     <string name="meeting_filter_complete_button">Готово</string>
     <string name="meeting_filter_popular_tags">Популярные</string>
     <string name="meeting_filter_search_from_tag">Поиск по тегам</string>
+    <string name="meeting_filter_select_categories">Выбрать категории</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>

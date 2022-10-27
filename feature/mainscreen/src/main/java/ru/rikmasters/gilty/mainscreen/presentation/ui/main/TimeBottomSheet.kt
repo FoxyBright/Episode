@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateDp

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

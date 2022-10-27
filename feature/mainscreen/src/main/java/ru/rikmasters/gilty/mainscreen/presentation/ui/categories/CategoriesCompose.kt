@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,28 +10,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.mainscreen.custom.FlowLayout
+import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
@@ -46,15 +47,12 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun CategoryListPreview() {
     GiltyTheme {
-        val list = remember { mutableStateListOf<Boolean>() }
-        repeat(DemoFullCategoryModelList.size) { list.add(false) }
         CategoryList(
-            CategoryListState(DemoFullCategoryModelList, list), Modifier.padding(16.dp),
-            object : CategoryListCallback {
-                override fun onCategoryClick(index: Int, it: Boolean) {
-                    list[index] = !it
-                }
-            })
+            CategoryListState(
+                DemoFullCategoryModelList,
+                listOf()
+            ), Modifier.padding(16.dp)
+        )
     }
 }
 
@@ -68,6 +66,7 @@ data class CategoryListState(
     val categoryListState: List<Boolean>
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(
     state: CategoryListState,
@@ -82,31 +81,33 @@ fun CategoryList(
             Icon(
                 painterResource(R.drawable.ic_back),
                 stringResource(R.string.action_bar_button_back),
-                Modifier.clickable { callback?.onBack() },
+                Modifier
+                    .clip(CircleShape)
+                    .clickable { callback?.onBack() },
                 ThemeExtra.colors.mainTextColor
             )
             Text(
-                "Выбрать категории",
+                stringResource(R.string.meeting_filter_select_categories),
                 Modifier.padding(start = 20.dp),
                 ThemeExtra.colors.mainTextColor,
                 style = ThemeExtra.typography.H3
             )
         }
         LazyColumn {
-            itemsIndexed(state.categoryList) { index, it ->
+            itemsIndexed(state.categoryList)
+            { index, it ->
                 Card(
-                    Modifier
+                    {
+                        callback?.onCategoryClick(
+                            index, state.categoryListState[index]
+                        )
+                    }, Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable {
-                            callback?.onCategoryClick(
-                                index,
-                                state.categoryListState[index]
-                            )
-                        },
+                        .padding(vertical = 6.dp), true,
                     MaterialTheme.shapes.large,
-                    CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
-                ) {
+                    CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                )
+                {
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -175,6 +176,7 @@ fun CategoryList(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp, bottom = 28.dp)
+                        .clip(CircleShape)
                         .clickable { },
                     ThemeExtra.colors.mainTextColor,
                     textAlign = TextAlign.Center,

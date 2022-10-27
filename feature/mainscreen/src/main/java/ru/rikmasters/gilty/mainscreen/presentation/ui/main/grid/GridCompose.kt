@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
@@ -19,12 +19,12 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun TodayMeetingGridPreview() {
     GiltyTheme {
-        MeetingGridCompose(Modifier.padding(16.dp), DemoMeetingList) {}
+        MeetingGridContent(Modifier.padding(16.dp), DemoMeetingList) {}
     }
 }
 
 @Composable
-fun MeetingGridCompose(
+fun MeetingGridContent(
     modifier: Modifier = Modifier,
     meetings: List<ShortMeetingModel>,
     onClick: () -> (Unit)
@@ -35,8 +35,6 @@ fun MeetingGridCompose(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(meetings) {
-            MeetingCard(it) { onClick() }
-        }
+        items(meetings) { MeetingCard(it) { onClick() } }
     }
 }

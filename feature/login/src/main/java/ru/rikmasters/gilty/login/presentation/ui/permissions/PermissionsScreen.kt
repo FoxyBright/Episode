@@ -13,5 +13,9 @@ fun PermissionsScreen(nav: NavState = get()) {
         override fun onBack() {
             nav.navigate("categories")
         }
+
+        override fun onNext() {
+            nav.navigateAbsolute("main")
+        }
     })
 }

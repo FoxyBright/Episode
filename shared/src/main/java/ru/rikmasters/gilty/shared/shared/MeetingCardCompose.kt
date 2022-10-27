@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.categoriesListCard
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients
@@ -72,7 +73,9 @@ fun MeetingCard(
         ) {
             DateTimeCard(meeting.dateTime, Gradients().green(), today)
             if (today)
-                categoriesListCard(Modifier.padding(start = 4.dp), meeting, true)
+                categoriesListCard(
+                    Modifier.padding(start = 4.dp), meeting, true
+                )
         }
         Box(
             Modifier

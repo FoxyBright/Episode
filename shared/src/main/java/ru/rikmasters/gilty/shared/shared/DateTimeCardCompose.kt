@@ -10,8 +10,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+
+@Preview
+@Composable
+fun TimeCardPreview() {
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients().green(), true)
+}
+
+@Preview
+@Composable
+fun DateCardPreview() {
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients().green(), false)
+}
 
 @Composable
 fun DateTimeCard(

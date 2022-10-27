@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -43,21 +43,21 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
-import ru.rikmasters.gilty.shared.shared.categoriesListCard
+import ru.rikmasters.gilty.shared.common.categoriesListCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun TodayMeetingsListComposePreview() {
+private fun MeetingsListContentPreview() {
     GiltyTheme {
-        TodayMeetingsListCompose(DemoMeetingList)
+        MeetingsListContent(DemoMeetingList)
     }
 }
 
 @Composable
-fun TodayMeetingsListCompose(
+fun MeetingsListContent(
     meetings: List<ShortMeetingModel>
 ) {
     Box(Modifier.fillMaxSize()) {
@@ -170,7 +170,9 @@ fun MeetingCardCompose(
                             colorResource(R.color.primary),
                             R.drawable.ic_heart
                         ) {
-                            scope.launch { state.swipe(Direction.Right) }
+                            scope.launch {
+                                state.swipe(Direction.Right)
+                            }
                         }
                     }
                 }
