@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -34,10 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.mainscreen.custom.swipeablecard.Direction
-import ru.rikmasters.gilty.mainscreen.custom.swipeablecard.SwipeableCardState
-import ru.rikmasters.gilty.mainscreen.custom.swipeablecard.rememberSwipeableCardState
-import ru.rikmasters.gilty.mainscreen.custom.swipeablecard.swipeableCard
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.Direction
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
@@ -52,13 +54,14 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun MeetingsListContentPreview() {
     GiltyTheme {
-        MeetingsListContent(DemoMeetingList)
+        MeetingsListContent(DemoMeetingList) {}
     }
 }
 
 @Composable
 fun MeetingsListContent(
-    meetings: List<ShortMeetingModel>
+    meetings: List<ShortMeetingModel>,
+    onSelect: (ShortMeetingModel) -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
         val states = meetings.map { it to rememberSwipeableCardState() }
@@ -71,14 +74,14 @@ fun MeetingsListContent(
                                 .fillMaxSize()
                                 .swipeableCard(
                                     state,
-                                    {},
+                                    { if (it == Direction.Right) onSelect(meeting) },
                                     {},
                                     listOf(Direction.Down, Direction.Up)
                                 ),
                             meeting,
                             state,
                             false
-                        )
+                        ) { onSelect(meeting) }
                     }
                 }
             }
@@ -87,15 +90,17 @@ fun MeetingsListContent(
 }
 
 @Composable
-fun MeetingCardCompose(
+private fun MeetingCardCompose(
     modifier: Modifier = Modifier,
     model: ShortMeetingModel,
     state: SwipeableCardState,
-    today: Boolean
+    today: Boolean,
+    onSelect: () -> Unit
 ) {
     Card(
         modifier,
-        MaterialTheme.shapes.large
+        MaterialTheme.shapes.large,
+        CardDefaults.cardColors(Color.Transparent)
     ) {
         Box {
             AsyncImage(
@@ -103,76 +108,103 @@ fun MeetingCardCompose(
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(MaterialTheme.shapes.large)
-                    .fillMaxHeight(),
+                    .fillMaxHeight(0.96f),
                 contentScale = ContentScale.FillBounds
             )
-            Card(
+            cardBottom(
+                Modifier.align(Alignment.BottomCenter),
+                model, state, today, onSelect
+            )
+        }
+    }
+}
+
+@Composable
+private fun cardBottom(
+    modifier: Modifier,
+    model: ShortMeetingModel,
+    state: SwipeableCardState,
+    today: Boolean,
+    onSelect: () -> Unit
+) {
+    Box(modifier) {
+        if (MaterialTheme.colorScheme.background == Color(0xFFF6F6F6))
+            Image(
+                painterResource(R.drawable.ic_back_rect),
+                null,
                 Modifier
+                    .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .wrapContentHeight(),
-                MaterialTheme.shapes.large,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                    .offset(y = 16.dp),
+                contentScale = ContentScale.FillWidth
+            )
+        Card(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .wrapContentHeight(),
+            MaterialTheme.shapes.large,
+            CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+        ) {
+            val scope = rememberCoroutineScope()
+            LazyVerticalGrid(
+                GridCells.Fixed(2),
+                Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                val scope = rememberCoroutineScope()
-                LazyVerticalGrid(
-                    GridCells.Fixed(2),
-                    Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    item {
-                        Text(
-                            model.title,
-                            style = ThemeExtra.typography.H3
-                        )
-                    }
-                    item {
-                        Box {
-                            Row(Modifier.align(Alignment.CenterEnd)) {
-                                Column(horizontalAlignment = Alignment.End) {
-                                    DateTimeCard(
-                                        DemoMeetingModel.dateTime,
-                                        Gradients().green(),
-                                        today
-                                    )
-                                    if (!today)
-                                        categoriesListCard(
-                                            Modifier.padding(top = 8.dp),
-                                            DemoMeetingModel,
-                                            false
-                                        )
-                                }
-                                if (today)
+                item {
+                    Text(
+                        model.title,
+                        style = ThemeExtra.typography.H3
+                    )
+                }
+                item {
+                    Box {
+                        Row(Modifier.align(Alignment.CenterEnd)) {
+                            Column(horizontalAlignment = Alignment.End) {
+                                DateTimeCard(
+                                    DemoMeetingModel.dateTime,
+                                    Gradients().green(),
+                                    today
+                                )
+                                if (!today)
                                     categoriesListCard(
-                                        Modifier.padding(start = 4.dp),
+                                        Modifier.padding(top = 8.dp),
                                         DemoMeetingModel,
                                         false
                                     )
                             }
+                            if (today)
+                                categoriesListCard(
+                                    Modifier.padding(start = 4.dp),
+                                    DemoMeetingModel,
+                                    false
+                                )
                         }
                     }
-                    item {
-                        CardButtonCompose(
-                            Modifier.weight(1f),
-                            stringResource(R.string.not_interesting),
-                            colorResource(R.color.primary),
-                            R.drawable.ic_cancel
-                        ) {
-                            scope.launch {
-                                state.swipe(Direction.Left)
-                            }
+                }
+                item {
+                    CardButtonCompose(
+                        Modifier.weight(1f),
+                        stringResource(R.string.not_interesting),
+                        colorResource(R.color.primary),
+                        R.drawable.ic_cancel
+                    ) {
+                        scope.launch {
+                            state.swipe(Direction.Left)
                         }
                     }
-                    item {
-                        CardButtonCompose(
-                            Modifier.weight(1f),
-                            stringResource(R.string.meeting_respond),
-                            colorResource(R.color.primary),
-                            R.drawable.ic_heart
-                        ) {
-                            scope.launch {
-                                state.swipe(Direction.Right)
-                            }
+                }
+                item {
+                    CardButtonCompose(
+                        Modifier.weight(1f),
+                        stringResource(R.string.meeting_respond),
+                        colorResource(R.color.primary),
+                        R.drawable.ic_heart
+                    ) {
+                        scope.launch {
+                            onSelect()
+                            state.swipe(Direction.Right)
                         }
                     }
                 }

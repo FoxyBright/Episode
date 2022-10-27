@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.meeting
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

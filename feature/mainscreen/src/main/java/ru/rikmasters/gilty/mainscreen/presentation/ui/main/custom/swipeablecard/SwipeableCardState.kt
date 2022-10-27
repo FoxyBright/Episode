@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.custom.swipeablecard
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec

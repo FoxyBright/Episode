@@ -27,7 +27,7 @@ private fun TodayMeetingGridPreview() {
 fun MeetingGridContent(
     modifier: Modifier = Modifier,
     meetings: List<ShortMeetingModel>,
-    onClick: () -> (Unit)
+    onClick: (ShortMeetingModel) -> (Unit)
 ) {
     LazyVerticalGrid(
         GridCells.Fixed(2),
@@ -35,6 +35,6 @@ fun MeetingGridContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(meetings) { MeetingCard(it) { onClick() } }
+        items(meetings) { MeetingCard(it) { onClick(it) } }
     }
 }

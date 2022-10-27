@@ -14,10 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +39,11 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScree
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
+import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
+import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
+import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.shared.Divider
@@ -56,6 +67,7 @@ interface MainContentCallback {
     fun onTodayChange() {}
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
+    fun onRespond(avatar: String) {}
     fun onMeetingSelect() {}
 }
 
@@ -111,8 +123,26 @@ fun MainContent(
         if (state.grid) MeetingGridContent(
             Modifier.padding(16.dp),
             state.meetings
-        ) { callback?.onMeetingSelect() }
-        else MeetingsListContent(state.meetings)
+        ) {
+            state.scope.launch {
+                asm.bottomSheetState.expand {
+                    Meeteing {
+                        callback?.onRespond(it.organizer.id)
+                        state.scope.launch { asm.bottomSheetState.collapse() }
+                    }
+                }
+            }
+        }
+        else MeetingsListContent(state.meetings) {
+            state.scope.launch {
+                asm.bottomSheetState.expand {
+                    Meeteing {
+                        callback?.onRespond(it.organizer.id)
+                        state.scope.launch { asm.bottomSheetState.collapse() }
+                    }
+                }
+            }
+        }
     }
     Box(Modifier.fillMaxSize()) {
         Row(
@@ -150,5 +180,38 @@ fun MainContent(
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 92.dp)
         ) { callback?.onStyleChange() }
+    }
+}
+
+@Composable
+fun Meeteing(onRespond: () -> Unit) {
+    Column(
+        Modifier
+            .padding(16.dp)
+            .padding(bottom = 50.dp)) {
+        MeetingBottomSheetTopBarCompose(
+            Modifier,
+            DemoFullMeetingModel,
+            "2 часа"
+        )
+        var hiddenPhoto by remember { mutableStateOf(false) }
+        var commentText by remember { mutableStateOf("") }
+        MeetingDetailsBottomCompose(
+            Modifier.padding(16.dp),
+            MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
+            object : MeetingDetailsBottomCallback {
+                override fun onHiddenPhotoActive(hidden: Boolean) {
+                    hiddenPhoto = hidden
+                }
+
+                override fun onCommentChange(text: String) {
+                    commentText = text
+                }
+
+                override fun onRespondClick() {
+                    onRespond()
+                }
+            }
+        )
     }
 }

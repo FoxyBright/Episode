@@ -15,7 +15,7 @@ fun PermissionsScreen(nav: NavState = get()) {
         }
 
         override fun onNext() {
-            nav.navigateAbsolute("main")
+            nav.navigateAbsolute("main/meetings")
         }
     })
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3
+package ru.rikmasters.gilty.core.app.ui.fork
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -23,10 +23,11 @@ import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.SwipeableDefaults.AnimationSpec
-import androidx.compose.material3.SwipeableDefaults.StandardResistanceFactor
-import androidx.compose.material3.SwipeableDefaults.VelocityThreshold
-import androidx.compose.material3.SwipeableDefaults.resistanceConfig
+import androidx.compose.material3.ExperimentalMaterial3Api
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.AnimationSpec
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.StandardResistanceFactor
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.VelocityThreshold
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -51,7 +52,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.core.app.ui.fork.lerp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
