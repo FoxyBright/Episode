@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +43,6 @@ import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
-import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.DividerBold
 import ru.rikmasters.gilty.shared.shared.GiltyString
 import ru.rikmasters.gilty.shared.shared.SquareCheckBox
@@ -68,7 +64,6 @@ interface MainContentCallback {
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
     fun onRespond(avatar: String) {}
-    fun onMeetingSelect() {}
 }
 
 data class MainContentState(
@@ -188,7 +183,8 @@ fun Meeteing(onRespond: () -> Unit) {
     Column(
         Modifier
             .padding(16.dp)
-            .padding(bottom = 50.dp)) {
+            .padding(bottom = 50.dp)
+    ) {
         MeetingBottomSheetTopBarCompose(
             Modifier,
             DemoFullMeetingModel,

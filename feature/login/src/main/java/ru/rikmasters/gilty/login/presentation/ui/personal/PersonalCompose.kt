@@ -1,15 +1,12 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.personal
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,23 +15,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.BottomSheetCompose
-import ru.rikmasters.gilty.shared.shared.BottomSheetComposeState
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.NumberPicker
@@ -45,16 +39,33 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 fun PersonalInfoPreview() {
     GiltyTheme {
-        PersonalInfoContent()
+        PersonalInfoContent(
+            PersonalInfoContentState(
+                rememberCoroutineScope(),
+                18, listOf()
+            )
+        )
     }
 }
 
+interface PersonalInfoContentCallback : NavigationInterface {
+    fun onAgeChange(it: Int) {}
+    fun onGenderChange(index: Int) {}
+}
+
+data class PersonalInfoContentState(
+    val scope: CoroutineScope,
+    val age: Int,
+    val list: List<Boolean>
+)
+
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun PersonalInfoContent(callback: NavigationInterface? = null) {
-    val bottomSheetState = remember { mutableStateOf(false) }
-    val ageTextFieldValue = remember { mutableStateOf("") }
-    var pickerValue by remember { mutableStateOf(18) }
+fun PersonalInfoContent(
+    state: PersonalInfoContentState,
+    callback: PersonalInfoContentCallback? = null,
+    asm: AppStateModel = get()
+) {
     Box(
         Modifier
             .fillMaxSize()
@@ -75,11 +86,23 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 style = ThemeExtra.typography.H3
             )
             TextField(
-                ageTextFieldValue.value, {},
+                state.age.toString(), {},
                 Modifier
                     .padding(top = 12.dp)
                     .fillMaxWidth()
-                    .clickable { bottomSheetState.value = !bottomSheetState.value },
+                    .clickable {
+                        state.scope.launch {
+                            asm.bottomSheetState.expand {
+                                BottomSheetContent(Modifier, state.age,
+                                    { callback?.onAgeChange(it) })
+                                {
+                                    state.scope.launch {
+                                        asm.bottomSheetState.collapse()
+                                    }
+                                }
+                            }
+                        }
+                    },
                 shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = ThemeExtra.colors.cardBackground,
@@ -108,13 +131,12 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 MaterialTheme.shapes.large,
                 CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
             ) {
-                val list = remember { mutableStateListOf(false, false, false) }
-                LazyRow(
+                Row(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    itemsIndexed(list) { index, it ->
+                    state.list.forEachIndexed { index, it ->
                         GiltyChip(
                             Modifier.padding(end = 12.dp),
                             stringResource(
@@ -124,10 +146,7 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                                     R.string.others_sex
                                 )[index]
                             ), it
-                        ) {
-                            for (i in 0..list.lastIndex) list[i] = false
-                            list[index] = true
-                        }
+                        ) { callback?.onGenderChange(index) }
                     }
                 }
             }
@@ -139,30 +158,31 @@ fun PersonalInfoContent(callback: NavigationInterface? = null) {
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
         ) { callback?.onNext() }
-        BottomSheetCompose(
-            BottomSheetComposeState(320.dp, bottomSheetState) {
-                NumberPicker(
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 40.dp),
-                    value = pickerValue,
-                    onValueChange = { pickerValue = it },
-                    range = 18..100
-                )
-                GradientButton(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 40.dp),
-                    stringResource(R.string.save_button), true
-                ) {
-                    ageTextFieldValue.value = pickerValue.toString()
-                    bottomSheetState.value = false
-                }
-            }, Modifier
-                .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
-                .align(Alignment.BottomCenter)
-                .background(ThemeExtra.colors.cardBackground)
-        ) { bottomSheetState.value = false }
+    }
+}
+
+@Composable
+private fun BottomSheetContent(
+    modifier: Modifier = Modifier,
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    onSave: () -> Unit
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        NumberPicker(
+            Modifier.padding(top = 40.dp),
+            value = value,
+            onValueChange = { onValueChange(it) },
+            range = 18..100
+        )
+        GradientButton(
+            Modifier.padding(top = 80.dp),
+            stringResource(R.string.save_button), true
+        ) { onSave() }
     }
 }

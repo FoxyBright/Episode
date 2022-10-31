@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +65,9 @@ private fun LoginPreview() {
     GiltyTheme {
         LoginContent(
             LoginState(
-                rememberCoroutineScope(), "9543422455", DemoCountry
+                rememberCoroutineScope(),
+                "9543422455", DemoCountry,
+                Countries()
             )
         )
     }
@@ -82,7 +85,8 @@ interface LoginCallback {
 data class LoginState(
     val scope: CoroutineScope,
     val phone: String,
-    val country: Country
+    val country: Country,
+    val allCountries: List<Country>
 )
 
 @Composable
@@ -226,22 +230,41 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
 
 @Composable
 private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
+    //TODO при попытке вынести в state и callback данных и методов
+    // все продолжает работать, но данные не обновляются до персвайпа BottomSheet
     var searchState by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
     val countries = Countries()
-    Column(Modifier.padding(16.dp, 20.dp)) {
+    val searchedCountry by remember {
+        mutableStateOf(arrayListOf<Country>())
+    }
+    Column(
+        Modifier
+            .height(800.dp)
+            .padding(16.dp, 20.dp)
+    ) {
         SearchActionBar(SearchState(
             stringResource(R.string.login_search_name),
             searchState, searchText, { searchText = it },
             { searchState = it }
         ))
+        if (searchState) {
+            searchedCountry.clear()
+            countries.forEach {
+                if (it.country.contains(searchText, true))
+                    searchedCountry.add(it)
+            }
+        } else {
+            searchedCountry.clear()
+            countries.forEach { searchedCountry.add(it) }
+        }
         LazyColumn(
             Modifier
                 .padding(top = 10.dp)
                 .clip(MaterialTheme.shapes.medium)
                 .background(ThemeExtra.colors.cardBackground)
         ) {
-            itemsIndexed(countries) { index, item ->
+            itemsIndexed(searchedCountry) { index, item ->
                 Row(
                     Modifier
                         .fillMaxWidth()

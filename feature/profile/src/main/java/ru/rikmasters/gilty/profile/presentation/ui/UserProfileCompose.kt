@@ -48,9 +48,9 @@ import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
-import ru.rikmasters.gilty.shared.shared.Profile
-import ru.rikmasters.gilty.shared.shared.ProfileCallback
-import ru.rikmasters.gilty.shared.shared.ProfileState
+import ru.rikmasters.gilty.shared.common.Profile
+import ru.rikmasters.gilty.shared.common.ProfileCallback
+import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 

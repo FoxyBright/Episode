@@ -6,15 +6,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.shared.ProfileCallback
-import ru.rikmasters.gilty.shared.shared.ProfileState
+import ru.rikmasters.gilty.shared.common.ProfileCallback
+import ru.rikmasters.gilty.shared.common.ProfileState
 
 @Composable
-fun ProfileScreen(nav: NavState = get()) {
+fun ProfileScreen(
+    photo: String,
+    hiddenPhoto: String,
+    nav: NavState = get()
+) {
     val lockState = remember { mutableStateOf(false) }
     val name = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
     val profileState = ProfileState(
+        profilePhoto = photo,
+        hiddenPhoto = hiddenPhoto,
         name = name.value,
         lockState = lockState.value,
         description = description.value,
@@ -27,6 +33,10 @@ fun ProfileScreen(nav: NavState = get()) {
 
         override fun onLockClick(state: Boolean) {
             lockState.value = state
+        }
+
+        override fun profileImage() {
+            nav.navigateAbsolute("registration/avatar")
         }
 
         override fun onDescriptionChange(text: String) {

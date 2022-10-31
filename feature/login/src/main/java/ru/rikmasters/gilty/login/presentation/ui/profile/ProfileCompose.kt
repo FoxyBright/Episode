@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.shared.Profile
-import ru.rikmasters.gilty.shared.shared.ProfileCallback
-import ru.rikmasters.gilty.shared.shared.ProfileState
+import ru.rikmasters.gilty.shared.common.Profile
+import ru.rikmasters.gilty.shared.common.ProfileCallback
+import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
