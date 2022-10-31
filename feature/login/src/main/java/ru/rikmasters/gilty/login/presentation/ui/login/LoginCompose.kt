@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,6 +53,7 @@ import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.login.presentation.ui.PhoneTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.Divider
+import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -150,24 +150,11 @@ fun LoginContent(
                         onValueChanged = { callback?.onPhoneChange(it) })
                 }
             }
-            Button(
-                { callback?.onNext() },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 32.dp),
-                true,
-                MaterialTheme.shapes.large,
-                ButtonDefaults.buttonColors(
-                    MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = ThemeExtra.colors.notActive
-                ),
-                contentPadding = PaddingValues(vertical = 18.dp)
-            ) {
-                Text(
-                    stringResource(R.string.next_button),
-                    style = ThemeExtra.typography.button
-                )
-            }
+            GradientButton(
+                Modifier.padding(top = 32.dp),
+                stringResource(R.string.next_button),
+                (state.phone.length > 9)
+            ) { callback?.onNext() }
             Text(
                 stringResource(R.string.login_alternative_separator),
                 Modifier.padding(top = 20.dp),
@@ -221,10 +208,10 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
     ClickableText(annotatedText, modifier, ThemeExtra.typography.SubHeadSb) {
         annotatedText.getStringAnnotations(
             "terms", it, it
-        ).firstOrNull()?.let { callback?.privatePolicy() }
+        ).firstOrNull()?.let { callback?.termsOfApp() }
         annotatedText.getStringAnnotations(
             "policy", it, it
-        ).firstOrNull()?.let { callback?.termsOfApp() }
+        ).firstOrNull()?.let { callback?.privatePolicy() }
     }
 }
 

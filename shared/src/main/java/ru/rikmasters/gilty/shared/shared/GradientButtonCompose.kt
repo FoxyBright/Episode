@@ -30,7 +30,11 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun GradientButtonPreview() {
     GiltyTheme {
-        GradientButton(text = "Далее", smallText = "Подробности", icon = R.drawable.ic_shared) {}
+        GradientButton(
+            text = "Далее",
+            smallText = "Подробности",
+            icon = R.drawable.ic_shared
+        ) {}
     }
 }
 
@@ -47,34 +51,25 @@ fun GradientButton(
     smallText: String? = null,
     icon: Int? = null,
     disabledColors: List<Color> = listOf(
-        ThemeExtra.colors.notActive,
-        ThemeExtra.colors.notActive
+        ThemeExtra.colors.DisabledGradientButton,
+        ThemeExtra.colors.DisabledGradientButton
     ),
     onClick: () -> Unit
 ) {
     Button(
-        modifier = modifier
-            .fillMaxWidth(),
-        onClick = onClick,
+        onClick, modifier.fillMaxWidth(), enabled, shape,
+        ButtonDefaults.buttonColors(Color.Transparent),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent
-        ),
-        shape = shape,
-        enabled = enabled,
     ) {
         Box(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .background(
-                    brush = Brush.linearGradient(
-                        colors = if (enabled) gradientColors
-                        else disabledColors
-                    ),
-                    shape = shape
+                    Brush.linearGradient(
+                        if (enabled) gradientColors else disabledColors
+                    ), shape
                 )
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp, 16.dp), Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 icon?.let {
@@ -85,13 +80,8 @@ fun GradientButton(
                     )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = text,
-                        style = ThemeExtra.typography.button
-                    )
-                    smallText?.let {
-                        Text(it, style = ThemeExtra.typography.ButtonLabelText)
-                    }
+                    Text(text, style = ThemeExtra.typography.button)
+                    smallText?.let { Text(it, style = ThemeExtra.typography.ButtonLabelText) }
                 }
             }
         }

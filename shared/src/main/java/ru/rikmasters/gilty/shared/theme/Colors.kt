@@ -38,7 +38,7 @@ object Colors {
     val Border = Color(0xFFB0B0B0)
     val Divider = Color(0xFFDFDFDF)
     val lockColors = Color(0xFF787579)
-
+    val DullPink = Color(0xFFFD7C7A)
 
     val BackgroundDay = Color(0xFFF6F6F6)
     val CardBackgroundDay = Color.White

@@ -27,6 +27,7 @@ data class ExtraColors(
     val secondaryTrackCheckBox: Color = Color.Unspecified,
     val meetingCardBackBackground: Color = Color.Unspecified,
     val lockColors: Color = Color.Unspecified,
+    val DisabledGradientButton: Color = Color.Unspecified,
     val lockColorsBackground: Color = Color.Unspecified,
 
     // Добавить новый цвет в схему = Color.Unspecified
@@ -57,6 +58,7 @@ val LightExtraColors = ExtraColors(
     borderColor = Color.White,
     lockColors = Color.White,
     lockColorsBackground = Colors.lockColorsBackgroundDay,
+    DisabledGradientButton = Colors.DullPink,
     meetingCardBackBackground = Colors.meetingCardBackBackgroundDay
 
 
@@ -77,6 +79,7 @@ val DarkExtraColors = ExtraColors(
     grayIcon = Colors.Gray2,
     chipGray = Colors.Gray,
     transparentBtnTextColor = Color.White,
+    DisabledGradientButton = Colors.DullPink,
     gradientColor1 = Colors.Gradient1,
     gradientColor2 = Colors.Gradient2,
     grayButton = Colors.Gray,
