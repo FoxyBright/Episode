@@ -1,5 +1,9 @@
 package ru.rikmasters.gilty.shared.common
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Environment
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -27,11 +31,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
@@ -40,6 +44,7 @@ import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import java.io.File
 
 @Preview(showBackground = true)
 @Composable
@@ -100,6 +105,13 @@ fun GalleryContent(
     modifier: Modifier = Modifier,
     callback: GalleryCallback? = null
 ) {
+    val commonPath = Environment.getExternalStorageDirectory().toString()
+    val allDirectories = arrayListOf<File>()
+    File("$commonPath/Pictures").listFiles()?.forEach { allDirectories.add(it) }
+    allDirectories.add(File("$commonPath/DCIM/Camera"))
+    allDirectories.add(File("$commonPath/DCIM/Screenshots"))
+    val imageList = arrayListOf<File>()
+    allDirectories.forEach { it.listFiles()?.forEach { image -> imageList.add(image) } }
     Box(Modifier.padding(start = 130.dp, top = 90.dp)) {
         DropdownMenu(
             state.menuExpanded,
@@ -154,13 +166,14 @@ fun GalleryContent(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            itemsIndexed(state.images) { index, image ->
+            items(imageList) {
+                val bitmap = BitmapFactory.decodeFile(it.absolutePath)
                 ImageItem(
-                    image, state.multipleSelect,
-                    state.selectedImages.contains(index)
+                    bitmap, state.multipleSelect,
+                    /*state.selectedImages.contains(index)*/false
                 ) {
-                    if (state.multipleSelect) callback?.onImageSelect(index)
-                    else callback?.changeImage(index)
+                    if (state.multipleSelect) callback?.onImageSelect(1)
+                    else callback?.changeImage(1)
                 }
             }
         }
@@ -169,7 +182,7 @@ fun GalleryContent(
 
 @Composable
 private fun ImageItem(
-    image: ImageModel,
+    image: Bitmap,
     multipleSelect: Boolean,
     selected: Boolean,
     modifier: Modifier = Modifier,
@@ -179,12 +192,10 @@ private fun ImageItem(
         modifier
             .size(115.dp)
             .clickable { onSelect() }) {
-        AsyncImage(
-            image.id,
-            null,
-            Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.ic_image_empty)
+        Image(
+            image.asImageBitmap(),
+            (null), Modifier.fillMaxSize(),
+            Alignment.Center, ContentScale.Crop,
         )
         if (multipleSelect)
             CheckBox(

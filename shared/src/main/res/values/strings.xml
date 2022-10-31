@@ -46,6 +46,7 @@
     <string name="profile_meeting_history_label">История</string>
     <string name="profile_menu_settings_button">Настройки</string>
     <string name="profile_menu_watch_photo_button">Смотреть фото</string>
+    <string name="profile_user_name_is_occupied">Имя пользователя занято</string>
 
     <!-- Code -->
     <string name="confirm_number_title">Подтвердите номер</string>

@@ -10,49 +10,24 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ProfilePreview() {
-    GiltyTheme {
-        val lockState = remember { mutableStateOf(false) }
-        val name = remember { mutableStateOf("") }
-        val description = remember { mutableStateOf("") }
-        val profileState = ProfileState(
-            name = name.value,
-            lockState = lockState.value,
-            description = description.value,
-            enabled = true
-        )
-        ProfileContent(profileState, Modifier, object : ProfileCallback {
-            override fun onNameChange(text: String) {
-                name.value = text
-            }
-
-            override fun onLockClick(state: Boolean) {
-                lockState.value = state
-            }
-
-            override fun onDescriptionChange(text: String) {
-                description.value = text
-            }
-        })
-    }
+    GiltyTheme { ProfileContent(ProfileState()) }
 }
 
 @Composable

@@ -56,7 +56,7 @@ object Login : FeatureDefinition() {
                     ?.let { avatar -> ProfileScreen(avatar, "") }
             }
 
-            screen("hidden") {  }
+            screen("hidden") { }
             screen("avatar") { ProfileSelectPhotoScreen() }
             screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }

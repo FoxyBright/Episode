@@ -16,10 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -51,7 +47,8 @@ data class ProfileState(
     val emoji: EmojiModel? = null,
     val profileType: ProfileType = ProfileType.CREATE,
     var observeState: Boolean = false,
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val occupiedName: Boolean = false
 )
 
 interface ProfileCallback : NavigationInterface {
@@ -66,37 +63,7 @@ interface ProfileCallback : NavigationInterface {
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun EditProfilePreview() {
-    GiltyTheme {
-        val lockState = remember { mutableStateOf(false) }
-        var observeState by remember { mutableStateOf(false) }
-        val name = remember { mutableStateOf("") }
-        val description = remember { mutableStateOf("") }
-        val profileState = ProfileState(
-            name.value,
-            lockState = lockState.value,
-            description = description.value,
-            enabled = true,
-            observeState = observeState,
-            profileType = ProfileType.CREATE
-        )
-        Profile(profileState, Modifier, object : ProfileCallback {
-            override fun onNameChange(text: String) {
-                name.value = text
-            }
-
-            override fun onLockClick(state: Boolean) {
-                lockState.value = state
-            }
-
-            override fun onObserveChange(state: Boolean) {
-                observeState = state
-            }
-
-            override fun onDescriptionChange(text: String) {
-                description.value = text
-            }
-        })
-    }
+    GiltyTheme { Profile(ProfileState()) }
 }
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -107,7 +74,6 @@ private fun OrganizerProfilePreview() {
         Profile(
             ProfileState(
                 "${user.username}, ${user.age}",
-                lockState = false,
                 description = user.aboutMe,
                 enabled = false,
                 profileType = ProfileType.ORGANIZER
@@ -183,6 +149,15 @@ fun Profile(
                 singleLine = true
             )
         }
+        if (state.occupiedName)
+            Text(
+                stringResource(R.string.profile_user_name_is_occupied),
+                Modifier
+                    .padding(bottom = 6.dp)
+                    .offset(y = -(10).dp),
+                MaterialTheme.colorScheme.primary,
+                style = ThemeExtra.typography.ProfileObserversText
+            )
         Row {
             ProfileImageContent(
                 Modifier,

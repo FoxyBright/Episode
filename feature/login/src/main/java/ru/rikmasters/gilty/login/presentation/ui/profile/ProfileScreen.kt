@@ -15,6 +15,7 @@ fun ProfileScreen(
     hiddenPhoto: String,
     nav: NavState = get()
 ) {
+    val occupiedName = remember { mutableStateOf(false) }
     val lockState = remember { mutableStateOf(false) }
     val name = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
@@ -24,11 +25,13 @@ fun ProfileScreen(
         name = name.value,
         lockState = lockState.value,
         description = description.value,
-        enabled = true
+        enabled = true,
+        occupiedName = occupiedName.value
     )
     ProfileContent(profileState, Modifier, object : ProfileCallback {
         override fun onNameChange(text: String) {
             name.value = text
+            occupiedName.value = name.value == "qwerty"
         }
 
         override fun onLockClick(state: Boolean) {
