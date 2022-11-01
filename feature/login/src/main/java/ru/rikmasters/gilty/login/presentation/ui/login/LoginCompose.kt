@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +51,6 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
-import ru.rikmasters.gilty.login.presentation.ui.PhoneTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -63,9 +63,11 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun LoginPreview() {
     GiltyTheme {
+        val mask = "+7 ### ###-##-##"
         LoginContent(
             LoginState(
                 rememberCoroutineScope(),
+                phoneTransform(mask), mask,
                 "9543422455", DemoCountry,
                 Countries()
             )
@@ -84,6 +86,8 @@ interface LoginCallback {
 
 data class LoginState(
     val scope: CoroutineScope,
+    val transform: VisualTransformation,
+    val mask: String,
     val phone: String,
     val country: Country,
     val allCountries: List<Country>
@@ -144,7 +148,8 @@ fun LoginContent(
                     )
                     PhoneTextField(
                         state.phone,
-                        state.country.code,
+                        state.transform,
+                        state.mask,
                         Modifier.fillMaxWidth(),
                         onClear = { callback?.onPhoneChange("") },
                         onValueChanged = { callback?.onPhoneChange(it) })

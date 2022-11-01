@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.login
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -9,13 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -27,10 +25,11 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun PhoneTextFieldPreview() {
     GiltyTheme {
+        val mask = "+7 ### ###-##-##"
         PhoneTextField(
             "9105152312",
-            "+7",
-            Modifier.padding(32.dp)
+            phoneTransform(mask),
+            mask, Modifier.padding(32.dp),
         )
     }
 }
@@ -39,17 +38,16 @@ private fun PhoneTextFieldPreview() {
 @Composable
 fun PhoneTextField(
     value: String,
-    region: String,
+    transform: VisualTransformation,
+    mask: String,
     modifier: Modifier = Modifier,
     onClear: (() -> Unit)? = null,
     onValueChanged: ((String) -> Unit)? = null
 ) {
-    val phoneMask = "$region ### ###-##-##"
-    val transformation by remember{ mutableStateOf(visualTransformationOf(phoneMask)) }
     TextField(
         value,
         { text ->
-            if (text.length <= phoneMask.count { it == '#' } && onValueChanged != null)
+            if (text.length <= mask.count { it == '#' } && onValueChanged != null)
                 onValueChanged(text)
         },
         modifier,
@@ -77,6 +75,6 @@ fun PhoneTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone
         ),
-        visualTransformation = transformation
+        visualTransformation = transform
     )
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">gilty</string>
+    <string name="app_name">Gilty</string>
 
     <!-- Login -->
     <string name="phone_number">Номер телефона</string>

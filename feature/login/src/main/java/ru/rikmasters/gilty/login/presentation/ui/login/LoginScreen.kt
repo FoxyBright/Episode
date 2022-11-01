@@ -20,9 +20,12 @@ fun LoginScreen(nav: NavState = get()) {
     var phone by remember { mutableStateOf("") }
     val context = LocalContext.current
     var selectCountry by remember { mutableStateOf(DemoCountry) }
+    val mask = "${selectCountry.code} ### ###-##-##"
+    val transform by remember(mask)
+    { mutableStateOf(phoneTransform(mask)) }
     LoginContent(LoginState(
-        rememberCoroutineScope(),
-        phone, selectCountry, Countries()
+        rememberCoroutineScope(), transform,
+        mask, phone, selectCountry, Countries()
     ),
         Modifier, object : LoginCallback {
             override fun onPhoneChange(text: String) {
