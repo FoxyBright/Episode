@@ -11,17 +11,17 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 
 @Composable
 fun ProfileScreen(
-    photo: String,
-    hiddenPhoto: String,
+    photo: String = "",
+    hiddenPhoto: String = "",
     nav: NavState = get()
 ) {
     val occupiedName = remember { mutableStateOf(false) }
     val lockState = remember { mutableStateOf(false) }
-    val name = remember { mutableStateOf("") }
-    val description = remember { mutableStateOf("") }
+    val name = remember { mutableStateOf(UserName) }
+    val description = remember { mutableStateOf(UserDescription) }
     val profileState = ProfileState(
-        profilePhoto = photo,
-        hiddenPhoto = hiddenPhoto,
+        profilePhoto = if (photo == "") Avatar else photo,
+        hiddenPhoto = if (hiddenPhoto == "") Hidden else hiddenPhoto,
         name = name.value,
         lockState = lockState.value,
         description = description.value,
@@ -30,6 +30,7 @@ fun ProfileScreen(
     )
     ProfileContent(profileState, Modifier, object : ProfileCallback {
         override fun onNameChange(text: String) {
+            UserName = text
             name.value = text
             occupiedName.value = name.value == "qwerty"
         }
@@ -39,10 +40,15 @@ fun ProfileScreen(
         }
 
         override fun profileImage() {
-            nav.navigateAbsolute("registration/avatar")
+            nav.navigateAbsolute("registration/gallery?multi=false")
+        }
+
+        override fun hiddenImages() {
+            nav.navigateAbsolute("registration/hidden")
         }
 
         override fun onDescriptionChange(text: String) {
+            UserDescription = text
             description.value = text
         }
 

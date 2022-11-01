@@ -22,9 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.presentation.ui.HiddenPhotoContent
-import ru.rikmasters.gilty.presentation.ui.ProfileImageContent
-import ru.rikmasters.gilty.presentation.ui.ProfileStatisticContent
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
@@ -200,7 +197,7 @@ fun Profile(
             readOnly = !state.enabled,
             shape = MaterialTheme.shapes.large,
             colors = TextFieldColors(),
-            textStyle = ThemeExtra.typography.LabelText,
+            textStyle = ThemeExtra.typography.Body1Medium,
             placeholder = {
                 Text(
                     stringResource(R.string.about_me_placeholder),

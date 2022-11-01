@@ -69,7 +69,10 @@ fun ProfileContent(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button)
+            stringResource(R.string.next_button),
+            (state.profilePhoto != "" &&
+                    state.name != "" &&
+                    !state.occupiedName)
         ) { callback?.onNext() }
     }
 }

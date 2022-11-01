@@ -11,8 +11,9 @@ import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
+import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
-import ru.rikmasters.gilty.login.presentation.ui.profile.photos.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.MainScreen
 
 object Login : FeatureDefinition() {
@@ -45,7 +46,7 @@ object Login : FeatureDefinition() {
                 }
             }
 
-            screen( /*TODO Этот экран нужен для обрезания фотки под рамкку*/
+            screen( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
                 "resize?photo={photo}",
                 listOf(navArgument("photo") {
                     type = NavType.StringType
@@ -53,11 +54,21 @@ object Login : FeatureDefinition() {
                 })
             ) {
                 it.arguments?.getString("photo")
-                    ?.let { avatar -> ProfileScreen(avatar, "") }
+                    ?.let { avatar -> ProfileScreen(avatar) }
             }
 
-            screen("hidden") { }
-            screen("avatar") { ProfileSelectPhotoScreen() }
+            screen(
+                "gallery?multi={multi}",
+                listOf(navArgument("multi") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                })
+            ) {
+                it.arguments?.getBoolean("multi")
+                    ?.let { multi -> ProfileSelectPhotoScreen(multi) }
+            }
+
+            screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }
             screen("permissions") { PermissionsScreen() }

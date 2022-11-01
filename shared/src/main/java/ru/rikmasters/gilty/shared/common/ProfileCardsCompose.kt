@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.ui
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -110,9 +109,9 @@ fun HiddenPhotoContent(
             Modifier
                 .padding(start = 8.dp, top = 8.dp)
                 .size(26.dp)
-                .background(ThemeExtra.colors.lockColorsBackground, CircleShape)
-                .align(Alignment.TopStart)
-                .alpha(50f)
+                .clip(CircleShape)
+                .align(Alignment.TopStart),
+            colors = CardDefaults.cardColors(ThemeExtra.colors.lockColorsBackground)
         ) { LockerCheckBox(lockState, Modifier.padding(4.dp)) { onLockClick(it) } }
         if (profileType == ProfileType.ORGANIZER)
             CreateProfileCardRow(

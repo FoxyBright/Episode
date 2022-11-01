@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Environment
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,9 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -38,8 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.ImageModel
 import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -50,53 +43,30 @@ import java.io.File
 @Composable
 fun GalleryPreview() {
     GiltyTheme {
-        val menuItems = listOf(
-            "Все медиа",
-            "Все видео",
-            "WhatsApp images",
-            "Screenshots",
-            "Viber",
-            "Telegram",
-            "Camera",
-            "Instagram"
+        GalleryContent(
+            GalleryState(
+                listOf(), (true), (false),
+                listOf(), (""), listOf()
+            )
         )
-        val imageList = arrayListOf<ImageModel>()
-        val menuExpanded = remember { mutableStateOf(false) }
-        repeat(22) { imageList.add(DemoAvatarModel) }
-        val selImageList =
-            remember { mutableStateListOf<Int>() }
-        val state = GalleryState(
-            imageList, selImageList,
-            true, menuExpanded.value, menuItems
-        )
-        GalleryContent(state, Modifier, object : GalleryCallback {
-            override fun menu(state: Boolean) {
-                menuExpanded.value = !menuExpanded.value
-            }
-
-            override fun onImageSelect(index: Int) {
-                if (selImageList.contains(index))
-                    selImageList.remove(index)
-                else selImageList.add(index)
-            }
-        })
     }
 }
 
 data class GalleryState(
-    val images: List<ImageModel>,
-    val selectedImages: List<Int>,
+    val selectedImages: List<File>,
     val multipleSelect: Boolean = false,
     val menuExpanded: Boolean = false,
-    val menuItemList: List<String>
+    val menuItemList: List<String>,
+    val menuPoint: String,
+    val directories: List<File>
 )
 
 interface GalleryCallback : NavigationInterface {
     fun onKebabClick() {}
     fun menu(state: Boolean) {}
     fun menuItemClick(item: String) {}
-    fun onImageSelect(index: Int) {}
-    fun changeImage(index: Int) {}
+    fun onImageSelect(file: File) {}
+    fun changeImage(file: File) {}
 }
 
 @Composable
@@ -105,13 +75,6 @@ fun GalleryContent(
     modifier: Modifier = Modifier,
     callback: GalleryCallback? = null
 ) {
-    val commonPath = Environment.getExternalStorageDirectory().toString()
-    val allDirectories = arrayListOf<File>()
-    File("$commonPath/Pictures").listFiles()?.forEach { allDirectories.add(it) }
-    allDirectories.add(File("$commonPath/DCIM/Camera"))
-    allDirectories.add(File("$commonPath/DCIM/Screenshots"))
-    val imageList = arrayListOf<File>()
-    allDirectories.forEach { it.listFiles()?.forEach { image -> imageList.add(image) } }
     Box(Modifier.padding(start = 130.dp, top = 90.dp)) {
         DropdownMenu(
             state.menuExpanded,
@@ -121,7 +84,8 @@ fun GalleryContent(
             state.menuItemList.forEach {
                 DropdownMenuItem({
                     Text(
-                        it, Modifier, ThemeExtra.colors.mainTextColor,
+                        File(it).name, Modifier,
+                        ThemeExtra.colors.mainTextColor,
                         style = ThemeExtra.typography.Body1Medium
                     )
                 }, {
@@ -166,14 +130,33 @@ fun GalleryContent(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(imageList) {
-                val bitmap = BitmapFactory.decodeFile(it.absolutePath)
-                ImageItem(
-                    bitmap, state.multipleSelect,
-                    /*state.selectedImages.contains(index)*/false
-                ) {
-                    if (state.multipleSelect) callback?.onImageSelect(1)
-                    else callback?.changeImage(1)
+            if (state.menuPoint == "Все медиа") {
+                state.directories.forEach { pack ->
+                    pack.listFiles()?.let { list ->
+                        items(list, { it.name }) {
+                            ImageItem(
+                                it, state.multipleSelect,
+                                state.selectedImages.contains(it)
+                            ) { file ->
+                                if (state.multipleSelect) callback
+                                    ?.onImageSelect(it)
+                                else callback?.changeImage(file)
+                            }
+                        }
+                    }
+                }
+            } else {
+                File(state.menuPoint).listFiles()?.let { list ->
+                    items(list, { it.name }) {
+                        ImageItem(
+                            it, state.multipleSelect,
+                            state.selectedImages.contains(it)
+                        ) { file ->
+                            if (state.multipleSelect) callback
+                                ?.onImageSelect(it)
+                            else callback?.changeImage(file)
+                        }
+                    }
                 }
             }
         }
@@ -182,20 +165,22 @@ fun GalleryContent(
 
 @Composable
 private fun ImageItem(
-    image: Bitmap,
+    file: File,
     multipleSelect: Boolean,
     selected: Boolean,
     modifier: Modifier = Modifier,
-    onSelect: () -> Unit
+    onSelect: (File) -> Unit
 ) {
+    val image =
+        BitmapFactory.decodeFile(file.canonicalPath)
     Box(
         modifier
             .size(115.dp)
-            .clickable { onSelect() }) {
+            .clickable { onSelect(file) }) {
         Image(
-            image.asImageBitmap(),
-            (null), Modifier.fillMaxSize(),
-            Alignment.Center, ContentScale.Crop,
+            image.asImageBitmap(), (null),
+            Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
         )
         if (multipleSelect)
             CheckBox(
@@ -203,6 +188,6 @@ private fun ImageItem(
                 Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
-            ) { onSelect() }
+            ) { onSelect(file) }
     }
 }
