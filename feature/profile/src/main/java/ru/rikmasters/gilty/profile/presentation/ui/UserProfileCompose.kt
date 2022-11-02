@@ -36,11 +36,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.Profile
+import ru.rikmasters.gilty.shared.common.ProfileCallback
+import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -48,11 +52,7 @@ import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
-import ru.rikmasters.gilty.shared.common.Profile
-import ru.rikmasters.gilty.shared.common.ProfileCallback
-import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 
 data class UserProfileState(
@@ -123,22 +123,22 @@ fun UserProfile(
                     Icon(
                         painterResource(R.drawable.ic_kebab),
                         null, Modifier,
-                        ThemeExtra.colors.mainTextColor
+                        MaterialTheme.colorScheme.tertiary
                     )
                 }
                 val metrics = Resources.getSystem().displayMetrics
                 DropdownMenu(
                     state.menuExpanded,
                     { callback?.menu(false) },
-                    Modifier.background(ThemeExtra.colors.cardBackground),
+                    Modifier.background(MaterialTheme.colorScheme.primaryContainer),
                     DpOffset(((metrics.widthPixels / metrics.density) - 200).dp, 0.dp)
                 ) {
                     DropdownMenuItem(
                         {
                             Text(
                                 stringResource(R.string.profile_menu_watch_photo_button),
-                                color = ThemeExtra.colors.mainTextColor,
-                                style = ThemeExtra.typography.Body1Medium
+                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         },
                         { callback?.onWatchPhotoClick() }
@@ -147,8 +147,8 @@ fun UserProfile(
                         {
                             Text(
                                 stringResource(R.string.profile_menu_settings_button),
-                                color = ThemeExtra.colors.mainTextColor,
-                                style = ThemeExtra.typography.Body1Medium
+                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         },
                         { callback?.onSettingsClick() }
@@ -177,8 +177,8 @@ fun UserProfile(
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
                 Modifier.padding(top = 28.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
         }
         item {
@@ -187,7 +187,7 @@ fun UserProfile(
                 Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp),
-                colors = CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -207,8 +207,8 @@ fun UserProfile(
                         Text(
                             stringResource(R.string.profile_responds_label),
                             Modifier.padding(start = 16.dp),
-                            color = ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.SubHeadMedium
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -221,14 +221,15 @@ fun UserProfile(
                                 "${state.notifications}",
                                 Modifier.padding(12.dp, 6.dp),
                                 Color.White,
-                                style = ThemeExtra.typography.SubHeadSb
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                         Icon(
                             Icons.Filled.KeyboardArrowRight,
                             stringResource(R.string.profile_responds_label),
                             Modifier,
-                            ThemeExtra.colors.secondaryTextColor
+                            MaterialTheme.colorScheme.onTertiary
                         )
                     }
                 }
@@ -261,14 +262,14 @@ fun UserProfile(
                     Text(
                         stringResource(R.string.profile_meeting_history_label),
                         Modifier.padding(8.dp),
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.H3
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Icon(
                         if (!state.historyState) Icons.Filled.KeyboardArrowRight
                         else Icons.Filled.KeyboardArrowDown,
                         stringResource(R.string.profile_responds_label),
-                        tint = ThemeExtra.colors.secondaryTextColor
+                        tint = MaterialTheme.colorScheme.onTertiary
                     )
                 }
                 if (state.historyState)

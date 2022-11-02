@@ -32,17 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
 import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetCallback
 import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetState
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -83,13 +82,13 @@ fun MyMeeting(
                     .padding(top = 13.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.large,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
                     state.meetingModel.title,
                     Modifier.padding(14.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -97,8 +96,8 @@ fun MyMeeting(
             Text(
                 stringResource(R.string.meeting_terms),
                 Modifier.padding(top = 28.dp),
-                color = ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
         }
         item {
@@ -107,7 +106,7 @@ fun MyMeeting(
                     .padding(top = 12.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.extraSmall,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
                     when (state.meetingModel.type) {
@@ -118,8 +117,8 @@ fun MyMeeting(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Divider(Modifier.padding(start = 16.dp))
                 Text(
@@ -133,8 +132,8 @@ fun MyMeeting(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -142,14 +141,14 @@ fun MyMeeting(
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
                     stringResource(R.string.meeting_members),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     "${state.memberList.size}/${state.meetingModel.memberCount}",
                     Modifier.padding(start = 8.dp),
                     MaterialTheme.colorScheme.primary,
-                    style = ThemeExtra.typography.H3
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Image(
                     painterResource(
@@ -166,7 +165,7 @@ fun MyMeeting(
                     .fillMaxWidth()
                     .padding(top = 12.dp)
                     .clip(MaterialTheme.shapes.large)
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 state.memberList.forEachIndexed { index, member ->
                     if (index < 3) {
@@ -190,8 +189,8 @@ fun MyMeeting(
                                 )
                                 Text(
                                     "${member.username}, ${member.age}",
-                                    color = ThemeExtra.colors.mainTextColor,
-                                    style = ThemeExtra.typography.Body1Sb,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -199,7 +198,7 @@ fun MyMeeting(
                                 Icons.Filled.KeyboardArrowRight,
                                 null,
                                 Modifier.padding(end = 16.dp),
-                                ThemeExtra.colors.mainTextColor
+                                MaterialTheme.colorScheme.tertiary
                             )
                         }
                         if (state.memberList.size <= 3 && index + 1 < state.memberList.size) {
@@ -217,7 +216,8 @@ fun MyMeeting(
                     .clip(CircleShape)
                     .clickable { callback?.onAllWatchClick() },
                 MaterialTheme.colorScheme.primary,
-                style = ThemeExtra.typography.Body1Sb,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
             )
         }
         item {
@@ -235,8 +235,8 @@ fun MyMeeting(
                         .padding(bottom = 28.dp)
                         .clip(CircleShape)
                         .clickable { callback?.onCloseClick() },
-                    ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.button,
+                    MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyLarge,
                 )
             }
         }

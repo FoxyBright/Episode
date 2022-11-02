@@ -10,7 +10,4 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#FFE8E8E8</color>
     <color name="primary">#FFFF4745</color>
-    <color name="green_gradient_1">#FFBCF028</color>
-    <color name="green_gradient_2">#FF8DE139</color>
-    <color name="green_gradient_3">#FF34C559</color>
 </resources>

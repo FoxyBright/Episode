@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +48,6 @@ import ru.rikmasters.gilty.shared.shared.DividerBold
 import ru.rikmasters.gilty.shared.shared.GiltyString
 import ru.rikmasters.gilty.shared.shared.SquareCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
@@ -111,7 +111,7 @@ fun MainContent(
                     else painterResource(R.drawable.ic_calendar),
                     null,
                     Modifier.size(30.dp),
-                    ThemeExtra.colors.mainTextColor
+                    MaterialTheme.colorScheme.tertiary
                 )
             }
         }
@@ -144,7 +144,7 @@ fun MainContent(
             Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .background(ThemeExtra.colors.cardBackground)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .align(Alignment.BottomCenter),
             Arrangement.SpaceEvenly, Alignment.CenterVertically
         ) {

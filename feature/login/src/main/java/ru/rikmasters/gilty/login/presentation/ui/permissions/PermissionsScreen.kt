@@ -1,17 +1,30 @@
 package ru.rikmasters.gilty.login.presentation.ui.permissions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.login.presentation.ui.PermissionsContent
-import ru.rikmasters.gilty.shared.NavigationInterface
 
 @Composable
 fun PermissionsScreen(nav: NavState = get()) {
-    PermissionsContent(Modifier, object : NavigationInterface {
+    var geopositionState by remember { mutableStateOf(true) }
+    var notificationState by remember { mutableStateOf(false) }
+    val state = PermissionsState(geopositionState, notificationState)
+    PermissionsContent(state, Modifier, object : PermissionsCallback {
         override fun onBack() {
             nav.navigate("categories")
+        }
+
+        override fun geopositionChange() {
+            geopositionState = !geopositionState
+        }
+
+        override fun notificationChange() {
+            notificationState = !notificationState
         }
 
         override fun onNext() {

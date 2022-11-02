@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -92,7 +92,7 @@ fun GiltyChip(
     val backgroundColorTarget = if (isSelected)
         MaterialTheme.colorScheme.primary
     else
-        ThemeExtra.colors.cardBackground
+        MaterialTheme.colorScheme.primaryContainer
 
     val borderColorTarget = if (isSelected)
         MaterialTheme.colorScheme.primary
@@ -102,7 +102,7 @@ fun GiltyChip(
     val textColorTarget = if (isSelected)
         Color.White
     else
-        ThemeExtra.colors.mainTextColor
+        MaterialTheme.colorScheme.tertiary
 
     val backgroundColor by animateColorAsState(backgroundColorTarget)
     val borderColor by animateColorAsState(borderColorTarget)
@@ -141,11 +141,11 @@ fun GiltyString(
             text,
             Modifier.padding(4.dp),
             animateColorAsState(
-                if (isSelected) ThemeExtra.colors.mainTextColor
-                else ThemeExtra.colors.secondaryTextColor
-            ).value, style = ThemeExtra.typography.H1.copy(
+                if (isSelected) MaterialTheme.colorScheme.tertiary
+                else MaterialTheme.colorScheme.onTertiary, tween(600)
+            ).value, style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = animateIntAsState(
-                    if (isSelected) 28 else 18
+                    if (isSelected) 28 else 18, tween(200)
                 ).value.sp
             )
         )

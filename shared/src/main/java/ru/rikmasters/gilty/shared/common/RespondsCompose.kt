@@ -35,7 +35,6 @@ import ru.rikmasters.gilty.shared.shared.BrieflyRowCompose
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.SmallButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
@@ -69,7 +68,7 @@ fun RespondsCompose(
                     .fillMaxWidth()
                     .padding(bottom = 6.dp), true,
                 MaterialTheme.shapes.medium,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 val user = respond.sender
                 when (respond.type) {
@@ -88,8 +87,8 @@ fun RespondsCompose(
                     respond.comment?.let {
                         Text(
                             it, Modifier.padding(bottom = 12.dp, end = 20.dp),
-                            ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.Body1Medium
+                            MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                     respond.hiddenPhoto?.let {
@@ -118,7 +117,7 @@ fun RespondsCompose(
                             ) { callback?.onAcceptClick(respond.meet) }
                         SmallButton(
                             stringResource(R.string.notification_respond_cancel_button),
-                            ThemeExtra.colors.grayIcon,
+                            MaterialTheme.colorScheme.outlineVariant,
                             Modifier.padding(bottom = 12.dp)
                         ) { callback?.onCancelClick(respond.meet) }
                     }

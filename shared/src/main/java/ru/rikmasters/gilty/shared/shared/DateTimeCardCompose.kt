@@ -10,23 +10,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
 fun TimeCardPreview() {
-    DateTimeCard(DemoMeetingModel.dateTime, Gradients().green(), true)
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), true)
 }
 
 @Preview
 @Composable
 fun DateCardPreview() {
-    DateTimeCard(DemoMeetingModel.dateTime, Gradients().green(), false)
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), false)
 }
 
 @Composable
@@ -47,8 +47,8 @@ fun DateTimeCard(
         Text(
             dateTime.format(if (today) "HH:mm" else "dd MMMM"),
             Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            style = ThemeExtra.typography.SubHeadEb,
-            color = Color.White
+            color = Color.White, fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }

@@ -28,14 +28,16 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmojiList
+import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -87,7 +89,8 @@ fun NotificationItem(
                 stringResource(R.string.meeting_filter_delete_tag_label),
                 Modifier.padding(),
                 Color.White,
-                style = ThemeExtra.typography.SubHeadSb
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold
             )
         }
         Row(
@@ -97,7 +100,7 @@ fun NotificationItem(
             Card(
                 { onClick?.let { it(state.notification) } },
                 Modifier.fillMaxWidth(), true, state.shape,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier.fillMaxWidth(),
@@ -136,11 +139,14 @@ fun NotificationItem(
                                 .padding(10.dp)
                                 .background(ThemeExtra.colors.chipGray, CircleShape)
                         ) {
-                            items(DemoEmojiList) {
-                                AsyncImage(it.path, null, Modifier
-                                    .padding(10.dp)
-                                    .size(20.dp)
-                                    .clickable { onEmojiClick?.let { c -> c(it) } }
+                            items(EmojiList) {
+                                Image(
+                                    if (it.type == "D") painterResource(it.path.toInt())
+                                    else rememberAsyncImagePainter(it.path), (null),
+                                    Modifier
+                                        .padding(10.dp)
+                                        .size(20.dp)
+                                        .clickable { onEmojiClick?.let { c -> c(it) } }
                                 )
                             }
                         }

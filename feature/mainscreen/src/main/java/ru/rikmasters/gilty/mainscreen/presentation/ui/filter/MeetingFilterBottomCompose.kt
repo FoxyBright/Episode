@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -25,7 +26,6 @@ import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -108,8 +108,8 @@ fun MeetingFilterBottom(
                     Text(
                         it.name,
                         Modifier.padding(top = 28.dp, bottom = 18.dp),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.H3
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.titleLarge
                     )
                     it.content.invoke()
                 }
@@ -132,9 +132,9 @@ fun MeetingFilterBottom(
                         .fillMaxWidth()
                         .padding(top = 12.dp, bottom = 28.dp)
                         .clickable { },
-                    ThemeExtra.colors.mainTextColor,
+                    MaterialTheme.colorScheme.tertiary,
                     textAlign = TextAlign.Center,
-                    style = ThemeExtra.typography.Body2Bold
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }

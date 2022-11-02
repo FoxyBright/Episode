@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
@@ -36,7 +37,6 @@ import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.TrackCheckBox
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
 fun Category(
@@ -52,7 +52,7 @@ fun Category(
                 .padding(bottom = 12.dp)
                 .clickable { onCategoryClick(index) },
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
@@ -69,14 +69,15 @@ fun Category(
                     Text(
                         category.name,
                         Modifier.padding(start = 18.dp),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = SemiBold
                     )
                 }
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
-                    tint = ThemeExtra.colors.secondaryTextColor
+                    tint = MaterialTheme.colorScheme.onTertiary
                 )
             }
             category.subcategories?.let {
@@ -85,7 +86,7 @@ fun Category(
                     Surface {
                         FlowLayout(
                             Modifier
-                                .background(ThemeExtra.colors.cardBackground)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(top = 16.dp)
                                 .padding(horizontal = 16.dp), 8.dp, 8.dp
                         ) {
@@ -107,7 +108,7 @@ fun Category(
                 .fillMaxWidth()
                 .clickable { onAllCategoryClick() },
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
@@ -116,13 +117,14 @@ fun Category(
             ) {
                 Text(
                     "Показать все категории",
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Sb
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = SemiBold
                 )
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
-                    tint = ThemeExtra.colors.secondaryTextColor
+                    tint = MaterialTheme.colorScheme.onTertiary
                 )
             }
         }
@@ -140,7 +142,7 @@ fun TagSearch(
             .fillMaxWidth()
             .clickable { onClick() },
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
     ) {
         if (tagList.isEmpty())
             Row(
@@ -152,20 +154,20 @@ fun TagSearch(
                     painterResource(R.drawable.magnifier),
                     stringResource(R.string.login_search_placeholder),
                     Modifier.size(20.dp),
-                    ThemeExtra.colors.secondaryTextColor
+                    MaterialTheme.colorScheme.onTertiary
                 )
                 Text(
                     stringResource(R.string.meeting_filter_add_tag_text_holder),
                     Modifier.padding(start = 12.dp),
-                    ThemeExtra.colors.secondaryTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    MaterialTheme.colorScheme.onTertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         else
             Surface {
                 FlowLayout(
                     Modifier
-                        .background(ThemeExtra.colors.cardBackground)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(top = 8.dp)
                         .padding(horizontal = 16.dp), 8.dp, 8.dp
                 ) {
@@ -183,7 +185,7 @@ fun TagSearch(
                                     item,
                                     Modifier.padding(end = 10.dp),
                                     Color.White,
-                                    style = ThemeExtra.typography.MediumText
+                                    style = MaterialTheme.typography.labelSmall
                                 )
                                 Icon(
                                     Icons.Filled.Close,
@@ -212,7 +214,7 @@ fun Distance(
             .fillMaxWidth()
             .clickable { onClick() },
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
     ) {
         Row(
             Modifier
@@ -223,8 +225,9 @@ fun Distance(
             Text(
                 stringResource(R.string.meeting_filter_radius_of_search_label),
                 Modifier.padding(start = 16.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.Body1Sb
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = SemiBold
             )
             Row(verticalAlignment = CenterVertically) {
                 Box(
@@ -236,7 +239,8 @@ fun Distance(
                         stringResource(R.string.meeting_filter_label_distance, distance),
                         Modifier.padding(12.dp, 6.dp),
                         Color.White,
-                        style = ThemeExtra.typography.SubHeadSb
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = SemiBold
                     )
                 }
                 Icon(
@@ -244,7 +248,7 @@ fun Distance(
                     else Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
                     Modifier.padding(horizontal = 16.dp),
-                    ThemeExtra.colors.secondaryTextColor
+                    MaterialTheme.colorScheme.onTertiary
                 )
             }
         }
@@ -272,13 +276,15 @@ fun Distance(
                 ) {
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 1),
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = SemiBold
                     )
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 50),
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = SemiBold
                     )
                 }
             }
@@ -302,12 +308,12 @@ fun MeetingType(
     Card(
         Modifier.fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingType.forEachIndexed { index, item ->
@@ -325,7 +331,7 @@ fun MeetingType(
             .padding(top = 12.dp)
             .fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
@@ -365,12 +371,12 @@ fun GenderAndConditions(
             .fillMaxWidth()
             .padding(bottom = 12.dp),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp), 8.dp, 8.dp
             ) {
@@ -387,12 +393,12 @@ fun GenderAndConditions(
     Card(
         Modifier.fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp), 8.dp, 8.dp
             ) {

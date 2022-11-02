@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +81,7 @@ fun CodeContent(
     modifier: Modifier = Modifier,
     callback: CodeCallback? = null
 ) {
-    Surface(modifier.background(MaterialTheme.colorScheme.background)) {
+    Box(modifier.background(MaterialTheme.colorScheme.background)) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -114,8 +114,9 @@ fun CodeContent(
                 Text(
                     stringResource(R.string.code_is_bad_code_notification),
                     Modifier.padding(top = 16.dp),
-                    ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Sb
+                    MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -166,8 +167,9 @@ private fun ButtonTimer(
             else stringResource(R.string.call_again)),
             Modifier.padding(6.dp),
             if (sec > 0) MaterialTheme.colorScheme.primary
-            else ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.Body1Sb,
+            else MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
     }

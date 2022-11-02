@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,6 @@ import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -84,13 +84,13 @@ fun CategoryList(
                 Modifier
                     .clip(CircleShape)
                     .clickable { callback?.onBack() },
-                ThemeExtra.colors.mainTextColor
+                MaterialTheme.colorScheme.tertiary
             )
             Text(
                 stringResource(R.string.meeting_filter_select_categories),
                 Modifier.padding(start = 20.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
         }
         LazyColumn {
@@ -105,7 +105,7 @@ fun CategoryList(
                         .fillMaxWidth()
                         .padding(vertical = 6.dp), true,
                     MaterialTheme.shapes.large,
-                    CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                    CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
                 )
                 {
                     Row(
@@ -125,8 +125,9 @@ fun CategoryList(
                             Text(
                                 it.name,
                                 Modifier.padding(start = 18.dp),
-                                ThemeExtra.colors.mainTextColor,
-                                style = ThemeExtra.typography.Body1Sb
+                                MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                         if (it.subcategories != null)
@@ -135,7 +136,7 @@ fun CategoryList(
                                     Icons.Filled.KeyboardArrowRight
                                 else Icons.Filled.KeyboardArrowDown,
                                 stringResource(R.string.next_button),
-                                tint = ThemeExtra.colors.secondaryTextColor
+                                tint = MaterialTheme.colorScheme.onTertiary
                             )
                         else if (state.categoryListState[index]) CheckBox(true) {}
                     }
@@ -144,7 +145,7 @@ fun CategoryList(
                         Surface {
                             FlowLayout(
                                 Modifier
-                                    .background(ThemeExtra.colors.cardBackground)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
                                     .padding(top = 16.dp)
                                     .padding(horizontal = 16.dp), 8.dp, 8.dp
                             ) {
@@ -178,9 +179,9 @@ fun CategoryList(
                         .padding(top = 12.dp, bottom = 28.dp)
                         .clip(CircleShape)
                         .clickable { },
-                    ThemeExtra.colors.mainTextColor,
+                    MaterialTheme.colorScheme.tertiary,
                     textAlign = TextAlign.Center,
-                    style = ThemeExtra.typography.Body2Bold
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -34,7 +35,6 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.shared.CategoryItem
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -65,14 +65,14 @@ fun MeetingBottomSheetTopBarCompose(
         ) {
             Text(
                 meetingModel.title,
-                color = ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
             IconButton({ }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,
-                    tint = ThemeExtra.colors.grayIcon
+                    tint = MaterialTheme.colorScheme.outlineVariant
                 )
             }
         }
@@ -93,7 +93,7 @@ fun MeetingBottomSheetTopBarCompose(
                     .weight(1f)
                     .size(180.dp),
                 ThemeExtra.shapes.cardShape,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Box(
                     Modifier.fillMaxSize()
@@ -114,13 +114,14 @@ fun MeetingBottomSheetTopBarCompose(
                         Text(
                             stringResource(R.string.meeting_profile_bottom_today_label),
                             Modifier.padding(bottom = 8.dp),
-                            ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.Body1Bold
+                            MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
                         )
                         Row(horizontalArrangement = Arrangement.SpaceBetween) {
                             DateTimeCard(
                                 DemoMeetingModel.dateTime,
-                                Gradients().primary(),
+                                Gradients.red(),
                                 true,
                                 Modifier.weight(1f)
                             )
@@ -129,13 +130,13 @@ fun MeetingBottomSheetTopBarCompose(
                                     .weight(1f)
                                     .padding(start = 4.dp)
                                     .clip(MaterialTheme.shapes.extraSmall)
-                                    .background(ThemeExtra.colors.grayIcon)
+                                    .background(MaterialTheme.colorScheme.outlineVariant)
                             ) {
                                 Text(
                                     eventDuration,
                                     Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                    style = ThemeExtra.typography.SubHeadEb,
-                                    color = Color.White
+                                    Color.White, fontWeight = FontWeight.SemiBold,
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             }
                         }
@@ -146,8 +147,9 @@ fun MeetingBottomSheetTopBarCompose(
         Text(
             "${meetingModel.organizer.username}, ${meetingModel.organizer.age}",
             Modifier.padding(top = 9.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.Body1Bold,
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
         )
     }
 }

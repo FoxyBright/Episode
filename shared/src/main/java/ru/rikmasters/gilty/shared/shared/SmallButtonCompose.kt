@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun SmallButton(
@@ -23,8 +23,9 @@ fun SmallButton(
     ) {
         Text(
             text,
-            color = ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.Body1Sb
+            color = MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }

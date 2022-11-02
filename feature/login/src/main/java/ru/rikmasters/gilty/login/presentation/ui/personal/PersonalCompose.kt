@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -15,11 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +39,6 @@ import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.NumberPicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -42,7 +47,7 @@ fun PersonalInfoPreview() {
         PersonalInfoContent(
             PersonalInfoContentState(
                 rememberCoroutineScope(),
-                18, listOf()
+                18, "", listOf()
             )
         )
     }
@@ -56,6 +61,7 @@ interface PersonalInfoContentCallback : NavigationInterface {
 data class PersonalInfoContentState(
     val scope: CoroutineScope,
     val age: Int,
+    val ageText: String,
     val list: List<Boolean>
 )
 
@@ -66,37 +72,33 @@ fun PersonalInfoContent(
     callback: PersonalInfoContentCallback? = null,
     asm: AppStateModel = get()
 ) {
+    // TODO Вынести состояние за пределы контента
+    var age by remember { mutableStateOf(state.age) }
     Box(
         Modifier
             .fillMaxSize()
     ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            ActionBar(
-                stringResource(R.string.personal_info_title)
-            )
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            ActionBar(stringResource(R.string.personal_info_title))
             { callback?.onBack() }
             Text(
                 stringResource(R.string.how_old_are_you),
                 Modifier.padding(top = 24.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
             TextField(
-                state.age.toString(), {},
+                state.ageText, {},
                 Modifier
                     .padding(top = 12.dp)
                     .fillMaxWidth()
                     .clickable {
                         state.scope.launch {
                             asm.bottomSheetState.expand {
-                                BottomSheetContent(Modifier, state.age,
-                                    { callback?.onAgeChange(it) })
+                                BottomSheetContent(Modifier, age, { age = it })
                                 {
                                     state.scope.launch {
+                                        callback?.onAgeChange(age)
                                         asm.bottomSheetState.collapse()
                                     }
                                 }
@@ -105,16 +107,17 @@ fun PersonalInfoContent(
                     },
                 shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = ThemeExtra.colors.cardBackground,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                     disabledIndicatorColor = Color.Transparent,
-                    disabledLabelColor = ThemeExtra.colors.secondaryTextColor,
-                    disabledTextColor = ThemeExtra.colors.mainTextColor
+                    disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledTextColor = MaterialTheme.colorScheme.tertiary
                 ),
                 placeholder = {
                     Text(
                         stringResource(R.string.personal_info_age_placeholder),
-                        color = ThemeExtra.colors.secondaryTextColor,
-                        style = ThemeExtra.typography.Body1Bold
+                        color = MaterialTheme.colorScheme.onTertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 singleLine = true,
@@ -123,13 +126,13 @@ fun PersonalInfoContent(
             Text(
                 stringResource(R.string.sex),
                 Modifier.padding(top = 24.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
             Card(
                 Modifier.padding(top = 12.dp),
                 MaterialTheme.shapes.large,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -156,7 +159,9 @@ fun PersonalInfoContent(
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button)
+            stringResource(R.string.next_button),
+            state.list != listOf(false, false, false)
+                    && state.ageText != ""
         ) { callback?.onNext() }
     }
 }
@@ -171,6 +176,7 @@ private fun BottomSheetContent(
     Column(
         modifier
             .fillMaxWidth()
+            .height(350.dp)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

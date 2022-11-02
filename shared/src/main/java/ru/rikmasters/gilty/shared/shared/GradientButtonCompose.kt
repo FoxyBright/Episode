@@ -22,8 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -43,17 +43,10 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     text: String,
     enabled: Boolean = true,
-    gradientColors: List<Color> = listOf(
-        ThemeExtra.colors.gradientColor1,
-        ThemeExtra.colors.gradientColor2
-    ),
+    online: Boolean = false,
     shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
     smallText: String? = null,
     icon: Int? = null,
-    disabledColors: List<Color> = listOf(
-        ThemeExtra.colors.DisabledGradientButton,
-        ThemeExtra.colors.DisabledGradientButton
-    ),
     onClick: () -> Unit
 ) {
     Button(
@@ -65,9 +58,19 @@ fun GradientButton(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.linearGradient(
-                        if (enabled) gradientColors else disabledColors
-                    ), shape
+                    if (online) Brush.linearGradient(
+                        if (enabled) Gradients.green() else listOf(
+                            MaterialTheme.colorScheme.inverseSurface,
+                            MaterialTheme.colorScheme.inverseSurface
+                        )
+                    )
+                    else
+                        Brush.linearGradient(
+                            if (enabled) Gradients.red() else listOf(
+                                MaterialTheme.colorScheme.inversePrimary,
+                                MaterialTheme.colorScheme.inversePrimary
+                            )
+                        ), shape
                 )
                 .padding(16.dp, 16.dp), Alignment.Center
         ) {
@@ -80,8 +83,8 @@ fun GradientButton(
                     )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text, style = ThemeExtra.typography.button)
-                    smallText?.let { Text(it, style = ThemeExtra.typography.ButtonLabelText) }
+                    Text(text, color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                    smallText?.let { Text(it, style = MaterialTheme.typography.headlineSmall) }
                 }
             }
         }

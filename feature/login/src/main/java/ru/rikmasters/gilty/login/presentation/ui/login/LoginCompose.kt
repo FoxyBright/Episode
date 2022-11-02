@@ -125,7 +125,7 @@ fun LoginContent(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .background(ThemeExtra.colors.cardBackground),
+                        .background(MaterialTheme.colorScheme.onPrimaryContainer),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
@@ -158,13 +158,13 @@ fun LoginContent(
             GradientButton(
                 Modifier.padding(top = 32.dp),
                 stringResource(R.string.next_button),
-                (state.phone.length > 9)
+                (state.phone.length > 9),
             ) { callback?.onNext() }
             Text(
                 stringResource(R.string.login_alternative_separator),
                 Modifier.padding(top = 20.dp),
                 style = MaterialTheme.typography.labelSmall,
-                color = ThemeExtra.colors.secondaryTextColor
+                color = MaterialTheme.colorScheme.onTertiary
             )
             Button(
                 { callback?.googleLogin() },
@@ -180,7 +180,7 @@ fun LoginContent(
                     stringResource(R.string.google_login),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = ThemeExtra.colors.transparentBtnTextColor
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
         }
@@ -198,9 +198,10 @@ fun LoginContent(
 private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCallback? = null) {
     val textStyle = SpanStyle(ThemeExtra.colors.policyAgreeColor)
     val linkStyle = SpanStyle(
-        ThemeExtra.colors.mainTextColor,
+        MaterialTheme.colorScheme.tertiary,
         textDecoration = TextDecoration.Underline
     )
+    val typography = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
     val annotatedText = buildAnnotatedString {
         withStyle(textStyle) { append(stringResource(R.string.login_privacy_police_agree)) }
         pushStringAnnotation("terms", "")
@@ -210,7 +211,7 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
         withStyle(linkStyle) { append(stringResource(R.string.login_privacy_police)) }; pop()
         withStyle(textStyle) { append(stringResource(R.string.login_application)) }
     }
-    ClickableText(annotatedText, modifier, ThemeExtra.typography.SubHeadSb) {
+    ClickableText(annotatedText, modifier, typography) {
         annotatedText.getStringAnnotations(
             "terms", it, it
         ).firstOrNull()?.let { callback?.termsOfApp() }
@@ -222,8 +223,8 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
 
 @Composable
 private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
-    //TODO при попытке вынести в state и callback данных и методов
-    // все продолжает работать, но данные не обновляются до персвайпа BottomSheet
+    // TODO при попытке вынести в state и callback данных и методов
+    //  все продолжает работать, но данные не обновляются до персвайпа BottomSheet
     var searchState by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
     val countries = Countries()
@@ -254,7 +255,7 @@ private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
             Modifier
                 .padding(top = 10.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(ThemeExtra.colors.cardBackground)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             itemsIndexed(searchedCountry) { index, item ->
                 Row(
@@ -279,16 +280,21 @@ private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
                             Text(
                                 item.country,
                                 Modifier.padding(start = 16.dp),
-                                style = ThemeExtra.typography.Body1Medium
+                                MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row {
                             Text(
                                 item.code,
                                 Modifier.padding(start = 16.dp, end = 8.dp),
-                                style = ThemeExtra.typography.Body1Medium
+                                MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
-                            Icon(Icons.Filled.KeyboardArrowRight, null)
+                            Icon(
+                                Icons.Filled.KeyboardArrowRight,
+                                (null), Modifier, MaterialTheme.colorScheme.outline
+                            )
                         }
                     }
                 }

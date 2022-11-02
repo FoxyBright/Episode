@@ -63,15 +63,15 @@ fun MeetingCard(
                 .width(180.dp)
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.Body1Bold,
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold
         )
         Row(
             Modifier
                 .padding(start = 14.dp)
         ) {
-            DateTimeCard(meeting.dateTime, Gradients().green(), today)
+            DateTimeCard(meeting.dateTime, Gradients.green(), today)
             if (today)
                 categoriesListCard(
                     Modifier.padding(start = 4.dp), meeting, true

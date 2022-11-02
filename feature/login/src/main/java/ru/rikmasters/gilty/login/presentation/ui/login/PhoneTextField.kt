@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -56,7 +55,8 @@ fun PhoneTextField(
         label = {
             Text(
                 stringResource(R.string.phone_number),
-                color = ThemeExtra.colors.secondaryTextColor
+                Modifier, MaterialTheme.colorScheme.onTertiary,
+                style = MaterialTheme.typography.bodyMedium
             )
         },
         trailingIcon = {
@@ -65,12 +65,12 @@ fun PhoneTextField(
                     Icon(
                         painterResource(R.drawable.ic_close),
                         stringResource(R.string.clear),
-                        tint = ThemeExtra.colors.grayIcon
+                        tint = MaterialTheme.colorScheme.scrim
                     )
                 }
             }
         },
-        textStyle = ThemeExtra.typography.Body1Medium,
+        textStyle = MaterialTheme.typography.bodyMedium,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone

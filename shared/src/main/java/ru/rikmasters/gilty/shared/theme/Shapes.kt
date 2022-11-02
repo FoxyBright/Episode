@@ -11,6 +11,6 @@ val Shapes = Shapes(
     extraSmall = RoundedCornerShape(10.dp),
     medium = RoundedCornerShape(12.dp),
     large = RoundedCornerShape(14.dp),
-    extraLarge = RoundedCornerShape(20.dp)
+    extraLarge = RoundedCornerShape(20.dp),
     // Добавить новые формы
 )

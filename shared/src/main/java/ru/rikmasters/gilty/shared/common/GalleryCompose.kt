@@ -22,6 +22,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,7 +37,6 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import java.io.File
 
 @Preview(showBackground = true)
@@ -79,14 +79,14 @@ fun GalleryContent(
         DropdownMenu(
             state.menuExpanded,
             { callback?.menu(false) },
-            Modifier.background(ThemeExtra.colors.cardBackground),
+            Modifier.background(MaterialTheme.colorScheme.primaryContainer),
         ) {
             state.menuItemList.forEach {
                 DropdownMenuItem({
                     Text(
                         File(it).name, Modifier,
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Medium
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }, {
                     callback?.menu(true)
@@ -121,7 +121,7 @@ fun GalleryContent(
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null, Modifier,
-                    ThemeExtra.colors.mainTextColor
+                    MaterialTheme.colorScheme.tertiary
                 )
             }
         }

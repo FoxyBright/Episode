@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.shared
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +27,6 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 const val CATEGORY_ELEMENT_SIZE = 120
 
@@ -74,7 +74,7 @@ fun CategoryItem(
                 .clip(CircleShape)
                 .background(
                     if (state) Color(item.color.toColorInt())
-                    else ThemeExtra.colors.grayIcon
+                    else MaterialTheme.colorScheme.outlineVariant
                 )
                 .align(Alignment.BottomCenter)
                 .clickable {
@@ -88,7 +88,7 @@ fun CategoryItem(
                 Color.White,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                style = ThemeExtra.typography.MediumText
+                style = MaterialTheme.typography.labelSmall
             )
         }
         Box(

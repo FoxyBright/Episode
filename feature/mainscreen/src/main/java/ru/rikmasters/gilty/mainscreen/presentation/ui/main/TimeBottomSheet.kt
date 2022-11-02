@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +27,6 @@ import ru.rikmasters.gilty.shared.shared.DividerBold
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ScrollTimePicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 interface TimeBottomSheetComposeCallback {
     fun onSaveClick(value: String)
@@ -55,7 +55,7 @@ fun AgeBottomSheetCompose(
     Box(
         modifier
             .height(sizeTransition)
-            .background(ThemeExtra.colors.cardBackground)
+            .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         DividerBold(
             Modifier

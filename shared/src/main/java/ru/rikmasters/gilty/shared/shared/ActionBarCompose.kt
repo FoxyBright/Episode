@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
 fun ActionBar(
@@ -37,7 +36,7 @@ fun ActionBar(
                 Modifier
                     .padding(end = 16.dp)
                     .size(24.dp),
-                ThemeExtra.colors.mainTextColor
+                MaterialTheme.colorScheme.tertiary
             )
         }
         Text(
@@ -46,7 +45,7 @@ fun ActionBar(
                 .padding(top = 16.dp)
                 .fillMaxWidth(),
             style = MaterialTheme.typography.titleLarge,
-            color = ThemeExtra.colors.mainTextColor
+            color = MaterialTheme.colorScheme.tertiary
         )
         details?.let {
             Text(
@@ -55,7 +54,7 @@ fun ActionBar(
                     .fillMaxWidth()
                     .padding(top = 12.dp),
                 style = MaterialTheme.typography.labelSmall,
-                color = ThemeExtra.colors.secondaryTextColor
+                color = MaterialTheme.colorScheme.onTertiary
             )
         }
     }
@@ -74,18 +73,18 @@ fun RowActionBar(
                 painterResource(R.drawable.ic_back),
                 stringResource(R.string.action_bar_button_back),
                 Modifier.size(24.dp),
-                ThemeExtra.colors.mainTextColor
+                MaterialTheme.colorScheme.tertiary
             )
         }
         Text(
             title,
             Modifier.padding(end = 4.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.H3
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.labelLarge
         )
         details?.let {
             Text(
-                details, style = ThemeExtra.typography.H3,
+                details, style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
             )
         }

@@ -62,7 +62,7 @@ fun RespondsList(
                     0 -> ThemeExtra.shapes.largeTopRoundedShape
                     membersList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape
                     else -> RoundedCornerShape(0.dp)
-                }, CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                }, CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -81,8 +81,8 @@ fun RespondsList(
                     )
                     Text(
                         "${member.username}, ${member.age}",
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
                 }

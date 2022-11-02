@@ -30,7 +30,6 @@ import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 data class ProfileState(
     val name: String = "",
@@ -115,7 +114,7 @@ fun Profile(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),
                         Modifier,
-                        ThemeExtra.colors.mainTextColor
+                        MaterialTheme.colorScheme.tertiary
                     )
                 }
             TextField(
@@ -125,20 +124,20 @@ fun Profile(
                     .offset((-16).dp)
                     .fillMaxWidth(),
                 colors = TransparentTextFieldColors(),
-                textStyle = ThemeExtra.typography.ExtraHeader,
+                textStyle = MaterialTheme.typography.displayLarge,
                 placeholder = {
                     Row(Modifier, Arrangement.Center, Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.user_name),
                             Modifier.padding(end = 8.dp),
-                            ThemeExtra.colors.secondaryTextColor,
-                            style = ThemeExtra.typography.H1
+                            MaterialTheme.colorScheme.onTertiary,
+                            style = MaterialTheme.typography.titleLarge
                         )
                         Icon(
                             painterResource(R.drawable.ic_edit),
                             stringResource(R.string.edit),
                             Modifier.padding(top = 4.dp),
-                            ThemeExtra.colors.grayIcon
+                            MaterialTheme.colorScheme.outlineVariant
                         )
                     }
                 },
@@ -153,7 +152,7 @@ fun Profile(
                     .padding(bottom = 6.dp)
                     .offset(y = -(10).dp),
                 MaterialTheme.colorScheme.primary,
-                style = ThemeExtra.typography.ProfileObserversText
+                style = MaterialTheme.typography.titleSmall
             )
         Row {
             ProfileImageContent(
@@ -170,7 +169,7 @@ fun Profile(
                     state.rating,
                     state.observers,
                     state.observed,
-                    state.emoji?.path
+                    state.emoji
                 )
                 Spacer(Modifier.height(14.dp))
                 HiddenPhotoContent(
@@ -185,8 +184,8 @@ fun Profile(
         Text(
             stringResource(R.string.profile_about_me),
             Modifier.padding(top = 20.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.H3
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.titleLarge
         )
         TextField(
             state.description,
@@ -197,12 +196,12 @@ fun Profile(
             readOnly = !state.enabled,
             shape = MaterialTheme.shapes.large,
             colors = TextFieldColors(),
-            textStyle = ThemeExtra.typography.Body1Medium,
+            textStyle = MaterialTheme.typography.bodyMedium,
             placeholder = {
                 Text(
                     stringResource(R.string.about_me_placeholder),
-                    color = ThemeExtra.colors.secondaryTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         )

@@ -8,6 +8,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.model.profile.EmojiList
 
 @Composable
 fun ProfileScreen(
@@ -16,15 +17,14 @@ fun ProfileScreen(
     nav: NavState = get()
 ) {
     val occupiedName = remember { mutableStateOf(false) }
-    val lockState = remember { mutableStateOf(false) }
+    val lockState = remember { mutableStateOf(true) }
     val name = remember { mutableStateOf(UserName) }
     val description = remember { mutableStateOf(UserDescription) }
     val profileState = ProfileState(
-        profilePhoto = if (photo == "") Avatar else photo,
-        hiddenPhoto = if (hiddenPhoto == "") Hidden else hiddenPhoto,
-        name = name.value,
-        lockState = lockState.value,
-        description = description.value,
+        name.value, if (hiddenPhoto == "") Hidden else hiddenPhoto,
+        if (photo == "") Avatar else photo, lockState.value,
+        description.value, "4.9",
+        emoji = EmojiList.first(),
         enabled = true,
         occupiedName = occupiedName.value
     )

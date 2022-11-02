@@ -29,7 +29,7 @@ fun HiddenPhotoScreen(photos: List<File> = listOf(), nav: NavState = get()) {
         }
 
         override fun onNext() {
-            Hidden = photoList.last().toString()
+            Hidden = if (photoList.isEmpty()) "" else photoList.last().toString()
             nav.navigateAbsolute(
                 "registration/profile?hp=${
                     if (photoList.isEmpty()) "" else photoList.last()

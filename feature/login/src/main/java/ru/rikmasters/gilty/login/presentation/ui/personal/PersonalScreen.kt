@@ -11,17 +11,21 @@ import ru.rikmasters.gilty.core.navigation.NavState
 
 @Composable
 fun PersonalScreen(nav: NavState = get()) {
+    val a = remember { mutableStateOf(18) }
     var age by remember { mutableStateOf(18) }
+    var ageText by remember { mutableStateOf("") }
     var list by remember { mutableStateOf(arrayListOf(false, false, false)) }
     PersonalInfoContent(
-        PersonalInfoContentState(rememberCoroutineScope(), age, list),
+        PersonalInfoContentState(rememberCoroutineScope(), a.value, ageText, list),
         object : PersonalInfoContentCallback {
             override fun onBack() {
                 nav.navigate("profile")
             }
 
             override fun onAgeChange(it: Int) {
+                a.value = it
                 age = it
+                ageText = "$it"
             }
 
             override fun onGenderChange(index: Int) {

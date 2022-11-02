@@ -29,8 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
+import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.Divider
@@ -39,7 +39,6 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 private val allTags = listOf("Здесь", "Должен", "Быть", "Список", "Всех", "Доступных", "Тегов")
 
@@ -104,14 +103,14 @@ fun MeetingTagSearch(
             if (state.popularTagsListVisible) stringResource(R.string.meeting_filter_popular_tags)
             else stringResource(R.string.meeting_filter_search_from_tag),
             Modifier.padding(top = 20.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.H3
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.titleLarge
         )
         if (state.popularTagsListVisible)
             Card(Modifier.padding(top = 20.dp)) {
                 FlowLayout(
                     Modifier
-                        .background(ThemeExtra.colors.cardBackground)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp), 4.dp, 8.dp
                 ) {
                     state.popularTags.forEach {
@@ -128,7 +127,7 @@ fun MeetingTagSearch(
                 Surface {
                     FlowLayout(
                         Modifier
-                            .background(ThemeExtra.colors.cardBackground)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                             .padding(top = 16.dp)
                             .padding(horizontal = 16.dp), 16.dp, 8.dp
                     ) {
@@ -146,7 +145,7 @@ fun MeetingTagSearch(
                                         item,
                                         Modifier.padding(end = 10.dp),
                                         Color.White,
-                                        style = ThemeExtra.typography.MediumText
+                                        style = MaterialTheme.typography.labelSmall
                                     )
                                     Icon(
                                         Icons.Filled.Close,
@@ -165,7 +164,7 @@ fun MeetingTagSearch(
                 Modifier
                     .padding(top = 16.dp)
                     .clip(MaterialTheme.shapes.medium)
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 itemsIndexed(state.allTagList) { index, item ->
                     Row(
@@ -178,7 +177,7 @@ fun MeetingTagSearch(
                         Text(
                             item,
                             Modifier.padding(start = 16.dp),
-                            style = ThemeExtra.typography.Body1Medium
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         if (!state.tagList.contains(item))
                             Icon(

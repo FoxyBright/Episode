@@ -18,16 +18,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.Profile
+import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
-import ru.rikmasters.gilty.shared.common.Profile
-import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 data class OrganizerProfileState(
     val profileModel: ProfileModel,
@@ -91,8 +90,8 @@ fun OrganizerProfile(
                 Text(
                     stringResource(R.string.profile_actual_meetings_label),
                     Modifier.padding(top = 28.dp, bottom = 14.dp),
-                    ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
+                    MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
             item {

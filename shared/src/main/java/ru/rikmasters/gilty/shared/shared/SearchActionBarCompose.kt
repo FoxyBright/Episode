@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -71,12 +72,12 @@ fun SearchActionBar(
                 .width(width)
                 .align(Alignment.CenterEnd)
                 .clip(MaterialTheme.shapes.extraSmall)
-                .background(ThemeExtra.colors.cardBackground)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(ThemeExtra.colors.cardBackground),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton({
@@ -99,11 +100,12 @@ fun SearchActionBar(
                     placeholder = {
                         Text(
                             stringResource(R.string.login_search_placeholder),
-                            color = ThemeExtra.colors.secondaryTextColor,
-                            style = ThemeExtra.typography.Body1Bold
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = Bold
                         )
                     },
-                    textStyle = ThemeExtra.typography.Body1Bold,
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = Bold),
                     singleLine = true,
                 )
             }
@@ -116,7 +118,7 @@ fun SearchActionBar(
                 Arrangement.SpaceBetween,
                 Alignment.CenterVertically
             ) {
-                Text(state.name, style = ThemeExtra.typography.H3)
+                Text(state.name, style = MaterialTheme.typography.titleLarge)
                 IconButton({
                     state.state = true
                     state.onExpandSearch?.let { it(true) }
@@ -125,7 +127,7 @@ fun SearchActionBar(
                         painterResource(R.drawable.magnifier),
                         stringResource(R.string.login_search_placeholder),
                         Modifier.size(22.dp),
-                        ThemeExtra.colors.mainTextColor
+                        MaterialTheme.colorScheme.tertiary
                     )
                 }
             }

@@ -28,7 +28,6 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.shared.TrackCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -90,7 +89,7 @@ fun MeetingDetailsBottomCompose(
         Text(
             stringResource(R.string.meeting_question_comment_or_assess),
             Modifier,
-            style = ThemeExtra.typography.H3
+            style = MaterialTheme.typography.titleLarge
         )
         TextField(
             state.comment, { if (it.length <= 120) callback?.onCommentChange(it) },
@@ -102,8 +101,8 @@ fun MeetingDetailsBottomCompose(
             placeholder = {
                 Text(
                     stringResource(R.string.meeting_comment_text_holder),
-                    color = ThemeExtra.colors.secondaryTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         )
@@ -112,16 +111,16 @@ fun MeetingDetailsBottomCompose(
             Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp),
-            ThemeExtra.colors.secondaryTextColor,
+            MaterialTheme.colorScheme.onTertiary,
             textAlign = TextAlign.End,
-            style = ThemeExtra.typography.LabelText
+            style = MaterialTheme.typography.headlineSmall
         )
         Card(
             Modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
         ) {
             Row(
                 Modifier
@@ -137,8 +136,8 @@ fun MeetingDetailsBottomCompose(
         Text(
             stringResource(R.string.meeting_only_organizer_label),
             Modifier.padding(top = 4.dp, start = 16.dp),
-            color = ThemeExtra.colors.secondaryTextColor,
-            style = ThemeExtra.typography.LabelText
+            color = MaterialTheme.colorScheme.onTertiary,
+            style = MaterialTheme.typography.headlineSmall
         )
         GradientButton(
             Modifier.padding(top = 28.dp),

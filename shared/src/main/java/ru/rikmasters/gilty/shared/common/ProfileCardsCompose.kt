@@ -31,13 +31,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
+import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.shared.LockerCheckBox
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -74,7 +77,7 @@ private fun ProfileStatisticContentPreview() {
     GiltyTheme {
         ProfileStatisticContent(
             Modifier.width(160.dp),
-            DemoProfileModel.rating.average, 100, 100, DemoProfileModel.emoji.path
+            DemoProfileModel.rating.average, 100, 100, DemoProfileModel.emoji
         )
     }
 }
@@ -94,7 +97,7 @@ fun HiddenPhotoContent(
             .height(100.dp)
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
-            .background(ThemeExtra.colors.cardBackground)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { onCardClick() }, Alignment.BottomCenter
     ) {
         AsyncImage(
@@ -136,7 +139,7 @@ fun ProfileImageContent(
             .height(214.dp)
             .fillMaxWidth(0.45f)
             .clip(MaterialTheme.shapes.large)
-            .background(ThemeExtra.colors.cardBackground)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { onClick() }, Alignment.BottomCenter
     ) {
         AsyncImage(
@@ -181,8 +184,9 @@ private fun CreateProfileCardRow(
             Text(
                 text,
                 Modifier.padding(end = 4.dp),
-                ThemeExtra.colors.secondaryTextColor,
-                style = ThemeExtra.typography.ProfileLabelText,
+                MaterialTheme.colorScheme.onTertiary,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold
             )
         when (profileType) {
             ProfileType.CREATE -> {
@@ -214,7 +218,7 @@ fun ProfileStatisticContent(
     rating: String,
     observers: Int,
     observed: Int,
-    emoji: String? = null
+    emoji: EmojiModel? = null
 ) {
     Card(
         modifier
@@ -222,7 +226,7 @@ fun ProfileStatisticContent(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row(
@@ -234,8 +238,9 @@ fun ProfileStatisticContent(
                 Text(rating, style = ThemeExtra.typography.RatingText)
                 Box(Modifier.padding(top = 14.dp)) {
                     Image(painterResource(R.drawable.ic_emoji), null)
-                    AsyncImage(
-                        emoji, null,
+                    Image(
+                        if (emoji?.type == "D") painterResource(emoji.path.toInt())
+                        else rememberAsyncImagePainter(emoji?.path), (null),
                         Modifier
                             .padding(top = 5.dp, end = 6.dp)
                             .size(20.dp)
@@ -252,15 +257,16 @@ fun ProfileStatisticContent(
                     Text(
                         digitalConverter(observers),
                         Modifier.fillMaxWidth(),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.ProfileLabelText,
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
                     Text(
                         stringResource(R.string.profile_observers),
                         Modifier.fillMaxWidth(),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.ProfileObserversText,
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.titleSmall,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -268,15 +274,16 @@ fun ProfileStatisticContent(
                     Text(
                         digitalConverter(observed),
                         Modifier.fillMaxWidth(),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.ProfileLabelText,
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                     )
                     Text(
                         stringResource(R.string.profile_observe),
                         Modifier.fillMaxWidth(),
-                        ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.ProfileObserversText,
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.titleSmall,
                         textAlign = TextAlign.Center
                     )
                 }

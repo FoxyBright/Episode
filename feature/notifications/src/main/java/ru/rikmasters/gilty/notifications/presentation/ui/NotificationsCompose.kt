@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -49,7 +50,6 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -121,8 +121,8 @@ fun NotificationsCompose(
         Text(
             stringResource(R.string.notification_screen_name),
             Modifier.padding(top = 80.dp, bottom = 10.dp),
-            ThemeExtra.colors.mainTextColor,
-            style = ThemeExtra.typography.H1
+            MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.titleLarge
         )
         if (state.myResponds != 0)
             Card(
@@ -130,7 +130,7 @@ fun NotificationsCompose(
                 Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp),
-                colors = CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -150,8 +150,8 @@ fun NotificationsCompose(
                         Text(
                             stringResource(R.string.notification_responds_on_user_meetings),
                             Modifier.padding(start = 16.dp),
-                            color = ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.SubHeadMedium
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -164,14 +164,15 @@ fun NotificationsCompose(
                                 "${state.myResponds}",
                                 Modifier.padding(12.dp, 6.dp),
                                 Color.White,
-                                style = ThemeExtra.typography.SubHeadSb
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                         Icon(
                             Icons.Filled.KeyboardArrowRight,
                             stringResource(R.string.profile_responds_label),
                             Modifier,
-                            ThemeExtra.colors.secondaryTextColor
+                            MaterialTheme.colorScheme.onTertiary
                         )
                     }
                 }
@@ -224,7 +225,7 @@ fun NotificationsCompose(
 private fun label(text: String) {
     Text(
         text, Modifier.padding(vertical = 20.dp),
-        ThemeExtra.colors.mainTextColor,
-        style = ThemeExtra.typography.H3
+        MaterialTheme.colorScheme.tertiary,
+        style = MaterialTheme.typography.titleLarge
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -22,7 +23,6 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -48,12 +48,12 @@ fun ProfileContent(
             { callback?.onBack() }
             Card(
                 Modifier
-                    .padding(top = 24.dp)
+                    .offset(y = 24.dp)
                     .padding(horizontal = 16.dp)
                     .fillMaxSize(),
                 RoundedCornerShape(30.dp),
                 CardDefaults.cardColors(MaterialTheme.colorScheme.background),
-                border = BorderStroke(6.dp, ThemeExtra.colors.cardBackground)
+                border = BorderStroke(6.dp, MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Profile(
                     state,

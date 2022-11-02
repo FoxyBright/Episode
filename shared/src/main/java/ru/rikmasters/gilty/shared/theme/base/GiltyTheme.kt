@@ -5,6 +5,7 @@ package ru.rikmasters.gilty.shared.theme.base
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -24,10 +25,11 @@ import ru.rikmasters.gilty.shared.theme.ExtraShapes
 import ru.rikmasters.gilty.shared.theme.ExtraTypography
 import ru.rikmasters.gilty.shared.theme.LightColorScheme
 import ru.rikmasters.gilty.shared.theme.LightExtraColors
+import ru.rikmasters.gilty.shared.theme.Ripple
 import ru.rikmasters.gilty.shared.theme.Shapes
 import ru.rikmasters.gilty.shared.theme.Typography
 
-object GiltyTheme: AppTheme {
+object GiltyTheme : AppTheme {
     @Composable
     override fun apply(
         darkMode: Boolean,
@@ -53,11 +55,14 @@ fun GiltyTheme(
     ) {
 
         MaterialTheme(
-            colorScheme = colorScheme.switch(),
-            typography = Typography,
-            shapes = Shapes,
-            content = content
-        )
+            colorScheme.switch(),
+            Shapes, Typography,
+        ) {
+            CompositionLocalProvider(
+                LocalRippleTheme provides Ripple,
+                content = content
+            )
+        }
     }
 }
 
@@ -68,9 +73,10 @@ private fun resolveColors(
 ): Pair<ColorScheme, ExtraColors> = when {
 
     dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-        if(darkTheme) dynamicDarkColorScheme(context) to DarkExtraColors
+        if (darkTheme) dynamicDarkColorScheme(context) to DarkExtraColors
         else dynamicLightColorScheme(context) to LightExtraColors
     }
+
     darkTheme -> DarkColorScheme to DarkExtraColors
     else -> LightColorScheme to LightExtraColors
 }

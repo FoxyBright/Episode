@@ -21,15 +21,15 @@
     <string name="interested_you_details">Выберите какие категории встреч\nвам интересны</string>
 
     <!-- Give Permissions -->
-    <string name="find_more">Находите больше</string>
-    <string name="find_more_details">Узнайте о самых актуальных встречах\nнедалеко от вас</string>
-    <string name="permissions">Разрешения</string>
-    <string name="geoposition">Геопозиция</string>
-    <string name="finish">Завершить</string>
-    <string name="answer_permission">Разрешить Guilty доступ к\nместоположению этого\nустройства?</string>
-    <string name="when_using">При использовании</string>
-    <string name="once">Однократно</string>
-    <string name="prohibit">Запретить</string>
+    <string name="permissions_action_bar">Находите больше</string>
+    <string name="permissions_action_bar_details">Узнайте о самых актуальных встречах\nнедалеко от вас</string>
+    <string name="permissions_title">Разрешения</string>
+    <string name="permission_geoposition_label">Геопозиция</string>
+    <string name="permissions_finish_button">Завершить</string>
+    <string name="permissions_answer">Разрешить Guilty доступ к\nместоположению этого\nустройства?</string>
+    <string name="permissions_when_using_button">При использовании</string>
+    <string name="permissions_once_button">Однократно</string>
+    <string name="permissions_prohibit_button">Запретить</string>
 
     <!-- Profile -->
     <string name="create_profile_title">Заполните профиль</string>

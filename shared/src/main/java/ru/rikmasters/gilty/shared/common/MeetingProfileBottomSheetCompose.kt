@@ -91,13 +91,13 @@ fun ProfileMeetingBottomSheet(
                     .padding(top = 13.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.large,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
                     state.meetingModel.title,
                     Modifier.padding(14.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -105,8 +105,8 @@ fun ProfileMeetingBottomSheet(
             Text(
                 stringResource(R.string.meeting_terms),
                 Modifier.padding(top = 28.dp),
-                color = ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
         }
         item {
@@ -115,7 +115,7 @@ fun ProfileMeetingBottomSheet(
                     .padding(top = 12.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.extraSmall,
-                CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
                     when (state.meetingModel.type) {
@@ -126,8 +126,8 @@ fun ProfileMeetingBottomSheet(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Divider(Modifier.padding(start = 16.dp))
                 Text(
@@ -141,8 +141,8 @@ fun ProfileMeetingBottomSheet(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.Body1Medium
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -150,14 +150,14 @@ fun ProfileMeetingBottomSheet(
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
                     stringResource(R.string.meeting_members),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     "${state.memberList.size}/${state.meetingModel.memberCount}",
                     Modifier.padding(start = 8.dp),
                     MaterialTheme.colorScheme.primary,
-                    style = ThemeExtra.typography.H3
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Image(
                     painterResource(
@@ -175,7 +175,7 @@ fun ProfileMeetingBottomSheet(
                     0 -> ThemeExtra.shapes.largeTopRoundedShape
                     state.memberList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape
                     else -> RoundedCornerShape(0.dp)
-                }, CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                }, CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -195,8 +195,8 @@ fun ProfileMeetingBottomSheet(
                     )
                     Text(
                         "${member.username}, ${member.age}",
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -208,13 +208,13 @@ fun ProfileMeetingBottomSheet(
                 Text(
                     stringResource(R.string.meeting_distance_from_user),
                     Modifier.padding(end = 4.dp),
-                    ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H3
+                    MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     stringResource(R.string.meeting_filter_label_distance, state.distance),
                     color = MaterialTheme.colorScheme.primary,
-                    style = ThemeExtra.typography.H3
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
         }
@@ -222,7 +222,7 @@ fun ProfileMeetingBottomSheet(
             Card(
                 { callback?.openMap() },
                 Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -231,13 +231,14 @@ fun ProfileMeetingBottomSheet(
                 ) {
                     Text(
                         stringResource(R.string.meeting_watch_on_mup_button),
-                        color = ThemeExtra.colors.mainTextColor,
-                        style = ThemeExtra.typography.Body1Sb
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
                     Icon(
                         Icons.Filled.KeyboardArrowRight,
                         null, Modifier,
-                        ThemeExtra.colors.mainTextColor
+                        MaterialTheme.colorScheme.tertiary
                     )
                 }
             }

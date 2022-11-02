@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui
+package ru.rikmasters.gilty.login.presentation.ui.permissions
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,13 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,13 +34,35 @@ import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
-fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null) {
-    var geopositionState by remember { mutableStateOf(true) }
-    var notificationState by remember { mutableStateOf(false) }
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+fun PermissionsContentPreview() {
+    GiltyTheme {
+        PermissionsContent(PermissionsState())
+    }
+}
+
+data class PermissionsState(
+    val geopositionState: Boolean = false,
+    val notificationState: Boolean = false
+)
+
+interface PermissionsCallback : NavigationInterface {
+    fun geopositionChange() {}
+
+    fun notificationChange() {}
+}
+
+@Composable
+fun PermissionsContent(
+    state: PermissionsState,
+    modifier: Modifier = Modifier,
+    callback: PermissionsCallback? = null
+) {
     Box(
         modifier
             .fillMaxSize()
@@ -53,8 +74,8 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                 .padding(horizontal = 16.dp)
         ) {
             ActionBar(
-                stringResource(R.string.find_more),
-                stringResource(R.string.find_more_details),
+                stringResource(R.string.permissions_action_bar),
+                stringResource(R.string.permissions_action_bar_details),
             ) { callback?.onBack() }
             Image(
                 painterResource(R.drawable.map),
@@ -65,44 +86,25 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                 contentScale = ContentScale.Crop
             )
             Text(
-                stringResource(R.string.permissions),
+                stringResource(R.string.permissions_title),
                 Modifier.padding(bottom = 12.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.H3
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.titleLarge
             )
-            Box(
+            Column(
                 Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.large)
-                    .background(ThemeExtra.colors.elementsBack)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                Column {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp), Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.geoposition),
-                            color = ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.buttonText
-                        )
-                        CheckBox(geopositionState) { geopositionState = it }
-                    }
-                    Divider(Modifier.padding(start = 16.dp))
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp), Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.notification_screen_name),
-                            color = ThemeExtra.colors.mainTextColor,
-                            style = ThemeExtra.typography.buttonText
-                        )
-                        CheckBox(notificationState) { notificationState = it }
-                    }
-                }
+                PermItem(
+                    stringResource(R.string.permission_geoposition_label),
+                    0, state.geopositionState
+                )
+                { callback?.geopositionChange() }
+                Divider(Modifier.padding(start = 16.dp))
+                PermItem(
+                    stringResource(R.string.notification_screen_name),
+                    1, state.notificationState
+                ) { callback?.notificationChange() }
             }
         }
         GradientButton(
@@ -110,8 +112,47 @@ fun PermissionsContent(modifier: Modifier, callback: NavigationInterface? = null
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
-            stringResource(R.string.finish)
+            stringResource(R.string.permissions_finish_button)
         ) { callback?.onNext() }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PermItem(
+    name: String,
+    index: Int,
+    state: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        { onClick() },
+        Modifier.fillMaxWidth(), (true),
+        LazyItemsShapes(index, 2),
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            Arrangement.SpaceBetween
+        ) {
+            Text(
+                name, Modifier,
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal
+            )
+            CheckBox(state) { onClick() }
+        }
+    }
+}
+
+@Composable
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+private fun PermissionConfirmationWindowPreview() {
+    GiltyTheme {
+        PermissionConfirmationWindow()
     }
 }
 
@@ -132,54 +173,37 @@ fun PermissionConfirmationWindow() {
                     .padding(18.dp)
             )
             Text(
-                stringResource(R.string.answer_permission),
+                stringResource(R.string.permissions_answer),
                 Modifier.padding(bottom = 20.dp),
-                ThemeExtra.colors.mainTextColor,
+                MaterialTheme.colorScheme.tertiary,
                 textAlign = TextAlign.Center,
-                style = ThemeExtra.typography.H3
+                style = MaterialTheme.typography.titleLarge
             )
             Divider()
             Text(
-                stringResource(R.string.when_using),
+                stringResource(R.string.permissions_when_using_button),
                 Modifier.padding(vertical = 20.dp),
-                ThemeExtra.colors.primary,
+                MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                style = ThemeExtra.typography.MediumText
+                style = MaterialTheme.typography.labelSmall
             )
             Divider()
             Text(
-                stringResource(R.string.once),
+                stringResource(R.string.permissions_once_button),
                 Modifier.padding(vertical = 20.dp),
-                ThemeExtra.colors.primary,
+                MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                style = ThemeExtra.typography.MediumText
+                style = MaterialTheme.typography.labelSmall
             )
             Divider()
             Text(
-                stringResource(R.string.prohibit),
+                stringResource(R.string.permissions_prohibit_button),
                 Modifier.padding(vertical = 20.dp),
-                ThemeExtra.colors.primary,
+                MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                style = ThemeExtra.typography.MediumText
+                style = MaterialTheme.typography.labelSmall
             )
         }
-    }
-}
-
-@Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-fun PermissionConfirmationWindowPreview() {
-    GiltyTheme {
-        PermissionConfirmationWindow()
-    }
-
-}
-
-@Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-fun PermissionsContentPreview() {
-    GiltyTheme {
-        PermissionsContent(Modifier)
     }
 }
 

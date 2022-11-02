@@ -1,11 +1,15 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -31,7 +35,7 @@ fun NumberPicker(
     },
     value: Int,
     onValueChange: (Int) -> Unit,
-    dividerColor: Color = ThemeExtra.colors.grayIcon,
+    dividerColor: Color = MaterialTheme.colorScheme.outlineVariant,
     range: Iterable<Int>
 ) {
     ListItemPicker(

@@ -41,11 +41,11 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.categoriesListCard
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
-import ru.rikmasters.gilty.shared.common.categoriesListCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -80,7 +80,6 @@ fun MeetingsListContent(
                                 ),
                             meeting,
                             state,
-                            false
                         ) { onSelect(meeting) }
                     }
                 }
@@ -94,7 +93,7 @@ private fun MeetingCardCompose(
     modifier: Modifier = Modifier,
     model: ShortMeetingModel,
     state: SwipeableCardState,
-    today: Boolean,
+    today: Boolean = false,
     onSelect: () -> Unit
 ) {
     Card(
@@ -108,8 +107,8 @@ private fun MeetingCardCompose(
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(MaterialTheme.shapes.large)
-                    .fillMaxHeight(0.96f),
-                contentScale = ContentScale.FillBounds
+                    .fillMaxHeight(),
+                contentScale = ContentScale.Crop
             )
             cardBottom(
                 Modifier.align(Alignment.BottomCenter),
@@ -143,7 +142,7 @@ private fun cardBottom(
                 .align(Alignment.BottomCenter)
                 .wrapContentHeight(),
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(ThemeExtra.colors.cardBackground)
+            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
         ) {
             val scope = rememberCoroutineScope()
             LazyVerticalGrid(
@@ -155,7 +154,7 @@ private fun cardBottom(
                 item {
                     Text(
                         model.title,
-                        style = ThemeExtra.typography.H3
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
                 item {
@@ -164,7 +163,7 @@ private fun cardBottom(
                             Column(horizontalAlignment = Alignment.End) {
                                 DateTimeCard(
                                     DemoMeetingModel.dateTime,
-                                    Gradients().green(),
+                                    Gradients.green(),
                                     today
                                 )
                                 if (!today)

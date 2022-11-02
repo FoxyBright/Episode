@@ -9,24 +9,25 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.shared.CategoryItem
+import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -53,20 +54,21 @@ fun ReactionContent(
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .clip(ThemeExtra.shapes.largeTopRoundedShape)
-                .background(ThemeExtra.colors.cardBackground)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             Column {
                 Text(
                     stringResource(R.string.meeting_respond_was_send),
                     Modifier.padding(top = 16.dp, start = 16.dp),
-                    color = ThemeExtra.colors.mainTextColor,
-                    style = ThemeExtra.typography.H2
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.displayLarge
                 )
                 Text(
                     stringResource(R.string.meeting_wait_organizer_access),
                     Modifier.padding(top = 8.dp, start = 16.dp),
-                    color = ThemeExtra.colors.secondaryTextColor,
-                    style = ThemeExtra.typography.SubHeadSb
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
             CategoryItem(
@@ -87,7 +89,7 @@ fun ReactionContent(
                     .padding(16.dp)
                     .size(30.dp)
                     .clip(CircleShape)
-                    .background(ThemeExtra.colors.cardBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Icon(
                     Icons.Filled.Close,

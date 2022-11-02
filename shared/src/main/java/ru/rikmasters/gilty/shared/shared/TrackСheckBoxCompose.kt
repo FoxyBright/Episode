@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -52,7 +53,8 @@ fun TrackCheckBox(
     )
     val borderColor by animateColorAsState(
         if (checked) Color.Transparent
-        else ThemeExtra.colors.secondaryTrackCheckBox
+        else ThemeExtra.colors.secondaryTrackCheckBox,
+        tween(400)
     )
     Surface(
         { onCheckedChange(!checked) },
@@ -63,7 +65,8 @@ fun TrackCheckBox(
         RoundedCornerShape(50),
         animateColorAsState(
             if (checked) activeColor
-            else ThemeExtra.colors.mainTrackCheckBox
+            else ThemeExtra.colors.mainTrackCheckBox,
+            tween(400)
         ).value,
         border = BorderStroke(2.dp, borderColor)
     ) {

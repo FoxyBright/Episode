@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -23,8 +24,8 @@ import ru.rikmasters.gilty.shared.model.profile.DemoEmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
+@Suppress("unused")
 private class UserShortModel(
     val name: String, val age: Int, val emoji: EmojiModel, val avatar: AvatarModel
 )
@@ -59,8 +60,9 @@ fun BrieflyRowCompose(
             Text(
                 text,
                 Modifier.padding(start = 12.dp),
-                ThemeExtra.colors.mainTextColor,
-                style = ThemeExtra.typography.Body1Sb
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
             )
             emoji?.let {
                 AsyncImage(

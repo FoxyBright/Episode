@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -16,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 private const val TIMES_START = "00"
 private const val MINUTES_END = "59"
@@ -59,7 +59,7 @@ fun ScrollTimePicker(
             { timeReplacer(it, HOURS_END) },
             timeReplacer(hoursValue, HOURS_END),
             { hoursValue = it },
-            ThemeExtra.colors.grayIcon,
+            MaterialTheme.colorScheme.outlineVariant,
             getTimesList(0..HOURS_END.toInt())
         )
         ListItemPicker(
@@ -67,7 +67,7 @@ fun ScrollTimePicker(
             { timeReplacer(it, MINUTES_END) },
             timeReplacer(minutesValue, MINUTES_END),
             { minutesValue = it },
-            ThemeExtra.colors.grayIcon,
+            MaterialTheme.colorScheme.outlineVariant,
             getTimesList(0..MINUTES_END.toInt())
         )
     }
