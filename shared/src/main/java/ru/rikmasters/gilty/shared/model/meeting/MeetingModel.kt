@@ -4,7 +4,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import java.util.UUID
 
-sealed interface MeetingModel{
+sealed interface MeetingModel {
 
     val id: UUID
 
@@ -16,28 +16,12 @@ sealed interface MeetingModel{
 
     val dateTime: String
 
+    val duration: String
+
     val organizer: OrganizerModel
 
     val isOnline: Boolean
 }
-
-data class ShortMeetingModel(
-
-    override val id: UUID,
-
-    override val title: String,
-
-    override val condition: ConditionType,
-
-    override val category: ShortCategoryModel,
-
-    override val dateTime: String,
-
-    override val organizer: OrganizerModel,
-
-    override val isOnline: Boolean
-
-): MeetingModel
 
 data class FullMeetingModel(
 
@@ -48,6 +32,8 @@ data class FullMeetingModel(
     override val condition: ConditionType,
 
     override val category: ShortCategoryModel,
+
+    override val duration: String,
 
     val type: MeetType,
 
@@ -73,17 +59,18 @@ data class FullMeetingModel(
 
     val hideAddress: Boolean
 
-): MeetingModel
+) : MeetingModel
 
 val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),
     title = "Поход в кино",
-    condition = ConditionType.FREE,
+    condition = ConditionType.MEMBER_PAY,
     category = DemoShortCategoryModel,
     type = MeetType.GROUP,
     dateTime = "2022-09-16T08:35:54.140Z",
+    duration = "2 часа",
     organizer = DemoOrganizerModel,
-    isOnline = true,
+    isOnline = false,
     tags = DemoTagList,
     description = "Описание вечеринки",
     isPrivate = false,
@@ -94,14 +81,10 @@ val DemoFullMeetingModel = FullMeetingModel(
     hideAddress = false
 )
 
-val DemoMeetingModel = ShortMeetingModel(
-    id = UUID.randomUUID(),
-    title = "R1, клубы, вечеринки",
-    condition = ConditionType.MEMBER_PAY,
-    category = DemoShortCategoryModel,
-    dateTime = "2022-09-16T08:35:54.140Z",
-    organizer = DemoOrganizerModel,
-    true
+val DemoMeetingList = listOf(
+    DemoFullMeetingModel,
+    DemoFullMeetingModel,
+    DemoFullMeetingModel,
+    DemoFullMeetingModel,
+    DemoFullMeetingModel
 )
-
-val DemoMeetingList = listOf(DemoMeetingModel, DemoMeetingModel, DemoMeetingModel, DemoMeetingModel, DemoMeetingModel)

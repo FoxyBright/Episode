@@ -25,27 +25,27 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.categoriesListCard
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
 private fun MeetingCardTodayPreview() {
-    MeetingCard(DemoMeetingModel, Modifier.padding(20.dp), true) {}
+    MeetingCard(DemoFullMeetingModel, Modifier.padding(20.dp), true) {}
 }
 
 @Preview
 @Composable
 private fun MeetingCardPreview() {
-    MeetingCard(DemoMeetingModel, Modifier.padding(20.dp)) {}
+    MeetingCard(DemoFullMeetingModel, Modifier.padding(20.dp)) {}
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingCard(
-    meeting: ShortMeetingModel,
+    meeting: FullMeetingModel,
     modifier: Modifier = Modifier,
     today: Boolean = false,
     onClick: () -> Unit

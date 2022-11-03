@@ -21,8 +21,8 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
@@ -31,7 +31,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 data class OrganizerProfileState(
     val profileModel: ProfileModel,
     val profileState: ProfileState,
-    val currentMeetings: List<ShortMeetingModel>,
+    val currentMeetings: List<FullMeetingModel>,
 )
 
 @Preview
@@ -44,7 +44,7 @@ private fun OrganizerProfilePreview() {
             OrganizerProfileState(
                 DemoProfileModel,
                 ProfileState(observeState = observeState),
-                listOf(DemoMeetingModel, DemoMeetingModel, DemoMeetingModel)
+                listOf(DemoFullMeetingModel, DemoFullMeetingModel, DemoFullMeetingModel)
             ), object : UserProfileCallback {
                 override fun onObserveChange(state: Boolean) {
                     super.onObserveChange(observeState)

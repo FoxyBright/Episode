@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
@@ -120,7 +119,7 @@ fun MeetingBottomSheetTopBarCompose(
                         )
                         Row(horizontalArrangement = Arrangement.SpaceBetween) {
                             DateTimeCard(
-                                DemoMeetingModel.dateTime,
+                                DemoFullMeetingModel.dateTime,
                                 Gradients.red(),
                                 true,
                                 Modifier.weight(1f)

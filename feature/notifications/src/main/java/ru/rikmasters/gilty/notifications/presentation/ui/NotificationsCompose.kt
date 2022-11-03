@@ -40,8 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.DemoTodayNotificationMeetingOver
@@ -66,7 +66,7 @@ fun NotificationsComposePreview() {
             )
         }
         NotificationsCompose(
-            Modifier, NotificationsComposeState(notificationsList, DemoMeetingModel, responds),
+            Modifier, NotificationsComposeState(notificationsList, DemoFullMeetingModel, responds),
             object : NotificationsComposeCallback {
                 override fun onClick(notification: NotificationModel) {
                     Toast.makeText(context, "Notification!", Toast.LENGTH_SHORT).show()
@@ -97,7 +97,7 @@ interface NotificationsComposeCallback {
 
 data class NotificationsComposeState(
     val notificationsList: List<NotificationModel> = listOf(),
-    val lastRespond: ShortMeetingModel,
+    val lastRespond: FullMeetingModel,
     val myResponds: Int = 0
 )
 

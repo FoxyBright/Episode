@@ -14,43 +14,39 @@ import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.MainScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.screen.MainScreen
 
 object Login : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
 
         //TODO Проверка на авторизованность пользователя
-        val userLogged = false
+        val userLogged = true
 
         screen("authorization") {
             if (userLogged) MainScreen() else LoginScreen()
         }
 
         nested("registration", "code") {
-            screen("code") { CodeScreen() }
 
             screen(
                 "profile?photo={photo}&hp={hp}",
                 listOf(navArgument("photo") {
-                    type = NavType.StringType
-                    defaultValue = ""
+                    type = NavType.StringType; defaultValue = ""
                 }, navArgument("hp") {
-                    type = NavType.StringType
-                    defaultValue = ""
+                    type = NavType.StringType; defaultValue = ""
                 })
             ) {
-                val photo = it.arguments?.getString("photo")
-                val hiddenPhoto = it.arguments?.getString("hp")
-                if (photo != null && hiddenPhoto != null) {
-                    ProfileScreen(photo, hiddenPhoto)
+                it.arguments?.getString("photo")?.let { avatar ->
+                    it.arguments?.getString("hp")?.let { hiddenPhoto ->
+                        ProfileScreen(avatar, hiddenPhoto)
+                    }
                 }
             }
 
             screen( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
                 "resize?photo={photo}",
                 listOf(navArgument("photo") {
-                    type = NavType.StringType
-                    defaultValue = ""
+                    type = NavType.StringType; defaultValue = ""
                 })
             ) {
                 it.arguments?.getString("photo")
@@ -60,14 +56,14 @@ object Login : FeatureDefinition() {
             screen(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
-                    type = NavType.BoolType
-                    defaultValue = false
+                    type = NavType.BoolType; defaultValue = false
                 })
             ) {
                 it.arguments?.getBoolean("multi")
                     ?.let { multi -> ProfileSelectPhotoScreen(multi) }
             }
 
+            screen("code") { CodeScreen() }
             screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }

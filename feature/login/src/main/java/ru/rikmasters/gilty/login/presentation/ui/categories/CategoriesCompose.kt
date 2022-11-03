@@ -22,8 +22,8 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.CATEGORY_ELEMENT_SIZE
-import ru.rikmasters.gilty.shared.shared.CategoryItem
+import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
+import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 

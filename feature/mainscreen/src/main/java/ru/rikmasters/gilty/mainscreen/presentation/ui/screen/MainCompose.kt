@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main
+package ru.rikmasters.gilty.mainscreen.presentation.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,9 +41,8 @@ import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.ShortMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DividerBold
 import ru.rikmasters.gilty.shared.shared.GiltyString
 import ru.rikmasters.gilty.shared.shared.SquareCheckBox
@@ -69,7 +68,7 @@ interface MainContentCallback {
 data class MainContentState(
     val grid: Boolean,
     val switcher: List<Boolean>,
-    val meetings: List<ShortMeetingModel>,
+    val meetings: List<FullMeetingModel>,
     val scope: CoroutineScope
 )
 
@@ -83,8 +82,7 @@ fun MainContent(
     Column(
         Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.82f)
-            .padding(horizontal = 16.dp)
+            .fillMaxHeight()
     ) {
         Row(
             modifier
@@ -92,7 +90,10 @@ fun MainContent(
                 .padding(top = 80.dp, bottom = 10.dp),
             Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.Bottom) {
+            Row(
+                Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
                 GiltyString(
                     Modifier.padding(end = 12.dp),
                     stringResource(R.string.meeting_profile_bottom_today_label),
@@ -115,24 +116,30 @@ fun MainContent(
                 )
             }
         }
-        if (state.grid) MeetingGridContent(
-            Modifier.padding(16.dp),
-            state.meetings
-        ) {
-            state.scope.launch {
-                asm.bottomSheetState.expand {
-                    Meeteing {
-                        callback?.onRespond(it.organizer.id)
-                        state.scope.launch { asm.bottomSheetState.collapse() }
+        if (state.grid)
+            MeetingGridContent(
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxHeight(0.90f),
+                state.meetings
+            ) {
+                state.scope.launch {
+                    asm.bottomSheetState.expand {
+                        Meeting(it) {
+                            callback?.onRespond(it.organizer.avatar.id)
+                            state.scope.launch { asm.bottomSheetState.collapse() }
+                        }
                     }
                 }
             }
-        }
-        else MeetingsListContent(state.meetings) {
+        else MeetingsListContent(
+            state.meetings, state.scope,
+            Modifier.fillMaxHeight(0.84f)
+        ) {
             state.scope.launch {
                 asm.bottomSheetState.expand {
-                    Meeteing {
-                        callback?.onRespond(it.organizer.id)
+                    Meeting(it) {
+                        callback?.onRespond(it.organizer.avatar.id)
                         state.scope.launch { asm.bottomSheetState.collapse() }
                     }
                 }
@@ -179,16 +186,14 @@ fun MainContent(
 }
 
 @Composable
-fun Meeteing(onRespond: () -> Unit) {
+fun Meeting(meet: FullMeetingModel, onRespond: () -> Unit) {
     Column(
         Modifier
             .padding(16.dp)
             .padding(bottom = 50.dp)
     ) {
         MeetingBottomSheetTopBarCompose(
-            Modifier,
-            DemoFullMeetingModel,
-            "2 часа"
+            Modifier, meet, meet.duration
         )
         var hiddenPhoto by remember { mutableStateOf(false) }
         var commentText by remember { mutableStateOf("") }

@@ -74,7 +74,6 @@ data class MeetingDetailsBottomComposeState(
 interface MeetingDetailsBottomCallback {
     fun onHiddenPhotoActive(hidden: Boolean)
     fun onCommentChange(text: String)
-
     fun onRespondClick()
 }
 
@@ -89,7 +88,7 @@ fun MeetingDetailsBottomCompose(
         Text(
             stringResource(R.string.meeting_question_comment_or_assess),
             Modifier,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.labelLarge
         )
         TextField(
             state.comment, { if (it.length <= 120) callback?.onCommentChange(it) },
@@ -129,7 +128,11 @@ fun MeetingDetailsBottomCompose(
                 Arrangement.SpaceBetween,
                 Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.meeting_open_hidden_photos))
+                Text(
+                    stringResource(R.string.meeting_open_hidden_photos),
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 TrackCheckBox(state.hiddenPhoto) { callback?.onHiddenPhotoActive(it) }
             }
         }

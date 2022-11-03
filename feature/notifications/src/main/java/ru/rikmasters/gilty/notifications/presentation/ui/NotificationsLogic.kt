@@ -19,7 +19,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.shared.common.extentions.FORMAT
+import ru.rikmasters.gilty.shared.common.extentions.FULL_FORMAT
 import ru.rikmasters.gilty.shared.common.extentions.toEpochMillis
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -28,8 +31,6 @@ import java.time.temporal.TemporalAdjusters
 import java.util.Calendar
 import kotlin.math.abs
 
-private const val FORMAT = "yyyy-MM-dd"
-private const val FULL_FORMAT = "yyyy-MM-dd-HH-mm-ss"
 //  Проблема с часовым поясом, часы при фоматировании даты дает на 3 часа больше
 
 fun getDifferenceOfTime(date: String): String {
@@ -53,10 +54,6 @@ fun getDifferenceOfTime(date: String): String {
         else "${localSecond - dateSecond} с"
     else "${now.dayOfYear - localDate.dayOfYear} д"
 
-}
-
-private fun todayControl(date: String): Boolean {
-    return date.format(FORMAT) == DateTimeFormatter.ofPattern(FORMAT).format(LocalDate.now())
 }
 
 class NotificationsByDateSeparator(private val notifications: List<NotificationModel>) {
