@@ -96,9 +96,10 @@ fun MeetingFilterBottom(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null
 ) {
+    val list = filterList(state, callback)
     Box(modifier.fillMaxSize()) {
         LazyColumn(Modifier.fillMaxSize()) {
-            items(filterList(state, callback)) {
+            items(list) {
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -164,25 +165,26 @@ interface MeetingFilterBottomCallback : NavigationInterface {
     fun onConditionSelect(it: Int, status: Boolean)
 }
 
+@Composable
 private fun filterList(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null
 ): List<FilterModel> {
     return listOf(
-        FilterModel("Категория") {
+        FilterModel(stringResource(R.string.meeting_filter_category)) {
             Category(state.categoryList, state.categoryStateList,
                 { callback?.onCategoryClick(it) },
                 { callback?.onAllCategoryClick() }
             )
         },
-        FilterModel("Поиск по тегам") {
+        FilterModel(stringResource(R.string.meeting_filter_tag_search)) {
             TagSearch(
                 state.tagList,
                 { callback?.onFilterClick() },
                 { callback?.onDeleteTag(it) }
             )
         },
-        FilterModel("Расстояние") {
+        FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
                 state.distance,
                 state.distanceState,
@@ -190,7 +192,7 @@ private fun filterList(
                 { callback?.onDistanceValueChange(it) }
             )
         },
-        FilterModel("Тип встречи") {
+        FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
             MeetingType(
                 state.onlyOnline,
                 state.meetingTypes,
@@ -198,7 +200,7 @@ private fun filterList(
                 { it, status -> callback?.onMeetingTypeSelect(it, status) }
             )
         },
-        FilterModel("Пол и условия") {
+        FilterModel(stringResource(R.string.meeting_filter_gender_and_conditions)) {
             GenderAndConditions(
                 state.genderList,
                 state.conditionList,

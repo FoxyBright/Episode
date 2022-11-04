@@ -116,7 +116,7 @@ fun Category(
                     .padding(16.dp), Arrangement.Absolute.SpaceBetween
             ) {
                 Text(
-                    "Показать все категории",
+                    stringResource(R.string.meeting_filter_show_all_categories),
                     color = MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = SemiBold

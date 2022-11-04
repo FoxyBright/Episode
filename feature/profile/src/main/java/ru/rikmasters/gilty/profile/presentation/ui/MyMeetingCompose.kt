@@ -52,7 +52,7 @@ private fun MyMeetingPreview() {
             ProfileMeetingBottomSheetState(
                 DemoFullMeetingModel,
                 listOf(DemoMemberModel, DemoMemberModel, DemoMemberModel, DemoMemberModel),
-                18, "2 часа"
+                18, DemoFullMeetingModel.duration
             )
         )
     }
