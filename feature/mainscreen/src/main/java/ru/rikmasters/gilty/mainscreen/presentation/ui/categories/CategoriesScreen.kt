@@ -6,19 +6,45 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 
 @Composable
-fun CategoriesScreen(nav: NavState = get()) {
-    val list = remember { mutableStateListOf<Boolean>() }
-    repeat(DemoFullCategoryModelList.size) { list.add(false) }
+fun CategoriesScreen(
+    categoryFilters: (
+        List<CategoryModel>,
+        List<Pair<CategoryModel, String>>
+    ) -> Unit
+) {
+    val allCategories = DemoFullCategoryModelList
+    val stateList =
+        remember { mutableStateListOf<Boolean>() }
+    val categories =
+        remember { mutableStateListOf<CategoryModel>() }
+    val subCategories =
+        remember { mutableStateListOf<Pair<CategoryModel, String>>() }
+    repeat(allCategories.size) { stateList.add(false) }
     CategoryList(
-        CategoryListState(DemoFullCategoryModelList, list), Modifier.padding(16.dp),
+        CategoryListState(
+            allCategories, stateList, subCategories
+        ), Modifier.padding(16.dp),
         object : CategoryListCallback {
             override fun onCategoryClick(index: Int, it: Boolean) {
-                list[index] = !it
+                stateList[index] = !it
+            }
+
+            override fun onSubSelect(category: CategoryModel, sub: String?) {
+                if (sub.isNullOrBlank()) categories.add(category)
+                else subCategories.add(Pair(category, sub))
+            }
+
+            override fun onDone() {
+                categoryFilters(categories, subCategories)
+            }
+
+            override fun onClear() {
+                repeat(allCategories.size) { stateList[it] = false }
+                subCategories.clear(); categories.clear()
             }
         })
 }

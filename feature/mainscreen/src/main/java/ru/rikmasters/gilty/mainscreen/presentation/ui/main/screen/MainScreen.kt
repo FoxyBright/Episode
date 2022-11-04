@@ -94,7 +94,11 @@ fun MainScreen(nav: NavState = get()) {
             override fun openFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheetState.halfExpand {
-                        CategoriesScreen() // TODO фильтры встречи
+                        CategoriesScreen { _, _ ->
+                            scope.launch {
+                                asm.bottomSheetState.collapse()
+                            }
+                        } // TODO фильтры встречи
                     }
                 }
             }

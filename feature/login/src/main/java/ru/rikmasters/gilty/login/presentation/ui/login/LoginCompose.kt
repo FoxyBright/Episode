@@ -3,32 +3,21 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,10 +36,7 @@ import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.shared.SearchActionBar
-import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -63,7 +49,7 @@ private fun LoginPreview() {
             LoginState(
                 phoneTransform(mask), mask,
                 "9543422455", DemoCountry,
-                Countries()
+                Countries(), 10
             )
         )
     }
@@ -75,6 +61,7 @@ interface LoginCallback {
     fun privatePolicy() {}
     fun termsOfApp() {}
     fun onPhoneChange(text: String) {}
+    fun onClear() {}
     fun openCountryBottomSheet() {}
 }
 
@@ -83,7 +70,8 @@ data class LoginState(
     val mask: String,
     val phone: String,
     val country: Country,
-    val allCountries: List<Country>
+    val allCountries: List<Country>,
+    val size: Int
 )
 
 @Composable
@@ -130,12 +118,10 @@ fun LoginContent(
                             { callback?.openCountryBottomSheet() }
                     )
                     PhoneTextField(
-                        state.phone,
-                        state.transform,
-                        state.mask,
-                        Modifier.fillMaxWidth(),
-                        onClear = { callback?.onPhoneChange("") },
-                        onValueChanged = { callback?.onPhoneChange(it) })
+                        state.phone, state.transform,
+                        Modifier.fillMaxWidth(), state.size,
+                        { callback?.onClear() },
+                        { callback?.onPhoneChange(it) })
                 }
             }
             GradientButton(

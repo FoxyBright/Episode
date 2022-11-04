@@ -103,10 +103,10 @@ fun MeetingDetailsBottomCompose(
                     color = MaterialTheme.colorScheme.onTertiary,
                     style = MaterialTheme.typography.bodyMedium
                 )
-            }
+            }, textStyle = MaterialTheme.typography.bodyMedium
         )
         Text(
-            "${if (state.comment.isEmpty()) "0" else state.comment.length}/120",
+            "${state.comment.length}/120",
             Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp),

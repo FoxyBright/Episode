@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,11 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
-import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -50,23 +49,26 @@ private fun CategoryListPreview() {
         CategoryList(
             CategoryListState(
                 DemoFullCategoryModelList,
-                listOf()
+                listOf(), listOf()
             ), Modifier.padding(16.dp)
         )
     }
 }
 
-interface CategoryListCallback : NavigationInterface {
+interface CategoryListCallback {
     fun onCategoryClick(index: Int, it: Boolean)
-    fun onCategorySelect() {}
+    fun onSubSelect(category: CategoryModel, sub: String?) {}
+    fun onBack() {}
+    fun onDone() {}
+    fun onClear() {}
 }
 
 data class CategoryListState(
     val categoryList: List<FullCategoryModel>,
-    val categoryListState: List<Boolean>
+    val categoryListState: List<Boolean>,
+    val subCategories: List<Pair<CategoryModel, String>>
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(
     state: CategoryListState,
@@ -95,95 +97,122 @@ fun CategoryList(
         }
         LazyColumn {
             itemsIndexed(state.categoryList)
-            { index, it ->
-                Card(
-                    {
-                        callback?.onCategoryClick(
-                            index, state.categoryListState[index]
-                        )
-                    }, Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp), true,
-                    MaterialTheme.shapes.large,
-                    CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
-                )
+            { index, category ->
+                val select = state.categoryListState[index]
+                Item(category, select, state.subCategories,
+                    { callback?.onSubSelect(category, it) })
                 {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        Arrangement.Absolute.SpaceBetween,
-                        Alignment.CenterVertically
-                    ) {
-                        Row {
-                            AsyncImage(
-                                it.emoji.path,
-                                null,
-                                Modifier.size(20.dp),
-                                placeholder = painterResource(R.drawable.cinema)
-                            )
-                            Text(
-                                it.name,
-                                Modifier.padding(start = 18.dp),
-                                MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        if (it.subcategories != null)
-                            Icon(
-                                if (!state.categoryListState[index])
-                                    Icons.Filled.KeyboardArrowRight
-                                else Icons.Filled.KeyboardArrowDown,
-                                stringResource(R.string.next_button),
-                                tint = MaterialTheme.colorScheme.onTertiary
-                            )
-                        else if (state.categoryListState[index]) CheckBox(true) {}
-                    }
-                    if (it.subcategories != null && state.categoryListState[index]) {
-                        Divider()
-                        Surface {
-                            FlowLayout(
-                                Modifier
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .padding(top = 16.dp)
-                                    .padding(horizontal = 16.dp), 8.dp, 8.dp
-                            ) {
-                                it.subcategories!!.forEach {
-                                    GiltyChip(
-                                        Modifier,
-                                        it,
-                                        false
-                                    ) {
-                                        callback?.onCategorySelect()
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    callback?.onSubSelect(category, null)
+                    callback?.onCategoryClick(index, select)
                 }
             }
             item {
-                GradientButton(
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 28.dp),
-                    stringResource(R.string.meeting_filter_complete_button)
-                ) { callback?.onNext() }
-            }
-            item {
-                Text(
-                    stringResource(R.string.meeting_filter_clear),
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp, bottom = 28.dp)
-                        .clip(CircleShape)
-                        .clickable { },
-                    MaterialTheme.colorScheme.tertiary,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Buttons({ callback?.onDone() },
+                    { callback?.onClear() })
             }
         }
     }
 }
+
+@Composable
+private fun Buttons(Done: () -> Unit, Clear: () -> Unit) {
+    Column {
+        GradientButton(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 28.dp),
+            stringResource(R.string.meeting_filter_complete_button)
+        ) { Done() }
+        Text(
+            stringResource(R.string.meeting_filter_clear),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, bottom = 28.dp)
+                .clip(CircleShape)
+                .clickable { Clear() },
+            MaterialTheme.colorScheme.tertiary,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Item(
+    category: FullCategoryModel,
+    select: Boolean,
+    subCategories: List<Pair<CategoryModel, String>>,
+    onSubSelect: (String) -> Unit,
+    onClick: () -> Unit,
+) {
+    val subs = category.subcategories
+    Column {
+        Card(
+            onClick, Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp), true,
+            MaterialTheme.shapes.large,
+            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                Arrangement.Absolute.SpaceBetween,
+                Alignment.CenterVertically
+            ) {
+                Row {
+                    AsyncImage(
+                        category.emoji.path,
+                        null,
+                        Modifier.size(20.dp),
+                        placeholder = painterResource(R.drawable.cinema)
+                    )
+                    Text(
+                        category.name,
+                        Modifier.padding(start = 18.dp),
+                        MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                if (subs != null) Icon(
+                    if (select) Icons.Filled.KeyboardArrowDown
+                    else Icons.Filled.KeyboardArrowRight,
+                    stringResource(R.string.next_button),
+                    tint = MaterialTheme.colorScheme.onTertiary
+                ) else if (select)
+                    Image(painterResource(R.drawable.enabled_check_box), (null))
+            }
+            subs?.let { list ->
+                if (select) (SubCategories(category, list, subCategories)
+                { onSubSelect(it) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun SubCategories(
+    category: CategoryModel,
+    subCategories: List<String>,
+    selectBubCategories: List<Pair<CategoryModel, String>>,
+    onSelect: (String) -> Unit
+) {
+    Divider()
+    FlowLayout(
+        Modifier
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(top = 16.dp)
+            .padding(horizontal = 16.dp), 8.dp, 8.dp
+    ) {
+        subCategories.forEach {
+            GiltyChip(
+                Modifier, it,
+                selectBubCategories.contains(Pair(category, it))
+            ) { onSelect(it) }
+        }
+    }
+}
+

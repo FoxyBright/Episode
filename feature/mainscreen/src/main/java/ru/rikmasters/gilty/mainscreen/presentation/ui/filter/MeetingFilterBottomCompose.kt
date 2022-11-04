@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -130,8 +129,7 @@ fun MeetingFilterBottom(
                     stringResource(R.string.meeting_filter_clear),
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp, bottom = 28.dp)
-                        .clickable { },
+                        .padding(top = 12.dp, bottom = 28.dp),
                     MaterialTheme.colorScheme.tertiary,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge

@@ -28,7 +28,7 @@ private fun PhoneTextFieldPreview() {
         PhoneTextField(
             "9105152312",
             phoneTransform(mask),
-            mask, Modifier.padding(32.dp),
+            Modifier.padding(32.dp),
         )
     }
 }
@@ -38,15 +38,15 @@ private fun PhoneTextFieldPreview() {
 fun PhoneTextField(
     value: String,
     transform: VisualTransformation,
-    mask: String,
     modifier: Modifier = Modifier,
+    size: Int = 10,
     onClear: (() -> Unit)? = null,
     onValueChanged: ((String) -> Unit)? = null
 ) {
     TextField(
         value,
         { text ->
-            if (text.length <= mask.count { it == '#' } && onValueChanged != null)
+            if (text.length <= size && onValueChanged != null)
                 onValueChanged(text)
         },
         modifier,

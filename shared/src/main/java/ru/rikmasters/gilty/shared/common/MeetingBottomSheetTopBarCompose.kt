@@ -67,7 +67,7 @@ fun MeetingBottomSheetTopBarCompose(
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
-            IconButton({ }) {
+            IconButton({ /* TODO Здесь должен быть PopUp */}) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,

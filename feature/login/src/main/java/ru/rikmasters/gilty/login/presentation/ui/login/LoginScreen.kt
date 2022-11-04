@@ -34,11 +34,16 @@ fun LoginScreen(nav: NavState = get()) {
     val countries = Countries()
     LoginContent(LoginState(
         transform, mask, phone,
-        selectCountry, Countries()
+        selectCountry, Countries(),
+        mask.count { it == '#' }
     ),
         Modifier, object : LoginCallback {
             override fun onPhoneChange(text: String) {
                 phone = text
+            }
+
+            override fun onClear() {
+                phone = ""
             }
 
             override fun googleLogin() {
