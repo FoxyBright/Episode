@@ -14,12 +14,15 @@ import ru.rikmasters.gilty.core.navigation.NavState
 
 @Composable
 fun CodeScreen(nav: NavState = get()) {
+    val codeSize = 4
     var text by remember { mutableStateOf("") }
     val blur = remember { mutableStateOf(false) }
-    val focuses = remember { Array(4) { FocusRequester() } }
+    val focusList = arrayListOf<FocusRequester>()
+    repeat(codeSize) { focusList.add(FocusRequester()) }
+    val focuses by remember { mutableStateOf(focusList) }
     var sec by remember { mutableStateOf(60) }
     LaunchedEffect(Unit) {
-        while (true) {
+        while (sec > 0) {
             delay(1000L); sec--
         }
     }
@@ -52,7 +55,7 @@ fun CodeScreen(nav: NavState = get()) {
                     }
                 }
             } else text = ""
-            if (text.length == focuses.size)
+            if (text.length == codeSize)
                 if (text == "1234") nav.navigate("profile")
                 else blur.value = true
         }

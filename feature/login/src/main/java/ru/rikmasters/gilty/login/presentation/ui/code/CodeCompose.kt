@@ -43,8 +43,7 @@ private fun CodePreview() {
         CodeContent(
             CodeState(
                 "1234",
-                Array(4)
-                { FocusRequester() }, 60, false
+                listOf(), 60, false
             )
         )
     }
@@ -52,22 +51,10 @@ private fun CodePreview() {
 
 data class CodeState(
     val code: String,
-    val focuses: Array<FocusRequester>,
+    val focuses: List<FocusRequester>,
     val sec: Int,
     val blur: Boolean
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as CodeState
-        if (!focuses.contentEquals(other.focuses)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return focuses.contentHashCode()
-    }
-}
+)
 
 interface CodeCallback : NavigationInterface {
     fun onCodeChange(index: Int, it: String)
@@ -127,7 +114,7 @@ fun CodeContent(
 private fun DigitCode(
     modifier: Modifier = Modifier,
     code: String,
-    focuses: Array<FocusRequester>,
+    focuses: List<FocusRequester>,
     onChange: (Int, String) -> Unit
 ) {
     Row {
