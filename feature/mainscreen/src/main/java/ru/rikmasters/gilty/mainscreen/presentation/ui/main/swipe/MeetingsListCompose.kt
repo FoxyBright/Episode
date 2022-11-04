@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.mainscreen.presentation.ui.screen.CardButton
-import ru.rikmasters.gilty.mainscreen.presentation.ui.screen.MeetingStates
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.CardButton
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MeetingStates
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.Direction
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
@@ -120,7 +120,7 @@ private fun MeetBottom(
     onSelect: () -> Unit
 ) {
     Box(modifier) {
-        if (isSystemInDarkTheme())
+        if (!isSystemInDarkTheme())
             Image(
                 painterResource(R.drawable.ic_back_rect),
                 null,

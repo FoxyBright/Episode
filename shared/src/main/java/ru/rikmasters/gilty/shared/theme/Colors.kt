@@ -89,9 +89,10 @@ object Colors {
     val lockColorsBackgroundDay = Color(0xFFB3B3B3)
     val meetingCardBackBackgroundNight = Color(0xFF303030)
     val lockColorsBackgroundNight = Color(0xFF222222)
+    val LightPink = Color(0xFFFFDADA)
+    val RottenPlum = Color(0xFF49454F)
     // Add new colors
 }
-
 
 @Deprecated(
     "Надо использовать тему",

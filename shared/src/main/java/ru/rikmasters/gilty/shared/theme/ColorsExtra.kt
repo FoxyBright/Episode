@@ -16,6 +16,10 @@ data class ExtraColors(
     val meetingCardBackBackground: Color = Color.Unspecified,
     val lockColors: Color = Color.Unspecified,
     val lockColorsBackground: Color = Color.Unspecified,
+    val navBarActiveBackground: Color = Color.Unspecified,
+    val navBarActive: Color = Color.Unspecified,
+    val navBarInactive: Color = Color.Unspecified,
+    val navBarAddButton: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
@@ -25,17 +29,21 @@ data class ExtraColors(
         "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
 )
 val LightExtraColors = ExtraColors(
-    elementsBack = Color.White,
+    elementsBack = Colors.White,
     chipGray = Colors.Gray,
     grayButton = Colors.Gray,
     searchCardBackground = Colors.LightGray,
     policyAgreeColor = Colors.Silver,
     mainTrackCheckBox = Colors.Ash,
     secondaryTrackCheckBox = Colors.Border,
-    borderColor = Color.White,
-    lockColors = Color.White,
+    borderColor = Colors.White,
+    lockColors = Colors.White,
     lockColorsBackground = Colors.lockColorsBackgroundDay,
-    meetingCardBackBackground = Color.White
+    meetingCardBackBackground = Colors.White,
+    navBarActiveBackground = Colors.LightPink,
+    navBarActive = Colors.RottenPlum,
+    navBarInactive = Colors.Silver,
+    navBarAddButton = Colors.AlmostDark,
     // Add colors in scheme from Colors-file
 )
 
@@ -55,6 +63,10 @@ val DarkExtraColors = ExtraColors(
     borderColor = Colors.meetingCardBackBackgroundNight,
     lockColors = Colors.lockColors,
     lockColorsBackground = Colors.lockColorsBackgroundNight,
-    meetingCardBackBackground = Colors.meetingCardBackBackgroundNight
+    meetingCardBackBackground = Colors.meetingCardBackBackgroundNight,
+    navBarActiveBackground = Colors.AlmostDark,
+    navBarActive = Colors.White,
+    navBarInactive = Colors.Zircon,
+    navBarAddButton = Colors.White,
     // Add colors in scheme from Colors-file
 )

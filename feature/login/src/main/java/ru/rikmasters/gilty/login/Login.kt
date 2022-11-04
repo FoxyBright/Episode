@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.screen.MainScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 
 object Login : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {

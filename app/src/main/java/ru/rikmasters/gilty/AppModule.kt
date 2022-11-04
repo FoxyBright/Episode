@@ -13,5 +13,6 @@ object AppModule : FeatureDefinition() {
         setOf(ExampleModule, Login, Main)
 
     override fun DeepNavGraphBuilder.navigation() {}
+
     override fun Module.koin() {}
 }

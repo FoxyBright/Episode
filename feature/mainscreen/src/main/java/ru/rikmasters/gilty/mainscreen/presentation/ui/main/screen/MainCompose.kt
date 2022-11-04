@@ -1,6 +1,5 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.screen
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -41,10 +39,12 @@ import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DividerBold
 import ru.rikmasters.gilty.shared.shared.GiltyString
+import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.shared.SquareCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -53,7 +53,19 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 fun MainContentPreview() {
     GiltyTheme {
         MainContent(
-            MainContentState(true, listOf(), DemoMeetingList, rememberCoroutineScope())
+            MainContentState(
+                true,
+                listOf(),
+                DemoMeetingList,
+                rememberCoroutineScope(),
+                listOf(
+                    NavIconState.INACTIVE,
+                    NavIconState.ACTIVE,
+                    NavIconState.INACTIVE,
+                    NavIconState.NEW,
+                    NavIconState.INACTIVE
+                )
+            )
         )
     }
 }
@@ -63,13 +75,15 @@ interface MainContentCallback {
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
     fun onRespond(avatar: String) {}
+    fun onNavBarSelect(point: Int) {}
 }
 
 data class MainContentState(
     val grid: Boolean,
     val switcher: List<Boolean>,
     val meetings: List<FullMeetingModel>,
-    val scope: CoroutineScope
+    val scope: CoroutineScope,
+    val navBarStates: List<NavIconState>
 )
 
 @Composable
@@ -147,21 +161,10 @@ fun MainContent(
         }
     }
     Box(Modifier.fillMaxSize()) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .align(Alignment.BottomCenter),
-            Arrangement.SpaceEvenly, Alignment.CenterVertically
-        ) {
-            repeat(5) {
-                Icon(
-                    painterResource(R.drawable.ic_clock),
-                    null, Modifier.size(30.dp)
-                )
-            }
-        }
+        NavBar(
+            state.navBarStates,
+            Modifier.align(Alignment.BottomCenter)
+        ) { callback?.onNavBarSelect(it) }
         DividerBold(
             Modifier
                 .padding(horizontal = 180.dp)
