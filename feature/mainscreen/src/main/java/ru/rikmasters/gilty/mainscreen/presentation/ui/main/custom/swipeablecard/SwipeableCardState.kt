@@ -19,9 +19,7 @@ fun rememberSwipeableCardState(): SwipeableCardState {
     val screenHeight = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx()
     }
-    return remember {
-        SwipeableCardState(screenWidth, screenHeight)
-    }
+    return remember { SwipeableCardState(screenWidth, screenHeight) }
 }
 
 class SwipeableCardState(
@@ -29,29 +27,22 @@ class SwipeableCardState(
     internal val maxHeight: Float,
 ) {
     val offset = Animatable(offset(0f, 0f), Offset.VectorConverter)
-
-    /**
-     * The [Direction] the card was swiped at.
-     *
-     * Null value means the card has not been swiped fully yet.
-     */
     var swipedDirection: DirectionType? by mutableStateOf(null)
-        private set
-
     internal suspend fun reset() {
         offset.animateTo(offset(0f, 0f), tween(400))
     }
 
-    suspend fun swipe(direction: DirectionType, animationSpec: AnimationSpec<Offset> = tween(400)) {
-        val endX = maxWidth * 1.5f
-        val endY = maxHeight
+    suspend fun swipe(
+        direction: DirectionType,
+        animationSpec: AnimationSpec<Offset> =
+            tween(400)
+    ) {
         when (direction) {
-            DirectionType.LEFT -> offset.animateTo(offset(x = -endX), animationSpec)
-            DirectionType.RIGHT -> offset.animateTo(offset(x = endX), animationSpec)
-            DirectionType.UP -> offset.animateTo(offset(y = -endY), animationSpec)
-            DirectionType.DOWN -> offset.animateTo(offset(y = endY), animationSpec)
-        }
-        this.swipedDirection = direction
+            DirectionType.LEFT -> offset.animateTo(offset(x = -(maxWidth * 1.5f)), animationSpec)
+            DirectionType.RIGHT -> offset.animateTo(offset(x = (maxWidth * 1.5f)), animationSpec)
+            DirectionType.UP -> offset.animateTo(offset(y = -maxHeight), animationSpec)
+            DirectionType.DOWN -> offset.animateTo(offset(y = maxHeight), animationSpec)
+        }; this.swipedDirection = direction
     }
 
     private fun offset(x: Float = offset.value.x, y: Float = offset.value.y): Offset {

@@ -15,11 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,11 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
@@ -40,6 +31,9 @@ import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
 import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DividerBold
@@ -54,16 +48,11 @@ fun MainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
-                true,
-                listOf(),
-                DemoMeetingList,
-                rememberCoroutineScope(),
+                (true), Pair(true, false),
+                DemoMeetingList, listOf(),
                 listOf(
-                    NavIconState.INACTIVE,
-                    NavIconState.ACTIVE,
-                    NavIconState.INACTIVE,
-                    NavIconState.NEW,
-                    NavIconState.INACTIVE
+                    INACTIVE, ACTIVE,
+                    INACTIVE, NEW, INACTIVE
                 )
             )
         )
@@ -74,16 +63,18 @@ interface MainContentCallback {
     fun onTodayChange() {}
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
-    fun onRespond(avatar: String) {}
+    fun onRespond(meet: FullMeetingModel) {}
     fun onNavBarSelect(point: Int) {}
-    fun openFiltersBottomSheet(){}
+    fun openFiltersBottomSheet() {}
+    fun interesting(state: SwipeableCardState) {}
+    fun notInteresting(state: SwipeableCardState) {}
 }
 
 data class MainContentState(
     val grid: Boolean,
-    val switcher: List<Boolean>,
+    val switcher: Pair<Boolean, Boolean>,
     val meetings: List<FullMeetingModel>,
-    val scope: CoroutineScope,
+    val cardStates: List<Pair<FullMeetingModel, SwipeableCardState>>,
     val navBarStates: List<NavIconState>
 )
 
@@ -92,7 +83,6 @@ fun MainContent(
     state: MainContentState,
     modifier: Modifier = Modifier,
     callback: MainContentCallback? = null,
-    asm: AppStateModel = get()
 ) {
     Column(
         Modifier
@@ -112,17 +102,17 @@ fun MainContent(
                 GiltyString(
                     Modifier.padding(end = 12.dp),
                     stringResource(R.string.meeting_profile_bottom_today_label),
-                    state.switcher.first()
+                    state.switcher.first
                 ) { callback?.onTodayChange() }
                 GiltyString(
                     Modifier,
                     stringResource(R.string.meeting_profile_bottom_latest_label),
-                    state.switcher.last()
+                    state.switcher.second
                 ) { callback?.onTodayChange() }
             }
             IconButton({ callback?.onTimeFilterClick() }) {
                 Icon(
-                    if (state.switcher.first())
+                    if (state.switcher.first)
                         painterResource(R.drawable.ic_clock)
                     else painterResource(R.drawable.ic_calendar),
                     null,
@@ -137,27 +127,15 @@ fun MainContent(
                     .padding(16.dp)
                     .fillMaxHeight(0.90f),
                 state.meetings
-            ) {
-                state.scope.launch {
-                    asm.bottomSheetState.expand {
-                        Meeting(it) {
-                            callback?.onRespond(it.organizer.avatar.id)
-                            state.scope.launch { asm.bottomSheetState.collapse() }
-                        }
-                    }
-                }
-            }
-        else MeetingsListContent(
-            state.meetings, state.scope,
-            Modifier.fillMaxHeight(0.84f)
-        ) {
-            state.scope.launch {
-                asm.bottomSheetState.expand {
-                    Meeting(it) {
-                        callback?.onRespond(it.organizer.avatar.id)
-                        state.scope.launch { asm.bottomSheetState.collapse() }
-                    }
-                }
+            ) { callback?.onRespond(it) }
+        else {
+            MeetingsListContent(
+                state.cardStates,
+                Modifier.fillMaxHeight(0.84f),
+                { callback?.notInteresting(it) }
+            ) { meet, it ->
+                callback?.onRespond(meet)
+                callback?.interesting(it)
             }
         }
     }
@@ -172,7 +150,7 @@ fun MainContent(
                 .padding(bottom = 92.dp)
                 .clip(CircleShape)
                 .align(Alignment.BottomCenter)
-                .clickable { callback?.openFiltersBottomSheet()}
+                .clickable { callback?.openFiltersBottomSheet() }
         )
         SquareCheckBox(
             state.grid,
@@ -184,33 +162,22 @@ fun MainContent(
 }
 
 @Composable
-fun Meeting(meet: FullMeetingModel, onRespond: () -> Unit) {
+fun Meeting(
+    meet: FullMeetingModel,
+    hiddenPhoto: Boolean,
+    commentText: String,
+    callback: MeetingDetailsBottomCallback?
+) {
     Column(
         Modifier
             .padding(16.dp)
-            .padding(bottom = 50.dp)
+            .padding(bottom = 40.dp)
     ) {
-        MeetingBottomSheetTopBarCompose(
-            Modifier, meet, meet.duration
-        )
-        var hiddenPhoto by remember { mutableStateOf(false) }
-        var commentText by remember { mutableStateOf("") }
+        MeetingBottomSheetTopBarCompose(Modifier, meet, meet.duration)
         MeetingDetailsBottomCompose(
             Modifier.padding(16.dp),
             MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
-            object : MeetingDetailsBottomCallback {
-                override fun onHiddenPhotoActive(hidden: Boolean) {
-                    hiddenPhoto = hidden
-                }
-
-                override fun onCommentChange(text: String) {
-                    commentText = text
-                }
-
-                override fun onRespondClick() {
-                    onRespond()
-                }
-            }
+            callback
         )
     }
 }

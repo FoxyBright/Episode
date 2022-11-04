@@ -17,7 +17,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,50 +27,49 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.CardButton
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MeetingStates
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.DOWN
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.UP
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun MeetingsListContentPreview() {
-    GiltyTheme {
-        MeetingsListContent(DemoMeetingList, rememberCoroutineScope()) {}
-    }
+    GiltyTheme { MeetingsListContent(listOf()) }
 }
 
 @Composable
 fun MeetingsListContent(
-    meetings: List<FullMeetingModel>,
-    scope: CoroutineScope,
+    states: List<Pair<FullMeetingModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
-    onSelect: (FullMeetingModel) -> Unit
+    notInteresting: ((state: SwipeableCardState) -> Unit)? = null,
+    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
-        val states = meetings.map { it to rememberSwipeableCardState() }
         Box(Modifier.padding(16.dp)) {
             states.forEach { (meeting, state) ->
                 run {
                     if (state.swipedDirection == null) {
                         MeetingCardCompose(
+                            meeting,
                             Modifier
                                 .fillMaxSize()
                                 .swipeableCard(
-                                    state,
-                                    { if (it == DirectionType.RIGHT) onSelect(meeting) },
-                                    {}, listOf(DirectionType.DOWN, DirectionType.UP)
+                                    { if (it == RIGHT) onSelect?.let { it(meeting, state) } },
+                                    state, {}, listOf(DOWN, UP)
                                 ),
-                            meeting, state, scope
-                        ) { onSelect(meeting) }
+                        ) {
+                            if (it == RIGHT) onSelect?.let { it(meeting, state) }
+                            if (it == LEFT) notInteresting?.let { it(state) }
+                        }
                     }
                 }
             }
@@ -81,11 +79,9 @@ fun MeetingsListContent(
 
 @Composable
 private fun MeetingCardCompose(
+    meet: FullMeetingModel,
     modifier: Modifier = Modifier,
-    model: FullMeetingModel,
-    state: SwipeableCardState,
-    scope: CoroutineScope,
-    onSelect: () -> Unit
+    onSelect: (DirectionType) -> Unit
 ) {
     Card(
         modifier,
@@ -94,7 +90,7 @@ private fun MeetingCardCompose(
     ) {
         Box {
             AsyncImage(
-                model.organizer.avatar.id,
+                meet.organizer.avatar.id,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(MaterialTheme.shapes.large)
@@ -104,9 +100,8 @@ private fun MeetingCardCompose(
             MeetBottom(
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 18.dp),
-                model, state, scope, onSelect
-            )
+                    .offset(y = 18.dp), meet
+            ) { onSelect(it) }
         }
     }
 }
@@ -115,12 +110,10 @@ private fun MeetingCardCompose(
 private fun MeetBottom(
     modifier: Modifier,
     meet: FullMeetingModel,
-    state: SwipeableCardState,
-    scope: CoroutineScope,
-    onSelect: () -> Unit
+    onSelect: (DirectionType) -> Unit
 ) {
     Box(modifier) {
-        if (isSystemInDarkTheme())
+        if (!isSystemInDarkTheme())
             Image(
                 painterResource(R.drawable.ic_back_rect),
                 null,
@@ -156,16 +149,12 @@ private fun MeetBottom(
                             .weight(1f),
                         stringResource(R.string.not_interesting),
                         meet.isOnline, R.drawable.ic_cancel
-                    ) { scope.launch { state.swipe(DirectionType.LEFT) } }
+                    ) { onSelect(LEFT) }
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
                         meet.isOnline, R.drawable.ic_heart
-                    ) {
-                        scope.launch {
-                            onSelect(); state.swipe(DirectionType.RIGHT)
-                        }
-                    }
+                    ) { onSelect(RIGHT) }
                 }
             }
         }
