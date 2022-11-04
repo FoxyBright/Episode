@@ -9,11 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-
-
-enum class Direction {
-    Left, Right, Up, Down
-}
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 
 @Composable
 fun rememberSwipeableCardState(): SwipeableCardState {
@@ -28,7 +24,6 @@ fun rememberSwipeableCardState(): SwipeableCardState {
     }
 }
 
-
 class SwipeableCardState(
     internal val maxWidth: Float,
     internal val maxHeight: Float,
@@ -40,21 +35,21 @@ class SwipeableCardState(
      *
      * Null value means the card has not been swiped fully yet.
      */
-    var swipedDirection: Direction? by mutableStateOf(null)
+    var swipedDirection: DirectionType? by mutableStateOf(null)
         private set
 
     internal suspend fun reset() {
         offset.animateTo(offset(0f, 0f), tween(400))
     }
 
-    suspend fun swipe(direction: Direction, animationSpec: AnimationSpec<Offset> = tween(400)) {
+    suspend fun swipe(direction: DirectionType, animationSpec: AnimationSpec<Offset> = tween(400)) {
         val endX = maxWidth * 1.5f
         val endY = maxHeight
         when (direction) {
-            Direction.Left -> offset.animateTo(offset(x = -endX), animationSpec)
-            Direction.Right -> offset.animateTo(offset(x = endX), animationSpec)
-            Direction.Up -> offset.animateTo(offset(y = -endY), animationSpec)
-            Direction.Down -> offset.animateTo(offset(y = endY), animationSpec)
+            DirectionType.LEFT -> offset.animateTo(offset(x = -endX), animationSpec)
+            DirectionType.RIGHT -> offset.animateTo(offset(x = endX), animationSpec)
+            DirectionType.UP -> offset.animateTo(offset(y = -endY), animationSpec)
+            DirectionType.DOWN -> offset.animateTo(offset(y = endY), animationSpec)
         }
         this.swipedDirection = direction
     }

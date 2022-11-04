@@ -9,23 +9,32 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
+import ru.rikmasters.gilty.shared.R
+
 
 @Composable
 fun LoginScreen(nav: NavState = get()) {
-    var phone by remember { mutableStateOf("") }
+    val asm = get<AppStateModel>()
     val context = LocalContext.current
+    var phone by remember { mutableStateOf("") }
     var selectCountry by remember { mutableStateOf(DemoCountry) }
+    val scope = rememberCoroutineScope()
     val mask = "${selectCountry.code} ### ###-##-##"
     val transform by remember(mask)
     { mutableStateOf(phoneTransform(mask)) }
+    var searchText by remember { mutableStateOf("") }
+    var searchState by remember { mutableStateOf(false) }
+    val countries = Countries()
     LoginContent(LoginState(
-        rememberCoroutineScope(), transform,
-        mask, phone, selectCountry, Countries()
+        transform, mask, phone,
+        selectCountry, Countries()
     ),
         Modifier, object : LoginCallback {
             override fun onPhoneChange(text: String) {
@@ -33,28 +42,43 @@ fun LoginScreen(nav: NavState = get()) {
             }
 
             override fun googleLogin() {
-                Toast.makeText(
-                    context, "Вход через гугл временно недоступен",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val toast = context.resources.getString(R.string.login_google_toast)
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
 
             override fun privatePolicy() {
-                Toast.makeText(
-                    context, "Политика не составлена, все на честном слове",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val toast = context.resources.getString(R.string.login_policy_toast)
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
 
             override fun termsOfApp() {
-                Toast.makeText(
-                    context, "Условий пока нет",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val toast = context.resources.getString(R.string.login_terms_toast)
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
 
-            override fun onCountryChange(country: Country) {
-                selectCountry = country
+            override fun openCountryBottomSheet() {
+                scope.launch {
+                    asm.bottomSheetState.expand {
+                        CountryBottomSheetContent(
+                            CountryBottomSheetState(searchText, searchState, countries),
+                            Modifier, object : CountryBottomSheetCallBack {
+                                override fun onSearchTextChange(text: String) {
+                                    searchText = text
+                                }
+
+                                override fun onSearchStateChange() {
+                                    searchState = !searchState
+                                }
+
+                                override fun onCountrySelect(country: Country) {
+                                    selectCountry = country
+                                    scope.launch {
+                                        asm.bottomSheetState.collapse()
+                                    }
+                                }
+                            })
+                    }
+                }
             }
 
             override fun onNext() {

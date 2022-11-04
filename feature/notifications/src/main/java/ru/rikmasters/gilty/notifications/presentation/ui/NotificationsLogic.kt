@@ -60,7 +60,6 @@ class NotificationsByDateSeparator(private val notifications: List<NotificationM
 
     private enum class Groups { Today, Week, Early }
 
-
     fun getTodayList(): List<NotificationModel> {
         return cycle(Groups.Today)
     }

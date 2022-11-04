@@ -139,4 +139,10 @@
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
     <string name="edit">Изменить</string>
+
+    <!-- TOASTS -->
+    <string name="login_google_toast">Вход через гугл временно недоступен</string>
+    <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
+    <string name="login_terms_toast">Условий пока нет</string>
+
 </resources>

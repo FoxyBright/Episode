@@ -76,6 +76,7 @@ interface MainContentCallback {
     fun onStyleChange() {}
     fun onRespond(avatar: String) {}
     fun onNavBarSelect(point: Int) {}
+    fun openFiltersBottomSheet(){}
 }
 
 data class MainContentState(
@@ -171,13 +172,7 @@ fun MainContent(
                 .padding(bottom = 92.dp)
                 .clip(CircleShape)
                 .align(Alignment.BottomCenter)
-                .clickable {
-                    state.scope.launch {
-                        asm.bottomSheetState.halfExpand {
-                            CategoriesScreen()
-                        }
-                    }
-                }
+                .clickable { callback?.openFiltersBottomSheet()}
         )
         SquareCheckBox(
             state.grid,

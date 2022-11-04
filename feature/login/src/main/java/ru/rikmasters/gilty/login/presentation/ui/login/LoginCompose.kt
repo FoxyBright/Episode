@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,10 +43,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
@@ -66,7 +61,6 @@ private fun LoginPreview() {
         val mask = "+7 ### ###-##-##"
         LoginContent(
             LoginState(
-                rememberCoroutineScope(),
                 phoneTransform(mask), mask,
                 "9543422455", DemoCountry,
                 Countries()
@@ -81,11 +75,10 @@ interface LoginCallback {
     fun privatePolicy() {}
     fun termsOfApp() {}
     fun onPhoneChange(text: String) {}
-    fun onCountryChange(country: Country) {}
+    fun openCountryBottomSheet() {}
 }
 
 data class LoginState(
-    val scope: CoroutineScope,
     val transform: VisualTransformation,
     val mask: String,
     val phone: String,
@@ -98,7 +91,6 @@ fun LoginContent(
     state: LoginState,
     modifier: Modifier = Modifier,
     callback: LoginCallback? = null,
-    asm: AppStateModel = get()
 ) {
     Box(
         Modifier.fillMaxSize()
@@ -135,16 +127,7 @@ fun LoginContent(
                             .padding(start = 10.dp)
                             .size(20.dp)
                             .clickable
-                            {
-                                state.scope.launch {
-                                    asm.bottomSheetState.expand {
-                                        CountryBottomSheetContent {
-                                            callback?.onCountryChange(it)
-                                            state.scope.launch { asm.bottomSheetState.collapse() }
-                                        }
-                                    }
-                                }
-                            }
+                            { callback?.openCountryBottomSheet() }
                     )
                     PhoneTextField(
                         state.phone,
@@ -218,88 +201,5 @@ private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCal
         annotatedText.getStringAnnotations(
             "policy", it, it
         ).firstOrNull()?.let { callback?.privatePolicy() }
-    }
-}
-
-@Composable
-private fun CountryBottomSheetContent(onSelect: (country: Country) -> Unit) {
-    // TODO при попытке вынести в state и callback данных и методов
-    //  все продолжает работать, но данные не обновляются до персвайпа BottomSheet
-    var searchState by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf("") }
-    val countries = Countries()
-    val searchedCountry by remember {
-        mutableStateOf(arrayListOf<Country>())
-    }
-    Column(
-        Modifier
-            .height(800.dp)
-            .padding(16.dp, 20.dp)
-    ) {
-        SearchActionBar(SearchState(
-            stringResource(R.string.login_search_name),
-            searchState, searchText, { searchText = it },
-            { searchState = it }
-        ))
-        if (searchState) {
-            searchedCountry.clear()
-            countries.forEach {
-                if (it.country.contains(searchText, true))
-                    searchedCountry.add(it)
-            }
-        } else {
-            searchedCountry.clear()
-            countries.forEach { searchedCountry.add(it) }
-        }
-        LazyColumn(
-            Modifier
-                .padding(top = 10.dp)
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-        ) {
-            itemsIndexed(searchedCountry) { index, item ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { onSelect(item) },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        Arrangement.SpaceBetween,
-                        Alignment.CenterVertically
-                    ) {
-                        Row(Modifier.weight(1f)) {
-                            Image(
-                                painterResource(item.flag),
-                                item.country,
-                                Modifier.size(24.dp)
-                            )
-                            Text(
-                                item.country,
-                                Modifier.padding(start = 16.dp),
-                                MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Row {
-                            Text(
-                                item.code,
-                                Modifier.padding(start = 16.dp, end = 8.dp),
-                                MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Icon(
-                                Icons.Filled.KeyboardArrowRight,
-                                (null), Modifier, MaterialTheme.colorScheme.outline
-                            )
-                        }
-                    }
-                }
-                if (index < countries.size - 1) Divider(Modifier.padding(start = 54.dp))
-            }
-        }
     }
 }

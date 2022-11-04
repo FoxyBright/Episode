@@ -118,7 +118,7 @@ fun SearchActionBar(
                 Arrangement.SpaceBetween,
                 Alignment.CenterVertically
             ) {
-                Text(state.name, style = MaterialTheme.typography.titleLarge)
+                Text(state.name, style = MaterialTheme.typography.labelLarge)
                 IconButton({
                     state.state = true
                     state.onExpandSearch?.let { it(true) }

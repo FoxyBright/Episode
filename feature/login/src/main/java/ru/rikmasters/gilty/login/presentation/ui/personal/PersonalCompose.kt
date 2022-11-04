@@ -1,37 +1,25 @@
 package ru.rikmasters.gilty.login.presentation.ui.personal
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ActionBar
@@ -43,25 +31,17 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 fun PersonalInfoPreview() {
-    GiltyTheme {
-        PersonalInfoContent(
-            PersonalInfoContentState(
-                rememberCoroutineScope(),
-                18, "", listOf()
-            )
-        )
-    }
+    GiltyTheme { PersonalInfoContent(PersonalInfoContentState(18, listOf())) }
 }
 
 interface PersonalInfoContentCallback : NavigationInterface {
     fun onAgeChange(it: Int) {}
     fun onGenderChange(index: Int) {}
+    fun onAgeClick() {}
 }
 
 data class PersonalInfoContentState(
-    val scope: CoroutineScope,
-    val age: Int,
-    val ageText: String,
+    val age: Int? = null,
     val list: List<Boolean>
 )
 
@@ -70,10 +50,7 @@ data class PersonalInfoContentState(
 fun PersonalInfoContent(
     state: PersonalInfoContentState,
     callback: PersonalInfoContentCallback? = null,
-    asm: AppStateModel = get()
 ) {
-    // TODO Вынести состояние за пределы контента
-    var age by remember { mutableStateOf(state.age) }
     Box(
         Modifier
             .fillMaxSize()
@@ -84,55 +61,35 @@ fun PersonalInfoContent(
             Text(
                 stringResource(R.string.how_old_are_you),
                 Modifier.padding(top = 24.dp),
-                MaterialTheme.colorScheme.tertiary,
+                colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
-            TextField(
-                state.ageText, {},
+            Card(
+                { callback?.onAgeClick() },
                 Modifier
                     .padding(top = 12.dp)
-                    .fillMaxWidth()
-                    .clickable {
-                        state.scope.launch {
-                            asm.bottomSheetState.expand {
-                                BottomSheetContent(Modifier, age, { age = it })
-                                {
-                                    state.scope.launch {
-                                        callback?.onAgeChange(age)
-                                        asm.bottomSheetState.collapse()
-                                    }
-                                }
-                            }
-                        }
-                    },
+                    .fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    disabledIndicatorColor = Color.Transparent,
-                    disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
-                    disabledTextColor = MaterialTheme.colorScheme.tertiary
-                ),
-                placeholder = {
-                    Text(
-                        stringResource(R.string.personal_info_age_placeholder),
-                        color = MaterialTheme.colorScheme.onTertiary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                singleLine = true,
-                enabled = false
-            )
+                colors = CardDefaults.cardColors(colorScheme.primaryContainer)
+            ) {
+                Text(
+                    "${state.age ?: stringResource(R.string.personal_info_age_placeholder)}",
+                    Modifier.padding(16.dp), if (state.age == null)
+                        colorScheme.onTertiary else colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             Text(
                 stringResource(R.string.sex),
                 Modifier.padding(top = 24.dp),
-                MaterialTheme.colorScheme.tertiary,
+                colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
             Card(
                 Modifier.padding(top = 12.dp),
                 MaterialTheme.shapes.large,
-                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+                CardDefaults.cardColors(colorScheme.primaryContainer)
             ) {
                 Row(
                     Modifier
@@ -160,34 +117,36 @@ fun PersonalInfoContent(
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
-            state.list != listOf(false, false, false)
-                    && state.ageText != ""
+            (state.list.contains(true) && state.age != null)
         ) { callback?.onNext() }
     }
 }
 
 @Composable
-private fun BottomSheetContent(
+fun BottomSheetContent(
     modifier: Modifier = Modifier,
-    value: Int,
+    value: Int?,
     onValueChange: (Int) -> Unit,
+    range: IntRange = 18..100,
     onSave: () -> Unit
 ) {
-    Column(
+    Box(
         modifier
             .fillMaxWidth()
-            .height(350.dp)
+            .fillMaxHeight(0.45f)
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        Alignment.TopCenter
     ) {
         NumberPicker(
             Modifier.padding(top = 40.dp),
-            value = value,
+            value = value ?: range.first,
             onValueChange = { onValueChange(it) },
-            range = 18..100
+            range = range
         )
         GradientButton(
-            Modifier.padding(top = 80.dp),
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 40.dp),
             stringResource(R.string.save_button), true
         ) { onSave() }
     }

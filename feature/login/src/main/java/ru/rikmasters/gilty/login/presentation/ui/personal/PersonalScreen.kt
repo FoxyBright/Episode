@@ -6,26 +6,40 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 
 @Composable
 fun PersonalScreen(nav: NavState = get()) {
-    val a = remember { mutableStateOf(18) }
-    var age by remember { mutableStateOf(18) }
-    var ageText by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf<Int?>(null) }
+    val asm = get<AppStateModel>()
     var list by remember { mutableStateOf(arrayListOf(false, false, false)) }
+    val scope = rememberCoroutineScope()
     PersonalInfoContent(
-        PersonalInfoContentState(rememberCoroutineScope(), a.value, ageText, list),
+        PersonalInfoContentState(age, list),
         object : PersonalInfoContentCallback {
             override fun onBack() {
                 nav.navigate("profile")
             }
 
+            override fun onAgeClick() {
+                scope.launch {
+                    asm.bottomSheetState.expand {
+                        BottomSheetContent(Modifier, age, { age = it })
+                        {
+                            scope.launch {
+                                asm.bottomSheetState.collapse()
+                            }
+                        }
+                    }
+                }
+            }
+
             override fun onAgeChange(it: Int) {
-                a.value = it
                 age = it
-                ageText = "$it"
             }
 
             override fun onGenderChange(index: Int) {

@@ -8,8 +8,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
@@ -17,6 +20,8 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 
 @Composable
 fun MainScreen(nav: NavState = get()) {
+    val asm = get<AppStateModel>()
+    val scope = rememberCoroutineScope()
     var grid by remember {
         mutableStateOf(false)
     }
@@ -52,6 +57,14 @@ fun MainScreen(nav: NavState = get()) {
                 nav.navigateAbsolute(
                     "main/reaction?avatar=$avatar"
                 )
+            }
+
+            override fun openFiltersBottomSheet() {
+                scope.launch {
+                    asm.bottomSheetState.halfExpand {
+                        CategoriesScreen() // TODO фильтры встречи
+                    }
+                }
             }
 
             override fun onStyleChange() {

@@ -32,11 +32,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.CardButton
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MeetingStates
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.Direction
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -67,8 +67,8 @@ fun MeetingsListContent(
                                 .fillMaxSize()
                                 .swipeableCard(
                                     state,
-                                    { if (it == Direction.Right) onSelect(meeting) },
-                                    {}, listOf(Direction.Down, Direction.Up)
+                                    { if (it == DirectionType.RIGHT) onSelect(meeting) },
+                                    {}, listOf(DirectionType.DOWN, DirectionType.UP)
                                 ),
                             meeting, state, scope
                         ) { onSelect(meeting) }
@@ -120,7 +120,7 @@ private fun MeetBottom(
     onSelect: () -> Unit
 ) {
     Box(modifier) {
-        if (!isSystemInDarkTheme())
+        if (isSystemInDarkTheme())
             Image(
                 painterResource(R.drawable.ic_back_rect),
                 null,
@@ -156,14 +156,14 @@ private fun MeetBottom(
                             .weight(1f),
                         stringResource(R.string.not_interesting),
                         meet.isOnline, R.drawable.ic_cancel
-                    ) { scope.launch { state.swipe(Direction.Left) } }
+                    ) { scope.launch { state.swipe(DirectionType.LEFT) } }
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
                         meet.isOnline, R.drawable.ic_heart
                     ) {
                         scope.launch {
-                            onSelect(); state.swipe(Direction.Right)
+                            onSelect(); state.swipe(DirectionType.RIGHT)
                         }
                     }
                 }
