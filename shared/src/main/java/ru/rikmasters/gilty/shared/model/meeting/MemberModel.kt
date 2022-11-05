@@ -19,10 +19,16 @@ data class MemberModel(
 )
 
 val DemoMemberModel = MemberModel(
-
     id = "1",
     username = "cristina",
     emoji = DemoEmojiModel,
     avatar = DemoAvatarModel,
     age = 23
+)
+
+val DemoMemberModelList = listOf(
+    DemoMemberModel,
+    DemoMemberModel,
+    DemoMemberModel,
+    DemoMemberModel,
 )

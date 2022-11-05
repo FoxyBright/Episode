@@ -6,13 +6,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -46,17 +48,16 @@ import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
+import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import ru.rikmasters.gilty.shared.shared.MeetingCard
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 
 data class UserProfileState(
-    val profileModel: ProfileModel,
     val profileState: ProfileState,
     val currentMeetings: List<FullMeetingModel>,
     val meetingsHistory: List<FullMeetingModel>,
@@ -79,18 +80,27 @@ interface UserProfileCallback : ProfileCallback {
 @Composable
 private fun UserProfilePreview() {
     GiltyTheme {
-        val historyState = remember { mutableStateOf(false) }
-        val menuExpanded = remember { mutableStateOf(false) }
+        val historyState =
+            remember { mutableStateOf(false) }
+        val menuExpanded =
+            remember { mutableStateOf(false) }
+        val meets = DemoMeetingList
+        val profileModel = DemoProfileModel
+        val state = ProfileState(
+            name = "${profileModel.username}, ${profileModel.age}",
+            profilePhoto = profileModel.avatar.id,
+            description = profileModel.aboutMe,
+            rating = profileModel.rating.average,
+            observers = 13500,
+            observed = 128,
+            emoji = EmojiList.first(),
+            profileType = ProfileType.USERPROFILE,
+            enabled = false,
+        )
         UserProfile(
             UserProfileState(
-                DemoProfileModel,
-                ProfileState(observers = 13500, observed = 128),
-                listOf(DemoFullMeetingModel, DemoFullMeetingModel, DemoFullMeetingModel),
-                listOf(DemoFullMeetingModel, DemoFullMeetingModel),
-                DemoFullMeetingModel,
-                3,
-                historyState.value,
-                menuExpanded.value
+                state, meets, meets, meets.first(), (3),
+                historyState.value, menuExpanded.value
             ), Modifier, object : UserProfileCallback {
                 override fun menu(state: Boolean) {
                     menuExpanded.value = !menuExpanded.value
@@ -104,7 +114,6 @@ private fun UserProfilePreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
     state: UserProfileState,
@@ -115,7 +124,6 @@ fun UserProfile(
         modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
     ) {
         item {
             Box(Modifier.fillMaxWidth(), Alignment.CenterEnd) {
@@ -126,164 +134,167 @@ fun UserProfile(
                         MaterialTheme.colorScheme.tertiary
                     )
                 }
-                val metrics = Resources.getSystem().displayMetrics
-                DropdownMenu(
-                    state.menuExpanded,
-                    { callback?.menu(false) },
-                    Modifier.background(MaterialTheme.colorScheme.primaryContainer),
-                    DpOffset(((metrics.widthPixels / metrics.density) - 200).dp, 0.dp)
-                ) {
-                    DropdownMenuItem(
-                        {
-                            Text(
-                                stringResource(R.string.profile_menu_watch_photo_button),
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        },
-                        { callback?.onWatchPhotoClick() }
-                    )
-                    DropdownMenuItem(
-                        {
-                            Text(
-                                stringResource(R.string.profile_menu_settings_button),
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        },
-                        { callback?.onSettingsClick() }
-                    )
-                }
+                menu(
+                    state.menuExpanded, { callback?.menu(false) },
+                    { callback?.onWatchPhotoClick() },
+                ) { callback?.onSettingsClick() }
             }
         }
-        item {
-            Profile(
-                ProfileState(
-                    "${state.profileModel.username}, ${state.profileModel.age}",
-                    state.profileState.hiddenPhoto,
-                    state.profileModel.avatar.id,
-                    state.profileState.lockState,
-                    state.profileModel.aboutMe,
-                    state.profileModel.rating.average,
-                    state.profileState.observers,
-                    state.profileState.observed,
-                    state.profileModel.emoji,
-                    ProfileType.USERPROFILE,
-                    false,
-                )
-            )
-        }
+        item { Profile(state.profileState) }
         item {
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
                 Modifier.padding(top = 28.dp),
                 MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.labelLarge
             )
         }
         item {
-            Card(
-                { callback?.onRespondsClick() },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    Arrangement.SpaceBetween,
-                    Alignment.CenterVertically,
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        AsyncImage(
-                            state.lastRespond.organizer.id, null,
-                            Modifier
-                                .size(40.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Text(
-                            stringResource(R.string.profile_responds_label),
-                            Modifier.padding(start = 16.dp),
-                            color = MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            Modifier
-                                .clip(MaterialTheme.shapes.extraSmall)
-                                .background(MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(
-                                "${state.notifications}",
-                                Modifier.padding(12.dp, 6.dp),
-                                Color.White,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        Icon(
-                            Icons.Filled.KeyboardArrowRight,
-                            stringResource(R.string.profile_responds_label),
-                            Modifier,
-                            MaterialTheme.colorScheme.onTertiary
-                        )
-                    }
+            Responds(
+                state.notifications, state.lastRespond,
+            ) { callback?.onRespondsClick() }
+        }
+        if (state.currentMeetings.isNotEmpty()) item {
+            LazyRow {
+                item { Spacer(Modifier.width(8.dp)) }
+                items(state.currentMeetings) {
+                    MeetingCard(it, Modifier.padding(horizontal = 4.dp))
+                    { callback?.onMeetingClick(it) }
                 }
             }
         }
-        if (state.currentMeetings.isNotEmpty()) {
-            item {
-                LazyRow {
-                    itemsIndexed(state.currentMeetings) { index, it ->
-                        MeetingCard(
-                            it,
-                            Modifier.padding(
-                                end = if (index <= state.currentMeetings.size - 2) 8.dp else 0.dp
-                            )
-                        ) { callback?.onMeetingClick(it) }
-                    }
-                }
-            }
+        if (state.meetingsHistory.isNotEmpty()) item {
+            meetHistory(state.historyState, state.meetingsHistory,
+                { callback?.openHistory(state.historyState) })
+            { callback?.onMeetingClick(it) }
         }
-        if (state.meetingsHistory.isNotEmpty()) {
-            item {
-                Row(
+    }
+}
+
+// TODO вынести в shared
+@Composable
+private fun menu(
+    menuState: Boolean,
+    collapse: () -> Unit,
+    onWatchPhotoClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+) {
+    val metrics = Resources.getSystem().displayMetrics
+    DropdownMenu(
+        menuState, collapse,
+        Modifier.background(MaterialTheme.colorScheme.primaryContainer),
+        DpOffset(((metrics.widthPixels / metrics.density) - 200).dp, 0.dp)
+    ) {
+        DropdownMenuItem(
+            { menuItem(stringResource(R.string.profile_menu_watch_photo_button)) },
+            onWatchPhotoClick
+        )
+        DropdownMenuItem(
+            { menuItem(stringResource(R.string.profile_menu_settings_button)) },
+            onSettingsClick
+        )
+    }
+}
+
+@Composable
+private fun menuItem(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text, modifier, MaterialTheme.colorScheme.tertiary,
+        style = MaterialTheme.typography.bodyMedium
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Responds(
+    size: Int,
+    last: FullMeetingModel,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick, modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            Arrangement.SpaceBetween,
+            Alignment.CenterVertically,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AsyncImage(
+                    last.organizer.id, (null), Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    stringResource(R.string.profile_responds_label),
+                    Modifier.padding(start = 16.dp),
+                    MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
                     Modifier
-                        .fillMaxWidth()
-                        .padding(top = 28.dp)
-                        .clip(CircleShape)
-                        .clickable { callback?.openHistory(state.historyState) },
-                    Arrangement.Start, Alignment.CenterVertically
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
-                        stringResource(R.string.profile_meeting_history_label),
-                        Modifier.padding(8.dp),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Icon(
-                        if (!state.historyState) Icons.Filled.KeyboardArrowRight
-                        else Icons.Filled.KeyboardArrowDown,
-                        stringResource(R.string.profile_responds_label),
-                        tint = MaterialTheme.colorScheme.onTertiary
+                        size.toString(),
+                        Modifier.padding(12.dp, 6.dp), Color.White,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
-                if (state.historyState)
-                    LazyRow {
-                        itemsIndexed(state.meetingsHistory) { index, it ->
-                            MeetingCard(
-                                it,
-                                Modifier.padding(
-                                    end = if (index <= state.meetingsHistory.size - 2) 8.dp else 0.dp
-                                )
-                            ) { callback?.onMeetingClick(it) }
-                        }
-                    }
+                Icon(
+                    Icons.Filled.KeyboardArrowRight,
+                    stringResource(R.string.profile_responds_label),
+                    Modifier, MaterialTheme.colorScheme.onTertiary
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun meetHistory(
+    historyState: Boolean,
+    historyList: List<FullMeetingModel>,
+    openHistory: () -> Unit,
+    onSelect: (FullMeetingModel) -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 28.dp)
+            .clip(CircleShape)
+            .clickable { openHistory() },
+        Arrangement.Start, Alignment.CenterVertically
+    ) {
+        Text(
+            stringResource(R.string.profile_meeting_history_label),
+            Modifier.padding(8.dp),
+            color = MaterialTheme.colorScheme.tertiary,
+            style = MaterialTheme.typography.titleLarge
+        )
+        Icon(
+            if (!historyState) Icons.Filled.KeyboardArrowRight
+            else Icons.Filled.KeyboardArrowDown,
+            stringResource(R.string.profile_responds_label),
+            tint = MaterialTheme.colorScheme.onTertiary
+        )
+    }
+    if (historyState) LazyRow {
+        item { Spacer(Modifier.width(8.dp)) }
+        items(historyList) {
+            MeetingCard(it, Modifier.padding(horizontal = 4.dp))
+            { onSelect(it) }
         }
     }
 }

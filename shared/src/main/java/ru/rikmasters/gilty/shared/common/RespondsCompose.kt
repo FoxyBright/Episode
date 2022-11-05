@@ -31,7 +31,7 @@ import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
-import ru.rikmasters.gilty.shared.shared.BrieflyRowCompose
+import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.SmallButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -72,12 +72,12 @@ fun RespondsCompose(
             ) {
                 val user = respond.sender
                 when (respond.type) {
-                    RespondType.SEND -> BrieflyRowCompose(
+                    RespondType.SEND -> BrieflyRow(
                         user.avatar, respond.meet.title, null,
                         Modifier.padding(start = 16.dp, top = 12.dp)
                     )
 
-                    RespondType.RECEIVED -> BrieflyRowCompose(
+                    RespondType.RECEIVED -> BrieflyRow(
                         user.avatar, "${user.username}, ${user.age}",
                         user.emoji, Modifier.padding(start = 16.dp, top = 12.dp)
                     )

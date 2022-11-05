@@ -185,7 +185,7 @@ fun Profile(
             stringResource(R.string.profile_about_me),
             Modifier.padding(top = 20.dp),
             MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.labelLarge
         )
         TextField(
             state.description,

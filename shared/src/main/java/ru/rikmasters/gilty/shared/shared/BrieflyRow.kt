@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -34,18 +32,20 @@ private class UserShortModel(
 @Composable
 private fun BrieflyRowPreview() {
     GiltyTheme {
-        BrieflyRowCompose(
-            DemoAvatarModel,
-            DemoProfileModel.username,
-            DemoEmojiModel,
+        val user = DemoProfileModel
+        BrieflyRow(
+            user.avatar, user.username, user.emoji,
             Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
 }
 
 @Composable
-fun BrieflyRowCompose(
-    avatar: AvatarModel, text: String, emoji: EmojiModel? = null, modifier: Modifier = Modifier
+fun BrieflyRow(
+    avatar: AvatarModel,
+    text: String,
+    emoji: EmojiModel? = null,
+    modifier: Modifier = Modifier
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(

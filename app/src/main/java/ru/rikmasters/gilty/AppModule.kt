@@ -7,10 +7,11 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.example.ExampleModule
 import ru.rikmasters.gilty.login.Login
 import ru.rikmasters.gilty.mainscreen.Main
+import ru.rikmasters.gilty.profile.Profile
 
 object AppModule : FeatureDefinition() {
     override fun include(): Set<ModuleDefinition> =
-        setOf(ExampleModule, Login, Main)
+        setOf(ExampleModule, Login, Main, Profile)
 
     override fun DeepNavGraphBuilder.navigation() {}
 

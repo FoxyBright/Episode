@@ -1,18 +1,6 @@
 package ru.rikmasters.gilty.shared.model.profile
 
-val DemoProfileModel = ProfileModel(
-    "0",
-    "+7 910 524-12-12",
-    "alina.loon",
-    DemoEmojiModel,
-    DemoGenderModel,
-    DemoOrientationModel,
-    27,
-    "Instagram @cristi",
-    DemoAvatarModel,
-    DemoRatingModel,
-    true
-)
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
 data class ProfileModel(
 
@@ -39,4 +27,21 @@ data class ProfileModel(
     val isComplete: Boolean
 )
 
+val DemoProfileModel = ProfileModel(
+    "0",
+    "+7 910 524-12-12",
+    "alina.loon",
+    DemoEmojiModel,
+    DemoGenderModel,
+    DemoOrientationModel,
+    27,
+    "Instagram @cristi",
+    DemoAvatarModel,
+    DemoRatingModel,
+    true
+)
 
+@Suppress("unused")
+fun MemberModel.toProfileModel(): MemberModel {
+    return MemberModel(id, username, emoji, avatar, age)
+}

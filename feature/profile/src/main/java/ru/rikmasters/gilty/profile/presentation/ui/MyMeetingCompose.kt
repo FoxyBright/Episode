@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -25,13 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
 import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetCallback
@@ -39,7 +36,8 @@ import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetState
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
+import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -47,12 +45,12 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MyMeetingPreview() {
     GiltyTheme {
+        val meet = DemoFullMeetingModel
         MyMeeting(
             Modifier,
             ProfileMeetingBottomSheetState(
-                DemoFullMeetingModel,
-                listOf(DemoMemberModel, DemoMemberModel, DemoMemberModel, DemoMemberModel),
-                18, DemoFullMeetingModel.duration
+                meet, DemoMemberModelList,
+                18, meet.duration
             )
         )
     }
@@ -75,14 +73,21 @@ fun MyMeeting(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
-        item { MeetingBottomSheetTopBarCompose(Modifier, state.meetingModel, state.eventDuration) }
+        item {
+            MeetingBottomSheetTopBarCompose(
+                Modifier, state.meetingModel,
+                state.eventDuration
+            )
+        }
         item {
             Card(
                 Modifier
                     .padding(top = 13.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.large,
-                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+                CardDefaults.cardColors(
+                    MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 Text(
                     state.meetingModel.title,
@@ -106,18 +111,20 @@ fun MyMeeting(
                     .padding(top = 12.dp)
                     .fillMaxWidth(),
                 MaterialTheme.shapes.extraSmall,
-                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+                CardDefaults.cardColors(
+                    MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 Text(
                     when (state.meetingModel.type) {
-                        MeetType.GROUP -> stringResource(id = R.string.meeting_group_type)
-                        MeetType.ANONYMOUS -> stringResource(id = R.string.meeting_anon_type)
-                        MeetType.PERSONAL -> stringResource(id = R.string.meeting_personal_type)
+                        MeetType.GROUP -> stringResource(R.string.meeting_group_type)
+                        MeetType.ANONYMOUS -> stringResource(R.string.meeting_anon_type)
+                        MeetType.PERSONAL -> stringResource(R.string.meeting_personal_type)
                     },
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Divider(Modifier.padding(start = 16.dp))
@@ -132,7 +139,7 @@ fun MyMeeting(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -140,8 +147,8 @@ fun MyMeeting(
         item {
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
-                    stringResource(R.string.meeting_members),
-                    color = MaterialTheme.colorScheme.tertiary,
+                    stringResource(R.string.meeting_members), Modifier,
+                    MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
@@ -176,24 +183,11 @@ fun MyMeeting(
                             Arrangement.SpaceBetween,
                             Alignment.CenterVertically
                         ) {
-                            Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
-                                AsyncImage(
-                                    member.avatar.id,
-                                    stringResource(R.string.meeting_avatar),
-                                    Modifier
-                                        .padding(12.dp, 8.dp)
-                                        .clip(CircleShape)
-                                        .size(40.dp),
-                                    painterResource(R.drawable.gb),
-                                    contentScale = ContentScale.FillBounds
-                                )
-                                Text(
-                                    "${member.username}, ${member.age}",
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                            BrieflyRow(
+                                member.avatar,
+                                "${member.username}, ${member.age}",
+                                modifier = Modifier.padding(12.dp, 8.dp)
+                            )
                             Icon(
                                 Icons.Filled.KeyboardArrowRight,
                                 null,
