@@ -1,12 +1,12 @@
-package ru.rikmasters.gilty.notifications
+package ru.rikmasters.gilty.addmeet
 
 import org.koin.core.module.Module
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 
-object Notifications : FeatureDefinition() {
+object AddMeet : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        screen("list") {}
+        screen("add") { }
     }
 
     override fun Module.koin() {}

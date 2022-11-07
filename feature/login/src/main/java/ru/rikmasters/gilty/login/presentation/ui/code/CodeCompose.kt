@@ -95,7 +95,7 @@ fun CodeContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painterResource(R.drawable.ic_bad_code),
+                    painterResource(R.drawable.ic_bad),
                     null, Modifier.size(40.dp)
                 )
                 Text(

@@ -24,6 +24,7 @@ val EmojiList = listOf(
     EmojiModel("D", "${R.drawable.ic_clown}"),
     EmojiModel("D", "${R.drawable.ic_broken_heart}"),
     EmojiModel("D", "${R.drawable.ic_fire}"),
+    EmojiModel("D", "${R.drawable.ic_batterfly}"),
     EmojiModel("D", "${R.drawable.ic_money_love}"),
     EmojiModel("D", "${R.drawable.ic_sarcasm}"),
 )

@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:addmeet")
+
+
 include(":feature:profile")
 
 

@@ -44,8 +44,6 @@ fun NavBarPreview() {
     }
 }
 
-// TODO Добавить анимацию перемещения активного ползунка
-
 @Composable
 fun NavBar(
     state: List<NavIconState>,
