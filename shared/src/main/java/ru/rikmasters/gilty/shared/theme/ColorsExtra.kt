@@ -20,13 +20,17 @@ data class ExtraColors(
     val navBarActive: Color = Color.Unspecified,
     val navBarInactive: Color = Color.Unspecified,
     val navBarAddButton: Color = Color.Unspecified,
+    val chatBackground: Color = Color.Unspecified,
+    val commentBackground: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
 @Deprecated(
     "Надо использовать тему",
-    ReplaceWith("ThemeExtra.colors",
-        "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
+    ReplaceWith(
+        "ThemeExtra.colors",
+        "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"
+    )
 )
 val LightExtraColors = ExtraColors(
     elementsBack = Colors.White,
@@ -44,13 +48,17 @@ val LightExtraColors = ExtraColors(
     navBarActive = Colors.RottenPlum,
     navBarInactive = Colors.Silver,
     navBarAddButton = Colors.AlmostDark,
+    chatBackground = Colors.Pinky,
+    commentBackground = Colors.RottenPlum,
     // Add colors in scheme from Colors-file
 )
 
 @Deprecated(
     "Надо использовать тему",
-    ReplaceWith("ThemeExtra.colors",
-        "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra")
+    ReplaceWith(
+        "ThemeExtra.colors",
+        "ru.rikmasters.gilty.presentation.ui.theme.base.ThemeExtra"
+    )
 )
 val DarkExtraColors = ExtraColors(
     elementsBack = Colors.PreDark,
@@ -68,5 +76,7 @@ val DarkExtraColors = ExtraColors(
     navBarActive = Colors.White,
     navBarInactive = Colors.Zircon,
     navBarAddButton = Colors.White,
+    chatBackground = Colors.RottenPlum,
+    commentBackground = Colors.RottenPlum,
     // Add colors in scheme from Colors-file
 )

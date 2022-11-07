@@ -136,6 +136,14 @@
     <string name="meeting_filter_meet_type">Тип встречи</string>
     <string name="meeting_filter_gender_and_conditions">Пол и условия</string>
 
+    <!-- Chats -->
+    <string name="chats_member_cases">участник%s</string>
+    <string name="chats_messenger_place_holder">Напишите сообщение…</string>
+    <string name="chats_comment_place_holder">Комментарий</string>
+    <string name="chats_message_answer_recipient">Ответить %s</string>
+    <string name="chats_message_answer_photo_label">Фотография</string>
+    <string name="chats_message_answer_video_label">Видео</string>
+
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
     <string name="action_bar_button_back">Кнопка назад</string>

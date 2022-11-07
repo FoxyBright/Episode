@@ -91,6 +91,7 @@ object Colors {
     val lockColorsBackgroundNight = Color(0xFF222222)
     val LightPink = Color(0xFFFFDADA)
     val RottenPlum = Color(0xFF49454F)
+    val Pinky = Color(0xFFF6EDEC)
     // Add new colors
 }
 

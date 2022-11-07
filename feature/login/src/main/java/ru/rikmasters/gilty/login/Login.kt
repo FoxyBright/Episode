@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.login
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
@@ -72,6 +71,6 @@ object Login : FeatureDefinition() {
     }
 
     override fun Module.koin() {
-        single { EntrypointResolver { "authorization" } }
+//        single { EntrypointResolver { "authorization" } }
     }
 }
