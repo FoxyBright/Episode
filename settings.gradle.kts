@@ -1,5 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:complaints")
+
+
+include(":feature:settings")
+
+
+include(":feature:chat")
+
+
 include(":feature:addmeet")
 
 

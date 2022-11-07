@@ -32,5 +32,8 @@ dependencies {
     implementation(project(":feature:profile"))
     implementation(project(":feature:addmeet"))
     implementation(project(":feature:mainscreen"))
+    implementation(project(":feature:complaints"))
+    implementation(project(":feature:settings"))
+    implementation(project(":feature:chat"))
     implementation(project(":feature:notifications"))
 }
