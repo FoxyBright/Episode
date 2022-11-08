@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +40,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.shared.LockerCheckBox
+import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -82,7 +81,6 @@ private fun ProfileStatisticContentPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HiddenPhotoContent(
     modifier: Modifier,
@@ -107,15 +105,24 @@ fun HiddenPhotoContent(
             placeholder = painterResource(R.drawable.ic_image_empty),
             contentScale = ContentScale.Crop
         )
-        Card(
-            {},
+        Box(
             Modifier
                 .padding(start = 8.dp, top = 8.dp)
                 .size(26.dp)
                 .clip(CircleShape)
                 .align(Alignment.TopStart),
-            colors = CardDefaults.cardColors(ThemeExtra.colors.lockColorsBackground)
-        ) { LockerCheckBox(lockState, Modifier.padding(4.dp)) { onLockClick(it) } }
+        ) {
+            Image(painterResource(R.drawable.transparency_circle), (null), Modifier.fillMaxSize())
+            CheckBox(
+                lockState,
+                Modifier
+                    .padding(4.dp)
+                    .size(24.dp), listOf(
+                    R.drawable.ic_lock_open,
+                    R.drawable.ic_lock_close
+                ), MaterialTheme.colorScheme.tertiary
+            ) { onLockClick(it) }
+        }
         if (profileType == ProfileType.ORGANIZER)
             CreateProfileCardRow(
                 stringResource(R.string.profile_hidden_photo),

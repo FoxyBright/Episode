@@ -70,8 +70,8 @@ fun ProfileContent(
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
-            (state.profilePhoto != "" &&
-                    state.name != "" &&
+            (state.profilePhoto?.isNotBlank() == true &&
+                    state.name.isNotBlank() &&
                     !state.occupiedName)
         ) { callback?.onNext() }
     }
