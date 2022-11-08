@@ -49,8 +49,6 @@ import ru.rikmasters.gilty.chat.presentation.ui.TextFieldType.COMMENT
 import ru.rikmasters.gilty.chat.presentation.ui.TextFieldType.MESSAGE
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
@@ -63,11 +61,7 @@ fun MessengerBarPreview() {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     var answer by
-    remember {
-        mutableStateOf<MessageAnswerState?>(
-            MessageAnswerState(DemoMemberModel, DemoMessageModel)
-        )
-    }
+    remember { mutableStateOf<MessageModel?>(DemoMessageModel) }
     Box(Modifier.fillMaxSize()) {
         MessengerBar(
             message, Modifier.align(Alignment.BottomCenter),
@@ -107,11 +101,6 @@ fun CommentBarPreview() {
     }
 }
 
-data class MessageAnswerState(
-    val recipient: MemberModel?,
-    val message: MessageModel?
-)
-
 interface MessengerBarCallback {
     fun textChange(text: String) {}
     fun gallery() {}
@@ -123,11 +112,11 @@ interface MessengerBarCallback {
 fun MessengerBar(
     text: String,
     modifier: Modifier = Modifier,
-    answerContent: MessageAnswerState? = null,
+    answer: MessageModel? = null,
     callback: MessengerBarCallback? = null
 ) {
     Column(modifier.background(colorScheme.primaryContainer)) {
-        answerContent?.let {
+        answer?.let {
             Row(
                 Modifier.fillMaxWidth(),
                 SpaceBetween, CenterVertically
@@ -142,11 +131,7 @@ fun MessengerBar(
                             .padding(horizontal = 20.dp)
                             .size(28.dp),
                         colorScheme.primary
-                    ); it.message?.let { mes ->
-                    it.recipient?.let { rec ->
-                        AnswerContent(mes, rec)
-                    }
-                }
+                    ); AnswerContent(it, Modifier, (true))
                 }
                 IconButton(
                     { callback?.onCancelAnswer() },

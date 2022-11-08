@@ -140,7 +140,7 @@
     <string name="chats_member_cases">участник%s</string>
     <string name="chats_messenger_place_holder">Напишите сообщение…</string>
     <string name="chats_comment_place_holder">Комментарий</string>
-    <string name="chats_message_answer_recipient">Ответить %s</string>
+    <string name="chats_message_answer_recipient">Ответить</string>
     <string name="chats_message_answer_photo_label">Фотография</string>
     <string name="chats_message_answer_video_label">Видео</string>
 

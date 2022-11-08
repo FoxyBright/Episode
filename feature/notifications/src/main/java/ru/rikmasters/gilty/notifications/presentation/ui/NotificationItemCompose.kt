@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.DragRowState
+import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel

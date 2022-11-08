@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
@@ -109,9 +110,12 @@ fun NotificationsCompose(
     callback: NotificationsComposeCallback? = null
 ) {
     val separator = NotificationsByDateSeparator(state.notificationsList)
-    val todayList = separator.getTodayList().map { it to rememberDragRowState() }
-    val weekList = separator.getWeekList().map { it to rememberDragRowState() }
-    val earlierList = separator.getEarlyList().map { it to rememberDragRowState() }
+    val todayList =
+        separator.getTodayList().map { it to rememberDragRowState() }
+    val weekList =
+        separator.getWeekList().map { it to rememberDragRowState() }
+    val earlierList =
+        separator.getEarlyList().map { it to rememberDragRowState() }
     Column(
         modifier
             .fillMaxSize()

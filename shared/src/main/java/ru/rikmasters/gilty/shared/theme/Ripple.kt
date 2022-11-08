@@ -8,11 +8,11 @@ import androidx.compose.ui.graphics.Color
 
 object Ripple : RippleTheme {
     @Composable
-    override fun defaultColor(): Color = Color.White
+    override fun defaultColor(): Color = Color.Gray
+
 
     @Composable
     override fun rippleAlpha(): RippleAlpha = RippleTheme.defaultRippleAlpha(
-        Color.White,
-        lightTheme = !isSystemInDarkTheme()
+        Color.White, isSystemInDarkTheme()
     )
 }
