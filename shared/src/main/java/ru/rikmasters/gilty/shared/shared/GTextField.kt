@@ -166,43 +166,10 @@ fun GTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = colorScheme.tertiary,
-    containerColor = colorScheme.onPrimaryContainer,
-    unfocusedIndicatorColor = Transparent,
+    textColor = Black, containerColor = White,
     unfocusedLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = colorScheme.tertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    errorIndicatorColor = Transparent,
-    focusedIndicatorColor = Transparent,
-    disabledTrailingIconColor = Transparent,
-    focusedTrailingIconColor = Transparent,
-    unfocusedTrailingIconColor = Transparent,
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = colorScheme.tertiary,
-    containerColor = Transparent,
-    unfocusedIndicatorColor = Transparent,
-    unfocusedLabelColor = colorScheme.onTertiary,
     focusedLabelColor = colorScheme.tertiary,
-    disabledLabelColor = colorScheme.onTertiary,
-    errorIndicatorColor = Transparent,
-    focusedIndicatorColor = Transparent,
-    disabledTrailingIconColor = Transparent,
-    focusedTrailingIconColor = Transparent,
-    unfocusedTrailingIconColor = Transparent,
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PreviewColors() = TextFieldDefaults.textFieldColors(
-    textColor = Black,                             // primaryContainer
-    containerColor = White,                        // tertiary
-    unfocusedLabelColor = Color(0xFF98989F), // onTertiary
-    disabledLabelColor = Color(0xFF98989F),  // onTertiary
-    focusedLabelColor = Color(0xFF000000),   // tertiary
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -210,6 +177,42 @@ private fun PreviewColors() = TextFieldDefaults.textFieldColors(
     unfocusedIndicatorColor = Transparent,
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
-    placeholderColor = Color(0xFF98989F), // onTertiary
+    placeholderColor = colorScheme.onTertiary,
+    disabledPlaceholderColor = Transparent,
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
+    textColor = Black, containerColor = Transparent,
+    unfocusedLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.onTertiary,
+    focusedLabelColor = colorScheme.tertiary,
+    disabledTrailingIconColor = Transparent,
+    focusedTrailingIconColor = Transparent,
+    unfocusedTrailingIconColor = Transparent,
+    focusedIndicatorColor = Transparent,
+    unfocusedIndicatorColor = Transparent,
+    disabledIndicatorColor = Transparent,
+    errorIndicatorColor = Transparent,
+    placeholderColor = colorScheme.onTertiary,
+    disabledPlaceholderColor = Transparent,
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PreviewColors() = TextFieldDefaults.textFieldColors(
+    textColor = Black, containerColor = White,
+    unfocusedLabelColor = Color(0xFF98989F),
+    disabledLabelColor = Color(0xFF98989F),
+    focusedLabelColor = Color(0xFF000000),
+    disabledTrailingIconColor = Transparent,
+    focusedTrailingIconColor = Transparent,
+    unfocusedTrailingIconColor = Transparent,
+    focusedIndicatorColor = Transparent,
+    unfocusedIndicatorColor = Transparent,
+    disabledIndicatorColor = Transparent,
+    errorIndicatorColor = Transparent,
+    placeholderColor = Color(0xFF98989F),
     disabledPlaceholderColor = Transparent,
 )

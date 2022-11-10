@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun SmallButton(
     text: String,
     color: Color,
+    textColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -22,8 +23,7 @@ fun SmallButton(
         colors = ButtonDefaults.buttonColors(color)
     ) {
         Text(
-            text,
-            color = MaterialTheme.colorScheme.tertiary,
+            text, Modifier, textColor,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold
         )

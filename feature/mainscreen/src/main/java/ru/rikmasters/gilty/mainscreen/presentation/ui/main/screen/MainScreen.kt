@@ -53,6 +53,7 @@ fun MainScreen(nav: NavState = get()) {
                     if (it == point) stateList[it] = ACTIVE
                     else if (stateList[it] != NEW)
                         stateList[it] = INACTIVE
+                    if (point == 1) nav.navigateAbsolute("notification/list")
                 }
             }
 

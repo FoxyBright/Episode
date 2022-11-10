@@ -67,18 +67,20 @@ fun RowActionBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null
 ) {
-    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton({ onBack?.let { it() } }, Modifier.padding(end = 16.dp)) {
-            Icon(
-                painterResource(R.drawable.ic_back),
-                stringResource(R.string.action_bar_button_back),
-                Modifier.size(24.dp),
-                MaterialTheme.colorScheme.tertiary
-            )
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        onBack?.let {
+            IconButton(it, Modifier.padding(end = 16.dp)) {
+                Icon(
+                    painterResource(R.drawable.ic_back),
+                    stringResource(R.string.action_bar_button_back),
+                    Modifier.size(24.dp),
+                    MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
         Text(
             title,
-            Modifier.padding(end = 4.dp),
+            Modifier.padding(end = 8.dp),
             MaterialTheme.colorScheme.tertiary,
             style = MaterialTheme.typography.labelLarge
         )

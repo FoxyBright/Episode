@@ -13,7 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
+import ru.rikmasters.gilty.shared.common.extentions.timeClock
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients
 
@@ -45,7 +46,7 @@ fun DateTimeCard(
         Alignment.Center
     ) {
         Text(
-            dateTime.format(if (today) "HH:mm" else "dd MMMM"),
+            if (today) dateTime.timeClock() else dateTime.dateCalendar(),
             Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             color = Color.White, fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelSmall

@@ -5,10 +5,14 @@ import androidx.annotation.RequiresApi
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
 import java.util.*
 
+private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
-const val FULL_FORMAT = "yyyy-MM-dd-HH-mm-ss"
+const val TIME_FORMAT = "HH-mm-ss"
+val LOCAL_TIME: LocalTime = LocalTime.now()
+val LOCAL_DATE: LocalDate = LocalDate.now()
 const val MILLIS_IN_SECOND = 1000
 const val SECONDS_IN_MINUTE = 60
 const val MINUTES_IN_HOUR = 60
@@ -19,6 +23,7 @@ const val MILLIS_IN_DAY = MILLIS_IN_SECOND * SECONDS_IN_MINUTE * MINUTES_IN_HOUR
 fun LocalDate.toEpochMillis() =
     this.toEpochDay() * MILLIS_IN_DAY
 
+@Suppress("unused")
 object LocalDateFactory {
 
     fun ofEpochMillis(millis: Long): LocalDate =
@@ -30,16 +35,77 @@ fun todayControl(date: String): Boolean {
     return date.format(FORMAT) == DateTimeFormatter.ofPattern(FORMAT).format(LocalDate.now())
 }
 
+fun getDifferenceOfTime(date: String): String {
+    val list = arrayListOf<Int>()
+    "${date.time().minusHours((3))}".split((":"))
+        .forEach { list.add(it.toInt()) }
+    return if (todayControl(date))
+        if (LOCAL_TIME.hour - list.first() > 0)
+            "${LOCAL_TIME.hour - list.first()} ч"
+        else if (LOCAL_TIME.minute - list[1] > 0)
+            "${LOCAL_TIME.minute - list[1]} м"
+        else "${LOCAL_TIME.second - list.last()} с"
+    else "${LOCAL_DATE.dayOfYear - date.date().dayOfYear} д"
+}
+
+fun String.date(): LocalDate {
+    val dateList = this.format(FORMAT).split(DASH)
+    return LocalDate.of(
+        dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
+    )
+}
+
+
+fun String.timeClock(): String {
+    return this.format("HH:mm")
+}
+
+fun String.dateCalendar(): String {
+    return this.format("dd MMMM")
+}
+
+fun String.time(): LocalTime {
+    val dateList = this.format(TIME_FORMAT).split(DASH)
+    return LocalTime.of(
+        dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
+    )
+}
+
+fun weekControl(date: String): Boolean {
+    val dateList = date.format(FORMAT).split(DASH)
+    val localDate = LocalDate.of(
+        dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
+    ).toEpochMillis() / 1000
+    return (localDate in thisWeek().first..thisWeek().second)
+}
+
+fun thisWeek(): Pair<Long, Long> {
+    val format = DateTimeFormatter.ofPattern("dd")
+    val now = LocalDate.now()
+    val start = LocalDate.of(
+        now.year, now.month, format.format(
+            LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        ).toInt()
+    )
+    return Pair(
+        start.toEpochMillis() / 1000, LocalDate.of(
+            now.year, now.month, format.format(start.plusDays(7)).toInt()
+        ).toEpochMillis() / 1000
+    )
+}
+
 fun String.format(pattern: String): String =
     OffsetDateTime.parse(this)
         .withOffsetSameInstant(ZoneOffset.ofHours(3))
         .toLocalDateTime()
         .format(pattern)
 
+@Suppress("unused")
 fun LocalDateTime.display(): String =
     this.format("d '%s' yyyy, HH:mm")
         .format(this.month.display())
 
+@Suppress("unused")
 fun LocalDateTime.displayDate(): String =
     this.format("d '%s' yyyy")
         .format(this.month.display())
@@ -47,9 +113,11 @@ fun LocalDateTime.displayDate(): String =
 fun LocalDateTime.format(pattern: String): String =
     this.format(DateTimeFormatter.ofPattern(pattern))
 
+@Suppress("unused")
 fun LocalDate.format(pattern: String): String =
     this.format(DateTimeFormatter.ofPattern(pattern))
 
+@Suppress("unused")
 fun LocalTime.format(pattern: String): String =
     this.format(DateTimeFormatter.ofPattern(pattern))
 
@@ -72,4 +140,5 @@ var monthNames = arrayOf(
 fun Month.display(): String =
     this.getDisplayName(TextStyle.FULL, Locale("ru"))
 
+@Suppress("unused")
 fun Month.displayStatic(): String = monthNames[this.ordinal]

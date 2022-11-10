@@ -82,6 +82,7 @@
     <string name="notification_on_this_week_label">На этой неделе</string>
     <string name="notification_respond_cancel_button">Отменить</string>
     <string name="notification_respond_accept_button">Принять</string>
+    <string name="notification_send_emotion">Оставьте эмоции участникам встречи</string>
 
     <!-- Meeting -->
     <string name="meeting_personal_type">Персональная встреча</string>

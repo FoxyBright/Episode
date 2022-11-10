@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.dp
 
 data class ExtraShapes(
     val cardShape: Shape = RectangleShape,
+    val zero: Shape = RectangleShape,
     val smallCardShape: Shape = RectangleShape,
     val largeTopRoundedShape: Shape = RectangleShape,
     val largeBottomRoundedShape: Shape = RectangleShape,
@@ -36,6 +37,7 @@ val DefaultExtraShapes = ExtraShapes(
     ultraTopRoundedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
     ExtraLargeStartRoundedShape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
     ExtraLargeEndRoundedShape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp),
-    chatRoundedShape = RoundedCornerShape(30.dp)
+    chatRoundedShape = RoundedCornerShape(30.dp),
+    zero = RoundedCornerShape(0.dp)
 // Add form in scheme
 )

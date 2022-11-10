@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
@@ -174,7 +173,7 @@ fun ProfileMeetingBottomSheet(
                 when (index) {
                     0 -> ThemeExtra.shapes.largeTopRoundedShape
                     state.memberList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape
-                    else -> RoundedCornerShape(0.dp)
+                    else -> ThemeExtra.shapes.zero
                 }, CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(

@@ -32,5 +32,17 @@ val DemoReceivedRespondsModel = RespondModel(
     "Классно выглядишь, пойдем? Я вроде адекватный))",
     DemoOrganizerModel,
     RespondType.RECEIVED,
-    listOf(DemoHiddenPhotoModel, DemoHiddenPhotoModel, DemoHiddenPhotoModel, DemoHiddenPhotoModel)
+    listOf(
+        DemoHiddenPhotoModel, DemoHiddenPhotoModel,
+        DemoHiddenPhotoModel, DemoHiddenPhotoModel
+    )
+)
+
+val DemoReceivedRespondModelWithoutPhoto = RespondModel(
+    1,
+    DemoFullMeetingModel,
+    "Покажи свои фото))",
+    DemoOrganizerModel,
+    RespondType.RECEIVED,
+    null
 )

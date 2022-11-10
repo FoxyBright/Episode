@@ -29,7 +29,6 @@ fun blur(context: Context, bitmap: Bitmap): Bitmap {
         setRadius(10f);setInput(bitmapAlloc); forEach(bitmapAlloc)
     }; bitmapAlloc.copyTo(bitmap); rs.destroy(); return bitmap
 }
-
 @Composable
 fun BackBlur(
     modifier: Modifier = Modifier,
@@ -52,8 +51,7 @@ fun BackBlur(
                 )
             else Image(
                 image.asImageBitmap(),
-                null,
-                Modifier
+                (null), Modifier
                     .fillMaxSize()
                     .blur(10.dp)
             )

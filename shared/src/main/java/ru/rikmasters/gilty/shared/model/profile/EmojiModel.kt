@@ -11,7 +11,8 @@ data class EmojiModel(
 
 )
 
-val DemoEmojiModel = EmojiModel("URL", "https://placekitten.com/1200/800")
+@Suppress("unused")
+val DemoEmojiModelURL = EmojiModel("URL", "https://placekitten.com/1200/800")
 
 val EmojiList = listOf(
     EmojiModel("D", "${R.drawable.ic_love}"),
@@ -28,3 +29,5 @@ val EmojiList = listOf(
     EmojiModel("D", "${R.drawable.ic_money_love}"),
     EmojiModel("D", "${R.drawable.ic_sarcasm}"),
 )
+
+val DemoEmojiModel = EmojiList.first()
