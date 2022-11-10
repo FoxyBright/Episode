@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -34,6 +35,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -46,7 +48,7 @@ private fun MeetingBottomSheetTopBarComposePreview() {
         MeetingBottomSheetTopBarCompose(
             Modifier,
             DemoFullMeetingModel,
-            "2 часа"
+            ("2 часа"), (true)
         )
     }
 }
@@ -55,7 +57,8 @@ private fun MeetingBottomSheetTopBarComposePreview() {
 fun MeetingBottomSheetTopBarCompose(
     modifier: Modifier = Modifier,
     meetingModel: FullMeetingModel,
-    eventDuration: String
+    eventDuration: String,
+    private: Boolean = false
 ) {
     Column(modifier) {
         Row(
@@ -67,7 +70,7 @@ fun MeetingBottomSheetTopBarCompose(
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
-            IconButton({ /* TODO Здесь должен быть PopUp */}) {
+            IconButton({ /* TODO Здесь должен быть PopUp */ }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,
@@ -87,68 +90,92 @@ fun MeetingBottomSheetTopBarCompose(
                 placeholder = painterResource(R.drawable.gb)
             )
             Spacer(Modifier.width(18.dp))
-            Card(
+            Meet(
                 Modifier
                     .weight(1f)
                     .size(180.dp),
-                ThemeExtra.shapes.cardShape,
-                CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Box(
-                    Modifier.fillMaxSize()
-                ) {
-                    CategoryItem(
-                        DemoShortCategoryModel,
-                        true,
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(25.dp, -(25).dp)
-                    )
-                    Column(
-                        Modifier
-                            .align(Alignment.BottomEnd)
-                            .fillMaxWidth()
-                            .padding(12.dp)
-                    ) {
-                        Text(
-                            stringResource(R.string.meeting_profile_bottom_today_label),
-                            Modifier.padding(bottom = 8.dp),
-                            MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                            DateTimeCard(
-                                DemoFullMeetingModel.dateTime,
-                                Gradients.red(),
-                                true,
-                                Modifier.weight(1f)
-                            )
-                            Box(
-                                Modifier
-                                    .weight(1f)
-                                    .padding(start = 4.dp)
-                                    .clip(MaterialTheme.shapes.extraSmall)
-                                    .background(MaterialTheme.colorScheme.outlineVariant)
-                            ) {
-                                Text(
-                                    eventDuration,
-                                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                    Color.White, fontWeight = FontWeight.SemiBold,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+                eventDuration
+            )
         }
+        Row(verticalAlignment = CenterVertically) {
+            BrieflyRow(
+                text = "${meetingModel.organizer.username}, " +
+                        "${meetingModel.organizer.age}",
+                emoji = meetingModel.organizer.emoji
+            )
+            if (private) Text(
+                stringResource(R.string.meeting_anon_type), Modifier,
+                MaterialTheme.colorScheme.onTertiary,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun Meet(
+    modifier: Modifier = Modifier,
+    eventDuration: String
+) {
+    Card(
+        modifier, ThemeExtra.shapes.cardShape,
+        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Box(
+            Modifier.fillMaxSize()
+        ) {
+            CategoryItem(
+                DemoShortCategoryModel,
+                true,
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(25.dp, -(25).dp)
+            )
+            MeetDetails(
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                eventDuration
+            )
+        }
+    }
+}
+
+@Composable
+private fun MeetDetails(
+    modifier: Modifier = Modifier,
+    eventDuration: String
+) {
+    Column(modifier) {
         Text(
-            "${meetingModel.organizer.username}, ${meetingModel.organizer.age}",
-            Modifier.padding(top = 9.dp),
+            stringResource(R.string.meeting_profile_bottom_today_label),
+            Modifier.padding(bottom = 8.dp),
             MaterialTheme.colorScheme.tertiary,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold
         )
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            DateTimeCard(
+                DemoFullMeetingModel.dateTime,
+                Gradients.red(),
+                true,
+                Modifier.weight(1f)
+            )
+            Box(
+                Modifier
+                    .weight(1f)
+                    .padding(start = 4.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Text(
+                    eventDuration,
+                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    Color.White, fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
+        }
     }
 }

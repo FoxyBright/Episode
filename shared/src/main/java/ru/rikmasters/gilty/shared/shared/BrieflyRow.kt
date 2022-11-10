@@ -42,20 +42,22 @@ private fun BrieflyRowPreview() {
 
 @Composable
 fun BrieflyRow(
-    avatar: AvatarModel,
+    avatar: AvatarModel? = null,
     text: String,
     emoji: EmojiModel? = null,
     modifier: Modifier = Modifier
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        AsyncImage(
-            avatar.id,
-            stringResource(R.string.meeting_avatar),
-            Modifier
-                .size(38.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
+        avatar?.let {
+            AsyncImage(
+                avatar.id,
+                stringResource(R.string.meeting_avatar),
+                Modifier
+                    .size(38.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text,
@@ -75,3 +77,4 @@ fun BrieflyRow(
         }
     }
 }
+
