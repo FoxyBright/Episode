@@ -57,7 +57,9 @@ data class FullMeetingModel(
 
     val address: String,
 
-    val hideAddress: Boolean
+    val hideAddress: Boolean,
+
+    val price: Int? = null
 
 ) : MeetingModel
 
@@ -66,9 +68,9 @@ val DemoFullMeetingModel = FullMeetingModel(
     title = "Поход в кино",
     condition = ConditionType.MEMBER_PAY,
     category = DemoShortCategoryModel,
+    duration = "2 часа",
     type = MeetType.GROUP,
     dateTime = "2022-09-16T08:35:54.140Z",
-    duration = "2 часа",
     organizer = DemoOrganizerModel,
     isOnline = false,
     tags = DemoTagList,
@@ -78,7 +80,8 @@ val DemoFullMeetingModel = FullMeetingModel(
     requirements = ListDemoMeetingRequirementModel,
     place = "Москва-сити",
     address = "Москва, ул. Пушкина 42",
-    hideAddress = false
+    hideAddress = false,
+    price = 600
 )
 
 val DemoMeetingList = listOf(

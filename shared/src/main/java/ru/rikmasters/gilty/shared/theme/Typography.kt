@@ -55,5 +55,5 @@ val Typography = Typography(
     labelLarge = baseTextStyle.copy(fontSize = 20.sp, fontWeight = Bold, lineHeight = 20.sp),
     displayLarge = baseTextStyle.copy(fontSize = 24.sp, fontWeight =  Bold, lineHeight = 32.sp),
     titleLarge = baseTextStyle.copy(fontSize = 28.sp, fontWeight = Bold, lineHeight = 32.sp),
-    headlineLarge = baseTextStyle.copy()
+    headlineLarge = baseTextStyle.copy(fontSize = 22.sp, fontWeight = Bold, lineHeight = 22.sp)
 )

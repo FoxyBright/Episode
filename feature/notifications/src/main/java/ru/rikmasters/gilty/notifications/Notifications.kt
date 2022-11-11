@@ -12,5 +12,7 @@ object Notifications : FeatureDefinition() {
         }
     }
 
-    override fun Module.koin() {}
+    override fun Module.koin() {
+
+    }
 }

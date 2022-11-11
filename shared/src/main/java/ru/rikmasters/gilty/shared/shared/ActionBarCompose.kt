@@ -10,7 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,8 +49,7 @@ fun ActionBar(
         )
         details?.let {
             Text(
-                it,
-                Modifier
+                it, Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp),
                 style = MaterialTheme.typography.labelSmall,
@@ -65,31 +64,55 @@ fun RowActionBar(
     title: String,
     details: String? = null,
     modifier: Modifier = Modifier,
+    description: String? = null,
     onBack: (() -> Unit)? = null
 ) {
-    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        onBack?.let {
-            IconButton(it, Modifier.padding(end = 16.dp)) {
-                Icon(
-                    painterResource(R.drawable.ic_back),
-                    stringResource(R.string.action_bar_button_back),
-                    Modifier.size(24.dp),
-                    MaterialTheme.colorScheme.tertiary
+    Column(modifier) {
+        Row(verticalAlignment = CenterVertically) {
+            onBack?.let {
+                IconButton(it, Modifier.padding(end = 16.dp)) {
+                    Icon(
+                        painterResource(R.drawable.ic_back),
+                        stringResource(R.string.action_bar_button_back),
+                        Modifier.size(24.dp),
+                        MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+            Text(
+                title,
+                Modifier.padding(end = 8.dp),
+                MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.labelLarge
+            )
+            details?.let {
+                Text(
+                    details, style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
-        Text(
-            title,
-            Modifier.padding(end = 8.dp),
-            MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.labelLarge
-        )
-        details?.let {
+        description?.let {
             Text(
-                details, style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
+                it,
+                if (onBack != null) Modifier.padding(start = 32.dp)
+                else Modifier, MaterialTheme.colorScheme.onTertiary,
+                style = MaterialTheme.typography.labelSmall
             )
         }
+    }
+}
+
+@Composable
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+private fun BackRowActionBarPreview() {
+    GiltyTheme {
+        RowActionBar(
+            "Заголовок",
+            "Детали",
+            Modifier.padding(16.dp),
+            "Описание"
+        ) {}
     }
 }
 
@@ -100,14 +123,15 @@ private fun RowActionBarPreview() {
         RowActionBar(
             "Заголовок",
             "Детали",
-            Modifier.padding(16.dp)
+            Modifier.padding(16.dp),
+            "Описание"
         )
     }
 }
 
 @Composable
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-private fun LoginActionBarPreview() {
+private fun ActionBarPreview() {
     GiltyTheme {
         ActionBar(
             "Заголовок",

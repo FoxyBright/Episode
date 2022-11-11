@@ -14,7 +14,7 @@ data class RespondModel(
     val comment: String?,
     val sender: OrganizerModel,
     val type: RespondType,
-    val hiddenPhoto: List<HiddenPhotoModel>?
+    val hiddenPhoto: List<Pair<HiddenPhotoModel, Boolean>>?
 )
 
 val DemoSendRespondsModel = RespondModel(
@@ -33,8 +33,10 @@ val DemoReceivedRespondsModel = RespondModel(
     DemoOrganizerModel,
     RespondType.RECEIVED,
     listOf(
-        DemoHiddenPhotoModel, DemoHiddenPhotoModel,
-        DemoHiddenPhotoModel, DemoHiddenPhotoModel
+        Pair(DemoHiddenPhotoModel, true),
+        Pair(DemoHiddenPhotoModel, true),
+        Pair(DemoHiddenPhotoModel, false),
+        Pair(DemoHiddenPhotoModel, false)
     )
 )
 

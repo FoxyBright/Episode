@@ -156,6 +156,26 @@
     <string name="edit">Изменить</string>
 
     <!-- TOASTS -->
+    <string name="complaints_title">Пожаловаться</string>
+    <string name="complaints_lie_title">Ложная информация</string>
+    <string name="complaints_spam_title">Это спам</string>
+    <string name="complaints_cheater_title">Мошенничество или обман</string>
+    <string name="complaints_description">Ваша жалоба будет анонимной</string>
+    <string name="complaints_lie_anything_photo_label">Фотографии другого пользователя</string>
+    <string name="complaints_lie_celebrity_label">Фотографии знаменитости</string>
+    <string name="complaints_lie_bad_category_label">Встреча не соответсвует выбранной категории</string>
+    <string name="complaints_lie_suspicious_label">Подозрительное место встречи</string>
+    <string name="complaints_spam_advertisement_label">Реклама</string>
+    <string name="complaints_spam_sending_label">Навязчивая рассылка</string>
+    <string name="complaints_cheater_fraud_label">Мошенничество</string>
+    <string name="complaints_cheater_deception_label">Обман</string>
+    <string name="complaints_cheater_delusion_label">Введение в заблуждение</string>
+    <string name="complaints_send_placeholder">Опишите вашу причину жалобы</string>
+    <string name="complaints_send_answer">Отлично, ваша жалоба отправлена!</string>
+    <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
+    <string name="complaints_button">Отправить жалобу</string>
+
+    <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
     <string name="login_terms_toast">Условий пока нет</string>

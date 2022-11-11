@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
@@ -136,7 +137,7 @@ fun GTextField(
         Box(Modifier, Alignment.TopEnd) {
             TextField(
                 value, { onValueChange(it) },
-                Modifier, enabled, readOnly,
+                Modifier.fillMaxWidth(), enabled, readOnly,
                 textStyle, label, placeholder, leadingIcon,
                 trailingIcon, supportingText, isError,
                 visualTransformation, keyboardOptions,
@@ -169,7 +170,7 @@ fun TextFieldColors() = TextFieldDefaults.textFieldColors(
     textColor = Black, containerColor = White,
     unfocusedLabelColor = colorScheme.onTertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = colorScheme.tertiary,
+    focusedLabelColor = Black,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -187,7 +188,7 @@ fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
     textColor = Black, containerColor = Transparent,
     unfocusedLabelColor = colorScheme.onTertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = colorScheme.tertiary,
+    focusedLabelColor = Black,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
