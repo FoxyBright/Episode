@@ -31,12 +31,12 @@ var ListHidden: List<File> = listOf()
 fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
     val context = LocalContext.current
     val commonPath = Environment.getExternalStorageDirectory().toString()
-    val menuPoint = remember { mutableStateOf("$commonPath/DCIM/Screenshots") }
+    val menuPoint = remember { mutableStateOf("$commonPath/DCIM/Camera") }
     val allDirectories = arrayListOf<File>()
     val selectImages = remember { mutableStateListOf<File>() }
     File("$commonPath/Pictures").listFiles()?.forEach { allDirectories.add(it) }
-    allDirectories.add(File("$commonPath/DCIM/Camera"))
-    allDirectories.add(File("$commonPath/DCIM/Screenshots"))
+//    allDirectories.add(File("$commonPath/DCIM/Camera"))
+//    allDirectories.add(File("$commonPath/DCIM/Screenshots"))
     val menuItems = arrayListOf<String>(); menuItems.add("Все медиа")
     allDirectories.forEach { if ((it.list()?.size ?: 0) != 0) menuItems.add(it.absolutePath) }
     val menuExpanded = remember { mutableStateOf(false) }
@@ -78,14 +78,13 @@ fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
             nav.navigateAbsolute("registration/resize?photo=$file")
         }
     })
-    if (multiple)
-        Box(Modifier.fillMaxSize()) {
-            GradientButton(
-                Modifier
-                    .padding(bottom = 48.dp)
-                    .padding(horizontal = 16.dp)
-                    .align(Alignment.BottomCenter),
-                "Прикрепить"
-            ) { nav.navigateAbsolute("registration/hidden") }
-        }
+    if (multiple) Box(Modifier.fillMaxSize()) {
+        GradientButton(
+            Modifier
+                .padding(bottom = 48.dp)
+                .padding(horizontal = 16.dp)
+                .align(Alignment.BottomCenter),
+            "Прикрепить"
+        ) { nav.navigateAbsolute("registration/hidden") }
+    }
 }

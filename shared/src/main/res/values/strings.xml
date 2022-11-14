@@ -175,6 +175,18 @@
     <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
     <string name="complaints_button">Отправить жалобу</string>
 
+    <!-- ADD MEETS -->
+    <string name="add_meet_create_title">Создать Meet</string>
+    <string name="add_meet_create_description">Выберите категорию</string>
+    <string name="add_meet_create_correct_description">Уточните чем именно хотите заняться</string>
+    <string name="add_meet_conditions_continue">Продолжаем</string>
+    <string name="add_meet_conditions_online_meet">Сделать встречу онлайн</string>
+    <string name="add_meet_conditions_additionally">Ещё</string>
+    <string name="add_meet_conditions_hidden">Доступ к скрытым фото</string>
+    <string name="add_meet_conditions_price">Цена</string>
+    <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
+    <string name="add_meet_conditions_hidden_label">Участники встречи получат доступ к скрытым фото.</string>
+
     <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>

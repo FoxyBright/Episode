@@ -125,28 +125,20 @@ fun GalleryContent(
                 )
             }
         }
-        LazyVerticalGrid(
-            GridCells.Fixed(3), Modifier.padding(horizontal = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (state.menuPoint == "Все медиа") {
-                state.directories.forEach { pack ->
-                    pack.listFiles()?.let { list ->
-                        items(list, { it.name }) {
-                            ImageItem(
-                                it, state.multipleSelect,
-                                state.selectedImages.contains(it)
-                            ) { file ->
-                                if (state.multipleSelect) callback
-                                    ?.onImageSelect(it)
-                                else callback?.changeImage(file)
-                            }
-                        }
-                    }
-                }
-            } else {
-                File(state.menuPoint).listFiles()?.let { list ->
+        Grid(state, callback)
+    }
+}
+
+@Composable
+private fun Grid(state: GalleryState, callback: GalleryCallback?) {
+    LazyVerticalGrid(
+        GridCells.Fixed(3), Modifier.padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (state.menuPoint == "Все медиа") {
+            state.directories.forEach { pack ->
+                pack.listFiles()?.let { list ->
                     items(list, { it.name }) {
                         ImageItem(
                             it, state.multipleSelect,
@@ -156,6 +148,19 @@ fun GalleryContent(
                                 ?.onImageSelect(it)
                             else callback?.changeImage(file)
                         }
+                    }
+                }
+            }
+        } else {
+            File(state.menuPoint).listFiles()?.let { list ->
+                items(list, { it.name }) {
+                    ImageItem(
+                        it, state.multipleSelect,
+                        state.selectedImages.contains(it)
+                    ) { file ->
+                        if (state.multipleSelect) callback
+                            ?.onImageSelect(it)
+                        else callback?.changeImage(file)
                     }
                 }
             }

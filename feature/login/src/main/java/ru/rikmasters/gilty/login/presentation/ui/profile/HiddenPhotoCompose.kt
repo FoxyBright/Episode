@@ -64,7 +64,6 @@ interface HiddenPhotoCallback : NavigationInterface {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun HiddenPhotoContent(
     state: HiddenPhotoState,
     modifier: Modifier = Modifier,
@@ -92,34 +91,7 @@ fun HiddenPhotoContent(
                     { callback?.onSelectImage(it) })
                 { callback?.onDeleteImage(it) }
             }
-            item {
-                Card(
-                    { callback?.openGallery() },
-                    Modifier.size(130.dp),
-                    shape = MaterialTheme.shapes.large,
-                ) {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(ThemeExtra.colors.grayButton),
-                        Center
-                    ) {
-                        Box(
-                            Modifier
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.ic_image_box),
-                                null,
-                                Modifier
-                                    .padding(6.dp)
-                                    .size(32.dp), Color.White
-                            )
-                        }
-                    }
-                }
-            }
+            item { GalleryButton(callback) }
         }
     }
     Box(Modifier.fillMaxSize()) {
@@ -130,6 +102,38 @@ fun HiddenPhotoContent(
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
         ) { callback?.onNext() }
+    }
+}
+
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun GalleryButton(callback: HiddenPhotoCallback?) {
+    Card(
+        { callback?.openGallery() },
+        Modifier.size(130.dp),
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(ThemeExtra.colors.grayButton),
+            Center
+        ) {
+            Box(
+                Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_image_box),
+                    null,
+                    Modifier
+                        .padding(6.dp)
+                        .size(32.dp), Color.White
+                )
+            }
+        }
     }
 }
 
@@ -162,7 +166,9 @@ private fun LazyItem(
                 .size(26.dp)
                 .clip(CircleShape)
                 .align(TopEnd)
-                .alpha(50f), colors = CardDefaults.cardColors(Color.Transparent)
+                .alpha(50f),
+            colors = CardDefaults
+                .cardColors(Color.Transparent)
         ) {
             Box(Modifier, Center) {
                 Image(

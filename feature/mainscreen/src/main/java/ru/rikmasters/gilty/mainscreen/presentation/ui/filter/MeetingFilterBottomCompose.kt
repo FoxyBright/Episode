@@ -20,6 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.Category
+import ru.rikmasters.gilty.shared.common.Distance
+import ru.rikmasters.gilty.shared.common.GenderAndConditions
+import ru.rikmasters.gilty.shared.common.MeetingType
+import ru.rikmasters.gilty.shared.common.TagSearch
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
@@ -30,15 +35,24 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 fun MeetingFilterBottomPreview() {
     GiltyTheme {
-        val distanceState = remember { mutableStateOf(false) }
-        val distance = remember { mutableStateOf(25) }
-        val onlyOnline = remember { mutableStateOf(false) }
-        val meetingTypes = remember { mutableStateListOf(false, false, false) }
-        val genderList = remember { mutableStateListOf(false, false, false) }
-        val conditionList = remember { mutableStateListOf(false, false, false, false, false) }
-        val tagList = remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
-        val categoryList = remember { mutableStateOf(DemoFullCategoryModelList) }
-        val categoryStateList = remember { mutableStateListOf<Boolean>() }
+        val distanceState =
+            remember { mutableStateOf(false) }
+        val distance =
+            remember { mutableStateOf(25) }
+        val onlyOnline =
+            remember { mutableStateOf(false) }
+        val meetingTypes =
+            remember { mutableStateListOf(false, false, false) }
+        val genderList =
+            remember { mutableStateListOf(false, false, false) }
+        val conditionList =
+            remember { mutableStateListOf(false, false, false, false, false) }
+        val tagList =
+            remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
+        val categoryList =
+            remember { mutableStateOf(DemoFullCategoryModelList) }
+        val categoryStateList =
+            remember { mutableStateListOf<Boolean>() }
         repeat(categoryList.value.size) { categoryStateList.add(false) }
         val state = FilterListState(
             distanceState.value,
@@ -109,7 +123,7 @@ fun MeetingFilterBottom(
                         it.name,
                         Modifier.padding(top = 28.dp, bottom = 18.dp),
                         MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.labelLarge
                     )
                     it.content.invoke()
                 }
@@ -196,6 +210,7 @@ private fun filterList(
             MeetingType(
                 state.onlyOnline,
                 state.meetingTypes,
+                stringResource(R.string.meeting_only_online_meetings_button),
                 { callback?.onOnlyOnlineClick() },
                 { it, status -> callback?.onMeetingTypeSelect(it, status) }
             )

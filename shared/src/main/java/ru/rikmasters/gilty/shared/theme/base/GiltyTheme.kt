@@ -41,7 +41,7 @@ object GiltyTheme : AppTheme {
 @Composable
 fun GiltyTheme(
     darkMode: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val (colorScheme, extraColors) = resolveColors(

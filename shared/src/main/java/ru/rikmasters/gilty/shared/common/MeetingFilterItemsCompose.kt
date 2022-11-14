@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +17,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -34,9 +36,9 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
+import ru.rikmasters.gilty.shared.shared.CheckBoxCard
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GiltyChip
-import ru.rikmasters.gilty.shared.shared.TrackCheckBox
 
 @Composable
 fun Category(
@@ -52,7 +54,7 @@ fun Category(
                 .padding(bottom = 12.dp)
                 .clickable { onCategoryClick(index) },
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+            CardDefaults.cardColors(colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
@@ -69,15 +71,15 @@ fun Category(
                     Text(
                         category.name,
                         Modifier.padding(start = 18.dp),
-                        MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                 }
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
-                    tint = MaterialTheme.colorScheme.onTertiary
+                    tint = colorScheme.onTertiary
                 )
             }
             category.subcategories?.let {
@@ -86,7 +88,7 @@ fun Category(
                     Surface {
                         FlowLayout(
                             Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .background(colorScheme.primaryContainer)
                                 .padding(top = 16.dp)
                                 .padding(horizontal = 16.dp), 8.dp, 8.dp
                         ) {
@@ -108,7 +110,7 @@ fun Category(
                 .fillMaxWidth()
                 .clickable { onAllCategoryClick() },
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+            CardDefaults.cardColors(colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
@@ -117,14 +119,14 @@ fun Category(
             ) {
                 Text(
                     stringResource(R.string.meeting_filter_show_all_categories),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorScheme.tertiary,
+                    style = typography.bodyMedium,
                     fontWeight = SemiBold
                 )
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
-                    tint = MaterialTheme.colorScheme.onTertiary
+                    tint = colorScheme.onTertiary
                 )
             }
         }
@@ -142,7 +144,7 @@ fun TagSearch(
             .fillMaxWidth()
             .clickable { onClick() },
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
         if (tagList.isEmpty())
             Row(
@@ -154,20 +156,20 @@ fun TagSearch(
                     painterResource(R.drawable.magnifier),
                     stringResource(R.string.login_search_placeholder),
                     Modifier.size(20.dp),
-                    MaterialTheme.colorScheme.onTertiary
+                    colorScheme.onTertiary
                 )
                 Text(
                     stringResource(R.string.meeting_filter_add_tag_text_holder),
                     Modifier.padding(start = 12.dp),
-                    MaterialTheme.colorScheme.onTertiary,
-                    style = MaterialTheme.typography.bodyMedium
+                    colorScheme.onTertiary,
+                    style = typography.bodyMedium
                 )
             }
         else
             Surface {
                 FlowLayout(
                     Modifier
-                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .background(colorScheme.primaryContainer)
                         .padding(top = 8.dp)
                         .padding(horizontal = 16.dp), 8.dp, 8.dp
                 ) {
@@ -175,7 +177,7 @@ fun TagSearch(
                         Box(
                             Modifier
                                 .clip(MaterialTheme.shapes.large)
-                                .background(MaterialTheme.colorScheme.primary)
+                                .background(colorScheme.primary)
                         ) {
                             Row(
                                 Modifier.padding(12.dp, 6.dp),
@@ -185,7 +187,7 @@ fun TagSearch(
                                     item,
                                     Modifier.padding(end = 10.dp),
                                     Color.White,
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = typography.labelSmall
                                 )
                                 Icon(
                                     Icons.Filled.Close,
@@ -214,7 +216,7 @@ fun Distance(
             .fillMaxWidth()
             .clickable { onClick() },
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
         Row(
             Modifier
@@ -225,21 +227,21 @@ fun Distance(
             Text(
                 stringResource(R.string.meeting_filter_radius_of_search_label),
                 Modifier.padding(start = 16.dp),
-                MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium,
+                colorScheme.tertiary,
+                style = typography.bodyMedium,
                 fontWeight = SemiBold
             )
             Row(verticalAlignment = CenterVertically) {
                 Box(
                     Modifier
                         .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.primary)
+                        .background(colorScheme.primary)
                 ) {
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, distance),
                         Modifier.padding(12.dp, 6.dp),
                         Color.White,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
                 }
@@ -248,7 +250,7 @@ fun Distance(
                     else Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
                     Modifier.padding(horizontal = 16.dp),
-                    MaterialTheme.colorScheme.onTertiary
+                    colorScheme.onTertiary
                 )
             }
         }
@@ -276,14 +278,14 @@ fun Distance(
                 ) {
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 1),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.tertiary,
+                        style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 50),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.tertiary,
+                        style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                 }
@@ -292,11 +294,11 @@ fun Distance(
     }
 }
 
-
 @Composable
 fun MeetingType(
     hiddenPhoto: Boolean,
     selectedMeetingType: List<Boolean>,
+    CheckLabel: String,
     onOnlyOnlineClick: (Boolean) -> Unit,
     onMeetingTypeSelect: (Int, Boolean) -> Unit
 ) {
@@ -308,12 +310,12 @@ fun MeetingType(
     Card(
         Modifier.fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingType.forEachIndexed { index, item ->
@@ -326,26 +328,49 @@ fun MeetingType(
             }
         }
     }
-    Card(
+    CheckBoxCard(
+        CheckLabel,
         Modifier
             .padding(top = 12.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth(), hiddenPhoto
+    ) { onOnlyOnlineClick(it) }
+}
+
+@Composable
+fun ConditionsSelect(
+    selectedMeetingTypes: List<Boolean>,
+    onConditionSelect: (Int, Boolean) -> Unit
+) {
+    val conditionList = listOf(
+        stringResource(R.string.meeting_filter_select_meeting_type_free),
+        stringResource(R.string.meeting_filter_select_meeting_type_divide_amount),
+        stringResource(R.string.meeting_filter_select_meeting_type_organizer_pays),
+        stringResource(R.string.meeting_filter_select_meeting_type_paid),
+        stringResource(R.string.meeting_filter_select_meeting_type_does_not_matter)
+    )
+    Card(
+        Modifier.fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            Arrangement.SpaceBetween,
-            CenterVertically
-        ) {
-            Text(stringResource(R.string.meeting_only_online_meetings_button))
-            TrackCheckBox(hiddenPhoto) { onOnlyOnlineClick(it) }
+        Surface {
+            FlowLayout(
+                Modifier
+                    .background(colorScheme.primaryContainer)
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+            ) {
+                selectedMeetingTypes.forEachIndexed { index, item ->
+                    GiltyChip(
+                        Modifier,
+                        conditionList[index],
+                        item
+                    ) { onConditionSelect(index, item) }
+                }
+            }
         }
     }
 }
-
 
 @Composable
 fun GenderAndConditions(
@@ -371,12 +396,12 @@ fun GenderAndConditions(
             .fillMaxWidth()
             .padding(bottom = 12.dp),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp), 8.dp, 8.dp
             ) {
@@ -393,12 +418,12 @@ fun GenderAndConditions(
     Card(
         Modifier.fillMaxWidth(),
         MaterialTheme.shapes.large,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
+        CardDefaults.cardColors(colorScheme.primaryContainer),
     ) {
         Surface {
             FlowLayout(
                 Modifier
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp), 8.dp, 8.dp
             ) {

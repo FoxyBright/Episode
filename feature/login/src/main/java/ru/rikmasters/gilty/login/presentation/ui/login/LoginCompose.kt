@@ -36,6 +36,7 @@ import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.textMask
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -47,7 +48,7 @@ private fun LoginPreview() {
         val mask = "+7 ### ###-##-##"
         LoginContent(
             LoginState(
-                phoneTransform(mask), mask,
+                textMask(mask), mask,
                 "9543422455", DemoCountry,
                 Countries(), 10
             )

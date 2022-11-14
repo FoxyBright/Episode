@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.login.presentation.model.Countries
 import ru.rikmasters.gilty.login.presentation.model.Country
 import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.textMask
 
 
 @Composable
@@ -28,7 +29,7 @@ fun LoginScreen(nav: NavState = get()) {
     val scope = rememberCoroutineScope()
     val mask = "${selectCountry.code} ### ###-##-##"
     val transform by remember(mask)
-    { mutableStateOf(phoneTransform(mask)) }
+    { mutableStateOf(textMask(mask)) }
     var searchText by remember { mutableStateOf("") }
     var searchState by remember { mutableStateOf(false) }
     val countries = Countries()

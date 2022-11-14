@@ -164,6 +164,24 @@ fun GTextField(
     }
 }
 
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun PriceFieldColors() = TextFieldDefaults.textFieldColors(
+    textColor = colorScheme.primary, containerColor = White,
+    unfocusedLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.onTertiary,
+    focusedLabelColor = Black,
+    disabledTrailingIconColor = Transparent,
+    focusedTrailingIconColor = Transparent,
+    unfocusedTrailingIconColor = Transparent,
+    focusedIndicatorColor = Transparent,
+    unfocusedIndicatorColor = Transparent,
+    disabledIndicatorColor = Transparent,
+    errorIndicatorColor = Transparent,
+    placeholderColor = colorScheme.onTertiary,
+    disabledPlaceholderColor = Transparent,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldColors() = TextFieldDefaults.textFieldColors(

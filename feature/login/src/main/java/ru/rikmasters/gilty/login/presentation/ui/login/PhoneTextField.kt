@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.textMask
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -27,7 +28,7 @@ private fun PhoneTextFieldPreview() {
         val mask = "+7 ### ###-##-##"
         PhoneTextField(
             "9105152312",
-            phoneTransform(mask),
+            textMask(mask),
             Modifier.padding(32.dp),
         )
     }
