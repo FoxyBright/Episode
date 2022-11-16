@@ -54,7 +54,6 @@ fun CategoriesContent(
             ActionBar(
                 stringResource(R.string.interested_you),
                 stringResource(R.string.interested_you_details),
-                Modifier.padding(horizontal = 16.dp)
             ) { callback?.onBack() }
             LazyRow(
                 Modifier

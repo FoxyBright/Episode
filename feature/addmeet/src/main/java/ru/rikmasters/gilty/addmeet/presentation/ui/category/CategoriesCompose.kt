@@ -7,27 +7,23 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
-import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.shared.CrossButton
+import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
+import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
+import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -36,8 +32,10 @@ data class CategoriesState(
     val selectCategories: List<ShortCategoryModel>
 )
 
-interface CategoriesCallback : NavigationInterface {
+interface CategoriesCallback {
     fun onCategoryClick(category: ShortCategoryModel) {}
+    fun onNext() {}
+    fun onClose() {}
 }
 
 @Composable
@@ -51,11 +49,11 @@ fun CategoriesContent(
             Modifier
                 .fillMaxSize()
         ) {
-            ActionBar(
+            ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
                 stringResource(R.string.add_meet_create_description),
-                Modifier.padding(horizontal = 16.dp)
-            ) { callback?.onBack() }
+                Modifier, { callback?.onClose() }
+            )
             LazyRow(
                 Modifier
                     .height((CATEGORY_ELEMENT_SIZE * 4).dp)
@@ -80,12 +78,6 @@ fun CategoriesContent(
                 }
             }
         }
-        CrossButton(
-            Modifier
-                .padding(top = 32.dp, end = 16.dp)
-                .size(20.dp)
-                .align(TopEnd)
-        ) { callback?.onBack() }
         Column(
             Modifier
                 .padding(bottom = 48.dp)

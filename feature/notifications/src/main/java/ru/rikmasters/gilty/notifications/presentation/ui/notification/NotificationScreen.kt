@@ -125,7 +125,11 @@ fun NotificationsScreen(nav: NavState = get()) {
                         if (it == point) stateList[it] = ACTIVE
                         else if (stateList[it] != NEW)
                             stateList[it] = INACTIVE
-                        if (point == 0) nav.navigateAbsolute("main/meetings")
+                        when (point) {
+                            0 -> nav.navigateAbsolute("main/meetings")
+                            1 -> nav.navigateAbsolute("notification/list")
+                            2 -> nav.navigateAbsolute("addmeet/category")
+                        }
                     }
                 }
 

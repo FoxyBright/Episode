@@ -55,21 +55,19 @@ fun ScrollTimePicker(
         Alignment.CenterVertically
     ) {
         ListItemPicker(
+            timeReplacer(hoursValue, HOURS_END),
+            getTimesList(0..HOURS_END.toInt()),
             Modifier.padding(end = 5.dp),
             { timeReplacer(it, HOURS_END) },
-            timeReplacer(hoursValue, HOURS_END),
-            { hoursValue = it },
-            MaterialTheme.colorScheme.outlineVariant,
-            getTimesList(0..HOURS_END.toInt())
-        )
+            MaterialTheme.colorScheme.outline
+        ) { hoursValue = it }
         ListItemPicker(
+            timeReplacer(minutesValue, MINUTES_END),
+            getTimesList(0..MINUTES_END.toInt()),
             Modifier.padding(start = 5.dp),
             { timeReplacer(it, MINUTES_END) },
-            timeReplacer(minutesValue, MINUTES_END),
-            { minutesValue = it },
-            MaterialTheme.colorScheme.outlineVariant,
-            getTimesList(0..MINUTES_END.toInt())
-        )
+            MaterialTheme.colorScheme.outlineVariant
+        ) { minutesValue = it }
     }
     onValueChange(
         timeReplacer(hoursValue, "23"),

@@ -55,12 +55,14 @@ fun PersonalInfoContent(
         Modifier
             .fillMaxSize()
     ) {
-        Column(Modifier.padding(horizontal = 16.dp)) {
+        Column {
             ActionBar(stringResource(R.string.personal_info_title))
             { callback?.onBack() }
             Text(
                 stringResource(R.string.how_old_are_you),
-                Modifier.padding(top = 24.dp),
+                Modifier
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
@@ -68,6 +70,7 @@ fun PersonalInfoContent(
                 { callback?.onAgeClick() },
                 Modifier
                     .padding(top = 12.dp)
+                    .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(colorScheme.primaryContainer)
@@ -82,12 +85,16 @@ fun PersonalInfoContent(
             }
             Text(
                 stringResource(R.string.sex),
-                Modifier.padding(top = 24.dp),
+                Modifier
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
             Card(
-                Modifier.padding(top = 12.dp),
+                Modifier
+                    .padding(top = 12.dp)
+                    .padding(horizontal = 16.dp),
                 MaterialTheme.shapes.large,
                 CardDefaults.cardColors(colorScheme.primaryContainer)
             ) {

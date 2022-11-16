@@ -37,11 +37,7 @@ fun ProfileContent(
     callback: ProfileCallback? = null
 ) {
     Box(Modifier.fillMaxSize()) {
-        Column(
-            modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
+        Column(modifier.fillMaxSize()) {
             ActionBar(
                 stringResource(R.string.create_profile_title)
             )
@@ -49,7 +45,7 @@ fun ProfileContent(
             Card(
                 Modifier
                     .offset(y = 24.dp)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 32.dp)
                     .fillMaxSize(),
                 RoundedCornerShape(30.dp),
                 CardDefaults.cardColors(MaterialTheme.colorScheme.background),
@@ -70,8 +66,7 @@ fun ProfileContent(
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
-            (state.profilePhoto?.isNotBlank() == true &&
-                    state.name.isNotBlank() &&
+            (state.name.isNotBlank() &&
                     !state.occupiedName)
         ) { callback?.onNext() }
     }

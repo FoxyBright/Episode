@@ -12,7 +12,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.shared.PriceFieldColors
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Composable
 fun ConditionsScreen(nav: NavState = get()) {
@@ -32,52 +31,54 @@ fun ConditionsScreen(nav: NavState = get()) {
         meetingTypes, conditionList,
         text, colors, focus
     )
-    GiltyTheme {
-        ConditionContent(state, Modifier, object : ConditionsCallback {
-            override fun onOnlineClick() {
-                online.value = !online.value
-            }
+    ConditionContent(state, Modifier, object : ConditionsCallback {
+        override fun onOnlineClick() {
+            online.value = !online.value
+        }
 
-            override fun onPriceChange(price: String) {
-                text = price
-            }
+        override fun onPriceChange(price: String) {
+            text = price
+        }
 
-            override fun onClear() {
-                text = ""
-            }
+        override fun onClose() {
+            nav.navigateAbsolute("main/meetings")
+        }
 
-            override fun onHiddenClick() {
-                hiddenPhoto.value = !hiddenPhoto.value
-            }
+        override fun onClear() {
+            text = ""
+        }
 
-            override fun onBack() {
-                nav.navigate("category")
-            }
+        override fun onHiddenClick() {
+            hiddenPhoto.value = !hiddenPhoto.value
+        }
 
-            override fun onNext() {
-                nav.navigate("tags")
-            }
+        override fun onBack() {
+            nav.navigate("category")
+        }
 
-            override fun onConditionSelect(it: Int) {
-                repeat(conditionList.size) { item -> conditionList[item] = it == item }
-            }
+        override fun onNext() {
+            nav.navigate("detailed")
+        }
 
-            override fun onMeetingTypeSelect(it: Int) {
-                repeat(meetingTypes.size) { item -> meetingTypes[item] = it == item }
-            }
+        override fun onConditionSelect(it: Int) {
+            repeat(conditionList.size) { item -> conditionList[item] = it == item }
+        }
 
-            override fun onPriceFocus(state: FocusState) {
-                focus = state
-                if (state.isFocused) {
-                    text = text.filter { it.isDigit() }
-                    colors = focusedColor
-                } else {
-                    text = if (text.isNotEmpty())
-                        text.filter { it.isDigit() } + " ₽"
-                    else text
-                    colors = unfocusedColor
-                }
+        override fun onMeetingTypeSelect(it: Int) {
+            repeat(meetingTypes.size) { item -> meetingTypes[item] = it == item }
+        }
+
+        override fun onPriceFocus(state: FocusState) {
+            focus = state
+            if (state.isFocused) {
+                text = text.filter { it.isDigit() }
+                colors = focusedColor
+            } else {
+                text = if (text.isNotEmpty())
+                    text.filter { it.isDigit() } + " ₽"
+                else text
+                colors = unfocusedColor
             }
-        })
-    }
+        }
+    })
 }

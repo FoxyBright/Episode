@@ -22,6 +22,7 @@ data class ExtraColors(
     val navBarAddButton: Color = Color.Unspecified,
     val chatBackground: Color = Color.Unspecified,
     val commentBackground: Color = Color.Unspecified,
+    val priceTextFieldText: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
@@ -50,6 +51,7 @@ val LightExtraColors = ExtraColors(
     navBarAddButton = Colors.AlmostDark,
     chatBackground = Colors.Pinky,
     commentBackground = Colors.RottenPlum,
+    priceTextFieldText = Colors.AlmostRed,
     // Add colors in scheme from Colors-file
 )
 
@@ -78,5 +80,6 @@ val DarkExtraColors = ExtraColors(
     navBarAddButton = Colors.White,
     chatBackground = Colors.RottenPlum,
     commentBackground = Colors.RottenPlum,
+    priceTextFieldText = Colors.White,
     // Add colors in scheme from Colors-file
 )

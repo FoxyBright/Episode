@@ -73,7 +73,6 @@ fun HiddenPhotoContent(
         modifier
             .fillMaxWidth()
             .fillMaxHeight(0.85f)
-            .padding(horizontal = 16.dp)
     ) {
         ActionBar(
             "Скрытые фото",
@@ -81,7 +80,7 @@ fun HiddenPhotoContent(
             Modifier.padding(bottom = 20.dp)
         ) { callback?.onBack() }
         LazyVerticalGrid(
-            GridCells.Fixed(3),
+            GridCells.Fixed(3), Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {

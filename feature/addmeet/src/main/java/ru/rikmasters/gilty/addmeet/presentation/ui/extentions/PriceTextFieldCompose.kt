@@ -2,8 +2,6 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.extentions
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +13,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.numberMask
 import ru.rikmasters.gilty.shared.common.extentions.textMask
 import ru.rikmasters.gilty.shared.shared.GTextField
+import ru.rikmasters.gilty.shared.shared.TextFieldLabel
 
 @Composable
 fun PriceTextField(
@@ -27,16 +26,18 @@ fun PriceTextField(
 ) {
     GTextField(
         value, {
-            if (it.length <= 15
-                && it.matches(Regex("^\\d+\$"))
-            ) onChange(onNull(it))
-        },
-        Modifier
+            if (it.matches(Regex("^\\d+\$")))
+                onChange(onNull(it))
+        }, Modifier
             .fillMaxWidth()
             .onFocusChanged { onFocused(it) },
         colors = colors, clear = onClear, label =
-        if (value.isNotEmpty()) label(true) else null,
-        placeholder = label(), singleLine = true,
+        if (value.isNotEmpty()) TextFieldLabel(
+            true, stringResource(R.string.add_meet_conditions_price_description)
+        ) else null,
+        placeholder = TextFieldLabel(
+            false, stringResource(R.string.add_meet_conditions_price_description)
+        ), singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.NumberPassword
         ), visualTransformation =
@@ -53,17 +54,3 @@ private fun onNull(text: String): String =
         && text.isNotEmpty()
     ) text.substring(1, text.length)
     else text
-
-@Composable
-private fun label(
-    label: Boolean = false
-): @Composable (() -> Unit) {
-    return {
-        Text(
-            stringResource(R.string.add_meet_conditions_price_description),
-            Modifier, style = if (label)
-                MaterialTheme.typography.headlineSmall
-            else MaterialTheme.typography.bodyMedium
-        )
-    }
-}

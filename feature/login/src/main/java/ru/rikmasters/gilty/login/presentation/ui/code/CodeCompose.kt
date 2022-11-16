@@ -69,11 +69,7 @@ fun CodeContent(
     callback: CodeCallback? = null
 ) {
     Box(modifier.background(MaterialTheme.colorScheme.background)) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
+        Column(Modifier.fillMaxSize()) {
             ActionBar(
                 stringResource(R.string.confirm_number_title),
                 stringResource(R.string.confirm_number_subtitle)

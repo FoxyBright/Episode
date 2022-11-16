@@ -38,7 +38,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 data class SearchState(
-    val name: String = "",
+    val name: String? = null,
     var state: Boolean,
     val text: String,
     val onChangeText: (it: String) -> Unit,
@@ -118,7 +118,7 @@ fun SearchActionBar(
                 Arrangement.SpaceBetween,
                 Alignment.CenterVertically
             ) {
-                Text(state.name, style = MaterialTheme.typography.labelLarge)
+                Text(state.name ?: "", style = MaterialTheme.typography.labelLarge)
                 IconButton({
                     state.state = true
                     state.onExpandSearch?.let { it(true) }

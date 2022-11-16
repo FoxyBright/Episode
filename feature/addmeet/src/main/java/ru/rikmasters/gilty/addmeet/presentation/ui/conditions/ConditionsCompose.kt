@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
@@ -27,6 +28,7 @@ import ru.rikmasters.gilty.shared.common.MeetingType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.CheckBoxCard
+import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.CrossButton
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
@@ -58,6 +60,7 @@ data class ConditionState(
 interface ConditionsCallback {
     fun onBack() {}
     fun onNext() {}
+    fun onClose() {}
     fun onOnlineClick() {}
     fun onHiddenClick() {}
     fun onPriceChange(price: String) {}
@@ -75,11 +78,10 @@ fun ConditionContent(
 ) {
     Box(modifier) {
         Column(Modifier.fillMaxSize()) {
-            ActionBar(
-                stringResource(R.string.add_meet_conditions_continue), (null),
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 10.dp)
+            ClosableActionBar(
+                stringResource(R.string.add_meet_conditions_continue),
+                (null), Modifier.padding(bottom = 10.dp),
+                { callback?.onClose() }
             ) { callback?.onBack() }
             Conditions(
                 Modifier.fillMaxSize(),
@@ -91,7 +93,7 @@ fun ConditionContent(
                 .padding(top = 32.dp, end = 16.dp)
                 .size(20.dp)
                 .align(Alignment.TopEnd)
-        ) { callback?.onBack() }
+        ) { callback?.onClose() }
     }
 }
 
@@ -145,26 +147,6 @@ private fun Conditions(
                 Dashes((5), (2), Modifier.padding(top = 16.dp))
             }
         }
-    }
-}
-
-@Composable
-private fun Element(
-    it: FilterModel,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        Text(
-            it.name,
-            Modifier.padding(bottom = 18.dp),
-            MaterialTheme.colorScheme.tertiary,
-            style = typography.labelLarge
-        )
-        it.content.invoke()
     }
 }
 

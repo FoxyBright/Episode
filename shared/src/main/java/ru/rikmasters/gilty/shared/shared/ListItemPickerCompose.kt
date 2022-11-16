@@ -39,13 +39,12 @@ private fun <T> getItemIndexForOffset(
 
 @Composable
 fun <T> ListItemPicker(
+    value: T, list: List<T>,
     modifier: Modifier = Modifier,
     label: (T) -> String = { it.toString() },
-    value: T,
-    onValueChange: (T) -> Unit,
-    dividersColor: Color = MaterialTheme.colorScheme.primary,
-    list: List<T>,
+    dividersColor: Color = MaterialTheme.colorScheme.outline,
     textStyle: TextStyle = LocalTextStyle.current,
+    onValueChange: (T) -> Unit,
 ) {
     val minimumAlpha = 0.3f
     val verticalMargin = 8.dp
@@ -67,7 +66,8 @@ fun <T> ListItemPicker(
 
     val coercedAnimatedOffset = animatedOffset.value % halfNumbersColumnHeightPx
 
-    val indexOfElement = getItemIndexForOffset(list, value, animatedOffset.value, halfNumbersColumnHeightPx)
+    val indexOfElement =
+        getItemIndexForOffset(list, value, animatedOffset.value, halfNumbersColumnHeightPx)
 
     var dividersWidth by remember { mutableStateOf(0.dp) }
 

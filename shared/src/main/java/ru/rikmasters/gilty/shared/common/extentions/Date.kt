@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.common.extentions
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import ru.rikmasters.gilty.core.log.log
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -10,9 +11,12 @@ import java.util.*
 
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
+const val TODAY_LABEL = "Сегодня"
 const val TIME_FORMAT = "HH-mm-ss"
 val LOCAL_TIME: LocalTime = LocalTime.now()
 val LOCAL_DATE: LocalDate = LocalDate.now()
+const val ZERO_TIME = "T00:00:00.000Z"
+const val TIME_START = "00"
 const val MILLIS_IN_SECOND = 1000
 const val SECONDS_IN_MINUTE = 60
 const val MINUTES_IN_HOUR = 60
@@ -30,9 +34,49 @@ object LocalDateFactory {
         LocalDate.ofEpochDay(millis / MILLIS_IN_DAY)
 }
 
+fun getDate(period: Int = 150): List<String> {
+    val list = arrayListOf<String>()
+    getDateList(period).first.forEach { list.add(it) }
+    list.reverse(); list.add(TODAY_LABEL)
+    getDateList(period).second.forEach { list.add(it) }
+    list.forEach { log.v(it) }
+    return list
+}
+
+fun getDateList(times: Int): Pair<List<String>, List<String>> {
+    val lastList = arrayListOf<String>()
+    val newList = arrayListOf<String>()
+    var todayPlus = LOCAL_DATE.plusDays(1)
+    var todayMinus = LOCAL_DATE.minusDays(1)
+    for (i in 1..times) {
+        lastList.add("$todayPlus$ZERO_TIME".dateCalendar())
+        newList.add("$todayMinus$ZERO_TIME".dateCalendar())
+        todayPlus = todayPlus.minusDays(1)
+        todayMinus = todayMinus.plusDays(1)
+    }
+    return Pair(lastList, newList)
+}
+
+fun getTime(range: Iterable<Int>, step: Int): List<String> {
+    val list = arrayListOf<String>()
+    list.add("start")
+    for (it in range as IntRange step step)
+        if (it.toString().length != 1) list.add(it.toString())
+        else list.add("0${it}")
+    list.add("end")
+    return list
+}
+
+fun replacer(it: String, end: String): String {
+    return when (it) {
+        "start" -> end
+        "end" -> TIME_START
+        else -> it
+    }
+}
 
 fun todayControl(date: String): Boolean {
-    return date.format(FORMAT) == DateTimeFormatter.ofPattern(FORMAT).format(LocalDate.now())
+    return date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
 }
 
 fun getDifferenceOfTime(date: String): String {

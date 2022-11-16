@@ -186,6 +186,19 @@
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
     <string name="add_meet_conditions_hidden_label">Участники встречи получат доступ к скрытым фото.</string>
+    <string name="add_meet_detailed_meet_duration">Длительность</string>
+    <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
+    <string name="add_meet_detailed_meet_date">Дата и время</string>
+    <string name="add_meet_detailed_meet_date_place_holder">Когда</string>
+    <string name="add_meet_detailed_title">Подробнее</string>
+    <string name="add_meet_detailed_tags">Теги</string>
+    <string name="add_meet_detailed_tags_maximum">(максимум %s)</string>
+    <string name="add_meet_detailed_tags_description">Первый тег будет отображаться в названии встречи</string>
+    <string name="add_meet_detailed_meet_description">Описание</string>
+    <string name="add_meet_detailed_meet_description_place_holder">Краткое описание встречи</string>
+    <string name="add_meet_detailed_meet_place">Место встречи</string>
+    <string name="add_meet_detailed_meet_place_place_holder">Точное место встречи будет видно только участникам</string>
+    <string name="add_meet_detailed_meet_hide_place">Скрыть место встречи</string>
 
     <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>

@@ -103,10 +103,7 @@ fun GalleryContent(
             Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                RowActionBar(
-                    "Галерея",
-                    modifier = Modifier.fillMaxWidth(0.38f)
-                )
+                RowActionBar("Галерея")
                 { callback?.onBack() }
                 IconButton({ callback?.menu(true) }, Modifier.size(30.dp)) {
                     Icon(

@@ -4,5 +4,6 @@ import androidx.compose.runtime.Composable
 
 data class FilterModel(
     val name: String,
+    val details: String? = null,
     val content: @Composable () -> Unit
 )

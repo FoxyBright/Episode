@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -69,11 +70,7 @@ fun PermissionsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
+        Column(Modifier.fillMaxSize()) {
             ActionBar(
                 stringResource(R.string.permissions_action_bar),
                 stringResource(R.string.permissions_action_bar_details),
@@ -83,17 +80,21 @@ fun PermissionsContent(
                 stringResource(R.string.map),
                 Modifier
                     .fillMaxWidth()
+                    .height(300.dp)
                     .padding(38.dp, 22.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillHeight
             )
             Text(
                 stringResource(R.string.permissions_title),
-                Modifier.padding(bottom = 12.dp),
+                Modifier
+                    .padding(bottom = 12.dp)
+                    .padding(horizontal = 16.dp),
                 MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
             Column(
                 Modifier
+                    .padding(horizontal = 16.dp)
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 PermItem(

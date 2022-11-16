@@ -23,9 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -106,6 +105,22 @@ private fun Placeholder() {
 }
 
 @Composable
+fun TextFieldLabel(
+    label: Boolean = false,
+    text: String? = null
+): @Composable (() -> Unit) {
+    return {
+        text?.let {
+            Text(
+                it, Modifier, style = if (label)
+                    typography.headlineSmall
+                else typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun GTextField(
     value: String,
@@ -167,10 +182,11 @@ fun GTextField(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun PriceFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = colorScheme.primary, containerColor = White,
+    textColor = colors.priceTextFieldText,
+    containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = colorScheme.onTertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = Black,
+    focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -185,10 +201,11 @@ fun PriceFieldColors() = TextFieldDefaults.textFieldColors(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = Black, containerColor = White,
+    textColor = colorScheme.tertiary,
+    containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = colorScheme.onTertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = Black,
+    focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -203,10 +220,11 @@ fun TextFieldColors() = TextFieldDefaults.textFieldColors(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = Black, containerColor = Transparent,
+    textColor = colorScheme.tertiary,
+    containerColor = Transparent,
     unfocusedLabelColor = colorScheme.onTertiary,
     disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = Black,
+    focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -221,7 +239,8 @@ fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PreviewColors() = TextFieldDefaults.textFieldColors(
-    textColor = Black, containerColor = White,
+    textColor = colorScheme.tertiary,
+    containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = Color(0xFF98989F),
     disabledLabelColor = Color(0xFF98989F),
     focusedLabelColor = Color(0xFF000000),

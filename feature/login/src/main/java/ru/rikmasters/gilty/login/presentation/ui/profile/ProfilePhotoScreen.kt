@@ -35,8 +35,6 @@ fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
     val allDirectories = arrayListOf<File>()
     val selectImages = remember { mutableStateListOf<File>() }
     File("$commonPath/Pictures").listFiles()?.forEach { allDirectories.add(it) }
-//    allDirectories.add(File("$commonPath/DCIM/Camera"))
-//    allDirectories.add(File("$commonPath/DCIM/Screenshots"))
     val menuItems = arrayListOf<String>(); menuItems.add("Все медиа")
     allDirectories.forEach { if ((it.list()?.size ?: 0) != 0) menuItems.add(it.absolutePath) }
     val menuExpanded = remember { mutableStateOf(false) }
