@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.core.module
 
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 
 abstract class FeatureDefinition: ModuleDefinition(), Iterable<FeatureDefinition> {

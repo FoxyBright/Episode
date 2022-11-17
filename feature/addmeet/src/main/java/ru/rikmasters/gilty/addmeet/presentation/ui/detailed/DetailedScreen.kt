@@ -15,10 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DurationBottomSheet
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBS
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSCallback
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSState
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DurationBottomSheet
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.TIME_START

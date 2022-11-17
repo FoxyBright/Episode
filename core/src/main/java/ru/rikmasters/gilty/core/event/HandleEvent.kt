@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.core.event
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
 //TODO доделать систему ивентов

@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
-import java.util.*
+import java.util.UUID
 
 data class TagModel(
 

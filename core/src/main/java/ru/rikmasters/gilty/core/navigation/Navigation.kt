@@ -1,12 +1,9 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import kotlinx.coroutines.runBlocking
 
 fun NavGraphBuilder.deepNavGraphBuilder(
     state: NavState,
