@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import ru.rikmasters.gilty.core.log.Loggable
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.util.extension.slash
 
 @Stable

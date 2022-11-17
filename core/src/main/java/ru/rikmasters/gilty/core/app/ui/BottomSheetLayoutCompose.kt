@@ -15,10 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import ru.rikmasters.gilty.core.app.ui.fork.FractionalThreshold
 import androidx.compose.material3.MaterialTheme
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableState
-import ru.rikmasters.gilty.core.app.ui.fork.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -39,6 +36,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.core.app.ui.fork.FractionalThreshold
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableState
+import ru.rikmasters.gilty.core.app.ui.fork.swipeable
 import java.lang.Float.max
 import kotlin.math.roundToInt
 

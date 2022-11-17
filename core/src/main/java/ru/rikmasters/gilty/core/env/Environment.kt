@@ -14,7 +14,6 @@ import ru.rikmasters.gilty.core.module.BusinessDefinition
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import java.lang.ClassCastException
 
 class Environment
 internal constructor(

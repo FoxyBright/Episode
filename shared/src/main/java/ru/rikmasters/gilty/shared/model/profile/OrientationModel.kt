@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.model.profile
 
-import java.util.*
+import java.util.UUID
 
 data class OrientationModel(
 

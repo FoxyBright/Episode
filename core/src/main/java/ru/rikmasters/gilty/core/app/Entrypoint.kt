@@ -8,7 +8,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -22,6 +21,7 @@ import org.koin.dsl.module
 import ru.rikmasters.gilty.core.app.ui.BottomSheetLayout
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
+import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState

@@ -24,10 +24,6 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.ExperimentalMaterial3Api
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.AnimationSpec
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.StandardResistanceFactor
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.VelocityThreshold
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -57,6 +53,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.AnimationSpec
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.StandardResistanceFactor
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.VelocityThreshold
+import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.resistanceConfig
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sign

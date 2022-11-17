@@ -26,7 +26,6 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
 import ru.rikmasters.gilty.shared.common.MeetingType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.CheckBoxCard
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.CrossButton
