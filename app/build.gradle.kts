@@ -26,6 +26,9 @@ android {
 dependencies {
     androidBase()
     compose()
+    
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
+    
     implementation(project(":shared"))
     implementation(project(":example"))
     implementation(project(":feature:login"))
