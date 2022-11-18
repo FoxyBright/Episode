@@ -16,5 +16,5 @@ object Config {
     val sourceCompatibility = JavaVersion.VERSION_1_8
     val targetCompatibility = sourceCompatibility
 
-    const val kotlinCompilerExtensionVersion = "1.3.1"
+    const val kotlinCompilerExtensionVersion = "1.4.0-alpha02"
 }
