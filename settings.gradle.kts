@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":dataexample")
+
+
 include(":feature:complaints")
 
 

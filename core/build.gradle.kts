@@ -9,13 +9,8 @@ compose()
 
 dependencies {
     androidBase(true)
+    dataBase()
     compose()
-    
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("io.realm.kotlin:library-base:1.5.0")
-    
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.14.0")
     
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     testImplementation("com.google.truth:truth:1.1.3")

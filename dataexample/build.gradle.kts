@@ -4,10 +4,8 @@ plugins {
 }
 
 baseConfig()
-compose()
 
 dependencies {
     androidBase()
-    compose()
-    implementation(project(":dataexample"))
+    dataBase()
 }

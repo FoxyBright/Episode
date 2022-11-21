@@ -4,7 +4,8 @@ import org.gradle.kotlin.dsl.project
 
 fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) = implementation(
     "androidx.core:core-ktx:1.9.0",
-    "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 )and koin() and implementationIf(!excludeCore, project(":core"))
 
 const val composeVer = Config.kotlinCompilerExtensionVersion
@@ -30,6 +31,17 @@ fun DependencyHandlerScope.koin() = implementation(
     "io.insert-koin:koin-core:$koinVer",
     "io.insert-koin:koin-android:$koinVer",
     "io.insert-koin:koin-androidx-compose:$koinVer"
+)
+
+fun DependencyHandlerScope.dataBase() = realm() and jackson()
+
+fun DependencyHandlerScope.realm() = implementation(
+    "io.realm.kotlin:library-base:1.5.0"
+)
+
+fun DependencyHandlerScope.jackson() = implementation(
+    "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0",
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.14.0"
 )
 
 @Suppress("UNUSED_PARAMETER")
