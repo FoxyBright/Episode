@@ -38,9 +38,9 @@ val baseTextStyle = TextStyle(
 val Typography = Typography(
     /*      SMALL TYPOGRAPHY      */
     headlineSmall = baseTextStyle.copy(fontSize = 12.sp, fontWeight = Medium, lineHeight = 16.sp),
-    titleSmall = baseTextStyle.copy(fontSize = 10.sp, fontWeight = Medium, lineHeight = 10.sp),
+    titleSmall = baseTextStyle.copy(fontSize = 10.sp, fontWeight = Medium, lineHeight = 12.sp),
     labelSmall = baseTextStyle.copy(fontSize = 14.sp, fontWeight = Medium, lineHeight = 18.sp),
-    displaySmall = baseTextStyle.copy(),
+    displaySmall = baseTextStyle.copy(fontSize = 8.sp, fontWeight = Medium, lineHeight = 10.sp),
     bodySmall = baseTextStyle.copy(),
 
     /*      MEDIUM TYPOGRAPHY      */

@@ -14,3 +14,13 @@ fun LazyItemsShapes(index: Int, size: Int): Shape {
             else -> ThemeExtra.shapes.zero
         } else MaterialTheme.shapes.medium
 }
+
+@Composable
+fun LazyRowItemsShapes(index: Int, size: Int): Shape {
+    return if (size != 1)
+        return when (index) {
+            0 -> ThemeExtra.shapes.extraLargeStartRoundedShape
+            size - 1 -> ThemeExtra.shapes.extraLargeEndRoundedShape
+            else -> ThemeExtra.shapes.zero
+        } else MaterialTheme.shapes.medium
+}

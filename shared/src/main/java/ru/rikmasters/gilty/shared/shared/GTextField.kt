@@ -159,13 +159,15 @@ fun GTextField(
                 keyboardActions, singleLine, maxLines,
                 interactionSource, shape, colors
             ); if (value.isNotEmpty() && !isError)
-            IconButton({ clear?.let { it() } }) {
-                if (value.isNotEmpty()) {
-                    Icon(
-                        painterResource(R.drawable.ic_close),
-                        stringResource(R.string.clear),
-                        Modifier.size(24.dp), colorScheme.scrim
-                    )
+            clear?.let {
+                IconButton({ it() }) {
+                    if (value.isNotEmpty()) {
+                        Icon(
+                            painterResource(R.drawable.ic_close),
+                            stringResource(R.string.clear),
+                            Modifier.size(24.dp), colorScheme.scrim
+                        )
+                    }
                 }
             }
         }

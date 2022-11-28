@@ -66,11 +66,11 @@ data class FullMeetingModel(
 val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),
     title = "Поход в кино",
-    condition = ConditionType.MEMBER_PAY,
+    condition = ConditionType.FREE,
     category = DemoShortCategoryModel,
     duration = "2 часа",
     type = MeetType.GROUP,
-    dateTime = "2022-09-16T08:35:54.140Z",
+    dateTime = "2022-11-28T08:35:54.140Z",
     organizer = DemoOrganizerModel,
     isOnline = false,
     tags = DemoTagList,

@@ -49,10 +49,10 @@ fun getDateList(times: Int): Pair<List<String>, List<String>> {
     var todayPlus = LOCAL_DATE.plusDays(1)
     var todayMinus = LOCAL_DATE.minusDays(1)
     for (i in 1..times) {
-        lastList.add("$todayPlus$ZERO_TIME".dateCalendar())
-        newList.add("$todayMinus$ZERO_TIME".dateCalendar())
-        todayPlus = todayPlus.minusDays(1)
-        todayMinus = todayMinus.plusDays(1)
+        newList.add("$todayPlus$ZERO_TIME".dateCalendar())
+        lastList.add("$todayMinus$ZERO_TIME".dateCalendar())
+        todayPlus = todayPlus.plusDays(1)
+        todayMinus = todayMinus.minusDays(1)
     }
     return Pair(lastList, newList)
 }

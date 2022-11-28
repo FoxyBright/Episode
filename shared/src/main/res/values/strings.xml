@@ -199,6 +199,28 @@
     <string name="add_meet_detailed_meet_place">Место встречи</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место встречи будет видно только участникам</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место встречи</string>
+    <string name="requirements_title">Требования к\nучастникам</string>
+    <string name="requirements_member_count_label">Количество</string>
+    <string name="requirements_member_count_place_holder">Сколько будет участников</string>
+    <string name="requirements_private_check">Сделать приватной</string>
+    <string name="requirements_private_check_label">На вашу встречу можно попасть только по ссылке</string>
+    <string name="requirements_filter_all">Ко всем</string>
+    <string name="requirements_filter_personal">К каждому</string>
+    <string name="orientation_title">Ориентация</string>
+    <string name="orientation_hetero">Гетеро</string>
+    <string name="orientation_gay">Гей</string>
+    <string name="orientation_lesbian">Лесбиянка</string>
+    <string name="orientation_bisexual">Бисексуал(ка)</string>
+    <string name="orientation_asexual">Асексуал(ка)</string>
+    <string name="orientation_demisexual">Демисексуал(ка)</string>
+    <string name="orientation_pansexual">Пансексуал(ка)</string>
+    <string name="orientation_queer">Квир</string>
+    <string name="add_meet_publish_button">Опубликовать</string>
+
+    <!-- ALERTS -->
+    <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
+    <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
+    <string name="cancel_button">Отменить</string>
 
     <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>

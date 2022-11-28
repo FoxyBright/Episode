@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,8 +15,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,16 +27,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -80,7 +85,6 @@ private fun StringPreview() {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GiltyChip(
@@ -91,19 +95,19 @@ fun GiltyChip(
 ) {
 
     val backgroundColorTarget = if (isSelected)
-        MaterialTheme.colorScheme.primary
+        colorScheme.primary
     else
-        MaterialTheme.colorScheme.primaryContainer
+        colorScheme.primaryContainer
 
     val borderColorTarget = if (isSelected)
-        MaterialTheme.colorScheme.primary
+        colorScheme.primary
     else
-        ThemeExtra.colors.chipGray
+        colors.chipGray
 
     val textColorTarget = if (isSelected)
         Color.White
     else
-        MaterialTheme.colorScheme.tertiary
+        colorScheme.tertiary
 
     val backgroundColor by animateColorAsState(backgroundColorTarget)
     val borderColor by animateColorAsState(borderColorTarget)
@@ -119,9 +123,7 @@ fun GiltyChip(
         interactionSource = MutableInteractionSource()
     ) {
         Text(
-            text,
-            Modifier.padding(vertical = 6.dp, horizontal = 16.dp),
-            textColor,
+            text, Modifier.padding(16.dp, 6.dp), textColor,
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
         )
     }
@@ -142,13 +144,77 @@ fun GiltyString(
             text,
             Modifier.padding(4.dp),
             animateColorAsState(
-                if (isSelected) MaterialTheme.colorScheme.tertiary
-                else MaterialTheme.colorScheme.onTertiary, tween(600)
+                if (isSelected) colorScheme.tertiary
+                else colorScheme.onTertiary, tween(600)
             ).value, style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = animateIntAsState(
                     if (isSelected) 28 else 18, tween(200)
                 ).value.sp
             )
         )
+    }
+}
+
+@Preview
+@Composable
+private fun GiltyTab() {
+    val list = remember { mutableStateListOf(true, false, false, false) }
+    GiltyTheme {
+        GiltyTab(listOf("Ко всем", "К каждому", "Ко мне"), list) {
+            repeat(list.size) { index ->
+                list[index] = it == index
+            }
+        }
+    }
+}
+
+@Composable
+fun GiltyTab(
+    tabs: List<String>,
+    isSelected: List<Boolean>,
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit
+) {
+    Row(
+        modifier.fillMaxWidth(),
+        Arrangement.Center,
+        Alignment.CenterVertically
+    ) {
+        repeat(tabs.size) {
+            GiltyTabElement(
+                tabs[it], LazyRowItemsShapes(it, tabs.size),
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f), isSelected[it]
+            ) { onClick(it) }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun GiltyTabElement(
+    text: String, shape: Shape,
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick, modifier.fillMaxWidth(), (true),
+        shape, CardDefaults.cardColors(
+            animateColorAsState(
+                if (isSelected) colors.tabActive
+                else colors.tabInactive, tween(400)
+            ).value
+        ),
+        border = BorderStroke(1.dp, colorScheme.onTertiary)
+    ) {
+        Box(Modifier.fillMaxWidth(), Center) {
+            Text(
+                text, Modifier.padding(10.dp),
+                colorScheme.tertiary, fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
     }
 }

@@ -49,8 +49,8 @@ fun PriceTextField(
     )
 }
 
-private fun onNull(text: String): String =
-    if (text.first() == '0'
-        && text.isNotEmpty()
+fun onNull(text: String): String =
+    if (text.isNotEmpty()
+        && text.first() == '0'
     ) text.substring(1, text.length)
     else text

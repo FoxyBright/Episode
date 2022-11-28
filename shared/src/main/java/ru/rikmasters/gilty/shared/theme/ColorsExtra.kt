@@ -23,6 +23,8 @@ data class ExtraColors(
     val chatBackground: Color = Color.Unspecified,
     val commentBackground: Color = Color.Unspecified,
     val priceTextFieldText: Color = Color.Unspecified,
+    val tabActive: Color = Color.Unspecified,
+    val tabInactive: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
@@ -52,6 +54,8 @@ val LightExtraColors = ExtraColors(
     chatBackground = Colors.Pinky,
     commentBackground = Colors.RottenPlum,
     priceTextFieldText = Colors.AlmostRed,
+    tabActive = Colors.GentlePinky,
+    tabInactive = Colors.LightGray,
     // Add colors in scheme from Colors-file
 )
 
@@ -81,5 +85,7 @@ val DarkExtraColors = ExtraColors(
     chatBackground = Colors.RottenPlum,
     commentBackground = Colors.RottenPlum,
     priceTextFieldText = Colors.White,
+    tabActive = Colors.RudePinky,
+    tabInactive = Colors.Black,
     // Add colors in scheme from Colors-file
 )
