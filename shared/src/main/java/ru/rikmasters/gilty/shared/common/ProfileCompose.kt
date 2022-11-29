@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -126,7 +128,7 @@ fun Profile(
                 colors = TransparentTextFieldColors(),
                 textStyle = MaterialTheme.typography.displayLarge,
                 placeholder = {
-                    Row(Modifier, Arrangement.Center, Alignment.CenterVertically) {
+                    Row(Modifier, Center, CenterVertically) {
                         Text(
                             stringResource(R.string.user_name),
                             Modifier.padding(end = 8.dp),

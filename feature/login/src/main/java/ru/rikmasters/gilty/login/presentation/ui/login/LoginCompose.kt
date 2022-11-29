@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,9 +17,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,8 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,21 +88,19 @@ fun LoginContent(
     callback: LoginCallback? = null,
 ) {
     Box(
-        Modifier.fillMaxSize()
-    ) {
+        modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+        Center) {
         Column(
-            modifier
-                .fillMaxSize()
+            Modifier
                 .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.colorScheme.background)
-                .padding(top = 32.dp)
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = CenterHorizontally,
         ) {
             Image(
                 painterResource(R.drawable.ic_logo),
-                stringResource(R.string.gilty_logo),
-                Modifier.padding(top = 132.dp)
+                stringResource(R.string.gilty_logo)
             )
             Box(
                 Modifier
@@ -106,7 +110,7 @@ fun LoginContent(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.onPrimaryContainer),
+                        .background(colorScheme.onPrimaryContainer),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
@@ -125,61 +129,75 @@ fun LoginContent(
                         { callback?.onPhoneChange(it) })
                 }
             }
-            GradientButton(
-                Modifier.padding(top = 32.dp),
-                stringResource(R.string.next_button),
-                (state.phone.length > 9),
-            ) { callback?.onNext() }
-            Text(
-                stringResource(R.string.login_alternative_separator),
-                Modifier.padding(top = 20.dp),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onTertiary
-            )
-            Button(
-                { callback?.googleLogin() },
-                Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(Color.Transparent)
-            ) {
-                Image(
-                    painterResource(R.drawable.ic_google),
-                    stringResource(R.string.google_login),
-                    Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    stringResource(R.string.google_login),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-            }
+            Buttons(Modifier.padding(top = 32.dp), state, callback)
         }
         ConfirmationPolicy(
             Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(start = 16.dp, end = 60.dp, bottom = 60.dp),
+                .padding(bottom = 60.dp)
+                .padding(horizontal = 16.dp),
             callback
         )
     }
 }
 
 @Composable
-private fun ConfirmationPolicy(modifier: Modifier = Modifier, callback: LoginCallback? = null) {
+private fun Buttons(
+    modifier: Modifier = Modifier,
+    state: LoginState,
+    callback: LoginCallback? = null
+) {
+    Column(modifier, Top, CenterHorizontally) {
+        GradientButton(
+            Modifier, stringResource(R.string.next_button),
+            /*(state.phone.length > 9)*/ true, // TODO активность кнопки
+        ) { callback?.onNext() }
+        Text(
+            stringResource(R.string.login_alternative_separator),
+            Modifier.padding(top = 20.dp),
+            style = typography.labelSmall,
+            color = colorScheme.onTertiary
+        )
+        Button(
+            { callback?.googleLogin() },
+            Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+            Image(
+                painterResource(R.drawable.ic_google),
+                stringResource(R.string.google_login),
+                Modifier.padding(end = 8.dp)
+            )
+            Text(
+                stringResource(R.string.google_login),
+                style = typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.tertiary
+            )
+        }
+    }
+}
+
+@Composable
+private fun ConfirmationPolicy(
+    modifier: Modifier = Modifier,
+    callback: LoginCallback? = null
+) {
     val textStyle = SpanStyle(ThemeExtra.colors.policyAgreeColor)
     val linkStyle = SpanStyle(
-        MaterialTheme.colorScheme.tertiary,
-        textDecoration = TextDecoration.Underline
+        colorScheme.tertiary,
+        textDecoration = Underline
     )
-    val typography = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
+    val typography = typography.labelSmall.copy(fontWeight = SemiBold)
     val annotatedText = buildAnnotatedString {
         withStyle(textStyle) { append(stringResource(R.string.login_privacy_police_agree)) }
         pushStringAnnotation("terms", "")
-        withStyle(linkStyle) { append(stringResource(R.string.login_terms)) }; pop()
-        withStyle(textStyle) { append(stringResource(R.string.login_connector_terms_and_privacy_police)) }
+        withStyle(linkStyle) { append(stringResource(R.string.login_terms)) }
+        pop(); withStyle(textStyle) { append(stringResource(R.string.login_connector_terms_and_privacy_police)) }
         pushStringAnnotation("policy", "")
-        withStyle(linkStyle) { append(stringResource(R.string.login_privacy_police)) }; pop()
-        withStyle(textStyle) { append(stringResource(R.string.login_application)) }
+        withStyle(linkStyle) { append("\n" + stringResource(R.string.login_privacy_police)) }
+        pop(); withStyle(textStyle) { append(stringResource(R.string.login_application)) }
     }
     ClickableText(annotatedText, modifier, typography) {
         annotatedText.getStringAnnotations(
