@@ -99,5 +99,3 @@ private fun DateTimePickerContent(
         }
     }
 }
-
-

@@ -2,11 +2,12 @@ package ru.rikmasters.gilty.login.presentation.ui.personal
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -98,12 +99,12 @@ fun PersonalInfoContent(
                 MaterialTheme.shapes.large,
                 CardDefaults.cardColors(colorScheme.primaryContainer)
             ) {
-                Row(
+                LazyRow(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    state.list.forEachIndexed { index, it ->
+                    itemsIndexed(state.list) { index, it ->
                         GiltyChip(
                             Modifier.padding(end = 12.dp),
                             stringResource(

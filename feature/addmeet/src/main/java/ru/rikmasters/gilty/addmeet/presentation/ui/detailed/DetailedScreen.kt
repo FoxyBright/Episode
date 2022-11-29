@@ -15,10 +15,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DurationBottomSheet
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBS
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSCallback
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSState
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DurationBottomSheet
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapBottomSheet
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapCallback
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapState
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.TIME_START
@@ -34,6 +37,7 @@ fun DetailedScreen(nav: NavState = get()) {
     var bsHour by remember { mutableStateOf(TIME_START) }
     var bsMinute by remember { mutableStateOf(TIME_START) }
     var duration by remember { mutableStateOf("") }
+    var alert by remember { mutableStateOf(false) }
     val tagList =
         remember { mutableStateListOf("Бэтмэн", "Кингсмен", "Лобби") }
     var time by remember { mutableStateOf("") }
@@ -43,7 +47,7 @@ fun DetailedScreen(nav: NavState = get()) {
     var meetPlace by
     remember { mutableStateOf<Pair<String, String>?>(null) }
     val context = LocalContext.current
-
+    var placeSearch by remember { mutableStateOf("") }
     val bsDateCallback = object : DateTimeBSCallback {
         override fun dateChange(it: String) {
             bsDate = it
@@ -67,7 +71,7 @@ fun DetailedScreen(nav: NavState = get()) {
         DetailedContent(
             DetailedState(
                 time, date, description,
-                tagList, meetPlace, hideMeetPlace
+                tagList, meetPlace, hideMeetPlace, alert
             ), Modifier, object : DetailedCallback {
                 override fun onBack() {
                     nav.navigate("conditions")
@@ -75,6 +79,10 @@ fun DetailedScreen(nav: NavState = get()) {
 
                 override fun onClose() {
                     nav.navigateAbsolute("main/meetings")
+                }
+
+                override fun onCloseAlert(it: Boolean) {
+                    alert = it
                 }
 
                 override fun onNext() {
@@ -122,14 +130,34 @@ fun DetailedScreen(nav: NavState = get()) {
                 }
 
                 override fun onMeetPlaceClick() {
-                    Toast.makeText(
-                        context, "Выбор места встречи",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    meetPlace = Pair(
-                        "ул. Большая Дмитровская, д 13, Москва",
-                        "Kaif Provance"
-                    )
+                    scope.launch {
+                        asm.bottomSheetState.expand {
+                            MapBottomSheet(
+                                MapState(placeSearch), Modifier,
+                                object : MapCallback {
+                                    override fun onChange(text: String) {
+                                        placeSearch = text
+                                    }
+
+                                    override fun onMapClick() {
+                                        Toast.makeText(
+                                            context, "Для карт пока что отсутствует API",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                    override fun onItemClick(place: Pair<String, String>) {
+                                        meetPlace = place
+                                        scope.launch { asm.bottomSheetState.collapse() }
+                                    }
+
+                                    override fun onBack() {
+                                        scope.launch { asm.bottomSheetState.collapse() }
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
 
                 override fun onHideMeetPlaceClick() {

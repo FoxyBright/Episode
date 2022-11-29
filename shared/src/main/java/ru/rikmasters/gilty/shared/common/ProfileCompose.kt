@@ -135,7 +135,7 @@ fun Profile(
                         )
                         Icon(
                             painterResource(R.drawable.ic_edit),
-                            stringResource(R.string.edit),
+                            stringResource(R.string.edit_button),
                             Modifier.padding(top = 4.dp),
                             MaterialTheme.colorScheme.outlineVariant
                         )

@@ -153,7 +153,8 @@
     <string name="map">Карта</string>
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
-    <string name="edit">Изменить</string>
+    <string name="edit_button">Изменить</string>
+    <string name="confirm_button">Применить</string>
 
     <!-- TOASTS -->
     <string name="complaints_title">Пожаловаться</string>
@@ -221,6 +222,8 @@
     <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
+    <string name="exit_button">Выйти</string>
+    <string name="cancel">Отмена</string>
 
     <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>

@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement.End
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -28,6 +25,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,14 +33,18 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
+private const val header = "Заголовок"
+private const val label = "Описание"
+private const val content = "Любой контент"
+
 @Preview
 @Composable
 private fun AlertDialogPreview() {
     GiltyTheme {
-        GAlertDialog(
-            ("Заголовок"), Modifier.padding(40.dp), ("Описание"),
-            Pair("Отмена") {}, Pair("Сохранить") {}
-        )
+        GAlert(true, {}, header,
+            Modifier.padding(40.dp), label,
+            Pair(stringResource(R.string.cancel)) {},
+            Pair(stringResource(R.string.save_button)) {})
     }
 }
 
@@ -50,11 +52,10 @@ private fun AlertDialogPreview() {
 @Composable
 private fun AlertDialogWithContentPreview() {
     GiltyTheme {
-        GAlertDialog(
-            ("Заголовок"), Modifier.padding(40.dp),
-            success = Pair("Сохранить") {},
-            cancel = Pair("Отмена") {}
-        ) {
+        GAlert(true, { }, header,
+            Modifier.padding(40.dp),
+            success = Pair(stringResource(R.string.save_button)) {},
+            cancel = Pair(stringResource(R.string.cancel)) {}) {
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -62,10 +63,9 @@ private fun AlertDialogWithContentPreview() {
                     .background(Color.White), Center
             ) {
                 Text(
-                    "Любой контент",
-                    Modifier, colorScheme.tertiary,
-                    fontWeight = SemiBold,
-                    style = typography.labelSmall
+                    content, Modifier, colorScheme.tertiary,
+                    style = typography.labelSmall,
+                    fontWeight = SemiBold
                 )
             }
         }
@@ -83,22 +83,22 @@ private fun ListAlertDialogPreview() {
                 Pair("Удалить", false)
             )
         }
-        GAlertDialog(
-            ("Заголовок"), Modifier.padding(40.dp),
-            cancel = Pair("Отменить") {},
-            success = Pair("Применить") {},
+        GAlert(true, {}, header, Modifier.padding(40.dp),
+            cancel = Pair(stringResource(R.string.cancel_button)) {},
+            success = Pair(stringResource(R.string.confirm_button)) {},
             list = list, listItemSelect = { active ->
                 repeat(list.size) {
                     if (it == active) list[it] = Pair(list[it].first, true)
                     else list[it] = Pair(list[it].first, false)
                 }
-            }
-        )
+            })
     }
 }
 
 @Composable
-fun GAlertDialog(
+fun GAlert(
+    show: Boolean,
+    onDismissRequest: () -> Unit,
     title: String,
     modifier: Modifier = Modifier,
     label: String? = null,
@@ -108,18 +108,56 @@ fun GAlertDialog(
     listItemSelect: ((Int) -> Unit)? = null,
     content: (@Composable () -> Unit)? = null
 ) {
-    Card(
-        modifier, MaterialTheme.shapes.large,
-        CardDefaults.cardColors(
-            colorScheme.primaryContainer
+    if (show) {
+        AlertDialog(
+            onDismissRequest,
+            confirmButton = {
+                Text(
+                    success.first, Modifier
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { success.second() },
+                    colorScheme.primary,
+                    style = typography.labelSmall,
+                    fontWeight = SemiBold
+                )
+            }, modifier,
+            dismissButton = {
+                cancel?.let {
+                    Text(
+                        it.first,
+                        Modifier
+                            .padding(end = 16.dp)
+                            .clickable(
+                                MutableInteractionSource(), (null)
+                            ) { it.second() },
+                        colorScheme.primary,
+                        style = typography.labelSmall,
+                        fontWeight = SemiBold
+                    )
+                }
+            }, (null), {
+                Text(
+                    title, Modifier,
+                    colorScheme.tertiary,
+                    style = typography.displayLarge,
+                    fontWeight = Bold
+                )
+            }, {
+                Column {
+                    label?.let {
+                        Text(
+                            it, Modifier.padding(bottom = 16.dp),
+                            colorScheme.tertiary,
+                            style = typography.labelSmall,
+                            fontWeight = SemiBold
+                        )
+                    }; content?.invoke()
+                    list?.let { List(list) { listItemSelect?.let { s -> s(it) } } }
+                }
+            },
+            containerColor = colorScheme.primaryContainer
         )
-    ) {
-        Column(Modifier.padding(26.dp)) {
-            Title(title, label)
-            content?.invoke()
-            list?.let { List(list) { listItemSelect?.let { s -> s(it) } } }
-            Buttons(success, cancel)
-        }
     }
 }
 
@@ -163,57 +201,6 @@ private fun ListItem(
                 ) { select?.let { it(index) } },
             colorScheme.tertiary, fontWeight = SemiBold,
             style = typography.labelSmall
-        )
-    }
-}
-
-@Composable
-private fun Title(
-    title: String,
-    label: String? = null,
-) {
-    Text(
-        title, Modifier.padding(bottom = 16.dp),
-        colorScheme.tertiary,
-        style = typography.displayLarge,
-        fontWeight = Bold
-    )
-    label?.let {
-        Text(
-            it, Modifier, colorScheme.tertiary,
-            style = typography.labelSmall,
-            fontWeight = SemiBold
-        )
-    }
-}
-
-@Composable
-private fun Buttons(
-    success: Pair<String, () -> Unit>,
-    cancel: Pair<String, () -> Unit>? = null,
-) {
-    Row(
-        Modifier
-            .padding(top = 34.dp)
-            .fillMaxWidth(), End
-    ) {
-        cancel?.let {
-            Text(
-                it.first, Modifier
-                    .padding(end = 34.dp)
-                    .clickable(
-                        MutableInteractionSource(), (null)
-                    ) { it.second() },
-                colorScheme.primary, style = typography.labelSmall,
-                fontWeight = SemiBold
-            )
-        }
-        Text(
-            success.first, Modifier.clickable(
-                MutableInteractionSource(), (null)
-            ) { success.second },
-            colorScheme.primary, style = typography.labelSmall,
-            fontWeight = SemiBold
         )
     }
 }

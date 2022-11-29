@@ -167,41 +167,40 @@ fun TagSearch(
                     fontWeight = Bold
                 )
             }
-        else
-            Surface {
-                FlowLayout(
-                    Modifier
-                        .background(colorScheme.primaryContainer)
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp), 8.dp, 8.dp
-                ) {
-                    tagList.forEachIndexed { index, item ->
-                        Box(
-                            Modifier
-                                .clip(MaterialTheme.shapes.large)
-                                .background(colorScheme.primary)
+        else Surface {
+            FlowLayout(
+                Modifier
+                    .background(colorScheme.primaryContainer)
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+            ) {
+                tagList.forEachIndexed { index, item ->
+                    Box(
+                        Modifier
+                            .clip(MaterialTheme.shapes.large)
+                            .background(colorScheme.primary)
+                    ) {
+                        Row(
+                            Modifier.padding(12.dp, 6.dp),
+                            Arrangement.Center, CenterVertically
                         ) {
-                            Row(
-                                Modifier.padding(12.dp, 6.dp),
-                                Arrangement.Center, CenterVertically
-                            ) {
-                                Text(
-                                    item,
-                                    Modifier.padding(end = 10.dp),
-                                    Color.White,
-                                    style = typography.labelSmall
-                                )
-                                Icon(
-                                    Icons.Filled.Close,
-                                    stringResource(R.string.meeting_filter_delete_tag_label),
-                                    Modifier.clickable { onDeleteTag(index) },
-                                    Color.White
-                                )
-                            }
+                            Text(
+                                item,
+                                Modifier.padding(end = 10.dp),
+                                Color.White,
+                                style = typography.labelSmall
+                            )
+                            Icon(
+                                Icons.Filled.Close,
+                                stringResource(R.string.meeting_filter_delete_tag_label),
+                                Modifier.clickable { onDeleteTag(index) },
+                                Color.White
+                            )
                         }
                     }
                 }
             }
+        }
     }
 }
 

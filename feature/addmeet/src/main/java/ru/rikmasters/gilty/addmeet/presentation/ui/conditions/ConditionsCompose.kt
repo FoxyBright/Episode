@@ -26,10 +26,10 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
 import ru.rikmasters.gilty.shared.common.MeetingType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.CheckBoxCard
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.CrossButton
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -41,7 +41,7 @@ fun ConditionPreview() {
         ConditionContent(
             ConditionState(
                 (false), (true), listOf(), listOf(),
-                ("100"), TextFieldColors(), (null)
+                ("100"), TextFieldColors(), (null), (false)
             )
         )
     }
@@ -54,7 +54,8 @@ data class ConditionState(
     val conditionList: List<Boolean>,
     val text: String,
     val priceColors: TextFieldColors,
-    val focus: FocusState?
+    val focus: FocusState?,
+    val alert: Boolean,
 )
 
 interface ConditionsCallback {
@@ -68,6 +69,7 @@ interface ConditionsCallback {
     fun onMeetingTypeSelect(it: Int) {}
     fun onConditionSelect(it: Int) {}
     fun onPriceFocus(state: FocusState) {}
+    fun onCloseAlert(it: Boolean) {}
 }
 
 @Composable
@@ -93,8 +95,15 @@ fun ConditionContent(
                 .padding(top = 32.dp, end = 16.dp)
                 .size(20.dp)
                 .align(Alignment.TopEnd)
-        ) { callback?.onClose() }
+        ) { callback?.onCloseAlert(true) }
     }
+    GAlert(state.alert, { callback?.onCloseAlert(false) },
+        stringResource(R.string.add_meet_exit_alert_title),
+        Modifier, stringResource(R.string.add_meet_exit_alert_details),
+        success = Pair(stringResource(R.string.exit_button))
+        { callback?.onCloseAlert(false); callback?.onClose() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onCloseAlert(false) })
 }
 
 @Composable
@@ -137,13 +146,11 @@ private fun Conditions(
                     .padding(horizontal = 16.dp),
                 Arrangement.Center, Alignment.CenterHorizontally
             ) {
-                val enabled =
-                    (state.conditionList.contains(true)
-                            && state.meetingTypes.contains(true))
-                            && if (pay) state.text.isNotEmpty() else true
-                GradientButton(
-                    Modifier, stringResource(R.string.next_button), enabled
-                ) { callback?.onNext() }
+                val enabled = (state.conditionList.contains(true)
+                        && state.meetingTypes.contains(true))
+                        && if (pay) state.text.isNotEmpty() else true
+                GradientButton(Modifier, stringResource(R.string.next_button), enabled)
+                { callback?.onNext() }
                 Dashes((5), (2), Modifier.padding(top = 16.dp))
             }
         }

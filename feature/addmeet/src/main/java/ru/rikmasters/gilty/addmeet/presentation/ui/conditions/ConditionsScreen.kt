@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.shared.shared.TextFieldColors
 @Composable
 fun ConditionsScreen(nav: NavState = get()) {
     var text by remember { mutableStateOf("") }
+    var alert by remember { mutableStateOf(false) }
     val online = remember { mutableStateOf(false) }
     val hiddenPhoto = remember { mutableStateOf(false) }
     val meetingTypes =
@@ -29,11 +30,15 @@ fun ConditionsScreen(nav: NavState = get()) {
     val state = ConditionState(
         online.value, hiddenPhoto.value,
         meetingTypes, conditionList,
-        text, colors, focus
+        text, colors, focus, alert
     )
     ConditionContent(state, Modifier, object : ConditionsCallback {
         override fun onOnlineClick() {
             online.value = !online.value
+        }
+
+        override fun onCloseAlert(it: Boolean) {
+            alert = it
         }
 
         override fun onPriceChange(price: String) {

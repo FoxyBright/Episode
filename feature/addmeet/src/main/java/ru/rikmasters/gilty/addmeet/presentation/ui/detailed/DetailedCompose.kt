@@ -15,6 +15,7 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -25,7 +26,8 @@ fun DetailedPreview() {
         DetailedContent(
             DetailedState(
                 (""), (""), (""),
-                listOf(), (null), (true)
+                listOf(), (null),
+                (true), (false)
             )
         )
     }
@@ -38,6 +40,7 @@ data class DetailedState(
     val tagList: List<String>,
     val meetPlace: Pair<String, String>?,
     val hideMeetPlace: Boolean,
+    val alert: Boolean,
 )
 
 interface DetailedCallback {
@@ -52,6 +55,7 @@ interface DetailedCallback {
     fun onDescriptionClear() {}
     fun onMeetPlaceClick() {}
     fun onHideMeetPlaceClick() {}
+    fun onCloseAlert(it: Boolean) {}
 }
 
 @Composable
@@ -64,13 +68,20 @@ fun DetailedContent(
         ClosableActionBar(
             stringResource(R.string.add_meet_detailed_title),
             (null), Modifier.padding(bottom = 10.dp),
-            { callback?.onClose() }
+            { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
         Content(
             Modifier.fillMaxSize(),
             state, callback
         )
     }
+    GAlert(state.alert, { callback?.onCloseAlert(false) },
+        stringResource(R.string.add_meet_exit_alert_title),
+        Modifier, stringResource(R.string.add_meet_exit_alert_details),
+        success = Pair(stringResource(R.string.exit_button))
+        { callback?.onCloseAlert(false); callback?.onClose() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onCloseAlert(false) })
 }
 
 @Composable

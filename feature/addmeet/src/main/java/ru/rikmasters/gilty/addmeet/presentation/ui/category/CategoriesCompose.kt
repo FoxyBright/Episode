@@ -24,18 +24,21 @@ import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
     val categoryList: List<ShortCategoryModel>,
-    val selectCategories: List<ShortCategoryModel>
+    val selectCategories: List<ShortCategoryModel>,
+    val alert: Boolean
 )
 
 interface CategoriesCallback {
     fun onCategoryClick(category: ShortCategoryModel) {}
     fun onNext() {}
     fun onClose() {}
+    fun onCloseAlert(it: Boolean) {}
 }
 
 @Composable
@@ -52,7 +55,7 @@ fun CategoriesContent(
             ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
                 stringResource(R.string.add_meet_create_description),
-                Modifier, { callback?.onClose() }
+                Modifier, { callback?.onCloseAlert(true) }
             )
             LazyRow(
                 Modifier
@@ -91,6 +94,13 @@ fun CategoriesContent(
             Dashes((5), (0), Modifier.padding(top = 16.dp))
         }
     }
+    GAlert(state.alert, { callback?.onCloseAlert(false) },
+        stringResource(R.string.add_meet_exit_alert_title),
+        Modifier, stringResource(R.string.add_meet_exit_alert_details),
+        success = Pair(stringResource(R.string.exit_button))
+        { callback?.onCloseAlert(false); callback?.onClose() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onCloseAlert(false) })
 }
 
 @Composable
@@ -100,7 +110,7 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(DemoShortCategoryModelList, arrayListOf())
+            CategoriesState(DemoShortCategoryModelList, arrayListOf(), false)
         )
     }
 }
