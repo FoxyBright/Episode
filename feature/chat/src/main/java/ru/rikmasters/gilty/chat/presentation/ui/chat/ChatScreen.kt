@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +27,7 @@ import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
 import ru.rikmasters.gilty.chat.presentation.model.MessageModel
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
@@ -86,7 +87,10 @@ fun ChatScreen() {
                 override fun gallery() {
                     scope.launch {
                         asm.bottomSheetState.expand {
-                            Text("Скрытые фотки", Modifier.height(300.dp))
+                            Text(
+                                "Скрытые фотки",
+                                Modifier.height(300.dp)
+                            )
                         }
                     }
                 }

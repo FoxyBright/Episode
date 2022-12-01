@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

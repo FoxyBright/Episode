@@ -68,7 +68,7 @@ fun BrieflyRow(
             )
             emoji?.let {
                 AsyncImage(
-                    emoji.path, null,
+                    emoji.path, (null),
                     Modifier
                         .padding(6.dp)
                         .size(18.dp)

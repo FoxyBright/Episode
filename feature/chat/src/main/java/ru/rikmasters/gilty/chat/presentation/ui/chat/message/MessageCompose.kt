@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -32,6 +32,7 @@ import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
 import ru.rikmasters.gilty.chat.presentation.model.MessageModel
+import ru.rikmasters.gilty.chat.presentation.ui.AnswerContent
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.profile.ImageModel

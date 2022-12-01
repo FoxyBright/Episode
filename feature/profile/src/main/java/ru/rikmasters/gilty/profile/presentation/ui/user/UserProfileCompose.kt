@@ -103,10 +103,10 @@ private fun UserProfilePreview() {
                 ), meets, meets, meets.first(),
                 (3), (false), (false), listOf(
                     NavIconState.INACTIVE,
-                    NavIconState.ACTIVE,
+                    NavIconState.NEW,
                     NavIconState.INACTIVE,
                     NavIconState.INACTIVE,
-                    NavIconState.INACTIVE
+                    NavIconState.ACTIVE
                 ), alert = false
             )
         )

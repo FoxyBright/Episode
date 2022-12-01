@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -45,8 +45,9 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
 import ru.rikmasters.gilty.chat.presentation.model.MessageModel
-import ru.rikmasters.gilty.chat.presentation.ui.TextFieldType.COMMENT
-import ru.rikmasters.gilty.chat.presentation.ui.TextFieldType.MESSAGE
+import ru.rikmasters.gilty.chat.presentation.ui.AnswerContent
+import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.COMMENT
+import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.MESSAGE
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme

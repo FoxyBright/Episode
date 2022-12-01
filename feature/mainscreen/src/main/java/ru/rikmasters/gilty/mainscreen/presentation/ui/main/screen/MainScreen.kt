@@ -66,6 +66,7 @@ fun MainScreen(nav: NavState = get()) {
                         0 -> nav.navigateAbsolute("main/meetings")
                         1 -> nav.navigateAbsolute("notification/list")
                         2 -> nav.navigateAbsolute("addmeet/category")
+                        3 -> nav.navigateAbsolute("chats/main")
                         4 -> nav.navigateAbsolute("profile/main")
                     }
                 }

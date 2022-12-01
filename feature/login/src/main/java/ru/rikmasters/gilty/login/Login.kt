@@ -20,7 +20,7 @@ object Login : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
 
         //TODO Проверка на авторизованность пользователя
-        val userLogged = true
+        val userLogged = false
 
         screen("authorization") {
             if (userLogged) MainScreen() else LoginScreen()

@@ -27,7 +27,6 @@ import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotio
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.DemoTodayNotificationMeetingOver
 import ru.rikmasters.gilty.shared.model.notification.DemoTodayNotificationRespondAccept
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.notification.RespondModel
@@ -47,8 +46,7 @@ fun NotificationsScreen(nav: NavState = get()) {
             mutableStateListOf(
                 DemoNotificationLeaveEmotionModel,
                 DemoNotificationMeetingOverModel,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationMeetingOver,
+                DemoTodayNotificationRespondAccept
             )
         }
         val stateList = remember {
@@ -129,6 +127,7 @@ fun NotificationsScreen(nav: NavState = get()) {
                             0 -> nav.navigateAbsolute("main/meetings")
                             1 -> nav.navigateAbsolute("notification/list")
                             2 -> nav.navigateAbsolute("addmeet/category")
+                            3 -> nav.navigateAbsolute("chats/main")
                             4 -> nav.navigateAbsolute("profile/main")
                         }
                     }
