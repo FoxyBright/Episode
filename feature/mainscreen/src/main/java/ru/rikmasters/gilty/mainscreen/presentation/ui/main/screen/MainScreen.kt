@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -101,15 +100,13 @@ fun MainScreen(nav: NavState = get()) {
                         Meeting(menuState,
                             { menuState = it },
                             {
-                                menuState = false
                                 scope.launch {
                                     asm.bottomSheetState.expand {
-                                        Box {
-                                            ComplainsContent(DemoFullMeetingModel) {
-                                                scope.launch {
-                                                    asm.bottomSheetState.collapse()
-                                                }; alert = true
-                                            }
+                                        menuState = false
+                                        ComplainsContent(DemoFullMeetingModel) {
+                                            scope.launch {
+                                                asm.bottomSheetState.collapse()
+                                            }; alert = true
                                         }
                                     }
                                 }

@@ -7,18 +7,12 @@ u
 Ecore/src/main/java/ru/rikmasters/gilty/core/app/EntrypointResolver.kt,e\b\ebf223773bcd1843ced5fee462f4c475a9293f06
 e
 5app/src/main/java/ru/rikmasters/gilty/MainActivity.kt,a\4\a41fc5df0fd9a3803c75270619e98a7bfdbd66e8
-~
-Ncore/src/main/java/ru/rikmasters/gilty/core/app/ui/BottomSheetLayoutCompose.kt,e\0\e025871b69b28dbb966c809270b9ae8ef303c5ad
 t
 Dcore/src/main/java/ru/rikmasters/gilty/core/navigation/Navigation.kt,6\5\650c854b792778c66ba727be0f56774cb7a09232
 }
 Mcore/src/main/java/ru/rikmasters/gilty/core/navigation/DeepNavGraphBuilder.kt,3\d\3d4bbf12d9a7cf3f985c39c72efdcc38cd10469a
-m
-=core/src/main/java/ru/rikmasters/gilty/core/app/Entrypoint.kt,5\2\52fa26c38a6371aa437ed8be3486ef96e36608e2
 x
 Hshared/src/main/java/ru/rikmasters/gilty/shared/shared/DividerCompose.kt,c\9\c9cf45d6b27ed2e4defd9cc72ba8f6fe880ec7ed
-n
->feature/login/src/main/java/ru/rikmasters/gilty/login/Login.kt,f\a\fa8ca69fbde54d1c6dddd7fd875ffc81ba92057b
 Š
 Zshared/src/main/java/ru/rikmasters/gilty/shared/common/MeetingProfileBottomSheetCompose.kt,d\b\dbaf3e8c5d7a2ff394526b401714c692f31cf94c
 x
@@ -27,8 +21,6 @@ Hshared/src/main/java/ru/rikmasters/gilty/shared/theme/base/GiltyTheme.kt,6\9\6
 zfeature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui/main/custom/swipeablecard/SwipeableCard.kt,5\9\59f64fffe4c959ee4b4d29497a1ff4ea7c530d49
 ¯
 feature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui/main/custom/swipeablecard/SwipeableCardState.kt,0\c\0c557b7969979cb1c007b7210adad184eaa5c934
-š
-jfeature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui/main/screen/MainCompose.kt,a\0\a0c1403b2dc9af12d5ce40ecfd7023599a69567d
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
 C

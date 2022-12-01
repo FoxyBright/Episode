@@ -15,10 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import ru.rikmasters.gilty.core.app.ui.fork.FractionalThreshold
 import androidx.compose.material3.MaterialTheme
-import ru.rikmasters.gilty.core.app.ui.fork.SwipeableState
-import ru.rikmasters.gilty.core.app.ui.fork.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -38,7 +35,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import ru.rikmasters.gilty.core.app.ui.fork.*
 import java.lang.Float.max
 import kotlin.math.roundToInt
 
@@ -51,30 +49,34 @@ class BottomSheetState(
     internal val swipeableState: SwipeableState<BottomSheetSwipeState>,
 ) {
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
-
+    
     suspend fun expand() = animateTo(BottomSheetSwipeState.EXPANDED)
     suspend fun halfExpand() = animateTo(BottomSheetSwipeState.HALF_EXPANDED)
     suspend fun collapse() = animateTo(BottomSheetSwipeState.COLLAPSED)
 
     suspend fun expand(content: @Composable () -> Unit) {
-        this.content = content
-        animateTo(BottomSheetSwipeState.EXPANDED, true)
+        animateTo(content, BottomSheetSwipeState.EXPANDED)
     }
 
     suspend fun halfExpand(content: @Composable () -> Unit) {
+        animateTo(content, BottomSheetSwipeState.HALF_EXPANDED)
+    }
+    
+    private suspend fun animateTo(
+        content: @Composable () -> Unit,
+        swipeState: BottomSheetSwipeState
+    ) {
+        animateTo(BottomSheetSwipeState.COLLAPSED)
         this.content = content
-        animateTo(BottomSheetSwipeState.HALF_EXPANDED, true)
+        animateTo(swipeState)
     }
 
     private suspend fun animateTo(
-        swipeState: BottomSheetSwipeState,
-        fromCollapsed: Boolean = false
+        swipeState: BottomSheetSwipeState
     ) {
-        if (swipeState != BottomSheetSwipeState.COLLAPSED && content == null)
+        if(swipeState != BottomSheetSwipeState.COLLAPSED && content == null)
             throw IllegalStateException("Открытие нижней панели без содержимого")
-        if (fromCollapsed)
-            swipeableState.animateTo(BottomSheetSwipeState.COLLAPSED)
-        swipeableState.animateTo(swipeState)
+        swipeableState.animateTo(swipeState, tween())
     }
 
     val offset: Float by swipeableState.offset
@@ -118,7 +120,7 @@ fun BottomSheetLayout(
 
         val offset = state.swipeableState.offset.value.roundToInt()
 
-        val connection = remember { BottomSheetConnection(state.swipeableState) }
+        val connection = remember { state.swipeableState.PreUpPostDownNestedScrollConnection }
 
         val scope = rememberCoroutineScope()
 
@@ -191,51 +193,4 @@ private fun Grip(
             .size(40.dp, 5.dp)
             .background(color, RoundedCornerShape(50)),
     )
-}
-
-@Stable
-private class BottomSheetConnection(
-    val swipeableState: SwipeableState<BottomSheetSwipeState>
-) : NestedScrollConnection {
-
-    override fun onPreScroll(
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        val delta = available.y
-        return if (delta < 0) {
-            swipeableState.performDrag(delta).toOffset()
-        } else {
-            Offset.Zero
-        }
-    }
-
-    override fun onPostScroll(
-        consumed: Offset,
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        val delta = available.y
-        return swipeableState.performDrag(delta).toOffset()
-    }
-
-    override suspend fun onPreFling(available: Velocity): Velocity {
-        return if (available.y < 0 && swipeableState.currentValue != BottomSheetSwipeState.EXPANDED) {
-            swipeableState.performFling(available.y)
-            available
-        } else {
-            Velocity.Zero
-        }
-    }
-
-    override suspend fun onPostFling(
-        consumed: Velocity,
-        available: Velocity
-    ): Velocity {
-        if (swipeableState.currentValue != BottomSheetSwipeState.HALF_EXPANDED)
-            swipeableState.performFling(available.y)
-        return Velocity.Zero
-    }
-
-    private fun Float.toOffset() = Offset(0f, this)
 }
