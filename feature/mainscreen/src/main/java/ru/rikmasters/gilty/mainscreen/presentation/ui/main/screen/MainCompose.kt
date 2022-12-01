@@ -37,6 +37,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DividerBold
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GiltyString
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.shared.SquareCheckBox
@@ -53,7 +54,7 @@ fun MainContentPreview() {
                 listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW, INACTIVE
-                )
+                ), (false)
             )
         )
     }
@@ -68,6 +69,7 @@ interface MainContentCallback {
     fun openFiltersBottomSheet() {}
     fun interesting(state: SwipeableCardState) {}
     fun notInteresting(state: SwipeableCardState) {}
+    fun closeAlert()
 }
 
 data class MainContentState(
@@ -75,7 +77,8 @@ data class MainContentState(
     val switcher: Pair<Boolean, Boolean>,
     val meetings: List<FullMeetingModel>,
     val cardStates: List<Pair<FullMeetingModel, SwipeableCardState>>,
-    val navBarStates: List<NavIconState>
+    val navBarStates: List<NavIconState>,
+    val alert: Boolean,
 )
 
 @Composable
@@ -159,10 +162,19 @@ fun MainContent(
                 .padding(end = 16.dp, bottom = 92.dp)
         ) { callback?.onStyleChange() }
     }
+    GAlert(
+        state.alert, { callback?.closeAlert() },
+        "Отлично, ваша жалоба отправлена!",
+        label = "Модераторы скоро рассмотрят\nвашу жалобу",
+        success = Pair("Закрыть") { callback?.closeAlert() }
+    )
 }
 
 @Composable
 fun Meeting(
+    menuState: Boolean,
+    menuCollapse: ((Boolean) -> Unit)? = null,
+    menuItemClick: ((Int) -> Unit)? = null,
     meet: FullMeetingModel,
     hiddenPhoto: Boolean,
     commentText: String,
@@ -173,7 +185,11 @@ fun Meeting(
             .padding(16.dp)
             .padding(bottom = 40.dp)
     ) {
-        MeetingBottomSheetTopBarCompose(Modifier, meet, meet.duration)
+        MeetingBottomSheetTopBarCompose(
+            Modifier, meet, meet.duration,
+            menuState, { menuCollapse?.let { c -> c(it) } },
+            { menuItemClick?.let { c -> c(it) } }
+        )
         MeetingDetailsBottomCompose(
             Modifier.padding(16.dp),
             MeetingDetailsBottomComposeState(hiddenPhoto, commentText),

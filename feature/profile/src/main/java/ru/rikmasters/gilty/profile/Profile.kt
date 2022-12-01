@@ -1,14 +1,20 @@
 package ru.rikmasters.gilty.profile
 
-import androidx.compose.material3.Text
 import org.koin.core.module.Module
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.profile.presentation.ui.mymeetings.MyMeetingScreen
+import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
+import ru.rikmasters.gilty.profile.presentation.ui.user.settings.SettingsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.user.settings.categories.CategoriesScreen
 
 object Profile : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        screen("profile") {
-            Text("PROFILE")
+        nested("profile", "main") {
+            screen("main") { UserProfileScreen() }
+            screen("meeting") { MyMeetingScreen() }
+            screen("settings") { SettingsScreen() }
+            screen("categories") { CategoriesScreen() }
         }
     }
 

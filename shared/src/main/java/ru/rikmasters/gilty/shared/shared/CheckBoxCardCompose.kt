@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -28,10 +29,11 @@ fun CheckBoxCard(
     label: String,
     modifier: Modifier = Modifier,
     state: Boolean,
+    shape: Shape = MaterialTheme.shapes.large,
     onChange: (Boolean) -> Unit
 ) {
     Card(
-        { onChange(!state) }, modifier, (true), MaterialTheme.shapes.large,
+        { onChange(!state) }, modifier, (true), shape,
         CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Row(

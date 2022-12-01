@@ -37,6 +37,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
+import ru.rikmasters.gilty.shared.shared.GDropMenu
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -58,6 +59,9 @@ fun MeetingBottomSheetTopBarCompose(
     modifier: Modifier = Modifier,
     meetingModel: FullMeetingModel,
     eventDuration: String,
+    menuState: Boolean = false,
+    menuCollapse: ((Boolean) -> Unit)? = null,
+    menuItemClick: ((Int) -> Unit)? = null,
     private: Boolean = false
 ) {
     Column(modifier) {
@@ -70,7 +74,13 @@ fun MeetingBottomSheetTopBarCompose(
                 color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
-            IconButton({ /* TODO Здесь должен быть PopUp */ }) {
+            GDropMenu(
+                menuState,
+                { menuCollapse?.let { it(false) } },
+                menuItem = listOf(Pair(stringResource(R.string.meeting_complain))
+                { menuItemClick?.let { it(0) } })
+            )
+            IconButton({ menuCollapse?.let { it(true) } }) {
                 Icon(
                     painterResource(R.drawable.ic_kebab),
                     null,

@@ -86,50 +86,48 @@ fun Category(
             category.subcategories?.let {
                 if (categoryStatus[index]) {
                     Divider()
-                    Surface {
-                        FlowLayout(
-                            Modifier
-                                .background(colorScheme.primaryContainer)
-                                .padding(top = 16.dp)
-                                .padding(horizontal = 16.dp), 8.dp, 8.dp
-                        ) {
-                            it.forEach { category ->
-                                GiltyChip(
-                                    Modifier,
-                                    category,
-                                    false
-                                ) { //TODO: Выбор подкатегорий }
-                                }
+                    FlowLayout(
+                        Modifier
+                            .background(colorScheme.primaryContainer)
+                            .padding(top = 16.dp)
+                            .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    ) {
+                        it.forEach { category ->
+                            GiltyChip(
+                                Modifier,
+                                category,
+                                false
+                            ) { //TODO: Выбор подкатегорий }
                             }
                         }
                     }
                 }
             }
         }
-        Card(
+    }
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .clickable { onAllCategoryClick() },
+        MaterialTheme.shapes.large,
+        CardDefaults.cardColors(colorScheme.primaryContainer),
+    ) {
+        Row(
             Modifier
                 .fillMaxWidth()
-                .clickable { onAllCategoryClick() },
-            MaterialTheme.shapes.large,
-            CardDefaults.cardColors(colorScheme.primaryContainer),
+                .padding(16.dp), Arrangement.Absolute.SpaceBetween
         ) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp), Arrangement.Absolute.SpaceBetween
-            ) {
-                Text(
-                    stringResource(R.string.meeting_filter_show_all_categories),
-                    color = colorScheme.tertiary,
-                    style = typography.bodyMedium,
-                    fontWeight = SemiBold
-                )
-                Icon(
-                    Icons.Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    tint = colorScheme.onTertiary
-                )
-            }
+            Text(
+                stringResource(R.string.meeting_filter_show_all_categories),
+                color = colorScheme.tertiary,
+                style = typography.bodyMedium,
+                fontWeight = SemiBold
+            )
+            Icon(
+                Icons.Filled.KeyboardArrowRight,
+                stringResource(R.string.next_button),
+                tint = colorScheme.onTertiary
+            )
         }
     }
 }

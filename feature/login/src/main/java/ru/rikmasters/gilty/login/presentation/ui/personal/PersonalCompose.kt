@@ -125,7 +125,7 @@ fun PersonalInfoContent(
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
-            (state.list.contains(true) && state.age != null)
+            /*(state.list.contains(true) && state.age != null)*/ true
         ) { callback?.onNext() }
     }
 }

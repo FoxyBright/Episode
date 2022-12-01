@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
+import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
@@ -146,9 +146,9 @@ private fun Conditions(
                     .padding(horizontal = 16.dp),
                 Arrangement.Center, Alignment.CenterHorizontally
             ) {
-                val enabled = (state.conditionList.contains(true)
+                val enabled = /*(state.conditionList.contains(true)
                         && state.meetingTypes.contains(true))
-                        && if (pay) state.text.isNotEmpty() else true
+                        && if (pay) state.text.isNotEmpty() else */true
                 GradientButton(Modifier, stringResource(R.string.next_button), enabled)
                 { callback?.onNext() }
                 Dashes((5), (2), Modifier.padding(top = 16.dp))

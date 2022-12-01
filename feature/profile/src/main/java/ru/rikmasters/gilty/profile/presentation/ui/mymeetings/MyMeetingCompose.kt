@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui
+package ru.rikmasters.gilty.profile.presentation.ui.mymeetings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
 import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetCallback
-import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetState
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.DIVIDE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
@@ -46,7 +45,10 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.ORGANIZER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -57,9 +59,10 @@ private fun MyMeetingPreview() {
         val meet = DemoFullMeetingModel
         MyMeeting(
             Modifier,
-            ProfileMeetingBottomSheetState(
+            MyMeetingState(
                 meet, DemoMemberModelList,
-                18, meet.duration
+                18, meet.duration,
+                (false), (false)
             )
         )
     }
@@ -69,14 +72,32 @@ private fun MyMeetingPreview() {
 interface MyMeetingCallback : ProfileMeetingBottomSheetCallback {
     fun onCloseClick()
     fun onAllWatchClick()
+    fun menuCollapse(it: Boolean)
+    fun menuItemClick(point: Int)
+    fun closeAlert()
 }
+
+data class MyMeetingState(
+    val meetingModel: FullMeetingModel,
+    val memberList: List<MemberModel>,
+    val distance: Int,
+    val eventDuration: String,
+    val menuState: Boolean,
+    val alert: Boolean,
+)
 
 @Composable
 fun MyMeeting(
     modifier: Modifier = Modifier,
-    state: ProfileMeetingBottomSheetState,
+    state: MyMeetingState,
     callback: MyMeetingCallback? = null
 ) {
+    GAlert(
+        state.alert, { callback?.closeAlert() },
+        "Отлично, ваша жалоба отправлена!",
+        label = "Модераторы скоро рассмотрят\nвашу жалобу",
+        success = Pair("Закрыть") { callback?.closeAlert() }
+    )
     LazyColumn(
         modifier
             .background(colorScheme.background)
@@ -85,7 +106,9 @@ fun MyMeeting(
         item {
             MeetingBottomSheetTopBarCompose(
                 Modifier, state.meetingModel,
-                state.eventDuration
+                state.eventDuration, state.menuState,
+                { callback?.menuCollapse(it) },
+                { callback?.menuItemClick(it) }
             )
         }
         item {
@@ -111,7 +134,7 @@ fun MyMeeting(
                 stringResource(R.string.meeting_terms),
                 Modifier.padding(top = 28.dp),
                 color = colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
         }
         item {
@@ -172,13 +195,13 @@ fun MyMeeting(
                 Text(
                     stringResource(R.string.meeting_members), Modifier,
                     colorScheme.tertiary,
-                    style = typography.titleLarge
+                    style = typography.labelLarge
                 )
                 Text(
                     "${state.memberList.size}/${state.meetingModel.memberCount}",
                     Modifier.padding(start = 8.dp),
                     colorScheme.primary,
-                    style = typography.titleLarge
+                    style = typography.labelLarge
                 )
                 Image(
                     painterResource(

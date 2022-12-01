@@ -89,7 +89,7 @@ fun ComplainTextBox(
         RowActionBar(
             title, (null),
             Modifier.padding(bottom = 12.dp),
-            (null), onBack
+            (null), (null), onBack
         )
         GTextField(
             text, { onTextChange(it) },
@@ -135,7 +135,7 @@ fun ComplainElements(
         RowActionBar(
             title, (null),
             Modifier.padding(bottom = 12.dp),
-            description, onBack
+            description, (null), onBack
         )
         LazyColumn(
             Modifier.background(

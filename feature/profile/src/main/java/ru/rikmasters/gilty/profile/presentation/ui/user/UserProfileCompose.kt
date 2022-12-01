@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui
+package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.content.res.Resources
 import androidx.compose.foundation.background
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,8 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,15 +46,17 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiList
-import ru.rikmasters.gilty.shared.shared.MeetingCard
+import ru.rikmasters.gilty.shared.shared.GAlert
+import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
+import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-
 
 data class UserProfileState(
     val profileState: ProfileState,
@@ -64,52 +65,50 @@ data class UserProfileState(
     val lastRespond: FullMeetingModel,
     val notifications: Int,
     val historyState: Boolean = false,
-    val menuExpanded: Boolean
+    val menuExpanded: Boolean,
+    val stateList: List<NavIconState>,
+    val alert: Boolean
 )
 
 interface UserProfileCallback : ProfileCallback {
     fun menu(state: Boolean) {}
     fun openHistory(state: Boolean) {}
     fun onMeetingClick(meet: MeetingModel) {}
+    fun onHistoryClick(meet: MeetingModel) {}
     fun onSettingsClick() {}
     fun onWatchPhotoClick() {}
     fun onRespondsClick() {}
+    fun onNavBarSelect(point: Int) {}
+    fun closeAlert()
 }
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun UserProfilePreview() {
     GiltyTheme {
-        val historyState =
-            remember { mutableStateOf(false) }
-        val menuExpanded =
-            remember { mutableStateOf(false) }
         val meets = DemoMeetingList
         val profileModel = DemoProfileModel
-        val state = ProfileState(
-            name = "${profileModel.username}, ${profileModel.age}",
-            profilePhoto = profileModel.avatar.id,
-            description = profileModel.aboutMe,
-            rating = profileModel.rating.average,
-            observers = 13500,
-            observed = 128,
-            emoji = EmojiList.first(),
-            profileType = ProfileType.USERPROFILE,
-            enabled = false,
-        )
         UserProfile(
             UserProfileState(
-                state, meets, meets, meets.first(), (3),
-                historyState.value, menuExpanded.value
-            ), Modifier, object : UserProfileCallback {
-                override fun menu(state: Boolean) {
-                    menuExpanded.value = !menuExpanded.value
-                }
-
-                override fun openHistory(state: Boolean) {
-                    historyState.value = !state
-                }
-            }
+                ProfileState(
+                    name = "${profileModel.username}, ${profileModel.age}",
+                    profilePhoto = profileModel.avatar.id,
+                    description = profileModel.aboutMe,
+                    rating = profileModel.rating.average,
+                    observers = 13500,
+                    observed = 128,
+                    emoji = EmojiList.first(),
+                    profileType = ProfileType.USERPROFILE,
+                    enabled = false,
+                ), meets, meets, meets.first(),
+                (3), (false), (false), listOf(
+                    NavIconState.INACTIVE,
+                    NavIconState.ACTIVE,
+                    NavIconState.INACTIVE,
+                    NavIconState.INACTIVE,
+                    NavIconState.INACTIVE
+                ), alert = false
+            )
         )
     }
 }
@@ -122,11 +121,17 @@ fun UserProfile(
 ) {
     LazyColumn(
         modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .fillMaxHeight(0.9f)
             .background(MaterialTheme.colorScheme.background)
     ) {
         item {
-            Box(Modifier.fillMaxWidth(), Alignment.CenterEnd) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                Alignment.CenterEnd
+            ) {
                 IconButton({ callback?.menu(true) }) {
                     Icon(
                         painterResource(R.drawable.ic_kebab),
@@ -140,11 +145,19 @@ fun UserProfile(
                 ) { callback?.onSettingsClick() }
             }
         }
-        item { Profile(state.profileState) }
+        item {
+            Profile(
+                state.profileState,
+                Modifier.padding(horizontal = 16.dp),
+                callback
+            )
+        }
         item {
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
-                Modifier.padding(top = 28.dp),
+                Modifier
+                    .padding(top = 28.dp)
+                    .padding(horizontal = 16.dp),
                 MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.labelLarge
             )
@@ -152,13 +165,14 @@ fun UserProfile(
         item {
             Responds(
                 state.notifications, state.lastRespond,
+                Modifier.padding(horizontal = 16.dp)
             ) { callback?.onRespondsClick() }
         }
         if (state.currentMeetings.isNotEmpty()) item {
             LazyRow {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
-                    MeetingCard(it, Modifier.padding(horizontal = 4.dp))
+                    MeetingCategoryCard(it, Modifier.padding(horizontal = 4.dp))
                     { callback?.onMeetingClick(it) }
                 }
             }
@@ -166,9 +180,20 @@ fun UserProfile(
         if (state.meetingsHistory.isNotEmpty()) item {
             meetHistory(state.historyState, state.meetingsHistory,
                 { callback?.openHistory(state.historyState) })
-            { callback?.onMeetingClick(it) }
+            { callback?.onHistoryClick(it) }
         }
     }
+    Box(Modifier.fillMaxSize()) {
+        NavBar(
+            state.stateList, Modifier.align(Alignment.BottomCenter)
+        ) { callback?.onNavBarSelect(it) }
+    }
+    GAlert(
+        state.alert, { callback?.closeAlert() },
+        "Отлично, ваша жалоба отправлена!",
+        label = "Модераторы скоро рассмотрят\nвашу жалобу",
+        success = Pair("Закрыть") { callback?.closeAlert() }
+    )
 }
 
 // TODO вынести в shared
@@ -236,11 +261,12 @@ private fun Responds(
                     stringResource(R.string.profile_responds_label),
                     Modifier.padding(start = 16.dp),
                     MaterialTheme.colorScheme.tertiary,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
+                if (size > 0) Box(
                     Modifier
                         .clip(MaterialTheme.shapes.extraSmall)
                         .background(MaterialTheme.colorScheme.primary)
@@ -273,6 +299,7 @@ private fun meetHistory(
         Modifier
             .fillMaxWidth()
             .padding(top = 28.dp)
+            .padding(horizontal = 16.dp)
             .clip(CircleShape)
             .clickable { openHistory() },
         Arrangement.Start, Alignment.CenterVertically
@@ -281,20 +308,21 @@ private fun meetHistory(
             stringResource(R.string.profile_meeting_history_label),
             Modifier.padding(8.dp),
             color = MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.labelLarge
         )
         Icon(
             if (!historyState) Icons.Filled.KeyboardArrowRight
-            else Icons.Filled.KeyboardArrowDown,
-            stringResource(R.string.profile_responds_label),
+            else Icons.Filled.KeyboardArrowDown, (null),
             tint = MaterialTheme.colorScheme.onTertiary
         )
     }
     if (historyState) LazyRow {
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
-            MeetingCard(it, Modifier.padding(horizontal = 4.dp))
-            { onSelect(it) }
+            MeetingCategoryCard(
+                it, Modifier.padding(horizontal = 4.dp),
+                old = true
+            ) { onSelect(it) }
         }
     }
 }

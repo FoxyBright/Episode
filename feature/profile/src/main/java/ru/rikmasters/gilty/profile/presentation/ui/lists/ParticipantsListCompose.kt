@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui
+package ru.rikmasters.gilty.profile.presentation.ui.lists
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,12 +27,12 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
-private fun RespondsListPreview() {
-    GiltyTheme { RespondsList(DemoFullMeetingModel, DemoMemberModelList) }
+private fun ParticipantsListPreview() {
+    GiltyTheme { ParticipantsList(DemoFullMeetingModel, DemoMemberModelList) }
 }
 
 @Composable
-fun RespondsList(
+fun ParticipantsList(
     meet: FullMeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,

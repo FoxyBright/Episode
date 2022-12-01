@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
+import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.GAlert
@@ -132,12 +132,12 @@ private fun Content(
                     .padding(horizontal = 16.dp),
                 Arrangement.Center, Alignment.CenterHorizontally
             ) {
-                val enabled = state.date.isNotEmpty()
+                val enabled = /*state.date.isNotEmpty()
                         && state.time.isNotEmpty()
                         && state.tagList.isNotEmpty()
                         && state.time.isNotEmpty()
                         && state.description.isNotEmpty()
-                        && state.meetPlace != null
+                        && state.meetPlace != null*/ true
                 GradientButton(
                     Modifier, stringResource(R.string.next_button), enabled
                 ) { callback?.onNext() }

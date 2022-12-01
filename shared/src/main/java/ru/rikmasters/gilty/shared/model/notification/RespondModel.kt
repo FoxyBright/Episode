@@ -27,8 +27,7 @@ val DemoSendRespondsModel = RespondModel(
 )
 
 val DemoReceivedRespondsModel = RespondModel(
-    1,
-    DemoFullMeetingModel,
+    1, DemoFullMeetingModel,
     "Классно выглядишь, пойдем? Я вроде адекватный))",
     DemoOrganizerModel,
     RespondType.RECEIVED,

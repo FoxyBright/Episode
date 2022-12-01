@@ -129,6 +129,7 @@ fun NotificationsScreen(nav: NavState = get()) {
                             0 -> nav.navigateAbsolute("main/meetings")
                             1 -> nav.navigateAbsolute("notification/list")
                             2 -> nav.navigateAbsolute("addmeet/category")
+                            4 -> nav.navigateAbsolute("profile/main")
                         }
                     }
                 }

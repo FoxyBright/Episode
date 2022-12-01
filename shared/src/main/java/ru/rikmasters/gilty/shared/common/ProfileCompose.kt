@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -56,6 +54,7 @@ interface ProfileCallback : NavigationInterface {
     fun onNameChange(text: String) {}
     fun onDescriptionChange(text: String) {}
     fun onObserveChange(state: Boolean) {}
+    fun onObserveClick() {}
 }
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -172,7 +171,7 @@ fun Profile(
                     state.observers,
                     state.observed,
                     state.emoji
-                )
+                ) {callback?.onObserveClick()}
                 Spacer(Modifier.height(14.dp))
                 HiddenPhotoContent(
                     Modifier,

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,9 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,71 +33,17 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 fun MeetingFilterBottomPreview() {
     GiltyTheme {
-        val distanceState =
-            remember { mutableStateOf(false) }
-        val distance =
-            remember { mutableStateOf(25) }
-        val onlyOnline =
-            remember { mutableStateOf(false) }
-        val meetingTypes =
-            remember { mutableStateListOf(false, false, false) }
-        val genderList =
-            remember { mutableStateListOf(false, false, false) }
-        val conditionList =
-            remember { mutableStateListOf(false, false, false, false, false) }
-        val tagList =
-            remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
-        val categoryList =
-            remember { mutableStateOf(DemoFullCategoryModelList) }
-        val categoryStateList =
-            remember { mutableStateListOf<Boolean>() }
-        repeat(categoryList.value.size) { categoryStateList.add(false) }
-        val state = FilterListState(
-            distanceState.value,
-            distance.value,
-            onlyOnline.value,
-            meetingTypes,
-            genderList,
-            conditionList,
-            tagList,
-            categoryList.value,
-            categoryStateList
+        MeetingFilterBottom(
+            Modifier, (26), FilterListState(
+                (false), (25), (false),
+                listOf(false, false, false),
+                listOf(false, false, false),
+                listOf(false, false, false, false, false),
+                listOf("kaif", "pain", "fast", "launch"),
+                DemoFullCategoryModelList,
+                listOf(false, false, false),
+            )
         )
-        MeetingFilterBottom(Modifier, 26, state, object : MeetingFilterBottomCallback {
-            override fun onAllCategoryClick() {}
-            override fun onFilterClick() {}
-            override fun onCategoryClick(index: Int) {
-                categoryStateList[index] = !categoryStateList[index]
-            }
-
-            override fun onDeleteTag(it: Int) {
-                tagList.removeAt(it)
-            }
-
-            override fun onDistanceClick() {
-                distanceState.value = !distanceState.value
-            }
-
-            override fun onDistanceValueChange(it: Int) {
-                distance.value = it
-            }
-
-            override fun onOnlyOnlineClick() {
-                onlyOnline.value = !onlyOnline.value
-            }
-
-            override fun onMeetingTypeSelect(it: Int, status: Boolean) {
-                meetingTypes[it] = !status
-            }
-
-            override fun onGenderSelect(it: Int, status: Boolean) {
-                genderList[it] = !status
-            }
-
-            override fun onConditionSelect(it: Int, status: Boolean) {
-                conditionList[it] = !status
-            }
-        })
     }
 }
 
@@ -144,6 +88,7 @@ fun MeetingFilterBottom(
                     stringResource(R.string.meeting_filter_clear),
                     Modifier
                         .fillMaxWidth()
+                        .clickable { callback?.onClear() }
                         .padding(top = 12.dp, bottom = 28.dp),
                     MaterialTheme.colorScheme.tertiary,
                     textAlign = TextAlign.Center,
@@ -177,6 +122,7 @@ interface MeetingFilterBottomCallback : NavigationInterface {
     fun onMeetingTypeSelect(it: Int, status: Boolean)
     fun onGenderSelect(it: Int, status: Boolean)
     fun onConditionSelect(it: Int, status: Boolean)
+    fun onClear()
 }
 
 @Composable

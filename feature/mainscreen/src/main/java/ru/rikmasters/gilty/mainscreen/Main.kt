@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
 
 object Main : FeatureDefinition() {
+
     override fun DeepNavGraphBuilder.navigation() {
 
         nested("main", "meetings") {

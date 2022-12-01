@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
+import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
