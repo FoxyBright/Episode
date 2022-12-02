@@ -1,18 +1,16 @@
 package ru.rikmasters.gilty.profile.presentation.ui.lists
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.EmptyResponds
 import ru.rikmasters.gilty.shared.common.Respond
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.common.RespondsListContent
@@ -20,10 +18,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SEND
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.GiltyTab
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -43,7 +39,8 @@ fun RespondsListPreview() {
                         DemoSendRespondsModel
                     )
                 )
-            ), listOf(true, false), listOf(true, false)
+            ), listOf(true, false),
+            listOf(true, false)
         )
     }
 }
@@ -58,7 +55,11 @@ fun RespondsList(
     onTabChange: ((Int) -> Unit)? = null,
     onBack: (() -> Unit)? = null
 ) {
-    Column(modifier.fillMaxSize()) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+    ) {
         RowActionBar(
             stringResource(R.string.profile_responds_label),
             modifier = Modifier.padding(top = 28.dp),
@@ -68,9 +69,9 @@ fun RespondsList(
             listOf(
                 stringResource(R.string.profile_sent_responds),
                 stringResource(R.string.profile_received_responds)
-            ), selectTabs, Modifier
+            ), selectTabs, Modifier.padding(horizontal = 16.dp)
         ) { onTabChange?.let { c -> c(it) } }
-        if (selectTabs.first())
+        if(selectTabs.last())
             ReceivedResponds(
                 responds, respondsStates,
                 callback, Modifier
@@ -93,11 +94,11 @@ private fun SentResponds(
         arrayListOf<RespondModel>()
     responds.forEach {
         it.second.forEach { respond ->
-            if (respond.type == SEND)
+            if(respond.type == SEND)
                 sentResponds.add(respond)
         }
     }
-    if (sentResponds.isNotEmpty())
+    if(sentResponds.isNotEmpty())
         LazyColumn(modifier.fillMaxWidth()) {
             items(sentResponds) {
                 Respond(
@@ -106,10 +107,10 @@ private fun SentResponds(
                 )
             }
         }
-    else EmptyResponds(
+    else EmptyScreen(
         stringResource(
             R.string.profile_hasnt_received_responds
-        )
+        ), R.drawable.broken_heart
     )
 }
 
@@ -127,19 +128,19 @@ private fun ReceivedResponds(
     responds.forEach { pair ->
         listOfResponds.clear()
         pair.second.forEach {
-            if (it.type == RECEIVED)
+            if(it.type == RECEIVED)
                 listOfResponds.add(it)
-        }; if (listOfResponds.isNotEmpty())
+        }; if(listOfResponds.isNotEmpty())
         list.add(Pair(pair.first, listOfResponds))
     }
-    if (list.isNotEmpty())
+    if(list.isNotEmpty())
         RespondsListContent(
             list, respondsStates,
             modifier, callback
         )
-    else EmptyResponds(
+    else EmptyScreen(
         stringResource(
             R.string.profile_hasnt_sent_responds
-        )
+        ), R.drawable.broken_heart
     )
 }
