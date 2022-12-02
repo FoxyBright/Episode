@@ -29,13 +29,13 @@ class SwipeableCardState(
     val offset = Animatable(offset(0f, 0f), Offset.VectorConverter)
     var swipedDirection: DirectionType? by mutableStateOf(null)
     internal suspend fun reset() {
-        offset.animateTo(offset(0f, 0f), tween(400))
+        offset.animateTo(offset(0f, 0f), tween(1000))
     }
 
     suspend fun swipe(
         direction: DirectionType,
         animationSpec: AnimationSpec<Offset> =
-            tween(400)
+            tween(1000)
     ) {
         when (direction) {
             DirectionType.LEFT -> offset.animateTo(offset(x = -(maxWidth * 1.5f)), animationSpec)

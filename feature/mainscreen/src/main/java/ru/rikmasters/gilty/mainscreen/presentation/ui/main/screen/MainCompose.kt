@@ -1,19 +1,12 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,14 +19,12 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
+import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DividerBold
@@ -61,6 +52,7 @@ fun MainContentPreview() {
 }
 
 interface MainContentCallback {
+    
     fun onTodayChange() {}
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
@@ -89,6 +81,7 @@ fun MainContent(
 ) {
     Column(
         Modifier
+            .background(colorScheme.background)
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
@@ -115,16 +108,16 @@ fun MainContent(
             }
             IconButton({ callback?.onTimeFilterClick() }) {
                 Icon(
-                    if (state.switcher.first)
+                    if(state.switcher.first)
                         painterResource(R.drawable.ic_clock)
                     else painterResource(R.drawable.ic_calendar),
                     null,
                     Modifier.size(30.dp),
-                    MaterialTheme.colorScheme.tertiary
+                    colorScheme.tertiary
                 )
             }
         }
-        if (state.grid)
+        if(state.grid)
             MeetingGridContent(
                 Modifier
                     .padding(16.dp)
@@ -170,6 +163,18 @@ fun MainContent(
     )
 }
 
+@Preview
+@Composable
+fun MeetingPreview() {
+    GiltyTheme {
+        Meeting(
+            (false), (null), (null),
+            DemoFullMeetingModel,
+            (true), ("")
+        )
+    }
+}
+
 @Composable
 fun Meeting(
     menuState: Boolean,
@@ -178,10 +183,11 @@ fun Meeting(
     meet: FullMeetingModel,
     hiddenPhoto: Boolean,
     commentText: String,
-    callback: MeetingDetailsBottomCallback?
+    callback: MeetingDetailsBottomCallback? = null
 ) {
     Column(
         Modifier
+            .background(colorScheme.background)
             .padding(16.dp)
             .padding(bottom = 40.dp)
     ) {
@@ -191,7 +197,7 @@ fun Meeting(
             { menuItemClick?.let { c -> c(it) } }
         )
         MeetingDetailsBottomCompose(
-            Modifier.padding(16.dp),
+            Modifier.padding(top = 30.dp),
             MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
             callback
         )
