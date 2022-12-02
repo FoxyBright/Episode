@@ -156,7 +156,7 @@ fun MainContent(
                 .clickable { callback?.openFiltersBottomSheet() }
         )
         SquareCheckBox(
-            state.grid,
+            !state.grid,
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 92.dp)
