@@ -1,8 +1,13 @@
 package ru.rikmasters.gilty.login
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
