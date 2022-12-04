@@ -3,14 +3,8 @@ x
 Happ/src/main/java/ru/rikmasters/gilty/ui/BottomSheetBackgroundCompose.kt,0\7\0744e776cc45ceea9940235ca6c02eb6b8dec7b7
 p
 @core/src/main/java/ru/rikmasters/gilty/core/app/AppStateModel.kt,b\5\b5572c86ec49a67ae2c4e38709b9f156048cfdaa
-u
-Ecore/src/main/java/ru/rikmasters/gilty/core/app/EntrypointResolver.kt,e\b\ebf223773bcd1843ced5fee462f4c475a9293f06
 e
 5app/src/main/java/ru/rikmasters/gilty/MainActivity.kt,a\4\a41fc5df0fd9a3803c75270619e98a7bfdbd66e8
-t
-Dcore/src/main/java/ru/rikmasters/gilty/core/navigation/Navigation.kt,6\5\650c854b792778c66ba727be0f56774cb7a09232
-}
-Mcore/src/main/java/ru/rikmasters/gilty/core/navigation/DeepNavGraphBuilder.kt,3\d\3d4bbf12d9a7cf3f985c39c72efdcc38cd10469a
 x
 Hshared/src/main/java/ru/rikmasters/gilty/shared/shared/DividerCompose.kt,c\9\c9cf45d6b27ed2e4defd9cc72ba8f6fe880ec7ed
 Š
@@ -23,14 +17,10 @@ zfeature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui
 feature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui/main/custom/swipeablecard/SwipeableCardState.kt,0\c\0c557b7969979cb1c007b7210adad184eaa5c934
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
-C
-settings.gradle.kts,7\4\749edfcc96398253e5b3416184e95c46621da850
 I
 shared/proguard-rules.pro,c\0\c05de8d50553152476668b23ff270078a8e8669c
 G
 shared/build.gradle.kts,c\7\c75a46202110405791c74357375762fb05087d5b
-D
-app/build.gradle.kts,d\2\d2a4383452aad84a18429a5844d31330a012a9e6
 P
  app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
 
@@ -127,8 +117,6 @@ tfeature/mainscreen/src/main/java/ru/rikmasters/gilty/mainscreen/presentation/ui
 }feature/addmeet/src/main/java/ru/rikmasters/gilty/addmeet/presentation/ui/detailed/bottomSheets/DateTimeBottomSheetCompose.kt,f\f\ff38e76c7b97e9b4fa409849303a28a3c2387ca5
 |
 Lshared/src/main/java/ru/rikmasters/gilty/shared/model/meeting/FilterModel.kt,4\5\45639db204df09290bd98339f75aaf98b1214a56
-ž
-nfeature/addmeet/src/main/java/ru/rikmasters/gilty/addmeet/presentation/ui/extentions/DetailedElementCompose.kt,a\b\ab7cc8cab5e62296f7cd52e9f2314641f7aa3223
 t
 Dshared/src/main/java/ru/rikmasters/gilty/shared/theme/ShapesExtra.kt,3\6\36d7e7ccfe5f1e423a768e97790fd1a620c548f2
 x
@@ -165,5 +153,6 @@ t
 Dfeature/addmeet/src/main/java/ru/rikmasters/gilty/addmeet/AddMeet.kt,a\9\a99e2da79ba5bd26cc4cb82bccb5ec4cb448998a
 t
 Dshared/src/main/java/ru/rikmasters/gilty/shared/shared/GTextField.kt,b\5\b55c3dc228f3c42214e23ca58bc77317313c5a42
-”
-dfeature/addmeet/src/main/java/ru/rikmasters/gilty/addmeet/presentation/ui/requirements/MapCompose.kt,c\6\c6ea6e6a0961c52803eebaba440ccbd7da301a37
+:
+
+.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302

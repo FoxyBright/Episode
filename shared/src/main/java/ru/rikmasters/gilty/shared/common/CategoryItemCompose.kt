@@ -66,7 +66,7 @@ fun CategoryItem(
     onClick: ((Boolean) -> Unit)? = null
 ) {
     Box(
-        modifier.size((CATEGORY_ELEMENT_SIZE + 10).dp)
+        modifier.size((CATEGORY_ELEMENT_SIZE).dp)
     ) {
         Box(
             Modifier
