@@ -46,7 +46,16 @@ fun NotificationsScreen(nav: NavState = get()) {
             mutableStateListOf(
                 DemoNotificationLeaveEmotionModel,
                 DemoNotificationMeetingOverModel,
-                DemoTodayNotificationRespondAccept
+                DemoTodayNotificationRespondAccept,
+                DemoNotificationMeetingOverModel,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
+                DemoTodayNotificationRespondAccept,
             )
         }
         val stateList = remember {

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +27,7 @@ fun Modifier.swipeableRow(
     onSwiped: (RowDirection) -> Unit,
 ) = pointerInput(Unit) {
     coroutineScope {
-        detectDragGestures({}, {
+        detectHorizontalDragGestures({}, {
             launch {
                 val coercedOffset = state.offset.targetValue.coerceIn(state.maxWidth)
                 if (abs(coercedOffset.x) < state.maxWidth / 4) state.reset()
@@ -39,7 +40,7 @@ fun Modifier.swipeableRow(
         }, { launch { state.reset() } }, { change, dragAmount ->
             launch {
                 if (change.positionChange() != Offset.Zero) change.consume()
-                state.drag((state.offset.targetValue + dragAmount).x.coerceIn(-state.maxWidth, 0f))
+                state.drag((state.offset.targetValue.x + dragAmount).coerceIn(-state.maxWidth, 0f))
             }
         }
         )
