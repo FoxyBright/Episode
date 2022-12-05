@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
+import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarState
 import ru.rikmasters.gilty.shared.common.ProfileMeetingBottomSheetCallback
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.DIVIDE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
@@ -47,6 +48,8 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -62,7 +65,8 @@ private fun MyMeetingPreview() {
             MyMeetingState(
                 meet, DemoMemberModelList,
                 18, meet.duration,
-                (false), (false)
+                (false), (false), (3),
+                DemoSendRespondsModel
             )
         )
     }
@@ -71,11 +75,12 @@ private fun MyMeetingPreview() {
 
 interface MyMeetingCallback: ProfileMeetingBottomSheetCallback {
     
-    fun onCloseClick()
-    fun onAllWatchClick()
-    fun menuCollapse(it: Boolean)
-    fun menuItemClick(point: Int)
-    fun closeAlert()
+    fun onCloseClick() {}
+    fun onAllWatchClick() {}
+    fun menuCollapse(it: Boolean) {}
+    fun menuItemClick(point: Int) {}
+    fun closeAlert() {}
+    fun onRespondsClick() {}
 }
 
 data class MyMeetingState(
@@ -85,6 +90,8 @@ data class MyMeetingState(
     val eventDuration: String,
     val menuState: Boolean,
     val alert: Boolean,
+    val respondsCount: Int? = null,
+    val lastRespond: RespondModel? = null,
 )
 
 @Composable
@@ -106,10 +113,13 @@ fun MyMeeting(
     ) {
         item {
             MeetingBottomSheetTopBarCompose(
-                Modifier, state.meetingModel,
-                state.eventDuration, state.menuState,
-                { callback?.menuCollapse(it) },
-                { callback?.menuItemClick(it) }
+                Modifier, MeetingBottomSheetTopBarState(
+                    state.meetingModel, state.eventDuration,
+                    state.menuState, lastRespond = state.lastRespond,
+                    respondsCount = state.respondsCount
+                ), { callback?.menuCollapse(it) },
+                { callback?.menuItemClick(it) },
+                { callback?.onRespondsClick() }
             )
         }
         item {

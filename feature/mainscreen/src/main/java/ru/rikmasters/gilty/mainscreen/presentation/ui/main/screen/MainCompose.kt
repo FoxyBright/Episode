@@ -192,8 +192,9 @@ fun Meeting(
             .padding(bottom = 40.dp)
     ) {
         MeetingBottomSheetTopBarCompose(
-            Modifier, meet, meet.duration,
-            menuState, { menuCollapse?.let { c -> c(it) } },
+            Modifier, MeetingBottomSheetTopBarState(
+                meet, meet.duration, menuState
+            ), { menuCollapse?.let { c -> c(it) } },
             { menuItemClick?.let { c -> c(it) } }
         )
         MeetingDetailsBottomCompose(

@@ -66,6 +66,7 @@ data class ProfileMeetingBottomSheetState(
 )
 
 interface ProfileMeetingBottomSheetCallback {
+    
     fun onConfirm()
     fun onMemberClick()
     fun openMap()
@@ -83,7 +84,13 @@ fun ProfileMeetingBottomSheet(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
-        item { MeetingBottomSheetTopBarCompose(Modifier, state.meetingModel, state.eventDuration) }
+        item {
+            MeetingBottomSheetTopBarCompose(
+                Modifier, MeetingBottomSheetTopBarState(
+                    state.meetingModel, state.eventDuration
+                )
+            )
+        }
         item {
             Card(
                 Modifier
@@ -117,7 +124,7 @@ fun ProfileMeetingBottomSheet(
                 CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
-                    when (state.meetingModel.type) {
+                    when(state.meetingModel.type) {
                         MeetType.GROUP -> stringResource(id = R.string.meeting_group_type)
                         MeetType.ANONYMOUS -> stringResource(id = R.string.meeting_anon_type)
                         MeetType.PERSONAL -> stringResource(id = R.string.meeting_personal_type)
@@ -130,7 +137,7 @@ fun ProfileMeetingBottomSheet(
                 )
                 Divider(Modifier.padding(start = 16.dp))
                 Text(
-                    when (state.meetingModel.condition) {
+                    when(state.meetingModel.condition) {
                         ConditionType.FREE -> stringResource(R.string.condition_free)
                         ConditionType.DIVIDE -> stringResource(R.string.condition_divide)
                         ConditionType.MEMBER_PAY -> stringResource(R.string.condition_member_pay)
@@ -160,7 +167,7 @@ fun ProfileMeetingBottomSheet(
                 )
                 Image(
                     painterResource(
-                        if (state.meetingModel.isPrivate) R.drawable.ic_lock_close
+                        if(state.meetingModel.isPrivate) R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
                     ), null,
                     Modifier.padding(start = 8.dp, bottom = 16.dp)
@@ -170,7 +177,7 @@ fun ProfileMeetingBottomSheet(
         itemsIndexed(state.memberList) { index, member ->
             Card(
                 Modifier.fillMaxWidth(),
-                when (index) {
+                when(index) {
                     0 -> ThemeExtra.shapes.largeTopRoundedShape
                     state.memberList.size - 1 -> ThemeExtra.shapes.largeBottomRoundedShape
                     else -> ThemeExtra.shapes.zero
@@ -199,7 +206,7 @@ fun ProfileMeetingBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                if (index < state.memberList.size - 1) Divider(Modifier.padding(start = 60.dp))
+                if(index < state.memberList.size - 1) Divider(Modifier.padding(start = 60.dp))
             }
         }
         item {
