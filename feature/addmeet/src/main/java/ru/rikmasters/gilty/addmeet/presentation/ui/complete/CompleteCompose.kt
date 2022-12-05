@@ -1,31 +1,18 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.complete
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -43,7 +30,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -54,6 +41,7 @@ fun CompleteContent() {
 }
 
 interface CompleteCallBack {
+    
     fun onShare() {}
     fun onClose() {}
 }
@@ -124,7 +112,7 @@ private fun MeetingCard(
                 meeting.organizer.avatar.id,
                 stringResource(R.string.meeting_avatar),
                 Modifier
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(shapes.large)
                     .fillMaxHeight(0.94f),
                 contentScale = ContentScale.Crop
             )
@@ -142,10 +130,10 @@ private fun PhoneContent(
     modifier: Modifier = Modifier,
     content: (@Composable () -> Unit)?
 ) {
-    Box(modifier.fillMaxSize(), Alignment.Center) {
+    Box(modifier.fillMaxSize(), Center) {
         Image(
             painterResource(
-                if (isSystemInDarkTheme())
+                if(isSystemInDarkTheme())
                     R.drawable.ic_new_meet_back_dark
                 else R.drawable.ic_new_meet_back
             ), (null), Modifier.fillMaxSize()
@@ -166,7 +154,7 @@ fun MeetBottom(
     Box(modifier) {
         Image(
             painterResource(
-                if (isSystemInDarkTheme())
+                if(isSystemInDarkTheme())
                     R.drawable.ic_back_rect_dark
                 else R.drawable.ic_back_rect
             ), (null), Modifier
@@ -179,7 +167,7 @@ fun MeetBottom(
                 .align(Alignment.BottomCenter)
                 .wrapContentHeight()
                 .offset(y = -(18).dp),
-            MaterialTheme.shapes.large,
+            shapes.large,
             CardDefaults.cardColors(colorScheme.primaryContainer)
         ) {
             Column(Modifier.padding(16.dp)) {
@@ -192,12 +180,15 @@ fun MeetBottom(
                         colorScheme.tertiary,
                         style = typography.labelSmall,
                         fontWeight = FontWeight.Bold
-                    ); MeetingStates(Modifier.weight(1f), meet, true)
+                    ); MeetingStates(
+                    Modifier.weight(1f),
+                    meet, true
+                )
                 }
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 22.dp)
+                        .padding(top = 12.dp)
                 ) {
                     CardButton(
                         Modifier
@@ -223,14 +214,15 @@ fun CardButton(
     text: String,
     icon: Int,
 ) {
-    Card(
-        modifier, MaterialTheme.shapes.extraLarge,
-        CardDefaults.cardColors(ThemeExtra.colors.grayButton)
+    Box(
+        modifier.background(
+            colors.grayButton,
+            shapes.extraLarge
+        ), Center
     ) {
         Row(
-            Modifier.padding(12.dp, 10.dp),
-            Arrangement.Start,
-            Alignment.CenterVertically
+            Modifier.padding(6.dp),
+            Start, CenterVertically
         ) {
             Icon(
                 painterResource(icon), (null),

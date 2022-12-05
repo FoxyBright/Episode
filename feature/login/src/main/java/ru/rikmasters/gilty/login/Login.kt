@@ -1,13 +1,8 @@
 package ru.rikmasters.gilty.login
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -21,18 +16,19 @@ import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 
-object Login : FeatureDefinition() {
+object Login: FeatureDefinition() {
+    
     override fun DeepNavGraphBuilder.navigation() {
-
+        
         //TODO Проверка на авторизованность пользователя
-        val userLogged = true
-
+        val userLogged = false
+        
         screen("authorization") {
-            if (userLogged) MainScreen() else LoginScreen()
+            if(userLogged) MainScreen() else LoginScreen()
         }
-
+        
         nested("registration", "code") {
-
+            
             screen(
                 "profile?photo={photo}&hp={hp}",
                 listOf(navArgument("photo") {
@@ -47,7 +43,7 @@ object Login : FeatureDefinition() {
                     }
                 }
             }
-
+            
             screen( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
                 "resize?photo={photo}",
                 listOf(navArgument("photo") {
@@ -57,7 +53,7 @@ object Login : FeatureDefinition() {
                 it.arguments?.getString("photo")
                     ?.let { avatar -> ProfileScreen(avatar) }
             }
-
+            
             screen(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
@@ -67,7 +63,7 @@ object Login : FeatureDefinition() {
                 it.arguments?.getBoolean("multi")
                     ?.let { multi -> ProfileSelectPhotoScreen(multi) }
             }
-
+            
             screen("code") { CodeScreen() }
             screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
@@ -75,7 +71,7 @@ object Login : FeatureDefinition() {
             screen("permissions") { PermissionsScreen() }
         }
     }
-
+    
     override fun Module.koin() {
         single { EntrypointResolver { "authorization" } }
     }

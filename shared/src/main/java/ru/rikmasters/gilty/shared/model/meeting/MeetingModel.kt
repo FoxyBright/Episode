@@ -66,7 +66,7 @@ data class FullMeetingModel(
 val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),
     title = "Поход в кино",
-    condition = ConditionType.FREE,
+    condition = ConditionType.MEMBER_PAY,
     category = DemoShortCategoryModel,
     duration = "2 часа",
     type = MeetType.GROUP,

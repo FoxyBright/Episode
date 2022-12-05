@@ -69,7 +69,8 @@ private fun MyMeetingPreview() {
 }
 
 
-interface MyMeetingCallback : ProfileMeetingBottomSheetCallback {
+interface MyMeetingCallback: ProfileMeetingBottomSheetCallback {
+    
     fun onCloseClick()
     fun onAllWatchClick()
     fun menuCollapse(it: Boolean)
@@ -148,7 +149,7 @@ fun MyMeeting(
                 )
             ) {
                 Text(
-                    when (state.meetingModel.type) {
+                    when(state.meetingModel.type) {
                         MeetType.GROUP -> stringResource(R.string.meeting_group_type)
                         MeetType.ANONYMOUS -> stringResource(R.string.meeting_anon_type)
                         MeetType.PERSONAL -> stringResource(R.string.meeting_personal_type)
@@ -166,23 +167,26 @@ fun MyMeeting(
                     SpaceBetween, CenterVertically
                 ) {
                     Row(Modifier.padding(16.dp), Start, CenterVertically) {
-                        if (condition == MEMBER_PAY)
+                        if(condition == MEMBER_PAY)
                             Image(
                                 painterResource(R.drawable.ic_money),
-                                (null), Modifier.size(24.dp)
+                                (null),
+                                Modifier
+                                    .padding(end = 16.dp)
+                                    .size(24.dp)
                             )
                         Text(
-                            when (state.meetingModel.condition) {
+                            when(state.meetingModel.condition) {
                                 FREE -> stringResource(R.string.condition_free)
                                 DIVIDE -> stringResource(R.string.condition_divide)
                                 MEMBER_PAY -> stringResource(R.string.condition_member_pay)
                                 NO_MATTER -> stringResource(R.string.condition_no_matter)
                                 ORGANIZER_PAY -> stringResource(R.string.condition_organizer_pay)
-                            }, Modifier.padding(start = 16.dp), colorScheme.tertiary,
-                            style = typography.bodyMedium
+                            }, Modifier,
+                            colorScheme.tertiary, style = typography.bodyMedium
                         )
                     }
-                    Text(
+                    if(condition == MEMBER_PAY) Text(
                         "${state.meetingModel.price ?: "0"} ₽",
                         Modifier.padding(end = 16.dp), colorScheme.primary,
                         style = typography.headlineLarge
@@ -205,7 +209,7 @@ fun MyMeeting(
                 )
                 Image(
                     painterResource(
-                        if (state.meetingModel.isPrivate) R.drawable.ic_lock_close
+                        if(state.meetingModel.isPrivate) R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
                     ), null,
                     Modifier.padding(start = 8.dp)
@@ -221,7 +225,7 @@ fun MyMeeting(
                     .background(colorScheme.primaryContainer)
             ) {
                 state.memberList.forEachIndexed { index, member ->
-                    if (index < 3) {
+                    if(index < 3) {
                         Row(
                             Modifier
                                 .fillMaxWidth()
@@ -241,9 +245,9 @@ fun MyMeeting(
                                 colorScheme.tertiary
                             )
                         }
-                        if (state.memberList.size <= 3 && index + 1 < state.memberList.size) {
+                        if(state.memberList.size <= 3 && index + 1 < state.memberList.size) {
                             Divider(Modifier.padding(start = 60.dp))
-                        } else if (index + 1 < 3) Divider(Modifier.padding(start = 60.dp))
+                        } else if(index + 1 < 3) Divider(Modifier.padding(start = 60.dp))
                     }
                 }
             }
