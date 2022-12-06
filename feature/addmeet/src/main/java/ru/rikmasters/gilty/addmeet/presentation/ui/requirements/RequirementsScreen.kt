@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ONLINE
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
@@ -60,56 +61,58 @@ fun RequirementsScreen(nav: NavState = get()) {
             RequirementsState(
                 hideMeetPlace, memberCount,
                 gender, age, orientation,
-                selectedTabs, selectedMember, alert
+                selectedTabs, selectedMember,
+                alert, ONLINE
             ),
-            Modifier, object : RequirementsCallback {
+            Modifier, object: RequirementsCallback {
                 override fun onHideMeetPlaceClick() {
                     hideMeetPlace = !hideMeetPlace
                 }
-
+                
                 override fun onCloseAlert(it: Boolean) {
                     alert = it
                 }
-
+                
                 override fun onMemberClick(it: Int) {
                     repeat(selectedMember.size) { index ->
                         selectedMember[index] = it == index
                     }
                 }
-
+                
                 override fun onClose() {
                     nav.navigateAbsolute("main/meetings")
                 }
-
+                
                 override fun onBack() {
                     nav.navigate("detailed")
                 }
-
+                
                 override fun onNext() {
                     nav.navigate("complete")
                 }
-
+                
                 override fun onGenderClick() {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             SelectBottom(
                                 stringResource(R.string.sex),
-                                genderList, genderControl
+                                genderList, genderControl, ONLINE
                             ) {
                                 repeat(genderControl.size) { index ->
                                     genderControl[index] = index == it
-                                    if (index == it) gender = genderList[index]
+                                    if(index == it) gender = genderList[index]
                                 }; scope.launch { asm.bottomSheetState.collapse() }
                             }
                         }
                     }
                 }
-
+                
                 override fun onAgeClick() {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             AgeBottom(from, to, Modifier,
-                                { from = it }, { to = it })
+                                { from = it }, { to = it }, ONLINE
+                            )
                             {
                                 age = "от $from до $to"
                                 scope.launch { asm.bottomSheetState.collapse() }
@@ -117,38 +120,39 @@ fun RequirementsScreen(nav: NavState = get()) {
                         }
                     }
                 }
-
+                
                 override fun onOrientationClick() {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             SelectBottom(
                                 stringResource(R.string.orientation_title),
-                                orientationList, orientationControl
+                                orientationList,
+                                orientationControl, ONLINE
                             ) {
                                 repeat(orientationControl.size) { index ->
                                     orientationControl[index] = index == it
-                                    if (index == it) orientation = orientationList[index]
+                                    if(index == it) orientation = orientationList[index]
                                 }; scope.launch { asm.bottomSheetState.collapse() }
                             }
                         }
                     }
                 }
-
+                
                 override fun onTabClick(it: Int) {
                     repeat(selectedTabs.size)
                     { index -> selectedTabs[index] = it == index }
                 }
-
+                
                 override fun onCountChange(text: String) {
-                    val count = if (text.isNotBlank()) text.toInt() else 1
+                    val count = if(text.isNotBlank()) text.toInt() else 1
                     when {
                         count > selectedMember.size ->
                             repeat(count) { selectedMember.add(false) }
-
-                        count < selectedMember.size -> if (count > 1)
+                        
+                        count < selectedMember.size -> if(count > 1)
                             repeat(selectedMember.size - count)
                             { selectedMember.removeLast() }
-
+                        
                     }
                     memberCount = text
                 }

@@ -38,7 +38,7 @@ fun GenderPreview() {
                 stringResource(R.string.female_sex),
                 stringResource(R.string.male_sex),
                 stringResource(R.string.others_sex)
-            ), listOf(false, false, true)
+            ), listOf(false, false, true), false
         )
     }
 }
@@ -60,7 +60,7 @@ fun OrientationPreview() {
             ), listOf(
                 false, false, false, false,
                 false, false, false, true
-            )
+            ), false
         )
     }
 }
@@ -70,7 +70,8 @@ fun OrientationPreview() {
 fun AgePreview() {
     GiltyTheme {
         AgeBottom("19", "40", Modifier,
-            {}, {}) {}
+            {}, {}, false
+        ) {}
     }
 }
 
@@ -79,6 +80,7 @@ fun SelectBottom(
     title: String,
     genderList: List<String>,
     list: List<Boolean>,
+    online: Boolean,
     onItemClick: ((Int) -> Unit)? = null
 ) {
     BottomContainer(title) {
@@ -93,7 +95,7 @@ fun SelectBottom(
             list.forEachIndexed { index, it ->
                 GiltyChip(
                     Modifier.padding(end = 12.dp),
-                    genderList[index], it
+                    genderList[index], it, online
                 ) { onItemClick?.let { c -> c(index) } }
             }
         }
@@ -107,6 +109,7 @@ fun AgeBottom(
     modifier: Modifier = Modifier,
     fromChange: (String) -> Unit,
     toChange: (String) -> Unit,
+    online: Boolean,
     onSave: () -> Unit
 ) {
     BottomContainer(stringResource(R.string.personal_info_age_placeholder)) {
@@ -133,6 +136,7 @@ fun AgeBottom(
                 Modifier
                     .padding(top = 20.dp),
                 stringResource(R.string.save_button),
+                online = online
             ) { onSave() }
         }
     }

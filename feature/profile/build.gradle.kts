@@ -11,4 +11,5 @@ dependencies {
     compose()
     implementation(project(":shared"))
     implementation(project(":feature:complaints")) // TODO КОСТЫЛЬ
+    implementation(project(":feature:bubbles"))
 }

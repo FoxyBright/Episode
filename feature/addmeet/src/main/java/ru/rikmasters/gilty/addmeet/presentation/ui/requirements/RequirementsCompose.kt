@@ -34,9 +34,11 @@ data class RequirementsState(
     val selectedTabs: List<Boolean>,
     val selectedMember: List<Boolean>,
     val alert: Boolean,
+    val online: Boolean
 )
 
 interface RequirementsCallback {
+    
     fun onHideMeetPlaceClick() {}
     fun onCountChange(text: String) {}
     fun onClose() {}
@@ -59,7 +61,8 @@ fun RequirementsContent() {
             RequirementsState(
                 (false), ("1"),
                 matter, matter, matter,
-                listOf(true), listOf(true), (false)
+                listOf(true), listOf(true),
+                (false), (false)
             )
         )
     }
@@ -79,9 +82,9 @@ fun RequirementsContent(
             (null), Modifier.padding(bottom = 10.dp),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
-        if (!state.private)
+        if(!state.private)
             Element(
-                MemberCountInput(state.memberCount)
+                MemberCountInput(state.memberCount, state.online)
                 { callback?.onCountChange(it) },
                 Modifier.padding(bottom = 12.dp)
             )
@@ -90,7 +93,7 @@ fun RequirementsContent(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            state.private
+            state.private, online = state.online
         ) { callback?.onHideMeetPlaceClick() }
         Text(
             stringResource(R.string.requirements_private_check_label),
@@ -100,9 +103,13 @@ fun RequirementsContent(
             colorScheme.onTertiary,
             style = typography.headlineSmall
         )
-        if (state.memberCount.isNotBlank()
+        if(state.memberCount.isNotBlank()
             && !state.private
-        ) RequirementsList(state, Modifier.padding(horizontal = 16.dp), callback)
+        ) RequirementsList(
+            state,
+            Modifier.padding(horizontal = 16.dp),
+            callback
+        )
     }
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -119,9 +126,14 @@ fun RequirementsContent(
                     && state.orientation.isNotEmpty())
                     || state.private*/ true
             GradientButton(
-                Modifier, stringResource(R.string.add_meet_publish_button), enabled
+                Modifier, stringResource(R.string.add_meet_publish_button),
+                enabled, state.online
             ) { callback?.onNext() }
-            Dashes((5), (4), Modifier.padding(top = 16.dp))
+            Dashes(
+                (5), (4), Modifier.padding(top = 16.dp),
+                if(state.online) colorScheme.secondary
+                else colorScheme.primary
+            )
         }
     }
     GAlert(state.alert, { callback?.onCloseAlert(false) },

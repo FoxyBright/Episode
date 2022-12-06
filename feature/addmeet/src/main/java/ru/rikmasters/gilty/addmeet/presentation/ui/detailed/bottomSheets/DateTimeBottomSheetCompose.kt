@@ -35,7 +35,10 @@ private const val HOURS_STEP = 1
 private fun DateTimeBSPreview() {
     GiltyTheme {
         DateTimeBS(
-            DateTimeBSState(TODAY_LABEL, TIME_START, TIME_START),
+            DateTimeBSState(
+                TODAY_LABEL, TIME_START,
+                TIME_START, false
+            ),
             Modifier.padding(16.dp)
         )
     }
@@ -45,9 +48,11 @@ data class DateTimeBSState(
     val date: String,
     val hour: String,
     val minute: String,
+    val online: Boolean
 )
 
 interface DateTimeBSCallback {
+    
     fun dateChange(it: String) {}
     fun hourChange(it: String) {}
     fun minuteChange(it: String) {}
@@ -70,7 +75,8 @@ fun DateTimeBS(
         DateTimePickerContent(state, callback, Modifier.fillMaxWidth())
         GradientButton(
             Modifier.padding(vertical = 28.dp),
-            stringResource(R.string.save_button)
+            stringResource(R.string.save_button),
+            online = state.online
         ) { callback?.onSave() }
     }
 }

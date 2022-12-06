@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,15 +61,15 @@ fun GradientButton(
                 .background(
                     if (online) Brush.linearGradient(
                         if (enabled) Gradients.green() else listOf(
-                            MaterialTheme.colorScheme.inverseSurface,
-                            MaterialTheme.colorScheme.inverseSurface
+                            colorScheme.inverseSurface,
+                            colorScheme.inverseSurface
                         )
                     )
                     else
                         Brush.linearGradient(
                             if (enabled) Gradients.red() else listOf(
-                                MaterialTheme.colorScheme.inversePrimary,
-                                MaterialTheme.colorScheme.inversePrimary
+                                colorScheme.inversePrimary,
+                                colorScheme.inversePrimary
                             )
                         ), shape
                 )

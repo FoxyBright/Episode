@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -50,6 +51,7 @@ interface CompleteCallBack {
 fun CompleteContent(
     meeting: FullMeetingModel,
     modifier: Modifier = Modifier,
+    online: Boolean = false,
     callback: CompleteCallBack? = null
 ) {
     Column(
@@ -64,10 +66,10 @@ fun CompleteContent(
                 .fillMaxHeight(0.8f)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting) }
+        ) { MeetingCard(meeting, Modifier, online) }
         Box(Modifier.fillMaxSize()) {
             Buttons(
-                Modifier.align(Alignment.BottomCenter),
+                Modifier.align(Alignment.BottomCenter), online,
                 { callback?.onShare() }) { callback?.onClose() }
         }
     }
@@ -76,6 +78,7 @@ fun CompleteContent(
 @Composable
 private fun Buttons(
     modifier: Modifier = Modifier,
+    online: Boolean,
     onShare: () -> Unit,
     onClose: () -> Unit
 ) {
@@ -88,7 +91,7 @@ private fun Buttons(
                 .padding(horizontal = 16.dp)
                 .padding(top = 28.dp),
             stringResource(R.string.meeting_shared_button),
-            icon = ic_shared
+            icon = ic_shared, online = online
         ) { onShare() }
         Text(
             stringResource(R.string.meeting_close_button), Modifier
@@ -104,7 +107,8 @@ private fun Buttons(
 @Composable
 private fun MeetingCard(
     meeting: FullMeetingModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    online: Boolean
 ) {
     Box(modifier) {
         Box {
@@ -119,7 +123,8 @@ private fun MeetingCard(
             MeetBottom(
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 18.dp), meeting
+                    .offset(y = 18.dp), meeting,
+                online
             )
         }
     }
@@ -150,6 +155,7 @@ private fun PhoneContent(
 fun MeetBottom(
     modifier: Modifier,
     meet: FullMeetingModel,
+    online: Boolean
 ) {
     Box(modifier) {
         Image(
@@ -168,7 +174,7 @@ fun MeetBottom(
                 .wrapContentHeight()
                 .offset(y = -(18).dp),
             shapes.large,
-            CardDefaults.cardColors(colorScheme.primaryContainer)
+            cardColors(colorScheme.primaryContainer)
         ) {
             Column(Modifier.padding(16.dp)) {
                 Row(
@@ -195,12 +201,12 @@ fun MeetBottom(
                             .padding(end = 8.dp)
                             .weight(1f),
                         stringResource(R.string.not_interesting),
-                        R.drawable.ic_cancel
+                        R.drawable.ic_cancel, online
                     )
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
-                        R.drawable.ic_heart
+                        R.drawable.ic_heart, online
                     )
                 }
             }
@@ -213,7 +219,10 @@ fun CardButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: Int,
+    online: Boolean
 ) {
+    val color = if(online) colorScheme.secondary
+    else colorScheme.primary
     Box(
         modifier.background(
             colors.grayButton,
@@ -226,13 +235,11 @@ fun CardButton(
         ) {
             Icon(
                 painterResource(icon), (null),
-                Modifier.size(8.dp),
-                colorScheme.primary
+                Modifier.size(8.dp), color
             )
             Text(
                 text, Modifier.padding(top = 2.dp, start = 2.dp),
-                colorScheme.primary,
-                style = typography.displaySmall,
+                color, style = typography.displaySmall,
                 fontWeight = FontWeight.SemiBold
             )
         }

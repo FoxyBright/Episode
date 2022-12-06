@@ -1,12 +1,16 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.tags
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ONLINE
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchScreen
 
 @Composable
 fun TagsScreen(nav: NavState = get()) {
-    TagSearchScreen({ nav.navigate("detailed") })
+    val online = remember { mutableStateOf(ONLINE) }
+    TagSearchScreen(online.value, { nav.navigate("detailed") })
     { nav.navigate("detailed") }
 }

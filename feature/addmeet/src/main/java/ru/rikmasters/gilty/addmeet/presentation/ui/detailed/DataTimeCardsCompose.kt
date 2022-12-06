@@ -20,6 +20,10 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.DataTimeType.TIME
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_calendar
+import ru.rikmasters.gilty.shared.R.drawable.ic_clock
+import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_date_place_holder
+import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_duration_place_holder
 
 enum class DataTimeType { DATE, TIME }
 
@@ -28,25 +32,28 @@ enum class DataTimeType { DATE, TIME }
 fun DataTimeCard(
     text: String,
     type: DataTimeType,
+    online: Boolean,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)
 ) {
     Card(
-        onClick, modifier.fillMaxWidth(), (true), shapes.large,
+        onClick, modifier.fillMaxWidth(),
+        (true), shapes.large,
         cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier.padding(18.dp)) {
             Icon(
                 painterResource(
-                    if (type == TIME) R.drawable.ic_clock
-                    else R.drawable.ic_calendar
+                    if(type == TIME) ic_clock
+                    else ic_calendar
                 ),
                 (null), Modifier.size(28.dp),
-                colorScheme.primary
+                if(online) colorScheme.secondary
+                else colorScheme.primary
             )
             Text(
                 stringResource(
-                    if (type == TIME)
+                    if(type == TIME)
                         R.string.add_meet_detailed_meet_duration
                     else R.string.add_meet_detailed_meet_date
                 ),
@@ -58,13 +65,14 @@ fun DataTimeCard(
             Text(
                 text.ifEmpty {
                     stringResource(
-                        if (type == TIME)
-                            R.string.add_meet_detailed_meet_duration_place_holder
-                        else R.string.add_meet_detailed_meet_date_place_holder
+                        if(type == TIME)
+                            add_meet_detailed_meet_duration_place_holder
+                        else add_meet_detailed_meet_date_place_holder
                     )
                 }, Modifier.padding(top = 4.dp),
-                if (text.isBlank())
+                if(text.isBlank())
                     colorScheme.onTertiary
+                else if(online) colorScheme.secondary
                 else colorScheme.primary,
                 style = typography.labelSmall,
                 fontWeight = SemiBold

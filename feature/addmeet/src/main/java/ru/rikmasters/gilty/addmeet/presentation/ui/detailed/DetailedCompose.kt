@@ -1,10 +1,8 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,11 +10,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.ClosableActionBar
-import ru.rikmasters.gilty.shared.shared.GAlert
-import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -27,7 +22,7 @@ fun DetailedPreview() {
             DetailedState(
                 (""), (""), (""),
                 listOf(), (null),
-                (true), (false)
+                (true), (false), (false)
             )
         )
     }
@@ -41,9 +36,11 @@ data class DetailedState(
     val meetPlace: Pair<String, String>?,
     val hideMeetPlace: Boolean,
     val alert: Boolean,
+    val online: Boolean
 )
 
 interface DetailedCallback {
+    
     fun onBack() {}
     fun onClose() {}
     fun onNext() {}
@@ -139,9 +136,14 @@ private fun Content(
                         && state.description.isNotEmpty()
                         && state.meetPlace != null*/ true
                 GradientButton(
-                    Modifier, stringResource(R.string.next_button), enabled
+                    Modifier, stringResource(R.string.next_button),
+                    enabled, state.online
                 ) { callback?.onNext() }
-                Dashes((5), (3), Modifier.padding(top = 16.dp))
+                Dashes(
+                    (5), (3), Modifier.padding(top = 16.dp),
+                    if(state.online) colorScheme.secondary
+                    else colorScheme.primary
+                )
             }
         }
     }

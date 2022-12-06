@@ -45,32 +45,32 @@ fun MeetingFilterContent(onSave: () -> Unit) {
         categoryList.value,
         categoryStateList
     )
-
+    
     val context = LocalContext.current
-
+    
     var categories by remember { mutableStateOf(0) }
-
-    when (categories) {
+    
+    when(categories) {
         1 -> CategoriesScreen { _, _ -> categories = 0 }
-        2 -> TagSearchScreen({ categories = 0 }) { categories = 0 }
+        2 -> TagSearchScreen(false, { categories = 0 }) { categories = 0 }
         else -> MeetingFilterBottom(Modifier, 26, state,
-            object : MeetingFilterBottomCallback {
+            object: MeetingFilterBottomCallback {
                 override fun onAllCategoryClick() {
                     categories = 1
                 }
-
-                override fun onFilterClick() {
+                
+                 override fun onFilterClick() {
                     categories = 2
                 }
-
+                
                 override fun onCategoryClick(index: Int) {
                     categoryStateList[index] = !categoryStateList[index]
                 }
-
+                
                 override fun onDeleteTag(it: Int) {
                     tagList.removeAt(it)
                 }
-
+                
                 override fun onClear() {
                     Toast.makeText(
                         context,
@@ -78,31 +78,31 @@ fun MeetingFilterContent(onSave: () -> Unit) {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-
+                
                 override fun onDistanceClick() {
                     distanceState.value = !distanceState.value
                 }
-
+                
                 override fun onDistanceValueChange(it: Int) {
                     distance.value = it
                 }
-
+                
                 override fun onOnlyOnlineClick() {
                     onlyOnline.value = !onlyOnline.value
                 }
-
+                
                 override fun onMeetingTypeSelect(it: Int, status: Boolean) {
                     meetingTypes[it] = !status
                 }
-
+                
                 override fun onGenderSelect(it: Int, status: Boolean) {
                     genderList[it] = !status
                 }
-
+                
                 override fun onNext() {
                     onSave()
                 }
-
+                
                 override fun onConditionSelect(it: Int, status: Boolean) {
                     conditionList[it] = !status
                 }

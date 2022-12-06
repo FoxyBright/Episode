@@ -8,6 +8,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +21,13 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview
 @Composable
 private fun CheckBoxCardPreview() {
-    GiltyTheme { CheckBoxCard("Описание", Modifier.fillMaxWidth(), true) {} }
+    GiltyTheme {
+        CheckBoxCard(
+            "Описание",
+            Modifier.fillMaxWidth(),
+            true
+        ) {}
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,11 +37,12 @@ fun CheckBoxCard(
     modifier: Modifier = Modifier,
     state: Boolean,
     shape: Shape = MaterialTheme.shapes.large,
+    online: Boolean = false,
     onChange: (Boolean) -> Unit
 ) {
     Card(
         { onChange(!state) }, modifier, (true), shape,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+        CardDefaults.cardColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
@@ -44,10 +52,14 @@ fun CheckBoxCard(
             Alignment.CenterVertically
         ) {
             Text(
-                label, Modifier, MaterialTheme.colorScheme.tertiary,
+                label, Modifier, colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium
             )
-            TrackCheckBox(state) { onChange(!state) }
+            TrackCheckBox(
+                state, Modifier,
+                if(online) colorScheme.secondary
+                else colorScheme.primary
+            ) { onChange(!state) }
         }
     }
 }

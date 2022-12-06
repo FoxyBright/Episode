@@ -111,7 +111,8 @@ data class FilterListState(
     val categoryStateList: List<Boolean>
 )
 
-interface MeetingFilterBottomCallback : NavigationInterface {
+interface MeetingFilterBottomCallback: NavigationInterface {
+    
     fun onCategoryClick(index: Int)
     fun onAllCategoryClick()
     fun onFilterClick()
@@ -141,8 +142,7 @@ private fun filterList(
             TagSearch(
                 state.tagList,
                 { callback?.onFilterClick() },
-                { callback?.onDeleteTag(it) }
-            )
+            ) { callback?.onDeleteTag(it) }
         },
         FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
@@ -156,7 +156,7 @@ private fun filterList(
             MeetingType(
                 state.onlyOnline,
                 state.meetingTypes,
-                stringResource(R.string.meeting_only_online_meetings_button),
+                stringResource(R.string.meeting_only_online_meetings_button), false,
                 { callback?.onOnlyOnlineClick() },
                 { it, status -> callback?.onMeetingTypeSelect(it, status) }
             )

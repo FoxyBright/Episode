@@ -1,10 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +20,10 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun DurationBottomSheetPreview() {
     GiltyTheme {
-        DurationBottomSheet("", Modifier.padding(16.dp))
+        DurationBottomSheet(
+            "", Modifier.padding(16.dp),
+            false
+        )
     }
 }
 
@@ -31,6 +31,7 @@ private fun DurationBottomSheetPreview() {
 fun DurationBottomSheet(
     value: String,
     modifier: Modifier = Modifier,
+    online: Boolean,
     onValueChange: ((String) -> Unit)? = null,
     onSave: (() -> Unit)? = null
 ) {
@@ -45,7 +46,8 @@ fun DurationBottomSheet(
         { value -> onValueChange?.let { it(value) } }
         GradientButton(
             Modifier.padding(vertical = 28.dp),
-            stringResource(R.string.save_button)
+            stringResource(R.string.save_button),
+            online = online
         ) { onSave?.let { it() } }
     }
 }
@@ -71,14 +73,14 @@ private fun getDuration(): List<String> {
         repeat(4) { minute ->
             list.add(
                 "${
-                    if (hour != 0) "$hour ${
-                        when ("$hour".last()) {
+                    if(hour != 0) "$hour ${
+                        when("$hour".last()) {
                             '1' -> "час"
                             '2', '3', '4' -> "часа"
                             else -> "часов"
                         }
                     }" else ""
-                } ${if (minute != 0) "${(minute) * 15} минут" else ""}"
+                } ${if(minute != 0) "${(minute) * 15} минут" else ""}"
             )
         }
     }; list.add("Сутки"); return list.minus(list[0])

@@ -241,7 +241,7 @@
     <string name="chats_label">Чат встреч</string>
 
     <!-- ALERTS -->
-    <string name="change_user_categories_alert">Выйти из режима\выбора категорий?</string>
+    <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>
     <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
