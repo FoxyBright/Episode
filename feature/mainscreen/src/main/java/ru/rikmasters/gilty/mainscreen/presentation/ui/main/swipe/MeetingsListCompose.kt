@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,11 +21,12 @@ fun MeetingsListContent(
     states: List<Pair<FullMeetingModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
     notInteresting: ((state: SwipeableCardState) -> Unit)? = null,
-    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null
+    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null,
+    onClick: ((FullMeetingModel) -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
         Box(Modifier.padding(16.dp)) {
-            Content(states, notInteresting, onSelect)
+            Content(states, notInteresting, onSelect, onClick)
         }
     }
 }
@@ -33,22 +35,24 @@ fun MeetingsListContent(
 private fun Content(
     states: List<Pair<FullMeetingModel, SwipeableCardState>>,
     notInteresting: ((state: SwipeableCardState) -> Unit)? = null,
-    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null
+    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null,
+    onClick: ((FullMeetingModel) -> Unit)? = null
 ) {
     states.forEach { (meeting, state) ->
         run {
-            if (state.swipedDirection == null) MeetingCardCompose(
+            if(state.swipedDirection == null) MeetingCardCompose(
                 meeting,
                 Modifier
                     .fillMaxSize()
+                    .clickable { onClick?.let { it(meeting) } }
                     .swipeableCard(
                         {
-                            if (it == RIGHT)
+                            if(it == RIGHT)
                                 onSelect?.let { it(meeting, state) }
                         }, state, {}, listOf(DOWN, UP)
                     )
             ) {
-                when (it) {
+                when(it) {
                     RIGHT -> onSelect?.let { it(meeting, state) }
                     LEFT -> notInteresting?.let { it(state) }
                     else -> {}

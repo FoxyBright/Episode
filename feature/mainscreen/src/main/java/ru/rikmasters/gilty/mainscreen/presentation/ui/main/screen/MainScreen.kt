@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
@@ -23,9 +24,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 
 @Composable
 fun MainScreen(nav: NavState = get()) {
@@ -55,13 +54,13 @@ fun MainScreen(nav: NavState = get()) {
         MainContentState(
             grid, switcher, meetings,
             cardStates, stateList, alert
-        ), Modifier, object : MainContentCallback {
+        ), Modifier, object: MainContentCallback {
             override fun onNavBarSelect(point: Int) {
                 repeat(stateList.size) {
-                    if (it == point) stateList[it] = ACTIVE
-                    else if (stateList[it] != NEW)
+                    if(it == point) stateList[it] = ACTIVE
+                    else if(stateList[it] != NEW)
                         stateList[it] = INACTIVE
-                    when (point) {
+                    when(point) {
                         0 -> nav.navigateAbsolute("main/meetings")
                         1 -> nav.navigateAbsolute("notification/list")
                         2 -> nav.navigateAbsolute("addmeet/category")
@@ -70,40 +69,69 @@ fun MainScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
+            override fun onMeetClick(meet: FullMeetingModel) {
+                scope.launch {
+                    asm.bottomSheetState.expand {
+                        MeetingClick(
+                            menuState,
+                            { menuState = it },
+                            {
+                                scope.launch {
+                                    asm.bottomSheetState.expand {
+                                        menuState = false
+                                        ComplainsContent(meet) {
+                                            scope.launch {
+                                                asm.bottomSheetState.collapse()
+                                            }; alert = true
+                                        }
+                                    }
+                                }
+                            }, meet, DemoMemberModelList,
+                            {
+                                nav.navigateAbsolute(
+                                    "main/reaction?avatar=${meet.organizer.avatar.id}"
+                                ); scope.launch { asm.bottomSheetState.collapse() }
+                            }
+                        )
+                    }
+                }
+            }
+            
             override fun onTimeFilterClick() {
                 Toast.makeText(
                     context, "Тут будет фильтрация по дате и времени",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
+            
             override fun closeAlert() {
                 alert = false
             }
-
+            
             override fun interesting(state: SwipeableCardState) {
                 scope.launch { state.swipe(DirectionType.RIGHT) }
             }
-
+            
             override fun notInteresting(state: SwipeableCardState) {
                 scope.launch { state.swipe(DirectionType.LEFT) }
             }
-
+            
             override fun onTodayChange() {
                 switcher = Pair(!switcher.first, !switcher.second)
             }
-
+            
             override fun onRespond(meet: FullMeetingModel) {
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        Meeting(menuState,
+                        MeetingSwipe(menuState,
                             { menuState = it },
                             {
+                                log.d("clk")
                                 scope.launch {
                                     asm.bottomSheetState.expand {
                                         menuState = false
-                                        ComplainsContent(DemoFullMeetingModel) {
+                                        ComplainsContent(meet) {
                                             scope.launch {
                                                 asm.bottomSheetState.collapse()
                                             }; alert = true
@@ -112,15 +140,15 @@ fun MainScreen(nav: NavState = get()) {
                                 }
                             },
                             meet, hiddenPhoto, commentText,
-                            object : MeetingDetailsBottomCallback {
+                            object: MeetingDetailsBottomCallback {
                                 override fun onHiddenPhotoActive(hidden: Boolean) {
                                     hiddenPhoto = hidden
                                 }
-
+                                
                                 override fun onCommentChange(text: String) {
                                     commentText = text
                                 }
-
+                                
                                 override fun onRespondClick() {
                                     nav.navigateAbsolute(
                                         "main/reaction?avatar=${meet.organizer.avatar.id}"
@@ -130,11 +158,11 @@ fun MainScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun openFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheetState.halfExpand {
-                        MeetingFilterContent() {
+                        MeetingFilterContent {
                             scope.launch {
                                 asm.bottomSheetState.collapse()
                             }
@@ -142,7 +170,7 @@ fun MainScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onStyleChange() {
                 grid = !grid
             }

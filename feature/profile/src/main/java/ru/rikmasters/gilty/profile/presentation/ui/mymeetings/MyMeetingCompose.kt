@@ -72,7 +72,6 @@ private fun MyMeetingPreview() {
     }
 }
 
-
 interface MyMeetingCallback: ProfileMeetingBottomSheetCallback {
     
     fun onCloseClick() {}
