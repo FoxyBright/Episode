@@ -1,14 +1,8 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.conditions
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -20,17 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Element
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
 import ru.rikmasters.gilty.shared.common.MeetingType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.ClosableActionBar
-import ru.rikmasters.gilty.shared.shared.CrossButton
-import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.shared.TextFieldColors
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -39,8 +28,10 @@ fun ConditionPreview() {
     GiltyTheme {
         ConditionContent(
             ConditionState(
-                (false), (true), listOf(), listOf(),
-                ("100"), TextFieldColors(), (null)
+                (false), (true), listOf(),
+                listOf(), ("100"),
+                TextFieldColors(),
+                (null), (false)
             )
         )
     }
@@ -53,10 +44,12 @@ data class ConditionState(
     val conditionList: List<Boolean>,
     val text: String,
     val priceColors: TextFieldColors,
-    val focus: FocusState?
+    val focus: FocusState?,
+    val alert: Boolean,
 )
 
 interface ConditionsCallback {
+    
     fun onBack() {}
     fun onNext() {}
     fun onClose() {}
@@ -67,6 +60,7 @@ interface ConditionsCallback {
     fun onMeetingTypeSelect(it: Int) {}
     fun onConditionSelect(it: Int) {}
     fun onPriceFocus(state: FocusState) {}
+    fun onCloseAlert(it: Boolean) {}
 }
 
 @Composable
@@ -92,8 +86,15 @@ fun ConditionContent(
                 .padding(top = 32.dp, end = 16.dp)
                 .size(20.dp)
                 .align(Alignment.TopEnd)
-        ) { callback?.onClose() }
+        ) { callback?.onCloseAlert(true) }
     }
+    GAlert(state.alert, { callback?.onCloseAlert(false) },
+        stringResource(R.string.add_meet_exit_alert_title),
+        Modifier, stringResource(R.string.add_meet_exit_alert_details),
+        success = Pair(stringResource(R.string.exit_button))
+        { callback?.onCloseAlert(false); callback?.onClose() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onCloseAlert(false) })
 }
 
 @Composable
@@ -116,7 +117,7 @@ private fun Conditions(
                 Modifier.padding(top = 28.dp)
             )
         }
-        if (pay)
+        if(pay)
             item {
                 Element(
                     Price(state, callback),
@@ -136,14 +137,18 @@ private fun Conditions(
                     .padding(horizontal = 16.dp),
                 Arrangement.Center, Alignment.CenterHorizontally
             ) {
-                val enabled =
-                    (state.conditionList.contains(true)
-                            && state.meetingTypes.contains(true))
-                            && if (pay) state.text.isNotEmpty() else true
+                val enabled = /*(state.conditionList.contains(true)
+                        && state.meetingTypes.contains(true))
+                        && if (pay) state.text.isNotEmpty() else */true
                 GradientButton(
-                    Modifier, stringResource(R.string.next_button), enabled
+                    Modifier, stringResource(R.string.next_button),
+                    enabled, state.online
                 ) { callback?.onNext() }
-                Dashes((5), (2), Modifier.padding(top = 16.dp))
+                Dashes(
+                    (5), (2), Modifier.padding(top = 16.dp),
+                    if(state.online) colorScheme.secondary
+                    else colorScheme.primary
+                )
             }
         }
     }
@@ -158,7 +163,7 @@ private fun Type(
         MeetingType(
             state.online,
             state.meetingTypes,
-            stringResource(R.string.meeting_only_online_meetings_button),
+            stringResource(R.string.meeting_only_online_meetings_button), state.online,
             { callback?.onOnlineClick() },
             { it, _ -> callback?.onMeetingTypeSelect(it) }
         )
@@ -171,7 +176,7 @@ private fun Conditions(
     callback: ConditionsCallback? = null
 ): FilterModel {
     return FilterModel(stringResource(R.string.meeting_terms)) {
-        ConditionsSelect(state.conditionList)
+        ConditionsSelect(state.conditionList, state.online)
         { it, _ -> callback?.onConditionSelect(it) }
     }
 }
@@ -199,14 +204,15 @@ private fun Additional(
         Column {
             CheckBoxCard(
                 stringResource(R.string.add_meet_conditions_hidden),
-                Modifier.fillMaxWidth(), state.hiddenPhoto
+                Modifier.fillMaxWidth(), state.hiddenPhoto,
+                online = state.online
             ) { callback?.onHiddenClick() }
             Text(
                 stringResource(R.string.add_meet_conditions_hidden_label),
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 16.dp),
-                MaterialTheme.colorScheme.onTertiary,
+                colorScheme.onTertiary,
                 style = typography.headlineSmall
             )
         }

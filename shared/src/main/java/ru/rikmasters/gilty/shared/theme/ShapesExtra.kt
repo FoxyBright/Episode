@@ -13,10 +13,13 @@ data class ExtraShapes(
     val largeBottomRoundedShape: Shape = RectangleShape,
     val mediumTopRoundedShape: Shape = RectangleShape,
     val mediumBottomRoundedShape: Shape = RectangleShape,
-    val ExtraLargeStartRoundedShape: Shape = RectangleShape,
-    val ExtraLargeEndRoundedShape: Shape = RectangleShape,
+    val mediumStartRoundedShape: Shape = RectangleShape,
+    val mediumEndRoundedShape: Shape = RectangleShape,
+    val extraLargeStartRoundedShape: Shape = RectangleShape,
+    val extraLargeEndRoundedShape: Shape = RectangleShape,
     val ultraTopRoundedShape: Shape = RectangleShape,
-    val chatRoundedShape: Shape = RectangleShape
+    val chatRoundedShape: Shape = RectangleShape,
+    val ultraRoundedShape: Shape = RectangleShape
     // Add new form in scheme = RectangleShape
 )
 
@@ -34,9 +37,12 @@ val DefaultExtraShapes = ExtraShapes(
     largeBottomRoundedShape = RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp),
     mediumTopRoundedShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
     mediumBottomRoundedShape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
+    mediumStartRoundedShape = RoundedCornerShape(bottomStart = 12.dp, topStart = 12.dp),
+    mediumEndRoundedShape = RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp),
     ultraTopRoundedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-    ExtraLargeStartRoundedShape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
-    ExtraLargeEndRoundedShape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp),
+    ultraRoundedShape = RoundedCornerShape(50.dp),
+    extraLargeStartRoundedShape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
+    extraLargeEndRoundedShape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
     chatRoundedShape = RoundedCornerShape(30.dp),
     zero = RoundedCornerShape(0.dp)
 // Add form in scheme

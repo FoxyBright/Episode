@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,6 +54,7 @@ interface ProfileCallback : NavigationInterface {
     fun onNameChange(text: String) {}
     fun onDescriptionChange(text: String) {}
     fun onObserveChange(state: Boolean) {}
+    fun onObserveClick() {}
 }
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -126,7 +127,7 @@ fun Profile(
                 colors = TransparentTextFieldColors(),
                 textStyle = MaterialTheme.typography.displayLarge,
                 placeholder = {
-                    Row(Modifier, Arrangement.Center, Alignment.CenterVertically) {
+                    Row(Modifier, Center, CenterVertically) {
                         Text(
                             stringResource(R.string.user_name),
                             Modifier.padding(end = 8.dp),
@@ -135,7 +136,7 @@ fun Profile(
                         )
                         Icon(
                             painterResource(R.drawable.ic_edit),
-                            stringResource(R.string.edit),
+                            stringResource(R.string.edit_button),
                             Modifier.padding(top = 4.dp),
                             MaterialTheme.colorScheme.outlineVariant
                         )
@@ -170,7 +171,7 @@ fun Profile(
                     state.observers,
                     state.observed,
                     state.emoji
-                )
+                ) {callback?.onObserveClick()}
                 Spacer(Modifier.height(14.dp))
                 HiddenPhotoContent(
                     Modifier,

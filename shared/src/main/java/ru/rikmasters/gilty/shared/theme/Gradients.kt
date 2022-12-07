@@ -21,5 +21,13 @@ object Gradients {
             MaterialTheme.colorScheme.inverseOnSurface,
         )
     }
+
+    @Composable
+    fun gray(): List<Color> {
+        return listOf(
+            MaterialTheme.colorScheme.onTertiary,
+            MaterialTheme.colorScheme.onTertiary,
+        )
+    }
 }
 

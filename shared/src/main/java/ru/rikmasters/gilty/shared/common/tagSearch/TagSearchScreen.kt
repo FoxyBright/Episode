@@ -10,7 +10,11 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Composable
-fun TagSearchScreen(onBack: () -> Unit, onNext: (List<String>) -> Unit) {
+fun TagSearchScreen(
+    online: Boolean,
+    onBack: () -> Unit,
+    onNext: (List<String>) -> Unit
+) {
     GiltyTheme {
         val tagList = remember { mutableStateListOf<String>() }
         val searchText = remember { mutableStateOf("") }
@@ -18,28 +22,28 @@ fun TagSearchScreen(onBack: () -> Unit, onNext: (List<String>) -> Unit) {
         val state = TagState(
             tagList,
             remember { mutableStateListOf("Бэтмэн", "Кингсмен", "Лобби", "Lorem", "Lolly") },
-            popularTagsListVisible.value, searchText.value, allTags
+            popularTagsListVisible.value, searchText.value, allTags, online
         )
-        TagSearchContent(state, Modifier.padding(16.dp), object : TagSearchCallback {
+        TagSearchContent(state, Modifier.padding(16.dp), object: TagSearchCallback {
             override fun searchTextChange(text: String) {
                 popularTagsListVisible.value = text == ""
                 searchText.value = text
             }
-
+            
             override fun onBack() {
                 onBack()
             }
-
+            
             override fun onNext() {
                 onNext(tagList)
             }
-
+            
             override fun onDeleteTag(tag: Int) {
                 tagList.removeAt(tag)
             }
-
+            
             override fun onTagClick(tag: String) {
-                if (!tagList.contains(tag)) tagList.add(tag)
+                if(!tagList.contains(tag)) tagList.add(tag)
                 else tagList.removeAt(tagList.indexOf(tag))
             }
         })

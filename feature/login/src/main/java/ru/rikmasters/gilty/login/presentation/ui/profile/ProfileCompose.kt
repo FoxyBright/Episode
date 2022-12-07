@@ -66,8 +66,8 @@ fun ProfileContent(
                 .padding(bottom = 48.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button),
-            (state.name.isNotBlank() &&
-                    !state.occupiedName)
+//            (state.name.isNotBlank() &&
+//                    !state.occupiedName) // TODO условия активации кнопки
         ) { callback?.onNext() }
     }
 }

@@ -38,6 +38,7 @@
     <string name="profile_hidden_photo">Скрытые фото</string>
     <string name="profile_observers">Наблюдели</string>
     <string name="profile_observe">Наблюдает</string>
+    <string name="profile_user_observe">Наблюдаете</string>
     <string name="profile_organizer_observe">Наблюдать</string>
     <string name="profile_about_me">О себе</string>
     <string name="profile_responds_label">Отклики</string>
@@ -47,6 +48,23 @@
     <string name="profile_menu_settings_button">Настройки</string>
     <string name="profile_menu_watch_photo_button">Смотреть фото</string>
     <string name="profile_user_name_is_occupied">Имя пользователя занято</string>
+    <string name="profile_sent_responds">Отправленные</string>
+    <string name="profile_received_responds">Полученные</string>
+    <string name="profile_hasnt_sent_responds">Вы еще не оставляли\nотклики</string>
+    <string name="profile_hasnt_received_responds">На ваши Meets\nникто не отреагировал</string>
+
+    <string name="settings_interest_label">Ваши интересы</string>
+    <string name="settings_about_app_label">О приложении</string>
+    <string name="settings_app_icon_label">Иконка приложения</string>
+    <string name="settings_delete_account_label">Удалить аккаунт</string>
+    <string name="settings_about_app_privacy_policy">Политика конфиденциальности</string>
+    <string name="settings_about_app_agreement">Пользовательское соглашение</string>
+    <string name="settings_about_app_rules">Правила Gilty</string>
+    <string name="settings_about_app_help">Помощь и поддержка</string>
+    <string name="settings_exit_alert">Вы хотите выйти?</string>
+    <string name="settings_delete_account_alert">Вы хотите удалить аккаунт навсегда?</string>
+    <string name="settings_white_icon_label">White</string>
+    <string name="settings_dark_icon_label">Dark</string>
 
     <!-- Code -->
     <string name="confirm_number_title">Подтвердите номер</string>
@@ -110,6 +128,7 @@
     <string name="meeting_watch_on_mup_button">Посмотреть на карте</string>
     <string name="meeting_distance_from_user">От вас</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
+    <string name="meeting_complain">Пожаловаться</string>
 
     <!--Meeting Filters-->
     <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>
@@ -153,7 +172,8 @@
     <string name="map">Карта</string>
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
-    <string name="edit">Изменить</string>
+    <string name="edit_button">Изменить</string>
+    <string name="confirm_button">Применить</string>
 
     <!-- TOASTS -->
     <string name="complaints_title">Пожаловаться</string>
@@ -199,6 +219,34 @@
     <string name="add_meet_detailed_meet_place">Место встречи</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место встречи будет видно только участникам</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место встречи</string>
+    <string name="requirements_title">Требования к\nучастникам</string>
+    <string name="requirements_member_count_label">Количество</string>
+    <string name="requirements_member_count_place_holder">Сколько будет участников</string>
+    <string name="requirements_private_check">Сделать приватной</string>
+    <string name="requirements_private_check_label">На вашу встречу можно попасть только по ссылке</string>
+    <string name="requirements_filter_all">Ко всем</string>
+    <string name="requirements_filter_personal">К каждому</string>
+    <string name="orientation_title">Ориентация</string>
+    <string name="orientation_hetero">Гетеро</string>
+    <string name="orientation_gay">Гей</string>
+    <string name="orientation_lesbian">Лесбиянка</string>
+    <string name="orientation_bisexual">Бисексуал(ка)</string>
+    <string name="orientation_asexual">Асексуал(ка)</string>
+    <string name="orientation_demisexual">Демисексуал(ка)</string>
+    <string name="orientation_pansexual">Пансексуал(ка)</string>
+    <string name="orientation_queer">Квир</string>
+    <string name="add_meet_publish_button">Опубликовать</string>
+
+    <!-- CHATS -->
+    <string name="chats_label">Чат встреч</string>
+
+    <!-- ALERTS -->
+    <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>
+    <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
+    <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
+    <string name="cancel_button">Отменить</string>
+    <string name="exit_button">Выйти</string>
+    <string name="cancel">Отмена</string>
 
     <!-- TOASTS -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>

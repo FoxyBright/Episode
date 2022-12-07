@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -25,23 +26,25 @@ private fun DashesPreview() {
 fun Dashes(
     count: Int,
     active: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = colorScheme.primary
 ) {
     Row(modifier, Center, CenterVertically) {
-        repeat(count) { Item(it == active) }
+        repeat(count) { Item(it == active, color) }
     }
 }
 
 @Composable
-private fun Item(active: Boolean) {
+private fun Item(active: Boolean, color: Color) {
     Box(
         Modifier
             .padding(horizontal = 2.dp)
-            .width(if (active) 24.dp else 12.dp)
+            .width(if(active) 24.dp else 12.dp)
             .height(6.dp)
             .background(
-                if (active) colorScheme.primary
-                else colorScheme.outline, CircleShape
+                if(active) color
+                else colorScheme.outline,
+                CircleShape
             )
     )
 }

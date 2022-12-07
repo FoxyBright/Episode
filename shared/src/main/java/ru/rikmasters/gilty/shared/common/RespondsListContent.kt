@@ -1,9 +1,8 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons.Filled
@@ -19,10 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -42,13 +38,16 @@ private fun ReceivedResponds() {
                     )
                 ),
                 Pair(DemoFullMeetingModel, listOf(DemoSendRespondsModel))
-            ), listOf(true, false)
+            ), listOf(true, false),
+            Modifier
+                .background(colorScheme.background)
+                .padding(16.dp)
         )
     }
 }
 
-
 interface RespondCallback {
+    
     fun onCancelClick(respond: RespondModel) {}
     fun onRespondClick(meet: MeetingModel) {}
     fun onAcceptClick(respond: RespondModel) {}
@@ -85,23 +84,28 @@ private fun GroupList(
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
-            RowActionBar(meet.title, responds.size.toString())
+            RowActionBar(
+                meet.title,
+                responds.size.toString(),
+                Modifier.clickable { callback?.onArrowClick(index) }
+            )
             IconButton({ callback?.onArrowClick(index) }) {
                 Icon(
-                    if (state) Filled.KeyboardArrowDown
+                    if(state) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
                     (null), Modifier.size(24.dp),
                     colorScheme.onTertiary
                 )
             }
-        };if (state) Column {
-        responds.forEach {
-            Respond(
-                it, callback,
-                Modifier.padding(bottom = 6.dp)
-            )
         }
-    }
+        if(state) Column {
+            responds.forEach {
+                Respond(
+                    it, callback,
+                    Modifier.padding(bottom = 6.dp)
+                )
+            }
+        }
     }
 }
 

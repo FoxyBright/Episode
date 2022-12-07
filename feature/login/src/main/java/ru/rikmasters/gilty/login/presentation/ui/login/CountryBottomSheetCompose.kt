@@ -70,9 +70,8 @@ fun CountryBottomSheetContent(
         SearchActionBar(SearchState(
             stringResource(R.string.login_search_name),
             state.searchState, state.text,
-            { callback?.onSearchTextChange(it) },
-            { callback?.onSearchStateChange() }
-        ))
+            { callback?.onSearchTextChange(it) }
+        ){ callback?.onSearchStateChange() })
         if (state.Countries.isNotEmpty())
             LazyColumn(
                 Modifier

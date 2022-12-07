@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -71,12 +72,16 @@ fun RowActionBar(
     details: String? = null,
     modifier: Modifier = Modifier,
     description: String? = null,
+    distanceBetween: Dp? = null,
     onBack: (() -> Unit)? = null
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             onBack?.let {
-                IconButton(it, Modifier.padding(end = 16.dp)) {
+                IconButton(
+                    it,
+                    Modifier.padding(end = distanceBetween ?: 16.dp)
+                ) {
                     Icon(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),

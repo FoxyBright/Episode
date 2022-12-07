@@ -16,18 +16,19 @@ import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 
-object Login : FeatureDefinition() {
+object Login: FeatureDefinition() {
+    
     override fun DeepNavGraphBuilder.navigation() {
-
+        
         //TODO Проверка на авторизованность пользователя
         val userLogged = true
-
+        
         screen("authorization") {
-            if (userLogged) MainScreen() else LoginScreen()
+            if(userLogged) MainScreen() else LoginScreen()
         }
-
+        
         nested("registration", "code") {
-
+            
             screen(
                 "profile?photo={photo}&hp={hp}",
                 listOf(navArgument("photo") {
@@ -42,7 +43,7 @@ object Login : FeatureDefinition() {
                     }
                 }
             }
-
+            
             screen( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
                 "resize?photo={photo}",
                 listOf(navArgument("photo") {
@@ -52,7 +53,7 @@ object Login : FeatureDefinition() {
                 it.arguments?.getString("photo")
                     ?.let { avatar -> ProfileScreen(avatar) }
             }
-
+            
             screen(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
@@ -62,7 +63,7 @@ object Login : FeatureDefinition() {
                 it.arguments?.getBoolean("multi")
                     ?.let { multi -> ProfileSelectPhotoScreen(multi) }
             }
-
+            
             screen("code") { CodeScreen() }
             screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
@@ -70,7 +71,7 @@ object Login : FeatureDefinition() {
             screen("permissions") { PermissionsScreen() }
         }
     }
-
+    
     override fun Module.koin() {
         single { EntrypointResolver { "authorization" } }
     }

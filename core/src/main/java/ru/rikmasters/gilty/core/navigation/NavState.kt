@@ -46,6 +46,8 @@ class NavState(
      *
      * @param dest полный путь
      */
-    fun navigateAbsolute(dest: String) =
+    fun navigateAbsolute(dest: String) {
+        // TODO Fast clicks
         navHostController.navigate(dest, routeOptions[dest])
+    }
 }
