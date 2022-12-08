@@ -80,10 +80,8 @@ fun RequirementsList(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun Item(
-    label: String,
-    text: String,
-    shape: Shape,
-    online: Boolean,
+    label: String, text: String,
+    shape: Shape, online: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {

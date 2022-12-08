@@ -1,6 +1,12 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
@@ -16,7 +22,7 @@ fun RequirementsScreen(nav: NavState = get()) {
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     var hideMeetPlace by remember { mutableStateOf(false) }
-    var memberCount by remember { mutableStateOf("2") }
+    var memberCount by remember { mutableStateOf("1") }
     var alert by remember { mutableStateOf(false) }
     var gender by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -24,7 +30,7 @@ fun RequirementsScreen(nav: NavState = get()) {
     var to by remember { mutableStateOf("18") }
     var orientation by remember { mutableStateOf("") }
     val selectedTabs = remember { mutableStateListOf(true, false) }
-    val selectedMember = remember { mutableStateListOf(true, false) }
+    val selectedMember = remember { mutableStateListOf(true) }
     val genderList = listOf(
         stringResource(R.string.female_sex),
         stringResource(R.string.male_sex),
@@ -139,18 +145,17 @@ fun RequirementsScreen(nav: NavState = get()) {
                 }
                 
                 override fun onCountChange(text: String) {
-                    val count = if(text.isNotBlank()) text.toInt() else 2
+                    val count = if(text.isNotBlank()) text.toInt() else 1
                     when {
                         count > selectedMember.size ->
-                            repeat(count - selectedMember.size)
-                            { selectedMember.add(false) }
+                            repeat(count) { selectedMember.add(false) }
                         
                         count < selectedMember.size -> if(count > 1)
                             repeat(selectedMember.size - count)
                             { selectedMember.removeLast() }
                         
                     }
-                    memberCount = if(count < 2 || text.isBlank()) "2" else text
+                    memberCount = text
                     MEETING.memberCount = count
                 }
             })

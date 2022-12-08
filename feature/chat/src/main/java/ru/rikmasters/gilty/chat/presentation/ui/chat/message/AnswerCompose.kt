@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -30,6 +30,7 @@ import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
 import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
 import ru.rikmasters.gilty.chat.presentation.model.MessageModel
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_image_empty
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -51,7 +52,7 @@ private fun MyAnswer() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
-            (true),  (false)
+            (true), (false)
         )
     }
 }
@@ -90,7 +91,7 @@ fun AnswerContent(
         Spacer(
             Modifier
                 .background(
-                    if (!sender)
+                    if(!sender)
                         colorScheme.primary
                     else White
                 )
@@ -104,16 +105,17 @@ fun AnswerContent(
                     .size(38.dp)
                     .clip(shapes.small),
                 contentScale = Crop,
-                placeholder = painterResource(R.drawable.ic_image_empty)
+                placeholder = painterResource(ic_image_empty)
             )
         }
         val user = message.sender.username
         Column(Modifier.padding(start = 12.dp)) {
             Text(
-                if (textField) "${
+                if(textField) "${
                     stringResource(R.string.chats_message_answer_recipient)
                 } $user" else user, Modifier,
-                if (!sender) colorScheme.primary else White,
+                if(!sender) colorScheme.primary
+                else White,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             ); Label(message, sender)
@@ -129,11 +131,11 @@ private fun Label(
     max: Int = 30
 ) {
     Text(
-        if (message.attachments != null) stringResource(
-            if (message.attachments.type == PHOTO) R.string.chats_message_answer_photo_label else R.string.chats_message_answer_video_label
-        ) else if (message.text.length < max) message.text
+        if(message.attachments != null) stringResource(
+            if(message.attachments.type == PHOTO) R.string.chats_message_answer_photo_label else R.string.chats_message_answer_video_label
+        ) else if(message.text.length < max) message.text
         else "${message.text.substring(0, max)}…",
-        modifier, if (!sender) colorScheme.onTertiary else White,
+        modifier, if(!sender) colorScheme.onTertiary else White,
         style = typography.labelSmall,
     )
 }
