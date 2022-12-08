@@ -1,17 +1,11 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ONLINE
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
@@ -22,7 +16,7 @@ fun RequirementsScreen(nav: NavState = get()) {
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     var hideMeetPlace by remember { mutableStateOf(false) }
-    var memberCount by remember { mutableStateOf("") }
+    var memberCount by remember { mutableStateOf("2") }
     var alert by remember { mutableStateOf(false) }
     var gender by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -30,7 +24,7 @@ fun RequirementsScreen(nav: NavState = get()) {
     var to by remember { mutableStateOf("18") }
     var orientation by remember { mutableStateOf("") }
     val selectedTabs = remember { mutableStateListOf(true, false) }
-    val selectedMember = remember { mutableStateListOf(true) }
+    val selectedMember = remember { mutableStateListOf(true, false) }
     val genderList = listOf(
         stringResource(R.string.female_sex),
         stringResource(R.string.male_sex),
@@ -62,11 +56,12 @@ fun RequirementsScreen(nav: NavState = get()) {
                 hideMeetPlace, memberCount,
                 gender, age, orientation,
                 selectedTabs, selectedMember,
-                alert, ONLINE
+                alert, MEETING.isOnline
             ),
             Modifier, object: RequirementsCallback {
                 override fun onHideMeetPlaceClick() {
                     hideMeetPlace = !hideMeetPlace
+                    MEETING.isPrivate = hideMeetPlace
                 }
                 
                 override fun onCloseAlert(it: Boolean) {
@@ -96,7 +91,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                         asm.bottomSheetState.expand {
                             SelectBottom(
                                 stringResource(R.string.sex),
-                                genderList, genderControl, ONLINE
+                                genderList, genderControl, MEETING.isOnline
                             ) {
                                 repeat(genderControl.size) { index ->
                                     genderControl[index] = index == it
@@ -111,7 +106,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             AgeBottom(from, to, Modifier,
-                                { from = it }, { to = it }, ONLINE
+                                { from = it }, { to = it }, MEETING.isOnline
                             )
                             {
                                 age = "от $from до $to"
@@ -127,7 +122,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                             SelectBottom(
                                 stringResource(R.string.orientation_title),
                                 orientationList,
-                                orientationControl, ONLINE
+                                orientationControl, MEETING.isOnline
                             ) {
                                 repeat(orientationControl.size) { index ->
                                     orientationControl[index] = index == it
@@ -144,17 +139,19 @@ fun RequirementsScreen(nav: NavState = get()) {
                 }
                 
                 override fun onCountChange(text: String) {
-                    val count = if(text.isNotBlank()) text.toInt() else 1
+                    val count = if(text.isNotBlank()) text.toInt() else 2
                     when {
                         count > selectedMember.size ->
-                            repeat(count) { selectedMember.add(false) }
+                            repeat(count - selectedMember.size)
+                            { selectedMember.add(false) }
                         
                         count < selectedMember.size -> if(count > 1)
                             repeat(selectedMember.size - count)
                             { selectedMember.removeLast() }
                         
                     }
-                    memberCount = text
+                    memberCount = if(count < 2 || text.isBlank()) "2" else text
+                    MEETING.memberCount = count
                 }
             })
     }

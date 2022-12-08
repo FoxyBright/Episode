@@ -12,4 +12,5 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":feature:complaints")) // TODO КОСТЫЛЬ
     implementation(project(":feature:bubbles"))
+    implementation(project(":feature:animated"))
 }

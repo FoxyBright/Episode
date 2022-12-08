@@ -2,28 +2,30 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.theme.Gradients
+import ru.rikmasters.gilty.shared.theme.Gradients.green
+import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 
@@ -45,37 +47,36 @@ fun GradientButton(
     text: String,
     enabled: Boolean = true,
     online: Boolean = false,
-    shape: CornerBasedShape = MaterialTheme.shapes.extraLarge,
+    shape: CornerBasedShape = shapes.extraLarge,
     smallText: String? = null,
     icon: Int? = null,
     onClick: () -> Unit
 ) {
+    val inverse = listOf(
+        colorScheme.inverseSurface,
+        colorScheme.inverseSurface
+    )
     Button(
-        onClick, modifier.fillMaxWidth(), enabled, shape,
-        ButtonDefaults.buttonColors(Color.Transparent),
+        onClick, modifier.fillMaxWidth(),
+        enabled, shape, buttonColors(Transparent),
         contentPadding = PaddingValues(),
     ) {
         Box(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    if (online) Brush.linearGradient(
-                        if (enabled) Gradients.green() else listOf(
-                            colorScheme.inverseSurface,
-                            colorScheme.inverseSurface
-                        )
+                    if(online) linearGradient(
+                        if(enabled) green()
+                        else inverse
                     )
-                    else
-                        Brush.linearGradient(
-                            if (enabled) Gradients.red() else listOf(
-                                colorScheme.inversePrimary,
-                                colorScheme.inversePrimary
-                            )
-                        ), shape
+                    else linearGradient(
+                        if(enabled) red()
+                        else inverse
+                    ), shape
                 )
-                .padding(16.dp, 16.dp), Alignment.Center
+                .padding(16.dp, 16.dp), Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier, Start, CenterVertically) {
                 icon?.let {
                     Image(
                         painterResource(it),
@@ -83,9 +84,9 @@ fun GradientButton(
                         Modifier.padding(end = 6.dp)
                     )
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text, color = Color.White, style = MaterialTheme.typography.bodyLarge)
-                    smallText?.let { Text(it, style = MaterialTheme.typography.headlineSmall) }
+                Column(Modifier, Top, CenterHorizontally) {
+                    Text(text, color = White, style = typography.bodyLarge)
+                    smallText?.let { Text(it, style = typography.headlineSmall) }
                 }
             }
         }

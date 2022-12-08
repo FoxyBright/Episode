@@ -26,6 +26,7 @@ data class FullCategoryModel(
     val subcategories: List<String>? = null
 ) : CategoryModel
 
+@Suppress("unused")
 val DemoFullCategoryModel = FullCategoryModel(
     id = "id",
     name = "Category",
@@ -62,7 +63,7 @@ val DemoShortCategoryModel = ShortCategoryModel(
 
 val DemoShortCategoryModelList: List<ShortCategoryModel> by lazy {
     val categories = arrayListOf<ShortCategoryModel>()
-    repeat(21) {
+    repeat(10) {
         val rand = Random.nextInt(1, 4)
         categories.add(
             ShortCategoryModel(

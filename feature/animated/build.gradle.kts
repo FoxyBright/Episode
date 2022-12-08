@@ -10,7 +10,5 @@ dependencies {
     androidBase()
     compose()
     implementation(project(":shared"))
-    implementation(project(":feature:mainscreen"))
-    implementation(project(":feature:bubbles"))
-    implementation(project(":feature:animated"))
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
 }

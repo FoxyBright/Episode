@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import ru.rikmasters.gilty.core.log.log
-
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -18,7 +16,6 @@ fun getDate(period: Int = 150): List<String> {
     getDateList(period).first.forEach { list.add(it) }
     list.reverse(); list.add(TODAY_LABEL)
     getDateList(period).second.forEach { list.add(it) }
-    list.forEach { log.v(it) }
     return list
 }
 

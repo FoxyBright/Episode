@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:animated")
+
+
 include(":feature:bubbles")
 
 

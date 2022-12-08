@@ -41,4 +41,5 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:notifications"))
+    implementation(project(":feature:animated"))
 }

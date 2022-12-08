@@ -1,11 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -16,13 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.ClosableActionBar
-import ru.rikmasters.gilty.shared.shared.GAlert
-import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class RequirementsState(
@@ -63,7 +58,7 @@ fun RequirementsContent() {
                 matter, matter, matter,
                 listOf(true), listOf(true),
                 (false), (false)
-            )
+            ), Modifier.background(colorScheme.background)
         )
     }
 }
@@ -82,7 +77,7 @@ fun RequirementsContent(
             (null), Modifier.padding(bottom = 10.dp),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
-        if(!state.private)
+        if(MEETING.type != PERSONAL)
             Element(
                 MemberCountInput(state.memberCount, state.online)
                 { callback?.onCountChange(it) },
@@ -130,17 +125,14 @@ fun RequirementsContent(
                 enabled, state.online
             ) { callback?.onNext() }
             Dashes(
-                (5), (4), Modifier.padding(top = 16.dp),
+                (4), (3), Modifier.padding(top = 16.dp),
                 if(state.online) colorScheme.secondary
                 else colorScheme.primary
             )
         }
     }
-    GAlert(state.alert, { callback?.onCloseAlert(false) },
-        stringResource(R.string.add_meet_exit_alert_title),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button))
-        { callback?.onCloseAlert(false); callback?.onClose() },
-        cancel = Pair(stringResource(R.string.cancel_button))
-        { callback?.onCloseAlert(false) })
+    CloseAddMeetAlert(
+        state.alert,
+        { callback?.onCloseAlert(false) },
+        { callback?.onCloseAlert(false); callback?.onClose() })
 }

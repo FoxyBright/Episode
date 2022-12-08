@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
 import ru.rikmasters.gilty.shared.common.MeetingStates
@@ -51,7 +52,6 @@ interface CompleteCallBack {
 fun CompleteContent(
     meeting: FullMeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean = false,
     callback: CompleteCallBack? = null
 ) {
     Column(
@@ -66,10 +66,10 @@ fun CompleteContent(
                 .fillMaxHeight(0.8f)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting, Modifier, online) }
+        ) { MeetingCard(meeting, Modifier, MEETING.isOnline) }
         Box(Modifier.fillMaxSize()) {
             Buttons(
-                Modifier.align(Alignment.BottomCenter), online,
+                Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
                 { callback?.onShare() }) { callback?.onClose() }
         }
     }

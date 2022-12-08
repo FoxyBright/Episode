@@ -5,63 +5,63 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import java.util.UUID
 
 sealed interface MeetingModel {
-
+    
     val id: UUID
-
+    
     val title: String
-
+    
     val condition: ConditionType
-
+    
     val category: ShortCategoryModel
-
+    
     val dateTime: String
-
+    
     val duration: String
-
+    
     val organizer: OrganizerModel
-
+    
     val isOnline: Boolean
 }
 
-data class FullMeetingModel(
+data class FullMeetingModel( // TODO заменить VAR на VAL сделано для верстки
+    
+    override var id: UUID,
+    
+    override var title: String,
+    
+    override var condition: ConditionType,
+    
+    override var category: ShortCategoryModel,
+    
+    override var duration: String,
+    
+    var type: MeetType,
+    
+    override var dateTime: String,
+    
+    override var organizer: OrganizerModel,
+    
+    override var isOnline: Boolean,
+    
+    var tags: List<TagModel>,
+    
+    var description: String,
+    
+    var isPrivate: Boolean,
+    
+    var memberCount: Int,
+    
+    var requirements: List<MeetingRequirementModel>,
+    
+    var place: String,
+    
+    var address: String,
+    
+    var hideAddress: Boolean,
+    
+    var price: Int? = null
 
-    override val id: UUID,
-
-    override val title: String,
-
-    override val condition: ConditionType,
-
-    override val category: ShortCategoryModel,
-
-    override val duration: String,
-
-    val type: MeetType,
-
-    override val dateTime: String,
-
-    override val organizer: OrganizerModel,
-
-    override val isOnline: Boolean,
-
-    val tags: List<TagModel>,
-
-    val description: String,
-
-    val isPrivate: Boolean,
-
-    val memberCount: Int,
-
-    val requirements: List<MeetingRequirementModel>,
-
-    val place: String,
-
-    val address: String,
-
-    val hideAddress: Boolean,
-
-    val price: Int? = null
-
-) : MeetingModel
+): MeetingModel
 
 val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),

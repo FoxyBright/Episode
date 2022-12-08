@@ -36,7 +36,7 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
-    <string name="profile_observers">Наблюдели</string>
+    <string name="profile_observers">Наблюдатели</string>
     <string name="profile_observe">Наблюдает</string>
     <string name="profile_user_observe">Наблюдаете</string>
     <string name="profile_organizer_observe">Наблюдать</string>
@@ -203,6 +203,8 @@
     <string name="add_meet_conditions_online_meet">Сделать встречу онлайн</string>
     <string name="add_meet_conditions_additionally">Ещё</string>
     <string name="add_meet_conditions_hidden">Доступ к скрытым фото</string>
+    <string name="add_meet_restrict_chat">Ограничить чат</string>
+    <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
     <string name="add_meet_conditions_hidden_label">Участники встречи получат доступ к скрытым фото.</string>

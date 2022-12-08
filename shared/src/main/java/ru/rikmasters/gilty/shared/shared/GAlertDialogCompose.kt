@@ -3,13 +3,8 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -106,7 +101,8 @@ fun GAlert(
     cancel: Pair<String, () -> Unit>? = null,
     list: List<Pair<String, Boolean>>? = null,
     listItemSelect: ((Int) -> Unit)? = null,
-    content: (@Composable () -> Unit)? = null
+    accentColors: Color = colorScheme.primary,
+    content: (@Composable () -> Unit)? = null,
 ) {
     if (show) {
         AlertDialog(
@@ -117,7 +113,7 @@ fun GAlert(
                         .clickable(
                             MutableInteractionSource(), (null)
                         ) { success.second() },
-                    colorScheme.primary,
+                    accentColors,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
@@ -131,7 +127,7 @@ fun GAlert(
                             .clickable(
                                 MutableInteractionSource(), (null)
                             ) { it.second() },
-                        colorScheme.primary,
+                        accentColors,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
@@ -178,6 +174,7 @@ private fun List(
 private fun ListItem(
     index: Int,
     item: Pair<String, Boolean>,
+    accentColors: Color = colorScheme.primary,
     select: ((Int) -> Unit)? = null
 ) {
     Row(
@@ -189,7 +186,7 @@ private fun ListItem(
             listOf(
                 R.drawable.ic_radio_active,
                 R.drawable.ic_radio_inactive
-            ), if (item.second) colorScheme.primary
+            ), if (item.second) accentColors
             else colorScheme.tertiary
         ) { select?.let { it(index) } }
         Text(

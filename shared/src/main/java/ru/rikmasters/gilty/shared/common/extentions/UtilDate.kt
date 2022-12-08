@@ -528,5 +528,10 @@ private fun String.getLongTime(sign: Char): Long {
 private fun String.timeZone(symbol: Char) =
     this.substring(this.lastIndexOf(symbol), this.length)
 
+fun String.format(from: String, to: String): String {
+    val date = SimpleDateFormat(from).parse(this)!!
+    return date.format(to)
+}
+
 fun String.pattern(pattern: String): Long =
     SimpleDateFormat(pattern).parse(this)!!.time

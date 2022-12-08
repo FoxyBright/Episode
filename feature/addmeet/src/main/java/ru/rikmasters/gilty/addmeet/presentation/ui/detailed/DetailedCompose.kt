@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -9,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.*
@@ -23,7 +26,7 @@ fun DetailedPreview() {
                 (""), (""), (""),
                 listOf(), (null),
                 (true), (false), (false)
-            )
+            ), Modifier.background(colorScheme.background)
         )
     }
 }
@@ -72,13 +75,10 @@ fun DetailedContent(
             state, callback
         )
     }
-    GAlert(state.alert, { callback?.onCloseAlert(false) },
-        stringResource(R.string.add_meet_exit_alert_title),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button))
-        { callback?.onCloseAlert(false); callback?.onClose() },
-        cancel = Pair(stringResource(R.string.cancel_button))
-        { callback?.onCloseAlert(false) })
+    CloseAddMeetAlert(
+        state.alert,
+        { callback?.onCloseAlert(false) },
+        { callback?.onCloseAlert(false);callback?.onClose() })
 }
 
 @Composable
@@ -106,7 +106,7 @@ private fun Content(
                 Modifier.padding(top = 8.dp)
             )
         }
-        item {
+        if(!MEETING.isOnline) item {
             MeetPlace(
                 state, Modifier
                     .padding(top = 28.dp)
@@ -114,7 +114,7 @@ private fun Content(
                 callback
             )
         }
-        item {
+        if(!MEETING.isOnline) item {
             HideMeetPlace(
                 state, Modifier
                     .padding(top = 28.dp)
@@ -140,7 +140,7 @@ private fun Content(
                     enabled, state.online
                 ) { callback?.onNext() }
                 Dashes(
-                    (5), (3), Modifier.padding(top = 16.dp),
+                    (4), (2), Modifier.padding(top = 16.dp),
                     if(state.online) colorScheme.secondary
                     else colorScheme.primary
                 )
