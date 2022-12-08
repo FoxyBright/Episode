@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
+import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.*
 import ru.rikmasters.gilty.core.data.entity.interfaces.DbEntity
@@ -15,7 +16,7 @@ import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.full.starProjectedType
 
-class RealmSource(
+open class RealmSource(
     manager: RealmManager
 ): DbSource() {
     
@@ -72,13 +73,17 @@ class RealmSource(
         return findContainerById(id, clazz)
     }
     
-    @Suppress("UNCHECKED_CAST")
     private suspend fun <T: DomainEntity, C: Any> findContainerById(id: Any?, clazz: KClass<C>): T? {
         val container = realm.query<RealmContainer>(
             "id == $0 && _javaClass == $1", id?.hashCode(), clazz.java.canonicalName
         ).first().find() ?: return null
     
-        return when(val entity = mapper.readerFor(clazz.java).readValue<C>(container.data)) {
+        return container.map(clazz)
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    private fun <T: DomainEntity, C: Any> RealmContainer.map(clazz: KClass<C>): T {
+        return when(val entity = mapper.readerFor(clazz.java).readValue<C>(data)) {
             is EntityVariant<*> -> entity.domain() as T
             is DomainEntity -> entity as T
             else -> throw IllegalArgumentException("$entity(${entity::class}) не соответствует запросу")
@@ -105,6 +110,26 @@ class RealmSource(
     }
     
     override suspend fun <T: DomainEntity> findAll(domainClass: KClass<T>): List<T> {
-        TODO("Not yet implemented")
+        val clazz = env.getEntitySpecs(domainClass).dbClass?.let { dbClass ->
+            if(dbClass.isRealmObject())
+                return findAllRealmObjects(dbClass)
+            else dbClass
+        } ?: domainClass
+        
+        return findAllContainers(clazz)
+    }
+    
+    private fun <T: DomainEntity, C: Any> findAllContainers(clazz: KClass<C>): List<T> {
+        val containers = realm.query<RealmContainer>(
+            "_javaClass == $0", clazz.java.canonicalName
+        ).find()
+        
+        return containers.map { it.map(clazz) }
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <T: DomainEntity> findAllRealmObjects(dbClass: KClass<DbEntity<T>>): List<T> {
+        return realm.query(dbClass as KClass<RealmObject>)
+            .find().map { (it as DbEntity<T>).domain() }.toList()
     }
 }

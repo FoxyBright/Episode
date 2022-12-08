@@ -27,7 +27,7 @@ class ExampleRepository(
     
         primarySource.save(entity)
     
-        primarySource.findById(id, ExampleModel::class) ?: throw IllegalStateException("Не найдено")
+        primarySource.find(ExampleModel::class) ?: throw IllegalStateException("Не найдено")
     }
     
     suspend fun getDomainOnly(name: String): ExampleDomainOnlyModel = background {
@@ -40,6 +40,6 @@ class ExampleRepository(
         
         primarySource.save(entity)
         
-        primarySource.findById(name, ExampleDomainOnlyModel::class) ?: throw IllegalStateException("Не найдено")
+        primarySource.find(ExampleDomainOnlyModel::class) ?: throw IllegalStateException("Не найдено")
     }
 }

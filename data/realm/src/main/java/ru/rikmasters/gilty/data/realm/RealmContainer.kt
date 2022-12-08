@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.data.realm
 import io.realm.kotlin.types.RealmObject
 import kotlin.reflect.KClass
 
+@Suppress("PropertyName")
 internal open class RealmContainer(): RealmObject {
     
     var id: Int? = null
