@@ -7,6 +7,8 @@ import ru.rikmasters.gilty.complaints.Complains
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.data.ktor.Ktor
+import ru.rikmasters.gilty.data.realm.Realm
 import ru.rikmasters.gilty.example.ExampleModule
 import ru.rikmasters.gilty.login.Login
 import ru.rikmasters.gilty.mainscreen.Main
@@ -19,7 +21,9 @@ object AppModule : FeatureDefinition() {
         setOf(
             ExampleModule, Login, Main,
             Profile, AddMeet, Notifications,
-            Chat, Complains, Settings
+            Chat, Complains, Settings,
+            
+            Realm, Ktor
         )
 
     override fun DeepNavGraphBuilder.navigation() {}

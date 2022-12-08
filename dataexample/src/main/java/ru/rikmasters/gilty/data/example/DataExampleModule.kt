@@ -1,11 +1,13 @@
 package ru.rikmasters.gilty.data.example
 
 import org.koin.core.module.Module
-import ru.rikmasters.gilty.core.data.builder.EntitiesBuilder
+import org.koin.core.module.dsl.singleOf
+import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
 import ru.rikmasters.gilty.data.example.model.ExampleDb
 import ru.rikmasters.gilty.data.example.model.ExampleModel
 import ru.rikmasters.gilty.data.example.model.ExampleWeb
+import ru.rikmasters.gilty.data.example.repository.ExampleRepository
 
 object DataExampleModule: DataDefinition() {
     
@@ -17,6 +19,6 @@ object DataExampleModule: DataDefinition() {
     }
     
     override fun Module.koin() {
-    
+        singleOf(::ExampleRepository)
     }
 }

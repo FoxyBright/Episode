@@ -1,7 +1,6 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    id("io.realm.kotlin") version "1.5.0"
 }
 
 baseConfig()
@@ -9,7 +8,6 @@ compose()
 
 dependencies {
     androidBase(true)
-    dataBase()
     compose()
     
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
@@ -22,6 +20,6 @@ dependencies {
     androidTestImplementation("androidx.test:core:1.5.0")
     androidTestImplementation("androidx.test:core-ktx:1.5.0")
     androidTestImplementation("androidx.test.ext:truth:1.5.0")
-    androidTestImplementation("androidx.test:runner:1.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.1")
     androidTestUtil("androidx.test:orchestrator:1.4.2")
 }

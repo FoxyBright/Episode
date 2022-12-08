@@ -13,5 +13,6 @@ data class ExampleWeb(
 
 ): WebEntity<ExampleModel> {
     
-    override fun map() = ExampleModel(UUID.fromString(id), name, age.toInt())
+    override fun domain() =
+        ExampleModel(UUID.fromString(id), name, age.toInt())
 }

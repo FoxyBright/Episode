@@ -18,4 +18,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinVer")
     implementation("org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVer")
+    
+    implementation("io.realm.kotlin:gradle-plugin:1.5.0")
 }

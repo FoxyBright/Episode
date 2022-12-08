@@ -13,6 +13,9 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/data" />
+            <option value="$PROJECT_DIR$/data/ktor" />
+            <option value="$PROJECT_DIR$/data/realm" />
             <option value="$PROJECT_DIR$/dataexample" />
             <option value="$PROJECT_DIR$/example" />
             <option value="$PROJECT_DIR$/feature" />

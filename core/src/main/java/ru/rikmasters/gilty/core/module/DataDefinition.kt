@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.core.module
 
-import ru.rikmasters.gilty.core.data.builder.EntitiesBuilder
+import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 
 abstract class DataDefinition: BusinessDefinition() {
     

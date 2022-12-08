@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.core.data.builder
+package ru.rikmasters.gilty.core.data.entity.builder
 
 import ru.rikmasters.gilty.core.data.entity.EntitySpecs
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity

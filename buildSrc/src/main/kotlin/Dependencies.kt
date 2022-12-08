@@ -33,7 +33,8 @@ fun DependencyHandlerScope.koin() = implementation(
     "io.insert-koin:koin-androidx-compose:$koinVer"
 )
 
-fun DependencyHandlerScope.dataBase() = realm() and jackson()
+fun DependencyHandlerScope.dataBase() =
+    realm() and implementation(project(":data:realm"))
 
 fun DependencyHandlerScope.realm() = implementation(
     "io.realm.kotlin:library-base:1.5.0"

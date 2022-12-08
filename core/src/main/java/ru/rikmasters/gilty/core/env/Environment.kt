@@ -2,14 +2,18 @@ package ru.rikmasters.gilty.core.env
 
 import android.content.Context
 import kotlinx.coroutines.*
+import okhttp3.internal.toImmutableList
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
 import org.koin.core.module.Module
 import ru.rikmasters.gilty.core.data.entity.EntitySpecs
+import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.core.data.entity.interfaces.Entity
+import ru.rikmasters.gilty.core.data.entity.interfaces.EntityVariant
 import ru.rikmasters.gilty.core.log.Loggable
 import ru.rikmasters.gilty.core.module.*
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import java.util.Collections
 import kotlin.reflect.KClass
 
 class Environment
@@ -61,6 +65,8 @@ internal constructor(
     
     private val entities = HashMap<KClass<out Entity>, EntitySpecs<*>>()
     
+    val specs = Collections.unmodifiableCollection(entities.values)
+    
     private fun loadEntities() {
         val list = businessModules.values
                 .filterIsInstance<DataDefinition>()
@@ -78,6 +84,21 @@ internal constructor(
                 throw IllegalStateException("В списке сущностей повторно упоминается класс ${it.simpleName}")
             entities[it] = specs
         }.size
+    
+    
+    inline fun <reified T: DomainEntity> getEntitySpecsOf(): EntitySpecs<T> {
+        return getEntitySpecs(T::class)
+    }
+    @Suppress("UNCHECKED_CAST")
+    @JvmName("getEntitySpecsByVariant")
+    fun <T: DomainEntity, V> getEntitySpecs(clazz: KClass<V>): EntitySpecs<T> where V: EntityVariant<T> {
+        return entities[clazz] as EntitySpecs<T>
+    }
+    @Suppress("UNCHECKED_CAST")
+    @JvmName("getEntitySpecsByDomain")
+    fun <T: DomainEntity> getEntitySpecs(clazz: KClass<T>): EntitySpecs<T> {
+        return entities[clazz] as EntitySpecs<T>
+    }
     
     private val EntitySpecs<*>.classes: List<KClass<out Entity>>
         get() = listOfNotNull(domainClass, dbClass, webClass)

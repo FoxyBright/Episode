@@ -3,6 +3,8 @@ plugins {
     kotlin("android")
 }
 
+apply<DataPlugin>()
+
 baseConfig()
 
 dependencies {

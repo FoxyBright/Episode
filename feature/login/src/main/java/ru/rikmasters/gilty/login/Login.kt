@@ -73,6 +73,6 @@ object Login: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        single { EntrypointResolver { "authorization" } }
+        single { EntrypointResolver { "myentrypoint" } }
     }
 }
