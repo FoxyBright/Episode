@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class ExampleWeb(
     
-    override val id: String,
+    val id: String,
     
     val name: String,
     

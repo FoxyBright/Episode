@@ -1,22 +1,23 @@
 package ru.rikmasters.gilty.data.realm
 
-import androidx.lifecycle.DefaultLifecycleObserver
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.types.RealmObject
 import ru.rikmasters.gilty.core.common.Component
 import kotlin.reflect.KClass
 
-class RealmManager: DefaultLifecycleObserver, Component {
+class RealmManager: Component {
     
     private val config by lazy {
         
         val realmObjects = env.specs
             .map { it.dbClass }
             .filterIsInstance<KClass<RealmObject>>()
-            .toSet()
-        
+            .toMutableSet()
+    
+        @Suppress("UNCHECKED_CAST")
+        realmObjects.add(RealmContainer::class as KClass<RealmObject>)
+    
         RealmConfiguration.Builder(realmObjects)
             .deleteRealmIfMigrationNeeded()
             .name("main")

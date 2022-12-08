@@ -10,12 +10,12 @@ class EntitiesBuilder {
     private val entities = LinkedList<EntitySpecs<*>>()
     
     inline fun <reified T: DomainEntity> entity(
-        noinline builder: EntitySpecsBuilder<T>.() -> Unit
+        noinline builder: EntitySpecsBuilder<T>.() -> Unit = {}
     ) = entity(T::class, builder)
     
     fun <T: DomainEntity> entity(
         domainClass: KClass<T>,
-        builder: EntitySpecsBuilder<T>.() -> Unit
+        builder: EntitySpecsBuilder<T>.() -> Unit = {}
     ) = buildEntity(domainClass, builder)
     
     private fun <T: DomainEntity> buildEntity(

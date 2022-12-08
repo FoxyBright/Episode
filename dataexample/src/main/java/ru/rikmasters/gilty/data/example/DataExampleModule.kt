@@ -4,9 +4,7 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
-import ru.rikmasters.gilty.data.example.model.ExampleDb
-import ru.rikmasters.gilty.data.example.model.ExampleModel
-import ru.rikmasters.gilty.data.example.model.ExampleWeb
+import ru.rikmasters.gilty.data.example.model.*
 import ru.rikmasters.gilty.data.example.repository.ExampleRepository
 
 object DataExampleModule: DataDefinition() {
@@ -16,6 +14,8 @@ object DataExampleModule: DataDefinition() {
             db(ExampleDb::class)
             web(ExampleWeb::class)
         }
+        
+        entity<ExampleDomainOnlyModel>()
     }
     
     override fun Module.koin() {

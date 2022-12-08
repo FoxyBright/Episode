@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class ExampleModel(
     
-    override val id: UUID,
+    val id: UUID,
     
     val name: String,
     

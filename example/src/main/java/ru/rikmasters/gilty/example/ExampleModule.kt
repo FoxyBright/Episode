@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.example
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -27,12 +28,26 @@ object ExampleModule : FeatureDefinition() {
             val scope = rememberCoroutineScope()
             Column(Modifier.fillMaxSize()) {
                 Text("MyEntrypoint")
-                Button({
-                    scope.launch(Dispatchers.IO) {
-                        log.v(repository.get(UUID.randomUUID()).toString())
+                
+                Row {
+                    Button({
+                        scope.launch(Dispatchers.IO) {
+                            log.v(repository.get(UUID.randomUUID()).toString())
+                        }
+                    }) {
+                        Text("Test data", color = MaterialTheme.colorScheme.background)
                     }
-                }) {
-                    Text("Test data", color = MaterialTheme.colorScheme.background)
+                }
+                
+                Row {
+                    Button({
+                        scope.launch(Dispatchers.IO) {
+                            log.v("Asking for Bob...")
+                            log.v(repository.getDomainOnly("Bob").toString())
+                        }
+                    }) {
+                        Text("Test domain only", color = MaterialTheme.colorScheme.background)
+                    }
                 }
             }
         }

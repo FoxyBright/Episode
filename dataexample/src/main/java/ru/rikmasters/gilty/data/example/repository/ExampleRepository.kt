@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.data.example.repository
 
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.WebSource
+import ru.rikmasters.gilty.data.example.model.ExampleDomainOnlyModel
 import ru.rikmasters.gilty.data.example.model.ExampleModel
 import ru.rikmasters.gilty.data.example.model.ExampleWeb
 import ru.rikmasters.gilty.data.realm.RealmSource
@@ -14,7 +15,7 @@ class ExampleRepository(
     override val primarySource: RealmSource
     
 ): OfflineFirstRepository<WebSource, RealmSource>(webSource, primarySource) {
-
+    
     suspend fun get(id: UUID): ExampleModel = background {
     
         //primarySource.findById(id, ExampleModel::class)
@@ -24,12 +25,21 @@ class ExampleRepository(
     
         val entity = webEntity.domain()
     
-        save(entity)
+        primarySource.save(entity)
     
-        primarySource.findById(id, ExampleModel::class) ?: throw IllegalStateException()
+        primarySource.findById(id, ExampleModel::class) ?: throw IllegalStateException("Не найдено")
     }
     
-    private suspend fun save(entity: ExampleModel) {
+    suspend fun getDomainOnly(name: String): ExampleDomainOnlyModel = background {
+        
+        //primarySource.findById(id, ExampleModel::class)
+        
+        // TODO Getting from web
+        
+        val entity = ExampleDomainOnlyModel(name, 21)
+        
         primarySource.save(entity)
+        
+        primarySource.findById(name, ExampleDomainOnlyModel::class) ?: throw IllegalStateException("Не найдено")
     }
 }
