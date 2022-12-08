@@ -83,7 +83,7 @@
     <string name="personal_info_age_placeholder">Возраст</string>
 
     <!-- Recommendation -->
-    <string name="not_interesting">Не интересно</string>
+    <string name="not_interesting">Неинтересно</string>
     <string name="meeting_respond">Откликнуться</string>
     <string name="meeting_terms">Условия</string>
 
@@ -163,6 +163,7 @@
     <string name="chats_message_answer_recipient">Ответить</string>
     <string name="chats_message_answer_photo_label">Фотография</string>
     <string name="chats_message_answer_video_label">Видео</string>
+    <string name="chats_empty_hidden_photos">Скрытых фото нет</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>

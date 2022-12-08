@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
@@ -201,12 +202,12 @@ fun MeetBottom(
                             .padding(end = 8.dp)
                             .weight(1f),
                         stringResource(R.string.not_interesting),
-                        R.drawable.ic_cancel, online
+                        R.drawable.cross, online,
                     )
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
-                        R.drawable.ic_heart, online
+                        R.drawable.ic_heart, online,
                     )
                 }
             }
@@ -219,7 +220,8 @@ fun CardButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: Int,
-    online: Boolean
+    online: Boolean,
+    betweenDistance: Dp = 2.dp
 ) {
     val color = if(online) colorScheme.secondary
     else colorScheme.primary
@@ -238,9 +240,9 @@ fun CardButton(
                 Modifier.size(8.dp), color
             )
             Text(
-                text, Modifier.padding(top = 2.dp, start = 2.dp),
-                color, style = typography.displaySmall,
-                fontWeight = FontWeight.SemiBold
+                text, Modifier.padding(start = betweenDistance),
+                color, style = typography.titleSmall,
+                maxLines = 1
             )
         }
     }

@@ -156,7 +156,11 @@ fun UserProfileScreen(nav: NavState = get()) {
                 }
                 
                 override fun profileImage() {
-                    nav.navigate("photo")
+                    Toast.makeText(
+                        context,
+                        "Ваш аватар",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 
                 override fun hiddenImages() {

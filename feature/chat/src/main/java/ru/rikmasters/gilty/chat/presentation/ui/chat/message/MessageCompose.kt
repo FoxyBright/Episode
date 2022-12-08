@@ -63,6 +63,12 @@ private fun MessagePreview() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
 @Composable
+private fun MyMessagePreview() {
+    GiltyTheme { Message(DemoMessageModel, true) }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
+@Composable
 private fun MessageImage() {
     GiltyTheme { Message(DemoImageMessage, false) }
 }
@@ -191,7 +197,7 @@ private fun Message(
                     Text(
                         messageModel.text,
                         Modifier.padding(
-                            end = if (state.sender) 40.dp else 30.dp
+                            end = if (state.sender) 44.dp else 30.dp
                         ), state.textColor,
                         style = MaterialTheme.typography.bodyMedium
                     )
