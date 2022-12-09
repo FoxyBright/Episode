@@ -8,6 +8,7 @@ import android.os.Build
 import android.renderscript.Allocation
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -29,17 +30,24 @@ fun blur(context: Context, bitmap: Bitmap): Bitmap {
         setRadius(10f);setInput(bitmapAlloc); forEach(bitmapAlloc)
     }; bitmapAlloc.copyTo(bitmap); rs.destroy(); return bitmap
 }
+
+@Composable
+fun getView() = LocalView.current
+@Composable
+fun getContext() = LocalContext.current
+
 @Composable
 fun BackBlur(
     modifier: Modifier = Modifier,
+    view: View = getView(),
+    context: Context= getContext(),
     content: @Composable BoxScope.() -> Unit
 ) {
-    LocalView.current.isDrawingCacheEnabled = true
-    val cache = LocalView.current.drawingCache
+    view.isDrawingCacheEnabled = true
+    val cache = view.drawingCache
     val image = remember(cache)
     { Bitmap.createBitmap(cache) }
-    LocalView.current.isDrawingCacheEnabled = false
-    val context = LocalContext.current
+    view.isDrawingCacheEnabled = false
     val blurImage = remember(image)
     { blur(context, image).asImageBitmap() }
     Popup {

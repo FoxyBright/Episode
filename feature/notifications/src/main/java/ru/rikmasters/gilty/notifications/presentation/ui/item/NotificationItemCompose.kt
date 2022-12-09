@@ -134,8 +134,7 @@ fun Item(
                     NotificationText(
                         notify.meeting.organizer, notify.type,
                         notify.meeting, state.duration, Modifier
-                            .padding(end = 20.dp)
-                            .padding(vertical = 12.dp)
+                            .padding(end = 20.dp, top = 12.dp)
                     )
                 }
                 if (notify.type == MEETING_OVER || notify.type == LEAVE_EMOTIONS)
