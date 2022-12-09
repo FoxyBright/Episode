@@ -14,11 +14,11 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.DescriptionColors
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.onNull
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.numberMask
@@ -132,7 +132,7 @@ fun MemberCountInput(
                 ) onChange?.let { text -> text(onNull(it)) }
             }, Modifier.fillMaxWidth(),
             shape = shapes.medium,
-            colors = RequirementsCountColor(online),
+            colors = DescriptionColors(online),
             label = if(text.isNotEmpty()) TextFieldLabel(
                 (true), stringResource(R.string.requirements_member_count_place_holder)
             ) else null, placeholder = TextFieldLabel(
@@ -146,26 +146,3 @@ fun MemberCountInput(
         )
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RequirementsCountColor(online: Boolean) =
-    TextFieldDefaults.textFieldColors(
-        textColor = colorScheme.tertiary,
-        cursorColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        containerColor = colorScheme.primaryContainer,
-        unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
-        focusedLabelColor = if(online) colorScheme.secondary
-        else colorScheme.tertiary,
-        disabledTrailingIconColor = Color.Transparent,
-        focusedTrailingIconColor = Color.Transparent,
-        unfocusedTrailingIconColor = Color.Transparent,
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent,
-        errorIndicatorColor = Color.Transparent,
-        placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Color.Transparent,
-    )

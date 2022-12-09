@@ -5,12 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,8 +30,7 @@ fun ConditionPreview() {
             ConditionState(
                 (false), (true), listOf(),
                 listOf(), ("100"),
-                TextFieldColors(),
-                (null), (false), (false)
+                (false), (false)
             )
         )
     }
@@ -45,8 +42,6 @@ data class ConditionState(
     val meetingTypes: List<Boolean>,
     val conditionList: List<Boolean>,
     val text: String,
-    val priceColors: TextFieldColors,
-    val focus: FocusState?,
     val alert: Boolean,
     val restrictChat: Boolean,
 )
@@ -63,7 +58,6 @@ interface ConditionsCallback {
     fun onClear() {}
     fun onMeetingTypeSelect(it: Int) {}
     fun onConditionSelect(it: Int) {}
-    fun onPriceFocus(state: FocusState) {}
     fun onCloseAlert(it: Boolean) {}
 }
 
@@ -190,8 +184,7 @@ private fun Price(
     return FilterModel(stringResource(R.string.add_meet_conditions_price)) {
         PriceTextField(state.text,
             { callback?.onPriceChange(it) },
-            { callback?.onClear() }, state.priceColors,
-            state.focus, { callback?.onPriceFocus(it) }
+            { callback?.onClear() }, state.online,
         )
     }
 }

@@ -7,10 +7,10 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.DescriptionColors
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.TagSearch
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
@@ -84,29 +84,6 @@ fun Description(
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DescriptionColors(online: Boolean) =
-    TextFieldDefaults.textFieldColors(
-        textColor = colorScheme.tertiary,
-        cursorColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        containerColor = colorScheme.primaryContainer,
-        unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
-        focusedLabelColor = if(online) colorScheme.secondary
-        else colorScheme.tertiary,
-        disabledTrailingIconColor = Transparent,
-        focusedTrailingIconColor = Transparent,
-        unfocusedTrailingIconColor = Transparent,
-        focusedIndicatorColor = Transparent,
-        unfocusedIndicatorColor = Transparent,
-        disabledIndicatorColor = Transparent,
-        errorIndicatorColor = Transparent,
-        placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
-    )
 
 @Composable
 fun Additionally(
