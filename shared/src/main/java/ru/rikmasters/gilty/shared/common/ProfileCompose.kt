@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,7 +49,8 @@ data class ProfileState(
     val occupiedName: Boolean = false
 )
 
-interface ProfileCallback : NavigationInterface {
+interface ProfileCallback: NavigationInterface {
+    
     fun profileImage() {}
     fun hiddenImages() {}
     fun onLockClick(state: Boolean) {}
@@ -106,7 +109,7 @@ fun Profile(
 ) {
     Column(modifier) {
         Row {
-            if (state.profileType == ProfileType.ORGANIZER)
+            if(state.profileType == ProfileType.ORGANIZER)
                 IconButton(
                     { callback?.onBack() },
                     Modifier.padding(top = 10.dp, end = 16.dp)
@@ -115,7 +118,7 @@ fun Profile(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),
                         Modifier,
-                        MaterialTheme.colorScheme.tertiary
+                        colorScheme.tertiary
                     )
                 }
             TextField(
@@ -125,20 +128,20 @@ fun Profile(
                     .offset((-16).dp)
                     .fillMaxWidth(),
                 colors = TransparentTextFieldColors(),
-                textStyle = MaterialTheme.typography.displayLarge,
+                textStyle = typography.displayLarge,
                 placeholder = {
                     Row(Modifier, Center, CenterVertically) {
                         Text(
                             stringResource(R.string.user_name),
                             Modifier.padding(end = 8.dp),
-                            MaterialTheme.colorScheme.onTertiary,
-                            style = MaterialTheme.typography.titleLarge
+                            colorScheme.onTertiary,
+                            style = typography.titleLarge
                         )
                         Icon(
                             painterResource(R.drawable.ic_edit),
                             stringResource(R.string.edit_button),
                             Modifier.padding(top = 4.dp),
-                            MaterialTheme.colorScheme.outlineVariant
+                            colorScheme.outlineVariant
                         )
                     }
                 },
@@ -146,14 +149,14 @@ fun Profile(
                 singleLine = true
             )
         }
-        if (state.occupiedName)
+        if(state.occupiedName)
             Text(
                 stringResource(R.string.profile_user_name_is_occupied),
                 Modifier
                     .padding(bottom = 6.dp)
                     .offset(y = -(10).dp),
-                MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall
+                colorScheme.primary,
+                style = typography.titleSmall
             )
         Row {
             ProfileImageContent(
@@ -171,7 +174,7 @@ fun Profile(
                     state.observers,
                     state.observed,
                     state.emoji
-                ) {callback?.onObserveClick()}
+                ) { callback?.onObserveClick() }
                 Spacer(Modifier.height(14.dp))
                 HiddenPhotoContent(
                     Modifier,
@@ -185,8 +188,8 @@ fun Profile(
         Text(
             stringResource(R.string.profile_about_me),
             Modifier.padding(top = 20.dp),
-            MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.labelLarge
+            colorScheme.tertiary,
+            style = typography.labelLarge
         )
         TextField(
             state.description,
@@ -194,15 +197,15 @@ fun Profile(
             Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            readOnly = !state.enabled,
+            readOnly = (state.profileType == ProfileType.ORGANIZER),
             shape = MaterialTheme.shapes.large,
             colors = TextFieldColors(),
-            textStyle = MaterialTheme.typography.bodyMedium,
+            textStyle = typography.bodyMedium,
             placeholder = {
                 Text(
                     stringResource(R.string.about_me_placeholder),
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    style = MaterialTheme.typography.bodyMedium
+                    color = colorScheme.onTertiary,
+                    style = typography.bodyMedium
                 )
             }
         )

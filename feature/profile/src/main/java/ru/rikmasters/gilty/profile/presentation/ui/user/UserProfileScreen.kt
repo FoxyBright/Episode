@@ -36,10 +36,12 @@ fun UserProfileScreen(nav: NavState = get()) {
             remember { mutableStateOf(false) }
         val meets = DemoMeetingList
         val profileModel = DemoProfileModel
+        var description by
+        remember { mutableStateOf(profileModel.aboutMe) }
         val state = ProfileState(
             name = "${profileModel.username}, ${profileModel.age}",
             profilePhoto = profileModel.avatar.id,
-            description = profileModel.aboutMe,
+            description = description,
             rating = profileModel.rating.average,
             observers = 13500,
             observed = 128,
@@ -99,6 +101,18 @@ fun UserProfileScreen(nav: NavState = get()) {
             ), Modifier, object: UserProfileCallback {
                 override fun menu(state: Boolean) {
                     menuExpanded.value = !menuExpanded.value
+                }
+                
+                override fun onLockClick(state: Boolean) {
+                    super.onLockClick(state)
+                }
+                
+                override fun onNameChange(text: String) {
+                    super.onNameChange(text)
+                }
+                
+                override fun onDescriptionChange(text: String) {
+                    description = text
                 }
                 
                 override fun onObserveClick() {
