@@ -1,13 +1,8 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,19 +14,19 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign.Companion.Left
+import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
+import ru.rikmasters.gilty.chat.presentation.model.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.profile.ImageModel
@@ -90,7 +85,7 @@ fun Message(
     answer: MessageModel? = null
 ) {
     val back = MaterialTheme.colorScheme.primaryContainer
-    val state = if (sender)
+    val state = if(sender)
         MessageState(
             (true), CenterEnd, Color.White,
             Brush.linearGradient(Gradients.red()),
@@ -106,15 +101,15 @@ fun Message(
                 .padding(10.dp, 4.dp), state.align
         ) {
             Row(verticalAlignment = Bottom) {
-                if (sender) Content(state, messageModel, answer, Modifier.weight(1f))
-                AsyncImage(
+                if(!sender) AsyncImage(
                     messageModel.sender.avatar.id, (null),
                     Modifier
                         .padding(horizontal = 6.dp)
                         .size(24.dp)
                         .clip(CircleShape), contentScale = Crop,
                     placeholder = painterResource(R.drawable.gb)
-                ); if (!sender) Content(state, messageModel, answer, Modifier.weight(1f))
+                )
+                Content(state, messageModel, answer, Modifier.weight(1f))
             }
         }
     }
@@ -127,7 +122,7 @@ private fun Content(
     answer: MessageModel?,
     modifier: Modifier = Modifier
 ) {
-    if (messageModel.attachments != null) ImageMessage(
+    if(messageModel.attachments != null) ImageMessage(
         state, messageModel,
         messageModel.sender.avatar, modifier
     ) else Message(state, messageModel, modifier, answer)
@@ -196,9 +191,12 @@ private fun Message(
                     }
                     Text(
                         messageModel.text,
-                        Modifier.padding(
-                            end = if (state.sender) 44.dp else 30.dp
-                        ), state.textColor,
+                        Modifier
+                            .align(if(state.sender) End else Alignment.Start)
+                            .padding(
+                                end = if(state.sender) 50.dp else 30.dp
+                            ), state.textColor,
+                        textAlign = if(state.sender) Right else Left,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -222,10 +220,10 @@ private fun Status(
         Text(
             messageModel.createdAt.format("HH:mm"),
             Modifier, color, style = MaterialTheme.typography.titleSmall,
-        ); if (sender && messageModel.isDelivered)
+        ); if(sender && messageModel.isDelivered)
         Icon(
             painterResource(
-                if (messageModel.isRead) R.drawable.ic_sms_read
+                if(messageModel.isRead) R.drawable.ic_sms_read
                 else R.drawable.ic_sms_delivered
             ), (null),
             Modifier

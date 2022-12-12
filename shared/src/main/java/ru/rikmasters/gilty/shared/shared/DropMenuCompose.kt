@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import android.content.res.Resources
+import android.util.DisplayMetrics
 import androidx.compose.foundation.background
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -12,14 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
-private val metrics = Resources.getSystem().displayMetrics
+val METRICS: DisplayMetrics = Resources.getSystem().displayMetrics
 
 @Composable
 fun GDropMenu(
     menuState: Boolean,
     collapse: () -> Unit,
     offset: DpOffset = DpOffset(
-        ((metrics.widthPixels / metrics.density) - 200).dp, 0.dp
+        ((METRICS.widthPixels / METRICS.density) - 200).dp, 0.dp
     ),
     menuItem: List<Pair<String, () -> Unit>>,
 ) {

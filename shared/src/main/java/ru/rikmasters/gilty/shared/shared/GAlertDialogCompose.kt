@@ -137,7 +137,7 @@ fun GAlert(
                     title, Modifier,
                     colorScheme.tertiary,
                     style = typography.displayLarge,
-                    fontWeight = Bold
+                    fontWeight = SemiBold
                 )
             }, {
                 Column {

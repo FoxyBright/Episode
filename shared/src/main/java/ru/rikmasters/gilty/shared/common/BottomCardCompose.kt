@@ -1,17 +1,21 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -37,7 +41,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -63,6 +67,7 @@ fun MeetingStatesPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardButton(
     modifier: Modifier = Modifier,
@@ -74,24 +79,28 @@ fun CardButton(
     val color = if(online)
         colorScheme.secondary
     else colorScheme.primary
-    Button(
+    Card(
         { onClick?.let { it() } },
-        modifier,
-        shape = shapes.extraLarge,
-        contentPadding = PaddingValues(12.dp, 10.dp),
-        colors = ButtonDefaults.buttonColors(ThemeExtra.colors.grayButton)
+        modifier, (true),
+        shapes.extraLarge,
+        cardColors(colors.grayButton)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painterResource(icon), (null),
-                Modifier.padding(end = 2.dp),
-                colorFilter = ColorFilter.tint(color)
-            )
-            Text(
-                text, Modifier.padding(top = 2.dp), color,
-                style = typography.labelSmall
-                    .copy(fontWeight = FontWeight.SemiBold)
-            )
+        Box(Modifier.fillMaxWidth(), Center) {
+            Row(
+                Modifier.padding(18.dp, 10.dp),
+                Start, CenterVertically
+            ) {
+                Image(
+                    painterResource(icon), (null),
+                    Modifier.padding(end = 2.dp),
+                    colorFilter = ColorFilter.tint(color)
+                )
+                Text(
+                    text, Modifier, color,
+                    style = typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
@@ -206,12 +215,12 @@ fun MeetBottom(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 22.dp)
+                        .padding(top = 4.dp)
                 ) {
                     CardButton(
                         Modifier
-                            .padding(end = 8.dp)
-                            .weight(1f),
+                            .weight(1f)
+                            .padding(end = 8.dp),
                         stringResource(R.string.not_interesting),
                         meet.isOnline, ic_cancel
                     ) { onSelect(LEFT) }

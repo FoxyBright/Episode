@@ -30,6 +30,7 @@ fun UserProfileScreen(nav: NavState = get()) {
     GiltyTheme {
         val asm = get<AppStateModel>()
         val scope = rememberCoroutineScope()
+        var menuState by remember { mutableStateOf(false) }
         val historyState =
             remember { mutableStateOf(false) }
         val menuExpanded =
@@ -96,19 +97,27 @@ fun UserProfileScreen(nav: NavState = get()) {
             UserProfileState(
                 state, meets, meets,
                 meets.first(), (respondsList.size),
-                historyState.value, menuExpanded.value,
-                stateList, alert
+                historyState.value,
+                stateList, alert, menuState
             ), Modifier, object: UserProfileCallback {
                 override fun menu(state: Boolean) {
-                    menuExpanded.value = !menuExpanded.value
+                    nav.navigate("settings")
                 }
                 
                 override fun onLockClick(state: Boolean) {
-                    super.onLockClick(state)
+                    Toast.makeText(
+                        context,
+                        "Ваши фото засекречены",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 
                 override fun onNameChange(text: String) {
-                    super.onNameChange(text)
+                    Toast.makeText(
+                        context,
+                        "Имя пока что не меняем",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 
                 override fun onDescriptionChange(text: String) {
@@ -153,6 +162,22 @@ fun UserProfileScreen(nav: NavState = get()) {
                     }
                 }
                 
+                override fun onMenuClick(it: Boolean) {
+                    menuState = it
+                }
+                
+                override fun onMenuItemClick(point: Int) {
+                    when(point) {
+                        0 -> nav.navigate("avatar")
+                        
+                        else -> Toast.makeText(
+                            context,
+                            "Тут будет возможность выбрать другое фото",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                
                 override fun onHistoryClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheetState.expand {
@@ -170,29 +195,13 @@ fun UserProfileScreen(nav: NavState = get()) {
                 }
                 
                 override fun profileImage() {
-                    Toast.makeText(
-                        context,
-                        "Ваш аватар",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    menuState = true
                 }
                 
                 override fun hiddenImages() {
                     Toast.makeText(
                         context,
                         "Ваши скрытые фото",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                
-                override fun onSettingsClick() {
-                    nav.navigate("settings")
-                }
-                
-                override fun onWatchPhotoClick() {
-                    Toast.makeText(
-                        context,
-                        "Фото пока что нет",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

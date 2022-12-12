@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -129,7 +130,7 @@ fun Item(
                             .clip(CircleShape)
                             .size(40.dp),
                         painterResource(R.drawable.gb),
-                        contentScale = ContentScale.FillBounds
+                        contentScale = Crop
                     )
                     NotificationText(
                         notify.meeting.organizer, notify.type,
