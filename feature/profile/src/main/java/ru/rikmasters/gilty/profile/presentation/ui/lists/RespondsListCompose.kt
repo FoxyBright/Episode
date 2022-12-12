@@ -103,7 +103,7 @@ private fun SentResponds(
             items(sentResponds) {
                 Respond(
                     it, callback,
-                    Modifier.padding(bottom = 6.dp)
+                    Modifier.padding(bottom = 12.dp)
                 )
             }
         }

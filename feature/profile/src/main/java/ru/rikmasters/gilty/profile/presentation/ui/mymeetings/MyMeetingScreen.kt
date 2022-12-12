@@ -235,8 +235,6 @@ private fun organizer(asm: AppStateModel = get(), scope: CoroutineScope) {
                 scope.launch { asm.bottomSheetState.expand { meet(asm, scope) } }
             }
             
-            override fun onWatchPhotoClick() {}
-            
             override fun onObserveChange(state: Boolean) {
                 super.onObserveChange(observeState)
                 observeState = state

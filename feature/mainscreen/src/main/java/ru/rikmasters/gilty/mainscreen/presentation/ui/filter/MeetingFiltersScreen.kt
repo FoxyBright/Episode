@@ -14,7 +14,9 @@ import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchScreen
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 
 @Composable
-fun MeetingFilterContent(onSave: () -> Unit) {
+fun MeetingFilterContent(
+    onSave: () -> Unit
+) {
     val distanceState =
         remember { mutableStateOf(false) }
     val distance =
@@ -59,7 +61,7 @@ fun MeetingFilterContent(onSave: () -> Unit) {
                     categories = 1
                 }
                 
-                 override fun onFilterClick() {
+                override fun onFilterClick() {
                     categories = 2
                 }
                 

@@ -55,7 +55,7 @@ private fun Emoji(
         else rememberAsyncImagePainter(emoji.path), (null),
         Modifier
             .padding(10.dp)
-            .size(24.dp)
+            .size(30.dp)
             .clickable(
                 MutableInteractionSource(), (null)
             ) { onClick(emoji) }

@@ -58,14 +58,6 @@ fun OrganizerProfileScreen() {
                 ).show()
             }
             
-            override fun onWatchPhotoClick() {
-                Toast.makeText(
-                    context,
-                    "Посмотреть фото",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            
             override fun closeAlert() {}
             
             override fun onObserveChange(state: Boolean) {

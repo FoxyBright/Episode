@@ -162,10 +162,8 @@ fun MainScreen(nav: NavState = get()) {
             override fun openFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        MeetingFilterContent {
-                            scope.launch {
-                                asm.bottomSheetState.collapse()
-                            }
+                        MeetingFilterContent{
+                            scope.launch { asm.bottomSheetState.collapse() }
                         }
                     }
                 }
@@ -176,3 +174,4 @@ fun MainScreen(nav: NavState = get()) {
             }
         })
 }
+

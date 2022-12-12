@@ -1,28 +1,21 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -34,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
@@ -56,6 +50,7 @@ private fun CategoryListPreview() {
 }
 
 interface CategoryListCallback {
+    
     fun onCategoryClick(index: Int, it: Boolean)
     fun onSubSelect(category: CategoryModel, sub: String?) {}
     fun onBack() {}
@@ -77,46 +72,54 @@ fun CategoryList(
 ) {
     Column(modifier) {
         Row(
-            Modifier.padding(bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
+            Modifier
+                .padding(bottom = 10.dp)
+                .offset((-6).dp),
+            Start, CenterVertically
         ) {
-            Icon(
-                painterResource(R.drawable.ic_back),
-                stringResource(R.string.action_bar_button_back),
-                Modifier
-                    .clip(CircleShape)
-                    .clickable { callback?.onBack() },
-                MaterialTheme.colorScheme.tertiary
-            )
+            IconButton(
+                { callback?.onBack() },
+            ) {
+                Icon(
+                    painterResource(ic_back),
+                    (null), Modifier,
+                    colorScheme.tertiary
+                )
+            }
             Text(
                 stringResource(R.string.meeting_filter_select_categories),
-                Modifier.padding(start = 20.dp),
-                MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.titleLarge
+                Modifier.padding(start = 14.dp),
+                colorScheme.tertiary,
+                style = typography.labelLarge
             )
         }
-        LazyColumn {
-            itemsIndexed(state.categoryList)
-            { index, category ->
-                val select = state.categoryListState[index]
-                Item(category, select, state.subCategories,
-                    { callback?.onSubSelect(category, it) })
-                {
-                    callback?.onSubSelect(category, null)
-                    callback?.onCategoryClick(index, select)
+        Column(Modifier.fillMaxSize(), SpaceBetween) {
+            LazyColumn(Modifier.weight(1f)) {
+                itemsIndexed(state.categoryList)
+                { index, category ->
+                    val select = state.categoryListState[index]
+                    Item(category, select, state.subCategories,
+                        { callback?.onSubSelect(category, it) })
+                    {
+                        callback?.onSubSelect(category, null)
+                        callback?.onCategoryClick(index, select)
+                    }
                 }
             }
-            item {
-                Buttons({ callback?.onDone() },
-                    { callback?.onClear() })
-            }
+            Buttons(
+                Modifier, { callback?.onDone() })
+            { callback?.onClear() }
         }
     }
 }
 
 @Composable
-private fun Buttons(Done: () -> Unit, Clear: () -> Unit) {
-    Column {
+private fun Buttons(
+    modifier: Modifier = Modifier,
+    Done: () -> Unit,
+    Clear: () -> Unit
+) {
+    Column(modifier) {
         GradientButton(
             Modifier
                 .padding(horizontal = 16.dp)
@@ -129,10 +132,13 @@ private fun Buttons(Done: () -> Unit, Clear: () -> Unit) {
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 28.dp)
                 .clip(CircleShape)
-                .clickable { Clear() },
-            MaterialTheme.colorScheme.tertiary,
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { Clear() },
+            colorScheme.tertiary,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge
+            style = typography.bodyLarge
         )
     }
 }
@@ -153,14 +159,14 @@ private fun Item(
                 .fillMaxWidth()
                 .padding(vertical = 6.dp), true,
             MaterialTheme.shapes.large,
-            CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+            CardDefaults.cardColors(colorScheme.primaryContainer)
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 Arrangement.Absolute.SpaceBetween,
-                Alignment.CenterVertically
+                CenterVertically
             ) {
                 Row {
                     AsyncImage(
@@ -172,21 +178,21 @@ private fun Item(
                     Text(
                         category.name,
                         Modifier.padding(start = 18.dp),
-                        MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                if (subs != null) Icon(
-                    if (select) Icons.Filled.KeyboardArrowDown
+                if(subs != null) Icon(
+                    if(select) Icons.Filled.KeyboardArrowDown
                     else Icons.Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
-                    tint = MaterialTheme.colorScheme.onTertiary
-                ) else if (select)
+                    tint = colorScheme.onTertiary
+                ) else if(select)
                     Image(painterResource(R.drawable.enabled_check_box), (null))
             }
             subs?.let { list ->
-                if (select) (SubCategories(category, list, subCategories)
+                if(select) (SubCategories(category, list, subCategories)
                 { onSubSelect(it) })
             }
         }
@@ -203,7 +209,7 @@ private fun SubCategories(
     Divider()
     FlowLayout(
         Modifier
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(colorScheme.primaryContainer)
             .padding(top = 16.dp)
             .padding(horizontal = 16.dp), 8.dp, 8.dp
     ) {

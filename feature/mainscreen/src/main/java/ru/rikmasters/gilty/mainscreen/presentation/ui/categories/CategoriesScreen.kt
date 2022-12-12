@@ -29,6 +29,10 @@ fun CategoriesScreen(
             allCategories, stateList, subCategories
         ), Modifier.padding(16.dp),
         object : CategoryListCallback {
+            override fun onBack() {
+                categoryFilters(listOf(), listOf())
+            }
+    
             override fun onCategoryClick(index: Int, it: Boolean) {
                 stateList[index] = !it
             }
