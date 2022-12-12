@@ -9,7 +9,7 @@ import ru.rikmasters.gilty.core.module.DomainDefinition
 object Realm: DomainDefinition() {
     
     override fun Module.koin() {
-        singleOf(::RealmSource) {
+        singleOf(::RealmSourceFacade) {
             bind<DbSource>()
         }
         singleOf(::RealmManager)

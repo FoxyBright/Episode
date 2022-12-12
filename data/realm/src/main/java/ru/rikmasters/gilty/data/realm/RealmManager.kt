@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 class RealmManager: Component {
     
-    private val config by lazy {
+    private val mainConfig by lazy {
         
         val realmObjects = env.specs
             .map { it.dbClass }
@@ -20,12 +20,12 @@ class RealmManager: Component {
     
         RealmConfiguration.Builder(realmObjects)
             .deleteRealmIfMigrationNeeded()
-            .name("main")
+            .name("main.realm")
             .build()
     }
     
     private val mainRealm by lazy {
-        Realm.open(config)
+        Realm.open(mainConfig)
     }
     
     val realm get() = mainRealm

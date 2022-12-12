@@ -34,15 +34,30 @@ fun DependencyHandlerScope.koin() = implementation(
 )
 
 fun DependencyHandlerScope.dataBase() =
-    realm() and implementation(project(":data:realm"))
+    realm() and ktor() and implementation(
+        project(":data:realm"),
+        project(":data:ktor")
+    )
 
 fun DependencyHandlerScope.realm() = implementation(
     "io.realm.kotlin:library-base:1.5.0"
 )
 
+
+val jacksonVer = "2.14.0"
 fun DependencyHandlerScope.jackson() = implementation(
-    "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0",
-    "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.14.0"
+    "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVer",
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:$jacksonVer"
+)
+
+val ktorVer = "2.2.1"
+fun DependencyHandlerScope.ktor() = implementation(
+    "io.ktor:ktor-client-core:$ktorVer",
+    "io.ktor:ktor-client-okhttp:$ktorVer",
+    "io.ktor:ktor-client-logging:$ktorVer",
+    "io.ktor:ktor-client-auth:$ktorVer",
+    "io.ktor:ktor-client-content-negotiation:$ktorVer",
+    "io.ktor:ktor-serialization-jackson:$ktorVer"
 )
 
 @Suppress("UNUSED_PARAMETER")

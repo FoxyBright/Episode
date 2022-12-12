@@ -15,6 +15,6 @@ abstract class Repository<T: Source>(
     
     override val dispatcher = Dispatchers.IO
     
-    protected suspend fun <T> background(block: suspend CoroutineScope.() -> T) =
+    protected suspend inline fun <T> background(noinline block: suspend CoroutineScope.() -> T) =
         withContext(context, block)
 }

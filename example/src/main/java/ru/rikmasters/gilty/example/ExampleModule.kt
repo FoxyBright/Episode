@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.core.module.Module
+import ru.rikmasters.gilty.core.data.source.WebSource
+import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
@@ -25,29 +27,34 @@ object ExampleModule : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
         screen("myentrypoint") {
             val repository: ExampleRepository = get()
+            val env: Environment = get()
             val scope = rememberCoroutineScope()
             Column(Modifier.fillMaxSize()) {
                 Text("MyEntrypoint")
                 
-                Row {
-                    Button({
-                        scope.launch(Dispatchers.IO) {
-                            log.v(repository.get(UUID.randomUUID()).toString())
-                        }
-                    }) {
-                        Text("Test data", color = MaterialTheme.colorScheme.background)
+                Button({
+                    scope.launch {
+                        log.v(repository.get(UUID.randomUUID()).toString())
                     }
+                }) {
+                    Text("Test data", color = MaterialTheme.colorScheme.background)
                 }
                 
-                Row {
-                    Button({
-                        scope.launch(Dispatchers.IO) {
-                            log.v("Asking for Bob...")
-                            log.v(repository.getDomainOnly("Bob").toString())
-                        }
-                    }) {
-                        Text("Test domain only", color = MaterialTheme.colorScheme.background)
+                Button({
+                    scope.launch {
+                        log.v("Asking for Bob...")
+                        log.v(repository.getDomainOnly("Bob").toString())
                     }
+                }) {
+                    Text("Test domain only", color = MaterialTheme.colorScheme.background)
+                }
+                
+                Button({
+                    scope.launch {
+                        //log.v(repository.getFromWeb().toString())
+                    }
+                }) {
+                    Text("Test web", color = MaterialTheme.colorScheme.background)
                 }
             }
         }

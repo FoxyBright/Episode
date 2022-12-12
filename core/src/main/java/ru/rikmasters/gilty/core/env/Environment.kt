@@ -118,7 +118,7 @@ internal constructor(
     operator fun set(key: String, value: Any?) = set(key, value, true)
 
     fun set(key: String, value: Any?, async: Boolean) = runBlocking {
-        logV("Set $key $value")
+        logV("Установлена переменная среды $key=$value")
         variables[key] = value
         subscribers[key]?.map { async {
             try {
@@ -129,7 +129,6 @@ internal constructor(
         } }?.let {
             if(!async) it.awaitAll()
         }
-        logV("Set $key $value end")
     }
 
     @Suppress("UNCHECKED_CAST")
