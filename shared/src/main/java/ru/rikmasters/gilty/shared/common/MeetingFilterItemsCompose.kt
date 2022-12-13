@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -12,12 +13,14 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.SliderDefaults.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -32,6 +35,56 @@ import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
+
+@Composable
+@Suppress("unused")
+fun Country(
+    onCountryClick: () -> Unit,
+    onCityClick: () -> Unit,
+) {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .clickable {  },
+        shapes.large, cardColors(colorScheme.primaryContainer),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp), SpaceBetween,
+            verticalAlignment = CenterVertically
+        ) {
+            Text(
+                stringResource(R.string.meeting_filter_radius_of_search_label),
+                Modifier.padding(start = 16.dp),
+                colorScheme.tertiary,
+                style = typography.bodyMedium,
+                fontWeight = SemiBold
+            )
+            Row(verticalAlignment = CenterVertically) {
+                Box(
+                    Modifier
+                        .clip(shapes.extraSmall)
+                        .background(colorScheme.primary)
+                ) {
+                    Text(
+                        stringResource(R.string.meeting_filter_label_distance),
+                        Modifier.padding(12.dp, 6.dp),
+                        Color.White,
+                        style = typography.labelSmall,
+                        fontWeight = SemiBold
+                    )
+                }
+                Icon(
+                    Icons.Filled.KeyboardArrowRight,
+                    stringResource(R.string.next_button),
+                    Modifier.padding(horizontal = 16.dp),
+                    colorScheme.onTertiary
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun Category(
@@ -213,7 +266,7 @@ fun Distance(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp), Arrangement.Absolute.SpaceBetween,
+                .padding(vertical = 10.dp), SpaceBetween,
             verticalAlignment = CenterVertically
         ) {
             Text(
@@ -256,9 +309,10 @@ fun Distance(
                         .padding(horizontal = 16.dp)
                         .padding(top = 50.dp),
                     valueRange = 1f..50f, steps = 50,
-                    colors = SliderDefaults.colors(
-                        activeTickColor = Color.Transparent,
-                        inactiveTickColor = Color.Transparent
+                    colors = colors(
+                        activeTickColor = Transparent,
+                        inactiveTickColor = Transparent,
+                        inactiveTrackColor = colorScheme.outline
                     )
                 )
                 Row(
@@ -266,7 +320,7 @@ fun Distance(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 18.dp),
-                    Arrangement.SpaceBetween
+                    SpaceBetween
                 ) {
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 1),

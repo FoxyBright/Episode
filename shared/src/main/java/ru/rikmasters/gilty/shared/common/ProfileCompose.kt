@@ -42,7 +42,6 @@ data class ProfileState(
     val name: String = "",
     val hiddenPhoto: String? = null,
     val profilePhoto: String? = null,
-    val lockState: Boolean = false,
     val description: String = "",
     val rating: String = "0",
     val observers: Int = 0,
@@ -58,7 +57,6 @@ interface ProfileCallback: NavigationInterface {
     
     fun profileImage() {}
     fun hiddenImages() {}
-    fun onLockClick(state: Boolean) {}
     fun onNameChange(text: String) {}
     fun onDescriptionChange(text: String) {}
     fun onObserveChange(state: Boolean) {}
@@ -95,7 +93,6 @@ private fun UserProfilePreview() {
         Profile(
             ProfileState(
                 "${user.username}, ${user.age}",
-                lockState = false,
                 description = user.aboutMe,
                 enabled = false,
                 profileType = ProfileType.USERPROFILE
@@ -180,14 +177,12 @@ fun Profile(
                     state.observed,
                     state.emoji
                 ) { callback?.onObserveClick() }
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(18.dp))
                 HiddenPhotoContent(
                     Modifier,
-                    state.lockState,
                     state.hiddenPhoto,
-                    state.profileType,
-                    { callback?.hiddenImages() },
-                    { callback?.onLockClick(it) })
+                    state.profileType
+                ) { callback?.hiddenImages() }
             }
         }
         Text(

@@ -35,9 +35,9 @@ private val GrBrush =
 val DefaultExtraTypography = ExtraTypography(
     RatingText = baseTextStyle.copy(
         brush = GrBrush,
-        fontSize = 38.sp,
+        fontSize = 46.sp,
         fontWeight = Bold,
-        lineHeight = 46.sp
+        lineHeight = 56.sp
     ),
     CodeText = baseTextStyle.copy(
         fontSize = 22.sp,

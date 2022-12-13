@@ -4,36 +4,44 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.TopEnd
+import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.ic_emoji
+import ru.rikmasters.gilty.shared.R.drawable.ic_image_box
+import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
+import ru.rikmasters.gilty.shared.R.drawable.transparency_circle
+import ru.rikmasters.gilty.shared.R.string.profile_observe
+import ru.rikmasters.gilty.shared.R.string.profile_observers_in_profile
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.shared.CheckBox
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -42,10 +50,10 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun HiddenPhotoContentPreview() {
     GiltyTheme {
-        var lookState by remember { mutableStateOf(true) }
-        HiddenPhotoContent(Modifier.width(160.dp), lookState, null, ProfileType.CREATE, {}) {
-            lookState = !lookState
-        }
+        HiddenPhotoContent(
+            Modifier.width(160.dp),
+            (null), CREATE
+        ) {}
     }
 }
 
@@ -53,13 +61,10 @@ private fun HiddenPhotoContentPreview() {
 @Composable
 private fun ProfileImageContentPreview() {
     GiltyTheme {
-        val observeState = remember { mutableStateOf(false) }
         ProfileImageContent(
             Modifier.width(160.dp),
-            "",
-            ProfileType.ORGANIZER,
-            false,
-            { observeState.value = it }) {}
+            (""), ORGANIZER, (false),
+            {}) {}
     }
 }
 
@@ -69,7 +74,8 @@ private fun ProfileStatisticContentPreview() {
     GiltyTheme {
         ProfileStatisticContent(
             Modifier.width(160.dp),
-            DemoProfileModel.rating.average, 100, 100, DemoProfileModel.emoji
+            DemoProfileModel.rating.average,
+            (100), (100), DemoProfileModel.emoji
         )
     }
 }
@@ -77,51 +83,51 @@ private fun ProfileStatisticContentPreview() {
 @Composable
 fun HiddenPhotoContent(
     modifier: Modifier,
-    lockState: Boolean,
     image: String?,
     profileType: ProfileType,
     onCardClick: () -> Unit,
-    onLockClick: (Boolean) -> Unit
 ) {
     Box(
         modifier
-            .height(100.dp)
+            .height(118.dp)
             .fillMaxWidth()
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
-            .clickable { onCardClick() }, Alignment.BottomCenter
+            .clickable { onCardClick() }, BottomCenter
     ) {
         AsyncImage(
-            image,
-            stringResource(R.string.profile_hidden_photo),
+            image, stringResource(R.string.profile_hidden_photo),
             Modifier.fillMaxSize(),
-            placeholder = painterResource(R.drawable.ic_image_empty),
-            contentScale = ContentScale.Crop
+            contentScale = Crop
         )
         Box(
             Modifier
                 .padding(start = 8.dp, top = 8.dp)
                 .size(26.dp)
                 .clip(CircleShape)
-                .align(Alignment.TopStart),
+                .align(TopStart),
         ) {
-            Image(painterResource(R.drawable.transparency_circle), (null), Modifier.fillMaxSize())
-            CheckBox(
-                lockState,
-                Modifier
+            Image(
+                painterResource(transparency_circle),
+                (null), Modifier.fillMaxSize()
+            )
+            if(profileType != USERPROFILE) Icon(
+                painterResource(ic_lock_close),
+                (null), Modifier
                     .padding(4.dp)
-                    .size(24.dp), listOf(
-                    R.drawable.ic_lock_open,
-                    R.drawable.ic_lock_close
-                ), colorScheme.tertiary
-            ) { onLockClick(it) }
+                    .size(24.dp),
+                colorScheme.tertiary
+            )
         }
-        if(profileType == ProfileType.ORGANIZER)
+        if(profileType == ORGANIZER)
             CreateProfileCardRow(
                 stringResource(R.string.profile_hidden_photo),
-                ProfileType.USERPROFILE
+                USERPROFILE
             )
-        else CreateProfileCardRow(stringResource(R.string.profile_hidden_photo), profileType)
+        else CreateProfileCardRow(
+            stringResource(R.string.profile_hidden_photo),
+            profileType
+        )
     }
 }
 
@@ -136,25 +142,27 @@ fun ProfileImageContent(
 ) {
     Box(
         modifier
-            .height(214.dp)
+            .height(254.dp)
             .fillMaxWidth(0.45f)
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
-            .clickable { onClick() }, Alignment.BottomCenter
+            .clickable { onClick() }, BottomCenter
     ) {
         AsyncImage(
             image,
             stringResource(R.string.meeting_avatar),
             Modifier.fillMaxSize(),
-            placeholder = painterResource(R.drawable.ic_image_empty),
-            contentScale = ContentScale.Crop
+            contentScale = Crop
         )
         when(profileType) {
-            ProfileType.CREATE -> {
-                CreateProfileCardRow(stringResource(R.string.profile_user_photo), profileType)
+            CREATE -> {
+                CreateProfileCardRow(
+                    stringResource(R.string.profile_user_photo),
+                    profileType
+                )
             }
             
-            ProfileType.ORGANIZER -> {
+            ORGANIZER -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_organizer_observe),
                     profileType,
@@ -162,7 +170,7 @@ fun ProfileImageContent(
                 ) { onObserveChange(it) }
             }
             
-            ProfileType.USERPROFILE -> {}
+            USERPROFILE -> {}
         }
     }
 }
@@ -178,25 +186,27 @@ private fun CreateProfileCardRow(
         Modifier
             .padding(horizontal = 8.dp)
             .padding(bottom = 8.dp),
-        Arrangement.Center, Alignment.CenterVertically
+        Arrangement.Center, CenterVertically
     ) {
-        if(profileType != ProfileType.ORGANIZER)
+        if(profileType != ORGANIZER)
             Text(
-                text,
-                Modifier.padding(end = 4.dp),
+                text, Modifier.padding(end = 4.dp),
                 colorScheme.onTertiary,
                 style = typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = SemiBold
             )
         when(profileType) {
-            ProfileType.CREATE -> {
+            CREATE -> {
                 Box(
                     Modifier
                         .size(26.dp)
-                        .background(colorScheme.primary, CircleShape)
+                        .background(
+                            colorScheme.primary,
+                            CircleShape
+                        )
                 ) {
                     Image(
-                        painterResource(R.drawable.ic_image_box),
+                        painterResource(ic_image_box),
                         null,
                         Modifier
                             .fillMaxSize()
@@ -205,9 +215,10 @@ private fun CreateProfileCardRow(
                 }
             }
             
-            ProfileType.ORGANIZER -> ObserveCheckBox(observeState) { bool -> onClick?.let { it(bool) } }
+            ORGANIZER -> ObserveCheckBox(observeState)
+            { bool -> onClick?.let { it(bool) } }
             
-            ProfileType.USERPROFILE -> {}
+            USERPROFILE -> {}
         }
     }
 }
@@ -222,81 +233,69 @@ fun ProfileStatisticContent(
     emoji: EmojiModel? = null,
     onClick: (() -> Unit)? = null
 ) {
-    
     Card(
         { onClick?.let { it() } },
         modifier
-            .height(100.dp)
+            .height(118.dp)
             .fillMaxWidth()
             .clip(shapes.large), (true),
         shapes.large, cardColors(colorScheme.primaryContainer)
     ) {
-        Column(horizontalAlignment = CenterHorizontally) {
+        Column {
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 8.dp)
-                    .wrapContentHeight()
+                    .padding(top = 8.dp),
+                Start, CenterVertically
             ) {
-                Text(rating, style = ThemeExtra.typography.RatingText)
-                Box(Modifier.padding(top = 14.dp)) {
-                    Image(painterResource(ic_emoji), null)
-                    Image(
-                        if(emoji?.type == "D") painterResource(emoji.path.toInt())
-                        else rememberAsyncImagePainter(emoji?.path), (null),
-                        Modifier
-                            .padding(top = 5.dp, end = 6.dp)
-                            .size(20.dp)
-                            .align(TopEnd)
-                    )
-                }
+                Text(
+                    rating, Modifier.weight(1f),
+                    style = ThemeExtra.typography.RatingText,
+                    textAlign = Right
+                )
+                Cloud(Modifier.weight(1f), emoji)
             }
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 8.dp, top = 4.dp)
             ) {
-                Column(
+                Observe(
                     Modifier.weight(1f),
-                    Top, CenterHorizontally
-                ) {
-                    Text(
-                        digitalConverter(observers),
-                        Modifier,
-                        colorScheme.tertiary,
-                        style = typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        stringResource(R.string.profile_observers_in_profile),
-                        Modifier, colorScheme.tertiary,
-                        style = typography.titleSmall,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                Column(
+                    stringResource(profile_observers_in_profile),
+                    observers
+                )
+                Observe(
                     Modifier.weight(1f),
-                    Top, CenterHorizontally
-                ) {
-                    Text(
-                        digitalConverter(observed),
-                        Modifier,
-                        colorScheme.tertiary,
-                        style = typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        stringResource(R.string.profile_observe),
-                        Modifier,
-                        colorScheme.tertiary,
-                        style = typography.titleSmall,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                    stringResource(profile_observe),
+                    observed
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun Observe(
+    modifier: Modifier = Modifier,
+    text: String, count: Int
+) {
+    Column(
+        modifier, Top, CenterHorizontally
+    ) {
+        Text(
+            digitalConverter(count),
+            Modifier, colorScheme.tertiary,
+            style = typography.labelSmall,
+            fontWeight = SemiBold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text, Modifier,
+            colorScheme.tertiary,
+            style = typography.titleSmall,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -309,12 +308,14 @@ fun digitalConverter(digit: Int): String {
         number.length in 4..9 -> {
             when(number.length) {
                 5, 8 -> {
-                    firstChar = number.substring(0..1)
+                    firstChar = number
+                        .substring(0..1)
                     count = "${number[2]}"
                 }
                 
                 6, 9 -> {
-                    firstChar = number.substring(0..2)
+                    firstChar = number
+                        .substring(0..2)
                     count = "${number[3]}"
                 }
                 
@@ -323,9 +324,49 @@ fun digitalConverter(digit: Int): String {
                     count = "${number[1]}"
                 }
             }
-            "$firstChar,$count ${if(number.length in 3..6) "k" else "m"}"
+            "$firstChar,$count ${
+                if(number.length
+                    in 3..6
+                ) "k" else "m"
+            }"
         }
         
         else -> number
     }
 }
+
+@Composable
+private fun Cloud(modifier: Modifier, emoji: EmojiModel?) {
+    Row(modifier, Start, Bottom) {
+        MiniCloud(Modifier.size(6.dp))
+        MiniCloud(
+            Modifier
+                .padding(bottom = 4.dp)
+                .padding(horizontal = 2.dp)
+                .size(10.dp)
+        )
+        MiniCloud(
+            Modifier.padding(bottom = 2.dp),
+        ) {
+            Image(
+                if(emoji?.type == "D")
+                    painterResource(emoji.path.toInt())
+                else rememberAsyncImagePainter
+                    (emoji?.path), (null),
+                Modifier
+                    .padding(10.dp, 8.dp)
+                    .size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun MiniCloud(
+    modifier: Modifier = Modifier,
+    content: @Composable (() -> Unit)? = null
+) = Box(
+    modifier.background(
+        ThemeExtra.colors.chipGray, CircleShape
+    )
+) { content?.invoke() }

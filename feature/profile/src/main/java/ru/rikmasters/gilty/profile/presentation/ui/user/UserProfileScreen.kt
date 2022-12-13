@@ -33,8 +33,6 @@ fun UserProfileScreen(nav: NavState = get()) {
         var menuState by remember { mutableStateOf(false) }
         val historyState =
             remember { mutableStateOf(false) }
-        val menuExpanded =
-            remember { mutableStateOf(false) }
         val meets = DemoMeetingList
         val profileModel = DemoProfileModel
         var description by
@@ -102,14 +100,6 @@ fun UserProfileScreen(nav: NavState = get()) {
             ), Modifier, object: UserProfileCallback {
                 override fun menu(state: Boolean) {
                     nav.navigate("settings")
-                }
-                
-                override fun onLockClick(state: Boolean) {
-                    Toast.makeText(
-                        context,
-                        "Ваши фото засекречены",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
                 
                 override fun onNameChange(text: String) {
