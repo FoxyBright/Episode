@@ -184,7 +184,7 @@ private fun PopularTags(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(16.dp), 4.dp, 8.dp
+                .padding(8.dp), 8.dp, 8.dp
         ) {
             popularTags.forEach {
                 GiltyChip(

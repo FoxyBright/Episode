@@ -2,19 +2,12 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -50,6 +43,7 @@ data class ChatAppBarState(
 )
 
 interface ChatAppBarCallback {
+    
     fun onBack() {}
     fun onAvatarClick() {}
     fun onKebabClick() {}
@@ -65,11 +59,10 @@ fun ChatAppBarContent(
         modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(20.dp, 14.dp)
-            .padding(top = 10.dp),
+            .padding(top = 24.dp, bottom = 14.dp),
         Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier, Start, CenterVertically) {
             IconButton({ callback?.onBack() }) {
                 Icon(
                     painterResource(R.drawable.ic_back), (null),
@@ -94,7 +87,7 @@ private fun Information(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier, verticalAlignment = CenterVertically) {
         AsyncImage(
             state.avatar.id,
             stringResource(R.string.meeting_avatar),

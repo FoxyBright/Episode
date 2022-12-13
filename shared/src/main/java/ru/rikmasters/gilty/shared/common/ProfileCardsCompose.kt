@@ -3,31 +3,20 @@ package ru.rikmasters.gilty.shared.common
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_emoji
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
@@ -126,7 +116,7 @@ fun HiddenPhotoContent(
                 ), colorScheme.tertiary
             ) { onLockClick(it) }
         }
-        if (profileType == ProfileType.ORGANIZER)
+        if(profileType == ProfileType.ORGANIZER)
             CreateProfileCardRow(
                 stringResource(R.string.profile_hidden_photo),
                 ProfileType.USERPROFILE
@@ -159,11 +149,11 @@ fun ProfileImageContent(
             placeholder = painterResource(R.drawable.ic_image_empty),
             contentScale = ContentScale.Crop
         )
-        when (profileType) {
+        when(profileType) {
             ProfileType.CREATE -> {
                 CreateProfileCardRow(stringResource(R.string.profile_user_photo), profileType)
             }
-
+            
             ProfileType.ORGANIZER -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_organizer_observe),
@@ -171,7 +161,7 @@ fun ProfileImageContent(
                     observeState,
                 ) { onObserveChange(it) }
             }
-
+            
             ProfileType.USERPROFILE -> {}
         }
     }
@@ -190,15 +180,15 @@ private fun CreateProfileCardRow(
             .padding(bottom = 8.dp),
         Arrangement.Center, Alignment.CenterVertically
     ) {
-        if (profileType != ProfileType.ORGANIZER)
+        if(profileType != ProfileType.ORGANIZER)
             Text(
                 text,
                 Modifier.padding(end = 4.dp),
                 colorScheme.onTertiary,
-                style = MaterialTheme.typography.headlineSmall,
+                style = typography.headlineSmall,
                 fontWeight = FontWeight.SemiBold
             )
-        when (profileType) {
+        when(profileType) {
             ProfileType.CREATE -> {
                 Box(
                     Modifier
@@ -214,9 +204,9 @@ private fun CreateProfileCardRow(
                     )
                 }
             }
-
+            
             ProfileType.ORGANIZER -> ObserveCheckBox(observeState) { bool -> onClick?.let { it(bool) } }
-
+            
             ProfileType.USERPROFILE -> {}
         }
     }
@@ -232,7 +222,7 @@ fun ProfileStatisticContent(
     emoji: EmojiModel? = null,
     onClick: (() -> Unit)? = null
 ) {
-
+    
     Card(
         { onClick?.let { it() } },
         modifier
@@ -241,7 +231,7 @@ fun ProfileStatisticContent(
             .clip(shapes.large), (true),
         shapes.large, cardColors(colorScheme.primaryContainer)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = CenterHorizontally) {
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
@@ -250,14 +240,14 @@ fun ProfileStatisticContent(
             ) {
                 Text(rating, style = ThemeExtra.typography.RatingText)
                 Box(Modifier.padding(top = 14.dp)) {
-                    Image(painterResource(R.drawable.ic_emoji), null)
+                    Image(painterResource(ic_emoji), null)
                     Image(
-                        if (emoji?.type == "D") painterResource(emoji.path.toInt())
+                        if(emoji?.type == "D") painterResource(emoji.path.toInt())
                         else rememberAsyncImagePainter(emoji?.path), (null),
                         Modifier
                             .padding(top = 5.dp, end = 6.dp)
                             .size(20.dp)
-                            .align(Alignment.TopEnd)
+                            .align(TopEnd)
                     )
                 }
             }
@@ -266,37 +256,42 @@ fun ProfileStatisticContent(
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 8.dp)
             ) {
-                Column(Modifier.weight(1f)) {
+                Column(
+                    Modifier.weight(1f),
+                    Top, CenterHorizontally
+                ) {
                     Text(
                         digitalConverter(observers),
-                        Modifier.fillMaxWidth(),
+                        Modifier,
                         colorScheme.tertiary,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        stringResource(R.string.profile_observers),
-                        Modifier.fillMaxWidth(),
-                        colorScheme.tertiary,
-                        style = MaterialTheme.typography.titleSmall,
+                        stringResource(R.string.profile_observers_in_profile),
+                        Modifier, colorScheme.tertiary,
+                        style = typography.titleSmall,
                         textAlign = TextAlign.Center
                     )
                 }
-                Column(Modifier.weight(1f)) {
+                Column(
+                    Modifier.weight(1f),
+                    Top, CenterHorizontally
+                ) {
                     Text(
                         digitalConverter(observed),
-                        Modifier.fillMaxWidth(),
+                        Modifier,
                         colorScheme.tertiary,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                     )
                     Text(
                         stringResource(R.string.profile_observe),
-                        Modifier.fillMaxWidth(),
+                        Modifier,
                         colorScheme.tertiary,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = typography.titleSmall,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -312,25 +307,25 @@ fun digitalConverter(digit: Int): String {
     return when {
         number.length > 9 -> ">999 m"
         number.length in 4..9 -> {
-            when (number.length) {
+            when(number.length) {
                 5, 8 -> {
                     firstChar = number.substring(0..1)
                     count = "${number[2]}"
                 }
-
+                
                 6, 9 -> {
                     firstChar = number.substring(0..2)
                     count = "${number[3]}"
                 }
-
+                
                 else -> {
                     firstChar = "${number[0]}"
                     count = "${number[1]}"
                 }
             }
-            "$firstChar,$count ${if (number.length in 3..6) "k" else "m"}"
+            "$firstChar,$count ${if(number.length in 3..6) "k" else "m"}"
         }
-
+        
         else -> number
     }
 }

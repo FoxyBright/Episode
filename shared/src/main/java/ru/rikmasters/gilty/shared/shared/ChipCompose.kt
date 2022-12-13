@@ -3,14 +3,13 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
@@ -23,9 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush.Companion.horizontalGradient
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +47,7 @@ private fun ChipsPreview() {
         LazyRow(Modifier.fillMaxWidth()) {
             itemsIndexed(list) { i, it ->
                 GiltyChip(
-                    Modifier.padding(end = 12.dp),
+                    Modifier.padding(6.dp, 12.dp),
                     "Чип ", it
                 ) {
                     for(i1 in 0..list.lastIndex) {
@@ -82,7 +85,6 @@ private fun StringPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GiltyChip(
     modifier: Modifier = Modifier,
@@ -94,21 +96,32 @@ fun GiltyChip(
     val primary = colorScheme.primary
     val empty = colorScheme.primaryContainer
     val border = colors.chipGray
-    Card(
-        onClick, modifier, (true),
-        shapes.large, cardColors(Transparent),
-        cardElevation(0.dp),
-        BorderStroke(
-            1.dp, horizontalGradient(
-                if(isSelected) if(online) green()
-                else listOf(primary, primary)
-                else listOf(border, border)
+    
+    
+    Box(
+        modifier = modifier
+            .sur(
+                shape = shapes.medium,
+                backgroundColor = Transparent,
+                border = BorderStroke(
+                    1.dp, horizontalGradient(
+                        if(isSelected) if(online) green()
+                        else listOf(primary, primary)
+                        else listOf(border, border)
+                    )
+                ),
             )
-        ), MutableInteractionSource()
+            .clickable(
+                interactionSource = MutableInteractionSource(),
+                indication = rememberRipple(),
+                enabled = true,
+                role = Role.Button,
+                onClick = onClick
+            ),
+        propagateMinConstraints = true
     ) {
         Box(
             Modifier
-                .wrapContentSize()
                 .background(
                     horizontalGradient(
                         if(isSelected) if(online) green()
@@ -127,6 +140,20 @@ fun GiltyChip(
         }
     }
 }
+
+private fun Modifier.sur(
+    shape: Shape,
+    backgroundColor: Color,
+    border: BorderStroke?
+) = this
+    .shadow(0.dp, shape, clip = false)
+    .then(
+        if(border != null)
+            Modifier.border(border, shape)
+        else Modifier
+    )
+    .background(backgroundColor, shape)
+    .clip(shape)
 
 @Composable
 fun GiltyString(
@@ -184,7 +211,8 @@ fun GiltyTab(
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Max)) {
+                .height(IntrinsicSize.Max)
+        ) {
             repeat(tabs.size) {
                 GiltyTabElement(
                     tabs[it], Modifier.weight(1f),

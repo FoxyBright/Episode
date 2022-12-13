@@ -15,13 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,7 +54,7 @@ private fun AlertDialogWithContentPreview() {
                 Modifier
                     .fillMaxWidth()
                     .height(300.dp)
-                    .background(Color.White), Center
+                    .background(Color.White), Alignment.Center
             ) {
                 Text(
                     content, Modifier, colorScheme.tertiary,
@@ -83,7 +82,7 @@ private fun ListAlertDialogPreview() {
             success = Pair(stringResource(R.string.confirm_button)) {},
             list = list, listItemSelect = { active ->
                 repeat(list.size) {
-                    if (it == active) list[it] = Pair(list[it].first, true)
+                    if(it == active) list[it] = Pair(list[it].first, true)
                     else list[it] = Pair(list[it].first, false)
                 }
             })
@@ -93,8 +92,8 @@ private fun ListAlertDialogPreview() {
 @Composable
 fun GAlert(
     show: Boolean,
-    onDismissRequest: () -> Unit,
-    title: String,
+    onDismissRequest: (() -> Unit)? = null,
+    title: (String)? = null,
     modifier: Modifier = Modifier,
     label: String? = null,
     success: Pair<String, () -> Unit>,
@@ -104,9 +103,9 @@ fun GAlert(
     accentColors: Color = colorScheme.primary,
     content: (@Composable () -> Unit)? = null,
 ) {
-    if (show) {
+    if(show) {
         AlertDialog(
-            onDismissRequest,
+            onDismissRequest ?: {},
             confirmButton = {
                 Text(
                     success.first, Modifier
@@ -133,12 +132,14 @@ fun GAlert(
                     )
                 }
             }, (null), {
-                Text(
-                    title, Modifier,
-                    colorScheme.tertiary,
-                    style = typography.displayLarge,
-                    fontWeight = SemiBold
-                )
+                title?.let {
+                    Text(
+                        it, Modifier,
+                        colorScheme.tertiary,
+                        style = typography.displayLarge,
+                        fontWeight = SemiBold
+                    )
+                }
             }, {
                 Column {
                     label?.let {
@@ -186,7 +187,7 @@ private fun ListItem(
             listOf(
                 R.drawable.ic_radio_active,
                 R.drawable.ic_radio_inactive
-            ), if (item.second) accentColors
+            ), if(item.second) accentColors
             else colorScheme.tertiary
         ) { select?.let { it(index) } }
         Text(

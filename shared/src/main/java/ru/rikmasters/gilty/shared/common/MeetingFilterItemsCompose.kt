@@ -82,7 +82,7 @@ fun Category(
                         Modifier
                             .background(colorScheme.primaryContainer)
                             .padding(top = 16.dp)
-                            .padding(horizontal = 16.dp), 8.dp, 8.dp
+                            .padding(horizontal = 8.dp), 8.dp, 8.dp
                     ) {
                         it.forEach { category ->
                             GiltyChip(
@@ -163,7 +163,7 @@ fun TagSearch(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(horizontal = 8.dp), 8.dp, 8.dp
             ) {
                 tagList.forEachIndexed { index, item ->
                     Box(
@@ -308,7 +308,8 @@ fun MeetingType(
             FlowLayout(
                 Modifier
                     .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
+                    .padding(top = 8.dp)
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingType.forEachIndexed { index, item ->
                     GiltyChip(
@@ -349,7 +350,7 @@ fun ConditionsSelect(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingTypes.forEachIndexed { index, item ->
                     GiltyChip(
@@ -394,7 +395,7 @@ fun GenderAndConditions(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedGenders.forEachIndexed { index, item ->
                     GiltyChip(
@@ -416,7 +417,7 @@ fun GenderAndConditions(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingTypes.forEachIndexed { index, item ->
                     GiltyChip(
