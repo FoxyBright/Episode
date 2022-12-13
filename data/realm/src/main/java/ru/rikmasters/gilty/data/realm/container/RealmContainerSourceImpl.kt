@@ -4,13 +4,13 @@ import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.core.data.entity.interfaces.EntityVariant
-import ru.rikmasters.gilty.data.realm.RealmContainer
+import ru.rikmasters.gilty.data.realm.model.RealmContainer
 import ru.rikmasters.gilty.data.realm.RealmManager
 import ru.rikmasters.gilty.data.realm.RealmSourceVariant
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
-class RealmContainerSourceImpl(
+internal class RealmContainerSourceImpl(
     manager: RealmManager
 ): RealmSourceVariant(manager), RealmContainerSource {
     
@@ -72,7 +72,7 @@ class RealmContainerSourceImpl(
     
     override suspend fun deleteAll(clazz: KClass<*>) {
         doDelete(
-            doQuery<RealmContainer>("$CLASS_FIELD == $0", clazz).find()
+            doQuery<RealmContainer>("$CLASS_FIELD == $0", clazz.java.canonicalName).find()
         )
     }
 }

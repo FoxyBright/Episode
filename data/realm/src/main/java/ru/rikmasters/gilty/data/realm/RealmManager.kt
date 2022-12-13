@@ -4,6 +4,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.types.RealmObject
 import ru.rikmasters.gilty.core.common.Component
+import ru.rikmasters.gilty.data.realm.model.RealmContainer
 import kotlin.reflect.KClass
 
 class RealmManager: Component {

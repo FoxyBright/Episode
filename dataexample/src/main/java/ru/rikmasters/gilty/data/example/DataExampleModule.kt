@@ -16,6 +16,8 @@ object DataExampleModule: DataDefinition() {
         }
         
         entity<ExampleDomainOnlyModel>()
+        
+        entity<Door>()
     }
     
     override fun Module.koin() {

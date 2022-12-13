@@ -1,20 +1,19 @@
 package ru.rikmasters.gilty.data.ktor
 
 import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.engine.okhttp.OkHttpConfig
-import io.ktor.client.plugins.*
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import ru.rikmasters.gilty.core.data.source.WebSource
-import ru.rikmasters.gilty.core.log.log
 import java.io.IOException
 
 open class KtorSource: WebSource() {
@@ -35,11 +34,9 @@ open class KtorSource: WebSource() {
         defaultRequest {
             contentType(ContentType.Application.Json)
             host = env[ENV_HOST] ?: ""
-            log.v("DefaultRequest $host")
         }
         install(UserAgent) {
             agent = env[ENV_USER_AGENT] ?: ""
-            log.v("UserAgent $agent")
         }
     } }
     

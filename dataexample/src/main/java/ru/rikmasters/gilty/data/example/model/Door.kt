@@ -5,7 +5,7 @@ import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 data class Door(
     val id: Int,
     val name: String,
-    val room: String,
+    val room: String?,
     val favorites: Boolean,
     val snapshot: String?,
 ): DomainEntity {

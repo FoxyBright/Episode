@@ -10,7 +10,7 @@ import java.util.UUID
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
-class RealmSourceImpl(
+internal class RealmSourceImpl(
     manager: RealmManager
 ): RealmSourceVariant(manager), RealmSource {
     

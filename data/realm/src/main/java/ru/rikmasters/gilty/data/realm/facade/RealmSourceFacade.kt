@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.data.realm
+package ru.rikmasters.gilty.data.realm.facade
 
 import io.realm.kotlin.types.*
 import ru.rikmasters.gilty.core.data.entity.interfaces.DbEntity
