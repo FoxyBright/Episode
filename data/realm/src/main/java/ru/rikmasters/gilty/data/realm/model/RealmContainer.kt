@@ -4,13 +4,11 @@ import io.realm.kotlin.types.RealmObject
 import kotlin.reflect.KClass
 
 @Suppress("PropertyName")
-internal class RealmContainer: RealmObject {
+internal abstract class RealmContainer: RealmObject {
     
-    var id: Int? = null
+    abstract var data: ByteArray
     
-    var data: ByteArray = byteArrayOf()
-    
-    private var _javaClass: String = ""
+    abstract var _javaClass: String
     
     var _class: KClass<*>
         get() = Class.forName(_javaClass).kotlin

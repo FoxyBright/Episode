@@ -2,11 +2,14 @@ package ru.rikmasters.gilty.example
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.core.module.Module
@@ -24,6 +27,13 @@ object ExampleModule : FeatureDefinition() {
         screen("myentrypoint") {
             val repository: ExampleRepository = get()
             val scope = rememberCoroutineScope()
+            val flow = remember { repository.doorsFlow() }
+            val doorsState by flow.collectAsState(emptyList())
+            LaunchedEffect(Unit) {
+                flow.collectLatest {
+                    log.v("Latest $it")
+                }
+            }
             Column(Modifier.fillMaxSize()) {
                 Text("MyEntrypoint")
                 Button({
@@ -35,6 +45,11 @@ object ExampleModule : FeatureDefinition() {
                     scope.launch { repository.getDoors(true).let { log.v("$it") } }
                 }) {
                     Text("Get doors force web", color = MaterialTheme.colorScheme.background)
+                }
+                LazyColumn {
+                    items(doorsState) {
+                        Text(it.name)
+                    }
                 }
             }
         }

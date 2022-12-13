@@ -1,9 +1,11 @@
 package ru.rikmasters.gilty.data.realm
 
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmObject
 import ru.rikmasters.gilty.core.data.source.Source
+import ru.rikmasters.gilty.core.log.log
 import kotlin.reflect.KClass
 
 
@@ -14,13 +16,20 @@ abstract class RealmSourceVariant(
     
     companion object {
         const val DEFAULT_QUERY = "TRUEPREDICATE"
+        val UPDATE_POLICY = UpdatePolicy.ALL
     }
     
-    protected val realm = manager.realm
+    private val realm = manager.realm
     
     protected suspend fun doSave(realmObject: RealmObject) {
         realm.write {
-            copyToRealm(realmObject)
+            copyToRealm(realmObject, UPDATE_POLICY)
+        }
+    }
+    
+    protected suspend fun doSave(realmObjects: Collection<RealmObject>) {
+        realm.write {
+            realmObjects.forEach { copyToRealm(it, UPDATE_POLICY) }
         }
     }
     

@@ -20,6 +20,8 @@ class ExampleRepository(
     
 ): OfflineFirstRepository<WebSource, RealmSourceFacade>(webSource, primarySource) {
     
+    fun doorsFlow() = primarySource.listenAll(Door::class)
+    
     suspend fun getDoors(forceWeb: Boolean = false) = background {
         if(!forceWeb) {
             log.v("Обычный запрос начинается с поиска в бд")
