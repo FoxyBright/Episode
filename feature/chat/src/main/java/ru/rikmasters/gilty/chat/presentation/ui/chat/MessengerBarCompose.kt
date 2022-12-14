@@ -28,12 +28,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
-import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.COMMENT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.MESSAGE
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelLongMessage
+import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes

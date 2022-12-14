@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.model
+package ru.rikmasters.gilty.shared.model.chat
 
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel

@@ -1,12 +1,7 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
@@ -19,8 +14,7 @@ fun MeetingFilterContent(
 ) {
     val distanceState =
         remember { mutableStateOf(false) }
-    val distance =
-        remember { mutableStateOf(25) }
+    val distance = remember { mutableStateOf(25) }
     val onlyOnline =
         remember { mutableStateOf(false) }
     val meetingTypes =
@@ -36,33 +30,52 @@ fun MeetingFilterContent(
     val categoryStateList =
         remember { mutableStateListOf<Boolean>() }
     repeat(categoryList.value.size) { categoryStateList.add(false) }
+    val country = remember { mutableStateOf("") }
+    val city = remember { mutableStateOf("") }
     val state = FilterListState(
-        distanceState.value,
-        distance.value,
-        onlyOnline.value,
-        meetingTypes,
-        genderList,
-        conditionList,
-        tagList,
-        categoryList.value,
-        categoryStateList
+        distanceState.value, distance.value,
+        onlyOnline.value, meetingTypes,
+        genderList, conditionList,
+        tagList, categoryList.value,
+        categoryStateList, country.value,
+        city.value
     )
     
     val context = LocalContext.current
     
-    var categories by remember { mutableStateOf(0) }
+    var bottomSheetScreen by remember { mutableStateOf(0) }
     
-    when(categories) {
-        1 -> CategoriesScreen { _, _ -> categories = 0 }
-        2 -> TagSearchScreen(false, { categories = 0 }) { categories = 0 }
+    when(bottomSheetScreen) {
+        1 -> CategoriesScreen { _, _ ->
+            bottomSheetScreen = 0
+        }
+        
+        2 -> TagSearchScreen(false,
+            { bottomSheetScreen = 0 })
+        { bottomSheetScreen = 0 }
+        
+//        3 -> {}
+//
+//        4 -> {}
+        
         else -> MeetingFilterBottom(Modifier, 26, state,
             object: MeetingFilterBottomCallback {
                 override fun onAllCategoryClick() {
-                    categories = 1
+                    bottomSheetScreen = 1
                 }
                 
                 override fun onFilterClick() {
-                    categories = 2
+                    bottomSheetScreen = 2
+                }
+                
+                override fun onCountryClick() {
+                    country.value = "Россия"
+//                    bottomSheetScreen = 3
+                }
+                
+                override fun onCityClick() {
+                    city.value = "Москва"
+//                    bottomSheetScreen = 4
                 }
                 
                 override fun onCategoryClick(index: Int) {
@@ -74,7 +87,7 @@ fun MeetingFilterContent(
                 }
                 
                 override fun onClear() {
-                    Toast.makeText(
+                    Toast.makeText( //TODO - сделать сброс фильтров
                         context,
                         "Фильтры сброшены",
                         Toast.LENGTH_SHORT

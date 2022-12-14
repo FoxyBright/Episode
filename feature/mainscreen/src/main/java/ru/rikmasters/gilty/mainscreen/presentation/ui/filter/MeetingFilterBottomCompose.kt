@@ -18,11 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.Category
-import ru.rikmasters.gilty.shared.common.Distance
-import ru.rikmasters.gilty.shared.common.GenderAndConditions
-import ru.rikmasters.gilty.shared.common.MeetingType
-import ru.rikmasters.gilty.shared.common.TagSearch
+import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
+import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
@@ -42,6 +39,7 @@ fun MeetingFilterBottomPreview() {
                 listOf("kaif", "pain", "fast", "launch"),
                 DemoFullCategoryModelList,
                 listOf(false, false, false),
+                ("Россия"), ("Москва"),
             )
         )
     }
@@ -108,22 +106,26 @@ data class FilterListState(
     val conditionList: List<Boolean>,
     val tagList: List<String>,
     val categoryList: List<FullCategoryModel>,
-    val categoryStateList: List<Boolean>
+    val categoryStateList: List<Boolean>,
+    val country: String,
+    val city: String
 )
 
 interface MeetingFilterBottomCallback: NavigationInterface {
     
-    fun onCategoryClick(index: Int)
-    fun onAllCategoryClick()
-    fun onFilterClick()
-    fun onDeleteTag(it: Int)
-    fun onDistanceClick()
-    fun onDistanceValueChange(it: Int)
-    fun onOnlyOnlineClick()
-    fun onMeetingTypeSelect(it: Int, status: Boolean)
-    fun onGenderSelect(it: Int, status: Boolean)
-    fun onConditionSelect(it: Int, status: Boolean)
-    fun onClear()
+    fun onCategoryClick(index: Int) {}
+    fun onAllCategoryClick() {}
+    fun onFilterClick() {}
+    fun onDeleteTag(it: Int) {}
+    fun onDistanceClick() {}
+    fun onDistanceValueChange(it: Int) {}
+    fun onOnlyOnlineClick() {}
+    fun onMeetingTypeSelect(it: Int, status: Boolean) {}
+    fun onGenderSelect(it: Int, status: Boolean) {}
+    fun onConditionSelect(it: Int, status: Boolean) {}
+    fun onCountryClick() {}
+    fun onCityClick() {}
+    fun onClear() {}
 }
 
 @Composable
@@ -132,8 +134,15 @@ private fun filterList(
     callback: MeetingFilterBottomCallback? = null
 ): List<FilterModel> {
     return listOf(
+        FilterModel(stringResource(add_meet_detailed_meet_place)) {
+            Country(state.country,
+                state.city,
+                { callback?.onCountryClick() })
+            { callback?.onCityClick() }
+        },
         FilterModel(stringResource(R.string.meeting_filter_category)) {
-            Category(state.categoryList, state.categoryStateList,
+            Category(state.categoryList,
+                state.categoryStateList,
                 { callback?.onCategoryClick(it) },
                 { callback?.onAllCategoryClick() }
             )
@@ -156,17 +165,22 @@ private fun filterList(
             MeetingType(
                 state.onlyOnline,
                 state.meetingTypes,
-                stringResource(R.string.meeting_only_online_meetings_button), false,
-                { callback?.onOnlyOnlineClick() },
-                { it, status -> callback?.onMeetingTypeSelect(it, status) }
+                stringResource(R.string.meeting_only_online_meetings_button),
+                (false), { callback?.onOnlyOnlineClick() },
+                { it, status ->
+                    callback?.onMeetingTypeSelect(it, status)
+                }
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_gender_and_conditions)) {
             GenderAndConditions(
                 state.genderList,
                 state.conditionList,
-                { it, status -> callback?.onGenderSelect(it, status) },
-                { it, status -> callback?.onConditionSelect(it, status) }
+                { it, status ->
+                    callback?.onGenderSelect(it, status)
+                }, { it, status ->
+                    callback?.onConditionSelect(it, status)
+                }
             )
         }
     )

@@ -30,59 +30,28 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.GiltyChip
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Composable
-@Suppress("unused")
 fun Country(
+    country: String,
+    city: String,
     onCountryClick: () -> Unit,
     onCityClick: () -> Unit,
 ) {
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .clickable {  },
-        shapes.large, cardColors(colorScheme.primaryContainer),
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp), SpaceBetween,
-            verticalAlignment = CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.meeting_filter_radius_of_search_label),
-                Modifier.padding(start = 16.dp),
-                colorScheme.tertiary,
-                style = typography.bodyMedium,
-                fontWeight = SemiBold
-            )
-            Row(verticalAlignment = CenterVertically) {
-                Box(
-                    Modifier
-                        .clip(shapes.extraSmall)
-                        .background(colorScheme.primary)
-                ) {
-                    Text(
-                        stringResource(R.string.meeting_filter_label_distance),
-                        Modifier.padding(12.dp, 6.dp),
-                        Color.White,
-                        style = typography.labelSmall,
-                        fontWeight = SemiBold
-                    )
-                }
-                Icon(
-                    Icons.Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    Modifier.padding(horizontal = 16.dp),
-                    colorScheme.onTertiary
-                )
-            }
-        }
+    Column {
+        CardRow(
+            stringResource(R.string.login_select_country), country,
+            ThemeExtra.shapes.mediumTopRoundedShape
+        ) { onCountryClick() }
+        Divider(Modifier.padding(start = 16.dp))
+        CardRow(
+            stringResource(R.string.login_select_city), city,
+            ThemeExtra.shapes.mediumBottomRoundedShape
+        ) { onCityClick() }
     }
 }
 

@@ -13,9 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.model.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
+import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 
 data class ChatState(

@@ -13,6 +13,7 @@
     <string name="login_application">" приложения"</string>
     <string name="login_link_stub">Здесь должна быть ссылка на политику конфиденциальности</string>
     <string name="login_select_country">Страна</string>
+    <string name="login_select_city">Город</string>
     <string name="login_search_placeholder">Поиск</string>
     <string name="login_search_name">Страна и регион</string>
 
@@ -243,6 +244,7 @@
 
     <!-- CHATS -->
     <string name="chats_label">Чат встреч</string>
+    <string name="chats_ended_chats_label">Завершенные</string>
 
     <!-- ALERTS -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

@@ -359,6 +359,21 @@ enum class Month {
             "Ноябрь",
             "Декабрь"
         )
+    
+        private val rodNames = arrayOf(
+            "Января",
+            "Февраля",
+            "Марта",
+            "Апреля",
+            "Мая",
+            "Июня",
+            "Июля",
+            "Августа",
+            "Сентября",
+            "Октября",
+            "Ноября",
+            "Декабря"
+        )
 
         /** Получает экземпляр Month из значения Int */
         fun of(month: Int): Month {
@@ -374,7 +389,8 @@ enum class Month {
 
         /** Получает текстовое представление, такое как "Январь" или "Декабрь" */
         fun Month.display() = names[this.ordinal]
-
+    
+        fun Month.displayRodName() = rodNames[this.ordinal]
     }
 }
 
@@ -413,12 +429,18 @@ enum class DayOfWeek {
             "Понедельник", "Вторник", "Среда",
             "Четверг", "Пятница", "Суббота", "Воскресенье",
         )
+    
+        private val rodNames = arrayOf(
+            "Понедельник", "Вторник", "Среду",
+            "Четверг", "Пятницу", "Субботу", "Воскресенье",
+        )
 
         private val shortRuNames = arrayOf(
             "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"
         )
 
         fun DayOfWeek.displayShort() = shortRuNames[this.ordinal]
+        fun DayOfWeek.displayRodName() = rodNames[this.ordinal]
 
         private val shortNames = arrayOf(
             "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"

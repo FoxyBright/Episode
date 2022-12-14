@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.login.presentation.model.Countries
-import ru.rikmasters.gilty.login.presentation.model.Country
-import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.textMask
+import ru.rikmasters.gilty.shared.model.login.Countries
+import ru.rikmasters.gilty.shared.model.login.Country
+import ru.rikmasters.gilty.shared.model.login.DemoCountry
 
 
 @Composable

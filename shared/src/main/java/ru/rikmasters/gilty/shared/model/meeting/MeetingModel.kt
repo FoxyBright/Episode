@@ -63,6 +63,8 @@ data class FullMeetingModel( // TODO заменить VAR на VAL сделан�
 
 ): MeetingModel
 
+enum class MeetStatus { ACTIVE, INACTIVE }
+
 val DemoFullMeetingModel = FullMeetingModel(
     id = UUID.randomUUID(),
     title = "Поход в кино",

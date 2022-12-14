@@ -1,14 +1,8 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -25,12 +19,9 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_image_empty
+import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -132,7 +123,8 @@ private fun Label(
 ) {
     Text(
         if(message.attachments != null) stringResource(
-            if(message.attachments.type == PHOTO) R.string.chats_message_answer_photo_label else R.string.chats_message_answer_video_label
+            if(message.attachments!!.type == PHOTO)
+                R.string.chats_message_answer_photo_label else R.string.chats_message_answer_video_label
         ) else if(message.text.length < max) message.text
         else "${message.text.substring(0, max)}…",
         modifier, if(!sender) colorScheme.onTertiary else White,

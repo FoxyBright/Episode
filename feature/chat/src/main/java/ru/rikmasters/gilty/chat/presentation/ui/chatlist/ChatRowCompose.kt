@@ -1,13 +1,9 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatlist
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -26,31 +22,74 @@ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.timeClock
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
+import ru.rikmasters.gilty.shared.model.chat.*
+import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
 @Composable
-private fun ChatRowPreview() {
+private fun ChatRowLastPreview() {
     GiltyTheme {
         ChatRowContent(
             Modifier.padding(16.dp),
-            DemoFullMeetingModel,
-            DemoMessageModel,
+            getChatWithData(dateTime = "2022-11-28T20:00:54.140Z"),
+            shapes.medium,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChatRowActualPreview() {
+    GiltyTheme {
+        ChatRowContent(
+            Modifier.padding(16.dp),
+            getChatWithData(
+                dateTime = TOMORROW,
+                hasUnread = true
+            ),
+            shapes.medium,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChatRowTodayPreview() {
+    GiltyTheme {
+        ChatRowContent(
+            Modifier.padding(16.dp),
+            getChatWithData(
+                dateTime = NOW_DATE,
+                hasUnread = true
+            ),
+            shapes.medium,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChatRowOnlinePreview() {
+    GiltyTheme {
+        ChatRowContent(
+            Modifier.padding(16.dp),
+            getChatWithData(
+                dateTime = NOW_DATE,
+                isOnline = true
+            ),
             shapes.medium,
         )
     }
@@ -60,8 +99,7 @@ private fun ChatRowPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 fun ChatRowContent(
     modifier: Modifier = Modifier,
-    meeting: FullMeetingModel,
-    lastMessage: MessageModel,
+    chat: ChatModel,
     shape: Shape,
     onClick: (() -> Unit)? = null
 ) {
@@ -71,15 +109,31 @@ fun ChatRowContent(
         cardColors(colorScheme.primaryContainer)
     ) {
         Box(Modifier.fillMaxWidth()) {
-            if (!todayControl(meeting.dateTime)) Timer(
-                meeting.dateTime,
-                meeting.isOnline,
-                Modifier
-                    .align(TopEnd)
-                    .padding(12.dp)
-            )
+            when {
+                todayControl(chat.dateTime) -> Timer(
+                    chat.dateTime, chat.isOnline,
+                    Modifier
+                        .align(TopEnd)
+                        .padding(12.dp)
+                )
+                
+                LocalDate.of(chat.dateTime)
+                    .isBefore(LOCAL_DATE) -> {
+                    val date = LocalDate.of(chat.dateTime)
+                    Text(
+                        "${date.day()} ${
+                            Month.of(date.month())
+                                .displayRodName()
+                        }", Modifier
+                            .align(TopEnd)
+                            .padding(top = 14.dp, end = 12.dp),
+                        colorScheme.tertiary, fontWeight = SemiBold,
+                        style = typography.labelSmall
+                    )
+                }
+            }
             Text(
-                lastMessage.createdAt.timeClock(),
+                chat.lastMessage.createdAt.timeClock(),
                 Modifier
                     .align(BottomEnd)
                     .padding(12.dp),
@@ -92,11 +146,10 @@ fun ChatRowContent(
                     .padding(12.dp),
                 Start, CenterVertically
             ) {
-                Avatar(
-                    meeting.organizer.avatar, (true)
-                )
+                Avatar(chat.organizer.avatar, chat.hasUnread)
                 Message(
-                    meeting, lastMessage,
+                    chat.title, chat.organizer,
+                    chat.lastMessage.text,
                     Modifier.padding(start = 8.dp)
                 )
             }
@@ -113,8 +166,10 @@ private fun Timer(
     Box(
         modifier.background(
             linearGradient(
-                if (isOnline) green()
-                else red()
+                if(isOnline) listOf(
+                    colorScheme.secondary,
+                    colorScheme.secondary,
+                ) else red()
             ), shapes.extraSmall
         )
     ) {
@@ -128,18 +183,18 @@ private fun Timer(
 
 @Composable
 private fun Message(
-    meet: FullMeetingModel,
-    message: MessageModel,
+    title: String,
+    user: OrganizerModel,
+    message: String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
         Text(
-            meet.title, Modifier,
+            title, Modifier,
             colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = SemiBold
         )
-        val user = meet.organizer
         Row(Modifier, Start, CenterVertically) {
             Text(
                 "${user.username}, ${user.age}",
@@ -147,15 +202,18 @@ private fun Message(
                 style = typography.labelSmall,
                 fontWeight = SemiBold
             )
-            AsyncImage(
-                user.emoji.path, (null),
+            Image(
+                if(user.emoji.type == "D")
+                    painterResource(user.emoji.path.toInt())
+                else rememberAsyncImagePainter
+                    (user.emoji.path), (null),
                 Modifier
                     .padding(6.dp)
                     .size(18.dp)
             )
         }
         Text(
-            message.text, Modifier,
+            message, Modifier,
             colorScheme.onTertiary,
             style = typography.labelSmall
         )
@@ -173,7 +231,7 @@ private fun Avatar(
             Modifier
                 .size(8.dp)
                 .background(
-                    if (unRead) colorScheme.primary
+                    if(unRead) colorScheme.primary
                     else colorScheme.primaryContainer,
                     CircleShape
                 )

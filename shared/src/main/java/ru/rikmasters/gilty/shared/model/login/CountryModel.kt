@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.model
+package ru.rikmasters.gilty.shared.model.login
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -18,11 +18,9 @@ fun Countries(): List<Country> {
     val context = LocalContext.current
     val countryList = arrayListOf<Country>()
     val jsonArray = JSONArray(
-        stringResource(
-            ru.rikmasters.gilty.login.R.string.countries
-        )
+        stringResource(R.string.countries)
     )
-    for (i in 0 until jsonArray.length()) {
+    for(i in 0 until jsonArray.length()) {
         val country = JSONObject(jsonArray[i].toString())
         val name = country.get("name").toString()
         val code = country.get("dial_code").toString()
@@ -34,7 +32,7 @@ fun Countries(): List<Country> {
         )
         countryList.add(
             Country(
-                name, code, if (img == 0) R.drawable.ic_image_empty else img
+                name, code, if(img == 0) R.drawable.ic_image_empty else img
             )
         )
     }
