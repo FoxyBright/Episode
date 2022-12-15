@@ -1,7 +1,9 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
@@ -24,30 +26,31 @@ fun ChatScreen(nav: NavState = get()) {
     var answer by
     remember { mutableStateOf<MessageModel?>(null) }
     val sender = DemoMemberModel
-    val messageList =
-        remember {
-            mutableStateListOf(
-                DemoImageMessage,
-                DemoMessageModelLongMessage,
-                DemoMessageModel
-            )
-        }
+    val messageList = remember {
+        mutableStateListOf(
+            DemoImageMessage,
+            DemoMessageModelLongMessage,
+            DemoMessageModel
+        )
+    }
     
-    val meet =
-        DemoFullMeetingModel
+    val meet = DemoFullMeetingModel
     var alert by
+    remember { mutableStateOf(false) }
+    var meetOutAlert by
     remember { mutableStateOf(false) }
     var menuState by
     remember { mutableStateOf(false) }
     var kebabMenuState by
     remember { mutableStateOf(false) }
-    
+    val context = LocalContext.current
     ChatContent(
         ChatState(
             ChatAppBarState(
                 meet.title, DemoAvatarModel, 2
             ), answer, meet, messageText,
-            messageList, sender, alert, kebabMenuState
+            messageList, sender, alert,
+            meetOutAlert, kebabMenuState
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
@@ -63,6 +66,19 @@ fun ChatScreen(nav: NavState = get()) {
                         HiddenPhotoBottomSheet()
                     }
                 }
+            }
+            
+            override fun onMeetOut() {
+                Toast.makeText(
+                    context,
+                    "Вы покинули встречу ${meet.title}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                meetOutAlert = false
+            }
+            
+            override fun onMeetOutAlertDismiss() {
+                meetOutAlert = false
             }
             
             override fun onSend() {
@@ -115,8 +131,25 @@ fun ChatScreen(nav: NavState = get()) {
                 }
             }
             
+            override fun onMenuItemClick(point: Int) {
+                when(point) {
+                    0 -> meetOutAlert = true
+                    1 -> scope.launch {
+                        asm.bottomSheetState.expand {
+                            menuState = false
+                            ComplainsContent(meet) {
+                                scope.launch {
+                                    asm.bottomSheetState.collapse()
+                                }; alert = true
+                            }
+                        }
+                    }
+                }
+                kebabMenuState = !kebabMenuState
+            }
+            
             override fun onKebabClick() {
-                kebabMenuState = true
+                kebabMenuState = !kebabMenuState
             }
         }
     )
