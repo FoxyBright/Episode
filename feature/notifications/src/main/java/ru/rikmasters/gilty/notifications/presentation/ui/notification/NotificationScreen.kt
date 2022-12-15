@@ -50,12 +50,7 @@ fun NotificationsScreen(nav: NavState = get()) {
                 DemoNotificationMeetingOverModel,
                 DemoTodayNotificationRespondAccept,
                 DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
+                DemoNotificationMeetingOverModel,
             )
         }
         val stateList = remember {

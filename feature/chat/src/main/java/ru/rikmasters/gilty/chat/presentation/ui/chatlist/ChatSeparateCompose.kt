@@ -4,6 +4,7 @@ import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayRodName
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
+import java.util.Locale
 
 fun getSortedChats(
     chats: List<ChatModel>
@@ -26,7 +27,8 @@ fun getSortedChats(
             .format(DATE_FORMAT)
         if(!dateList.contains(date) &&
             (LocalDate.of(date).isAfter(LOCAL_DATE)
-                    || todayControl(date)))
+                    || todayControl(date))
+        )
             dateList.add(date)
         if(LocalDate.of(date)
                 .isBefore(LOCAL_DATE)
@@ -54,8 +56,11 @@ fun getSortedChats(
                             "Во" else "В"
                     } ${
                         dayOfWeek.displayRodName()
+                            .lowercase(Locale.getDefault())
                     } ${it.day()} ${
-                        Month.of(it.month()).displayRodName()
+                        Month.of(it.month())
+                            .displayRodName()
+                            .lowercase(Locale.getDefault())
                     }"
                 },
                 chatList

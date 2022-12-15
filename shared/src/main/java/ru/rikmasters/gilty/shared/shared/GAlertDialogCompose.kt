@@ -8,18 +8,17 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +35,7 @@ private const val content = "Любой контент"
 private fun AlertDialogPreview() {
     GiltyTheme {
         GAlert(true, {}, header,
-            Modifier.padding(40.dp), label,
+            Modifier.padding(10.dp), label,
             Pair(stringResource(R.string.cancel)) {},
             Pair(stringResource(R.string.save_button)) {})
     }
@@ -47,17 +46,19 @@ private fun AlertDialogPreview() {
 private fun AlertDialogWithContentPreview() {
     GiltyTheme {
         GAlert(true, { }, header,
-            Modifier.padding(40.dp),
+            Modifier.padding(10.dp),
             success = Pair(stringResource(R.string.save_button)) {},
             cancel = Pair(stringResource(R.string.cancel)) {}) {
             Box(
                 Modifier
                     .fillMaxWidth()
                     .height(300.dp)
-                    .background(Color.White), Alignment.Center
+                    .background(White),
+                Alignment.Center
             ) {
                 Text(
-                    content, Modifier, colorScheme.tertiary,
+                    content, Modifier,
+                    colorScheme.tertiary,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
@@ -73,22 +74,24 @@ private fun ListAlertDialogPreview() {
         val list = remember {
             mutableStateListOf(
                 Pair("Удалить у меня", true),
-                Pair("Удалить у всех", false),
-                Pair("Удалить", false)
+                Pair("Удалить у всех", false)
             )
         }
-        GAlert(true, {}, header, Modifier.padding(40.dp),
-            cancel = Pair(stringResource(R.string.cancel_button)) {},
-            success = Pair(stringResource(R.string.confirm_button)) {},
-            list = list, listItemSelect = { active ->
-                repeat(list.size) {
-                    if(it == active) list[it] = Pair(list[it].first, true)
-                    else list[it] = Pair(list[it].first, false)
-                }
-            })
+        Box(Modifier.fillMaxSize()) {
+            GAlert(true, {}, header, Modifier.padding(10.dp),
+                cancel = Pair(stringResource(R.string.cancel_button)) {},
+                success = Pair(stringResource(R.string.confirm_button)) {},
+                list = list, listItemSelect = { active ->
+                    repeat(list.size) {
+                        if(it == active) list[it] = Pair(list[it].first, true)
+                        else list[it] = Pair(list[it].first, false)
+                    }
+                })
+        }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GAlert(
     show: Boolean,
@@ -103,59 +106,59 @@ fun GAlert(
     accentColors: Color = colorScheme.primary,
     content: (@Composable () -> Unit)? = null,
 ) {
-    if(show) {
-        AlertDialog(
-            onDismissRequest ?: {},
-            confirmButton = {
+    if(show) AlertDialog(
+        onDismissRequest ?: {},
+        confirmButton = {
+            Text(
+                success.first, Modifier
+                    .clickable(
+                        MutableInteractionSource(), (null)
+                    ) { success.second() },
+                accentColors,
+                style = typography.labelSmall,
+                fontWeight = SemiBold
+            )
+        }, modifier,
+        dismissButton = {
+            cancel?.let {
                 Text(
-                    success.first, Modifier
+                    it.first,
+                    Modifier
+                        .padding(end = 16.dp)
                         .clickable(
                             MutableInteractionSource(), (null)
-                        ) { success.second() },
+                        ) { it.second() },
                     accentColors,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
-            }, modifier,
-            dismissButton = {
-                cancel?.let {
+            }
+        }, (null), {
+            title?.let {
+                Text(
+                    it, Modifier,
+                    colorScheme.tertiary,
+                    style = typography.displayLarge,
+                    fontWeight = SemiBold
+                )
+            }
+        }, {
+            Column {
+                label?.let {
                     Text(
-                        it.first,
-                        Modifier
-                            .padding(end = 16.dp)
-                            .clickable(
-                                MutableInteractionSource(), (null)
-                            ) { it.second() },
-                        accentColors,
+                        it, Modifier.padding(bottom = 16.dp),
+                        colorScheme.tertiary,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
+                }; content?.invoke()
+                list?.let {
+                    List(list)
+                    { listItemSelect?.let { s -> s(it) } }
                 }
-            }, (null), {
-                title?.let {
-                    Text(
-                        it, Modifier,
-                        colorScheme.tertiary,
-                        style = typography.displayLarge,
-                        fontWeight = SemiBold
-                    )
-                }
-            }, {
-                Column {
-                    label?.let {
-                        Text(
-                            it, Modifier.padding(bottom = 16.dp),
-                            colorScheme.tertiary,
-                            style = typography.labelSmall,
-                            fontWeight = SemiBold
-                        )
-                    }; content?.invoke()
-                    list?.let { List(list) { listItemSelect?.let { s -> s(it) } } }
-                }
-            },
-            containerColor = colorScheme.primaryContainer
-        )
-    }
+            }
+        }, containerColor = colorScheme.primaryContainer
+    )
 }
 
 @Composable
@@ -179,7 +182,7 @@ private fun ListItem(
     select: ((Int) -> Unit)? = null
 ) {
     Row(
-        Modifier.padding(vertical = 16.dp),
+        Modifier.padding(horizontal = 16.dp),
         Start, CenterVertically
     ) {
         CheckBox(

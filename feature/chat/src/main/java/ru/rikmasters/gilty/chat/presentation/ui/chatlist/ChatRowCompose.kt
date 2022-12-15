@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,12 +15,13 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -35,17 +37,20 @@ import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodNa
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import java.util.Locale
 
 @Preview
 @Composable
 private fun ChatRowLastPreview() {
     GiltyTheme {
-        ChatRowContent(
-            Modifier.padding(16.dp),
+        SwipeableChatRow(
+            DragRowState(100f),
             getChatWithData(dateTime = "2022-11-28T20:00:54.140Z"),
             shapes.medium,
+            Modifier.padding(16.dp),
         )
     }
 }
@@ -54,13 +59,14 @@ private fun ChatRowLastPreview() {
 @Composable
 private fun ChatRowActualPreview() {
     GiltyTheme {
-        ChatRowContent(
-            Modifier.padding(16.dp),
+        SwipeableChatRow(
+            DragRowState(100f),
             getChatWithData(
                 dateTime = TOMORROW,
                 hasUnread = true
             ),
             shapes.medium,
+            Modifier.padding(16.dp),
         )
     }
 }
@@ -69,13 +75,14 @@ private fun ChatRowActualPreview() {
 @Composable
 private fun ChatRowTodayPreview() {
     GiltyTheme {
-        ChatRowContent(
-            Modifier.padding(16.dp),
+        SwipeableChatRow(
+            DragRowState(100f),
             getChatWithData(
                 dateTime = NOW_DATE,
                 hasUnread = true
             ),
             shapes.medium,
+            Modifier.padding(16.dp),
         )
     }
 }
@@ -84,20 +91,47 @@ private fun ChatRowTodayPreview() {
 @Composable
 private fun ChatRowOnlinePreview() {
     GiltyTheme {
-        ChatRowContent(
-            Modifier.padding(16.dp),
+        SwipeableChatRow(
+            DragRowState(100f),
             getChatWithData(
                 dateTime = NOW_DATE,
                 isOnline = true
             ),
             shapes.medium,
+            Modifier.padding(16.dp),
         )
     }
 }
 
 @Composable
+fun SwipeableChatRow(
+    state: DragRowState,
+    chat: ChatModel,
+    shape: Shape,
+    modifier: Modifier = Modifier,
+    onClick: ((ChatModel) -> Unit)? = null,
+    onSwiped: ((ChatModel) -> Unit)? = null,
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .background(colorScheme.primary, shape)
+    ) {
+        SwipeableRowBack(Modifier.align(CenterEnd))
+        Row(
+            Modifier.swipeableRow(state)
+            { onSwiped?.let { it(chat) } },
+            Arrangement.Center, CenterVertically
+        ) {
+            ChatRowContent(Modifier, chat, shape)
+            { onClick?.let { it(chat) } }
+        }
+    }
+}
+
+@Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ChatRowContent(
+private fun ChatRowContent(
     modifier: Modifier = Modifier,
     chat: ChatModel,
     shape: Shape,
@@ -124,6 +158,7 @@ fun ChatRowContent(
                         "${date.day()} ${
                             Month.of(date.month())
                                 .displayRodName()
+                                .lowercase(Locale.getDefault())
                         }", Modifier
                             .align(TopEnd)
                             .padding(top = 14.dp, end = 12.dp),
@@ -170,13 +205,13 @@ private fun Timer(
                     colorScheme.secondary,
                     colorScheme.secondary,
                 ) else red()
-            ), shapes.extraSmall
+            ), RoundedCornerShape(6.dp)
         )
     ) {
         Text(
             time.timeClock(),
-            Modifier.padding(12.dp, 6.dp),
-            Color.White, style = typography.labelSmall
+            Modifier.padding(12.dp, 4.dp),
+            White, style = typography.labelSmall
         )
     }
 }

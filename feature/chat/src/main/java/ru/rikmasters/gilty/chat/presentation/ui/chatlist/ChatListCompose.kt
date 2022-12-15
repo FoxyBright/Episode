@@ -16,15 +16,19 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState
+import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.ChatDeleteAlert
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
+import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatListModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
@@ -44,7 +48,8 @@ private fun ChatListPreview() {
                     NavIconState.INACTIVE,
                     NavIconState.INACTIVE,
                     NavIconState.ACTIVE
-                ), getSortedChats(DemoChatListModel), (true)
+                ), getSortedChats(DemoChatListModel), (true),
+                (false), LIST, listOf()
             ), Modifier.background(colorScheme.background)
         )
     }
@@ -55,14 +60,21 @@ data class ChatListState(
     val chats: Pair<
             List<Pair<String, List<ChatModel>>>,
             List<ChatModel>>,
-    val endedState: Boolean
+    val endedState: Boolean,
+    val alertActive: Boolean,
+    val alertState: AlertState,
+    val alertList: List<Pair<String, Boolean>>
 )
 
 interface ChatListCallback {
     
     fun onNavBarSelect(point: Int) {}
     fun onChatClick(chat: ChatModel) {}
+    fun onChatSwipe(chat: ChatModel) {}
     fun onEndedClick() {}
+    fun onAlertSuccess() {}
+    fun onAlertDismiss() {}
+    fun listAlertSelect(index: Int) {}
 }
 
 @Composable
@@ -101,7 +113,8 @@ fun ChatListContent(
                                 bottom = 18.dp
                             )
                         )
-                        list(it.second) {
+                        list(it.second,
+                            { callback?.onChatSwipe(it) }) {
                             callback?.onChatClick(it)
                         }
                     }
@@ -115,9 +128,9 @@ fun ChatListContent(
                             end = 16.dp
                         ), state.endedState
                     ) { callback?.onEndedClick() }
-                    if(state.endedState)
-                        list(state.chats.second)
-                        { callback?.onChatClick(it) }
+                    if(state.endedState) list(state.chats.second,
+                        { callback?.onChatSwipe(it) })
+                    { callback?.onChatClick(it) }
                 }
             }
         }
@@ -125,21 +138,32 @@ fun ChatListContent(
     Box(Modifier.fillMaxSize()) {
         NavBar(
             state.stateList, Modifier
-                .align(Alignment.BottomCenter)
+                .align(BottomCenter)
         ) { callback?.onNavBarSelect(it) }
     }
+    ChatDeleteAlert(
+        state.alertActive,
+        state.alertState, state.alertList,
+        { callback?.listAlertSelect(it) },
+        { callback?.onAlertDismiss() },
+        { callback?.onAlertSuccess() })
 }
 
 @Composable
 private fun list(
     list: List<ChatModel>,
-    onClick: (ChatModel) -> Unit
+    onClick: (ChatModel) -> Unit,
+    onSwipe: (ChatModel) -> Unit
 ) {
-    list.forEachIndexed { index, it ->
-        ChatRowContent(
-            Modifier, it, LazyItemsShapes(
+    list.map {
+        it to rememberDragRowState()
+    }.forEachIndexed { index, it ->
+        SwipeableChatRow(
+            it.second, it.first,
+            LazyItemsShapes(
                 index, list.size
-            )
+            ),
+            Modifier, { onSwipe(it) }
         ) { onClick(it) }
     }
 }

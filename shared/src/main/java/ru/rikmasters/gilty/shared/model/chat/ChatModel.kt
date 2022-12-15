@@ -51,9 +51,9 @@ fun getChatWithData(
 )
 
 val DemoChatListModel = listOf(
-    getChatWithData(dateTime = NOW_DATE, isOnline = true, hasUnread = true),
-    getChatWithData(dateTime = TOMORROW),
-    getChatWithData(dateTime = TOMORROW, hasUnread = true),
-    getChatWithData(dateTime = YESTERDAY, isOnline = true),
-    getChatWithData(dateTime = YESTERDAY)
+    getChatWithData(id = "1", dateTime = NOW_DATE, isOnline = true, hasUnread = true),
+    getChatWithData(id = "2", dateTime = TOMORROW),
+    getChatWithData(id = "3", dateTime = TOMORROW, hasUnread = true),
+    getChatWithData(id = "4", dateTime = YESTERDAY, isOnline = true),
+    getChatWithData(id = "5", dateTime = YESTERDAY)
 )

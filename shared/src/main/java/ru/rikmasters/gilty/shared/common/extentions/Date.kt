@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import android.util.Log
-
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -56,7 +54,6 @@ fun replacer(it: String, end: String): String {
 }
 
 fun todayControl(date: String): Boolean {
-    Log.d("DTCONTROL", "${date.format(FORMAT)} ----> ${LOCAL_DATE.format(FORMAT)}")
     return date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
 }
 
