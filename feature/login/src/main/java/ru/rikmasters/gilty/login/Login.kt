@@ -27,6 +27,10 @@ object Login: FeatureDefinition() {
             if(userLogged) MainScreen() else LoginScreen()
         }
         
+        screen("login"){
+            LoginScreen() //TODO для выхода на экран авторизации. Позже убрать
+        }
+        
         nested("registration", "code") {
             
             screen(

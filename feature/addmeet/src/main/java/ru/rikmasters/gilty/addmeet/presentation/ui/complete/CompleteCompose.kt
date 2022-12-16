@@ -60,7 +60,11 @@ fun CompleteContent(
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        ActionBar("Meet создан")
+        ActionBar(
+            "Meet создан",
+            modifier = Modifier
+                .padding(top = 60.dp)
+        )
         PhoneContent(
             Modifier
                 .fillMaxWidth()
@@ -68,11 +72,11 @@ fun CompleteContent(
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
         ) { MeetingCard(meeting, Modifier, MEETING.isOnline) }
-        Box(Modifier.fillMaxSize()) {
-            Buttons(
-                Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
-                { callback?.onShare() }) { callback?.onClose() }
-        }
+    }
+    Box(Modifier.fillMaxSize()) {
+        Buttons(
+            Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
+            { callback?.onShare() }) { callback?.onClose() }
     }
 }
 

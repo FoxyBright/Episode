@@ -183,7 +183,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     "Алерт будет позже",
                     Toast.LENGTH_SHORT
                 ).show()
-                nav.navigateAbsolute("authorization")
+                nav.navigateAbsolute("login")
             }
 
             override fun onDelete() {

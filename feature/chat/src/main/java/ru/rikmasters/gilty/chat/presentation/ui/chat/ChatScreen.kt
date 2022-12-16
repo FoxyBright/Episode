@@ -1,16 +1,17 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.widget.Toast
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.MeetBottomSheet
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MeetingClick
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
@@ -50,6 +51,8 @@ fun ChatScreen(nav: NavState = get()) {
         mutableStateOf<MessageModel?>(null)
     }
     
+    val listState = rememberLazyListState()
+    
     val context = LocalContext.current
     ChatContent(
         ChatState(
@@ -57,7 +60,8 @@ fun ChatScreen(nav: NavState = get()) {
                 meet.title, DemoAvatarModel, 2
             ), answer, meet, messageText,
             messageList, sender, alert,
-            meetOutAlert, kebabMenuState, messageMenuState
+            meetOutAlert, kebabMenuState,
+            messageMenuState, listState
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
@@ -119,6 +123,12 @@ fun ChatScreen(nav: NavState = get()) {
                         answer = answer
                     )
                 )
+                messageText = ""
+                scope.launch {
+                    listState.animateScrollToItem(
+                        messageList.lastIndex
+                    )
+                }
             }
             
             override fun onCancelAnswer() {
@@ -132,7 +142,7 @@ fun ChatScreen(nav: NavState = get()) {
             override fun onAvatarClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        MeetingClick(
+                        MeetBottomSheet(
                             menuState, { menuState = it },
                             {
                                 scope.launch {
@@ -147,9 +157,8 @@ fun ChatScreen(nav: NavState = get()) {
                                 }
                             }, meet, DemoMemberModelList,
                             {
-                                nav.navigateAbsolute(
-                                    "main/reaction?avatar=${meet.organizer.avatar.id}"
-                                ); scope.launch { asm.bottomSheetState.collapse() }
+                                scope.launch { asm.bottomSheetState.collapse() }
+                                meetOutAlert = true
                             }
                         )
                     }

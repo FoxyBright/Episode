@@ -2,8 +2,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -31,7 +30,8 @@ data class ChatState(
     val alert: Boolean,
     val meetAlert: Boolean,
     val kebabMenuState: Boolean,
-    val messageMenuState: Boolean
+    val messageMenuState: Boolean,
+    val listState: LazyListState
 )
 
 interface ChatCallback:
@@ -92,7 +92,7 @@ fun ChatContent(
                 .padding(it)
                 .fillMaxSize()
         ) {
-            LazyColumn(Modifier.align(BottomCenter)) {
+            LazyColumn(Modifier.align(BottomCenter), state.listState) {
                 items(state.messageList) { mes ->
                     Message(
                         mes, (state.sender == mes.sender), mes.answer

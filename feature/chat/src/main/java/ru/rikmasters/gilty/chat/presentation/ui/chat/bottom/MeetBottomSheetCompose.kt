@@ -1,13 +1,13 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
+package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -17,215 +17,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
-import ru.rikmasters.gilty.shared.common.*
+import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
+import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarState
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-
-@Preview
-@Composable
-fun MainContentPreview() {
-    GiltyTheme {
-        MainContent(
-            MainContentState(
-                (true), Pair(true, false),
-                DemoMeetingList, listOf(),
-                listOf(
-                    INACTIVE, ACTIVE,
-                    INACTIVE, NEW, INACTIVE
-                ), (false)
-            )
-        )
-    }
-}
-
-interface MainContentCallback {
-    
-    fun onTodayChange() {}
-    fun onTimeFilterClick() {}
-    fun onStyleChange() {}
-    fun onRespond(meet: FullMeetingModel) {}
-    fun onMeetClick(meet: FullMeetingModel) {}
-    fun onNavBarSelect(point: Int) {}
-    fun openFiltersBottomSheet() {}
-    fun interesting(state: SwipeableCardState) {}
-    fun notInteresting(state: SwipeableCardState) {}
-    fun closeAlert()
-}
-
-data class MainContentState(
-    val grid: Boolean,
-    val switcher: Pair<Boolean, Boolean>,
-    val meetings: List<FullMeetingModel>,
-    val cardStates: List<Pair<FullMeetingModel, SwipeableCardState>>,
-    val navBarStates: List<NavIconState>,
-    val alert: Boolean,
-)
-
-@Composable
-fun MainContent(
-    state: MainContentState,
-    modifier: Modifier = Modifier,
-    callback: MainContentCallback? = null,
-) {
-    Column(
-        Modifier
-            .background(colorScheme.background)
-            .fillMaxWidth()
-            .fillMaxHeight()
-    ) {
-        Row(
-            modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp, bottom = 10.dp),
-            Arrangement.SpaceBetween
-        ) {
-            Row(
-                Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                GiltyString(
-                    Modifier.padding(end = 12.dp),
-                    stringResource(R.string.meeting_profile_bottom_today_label),
-                    state.switcher.first
-                ) { callback?.onTodayChange() }
-                GiltyString(
-                    Modifier,
-                    stringResource(R.string.meeting_profile_bottom_latest_label),
-                    state.switcher.second
-                ) { callback?.onTodayChange() }
-            }
-            IconButton({ callback?.onTimeFilterClick() }) {
-                Icon(
-                    if(state.switcher.first)
-                        painterResource(R.drawable.ic_clock)
-                    else painterResource(R.drawable.ic_calendar),
-                    null,
-                    Modifier.size(30.dp),
-                    colorScheme.tertiary
-                )
-            }
-        }
-        if(state.grid)
-            MeetingGridContent(
-                Modifier
-                    .padding(16.dp)
-                    .fillMaxHeight(0.90f),
-                state.meetings
-            ) { callback?.onRespond(it) }
-        else {
-            MeetingsListContent(
-                state.cardStates,
-                Modifier.fillMaxHeight(0.84f),
-                { callback?.notInteresting(it) },
-                { meet, it ->
-                    callback?.onRespond(meet)
-                    callback?.interesting(it)
-                }
-            ) { callback?.onMeetClick(it) }
-        }
-    }
-    Box(Modifier.fillMaxSize()) {
-        NavBar(
-            state.navBarStates,
-            Modifier.align(Alignment.BottomCenter)
-        ) { callback?.onNavBarSelect(it) }
-        DividerBold(
-            Modifier
-                .padding(horizontal = 180.dp)
-                .padding(bottom = 92.dp)
-                .clip(CircleShape)
-                .align(Alignment.BottomCenter)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures { _, _ ->
-                        callback?.openFiltersBottomSheet()
-                    }
-                }
-                .clickable { callback?.openFiltersBottomSheet() }
-        )
-        SquareCheckBox(
-            !state.grid,
-            Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 92.dp)
-        ) { callback?.onStyleChange() }
-    }
-    GAlert(
-        state.alert, { callback?.closeAlert() },
-        "Отлично, ваша жалоба отправлена!",
-        label = "Модераторы скоро рассмотрят\nвашу жалобу",
-        success = Pair("Закрыть") { callback?.closeAlert() }
-    )
-}
-
-@Preview
-@Composable
-fun MeetingPreview() {
-    GiltyTheme {
-        MeetingSwipe(
-            (false), (null), (null),
-            DemoFullMeetingModel,
-            (true), ("")
-        )
-    }
-}
-
-@Composable
-fun MeetingSwipe(
-    menuState: Boolean,
-    menuCollapse: ((Boolean) -> Unit)? = null,
-    menuItemClick: ((Int) -> Unit)? = null,
-    meet: FullMeetingModel,
-    hiddenPhoto: Boolean,
-    commentText: String,
-    callback: MeetingDetailsBottomCallback? = null
-) {
-    Column(
-        Modifier
-            .background(colorScheme.background)
-            .padding(16.dp)
-            .padding(bottom = 40.dp)
-    ) {
-        MeetingBottomSheetTopBarCompose(
-            Modifier, MeetingBottomSheetTopBarState(
-                meet, meet.duration, menuState
-            ), { menuCollapse?.let { c -> c(it) } },
-            { menuItemClick?.let { c -> c(it) } }
-        )
-        MeetingDetailsBottomCompose(
-            Modifier.padding(top = 30.dp),
-            MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
-            callback
-        )
-    }
-}
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.shared.BrieflyRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeetingClick(
+fun MeetBottomSheet(
+    // TODO - пока дублируется позже вынести в shared
     menuState: Boolean,
     menuCollapse: ((Boolean) -> Unit)? = null,
     menuItemClick: ((Int) -> Unit)? = null,
     meet: FullMeetingModel,
     membersList: List<MemberModel>,
-    onRespond: (() -> Unit)? = null,
+    onExit: (() -> Unit)? = null,
 ) {
     LazyColumn(
         Modifier
@@ -271,7 +86,7 @@ fun MeetingClick(
                     colorScheme.tertiary,
                     style = typography.bodyMedium
                 )
-                androidx.compose.material3.Divider(Modifier.padding(start = 16.dp))
+                Divider(Modifier.padding(start = 16.dp))
                 val condition = meet.condition
                 Row(
                     Modifier.fillMaxWidth(),
@@ -297,8 +112,10 @@ fun MeetingClick(
                                 ConditionType.MEMBER_PAY -> stringResource(R.string.condition_member_pay)
                                 ConditionType.NO_MATTER -> stringResource(R.string.condition_no_matter)
                                 ConditionType.ORGANIZER_PAY -> stringResource(R.string.condition_organizer_pay)
-                            }, Modifier,
-                            colorScheme.tertiary, style = typography.bodyMedium
+                            },
+                            Modifier,
+                            colorScheme.tertiary,
+                            style = typography.bodyMedium
                         )
                     }
                     if(condition == ConditionType.MEMBER_PAY) Text(
@@ -312,8 +129,8 @@ fun MeetingClick(
         item {
             Row(Modifier.padding(top = 28.dp)) {
                 Text(
-                    stringResource(R.string.meeting_members),
-                    Modifier, colorScheme.tertiary,
+                    stringResource(R.string.meeting_members), Modifier,
+                    colorScheme.tertiary,
                     style = typography.labelLarge
                 )
                 Text(
@@ -324,7 +141,7 @@ fun MeetingClick(
                 )
                 Image(
                     painterResource(
-                        if(meet.isPrivate) ic_lock_close
+                        if(meet.isPrivate) R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
                     ), (null), Modifier.padding(start = 8.dp),
                     colorFilter = tint(colorScheme.tertiary)
@@ -352,15 +169,13 @@ fun MeetingClick(
                                 modifier = Modifier.padding(12.dp, 8.dp)
                             )
                             Icon(
-                                Filled.KeyboardArrowRight,
+                                Icons.Filled.KeyboardArrowRight,
                                 null,
                                 Modifier.padding(end = 16.dp),
                                 colorScheme.tertiary
                             )
                         }
-                        if(membersList.size <= 3
-                            && index + 1 < membersList.size
-                        ) {
+                        if(membersList.size <= 3 && index + 1 < membersList.size) {
                             Divider(Modifier.padding(start = 60.dp))
                         } else if(index + 1 < 3) Divider(
                             Modifier.padding(
@@ -430,10 +245,17 @@ fun MeetingClick(
             }
         }
         item {
-            GradientButton(
-                Modifier.padding(top = 20.dp, bottom = 12.dp),
-                stringResource(R.string.meeting_respond)
-            ) { onRespond?.let { it() } }
+            Text(
+                stringResource(R.string.exit_from_meet),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 28.dp, bottom = 32.dp)
+                    .clickable(
+                        MutableInteractionSource(), (null)
+                    ) { onExit?.let { it() } },
+                colorScheme.primary, textAlign = TextAlign.Center,
+                style = typography.bodyLarge
+            )
         }
     }
 }
