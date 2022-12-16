@@ -1,13 +1,12 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
@@ -17,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
 import ru.rikmasters.gilty.complaints.presentation.ui.MeetOutAlert
-import ru.rikmasters.gilty.shared.R.string.exit_from_meet
-import ru.rikmasters.gilty.shared.R.string.meeting_complain
+import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GDropMenu
@@ -32,7 +30,8 @@ data class ChatState(
     val sender: MemberModel,
     val alert: Boolean,
     val meetAlert: Boolean,
-    val kebabMenuState: Boolean
+    val kebabMenuState: Boolean,
+    val messageMenuState: Boolean
 )
 
 interface ChatCallback:
@@ -43,6 +42,9 @@ interface ChatCallback:
     fun onMenuItemClick(point: Int) {}
     fun onMeetOut() {}
     fun onMeetOutAlertDismiss() {}
+    fun onMessageLongClick(message: MessageModel) {}
+    fun onMessageMenuItemSelect(point: Int) {}
+    fun onMessageMenuDismiss() {}
 }
 
 @Composable
@@ -50,7 +52,7 @@ interface ChatCallback:
 fun ChatContent(
     state: ChatState,
     modifier: Modifier = Modifier,
-    callback: ChatCallback? = null
+    callback: ChatCallback? = null,
 ) {
     ComplainAlert(
         state.alert,
@@ -60,7 +62,7 @@ fun ChatContent(
         state.meetAlert,
         { callback?.onMeetOut() })
     { callback?.onMeetOutAlertDismiss() }
-    Box(modifier) {
+    Box(Modifier) {
         GDropMenu(
             state.kebabMenuState,
             { callback?.onKebabClick() },
@@ -73,14 +75,12 @@ fun ChatContent(
         )
     }
     Scaffold(
-        modifier,
-        {
+        modifier, {
             ChatAppBarContent(
                 state.topState, Modifier,
                 callback
             )
-        },
-        {
+        }, {
             MessengerBar(
                 state.messageText, Modifier,
                 state.answer, callback
@@ -95,11 +95,49 @@ fun ChatContent(
             LazyColumn(Modifier.align(BottomCenter)) {
                 items(state.messageList) { mes ->
                     Message(
-                        mes, (state.sender == mes.sender), state.answer
-                    )
+                        mes, (state.sender == mes.sender), mes.answer
+                    ) { message -> callback?.onMessageLongClick(message) }
                 }
                 item { Divider(Modifier, 10.dp, Color.Transparent) }
+                item {
+                    MessageMenu(state.messageMenuState, {
+                        callback?.onMessageMenuDismiss()
+                    }, Modifier.fillMaxWidth())
+                    { point -> callback?.onMessageMenuItemSelect(point) }
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun MessageMenu(
+    state: Boolean,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit
+) {
+    Box(modifier) {
+        DropdownMenu(
+            state, onDismiss,
+            Modifier.background(
+                colorScheme.primaryContainer
+            )
+        ) {
+            DropdownMenuItem({
+                Text(
+                    stringResource(answer_button),
+                    color = colorScheme.tertiary,
+                    style = typography.bodyMedium
+                )
+            }, { onClick(0) })
+            DropdownMenuItem({
+                Text(
+                    stringResource(meeting_filter_delete_tag_label),
+                    color = colorScheme.primary,
+                    style = typography.bodyMedium
+                )
+            }, { onClick(1) })
         }
     }
 }

@@ -26,6 +26,14 @@ val DemoMemberModel = MemberModel(
     age = 23
 )
 
+val DemoMemberModelTwo = MemberModel(
+    id = "2",
+    username = "gosha",
+    emoji = DemoEmojiModel,
+    avatar = DemoAvatarModel,
+    age = 26
+)
+
 val DemoMemberModelList = listOf(
     DemoMemberModel,
     DemoMemberModel,

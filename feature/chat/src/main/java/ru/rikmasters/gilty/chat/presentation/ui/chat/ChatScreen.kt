@@ -43,6 +43,13 @@ fun ChatScreen(nav: NavState = get()) {
     remember { mutableStateOf(false) }
     var kebabMenuState by
     remember { mutableStateOf(false) }
+    var messageMenuState by
+    remember { mutableStateOf(false) }
+    
+    var selectMessage by remember {
+        mutableStateOf<MessageModel?>(null)
+    }
+    
     val context = LocalContext.current
     ChatContent(
         ChatState(
@@ -50,10 +57,27 @@ fun ChatScreen(nav: NavState = get()) {
                 meet.title, DemoAvatarModel, 2
             ), answer, meet, messageText,
             messageList, sender, alert,
-            meetOutAlert, kebabMenuState
+            meetOutAlert, kebabMenuState, messageMenuState
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
+            }
+            
+            override fun onMessageLongClick(message: MessageModel) {
+                selectMessage = message
+                messageMenuState = true
+            }
+            
+            override fun onMessageMenuDismiss() {
+                messageMenuState = false
+            }
+            
+            override fun onMessageMenuItemSelect(point: Int) {
+                when(point) {
+                    0 -> answer = selectMessage
+                    1 -> messageList.remove(selectMessage)
+                }
+                messageMenuState = false
             }
             
             override fun textChange(text: String) {
@@ -88,10 +112,11 @@ fun ChatScreen(nav: NavState = get()) {
                         sender = DemoMemberModel,
                         album = "Бэтмен",
                         text = messageText,
-                        attachments = answer?.attachments,
+                        attachments = null,
                         isRead = false,
                         isDelivered = true,
                         createdAt = "2022-10-17T08:35:54.140Z",
+                        answer = answer
                     )
                 )
             }

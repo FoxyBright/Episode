@@ -257,6 +257,7 @@
     <string name="exit_button">Выйти</string>
     <string name="out_button">Покинуть</string>
     <string name="cancel">Отмена</string>
+    <string name="answer_button">Ответить</string>
     <string name="exit_from_meet">Покинуть встречу</string>
     <string name="exit_from_meet_label">Чат и отображение встречи в истории пропадут</string>
     <string name="chat_send_complaint">Жалоба отправлена</string>

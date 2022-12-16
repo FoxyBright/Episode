@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
@@ -14,11 +15,11 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign.Companion.Left
@@ -43,9 +44,10 @@ private fun MyMessage() {
 @Composable
 private fun MyMessageWithAttach() {
     GiltyTheme {
+        val message = DemoMessageModel
         Message(
-            DemoMessageModel, (true),
-            DemoImageMessage
+            message, (true),
+            message.answer
         )
     }
 }
@@ -81,8 +83,10 @@ private fun MessageAnswer() {
 
 @Composable
 fun Message(
-    messageModel: MessageModel, sender: Boolean,
-    answer: MessageModel? = null
+    messageModel: MessageModel,
+    sender: Boolean,
+    answer: MessageModel? = null,
+    onLongPress: ((MessageModel) -> Unit)? = null
 ) {
     val back = MaterialTheme.colorScheme.primaryContainer
     val state = if(sender)
@@ -109,7 +113,18 @@ fun Message(
                         .clip(CircleShape), contentScale = Crop,
                     placeholder = painterResource(R.drawable.gb)
                 )
-                Content(state, messageModel, answer, Modifier.weight(1f))
+                Content(
+                    Modifier
+                        .weight(1f)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    onLongPress?.let { it(messageModel) }
+                                }
+                            )
+                        },
+                    state, messageModel, answer
+                )
             }
         }
     }
@@ -117,10 +132,10 @@ fun Message(
 
 @Composable
 private fun Content(
+    modifier: Modifier = Modifier,
     state: MessageState,
     messageModel: MessageModel,
-    answer: MessageModel?,
-    modifier: Modifier = Modifier
+    answer: MessageModel?
 ) {
     if(messageModel.attachments != null) ImageMessage(
         state, messageModel,
@@ -192,9 +207,9 @@ private fun Message(
                     Text(
                         messageModel.text,
                         Modifier
-                            .align(if(state.sender) End else Alignment.Start)
+                            .align(Alignment.Start)
                             .padding(
-                                end = if(state.sender) 50.dp else 30.dp
+                                end = if(state.sender) 50.dp else 36.dp
                             ), state.textColor,
                         textAlign = if(state.sender) Right else Left,
                         style = MaterialTheme.typography.bodyMedium

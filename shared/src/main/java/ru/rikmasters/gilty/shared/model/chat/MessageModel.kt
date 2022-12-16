@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.model.chat
 
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelTwo
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ImageModel
@@ -13,7 +14,8 @@ data class MessageModel(
     val attachments: ImageModel?,
     val isRead: Boolean,
     val isDelivered: Boolean,
-    val createdAt: String
+    val createdAt: String,
+    val answer: MessageModel?
 )
 
 val DemoMessageModel = MessageModel(
@@ -25,6 +27,7 @@ val DemoMessageModel = MessageModel(
     isRead = false,
     isDelivered = true,
     createdAt = "2022-10-17T08:35:54.140Z",
+    answer = null
 )
 
 val DemoImageMessage = MessageModel(
@@ -36,15 +39,17 @@ val DemoImageMessage = MessageModel(
     isRead = true,
     isDelivered = true,
     createdAt = "2022-10-17T08:35:54.140Z",
+    answer = DemoMessageModel
 )
 
 val DemoMessageModelLongMessage = MessageModel(
     id = "1",
-    sender = DemoMemberModel,
+    sender = DemoMemberModelTwo,
     album = "Бэтмен",
     text = "Как ты? Давно не виделись",
     attachments = null,
     isRead = true,
     isDelivered = true,
     createdAt = "2022-10-17T08:35:54.140Z",
+    answer = DemoImageMessage
 )
