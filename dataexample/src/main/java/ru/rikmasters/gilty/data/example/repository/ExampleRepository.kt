@@ -3,22 +3,19 @@ package ru.rikmasters.gilty.data.example.repository
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
-import ru.rikmasters.gilty.core.data.source.WebSource
-import ru.rikmasters.gilty.core.data.source.deleteAll
-import ru.rikmasters.gilty.core.data.source.findAll
+import ru.rikmasters.gilty.core.data.source.*
 import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.example.model.Door
 import ru.rikmasters.gilty.data.example.model.ResponseWrapper
 import ru.rikmasters.gilty.data.ktor.KtorSource
-import ru.rikmasters.gilty.data.realm.facade.RealmSourceFacade
 
 class ExampleRepository(
     
     override val webSource: KtorSource,
     
-    override val primarySource: RealmSourceFacade
+    override val primarySource: DbSource
     
-): OfflineFirstRepository<WebSource, RealmSourceFacade>(webSource, primarySource) {
+): OfflineFirstRepository<WebSource, DbSource>(webSource, primarySource) {
     
     fun doorsFlow() = primarySource.listenAll(Door::class)
     
