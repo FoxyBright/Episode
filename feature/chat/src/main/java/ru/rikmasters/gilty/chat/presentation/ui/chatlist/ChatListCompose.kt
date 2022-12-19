@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,11 +28,16 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.ChatDeleteAlert
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatListModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -43,13 +49,10 @@ private fun ChatListPreview() {
         ChatListContent(
             ChatListState(
                 listOf(
-                    NavIconState.INACTIVE,
-                    NavIconState.NEW,
-                    NavIconState.INACTIVE,
-                    NavIconState.INACTIVE,
-                    NavIconState.ACTIVE
-                ), getSortedChats(DemoChatListModel), (true),
-                (false), LIST, listOf()
+                    INACTIVE, NEW, INACTIVE,
+                    INACTIVE, ACTIVE
+                ), getSortedChats(DemoChatListModel),
+                (true), (false), LIST, listOf()
             ), Modifier.background(colorScheme.background)
         )
     }
@@ -155,16 +158,25 @@ private fun list(
     onClick: (ChatModel) -> Unit,
     onSwipe: (ChatModel) -> Unit
 ) {
-    list.map {
-        it to rememberDragRowState()
-    }.forEachIndexed { index, it ->
-        SwipeableChatRow(
-            it.second, it.first,
-            LazyItemsShapes(
-                index, list.size
-            ),
-            Modifier, { onSwipe(it) }
-        ) { onClick(it) }
+    Column(
+        Modifier.background(
+            colorScheme.primaryContainer,
+            shapes.medium
+        )
+    ) {
+        list.map {
+            it to rememberDragRowState()
+        }.forEachIndexed { index, it ->
+            SwipeableChatRow(
+                it.second, it.first,
+                LazyItemsShapes(
+                    index, list.size
+                ), index, //TODO <- Сюда кол-во непрочитанных
+                Modifier, { onSwipe(it) }
+            ) { onClick(it) }
+            if(index < list.size - 1)
+                Divider(Modifier.padding(start = 78.dp))
+        }
     }
 }
 
@@ -203,7 +215,7 @@ private fun EmptyChats(  //TODO Перерисовать нормальным о
 ) {
     Image(
         painterResource(
-            R.drawable.empty_chat_zaglushka
+            empty_chat_zaglushka
         ), (null), modifier.fillMaxSize()
     )
 }

@@ -137,7 +137,12 @@ private fun Answer(
                     .padding(horizontal = 20.dp)
                     .size(28.dp),
                 colorScheme.primary
-            ); answer?.let { AnswerContent(it, Modifier, (false)) }
+            ); answer?.let {
+            AnswerContent(
+                it, Modifier,
+                (false), (true)
+            )
+        }
         }
         IconButton(onCancel, Modifier.padding(6.dp)) {
             Icon(

@@ -1,17 +1,16 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatlist
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterEnd
@@ -22,7 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +37,7 @@ import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import java.util.Locale
 
 @Preview
@@ -47,7 +47,7 @@ private fun ChatRowLastPreview() {
         SwipeableChatRow(
             DragRowState(100f),
             getChatWithData(dateTime = "2022-11-28T20:00:54.140Z"),
-            shapes.medium,
+            shapes.medium, (123),
             Modifier.padding(16.dp),
         )
     }
@@ -63,7 +63,7 @@ private fun ChatRowActualPreview() {
                 dateTime = TOMORROW,
                 hasUnread = true
             ),
-            shapes.medium,
+            shapes.medium, (15152),
             Modifier.padding(16.dp),
         )
     }
@@ -79,7 +79,7 @@ private fun ChatRowTodayPreview() {
                 dateTime = NOW_DATE,
                 hasUnread = true
             ),
-            shapes.medium,
+            shapes.medium, (13151),
             Modifier.padding(16.dp),
         )
     }
@@ -95,7 +95,7 @@ private fun ChatRowOnlinePreview() {
                 dateTime = NOW_DATE,
                 isOnline = true
             ),
-            shapes.medium,
+            shapes.medium, (1241521),
             Modifier.padding(16.dp),
         )
     }
@@ -103,9 +103,8 @@ private fun ChatRowOnlinePreview() {
 
 @Composable
 fun SwipeableChatRow(
-    state: DragRowState,
-    chat: ChatModel,
-    shape: Shape,
+    state: DragRowState, chat: ChatModel,
+    shape: Shape, unRead: Int,
     modifier: Modifier = Modifier,
     onClick: ((ChatModel) -> Unit)? = null,
     onSwiped: ((ChatModel) -> Unit)? = null,
@@ -121,7 +120,7 @@ fun SwipeableChatRow(
             { onSwiped?.let { it(chat) } },
             Arrangement.Center, CenterVertically
         ) {
-            ChatRowContent(Modifier, chat, shape)
+            ChatRowContent(Modifier, chat, shape, unRead)
             { onClick?.let { it(chat) } }
         }
     }
@@ -133,6 +132,7 @@ private fun ChatRowContent(
     modifier: Modifier = Modifier,
     chat: ChatModel,
     shape: Shape,
+    unRead: Int,
     onClick: (() -> Unit)? = null
 ) {
     Card(
@@ -179,10 +179,7 @@ private fun ChatRowContent(
                     .padding(12.dp),
                 Start, CenterVertically
             ) {
-                Avatar(
-                    chat.organizer.avatar,
-                    chat.hasUnread, chat.isOnline
-                )
+                Avatar(chat.organizer.avatar, unRead)
                 Message(
                     chat.title, chat.organizer,
                     chat.lastMessage.text,
@@ -255,22 +252,10 @@ private fun Message(
 @Composable
 private fun Avatar(
     avatar: AvatarModel,
-    unRead: Boolean = true,
-    online: Boolean,
+    unRead: Int,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier, Start, CenterVertically) {
-        Box(
-            Modifier
-                .size(8.dp)
-                .background(
-                    if(unRead)
-                        if(online) colorScheme.secondary
-                        else colorScheme.primary
-                    else colorScheme.primaryContainer,
-                    CircleShape
-                )
-        )
+    Box(modifier) {
         AsyncImage(
             avatar.id,
             stringResource(R.string.meeting_avatar),
@@ -278,7 +263,47 @@ private fun Avatar(
                 .padding(start = 4.dp)
                 .size(52.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop
+            contentScale = Crop
         )
+        if(unRead > 0) Card(
+            Modifier
+                .align(BottomEnd)
+                .offset(6.dp, 6.dp), shapes.medium,
+            cardColors(colors.chipGray),
+            border = BorderStroke(
+                2.dp, colorScheme.primaryContainer
+            )
+        ) {
+            val stringUnRead = "$unRead"
+            Text(
+                counter(stringUnRead),
+                Modifier.padding(
+                    when(stringUnRead.length) {
+                        1 -> 12.dp
+                        2 -> 8.dp
+                        else -> 4.dp
+                    }, 4.dp
+                ), colorScheme.onTertiary,
+                style = typography.headlineSmall,
+                fontWeight = SemiBold
+            )
+        }
+    }
+}
+
+private fun counter(
+    count: String
+): String {
+    return when(val size = count.length) {
+        
+        in 0..3 -> count
+        
+        in 4..6 -> count.substring(0, size - 3) +
+                ",${count[4]}" + "k"
+        
+        in 7..9 -> count.substring(0, size - 6) +
+                ",${count[4]}" + "m"
+        
+        else -> ">999m"
     }
 }
