@@ -50,7 +50,7 @@ job("Сборка и публикация (внутренний тест)") {
             env["PUBLISH_VERSION_CODE"] = jbExecNumber
             env["PUBLISH_VERSION_NAME"] = "INTERNAL-$jbExecNumber"
             
-            api.gradlew("ciPublish")
+            api.gradlew("ciPublish") // Падает из-за окончание строки -> env: sh\r: No such file or directory
         }
     }
 }
