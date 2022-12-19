@@ -32,7 +32,8 @@ fun CodeScreen(nav: NavState = get()) {
         }
 
         override fun onBlur() {
-            blur.value = false
+            nav.navigate("profile")
+            /*blur.value = false*/
         }
 
         override fun onCodeSend() {
@@ -56,7 +57,7 @@ fun CodeScreen(nav: NavState = get()) {
                 }
             } else text = ""
             if (text.length == codeSize)
-                if (text == "1234") nav.navigate("profile")
+                if (text == "вфы") nav.navigate("profile")
                 else blur.value = true
         }
     })

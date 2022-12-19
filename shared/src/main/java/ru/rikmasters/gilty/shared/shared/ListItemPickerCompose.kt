@@ -57,7 +57,7 @@ fun <T> ListItemPicker(
     modifier: Modifier = Modifier,
     label: (T) -> String = { it.toString() },
     dividersColor: Color = MaterialTheme.colorScheme.outline,
-    textStyle: TextStyle = LocalTextStyle.current,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     onValueChange: (T) -> Unit,
 ) {
     val minimumAlpha = 0.3f
@@ -226,7 +226,7 @@ private fun Label(text: String, modifier: Modifier) {
             detectTapGestures(onLongPress = {
                 // FIXME: Empty to disable text selection
             })
-        },
+        }, color = MaterialTheme.colorScheme.tertiary,
         textAlign = TextAlign.Center,
     )
 }

@@ -1,9 +1,14 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import kotlinx.coroutines.runBlocking
 
 fun NavGraphBuilder.deepNavGraphBuilder(
     state: NavState,
@@ -17,10 +22,18 @@ fun DeepNavHost(
     route: String? = null,
     builder: DeepNavGraphBuilder.() -> Unit
 ) {
+    val internalEntrypoint = "internal_entrypoint"
     NavHost(
         state.navHostController,
-        state.startDestination,
+        internalEntrypoint,
         modifier,
         route
-    ) { deepNavGraphBuilder(state, builder) }
+    ) {
+        deepNavGraphBuilder(state, builder)
+        composable(internalEntrypoint) {
+            LaunchedEffect(Unit) {
+                state.navigateAbsolute(state.startDestination)
+            }
+        }
+    }
 }

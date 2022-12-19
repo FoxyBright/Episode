@@ -35,13 +35,13 @@ val baseTextStyle = TextStyle(
         "androidx.compose.material3.MaterialTheme"
     )
 )
-val Typography = Typography(
+val Typography = Typography(  //FONTS ШРИФТ - это для удобства поиска
     /*      SMALL TYPOGRAPHY      */
-    headlineSmall = baseTextStyle.copy(fontSize = 12.sp, fontWeight = Medium, lineHeight = 16.sp),
-    titleSmall = baseTextStyle.copy(fontSize = 10.sp, fontWeight = Medium, lineHeight = 10.sp),
-    labelSmall = baseTextStyle.copy(fontSize = 14.sp, fontWeight = Medium, lineHeight = 18.sp),
-    displaySmall = baseTextStyle.copy(),
     bodySmall = baseTextStyle.copy(),
+    displaySmall = baseTextStyle.copy(fontSize = 8.sp, fontWeight = Medium, lineHeight = 10.sp),
+    titleSmall = baseTextStyle.copy(fontSize = 10.sp, fontWeight = Medium, lineHeight = 12.sp),
+    headlineSmall = baseTextStyle.copy(fontSize = 12.sp, fontWeight = Medium, lineHeight = 16.sp),
+    labelSmall = baseTextStyle.copy(fontSize = 14.sp, fontWeight = Medium, lineHeight = 18.sp),
 
     /*      MEDIUM TYPOGRAPHY      */
     bodyMedium = baseTextStyle.copy(fontSize = 16.sp, fontWeight = Medium, lineHeight = 20.sp),
@@ -53,7 +53,7 @@ val Typography = Typography(
     /*      LARGE TYPOGRAPHY      */
     bodyLarge = baseTextStyle.copy(fontSize = 18.sp, fontWeight =  Bold, lineHeight = 22.sp),
     labelLarge = baseTextStyle.copy(fontSize = 20.sp, fontWeight = Bold, lineHeight = 20.sp),
+    headlineLarge = baseTextStyle.copy(fontSize = 22.sp, fontWeight = Bold, lineHeight = 22.sp),
     displayLarge = baseTextStyle.copy(fontSize = 24.sp, fontWeight =  Bold, lineHeight = 32.sp),
-    titleLarge = baseTextStyle.copy(fontSize = 28.sp, fontWeight = Bold, lineHeight = 32.sp),
-    headlineLarge = baseTextStyle.copy(fontSize = 22.sp, fontWeight = Bold, lineHeight = 22.sp)
+    titleLarge = baseTextStyle.copy(fontSize = 28.sp, fontWeight = Bold, lineHeight = 32.sp)
 )

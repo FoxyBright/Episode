@@ -17,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,11 +33,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
+import ru.rikmasters.gilty.shared.shared.GDropMenu
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -46,19 +51,32 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 private fun MeetingBottomSheetTopBarComposePreview() {
     GiltyTheme {
         MeetingBottomSheetTopBarCompose(
-            Modifier,
-            DemoFullMeetingModel,
-            ("2 часа"), (true)
+            Modifier, MeetingBottomSheetTopBarState(
+                DemoFullMeetingModel,
+                ("2 часа"), (true),
+                respondsCount = 3,
+                lastRespond = DemoSendRespondsModel
+            )
         )
     }
 }
 
+data class MeetingBottomSheetTopBarState(
+    val meetingModel: FullMeetingModel,
+    val eventDuration: String,
+    val menuState: Boolean = false,
+    val private: Boolean = false,
+    val respondsCount: Int? = null,
+    val lastRespond: RespondModel? = null,
+)
+
 @Composable
 fun MeetingBottomSheetTopBarCompose(
     modifier: Modifier = Modifier,
-    meetingModel: FullMeetingModel,
-    eventDuration: String,
-    private: Boolean = false
+    state: MeetingBottomSheetTopBarState,
+    menuCollapse: ((Boolean) -> Unit)? = null,
+    menuItemClick: ((Int) -> Unit)? = null,
+    onRespondsClick: (() -> Unit)? = null,
 ) {
     Column(modifier) {
         Row(
@@ -66,21 +84,33 @@ fun MeetingBottomSheetTopBarCompose(
             Arrangement.SpaceBetween,
         ) {
             Text(
-                meetingModel.title,
-                color = MaterialTheme.colorScheme.tertiary,
+                state.meetingModel.title,
+                color = colorScheme.tertiary,
                 style = MaterialTheme.typography.titleLarge
             )
-            IconButton({ /* TODO Здесь должен быть PopUp */ }) {
+            GDropMenu(
+                state.menuState,
+                { menuCollapse?.let { it(false) } },
+                menuItem = listOf(Pair(stringResource(R.string.meeting_complain))
+                { menuItemClick?.let { it(0) } })
+            )
+            IconButton({ menuCollapse?.let { it(true) } }) {
                 Icon(
-                    painterResource(R.drawable.ic_kebab),
-                    null,
-                    tint = MaterialTheme.colorScheme.outlineVariant
+                    painterResource(ic_kebab), (null),
+                    Modifier, colorScheme.outlineVariant
                 )
             }
         }
+        if(state.respondsCount != null
+            && state.lastRespond != null
+        ) Responds(
+            state.respondsCount,
+            state.lastRespond.sender.avatar,
+            stringResource(R.string.profile_responds_label)
+        ) { onRespondsClick?.let { it() } }
         Row(Modifier.padding(top = 12.dp)) {
             AsyncImage(
-                meetingModel.organizer.avatar.id,
+                state.meetingModel.organizer.avatar.id,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .weight(1f)
@@ -94,18 +124,18 @@ fun MeetingBottomSheetTopBarCompose(
                 Modifier
                     .weight(1f)
                     .size(180.dp),
-                eventDuration
+                state.eventDuration
             )
         }
         Row(verticalAlignment = CenterVertically) {
             BrieflyRow(
-                text = "${meetingModel.organizer.username}, " +
-                        "${meetingModel.organizer.age}",
-                emoji = meetingModel.organizer.emoji
+                text = "${state.meetingModel.organizer.username}, " +
+                        "${state.meetingModel.organizer.age}",
+                emoji = state.meetingModel.organizer.emoji
             )
-            if (private) Text(
+            if(state.private) Text(
                 stringResource(R.string.meeting_anon_type), Modifier,
-                MaterialTheme.colorScheme.onTertiary,
+                colorScheme.onTertiary,
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -119,7 +149,7 @@ private fun Meet(
 ) {
     Card(
         modifier, ThemeExtra.shapes.cardShape,
-        CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+        CardDefaults.cardColors(colorScheme.primaryContainer)
     ) {
         Box(
             Modifier.fillMaxSize()
@@ -151,7 +181,7 @@ private fun MeetDetails(
         Text(
             stringResource(R.string.meeting_profile_bottom_today_label),
             Modifier.padding(bottom = 8.dp),
-            MaterialTheme.colorScheme.tertiary,
+            colorScheme.tertiary,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold
         )
@@ -167,7 +197,7 @@ private fun MeetDetails(
                     .weight(1f)
                     .padding(start = 4.dp)
                     .clip(MaterialTheme.shapes.extraSmall)
-                    .background(MaterialTheme.colorScheme.outlineVariant)
+                    .background(colorScheme.outlineVariant)
             ) {
                 Text(
                     eventDuration,

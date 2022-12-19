@@ -1,5 +1,20 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":data:ktor")
+
+
+include(":data:realm")
+
+
+include(":data")
+
+
+include(":feature:bubbles")
+
+
+include(":dataexample")
+
+
 include(":feature:complaints")
 
 

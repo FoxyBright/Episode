@@ -9,5 +9,5 @@ data class GenderModel(
 
 val DemoGenderModel = GenderModel(
     "id",
-    "Гендер"
+    "Мужской"
 )

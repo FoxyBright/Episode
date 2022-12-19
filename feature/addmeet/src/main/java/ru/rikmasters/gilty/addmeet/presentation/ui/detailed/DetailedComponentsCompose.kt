@@ -1,20 +1,13 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,7 +16,6 @@ import ru.rikmasters.gilty.shared.common.TagSearch
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.CheckBoxCard
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.shared.TextFieldLabel
 
 @Composable
@@ -36,8 +28,11 @@ fun Tags(
         stringResource(R.string.add_meet_detailed_tags_maximum, (3))
     ) {
         Column {
-            TagSearch(state.tagList, { callback?.onTagsClick() })
-            { callback?.onTagDelete(it) }
+            TagSearch(
+                state.tagList,
+                { callback?.onTagsClick() },
+                state.online
+            ) { callback?.onTagDelete(it) }
             Text(
                 stringResource(R.string.add_meet_detailed_tags_description),
                 Modifier
@@ -60,13 +55,13 @@ fun Description(
             Column(Modifier.fillMaxWidth()) {
                 GTextField(
                     state.description, {
-                        if (it.length <= 120)
+                        if(it.length <= 120)
                             callback?.onDescriptionChange(it)
                     },
                     Modifier.fillMaxWidth(),
                     shape = shapes.medium,
-                    colors = TextFieldColors(),
-                    label = if (state.description.isNotEmpty()) TextFieldLabel(
+                    colors = DescriptionColors(state.online),
+                    label = if(state.description.isNotEmpty()) TextFieldLabel(
                         true,
                         stringResource(R.string.add_meet_detailed_meet_description_place_holder)
                     ) else null,
@@ -90,6 +85,29 @@ fun Description(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DescriptionColors(online: Boolean) =
+    TextFieldDefaults.textFieldColors(
+        textColor = colorScheme.tertiary,
+        cursorColor = if(online) colorScheme.secondary
+        else colorScheme.primary,
+        containerColor = colorScheme.primaryContainer,
+        unfocusedLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.onTertiary,
+        focusedLabelColor = if(online) colorScheme.secondary
+        else colorScheme.tertiary,
+        disabledTrailingIconColor = Transparent,
+        focusedTrailingIconColor = Transparent,
+        unfocusedTrailingIconColor = Transparent,
+        focusedIndicatorColor = Transparent,
+        unfocusedIndicatorColor = Transparent,
+        disabledIndicatorColor = Transparent,
+        errorIndicatorColor = Transparent,
+        placeholderColor = colorScheme.onTertiary,
+        disabledPlaceholderColor = Transparent,
+    )
+
 @Composable
 fun Additionally(
     state: DetailedState,
@@ -97,11 +115,15 @@ fun Additionally(
 ): FilterModel {
     return FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
         Row(Modifier.fillMaxWidth()) {
-            DataTimeCard(state.date, DataTimeType.DATE, Modifier.weight(1f))
-            { callback?.onDateClick() }
+            DataTimeCard(
+                state.date, DataTimeType.DATE,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onDateClick() }
             Spacer(Modifier.width(16.dp))
-            DataTimeCard(state.time, DataTimeType.TIME, Modifier.weight(1f))
-            { callback?.onTimeClick() }
+            DataTimeCard(
+                state.time, DataTimeType.TIME,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onTimeClick() }
         }
     }
 }
@@ -120,7 +142,7 @@ fun MeetPlace(
                 Modifier.fillMaxWidth(), (true), shapes.medium,
                 CardDefaults.cardColors(colorScheme.primaryContainer)
             ) {
-                if (state.meetPlace != null)
+                if(state.meetPlace != null)
                     Column(Modifier.fillMaxWidth()) {
                         Text(
                             state.meetPlace.first,
@@ -162,6 +184,7 @@ fun HideMeetPlace(
 ) {
     CheckBoxCard(
         stringResource(R.string.add_meet_detailed_meet_hide_place),
-        modifier.fillMaxWidth(), state.hideMeetPlace
+        modifier.fillMaxWidth(), state.hideMeetPlace,
+        online = state.online
     ) { callback?.onHideMeetPlaceClick() }
 }

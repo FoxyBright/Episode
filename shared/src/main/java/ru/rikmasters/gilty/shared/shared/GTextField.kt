@@ -1,23 +1,13 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -159,13 +148,15 @@ fun GTextField(
                 keyboardActions, singleLine, maxLines,
                 interactionSource, shape, colors
             ); if (value.isNotEmpty() && !isError)
-            IconButton({ clear?.let { it() } }) {
-                if (value.isNotEmpty()) {
-                    Icon(
-                        painterResource(R.drawable.ic_close),
-                        stringResource(R.string.clear),
-                        Modifier.size(24.dp), colorScheme.scrim
-                    )
+            clear?.let {
+                IconButton({ it() }) {
+                    if (value.isNotEmpty()) {
+                        Icon(
+                            painterResource(R.drawable.ic_close),
+                            stringResource(R.string.clear),
+                            Modifier.size(24.dp), colorScheme.scrim
+                        )
+                    }
                 }
             }
         }
@@ -178,25 +169,6 @@ fun GTextField(
         }
     }
 }
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun PriceFieldColors() = TextFieldDefaults.textFieldColors(
-    textColor = colors.priceTextFieldText,
-    containerColor = colorScheme.primaryContainer,
-    unfocusedLabelColor = colorScheme.onTertiary,
-    disabledLabelColor = colorScheme.onTertiary,
-    focusedLabelColor = colorScheme.tertiary,
-    disabledTrailingIconColor = Transparent,
-    focusedTrailingIconColor = Transparent,
-    unfocusedTrailingIconColor = Transparent,
-    focusedIndicatorColor = Transparent,
-    unfocusedIndicatorColor = Transparent,
-    disabledIndicatorColor = Transparent,
-    errorIndicatorColor = Transparent,
-    placeholderColor = colorScheme.onTertiary,
-    disabledPlaceholderColor = Transparent,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

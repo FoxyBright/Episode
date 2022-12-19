@@ -4,19 +4,20 @@ import org.gradle.kotlin.dsl.project
 
 fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) = implementation(
     "androidx.core:core-ktx:1.9.0",
-    "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 )and koin() and implementationIf(!excludeCore, project(":core"))
 
-const val composeVer = "1.3.0-rc01"
+const val composeVer = Config.kotlinCompilerExtensionVersion
 fun DependencyHandlerScope.compose() = implementation(
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.material3:material3:1.0.0-rc01",
     "androidx.navigation:navigation-compose:2.5.2",
     "io.coil-kt:coil-compose:2.2.2",
     "androidx.compose.ui:ui:$composeVer",
-    "androidx.compose.ui:ui-tooling-preview:$composeVer",
 ) and debugImplementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
+    "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer"
 ) and accompanist()
 
@@ -30,6 +31,33 @@ fun DependencyHandlerScope.koin() = implementation(
     "io.insert-koin:koin-core:$koinVer",
     "io.insert-koin:koin-android:$koinVer",
     "io.insert-koin:koin-androidx-compose:$koinVer"
+)
+
+fun DependencyHandlerScope.dataBase() =
+    realm() and ktor() and implementation(
+        project(":data:realm"),
+        project(":data:ktor")
+    )
+
+fun DependencyHandlerScope.realm() = implementation(
+    "io.realm.kotlin:library-base:1.5.0"
+)
+
+
+val jacksonVer = "2.14.0"
+fun DependencyHandlerScope.jackson() = implementation(
+    "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVer",
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:$jacksonVer"
+)
+
+val ktorVer = "2.2.1"
+fun DependencyHandlerScope.ktor() = implementation(
+    "io.ktor:ktor-client-core:$ktorVer",
+    "io.ktor:ktor-client-okhttp:$ktorVer",
+    "io.ktor:ktor-client-logging:$ktorVer",
+    "io.ktor:ktor-client-auth:$ktorVer",
+    "io.ktor:ktor-client-content-negotiation:$ktorVer",
+    "io.ktor:ktor-serialization-jackson:$ktorVer"
 )
 
 @Suppress("UNUSED_PARAMETER")

@@ -21,11 +21,19 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
 }
 
 dependencies {
     androidBase()
     compose()
+    
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
+    
     implementation(project(":shared"))
     implementation(project(":example"))
     implementation(project(":feature:login"))
@@ -36,4 +44,7 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:notifications"))
+    
+    implementation(project(":data:realm"))
+    implementation(project(":data:ktor"))
 }

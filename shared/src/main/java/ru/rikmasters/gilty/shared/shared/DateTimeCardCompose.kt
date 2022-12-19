@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,8 @@ fun DateTimeCard(
     dateTime: String,
     color: List<Color>,
     today: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.labelSmall
 ) {
     Box(
         modifier
@@ -49,7 +51,7 @@ fun DateTimeCard(
             if (today) dateTime.timeClock() else dateTime.dateCalendar(),
             Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             color = Color.White, fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall
+            style = textStyle
         )
     }
 }

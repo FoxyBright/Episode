@@ -1,45 +1,37 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.MeetingBottomSheetTopBarCompose
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCompose
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomComposeState
+import ru.rikmasters.gilty.shared.common.*
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.shared.DividerBold
-import ru.rikmasters.gilty.shared.shared.GiltyString
-import ru.rikmasters.gilty.shared.shared.NavBar
-import ru.rikmasters.gilty.shared.shared.SquareCheckBox
+import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -53,21 +45,24 @@ fun MainContentPreview() {
                 listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW, INACTIVE
-                )
+                ), (false)
             )
         )
     }
 }
 
 interface MainContentCallback {
+    
     fun onTodayChange() {}
     fun onTimeFilterClick() {}
     fun onStyleChange() {}
     fun onRespond(meet: FullMeetingModel) {}
+    fun onMeetClick(meet: FullMeetingModel) {}
     fun onNavBarSelect(point: Int) {}
     fun openFiltersBottomSheet() {}
     fun interesting(state: SwipeableCardState) {}
     fun notInteresting(state: SwipeableCardState) {}
+    fun closeAlert()
 }
 
 data class MainContentState(
@@ -75,7 +70,8 @@ data class MainContentState(
     val switcher: Pair<Boolean, Boolean>,
     val meetings: List<FullMeetingModel>,
     val cardStates: List<Pair<FullMeetingModel, SwipeableCardState>>,
-    val navBarStates: List<NavIconState>
+    val navBarStates: List<NavIconState>,
+    val alert: Boolean,
 )
 
 @Composable
@@ -86,6 +82,7 @@ fun MainContent(
 ) {
     Column(
         Modifier
+            .background(colorScheme.background)
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
@@ -112,16 +109,16 @@ fun MainContent(
             }
             IconButton({ callback?.onTimeFilterClick() }) {
                 Icon(
-                    if (state.switcher.first)
+                    if(state.switcher.first)
                         painterResource(R.drawable.ic_clock)
                     else painterResource(R.drawable.ic_calendar),
                     null,
                     Modifier.size(30.dp),
-                    MaterialTheme.colorScheme.tertiary
+                    colorScheme.tertiary
                 )
             }
         }
-        if (state.grid)
+        if(state.grid)
             MeetingGridContent(
                 Modifier
                     .padding(16.dp)
@@ -132,11 +129,12 @@ fun MainContent(
             MeetingsListContent(
                 state.cardStates,
                 Modifier.fillMaxHeight(0.84f),
-                { callback?.notInteresting(it) }
-            ) { meet, it ->
-                callback?.onRespond(meet)
-                callback?.interesting(it)
-            }
+                { callback?.notInteresting(it) },
+                { meet, it ->
+                    callback?.onRespond(meet)
+                    callback?.interesting(it)
+                }
+            ) { callback?.onMeetClick(it) }
         }
     }
     Box(Modifier.fillMaxSize()) {
@@ -153,31 +151,230 @@ fun MainContent(
                 .clickable { callback?.openFiltersBottomSheet() }
         )
         SquareCheckBox(
-            state.grid,
+            !state.grid,
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 92.dp)
         ) { callback?.onStyleChange() }
     }
+    GAlert(
+        state.alert, { callback?.closeAlert() },
+        "Отлично, ваша жалоба отправлена!",
+        label = "Модераторы скоро рассмотрят\nвашу жалобу",
+        success = Pair("Закрыть") { callback?.closeAlert() }
+    )
+}
+
+@Preview
+@Composable
+fun MeetingPreview() {
+    GiltyTheme {
+        MeetingSwipe(
+            (false), (null), (null),
+            DemoFullMeetingModel,
+            (true), ("")
+        )
+    }
 }
 
 @Composable
-fun Meeting(
+fun MeetingSwipe(
+    menuState: Boolean,
+    menuCollapse: ((Boolean) -> Unit)? = null,
+    menuItemClick: ((Int) -> Unit)? = null,
     meet: FullMeetingModel,
     hiddenPhoto: Boolean,
     commentText: String,
-    callback: MeetingDetailsBottomCallback?
+    callback: MeetingDetailsBottomCallback? = null
 ) {
     Column(
         Modifier
+            .background(colorScheme.background)
             .padding(16.dp)
             .padding(bottom = 40.dp)
     ) {
-        MeetingBottomSheetTopBarCompose(Modifier, meet, meet.duration)
+        MeetingBottomSheetTopBarCompose(
+            Modifier, MeetingBottomSheetTopBarState(
+                meet, meet.duration, menuState
+            ), { menuCollapse?.let { c -> c(it) } },
+            { menuItemClick?.let { c -> c(it) } }
+        )
         MeetingDetailsBottomCompose(
-            Modifier.padding(16.dp),
+            Modifier.padding(top = 30.dp),
             MeetingDetailsBottomComposeState(hiddenPhoto, commentText),
             callback
         )
+    }
+}
+
+@Composable
+fun MeetingClick(
+    menuState: Boolean,
+    menuCollapse: ((Boolean) -> Unit)? = null,
+    menuItemClick: ((Int) -> Unit)? = null,
+    meet: FullMeetingModel,
+    membersList: List<MemberModel>,
+    onRespond: (() -> Unit)? = null,
+) {
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(colorScheme.background)
+    ) {
+        item {
+            MeetingBottomSheetTopBarCompose(
+                Modifier, MeetingBottomSheetTopBarState(
+                    meet, meet.duration, menuState
+                ), { menuCollapse?.let { c -> c(it) } },
+                { menuItemClick?.let { c -> c(it) } }
+            )
+        }
+        item {
+            Text(
+                stringResource(R.string.meeting_terms),
+                Modifier.padding(top = 28.dp),
+                color = colorScheme.tertiary,
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+        item {
+            Card(
+                Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth(),
+                MaterialTheme.shapes.extraSmall,
+                CardDefaults.cardColors(
+                    colorScheme.primaryContainer
+                )
+            ) {
+                Text(
+                    when(meet.type) {
+                        MeetType.GROUP -> stringResource(R.string.meeting_group_type)
+                        MeetType.ANONYMOUS -> stringResource(R.string.meeting_anon_type)
+                        MeetType.PERSONAL -> stringResource(R.string.meeting_personal_type)
+                    },
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colorScheme.tertiary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Divider(Modifier.padding(start = 16.dp))
+                val condition = meet.condition
+                Row(
+                    Modifier.fillMaxWidth(),
+                    Arrangement.SpaceBetween, Alignment.CenterVertically
+                ) {
+                    Row(
+                        Modifier.padding(16.dp),
+                        Arrangement.Start,
+                        Alignment.CenterVertically
+                    ) {
+                        if(condition == ConditionType.MEMBER_PAY)
+                            Image(
+                                painterResource(R.drawable.ic_money),
+                                (null),
+                                Modifier
+                                    .padding(end = 16.dp)
+                                    .size(24.dp)
+                            )
+                        Text(
+                            when(meet.condition) {
+                                ConditionType.FREE -> stringResource(R.string.condition_free)
+                                ConditionType.DIVIDE -> stringResource(R.string.condition_divide)
+                                ConditionType.MEMBER_PAY -> stringResource(R.string.condition_member_pay)
+                                ConditionType.NO_MATTER -> stringResource(R.string.condition_no_matter)
+                                ConditionType.ORGANIZER_PAY -> stringResource(R.string.condition_organizer_pay)
+                            }, Modifier,
+                            colorScheme.tertiary, style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    if(condition == ConditionType.MEMBER_PAY) Text(
+                        "${meet.price ?: "0"} ₽",
+                        Modifier.padding(end = 16.dp), colorScheme.primary,
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+                }
+            }
+        }
+        item {
+            Row(Modifier.padding(top = 28.dp)) {
+                Text(
+                    stringResource(R.string.meeting_members), Modifier,
+                    colorScheme.tertiary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Text(
+                    "${membersList.size}/${meet.memberCount}",
+                    Modifier.padding(start = 8.dp),
+                    colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Image(
+                    painterResource(
+                        if(meet.isPrivate) R.drawable.ic_lock_close
+                        else R.drawable.ic_lock_open
+                    ), null,
+                    Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+        item {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(colorScheme.primaryContainer)
+            ) {
+                membersList.forEachIndexed { index, member ->
+                    if(index < 3) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            Arrangement.SpaceBetween,
+                            Alignment.CenterVertically
+                        ) {
+                            BrieflyRow(
+                                member.avatar,
+                                "${member.username}, ${member.age}",
+                                modifier = Modifier.padding(12.dp, 8.dp)
+                            )
+                            Icon(
+                                Filled.KeyboardArrowRight,
+                                null,
+                                Modifier.padding(end = 16.dp),
+                                colorScheme.tertiary
+                            )
+                        }
+                        if(membersList.size <= 3 && index + 1 < membersList.size) {
+                            androidx.compose.material3.Divider(Modifier.padding(start = 60.dp))
+                        } else if(index + 1 < 3) androidx.compose.material3.Divider(
+                            Modifier.padding(
+                                start = 60.dp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        item {
+            Text(
+                stringResource(R.string.meeting_watch_all_members_in_meet),
+                Modifier
+                    .padding(top = 12.dp)
+                    .clip(CircleShape)
+                    .clickable { /*TODO клик на смотреть всех участников*/ },
+                colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        item {
+            GradientButton(
+                Modifier.padding(top = 20.dp, bottom = 12.dp),
+                stringResource(R.string.meeting_respond)
+            ) { onRespond?.let { it() } }
+        }
     }
 }

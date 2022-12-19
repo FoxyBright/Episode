@@ -9,4 +9,5 @@ compose()
 dependencies {
     androidBase()
     compose()
+    implementation(project(":dataexample"))
 }

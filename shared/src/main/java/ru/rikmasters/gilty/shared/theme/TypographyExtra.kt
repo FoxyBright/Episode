@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.OrangeRed
 
 data class ExtraTypography(
     val CodeText: TextStyle = baseTextStyle,
-    val RatingText: TextStyle = baseTextStyle
+    val RatingText: TextStyle = baseTextStyle,
     // Add new fonts in scheme = baseTextStyle
 )
 

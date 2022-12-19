@@ -1,8 +1,7 @@
 package ru.rikmasters.gilty.complaints.presentation.ui
 
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,10 +27,9 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 private enum class ComplainType { LIE, CHEAT, SPAM, OTHER }
 
 @Composable
-fun ComplainsContent(meet: MeetingModel) {
-    val context = LocalContext.current
+fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
     var tag by remember { mutableStateOf<ComplainType?>(null) }
-    if (tag == null)
+    if (tag == null) {
         ComplainElements(
             (stringResource(R.string.complaints_title)), listOf(
                 stringResource(R.string.complaints_lie_title),
@@ -39,7 +37,7 @@ fun ComplainsContent(meet: MeetingModel) {
                 stringResource(R.string.complaints_cheater_title),
                 stringResource(R.string.others_sex),
             ), (stringResource(R.string.complaints_description)),
-            Modifier.padding(16.dp)
+            Modifier.padding(16.dp), onBack = null
         ) {
             tag = when (it) {
                 0 -> LIE
@@ -48,7 +46,9 @@ fun ComplainsContent(meet: MeetingModel) {
                 else -> OTHER
             }
         }
-    else {
+        Box(Modifier.fillMaxSize())
+        { Spacer(Modifier.align(BottomCenter)) }
+    } else {
         var text by remember { mutableStateOf("") }
         val itemList = list(tag!!)
         val select =
@@ -79,17 +79,7 @@ fun ComplainsContent(meet: MeetingModel) {
                     .padding(bottom = 48.dp)
                     .align(BottomCenter),
                 stringResource(R.string.complaints_button),
-            ) {
-                Toast.makeText(
-                    context,
-                    "${
-                        if (tag == OTHER) text
-                        else itemList.second[select.indexOf(true)]
-                    } на встрече ${meet.title}",
-                    LENGTH_SHORT
-                ).show()
-                tag = null
-            }
+            ) { tag = null; send() }
         }
     }
 }

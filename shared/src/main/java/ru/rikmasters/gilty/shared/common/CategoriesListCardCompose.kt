@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
@@ -23,13 +24,14 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 fun categoriesListCard(
     modifier: Modifier,
     meeting: FullMeetingModel,
-    border: Boolean
+    border: Boolean,
+    imageSize: Dp = 20.dp
 ) {
     Surface(
         modifier,
         MaterialTheme.shapes.medium,
         MaterialTheme.colorScheme.background,
-        border = if (border) BorderStroke(
+        border = if(border) BorderStroke(
             3.dp, ThemeExtra.colors.borderColor
         ) else BorderStroke(0.dp, Color.Transparent)
     ) {
@@ -41,14 +43,14 @@ fun categoriesListCard(
                 painterResource(R.drawable.ic_fire), (null),
                 Modifier
                     .padding(6.dp)
-                    .size(20.dp),
+                    .size(imageSize),
             )
-            if (meeting.condition == ConditionType.MEMBER_PAY)
+            if(meeting.condition == ConditionType.MEMBER_PAY)
                 Image(
                     painterResource(R.drawable.ic_money), (null),
                     Modifier
                         .padding(6.dp)
-                        .size(20.dp)
+                        .size(imageSize)
                 )
         }
     }

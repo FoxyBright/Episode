@@ -9,7 +9,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 object Complains : FeatureDefinition() {
 
     override fun DeepNavGraphBuilder.navigation() {
-        screen("complains") { ComplainsContent(DemoFullMeetingModel) }
+        screen("complains") { ComplainsContent(DemoFullMeetingModel){} }
     }
 
     override fun Module.koin() {}
