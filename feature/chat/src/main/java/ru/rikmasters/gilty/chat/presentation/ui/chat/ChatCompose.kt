@@ -45,6 +45,7 @@ interface ChatCallback:
     fun onMessageLongClick(message: MessageModel) {}
     fun onMessageMenuItemSelect(point: Int) {}
     fun onMessageMenuDismiss() {}
+    fun onImageClick(image: String) {}
 }
 
 @Composable
@@ -95,8 +96,10 @@ fun ChatContent(
             LazyColumn(Modifier.align(BottomCenter), state.listState) {
                 items(state.messageList) { mes ->
                     Message(
-                        mes, (state.sender == mes.sender), mes.answer
-                    ) { message -> callback?.onMessageLongClick(message) }
+                        mes, (state.sender == mes.sender),
+                        mes.answer, hide = false,
+                        { message -> callback?.onMessageLongClick(message) }
+                    ) { image -> callback?.onImageClick(image) }
                 }
                 item { Divider(Modifier, 10.dp, Color.Transparent) }
                 item {

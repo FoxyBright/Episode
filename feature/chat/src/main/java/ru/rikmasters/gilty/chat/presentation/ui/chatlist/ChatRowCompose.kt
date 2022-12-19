@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chatlist
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -112,16 +113,24 @@ fun SwipeableChatRow(
     Box(
         modifier
             .fillMaxWidth()
-            .background(colorScheme.primary, shape)
+            .background(
+                if(chat.isOnline) colorScheme.secondary
+                else colorScheme.primary,
+                shape
+            )
     ) {
-        SwipeableRowBack(Modifier.align(CenterEnd))
+        SwipeableRowBack(
+            Modifier.align(CenterEnd)
+        )
         Row(
             Modifier.swipeableRow(state)
             { onSwiped?.let { it(chat) } },
-            Arrangement.Center, CenterVertically
+            Center, CenterVertically
         ) {
-            ChatRowContent(Modifier, chat, shape, unRead)
-            { onClick?.let { it(chat) } }
+            ChatRowContent(
+                Modifier, chat,
+                shape, unRead
+            ) { onClick?.let { it(chat) } }
         }
     }
 }

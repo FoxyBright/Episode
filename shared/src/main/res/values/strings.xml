@@ -253,6 +253,7 @@
     <string name="chats_delete">Удалить чат навсегда?</string>
     <string name="chats_delete_label">Удалить чат</string>
     <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
+    <string name="chats_hidden_photo">Фото</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

@@ -36,7 +36,8 @@ fun ChatScreen(nav: NavState = get()) {
         mutableStateListOf(
             DemoImageMessage,
             DemoMessageModelLongMessage,
-            DemoMessageModel
+            DemoMessageModel,
+            DemoHiddenImageMessage
         )
     }
     
@@ -114,6 +115,10 @@ fun ChatScreen(nav: NavState = get()) {
                 messageMenuState = false
             }
             
+            override fun onImageClick(image: String) {
+                nav.navigate("photo?image=$image")
+            }
+            
             override fun textChange(text: String) {
                 messageText = text
             }
@@ -147,6 +152,7 @@ fun ChatScreen(nav: NavState = get()) {
                         album = "Бэтмен",
                         text = messageText,
                         attachments = null,
+                        hidden = false,
                         isRead = false,
                         isDelivered = true,
                         createdAt = "2022-10-17T08:35:54.140Z",

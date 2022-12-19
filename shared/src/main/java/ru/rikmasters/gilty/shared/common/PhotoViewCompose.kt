@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
-import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.shared.GDropMenu
+import ru.rikmasters.gilty.shared.shared.GKebabButton
 import ru.rikmasters.gilty.shared.shared.METRICS
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -37,13 +37,15 @@ private fun PhotoPreview() {
     }
 }
 
+//enum class PhotoViewType { IMAGE, HIDDEN }
+
 @Composable
 fun PhotoView(
     image: String,
     menuState: Boolean,
     modifier: Modifier = Modifier,
-    onMenuClick: (Boolean) -> Unit,
-    onMenuItemClick: (Int) -> Unit,
+    onMenuClick: ((Boolean) -> Unit)? = null,
+    onMenuItemClick: ((Int) -> Unit)? = null,
     onBack: () -> Unit
 ) {
     Column(modifier.background(colorScheme.background)) {
@@ -67,14 +69,9 @@ fun PhotoView(
                     style = typography.headlineLarge
                 ) // TODO временная заглушка - тут количество фотографий
             }
-            IconButton(
-                { onMenuClick(true) },
-                Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    painterResource(ic_kebab),
-                    (null), Modifier.size(16.dp)
-                )
+            onMenuClick?.let {
+                GKebabButton(Modifier.padding(16.dp))
+                { it(true) }
             }
         }
         AsyncImage(
@@ -85,13 +82,12 @@ fun PhotoView(
         )
     }
     GDropMenu(
-        menuState,
-        { onMenuClick(false) },
+        menuState, { onMenuClick?.let { it(false) } },
         DpOffset(
             ((METRICS.widthPixels / METRICS.density) - 160).dp, -(100).dp
         ), listOf(
             Pair(stringResource(R.string.edit_button))
-            { onMenuItemClick(0) },
+            { onMenuItemClick?.let { it(0) } },
         )
     )
 }
