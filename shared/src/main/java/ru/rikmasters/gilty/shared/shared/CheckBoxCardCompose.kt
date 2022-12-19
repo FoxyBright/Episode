@@ -32,7 +32,7 @@ private fun CheckBoxCardPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckBoxCard(
+fun  CheckBoxCard(
     label: String,
     modifier: Modifier = Modifier,
     state: Boolean,

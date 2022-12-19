@@ -1,19 +1,24 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.MeetBottomSheet
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
@@ -35,7 +40,7 @@ fun ChatScreen(nav: NavState = get()) {
         )
     }
     
-    val meet = DemoFullMeetingModel
+    val meet = DemoMeetingModel
     var alert by
     remember { mutableStateOf(false) }
     var meetOutAlert by
@@ -54,6 +59,31 @@ fun ChatScreen(nav: NavState = get()) {
     val listState = rememberLazyListState()
     
     val context = LocalContext.current
+    
+    val meetBsCallback = object: MeetingBSCallback {
+        override fun onKebabClick(state: Boolean) {
+            menuState = state
+        }
+        
+        override fun onBottomButtonClick(point: Int) {
+            scope.launch { asm.bottomSheetState.collapse() }
+            meetOutAlert = true
+        }
+        
+        override fun onMenuItemClick(index: Int) {
+            scope.launch {
+                asm.bottomSheetState.expand {
+                    menuState = false
+                    ComplainsContent(meet) {
+                        scope.launch {
+                            asm.bottomSheetState.collapse()
+                        }; alert = true
+                    }
+                }
+            }
+        }
+    }
+    
     ChatContent(
         ChatState(
             ChatAppBarState(
@@ -142,24 +172,17 @@ fun ChatScreen(nav: NavState = get()) {
             override fun onAvatarClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        MeetBottomSheet(
-                            menuState, { menuState = it },
-                            {
-                                scope.launch {
-                                    asm.bottomSheetState.expand {
-                                        menuState = false
-                                        ComplainsContent(meet) {
-                                            scope.launch {
-                                                asm.bottomSheetState.collapse()
-                                            }; alert = true
-                                        }
-                                    }
-                                }
-                            }, meet, DemoMemberModelList,
-                            {
-                                scope.launch { asm.bottomSheetState.collapse() }
-                                meetOutAlert = true
-                            }
+                        MeetingBottomSheet(
+                            MeetingBSState(
+                                menuState, meet,
+                                DemoMemberModelList,
+                                distanceCalculator(meet),
+                                (true),
+                            ),
+                            Modifier
+                                .padding(16.dp)
+                                .padding(bottom = 40.dp),
+                            meetBsCallback
                         )
                     }
                 }

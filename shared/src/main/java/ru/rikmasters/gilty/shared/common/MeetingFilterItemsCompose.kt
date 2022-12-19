@@ -26,10 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
+import ru.rikmasters.gilty.shared.R.drawable.magnifier
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -57,7 +57,7 @@ fun Country(
 
 @Composable
 fun Category(
-    categories: List<FullCategoryModel>,
+    categories: List<CategoriesType>,
     categoryStatus: List<Boolean>,
     onCategoryClick: (selected: Int) -> Unit,
     onAllCategoryClick: () -> Unit
@@ -74,14 +74,13 @@ fun Category(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), Arrangement.Absolute.SpaceBetween, CenterVertically
+                    .padding(16.dp),
+                SpaceBetween, CenterVertically
             ) {
                 Row {
-                    AsyncImage(
-                        category.emoji.path,
-                        null,
-                        Modifier.size(20.dp),
-                        placeholder = painterResource(R.drawable.cinema)
+                    GEmojiImage(
+                        category.emoji,
+                        Modifier.size(20.dp)
                     )
                     Text(
                         category.name,
@@ -97,10 +96,9 @@ fun Category(
                     tint = colorScheme.onTertiary
                 )
             }
-            category.subcategories?.let {
+            category.subs?.let {
                 if(categoryStatus[index]) {
-                    Divider()
-                    FlowLayout(
+                    Divider(); FlowLayout(
                         Modifier
                             .background(colorScheme.primaryContainer)
                             .padding(top = 16.dp)
@@ -111,8 +109,7 @@ fun Category(
                                 Modifier,
                                 category,
                                 false
-                            ) { //TODO: Выбор подкатегорий }
-                            }
+                            ) { /*TODO: Выбор подкатегорий*/ }
                         }
                     }
                 }
@@ -121,15 +118,17 @@ fun Category(
     }
     Card(
         Modifier
-            .fillMaxWidth()
-            .clickable { onAllCategoryClick() },
+            .clickable {
+                onAllCategoryClick()
+            },
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp), Arrangement.Absolute.SpaceBetween
+                .padding(16.dp),
+            SpaceBetween
         ) {
             Text(
                 stringResource(R.string.meeting_filter_show_all_categories),
@@ -167,7 +166,7 @@ fun TagSearch(
                     .padding(16.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.magnifier),
+                    painterResource(magnifier),
                     stringResource(R.string.login_search_placeholder),
                     Modifier.size(20.dp),
                     colorScheme.onTertiary

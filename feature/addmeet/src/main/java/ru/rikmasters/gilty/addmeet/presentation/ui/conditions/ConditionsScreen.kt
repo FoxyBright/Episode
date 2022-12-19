@@ -4,18 +4,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
 import ru.rikmasters.gilty.shared.model.meeting.*
-import java.util.UUID
+import java.util.UUID.randomUUID
 
-var MEETING: FullMeetingModel = FullMeetingModel(
-    id = UUID.randomUUID(),
+var MEETING: MeetingModel = MeetingModel(
+    id = randomUUID(),
     title = DemoTag.title,
     condition = FREE,
-    category = DemoShortCategoryModel,
+    category = ENTERTAINMENT,
     duration = "",
     type = GROUP,
     dateTime = "1970-01-01T00:00:00Z",

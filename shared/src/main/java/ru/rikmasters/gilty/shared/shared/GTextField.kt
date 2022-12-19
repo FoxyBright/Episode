@@ -101,7 +101,7 @@ fun TextFieldLabel(
     return {
         text?.let {
             Text(
-                it, Modifier, style = if (label)
+                it, Modifier, style = if(label)
                     typography.headlineSmall
                 else typography.bodyMedium
             )
@@ -147,10 +147,10 @@ fun GTextField(
                 visualTransformation, keyboardOptions,
                 keyboardActions, singleLine, maxLines,
                 interactionSource, shape, colors
-            ); if (value.isNotEmpty() && !isError)
+            ); if(value.isNotEmpty() && !isError)
             clear?.let {
                 IconButton({ it() }) {
-                    if (value.isNotEmpty()) {
+                    if(value.isNotEmpty()) {
                         Icon(
                             painterResource(R.drawable.ic_close),
                             stringResource(R.string.clear),
@@ -161,7 +161,7 @@ fun GTextField(
             }
         }
         errorBottomText?.let {
-            if (isError)
+            if(isError)
                 Text(
                     it, Modifier.padding(start = 16.dp, top = 4.dp),
                     colorScheme.primary, style = typography.titleSmall
@@ -226,3 +226,48 @@ private fun PreviewColors() = TextFieldDefaults.textFieldColors(
     placeholderColor = Color(0xFF98989F),
     disabledPlaceholderColor = Transparent,
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DescriptionColors(online: Boolean) =
+    TextFieldDefaults.textFieldColors(
+        textColor = colorScheme.tertiary,
+        cursorColor = if(online) colorScheme.secondary
+        else colorScheme.primary,
+        containerColor = colorScheme.primaryContainer,
+        unfocusedLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.onTertiary,
+        focusedLabelColor = colorScheme.tertiary,
+        disabledTrailingIconColor = Transparent,
+        focusedTrailingIconColor = Transparent,
+        unfocusedTrailingIconColor = Transparent,
+        focusedIndicatorColor = Transparent,
+        unfocusedIndicatorColor = Transparent,
+        disabledIndicatorColor = Transparent,
+        errorIndicatorColor = Transparent,
+        placeholderColor = colorScheme.onTertiary,
+        disabledPlaceholderColor = Transparent,
+    )
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun PriceFieldColors(online: Boolean = false) =
+    TextFieldDefaults.textFieldColors(
+        textColor = if(online) colorScheme.secondary
+        else colorScheme.primary,
+        cursorColor = if(online) colorScheme.secondary
+        else colorScheme.primary,
+        containerColor = colorScheme.primaryContainer,
+        unfocusedLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.onTertiary,
+        focusedLabelColor = colorScheme.tertiary,
+        disabledTrailingIconColor = Transparent,
+        focusedTrailingIconColor = Transparent,
+        unfocusedTrailingIconColor = Transparent,
+        focusedIndicatorColor = Transparent,
+        unfocusedIndicatorColor = Transparent,
+        disabledIndicatorColor = Transparent,
+        errorIndicatorColor = Transparent,
+        placeholderColor = colorScheme.onTertiary,
+        disabledPlaceholderColor = Transparent,
+    )

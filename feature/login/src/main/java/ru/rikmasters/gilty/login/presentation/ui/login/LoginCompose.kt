@@ -69,7 +69,7 @@ interface LoginCallback {
     fun termsOfApp() {}
     fun onPhoneChange(text: String) {}
     fun onClear() {}
-    fun openCountryBottomSheet() {}
+    fun openCountryBottomSheet() {} //Selector
 }
 
 data class LoginState(

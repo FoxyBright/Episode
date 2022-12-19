@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
@@ -31,13 +31,13 @@ private fun ReceivedResponds() {
         RespondsListContent(
             listOf(
                 Pair(
-                    DemoFullMeetingModel,
+                    DemoMeetingModel,
                     listOf(
                         DemoReceivedRespondsModel,
                         DemoReceivedRespondModelWithoutPhoto
                     )
                 ),
-                Pair(DemoFullMeetingModel, listOf(DemoSendRespondsModel))
+                Pair(DemoMeetingModel, listOf(DemoSendRespondsModel))
             ), listOf(true, false),
             Modifier
                 .background(colorScheme.background)

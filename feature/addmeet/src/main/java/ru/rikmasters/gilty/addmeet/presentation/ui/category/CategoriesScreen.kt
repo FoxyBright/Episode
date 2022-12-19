@@ -4,16 +4,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 
 @Composable
 fun CategoriesScreen(nav: NavState = get()) {
     var alert by remember { mutableStateOf(false) }
     CategoriesContent(
         Modifier,
-        CategoriesState(DemoShortCategoryModelList, listOf(), alert),
-        object: CategoriesCallback {
+        CategoriesState(
+            CategoriesType.values().toList(),
+            listOf(), alert
+        ), object: CategoriesCallback {
             
             override fun onClose() {
                 nav.navigateAbsolute("main/meetings")
@@ -23,7 +24,7 @@ fun CategoriesScreen(nav: NavState = get()) {
                 alert = it
             }
             
-            override fun onCategoryClick(category: ShortCategoryModel) {
+            override fun onCategoryClick(category: CategoriesType) {
                 nav.navigateAbsolute("addmeet/conditions")
             }
         })

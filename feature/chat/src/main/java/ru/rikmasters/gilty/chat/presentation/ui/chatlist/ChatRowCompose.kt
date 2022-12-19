@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatlist
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -24,19 +23,18 @@ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -181,7 +179,10 @@ private fun ChatRowContent(
                     .padding(12.dp),
                 Start, CenterVertically
             ) {
-                Avatar(chat.organizer.avatar, chat.hasUnread)
+                Avatar(
+                    chat.organizer.avatar,
+                    chat.hasUnread, chat.isOnline
+                )
                 Message(
                     chat.title, chat.organizer,
                     chat.lastMessage.text,
@@ -237,12 +238,8 @@ private fun Message(
                 style = typography.labelSmall,
                 fontWeight = SemiBold
             )
-            Image(
-                if(user.emoji.type == "D")
-                    painterResource(user.emoji.path.toInt())
-                else rememberAsyncImagePainter
-                    (user.emoji.path), (null),
-                Modifier
+            GEmojiImage(
+                user.emoji, Modifier
                     .padding(6.dp)
                     .size(18.dp)
             )
@@ -259,6 +256,7 @@ private fun Message(
 private fun Avatar(
     avatar: AvatarModel,
     unRead: Boolean = true,
+    online: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(modifier, Start, CenterVertically) {
@@ -266,7 +264,9 @@ private fun Avatar(
             Modifier
                 .size(8.dp)
                 .background(
-                    if(unRead) colorScheme.primary
+                    if(unRead)
+                        if(online) colorScheme.secondary
+                        else colorScheme.primary
                     else colorScheme.primaryContainer,
                     CircleShape
                 )

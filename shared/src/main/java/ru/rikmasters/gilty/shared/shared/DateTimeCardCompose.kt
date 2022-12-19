@@ -17,19 +17,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.timeClock
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients
 
 @Preview
 @Composable
 fun TimeCardPreview() {
-    DateTimeCard(DemoFullMeetingModel.dateTime, Gradients.green(), true)
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), true)
 }
 
 @Preview
 @Composable
 fun DateCardPreview() {
-    DateTimeCard(DemoFullMeetingModel.dateTime, Gradients.green(), false)
+    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), false)
 }
 
 @Composable

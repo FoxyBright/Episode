@@ -23,7 +23,7 @@ import ru.rikmasters.gilty.shared.shared.GDropMenu
 data class ChatState(
     val topState: ChatAppBarState,
     val answer: MessageModel?,
-    val meet: FullMeetingModel,
+    val meet: MeetingModel,
     val messageText: String,
     val messageList: List<MessageModel>,
     val sender: MemberModel,

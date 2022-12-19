@@ -1,25 +1,23 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
-import ru.rikmasters.gilty.shared.common.MeetingDetailsBottomCallback
+import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -50,6 +48,55 @@ fun MainScreen(nav: NavState = get()) {
     var alert by remember { mutableStateOf(false) }
     val cardStates =
         meetings.map { it to rememberSwipeableCardState() }
+    
+    var clickedMeet by remember {
+        mutableStateOf<MeetingModel?>(null)
+    }
+    
+    val meetBSCallback = object: MeetingBSCallback {
+        override fun onKebabClick(state: Boolean) {
+            menuState = state
+        }
+        
+        override fun onMenuItemClick(index: Int) {
+            scope.launch {
+                asm.bottomSheetState.expand {
+                    menuState = false
+                    clickedMeet?.let {
+                        ComplainsContent(it) {
+                            scope.launch {
+                                asm.bottomSheetState.collapse()
+                            }; alert = true
+                        }
+                    }
+                }
+            }
+        }
+        
+        override fun onBottomButtonClick(point: Int) {
+            clickedMeet?.let {
+                nav.navigateAbsolute(
+                    "main/reaction?avatar=${
+                        it.organizer.avatar.id
+                    }&meetType=${it.category.ordinal}"
+                ); scope.launch { asm.bottomSheetState.collapse() }
+            }
+        }
+        
+        
+        override fun onHiddenPhotoActive(hidden: Boolean) {
+            hiddenPhoto = hidden
+        }
+        
+        override fun onCommentChange(text: String) {
+            commentText = text
+        }
+        
+        override fun onCommentTextClear() {
+            commentText = ""
+        }
+    }
+    
     MainContent(
         MainContentState(
             grid, switcher, meetings,
@@ -70,28 +117,19 @@ fun MainScreen(nav: NavState = get()) {
                 }
             }
             
-            override fun onMeetClick(meet: FullMeetingModel) {
+            override fun onMeetClick(meet: MeetingModel) {
+                clickedMeet = meet
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        MeetingClick(
-                            menuState, { menuState = it },
-                            {
-                                scope.launch {
-                                    asm.bottomSheetState.expand {
-                                        menuState = false
-                                        ComplainsContent(meet) {
-                                            scope.launch {
-                                                asm.bottomSheetState.collapse()
-                                            }; alert = true
-                                        }
-                                    }
-                                }
-                            }, meet, DemoMemberModelList,
-                            {
-                                nav.navigateAbsolute(
-                                    "main/reaction?avatar=${meet.organizer.avatar.id}"
-                                ); scope.launch { asm.bottomSheetState.collapse() }
-                            }
+                        MeetingBottomSheet(
+                            MeetingBSState(
+                                menuState, meet,
+                                DemoMemberModelList,
+                                distanceCalculator(meet)
+                            ), Modifier
+                                .padding(16.dp)
+                                .padding(bottom = 40.dp),
+                            meetBSCallback
                         )
                     }
                 }
@@ -120,40 +158,21 @@ fun MainScreen(nav: NavState = get()) {
                 switcher = Pair(!switcher.first, !switcher.second)
             }
             
-            override fun onRespond(meet: FullMeetingModel) {
+            override fun onRespond(meet: MeetingModel) {
+                clickedMeet = meet
                 scope.launch {
                     asm.bottomSheetState.expand {
-                        MeetingSwipe(menuState,
-                            { menuState = it },
-                            {
-                                log.d("clk")
-                                scope.launch {
-                                    asm.bottomSheetState.expand {
-                                        menuState = false
-                                        ComplainsContent(meet) {
-                                            scope.launch {
-                                                asm.bottomSheetState.collapse()
-                                            }; alert = true
-                                        }
-                                    }
-                                }
-                            },
-                            meet, hiddenPhoto, commentText,
-                            object: MeetingDetailsBottomCallback {
-                                override fun onHiddenPhotoActive(hidden: Boolean) {
-                                    hiddenPhoto = hidden
-                                }
-                                
-                                override fun onCommentChange(text: String) {
-                                    commentText = text
-                                }
-                                
-                                override fun onRespondClick() {
-                                    nav.navigateAbsolute(
-                                        "main/reaction?avatar=${meet.organizer.avatar.id}"
-                                    ); scope.launch { asm.bottomSheetState.collapse() }
-                                }
-                            })
+                        MeetingBottomSheet(
+                            MeetingBSState(
+                                menuState, meet,
+                                detailed = Pair(
+                                    commentText, hiddenPhoto
+                                )
+                            ), Modifier
+                                .padding(16.dp)
+                                .padding(bottom = 40.dp),
+                            meetBSCallback
+                        )
                     }
                 }
             }
@@ -173,4 +192,3 @@ fun MainScreen(nav: NavState = get()) {
             }
         })
 }
-

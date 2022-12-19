@@ -26,12 +26,12 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Preview
 @Composable
 private fun ParticipantsListPreview() {
-    GiltyTheme { ParticipantsList(DemoFullMeetingModel, DemoMemberModelList) }
+    GiltyTheme { ParticipantsList(DemoMeetingModel, DemoMemberModelList) }
 }
 
 @Composable
 fun ParticipantsList(
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,

@@ -21,7 +21,7 @@ import ru.rikmasters.gilty.shared.common.extentions.MeetSeparate
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
@@ -103,7 +103,7 @@ fun NotificationsScreen(nav: NavState = get()) {
         NotificationsContent(
             NotificationsState(
                 notificationsList,
-                DemoFullMeetingModel, respondsList.size, stateList,
+                DemoMeetingModel, respondsList.size, stateList,
                 blur, activeNotification, memberList, memberListWrap
             ), Modifier, object : NotificationsCallback {
                 override fun onClick(notification: NotificationModel) {

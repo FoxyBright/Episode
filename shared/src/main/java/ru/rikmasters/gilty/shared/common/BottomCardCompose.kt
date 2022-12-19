@@ -36,8 +36,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -62,7 +62,7 @@ fun MeetingStatesPreview() {
     GiltyTheme {
         MeetingStates(
             Modifier,
-            DemoFullMeetingModel
+            DemoMeetingModel
         )
     }
 }
@@ -106,7 +106,7 @@ fun CardButton(
 }
 
 @Composable
-fun MeetingStates(modifier: Modifier, meet: FullMeetingModel, small: Boolean = false) {
+fun MeetingStates(modifier: Modifier, meet: MeetingModel, small: Boolean = false) {
     val today = todayControl(meet.dateTime)
     Box(modifier) {
         Row(Modifier.align(Alignment.CenterEnd)) {
@@ -138,7 +138,7 @@ fun MeetingStates(modifier: Modifier, meet: FullMeetingModel, small: Boolean = f
 @Composable
 private fun Icons(
     modifier: Modifier,
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     imageSize: Dp = 20.dp
 ) {
     categoriesListCard(
@@ -150,7 +150,7 @@ private fun Icons(
 
 @Composable
 fun MeetingCardCompose(
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     modifier: Modifier = Modifier,
     onSelect: ((DirectionType) -> Unit)? = null,
 ) {
@@ -179,7 +179,7 @@ fun MeetingCardCompose(
 @Composable
 fun MeetBottom(
     modifier: Modifier,
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     onSelect: (DirectionType) -> Unit
 ) {
     Box(modifier) {

@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchScreen
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 
 @Composable
 fun MeetingFilterContent(
@@ -26,7 +26,7 @@ fun MeetingFilterContent(
     val tagList =
         remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
     val categoryList =
-        remember { mutableStateOf(DemoFullCategoryModelList) }
+        remember { mutableStateOf(CategoriesType.values().toList()) }
     val categoryStateList =
         remember { mutableStateListOf<Boolean>() }
     repeat(categoryList.value.size) { categoryStateList.add(false) }
@@ -54,9 +54,9 @@ fun MeetingFilterContent(
             { bottomSheetScreen = 0 })
         { bottomSheetScreen = 0 }
         
-//        3 -> {}
-//
-//        4 -> {}
+        //        3 -> {}
+        //
+        //        4 -> {}
         
         else -> MeetingFilterBottom(Modifier, 26, state,
             object: MeetingFilterBottomCallback {
@@ -70,12 +70,12 @@ fun MeetingFilterContent(
                 
                 override fun onCountryClick() {
                     country.value = "Россия"
-//                    bottomSheetScreen = 3
+                    //                    bottomSheetScreen = 3
                 }
                 
                 override fun onCityClick() {
                     city.value = "Москва"
-//                    bottomSheetScreen = 4
+                    //                    bottomSheetScreen = 4
                 }
                 
                 override fun onCategoryClick(index: Int) {

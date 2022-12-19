@@ -28,8 +28,8 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
 import ru.rikmasters.gilty.shared.common.MeetingStates
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -39,7 +39,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 fun CompleteContent() {
     GiltyTheme {
-        CompleteContent(DemoFullMeetingModel)
+        CompleteContent(DemoMeetingModel)
     }
 }
 
@@ -51,7 +51,7 @@ interface CompleteCallBack {
 
 @Composable
 fun CompleteContent(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
     callback: CompleteCallBack? = null
 ) {
@@ -111,7 +111,7 @@ private fun Buttons(
 
 @Composable
 private fun MeetingCard(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
     online: Boolean
 ) {
@@ -159,7 +159,7 @@ private fun PhoneContent(
 @Composable
 fun MeetBottom(
     modifier: Modifier,
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     online: Boolean
 ) {
     Box(modifier) {

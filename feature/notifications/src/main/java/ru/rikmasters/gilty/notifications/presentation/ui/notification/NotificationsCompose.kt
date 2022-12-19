@@ -24,8 +24,8 @@ import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
@@ -45,7 +45,7 @@ private fun NotificationsContentPreview() {
         )
         NotificationsContent(
             NotificationsState(
-                list, DemoFullMeetingModel,
+                list, DemoMeetingModel,
                 (3), listOf(), true,
                 DemoNotificationLeaveEmotionModel,
                 listOf(), listOf()
@@ -67,7 +67,7 @@ interface NotificationsCallback {
 
 data class NotificationsState(
     val notificationsList: List<NotificationModel> = listOf(),
-    val lastRespond: FullMeetingModel,
+    val lastRespond: MeetingModel,
     val myResponds: Int = 0,
     val stateList: List<NavIconState>,
     val blur: Boolean = false,
@@ -146,9 +146,8 @@ private fun Notifications(
     LazyColumn(modifier) {
         if(state.myResponds != 0) item {
             Responds(
-                state.myResponds,
-                state.lastRespond.organizer.avatar,
-                stringResource(R.string.notification_responds_on_user_meetings)
+                stringResource(R.string.notification_responds_on_user_meetings),
+                state.myResponds, state.lastRespond.organizer.avatar
             ) { onRespondsClick?.let { it() } }
         };if(todayList.isNotEmpty()) {; item { label(R.string.meeting_profile_bottom_today_label) }
         itemsIndexed(todayList) { i, not ->

@@ -34,12 +34,12 @@ fun getChatWithData(
     isOnline: Boolean = false,
     organizer: OrganizerModel = DemoOrganizerModel,
     organizerOnly: Boolean = false,
-    title: String = DemoFullMeetingModel.title,
+    title: String = DemoMeetingModel.title,
     lastMessage: MessageModel = DemoMessageModel,
     dateTime: String = "2022-11-28T20:00:54.140Z",
     hasUnread: Boolean = false,
     canMessage: Boolean = false,
-    memberCount: Int = DemoFullMeetingModel.memberCount,
+    memberCount: Int = DemoMeetingModel.memberCount,
     createdAt: String = "2022-11-28T20:00:54.140Z"
 ) = ChatModel(
     id, meetingId, userId, meetStatus,

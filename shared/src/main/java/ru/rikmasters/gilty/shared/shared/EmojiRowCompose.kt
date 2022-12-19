@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R.drawable.ic_cloud_part
 import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
@@ -28,36 +27,26 @@ fun EmojiRow(
     Column(modifier) {
         Image(
             painterResource(ic_cloud_part),
-            null, Modifier.padding(start = 40.dp)
+            (null), Modifier.padding(start = 40.dp)
         )
         Box(
             Modifier
                 .padding(top = 2.dp, bottom = 12.dp)
-                .background(colors.chipGray, CircleShape), Center
+                .background(
+                    colors.chipGray, CircleShape
+                ), Center
         ) {
-            LazyRow(Modifier.clip(CircleShape))
-            {
+            LazyRow(Modifier.clip(CircleShape)) {
                 items(EmojiList) {
-                    Emoji(it) { e -> onClick(e) }
+                    GEmojiImage(it, Modifier
+                        .padding(10.dp)
+                        .size(30.dp)
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { onClick(it) }
+                    )
                 }
             }
         }
     }
-}
-
-@Composable
-private fun Emoji(
-    emoji: EmojiModel,
-    onClick: (EmojiModel) -> Unit
-) {
-    Image(
-        if(emoji.type == "D") painterResource(emoji.path.toInt())
-        else rememberAsyncImagePainter(emoji.path), (null),
-        Modifier
-            .padding(10.dp)
-            .size(30.dp)
-            .clickable(
-                MutableInteractionSource(), (null)
-            ) { onClick(emoji) }
-    )
 }

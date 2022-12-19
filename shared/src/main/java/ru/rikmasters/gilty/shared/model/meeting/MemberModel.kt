@@ -36,7 +36,7 @@ val DemoMemberModelTwo = MemberModel(
 
 val DemoMemberModelList = listOf(
     DemoMemberModel,
+    DemoMemberModelTwo,
     DemoMemberModel,
-    DemoMemberModel,
-    DemoMemberModel,
+    DemoMemberModelTwo,
 )

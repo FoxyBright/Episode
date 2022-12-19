@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -26,8 +26,8 @@ private fun TodayMeetingGridPreview() {
 @Composable
 fun MeetingGridContent(
     modifier: Modifier = Modifier,
-    meetings: List<FullMeetingModel>,
-    onClick: (FullMeetingModel) -> (Unit)
+    meetings: List<MeetingModel>,
+    onClick: (MeetingModel) -> (Unit)
 ) {
     LazyVerticalGrid(
         GridCells.Fixed(2),

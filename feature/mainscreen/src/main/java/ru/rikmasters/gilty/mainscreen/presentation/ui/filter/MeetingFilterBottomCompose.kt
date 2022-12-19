@@ -1,11 +1,7 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -20,9 +16,8 @@ import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullCategoryModelList
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -37,7 +32,7 @@ fun MeetingFilterBottomPreview() {
                 listOf(false, false, false),
                 listOf(false, false, false, false, false),
                 listOf("kaif", "pain", "fast", "launch"),
-                DemoFullCategoryModelList,
+                CategoriesType.list(),
                 listOf(false, false, false),
                 ("Россия"), ("Москва"),
             )
@@ -105,7 +100,7 @@ data class FilterListState(
     val genderList: List<Boolean>,
     val conditionList: List<Boolean>,
     val tagList: List<String>,
-    val categoryList: List<FullCategoryModel>,
+    val categoryList: List<CategoriesType>,
     val categoryStateList: List<Boolean>,
     val country: String,
     val city: String

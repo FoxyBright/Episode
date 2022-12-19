@@ -15,22 +15,21 @@ import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<ShortCategoryModel>,
-    val selectCategories: List<ShortCategoryModel>,
+    val categoryList: List<CategoriesType>,
+    val selectCategories: List<CategoriesType>,
     val alert: Boolean
 )
 
 interface CategoriesCallback {
     
-    fun onCategoryClick(category: ShortCategoryModel) {}
+    fun onCategoryClick(category: CategoriesType) {}
     fun onNext() {}
     fun onClose() {}
     fun onCloseAlert(it: Boolean) {}
@@ -116,7 +115,10 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(DemoShortCategoryModelList, arrayListOf(), false)
+            CategoriesState(
+                CategoriesType.list(),
+                arrayListOf(), false
+            )
         )
     }
 }

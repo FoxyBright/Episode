@@ -14,15 +14,15 @@ import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.DOWN
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.UP
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 @Composable
 fun MeetingsListContent(
-    states: List<Pair<FullMeetingModel, SwipeableCardState>>,
+    states: List<Pair<MeetingModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
     notInteresting: ((state: SwipeableCardState) -> Unit)? = null,
-    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null,
-    onClick: ((FullMeetingModel) -> Unit)? = null
+    onSelect: ((MeetingModel, state: SwipeableCardState) -> Unit)? = null,
+    onClick: ((MeetingModel) -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
         Box(Modifier.padding(16.dp)) {
@@ -33,10 +33,10 @@ fun MeetingsListContent(
 
 @Composable
 private fun Content(
-    states: List<Pair<FullMeetingModel, SwipeableCardState>>,
+    states: List<Pair<MeetingModel, SwipeableCardState>>,
     notInteresting: ((state: SwipeableCardState) -> Unit)? = null,
-    onSelect: ((FullMeetingModel, state: SwipeableCardState) -> Unit)? = null,
-    onClick: ((FullMeetingModel) -> Unit)? = null
+    onSelect: ((MeetingModel, state: SwipeableCardState) -> Unit)? = null,
+    onClick: ((MeetingModel) -> Unit)? = null
 ) {
     states.forEach { (meeting, state) ->
         run {

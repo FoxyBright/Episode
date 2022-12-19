@@ -9,7 +9,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.presentation.ui.lists.*
-import ru.rikmasters.gilty.profile.presentation.ui.mymeetings.MyMeetingScreen
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -89,7 +88,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 )
             }
         val pairRespondsList =
-            remember { mutableStateOf(Pair(DemoFullMeetingModel, respondsList)) }
+            remember { mutableStateOf(Pair(DemoMeetingModel, respondsList)) }
         val tabState = remember { mutableStateListOf(true, false) }
         UserProfile(
             UserProfileState(
@@ -171,7 +170,10 @@ fun UserProfileScreen(nav: NavState = get()) {
                 override fun onHistoryClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheetState.expand {
-                            MyMeetingScreen(asm, scope)
+                            MyMeetingScreen(
+                                profileModel, meet,
+                                asm, scope
+                            )
                         }
                     }
                 }
@@ -179,7 +181,10 @@ fun UserProfileScreen(nav: NavState = get()) {
                 override fun onMeetingClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheetState.expand {
-                            MyMeetingScreen(asm, scope)
+                            MyMeetingScreen(
+                                profileModel, meet,
+                                asm, scope
+                            )
                         }
                     }
                 }
@@ -244,8 +249,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                                     repeat(tabsState.size) { index ->
                                         tabsState[index] = it == index
                                     }
-                                })
-                            {
+                                }) {
                                 scope.launch {
                                     asm.bottomSheetState.collapse()
                                 }

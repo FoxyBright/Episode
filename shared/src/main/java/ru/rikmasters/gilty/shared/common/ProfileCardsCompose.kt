@@ -29,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_image_box
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
@@ -42,6 +41,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -107,17 +107,19 @@ fun HiddenPhotoContent(
                 .clip(CircleShape)
                 .align(TopStart),
         ) {
-            Image(
-                painterResource(transparency_circle),
-                (null), Modifier.fillMaxSize()
-            )
-            if(profileType != USERPROFILE) Icon(
-                painterResource(ic_lock_close),
-                (null), Modifier
-                    .padding(4.dp)
-                    .size(24.dp),
-                colorScheme.tertiary
-            )
+            if(profileType != USERPROFILE) {
+                Image(
+                    painterResource(transparency_circle),
+                    (null), Modifier.fillMaxSize()
+                )
+                Icon(
+                    painterResource(ic_lock_close),
+                    (null), Modifier
+                        .padding(4.dp)
+                        .size(24.dp),
+                    colorScheme.tertiary
+                )
+            }
         }
         if(profileType == ORGANIZER)
             CreateProfileCardRow(
@@ -348,15 +350,13 @@ private fun Cloud(modifier: Modifier, emoji: EmojiModel?) {
         MiniCloud(
             Modifier.padding(bottom = 2.dp),
         ) {
-            Image(
-                if(emoji?.type == "D")
-                    painterResource(emoji.path.toInt())
-                else rememberAsyncImagePainter
-                    (emoji?.path), (null),
-                Modifier
-                    .padding(10.dp, 8.dp)
-                    .size(24.dp)
-            )
+            emoji?.let {
+                GEmojiImage(
+                    it, Modifier
+                        .padding(10.dp, 8.dp)
+                        .size(24.dp)
+                )
+            }
         }
     }
 }

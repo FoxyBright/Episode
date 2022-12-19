@@ -162,14 +162,14 @@ fun Profile(
             )
         Row {
             ProfileImageContent(
-                Modifier,
+                Modifier.weight(1f),
                 state.profilePhoto ?: "",
                 state.profileType,
                 state.observeState,
                 { bool -> onChange?.let { it(bool) } },
                 { callback?.profileImage() })
             Spacer(Modifier.width(14.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
                     Modifier,
                     state.rating,

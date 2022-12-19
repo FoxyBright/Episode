@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
-import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,7 +33,6 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiList
@@ -43,9 +41,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class UserProfileState(
     val profileState: ProfileState,
-    val currentMeetings: List<FullMeetingModel>,
-    val meetingsHistory: List<FullMeetingModel>,
-    val lastRespond: FullMeetingModel,
+    val currentMeetings: List<MeetingModel>,
+    val meetingsHistory: List<MeetingModel>,
+    val lastRespond: MeetingModel,
     val notifications: Int,
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
@@ -197,7 +195,7 @@ fun UserProfile(
 @Composable
 private fun Responds(
     size: Int,
-    last: FullMeetingModel,
+    last: MeetingModel,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -255,9 +253,9 @@ private fun Responds(
 @Composable
 private fun meetHistory(
     historyState: Boolean,
-    historyList: List<FullMeetingModel>,
+    historyList: List<MeetingModel>,
     openHistory: () -> Unit,
-    onSelect: (FullMeetingModel) -> Unit
+    onSelect: (MeetingModel) -> Unit
 ) {
     Row(
         Modifier

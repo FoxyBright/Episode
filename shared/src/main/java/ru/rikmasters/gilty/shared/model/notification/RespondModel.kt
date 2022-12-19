@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.shared.model.notification
 
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
@@ -19,7 +19,7 @@ data class RespondModel(
 
 val DemoSendRespondsModel = RespondModel(
     1,
-    DemoFullMeetingModel,
+    DemoMeetingModel,
     null,
     DemoOrganizerModel,
     RespondType.SEND,
@@ -27,7 +27,7 @@ val DemoSendRespondsModel = RespondModel(
 )
 
 val DemoReceivedRespondsModel = RespondModel(
-    1, DemoFullMeetingModel,
+    1, DemoMeetingModel,
     "Классно выглядишь, пойдем? Я вроде адекватный))",
     DemoOrganizerModel,
     RespondType.RECEIVED,
@@ -41,7 +41,7 @@ val DemoReceivedRespondsModel = RespondModel(
 
 val DemoReceivedRespondModelWithoutPhoto = RespondModel(
     1,
-    DemoFullMeetingModel,
+    DemoMeetingModel,
     "Покажи свои фото))",
     DemoOrganizerModel,
     RespondType.RECEIVED,

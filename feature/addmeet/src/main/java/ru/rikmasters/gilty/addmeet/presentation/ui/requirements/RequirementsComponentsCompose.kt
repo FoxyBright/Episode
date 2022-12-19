@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.DescriptionColors
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.onNull
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.numberMask

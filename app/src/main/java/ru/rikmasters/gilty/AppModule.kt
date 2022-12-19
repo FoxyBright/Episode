@@ -21,7 +21,7 @@ object AppModule : FeatureDefinition() {
             Profile, AddMeet, Notifications,
             Chat, Complains, Settings
         )
-
+    
     override fun DeepNavGraphBuilder.navigation() {}
 
     override fun Module.koin() {}

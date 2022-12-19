@@ -30,7 +30,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.LEAVE_EMOTIONS
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.MEETING_OVER
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.RESPOND_ACCEPT
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
@@ -41,8 +41,8 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun LEAVE_EMOTIONS() {
     GiltyTheme {
         NotificationText(
-            DemoOrganizerModel, LEAVE_EMOTIONS, DemoFullMeetingModel,
-            getDifferenceOfTime(DemoFullMeetingModel.dateTime),
+            DemoOrganizerModel, LEAVE_EMOTIONS, DemoMeetingModel,
+            getDifferenceOfTime(DemoMeetingModel.dateTime),
             Modifier.padding(20.dp)
         )
     }
@@ -53,8 +53,8 @@ private fun LEAVE_EMOTIONS() {
 private fun MEETING_OVER() {
     GiltyTheme {
         NotificationText(
-            DemoOrganizerModel, MEETING_OVER, DemoFullMeetingModel,
-            getDifferenceOfTime(DemoFullMeetingModel.dateTime),
+            DemoOrganizerModel, MEETING_OVER, DemoMeetingModel,
+            getDifferenceOfTime(DemoMeetingModel.dateTime),
             Modifier.padding(20.dp)
         )
     }
@@ -65,8 +65,8 @@ private fun MEETING_OVER() {
 private fun RESPOND_ACCEPT() {
     GiltyTheme {
         NotificationText(
-            DemoOrganizerModel, RESPOND_ACCEPT, DemoFullMeetingModel,
-            getDifferenceOfTime(DemoFullMeetingModel.dateTime),
+            DemoOrganizerModel, RESPOND_ACCEPT, DemoMeetingModel,
+            getDifferenceOfTime(DemoMeetingModel.dateTime),
             Modifier.padding(20.dp)
         )
     }

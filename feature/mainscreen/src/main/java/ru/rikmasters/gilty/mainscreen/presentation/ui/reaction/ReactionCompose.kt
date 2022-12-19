@@ -3,90 +3,100 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 fun ReactionPreview() {
-    GiltyTheme { ReactionContent(DemoAvatarModel.id) {} }
+    GiltyTheme {
+        Box(Modifier.background(colorScheme.background)) {
+            ReactionContent(
+                DemoAvatarModel.id,
+                ENTERTAINMENT
+            )
+        }
+    }
 }
 
 @Composable
 fun ReactionContent(
     avatar: String,
+    categoriesType: CategoriesType,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    onBack: (() -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
         AsyncImage(
-            avatar,
-            stringResource(R.string.meeting_avatar),
+            avatar, stringResource(R.string.meeting_avatar),
             Modifier.fillMaxSize(),
             contentScale = Crop
         )
         Box(
             Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .clip(ThemeExtra.shapes.largeTopRoundedShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .align(BottomCenter)
+                .clip(shapes.largeTopRoundedShape)
+                .background(colorScheme.primaryContainer)
         ) {
             Column {
                 Text(
                     stringResource(R.string.meeting_respond_was_send),
                     Modifier.padding(top = 16.dp, start = 16.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    style = MaterialTheme.typography.displayLarge
+                    color = colorScheme.tertiary,
+                    style = typography.displayLarge
                 )
                 Text(
                     stringResource(R.string.meeting_wait_organizer_access),
                     Modifier.padding(top = 8.dp, start = 16.dp),
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold
+                    color = colorScheme.onTertiary,
+                    style = typography.labelSmall,
+                    fontWeight = SemiBold
                 )
             }
             CategoryItem(
-                DemoShortCategoryModel,
-                true,
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(20.dp, (-20).dp)
+                categoriesType, (true), Modifier
+                    .align(TopEnd)
+                    .offset(12.dp, (-18).dp)
             )
         }
         Box(
             Modifier
                 .padding(16.dp)
-                .align(Alignment.TopEnd)
+                .align(TopEnd)
         ) {
             IconButton(
-                onBack, Modifier
+                { onBack?.let { it() } }, Modifier
                     .padding(16.dp)
                     .size(30.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(colorScheme.primaryContainer)
             ) {
                 Icon(
-                    Icons.Filled.Close,
-                    null,
+                    Filled.Close, (null),
                     Modifier.size(20.dp)
                 )
             }

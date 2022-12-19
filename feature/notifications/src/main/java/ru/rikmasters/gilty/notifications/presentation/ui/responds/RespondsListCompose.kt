@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.common.RespondsListContent
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
@@ -28,14 +28,14 @@ private fun NotificationRespondsPreview() {
             NotificationRespondsState(
                 listOf(
                     Pair(
-                        DemoFullMeetingModel,
+                        DemoMeetingModel,
                         listOf(
                             DemoReceivedRespondsModel,
                             DemoReceivedRespondModelWithoutPhoto
                         )
                     ),
                     Pair(
-                        DemoFullMeetingModel,
+                        DemoMeetingModel,
                         listOf(DemoSendRespondsModel)
                     )
                 ), listOf(true, false)
