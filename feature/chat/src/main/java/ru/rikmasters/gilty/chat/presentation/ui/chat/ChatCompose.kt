@@ -12,10 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.SwipeableMessage
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
 import ru.rikmasters.gilty.complaints.presentation.ui.MeetOutAlert
 import ru.rikmasters.gilty.shared.R.string.*
+import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GDropMenu
@@ -46,6 +47,7 @@ interface ChatCallback:
     fun onMessageMenuItemSelect(point: Int) {}
     fun onMessageMenuDismiss() {}
     fun onImageClick(image: String) {}
+    fun onSwipeMessage(message: MessageModel) {}
 }
 
 @Composable
@@ -93,12 +95,14 @@ fun ChatContent(
                 .padding(it)
                 .fillMaxSize()
         ) {
+            val list = state.messageList.map { mess -> mess to rememberDragRowState() }
             LazyColumn(Modifier.align(BottomCenter), state.listState) {
-                items(state.messageList) { mes ->
-                    Message(
-                        mes, (state.sender == mes.sender),
-                        mes.answer, hide = false,
-                        { message -> callback?.onMessageLongClick(message) }
+                items(list) { mes ->
+                    SwipeableMessage(
+                        mes.first, (state.sender == mes.first.sender),
+                        mes.second, mes.first.answer, (false), Modifier,
+                        { message -> callback?.onMessageLongClick(message) },
+                        { message -> callback?.onSwipeMessage(message) }
                     ) { image -> callback?.onImageClick(image) }
                 }
                 item { Divider(Modifier, 10.dp, Color.Transparent) }

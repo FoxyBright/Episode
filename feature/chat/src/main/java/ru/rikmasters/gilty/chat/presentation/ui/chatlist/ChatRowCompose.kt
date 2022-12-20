@@ -114,9 +114,9 @@ fun SwipeableChatRow(
         modifier
             .fillMaxWidth()
             .background(
-                if(chat.isOnline) colorScheme.secondary
-                else colorScheme.primary,
-                shape
+                if(chat.isOnline)
+                    colorScheme.secondary
+                else colorScheme.primary, shape
             )
     ) {
         SwipeableRowBack(

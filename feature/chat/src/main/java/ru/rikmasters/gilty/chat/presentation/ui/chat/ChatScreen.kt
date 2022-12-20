@@ -98,6 +98,10 @@ fun ChatScreen(nav: NavState = get()) {
                 nav.navigate("main")
             }
             
+            override fun onSwipeMessage(message: MessageModel) {
+                answer = message
+            }
+            
             override fun onMessageLongClick(message: MessageModel) {
                 selectMessage = message
                 messageMenuState = true
@@ -159,6 +163,7 @@ fun ChatScreen(nav: NavState = get()) {
                         answer = answer
                     )
                 )
+                answer = null
                 messageText = ""
                 scope.launch {
                     listState.animateScrollToItem(

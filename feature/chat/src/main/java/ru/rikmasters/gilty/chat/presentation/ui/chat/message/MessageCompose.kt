@@ -36,7 +36,9 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.gb
 import ru.rikmasters.gilty.shared.R.drawable.ic_sms_delivered
 import ru.rikmasters.gilty.shared.R.drawable.ic_sms_read
+import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.profile.ImageModel
 import ru.rikmasters.gilty.shared.shared.HiddenImage
@@ -47,9 +49,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MyMessage() {
     GiltyTheme {
-        Message(
+        SwipeableMessage(
             DemoMessageModelLongMessage,
-            (true), hide = false
+            (true), DragRowState(1f)
         )
     }
 }
@@ -58,10 +60,10 @@ private fun MyMessage() {
 @Composable
 private fun MyMessageWithAttach() {
     GiltyTheme {
-        val message = DemoMessageModel
-        Message(
-            message, (true),
-            message.answer, (false)
+        SwipeableMessage(
+            DemoMessageModel, (true),
+            DragRowState(1f),
+            DemoMessageModel.answer,
         )
     }
 }
@@ -70,9 +72,9 @@ private fun MyMessageWithAttach() {
 @Composable
 private fun MessagePreview() {
     GiltyTheme {
-        Message(
-            DemoMessageModelLongMessage,
-            (false), hide = false
+        SwipeableMessage(
+            DemoMessageModel,
+            (false), DragRowState(1f)
         )
     }
 }
@@ -81,9 +83,9 @@ private fun MessagePreview() {
 @Composable
 private fun MyMessagePreview() {
     GiltyTheme {
-        Message(
+        SwipeableMessage(
             DemoMessageModel,
-            (true), hide = false
+            (true), DragRowState(1f)
         )
     }
 }
@@ -92,9 +94,9 @@ private fun MyMessagePreview() {
 @Composable
 private fun MessageImage() {
     GiltyTheme {
-        Message(
+        SwipeableMessage(
             DemoImageMessage,
-            (false), hide = false
+            (false), DragRowState(1f)
         )
     }
 }
@@ -103,9 +105,9 @@ private fun MessageImage() {
 @Composable
 private fun MessageHiddenImage() {
     GiltyTheme {
-        Message(
+        SwipeableMessage(
             DemoHiddenImageMessage,
-            (true), hide = false
+            (true), DragRowState(1f)
         )
     }
 }
@@ -114,19 +116,51 @@ private fun MessageHiddenImage() {
 @Composable
 private fun MessageAnswer() {
     GiltyTheme {
-        Message(
+        SwipeableMessage(
             DemoMessageModel, (false),
-            DemoMessageModelLongMessage, (false)
+            DragRowState(1f),
         )
     }
 }
 
+private data class MessageState(
+    val sender: Boolean,
+    val align: Alignment,
+    val textColor: Color,
+    val background: Brush
+)
+
 @Composable
-fun Message(
-    messageModel: MessageModel,
+fun SwipeableMessage(
+    message: MessageModel,
+    sender: Boolean,
+    state: DragRowState,
+    answer: MessageModel? = null,
+    hide: Boolean = false,
+    modifier: Modifier = Modifier,
+    onLongPress: ((MessageModel) -> Unit)? = null,
+    onSwiped: ((MessageModel) -> Unit)? = null,
+    onImageClick: ((String) -> Unit)? = null,
+) {
+    Row(
+        modifier.swipeableRow(state)
+        { onSwiped?.let { it(message) } },
+        Arrangement.Center, CenterVertically
+    ) {
+        MessageContent(
+            message, sender, answer, hide, Modifier,
+            { onLongPress?.let { c -> c(it) } })
+        { onImageClick?.let { c -> c(it) } }
+    }
+}
+
+@Composable
+private fun MessageContent(
+    message: MessageModel,
     sender: Boolean,
     answer: MessageModel? = null,
     hide: Boolean,
+    modifier: Modifier = Modifier,
     onLongPress: ((MessageModel) -> Unit)? = null,
     onImageClick: ((String) -> Unit)? = null
 ) {
@@ -140,7 +174,7 @@ fun Message(
         (false), CenterStart, colorScheme.tertiary,
         Brush.linearGradient(listOf(back, back)),
     )
-    Box(Modifier.fillMaxWidth(), state.align) {
+    Box(modifier.fillMaxWidth(), state.align) {
         Box(
             Modifier
                 .fillMaxWidth(0.8f)
@@ -148,11 +182,12 @@ fun Message(
         ) {
             Row(verticalAlignment = Bottom) {
                 if(!sender) AsyncImage(
-                    messageModel.sender.avatar.id, (null),
+                    message.sender.avatar.id, (null),
                     Modifier
                         .padding(horizontal = 6.dp)
                         .size(24.dp)
-                        .clip(CircleShape), contentScale = Crop,
+                        .clip(CircleShape),
+                    contentScale = Crop,
                     placeholder = painterResource(gb)
                 )
                 Content(
@@ -161,11 +196,18 @@ fun Message(
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onLongPress = {
-                                    onLongPress?.let { it(messageModel) }
+                                    onLongPress?.let {
+                                        it(message)
+                                    }
+                                },
+                                onPress = {
+                                    onImageClick?.let { c ->
+                                        message.attachments?.let { c(it.id) }
+                                    }
                                 }
                             )
                         },
-                    state, messageModel, answer, hide
+                    state, message, answer, hide
                 ) { onImageClick?.let { c -> c(it) } }
             }
         }
@@ -190,6 +232,48 @@ private fun Content(
         state, message,
         modifier, answer
     )
+}
+
+@Composable
+private fun Message(
+    state: MessageState,
+    messageModel: MessageModel,
+    modifier: Modifier = Modifier,
+    answer: MessageModel? = null
+) {
+    Box(modifier, state.align) {
+        Box(
+            Modifier.background(
+                state.background,
+                shapes.large
+            ), state.align
+        ) {
+            Box(Modifier.padding(8.dp), state.align) {
+                Column {
+                    answer?.let {
+                        AnswerContent(
+                            it, Modifier.padding(bottom = 4.dp),
+                            sender = state.sender
+                        )
+                    }
+                    Text(
+                        messageModel.text,
+                        Modifier
+                            .align(Alignment.Start)
+                            .padding(
+                                end = if(state.sender) 50.dp else 36.dp
+                            ), state.textColor,
+                        textAlign = if(state.sender) Right else Left,
+                        style = typography.bodyMedium
+                    )
+                }
+                Status(
+                    state.textColor, state.sender,
+                    messageModel, Modifier.align(BottomEnd)
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -229,8 +313,11 @@ private fun ImageMessage(
                 Modifier
                     .size(220.dp)
                     .clip(shapes.large)
-                    .clickable { onImageClick?.let { it(image.id) } },
-                contentScale = Crop,
+                    .clickable {
+                        onImageClick?.let {
+                            it(image.id)
+                        }
+                    }, contentScale = Crop,
                 placeholder = painterResource(gb)
             )
             Box(
@@ -249,57 +336,9 @@ private fun ImageMessage(
             ) {
                 Status(
                     if(!hidden) state.textColor
-                    else colorScheme.onTertiary, state.sender,
-                    messageModel, Modifier.padding(4.dp, 2.dp)
-                )
-            }
-        }
-    }
-}
-
-private data class MessageState(
-    val sender: Boolean,
-    val align: Alignment,
-    val textColor: Color,
-    val background: Brush
-)
-
-@Composable
-private fun Message(
-    state: MessageState,
-    messageModel: MessageModel,
-    modifier: Modifier = Modifier,
-    answer: MessageModel? = null
-) {
-    Box(modifier, state.align) {
-        Box(
-            Modifier.background(
-                state.background,
-                shapes.large
-            ), state.align
-        ) {
-            Box(Modifier.padding(8.dp), state.align) {
-                Column {
-                    answer?.let {
-                        AnswerContent(
-                            it, Modifier.padding(bottom = 4.dp),
-                            sender = state.sender
-                        )
-                    }
-                    Text(
-                        messageModel.text,
-                        Modifier
-                            .align(Alignment.Start)
-                            .padding(
-                                end = if(state.sender) 50.dp else 36.dp
-                            ), state.textColor,
-                        textAlign = if(state.sender) Right else Left,
-                        style = typography.bodyMedium
-                    )
-                }
-                Status(
-                    state.textColor, state.sender,
-                    messageModel, Modifier.align(BottomEnd)
+                    else colorScheme.onTertiary,
+                    state.sender, messageModel,
+                    Modifier.padding(4.dp, 2.dp)
                 )
             }
         }
