@@ -3,13 +3,8 @@ package ru.rikmasters.gilty.shared.common.extentions
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,20 +24,30 @@ fun Modifier.swipeableRow(
     coroutineScope {
         detectHorizontalDragGestures({}, {
             launch {
-                val coercedOffset = state.offset.targetValue.coerceIn(state.maxWidth)
-                if (abs(coercedOffset.x) < state.maxWidth / 4) state.reset()
+                val coercedOffset = state.offset
+                    .targetValue.coerceIn(state.maxWidth)
+                if(abs(coercedOffset.x) < state.maxWidth / 4)
+                    state.reset()
                 else {
-                    if (state.offset.targetValue.x < 0) {
-                        state.swipe(RowDirection()); state.reset(); onSwiped(RowDirection())
+                    if(state.offset.targetValue.x < 0) {
+                        state.swipe(RowDirection())
+                        state.reset()
+                        onSwiped(RowDirection())
                     }
                 }
             }
-        }, { launch { state.reset() } }, { change, dragAmount ->
-            launch {
-                if (change.positionChange() != Offset.Zero) change.consume()
-                state.drag((state.offset.targetValue.x + dragAmount).coerceIn(-state.maxWidth, 0f))
+        }, { launch { state.reset() } },
+            { change, dragAmount ->
+                launch {
+                    if(change.positionChange() != Offset.Zero)
+                        change.consume()
+                    state.drag(
+                        (state.offset.targetValue.x + dragAmount).coerceIn(
+                            -state.maxWidth, 0f
+                        )
+                    )
+                }
             }
-        }
         )
     }
 }.graphicsLayer { translationX = state.offset.value.x }
@@ -62,22 +67,34 @@ fun rememberDragRowState(): DragRowState {
 }
 
 class DragRowState(val maxWidth: Float) {
-    val offset = Animatable(offset(0f), Offset.VectorConverter)
-    private var swipedDirection: RowDirection? by mutableStateOf(null)
+    
+    val offset =
+        Animatable(offset(0f), Offset.VectorConverter)
+    private var swipedDirection: RowDirection? by
+    mutableStateOf(null)
+    
     suspend fun reset() {
-        offset.animateTo(offset(0f), tween(400))
+        offset.animateTo(
+            offset(0f),
+            tween(400)
+        )
     }
-
+    
     suspend fun swipe(direction: RowDirection) {
-        if (direction == RowDirection())
-            offset.animateTo(offset(-(maxWidth * 1.5f)), tween(400))
+        if(direction == RowDirection())
+            offset.animateTo(
+                offset(-(maxWidth * 1.5f)),
+                tween(400)
+            )
         this.swipedDirection = direction
     }
-
-    private fun offset(x: Float = offset.value.x): Offset {
+    
+    private fun offset(
+        x: Float = offset.value.x
+    ): Offset {
         return Offset(x, 0f)
     }
-
+    
     suspend fun drag(x: Float) {
         offset.animateTo(offset(x))
     }

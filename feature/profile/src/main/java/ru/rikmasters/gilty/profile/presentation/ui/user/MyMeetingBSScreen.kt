@@ -133,7 +133,7 @@ private fun meet(
 }
 
 @Composable
-private fun organizer(
+fun organizer(
     user: ProfileModel,
     meet: MeetingModel,
     asm: AppStateModel = get(),

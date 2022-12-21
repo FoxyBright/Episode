@@ -2,9 +2,10 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,8 +55,10 @@ fun HiddenImage(
     Box(
         modifier
             .size(50.dp)
-            .clip(MaterialTheme.shapes.extraSmall)
-            .clickable { onClick?.let { it(image) } }
+            .clip(shapes.extraSmall)
+            .clickable(
+                MutableInteractionSource(), (null)
+            ) { onClick?.let { it(image) } }
     ) {
         if(hidden) Box(
             Modifier

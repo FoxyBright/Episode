@@ -1,21 +1,19 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
+import ru.rikmasters.gilty.shared.model.enumeration.SexType
+import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoEmojiModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 
 data class OrganizerModel(
-    
     val id: String,
-    
     val username: String,
-    
     val emoji: EmojiModel,
-    
     val avatar: AvatarModel,
-    
-    val age: Int
+    val age: Int,
+    val gender: SexType
 ) {
     
     override fun equals(other: Any?): Boolean {
@@ -48,5 +46,6 @@ val DemoOrganizerModel = OrganizerModel(
     "alina.loon",
     DemoEmojiModel,
     DemoAvatarModel,
-    20
+    20,
+    FEMALE
 )

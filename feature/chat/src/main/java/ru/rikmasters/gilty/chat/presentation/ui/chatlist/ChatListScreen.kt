@@ -4,10 +4,13 @@ import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
+import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
 import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
 import ru.rikmasters.gilty.shared.common.extentions.YESTERDAY
@@ -40,10 +43,14 @@ fun ChatListScreen(nav: NavState = get()) {
     val context = LocalContext.current
     var active by
     remember { mutableStateOf(false) }
+    
+    
+    val delForMe = stringResource(delete_my_chat_button)
+    val delForOther = stringResource(delete_my_and_other_chat_button)
     val list = remember {
         mutableStateListOf(
-            Pair("Удалить у меня", true),
-            Pair("Удалить у всех", false)
+            Pair(delForMe, true),
+            Pair(delForOther, false)
         )
     }
     val chatToDelete =

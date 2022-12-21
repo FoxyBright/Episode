@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.profile
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 
 sealed interface ImageModel {
+    
     val id: String
     val albumId: String
     val ownerId: String
@@ -14,6 +15,7 @@ sealed interface ImageModel {
     val resolutionX: Int
     val resolutionY: Int
     val playtime: Number
+    val hasAccess: Boolean
 }
 
 data class AvatarModel(
@@ -27,8 +29,9 @@ data class AvatarModel(
     override val height: Int,
     override val resolutionX: Int,
     override val resolutionY: Int,
-    override val playtime: Number
-) : ImageModel
+    override val playtime: Number,
+    override val hasAccess: Boolean
+): ImageModel
 
 val DemoAvatarModel = AvatarModel(
     "https://placekitten.com/1200/800",
@@ -41,5 +44,22 @@ val DemoAvatarModel = AvatarModel(
     800,
     400,
     800,
-    0
+    0,
+    false
 )
+
+val DemoAvatarAccessModel = AvatarModel(
+    "https://placekitten.com/1200/800",
+    "test",
+    "test",
+    PhotoType.PHOTO,
+    "mimeType",
+    10,
+    400,
+    800,
+    400,
+    800,
+    0,
+    true
+)
+

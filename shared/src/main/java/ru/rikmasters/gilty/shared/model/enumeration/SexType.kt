@@ -8,6 +8,14 @@ enum class SexType() {
     
     FEMALE, MALE, OTHER;
     
+    companion object {
+        
+        private val enums =
+            SexType.values()
+        
+        fun get(index: Int) = enums[index]
+    }
+    
     val display
         @Composable get() =
             stringResource(

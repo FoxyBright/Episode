@@ -20,8 +20,8 @@ private fun AlertListPreview() {
     GiltyTheme {
         ChatDeleteAlert(
             true, LIST, listOf(
-                Pair("Удалить у меня", true),
-                Pair("Удалить у всех", false)
+                Pair(stringResource(delete_my_chat_button), true),
+                Pair(stringResource(delete_my_and_other_chat_button), false)
             ), {}, {}, {})
     }
 }
@@ -32,8 +32,8 @@ private fun AlertConfirmPreview() {
     GiltyTheme {
         ChatDeleteAlert(
             true, CONFIRM, listOf(
-                Pair("Удалить у меня", true),
-                Pair("Удалить у всех", false)
+                Pair(stringResource(delete_my_chat_button), true),
+                Pair(stringResource(delete_my_and_other_chat_button), false)
             ), {}, {}, {})
     }
 }

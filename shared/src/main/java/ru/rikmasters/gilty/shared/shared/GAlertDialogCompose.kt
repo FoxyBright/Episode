@@ -8,13 +8,13 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
+import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private const val header = "Заголовок"
@@ -71,27 +73,19 @@ private fun AlertDialogWithContentPreview() {
 @Composable
 private fun ListAlertDialogPreview() {
     GiltyTheme {
-        val list = remember {
-            mutableStateListOf(
-                Pair("Удалить у меня", true),
-                Pair("Удалить у всех", false)
-            )
-        }
+        val list = listOf(
+            Pair(stringResource(delete_my_chat_button), true),
+            Pair(stringResource(delete_my_and_other_chat_button), false)
+        )
         Box(Modifier.fillMaxSize()) {
             GAlert(true, {}, header, Modifier.padding(10.dp),
                 cancel = Pair(stringResource(R.string.cancel_button)) {},
                 success = Pair(stringResource(R.string.confirm_button)) {},
-                list = list, listItemSelect = { active ->
-                    repeat(list.size) {
-                        if(it == active) list[it] = Pair(list[it].first, true)
-                        else list[it] = Pair(list[it].first, false)
-                    }
-                })
+                list = list, listItemSelect = {})
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GAlert(
     show: Boolean,
