@@ -14,12 +14,12 @@ abstract class CoroutineController {
     
     private val calls: MutableMap<String, Deferred<*>> = HashMap()
     
-    @Suppress("UNCHECKED_CAST")
     protected suspend inline fun <T> single(
         strategy: Strategy = DEFAULT_SINGLE_STRATEGY,
         noinline block: suspend CoroutineScope.() -> T
     ): T = single(methodName(), strategy, block)
     
+    @Suppress("UNCHECKED_CAST")
     protected suspend fun <T> single(
         key: String,
         strategy: Strategy = DEFAULT_SINGLE_STRATEGY,

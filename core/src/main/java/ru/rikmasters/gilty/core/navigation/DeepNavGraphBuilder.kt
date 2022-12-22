@@ -2,16 +2,19 @@ package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import androidx.navigation.navOptions
-import androidx.navigation.navigation
+import org.koin.androidx.compose.getKoin
 import ru.rikmasters.gilty.core.util.extension.slash
+import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import kotlin.collections.List
+import kotlin.collections.emptyList
+import kotlin.collections.forEach
+import kotlin.collections.mutableListOf
+import kotlin.collections.plusAssign
+import kotlin.collections.set
+import kotlin.reflect.KClass
 
 
 /**
@@ -37,7 +40,29 @@ class DeepNavGraphBuilder internal constructor(
         navOptions: NavOptionsBuilder.() -> Unit = { },
         content: @Composable (NavBackStackEntry) -> Unit
     ) {
-        destinations += Screen(route.deep(), arguments, deepLinks, navOptions, content)
+        destinations += SimpleScreen(route.deep(), arguments, deepLinks, navOptions, content)
+    }
+    
+    inline fun <reified T: ViewModel> screen(
+        route: String,
+        arguments: List<NamedNavArgument> = emptyList(),
+        deepLinks: List<NavDeepLink> = emptyList(),
+        noinline navOptions: NavOptionsBuilder.() -> Unit = { },
+        noinline content: @Composable (T, NavBackStackEntry) -> Unit
+    ) {
+        screen(route, arguments, deepLinks, navOptions, T::class, content)
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T: ViewModel> screen(
+        route: String,
+        arguments: List<NamedNavArgument> = emptyList(),
+        deepLinks: List<NavDeepLink> = emptyList(),
+        navOptions: NavOptionsBuilder.() -> Unit = { },
+        vmClass: KClass<T>,
+        content: @Composable (T, NavBackStackEntry) -> Unit
+    ) {
+        destinations += VmScreen(route.deep(), arguments, deepLinks, navOptions, vmClass, content)
     }
 
     /**
