@@ -1,18 +1,10 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import org.koin.androidx.compose.getKoin
 import ru.rikmasters.gilty.core.util.extension.slash
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import kotlin.collections.List
-import kotlin.collections.emptyList
-import kotlin.collections.forEach
-import kotlin.collections.mutableListOf
-import kotlin.collections.plusAssign
 import kotlin.collections.set
 import kotlin.reflect.KClass
 
@@ -68,24 +60,6 @@ class DeepNavGraphBuilder internal constructor(
     /**
      * Реальный route будет сгенерирован по принципу $nested/$nested/.../$route
      *
-     * @param navOptions параметры по умолчанию
-     *
-     * @see [NavGraphBuilder.dialog]
-     */
-    fun dialogScreen(
-        route: String,
-        arguments: List<NamedNavArgument> = emptyList(),
-        deepLinks: List<NavDeepLink> = emptyList(),
-        dialogProperties: DialogProperties = DialogProperties(),
-        navOptions: NavOptionsBuilder.() -> Unit,
-        content: @Composable (NavBackStackEntry) -> Unit
-    ) {
-        destinations += Dialog(route.deep(), arguments, deepLinks, dialogProperties, navOptions, content)
-    }
-
-    /**
-     * Реальный route будет сгенерирован по принципу $nested/$nested/.../$route
-     *
      * @see [NavGraphBuilder.navigation]
      */
     fun nested(
@@ -103,19 +77,8 @@ class DeepNavGraphBuilder internal constructor(
                     processNavOptions(it.deepRoute, it.navOptions)
                     composable(
                         it.deepRoute,
-                        it.arguments,
+                        it.resolveNavArgs(),
                         it.deepLinks,
-                        it.content
-                    )
-                }
-
-                is Dialog -> {
-                    processNavOptions(it.deepRoute, it.navOptions)
-                    dialog(
-                        it.deepRoute,
-                        it.arguments,
-                        it.deepLinks,
-                        it.dialogProperties,
                         it.content
                     )
                 }
@@ -127,6 +90,27 @@ class DeepNavGraphBuilder internal constructor(
                     }
             }
         }
+    }
+    
+    private fun Screen.resolveNavArgs() =
+        resolveNavArgs(deepRoute, navArgs)
+    
+    private fun resolveNavArgs(
+        route: String,
+        args: List<NamedNavArgument>
+    ): List<NamedNavArgument> {
+        var result: MutableList<NamedNavArgument>? = null
+        val argsStr = route.substringAfter('?', "")
+        Regex("(\\w+)=\\{(\\w+)\\}").findAll(argsStr).forEach { res ->
+            val name = res.groups[2]?.value ?: return@forEach
+            if(args.any { it.name == name }) return@forEach
+            if(result == null) result = args.toMutableList()
+            result!! += navArgument(name) {
+                type = NavType.StringType
+                defaultValue = ""
+            }
+        }
+        return result ?: args
     }
 
     private fun processNavOptions(route: String, builder: NavOptionsBuilder.() -> Unit) {
