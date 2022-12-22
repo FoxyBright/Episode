@@ -18,21 +18,21 @@ fun AvatarScreen(nav: NavState = get()) {
     var menuState by remember { mutableStateOf(false) }
     PhotoView(
         PhotoViewState(
-            profile.avatar.id,
-            menuState, (0)
+            profile.avatar.id, ("1/1"), menuState, (0)
         ), Modifier, object: PhotoViewCallback {
-            override fun onMenuClick(state: Boolean) {
-                menuState = state
-            }
             
             override fun onMenuItemClick(point: Int) {
                 menuState = false
                 Toast.makeText(
-                    context, "Тут будет возможность выбрать другое фото",
+                    context,
+                    ("Тут будет возможность выбрать другое фото"),
                     Toast.LENGTH_SHORT
                 ).show()
             }
             
+            override fun onMenuClick(state: Boolean) {
+                menuState = state
+            }
             
             override fun onBack() {
                 nav.navigate("main")

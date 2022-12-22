@@ -136,7 +136,6 @@ private fun Label(
     Text(
         text = message.attachments?.let {
             stringResource(
-                
                 when(it.type) {
                     PHOTO -> chats_message_answer_photo_label
                     PRIVATE_PHOTO -> profile_hidden_photo

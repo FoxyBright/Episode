@@ -1,8 +1,9 @@
 package ru.rikmasters.gilty.chat.presentation.ui.photoView
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.PhotoView
@@ -16,19 +17,22 @@ fun PhotoViewScreen(
     nav: NavState = get()
 ) {
     var timer by remember {
-        mutableStateOf(0f)
+        mutableStateOf(false)
     }
     LaunchedEffect(Unit) {
-        while(timer <= 1f) {
-            delay(10L)
-            timer += 0.005f
-        }
+        timer = true
     }
-    
+    val animateTimer =
+        animateFloatAsState(
+            if(timer) 1f else 0f,
+            tween(6000)
+        ) {
+            timer = false
+            nav.navigate("chat")
+        }.value
     PhotoView(
         PhotoViewState(
-            image, (false),
-            type, timer
+            image, ("1/1"), (false), type, animateTimer
         ), Modifier, object: PhotoViewCallback {
             override fun onBack() {
                 nav.navigate("chat")

@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.End
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,7 +73,6 @@ data class MessState(
 
 interface MessCallBack {
     
-    fun onLongPress(message: MessageModel) {}
     fun onImageClick(message: MessageModel) {}
     fun onHiddenClick(message: MessageModel) {}
     fun onSwipe(message: MessageModel) {}
@@ -162,14 +159,13 @@ private fun Content(
                     )
                     
                     (message.answer != null) -> Text(
-                        message, sender,
-                        callback, state.shape,
+                        message, sender, state.shape,
                         message.answer
                     )
                     
                     else -> Text(
                         message, sender,
-                        callback, state.shape
+                        state.shape
                     )
                 }
             }
@@ -191,32 +187,14 @@ private fun Image(
         
         PHOTO -> {
             ImageMessage(
-                message, sender,
-                Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            callback?.onImageClick(message)
-                        }, onLongPress = {
-                            callback?.onLongPress(message)
-                        }
-                    )
-                }, shape
-            )
+                message, sender, shape
+            ) { callback?.onImageClick(message) }
         }
         
         PRIVATE_PHOTO -> {
             HiddenImageMessage(
                 message, sender, message.attachments
-                    ?.file?.hasAccess ?: false,
-                Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            callback?.onHiddenClick(message)
-                        }, onLongPress = {
-                            callback?.onLongPress(message)
-                        }
-                    )
-                }, shape
+                    ?.file?.hasAccess ?: false, shape
             ) { callback?.onHiddenClick(message) }
         }
         
@@ -228,18 +206,11 @@ private fun Image(
 private fun Text(
     message: MessageModel,
     sender: Boolean,
-    callback: MessCallBack?,
     shape: Shape,
     answer: MessageModel? = null
 ) {
     TextMessage(
         message, sender,
-        Modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onLongPress = {
-                    callback?.onLongPress(message)
-                }
-            )
-        }, answer, shape
+        Modifier, answer, shape
     )
 }

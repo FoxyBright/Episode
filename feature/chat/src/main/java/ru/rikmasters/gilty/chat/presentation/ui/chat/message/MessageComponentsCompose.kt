@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material3.Icon
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
@@ -106,12 +107,12 @@ private fun HiddenPhotoMessagePreview() {
         ) {
             HiddenImageMessage(
                 DemoImageMessage,
-                (true), (false),
+                (true), (false), shapes.large,
                 Modifier.padding(6.dp)
             )
             HiddenImageMessage(
                 DemoImageMessage,
-                (false), (true),
+                (false), (true), shapes.large,
                 Modifier.padding(6.dp)
             )
         }
@@ -152,11 +153,13 @@ private fun ImageMessagePreview() {
         ) {
             ImageMessage(
                 DemoImageMessage,
-                (true), Modifier.padding(6.dp)
+                (true), shapes.large,
+                Modifier.padding(6.dp)
             )
             ImageMessage(
                 DemoImageMessage,
-                (false), Modifier.padding(6.dp)
+                (false), shapes.large,
+                Modifier.padding(6.dp)
             )
         }
     }
@@ -311,90 +314,105 @@ fun SystemMessage(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun HiddenImageMessage(
     message: MessageModel,
     sender: Boolean,
     hide: Boolean,
-    modifier: Modifier = Modifier,
     shape: Shape = shapes.large,
+    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    message.attachments?.let {
-        Box(
-            modifier.background(
-                colorScheme.primaryContainer,
-                shape
-            )
-        ) {
-            Row(Modifier.padding(12.dp, 8.dp)) {
-                it.file?.let { img ->
-                    HiddenImage(img, Modifier, hide)
-                    { onClick?.let { it() } }
+    Card(
+        { onClick?.let { it() } },
+        modifier, (true), shape,
+        cardColors(Transparent),
+    ) {
+        message.attachments?.let {
+            Box(
+                Modifier.background(
+                    colorScheme.primaryContainer,
+                    shape
+                )
+            ) {
+                Row(Modifier.padding(12.dp, 8.dp)) {
+                    it.file?.let { img ->
+                        HiddenImage(img, Modifier, hide)
+                        { onClick?.let { it() } }
+                    }
+                    Text(
+                        stringResource(chats_hidden_photo),
+                        Modifier.padding(
+                            start = 12.dp,
+                            top = 4.dp
+                        ), colorScheme.tertiary,
+                        style = typography.bodyMedium,
+                        fontWeight = SemiBold
+                    )
                 }
-                Text(
-                    stringResource(chats_hidden_photo),
-                    Modifier.padding(
-                        start = 12.dp,
-                        top = 4.dp
-                    ), colorScheme.tertiary,
-                    style = typography.bodyMedium,
-                    fontWeight = SemiBold
+                MessageStatus(
+                    colorScheme.onTertiary,
+                    sender, message, Modifier
+                        .padding(8.dp)
+                        .align(BottomEnd)
                 )
             }
-            MessageStatus(
-                colorScheme.onTertiary,
-                sender, message, Modifier
-                    .padding(8.dp)
-                    .align(BottomEnd)
-            )
         }
     }
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun ImageMessage(
     message: MessageModel,
     sender: Boolean,
+    shape: Shape = shapes.large,
     modifier: Modifier = Modifier,
-    shape: Shape = shapes.large
+    onClick: (() -> Unit)? = null
 ) {
-    Box(modifier) {
-        message.attachments?.let {
-            it.file?.let { file ->
-                AsyncImage(
-                    file.id, (null),
-                    Modifier
-                        .size(220.dp)
-                        .background(
-                            colorScheme.onTertiary,
-                            shape
-                        )
-                        .clip(shape),
-                    contentScale = Crop,
-                )
+    Card(
+        { onClick?.let { it() } },
+        modifier, (true), shape,
+        cardColors(Transparent),
+    ) {
+        Box {
+            message.attachments?.let {
+                it.file?.let { file ->
+                    AsyncImage(
+                        file.id, (null),
+                        Modifier
+                            .size(220.dp)
+                            .background(
+                                colorScheme.onTertiary,
+                                shape
+                            )
+                            .clip(shape),
+                        contentScale = Crop,
+                    )
+                }
             }
-        }
-        Box(
-            Modifier
-                .padding(8.dp)
-                .height(IntrinsicSize.Max)
-                .width(IntrinsicSize.Max)
-                .align(BottomEnd)
-        ) {
             Box(
                 Modifier
-                    .fillMaxSize()
-                    .alpha(if(sender) 1f else 0.5f)
-                    .background(
-                        if(sender) colorScheme.primary
-                        else colorScheme.outline,
-                        CircleShape
-                    )
-            )
-            MessageStatus(
-                White, sender, message,
-                Modifier.padding(6.dp, 4.dp)
-            )
+                    .padding(8.dp)
+                    .height(IntrinsicSize.Max)
+                    .width(IntrinsicSize.Max)
+                    .align(BottomEnd)
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .alpha(if(sender) 1f else 0.5f)
+                        .background(
+                            if(sender) colorScheme.primary
+                            else colorScheme.outline,
+                            CircleShape
+                        )
+                )
+                MessageStatus(
+                    White, sender, message,
+                    Modifier.padding(6.dp, 4.dp)
+                )
+            }
         }
     }
 }

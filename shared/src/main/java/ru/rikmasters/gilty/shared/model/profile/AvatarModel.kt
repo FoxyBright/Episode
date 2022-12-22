@@ -33,33 +33,29 @@ data class AvatarModel(
     override val hasAccess: Boolean
 ): ImageModel
 
-val DemoAvatarModel = AvatarModel(
-    "https://placekitten.com/1200/800",
-    "test",
-    "test",
-    PhotoType.PHOTO,
-    "mimeType",
-    10,
-    400,
-    800,
-    400,
-    800,
-    0,
-    false
+fun getDemoAvatarModel(
+    id: String = "https://placekitten.com/1200/800",
+    albumId: String = "test",
+    ownerId: String = "test",
+    type: PhotoType = PhotoType.PHOTO,
+    mimeType: String = "mimeType",
+    fileSize: Int = 10,
+    width: Int = 400,
+    height: Int = 800,
+    resolutionX: Int = 400,
+    resolutionY: Int = 800,
+    playtime: Number = 0,
+    hasAccess: Boolean = false
+) = AvatarModel(
+    id, albumId, ownerId,
+    type, mimeType, fileSize,
+    width, height, resolutionX,
+    resolutionY, playtime, hasAccess
 )
 
-val DemoAvatarAccessModel = AvatarModel(
-    "https://placekitten.com/1200/800",
-    "test",
-    "test",
-    PhotoType.PHOTO,
-    "mimeType",
-    10,
-    400,
-    800,
-    400,
-    800,
-    0,
-    true
-)
+val DemoAvatarModel =
+    getDemoAvatarModel()
+
+val DemoAvatarAccessModel =
+    getDemoAvatarModel(hasAccess = true)
 

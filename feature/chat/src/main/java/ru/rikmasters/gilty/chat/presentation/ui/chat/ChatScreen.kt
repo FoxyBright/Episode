@@ -20,6 +20,7 @@ import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
 import ru.rikmasters.gilty.shared.model.chat.*
+import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -35,26 +36,27 @@ fun ChatScreen(nav: NavState = get()) {
     val sender = DemoMemberModel
     val messageList = remember {
         mutableStateListOf(
-            DemoMessageModelCreated,
             DemoMessageModel,
-            DemoMessageModelJoinToChat,
-            DemoImageMessage,
-            DemoMyHiddenImageMessage,
-            DemoMessageModelScreenshot,
-            getDemoMessageModel(sender = DemoMemberModelTwo),
-            getDemoMessageModel(sender = DemoMemberModelTwo),
-            getDemoMessageModel(sender = DemoMemberModelTwo),
-            DemoMessageModelLeaveChat,
-            DemoHiddenImageMessage,
-            DemoMessageModel5Minutes,
-            DemoMessageModelLongMessage,
-            DemoMessageModel30Minutes,
+            DemoMessageModel,
             DemoMessageModelVeryLong,
+            DemoMessageModel30Minutes,
+            DemoMessageModelLongMessage,
+            DemoMessageModel5Minutes,
+            DemoHiddenImageMessage,
+            DemoMessageModelLeaveChat,
+            getDemoMessageModel(sender = DemoMemberModelTwo),
+            getDemoMessageModel(sender = DemoMemberModelTwo),
+            getDemoMessageModel(sender = DemoMemberModelTwo),
+            DemoMessageModelScreenshot,
+            DemoMyHiddenImageMessage,
+            DemoImageMessage,
+            DemoMessageModelJoinToChat,
             DemoMessageModel,
-            DemoMessageModel
+            DemoMessageModelCreated,
         )
     }
-    
+    //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
+    var unReadCount by remember { mutableStateOf(5) }
     val meet = DemoMeetingModel
     var alert by
     remember { mutableStateOf(false) }
@@ -67,11 +69,14 @@ fun ChatScreen(nav: NavState = get()) {
     var messageMenuState by
     remember { mutableStateOf(false) }
     
-    var selectMessage by remember {
-        mutableStateOf<MessageModel?>(null)
+    val listState = rememberLazyListState()
+    
+    LaunchedEffect(Unit) {
+        scope.launch {
+            listState.scrollToItem(unReadCount)
+        }
     }
     
-    val listState = rememberLazyListState()
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     
@@ -110,30 +115,36 @@ fun ChatScreen(nav: NavState = get()) {
         }
     }
     
+    fun listToDown() {
+        scope.launch {
+            listState.animateScrollToItem(0)
+        }
+    }
+    
     ChatContent(
         ChatState(
             ChatAppBarState(
-                meet.title, DemoAvatarModel, 2
+                meet.title, DemoAvatarModel, (2)
             ), answer, meet, messageText,
             messageList, sender, alert,
             meetOutAlert, kebabMenuState,
-            messageMenuState, listState
+            messageMenuState, listState, unReadCount
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
-            }
-            
-            override fun onLongPress(message: MessageModel) {
-                selectMessage = message
-                messageMenuState = true
             }
             
             override fun onImageClick(message: MessageModel) {
                 nav.navigate(
                     "photo?image=${
                         message.attachments!!.file!!.id
-                    }&type=0"
+                    }&type=2"
                 )
+            }
+            
+            override fun onDownButtonClick() {
+                listToDown()
+                unReadCount = 0
             }
             
             override fun onHiddenClick(message: MessageModel) {
@@ -150,6 +161,10 @@ fun ChatScreen(nav: NavState = get()) {
                 )
             }
             
+            override fun onListDown() {
+                unReadCount -= 1
+            }
+            
             override fun onSwipe(message: MessageModel) {
                 answer = message
             }
@@ -158,10 +173,13 @@ fun ChatScreen(nav: NavState = get()) {
                 messageMenuState = false
             }
             
-            override fun onMessageMenuItemSelect(point: Int) {
+            override fun onMessageMenuItemSelect(point: Int, message: MessageModel) {
                 when(point) {
-                    0 -> answer = selectMessage
-                    1 -> messageList.remove(selectMessage)
+                    0 -> answer = message
+                    1 -> {
+                        answer = null
+                        messageList.remove(message)
+                    }
                 }
                 messageMenuState = false
             }
@@ -194,14 +212,14 @@ fun ChatScreen(nav: NavState = get()) {
             
             override fun onSend() {
                 messageList.add(
-                    MessageModel(
+                    0, MessageModel(
                         id = "1",
                         sender = DemoMemberModel,
                         album = "Бэтмен",
                         text = messageText,
                         attachments = null,
                         notification = null,
-                        type = MessageType.MESSAGE,
+                        type = MESSAGE,
                         isRead = false,
                         isDelivered = true,
                         createdAt = "2022-10-17T08:35:54.140Z",
@@ -210,11 +228,7 @@ fun ChatScreen(nav: NavState = get()) {
                 )
                 answer = null
                 messageText = ""
-                scope.launch {
-                    listState.animateScrollToItem(
-                        messageList.lastIndex
-                    )
-                }
+                listToDown()
             }
             
             override fun onCancelAnswer() {
@@ -234,8 +248,7 @@ fun ChatScreen(nav: NavState = get()) {
                                 DemoMemberModelList,
                                 distanceCalculator(meet),
                                 (true),
-                            ),
-                            Modifier
+                            ), Modifier
                                 .padding(16.dp)
                                 .padding(bottom = 40.dp),
                             meetBsCallback

@@ -44,7 +44,6 @@ fun ChatListScreen(nav: NavState = get()) {
     var active by
     remember { mutableStateOf(false) }
     
-    
     val delForMe = stringResource(delete_my_chat_button)
     val delForOther = stringResource(delete_my_and_other_chat_button)
     val list = remember {

@@ -32,6 +32,8 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.COMMENT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.TextFieldType.MESSAGE
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_answer_arrow
+import ru.rikmasters.gilty.shared.R.drawable.ic_cross
 import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelLongMessage
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -128,25 +130,26 @@ private fun Answer(
         SpaceBetween, CenterVertically
     ) {
         Row(
-            Modifier.padding(10.dp),
+            Modifier.padding(10.dp).weight(1f),
             Start, CenterVertically
         ) {
             Icon(
-                painterResource(R.drawable.ic_answer_arrow),
+                painterResource(ic_answer_arrow),
                 null, Modifier
                     .padding(horizontal = 20.dp)
                     .size(28.dp),
                 colorScheme.primary
-            ); answer?.let {
-            AnswerContent(
-                it, Modifier,
-                (false), (true)
             )
-        }
+            answer?.let {
+                AnswerContent(
+                    it, Modifier,
+                    (false), (true)
+                )
+            }
         }
         IconButton(onCancel, Modifier.padding(6.dp)) {
             Icon(
-                painterResource(R.drawable.ic_cross),
+                painterResource(ic_cross),
                 (null), Modifier.size(26.dp),
                 colorScheme.primary
             )
