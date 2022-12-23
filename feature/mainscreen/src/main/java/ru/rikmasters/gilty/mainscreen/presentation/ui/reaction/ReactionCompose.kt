@@ -23,9 +23,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModel
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
