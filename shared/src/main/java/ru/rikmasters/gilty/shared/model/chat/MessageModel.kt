@@ -2,12 +2,13 @@ package ru.rikmasters.gilty.shared.model.chat
 
 import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
+import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelTwo
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
 enum class MessageType {
-    MESSAGE, NOTIFICATION
+    MESSAGE, NOTIFICATION, WRITING
 }
 
 data class MessageModel(
@@ -41,6 +42,20 @@ fun getDemoMessageModel(
     attachments, notification,
     type, isRead, isDelivered,
     createdAt, answer
+)
+
+val WritingMessageModel = MessageModel(
+    id = "0",
+    sender = DemoMemberModelTwo,
+    album = "Бэтмен",
+    text = "",
+    attachments = null,
+    notification = null,
+    type = WRITING,
+    isRead = false,
+    isDelivered = false,
+    createdAt = "2022-10-17T08:35:54.140Z",
+    answer = null
 )
 
 val DemoMessageModel = MessageModel(

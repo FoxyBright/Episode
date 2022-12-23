@@ -11,11 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.*
 import com.airbnb.lottie.compose.LottieConstants.IterateForever
-import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.raw.find_more
 
 @Preview
 @Composable
@@ -26,7 +27,10 @@ fun Preview() {
             .background(colorScheme.primary),
         Center
     ) {
-        AnimatedImage(R.raw.find_more, Modifier.size(300.dp))
+        AnimatedImage(
+            find_more,
+            Modifier.size(300.dp)
+        )
     }
 }
 
@@ -34,7 +38,7 @@ fun Preview() {
 fun AnimatedImage(
     resource: Int,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit,
+    contentScale: ContentScale = Fit,
     alignment: Alignment = Center,
     speed: Float = 1f,
     iterations: Int = IterateForever,

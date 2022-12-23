@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:complaints"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:animated"))
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -37,9 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_sms_delivered
 import ru.rikmasters.gilty.shared.R.drawable.ic_sms_read
 import ru.rikmasters.gilty.shared.R.drawable.ic_write
+import ru.rikmasters.gilty.shared.R.raw.typing_dots
 import ru.rikmasters.gilty.shared.R.string.chats_hidden_photo
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -70,6 +73,17 @@ private fun TextMessagePreview() {
                 (false), Modifier.padding(6.dp)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun WritingMessagePreview() {
+    GiltyTheme {
+        WritingMessage(
+            shapes.large,
+            Modifier.padding(6.dp)
+        )
     }
 }
 
@@ -185,18 +199,10 @@ private fun SystemMessagePreview() {
     }
 }
 
-@Preview
 @Composable
-private fun WritingMessagePreview() {
-    GiltyTheme {
-        WritingMessage(Modifier.padding(6.dp))
-    }
-}
-
-@Composable
-fun WritingMessage( //TODO сюда гифку печатающегося сообщения
-    modifier: Modifier = Modifier,
-    shape: Shape = shapes.large
+fun WritingMessage(
+    shape: Shape = shapes.large,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier.background(
@@ -204,13 +210,12 @@ fun WritingMessage( //TODO сюда гифку печатающегося соо
             shape
         )
     ) {
-        Image(
-            painterResource(ic_write),
-            (null),
-            Modifier
-                .padding(8.dp, 4.dp)
-                .size(50.dp)
-        )
+        val mod = Modifier
+            .padding(12.dp, 8.dp)
+            .size(24.dp)
+        if(LocalInspectionMode.current) Image(
+            painterResource(ic_write), (null), mod
+        ) else AnimatedImage(typing_dots, mod)
     }
 }
 

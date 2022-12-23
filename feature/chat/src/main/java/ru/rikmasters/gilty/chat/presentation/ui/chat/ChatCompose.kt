@@ -33,6 +33,7 @@ import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GDropMenu
@@ -173,7 +174,6 @@ private fun Item(
     callback: ChatCallback?
 ) {
     val type = message.type
-    val messType = type != NOTIFICATION
     val density = getSystem()
         .displayMetrics.density
     var offset by remember {
@@ -184,7 +184,7 @@ private fun Item(
     Box(Modifier.pointerInput(Unit) {
         detectTapGestures(
             onLongPress = { off ->
-                if(messType) {
+                if(type == MESSAGE) {
                     menuState = true
                     offset = off
                 }
@@ -200,7 +200,7 @@ private fun Item(
                 )
             ), Modifier
                 .padding(
-                    16.dp, if(messType)
+                    16.dp, if(type != NOTIFICATION)
                         2.dp else 10.dp
                 ), callback
         )

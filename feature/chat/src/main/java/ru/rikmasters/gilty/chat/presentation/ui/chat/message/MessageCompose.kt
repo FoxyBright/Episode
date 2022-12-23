@@ -36,6 +36,7 @@ import ru.rikmasters.gilty.shared.model.chat.MessageList
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
+import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -84,14 +85,15 @@ fun Message(
     modifier: Modifier = Modifier,
     callBack: MessCallBack? = null
 ) {
-    val notification = state.message.type == NOTIFICATION
+    val message = state.message
+    val notification = message.type == NOTIFICATION
     Row(
         modifier
             .swipeableRow(
-                if(!notification)
+                if(message.type == MESSAGE)
                     state.dragState
                 else DragRowState(0f)
-            ) { callBack?.onSwipe(state.message) },
+            ) { callBack?.onSwipe(message) },
         SpaceBetween, CenterVertically
     ) {
         Box(
@@ -170,7 +172,7 @@ private fun Content(
                 }
             }
             
-            else -> WritingMessage()
+            WRITING -> WritingMessage(state.shape)
         }
     }
 }

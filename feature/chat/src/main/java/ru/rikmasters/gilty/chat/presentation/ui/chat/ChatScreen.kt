@@ -36,6 +36,7 @@ fun ChatScreen(nav: NavState = get()) {
     val sender = DemoMemberModel
     val messageList = remember {
         mutableStateListOf(
+            WritingMessageModel,
             DemoMessageModel,
             DemoMessageModel,
             DemoMessageModelVeryLong,
