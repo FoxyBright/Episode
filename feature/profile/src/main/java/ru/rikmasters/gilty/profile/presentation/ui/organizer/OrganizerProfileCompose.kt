@@ -25,7 +25,7 @@ import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
@@ -33,7 +33,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class OrganizerProfileState(
     val profileState: ProfileState,
-    val currentMeetings: List<FullMeetingModel>,
+    val currentMeetings: List<MeetingModel>,
 )
 
 @Preview

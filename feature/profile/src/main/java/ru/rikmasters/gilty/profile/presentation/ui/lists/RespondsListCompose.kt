@@ -16,7 +16,7 @@ import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.common.RespondsListContent
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SEND
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
@@ -31,7 +31,7 @@ fun RespondsListPreview() {
         RespondsList(
             listOf(
                 Pair(
-                    DemoFullMeetingModel,
+                    DemoMeetingModel,
                     listOf(
                         DemoReceivedRespondsModel,
                         DemoReceivedRespondModelWithoutPhoto,
@@ -103,7 +103,7 @@ private fun SentResponds(
             items(sentResponds) {
                 Respond(
                     it, callback,
-                    Modifier.padding(bottom = 6.dp)
+                    Modifier.padding(bottom = 12.dp)
                 )
             }
         }

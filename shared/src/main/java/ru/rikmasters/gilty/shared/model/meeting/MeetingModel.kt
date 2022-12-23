@@ -1,93 +1,69 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import java.util.UUID
 
-sealed interface MeetingModel {
-
-    val id: UUID
-
-    val title: String
-
-    val condition: ConditionType
-
-    val category: ShortCategoryModel
-
-    val dateTime: String
-
-    val duration: String
-
-    val organizer: OrganizerModel
-
-    val isOnline: Boolean
-}
-
-data class FullMeetingModel(
-
-    override val id: UUID,
-
-    override val title: String,
-
-    override val condition: ConditionType,
-
-    override val category: ShortCategoryModel,
-
-    override val duration: String,
-
-    val type: MeetType,
-
-    override val dateTime: String,
-
-    override val organizer: OrganizerModel,
-
-    override val isOnline: Boolean,
-
-    val tags: List<TagModel>,
-
-    val description: String,
-
-    val isPrivate: Boolean,
-
-    val memberCount: Int,
-
-    val requirements: List<MeetingRequirementModel>,
-
-    val place: String,
-
-    val address: String,
-
-    val hideAddress: Boolean,
-
-    val price: Int? = null
-
-) : MeetingModel
-
-val DemoFullMeetingModel = FullMeetingModel(
-    id = UUID.randomUUID(),
-    title = "Поход в кино",
-    condition = ConditionType.MEMBER_PAY,
-    category = DemoShortCategoryModel,
-    duration = "2 часа",
-    type = MeetType.GROUP,
-    dateTime = "2022-11-28T20:00:54.140Z",
-    organizer = DemoOrganizerModel,
-    isOnline = false,
-    tags = DemoTagList,
-    description = "Описание вечеринки",
-    isPrivate = false,
-    memberCount = 4,
-    requirements = ListDemoMeetingRequirementModel,
-    place = "Москва-сити",
-    address = "Москва, ул. Пушкина 42",
-    hideAddress = false,
-    price = 600
+data class MeetingModel( // TODO заменить VAR на VAL сделано для верстки
+    var id: UUID,
+    var title: String,
+    var condition: ConditionType,
+    var category: CategoriesType,
+    var duration: String,
+    var type: MeetType,
+    var dateTime: String,
+    var organizer: OrganizerModel,
+    var isOnline: Boolean,
+    var tags: List<TagModel>,
+    var description: String,
+    var isPrivate: Boolean,
+    var memberCount: Int,
+    var requirements: List<MeetingRequirementModel>,
+    var place: String,
+    var address: String,
+    var hideAddress: Boolean,
+    var price: Int? = null
 )
 
+enum class MeetStatus { ACTIVE, INACTIVE }
+
+fun getDemoMeetingModel(
+    id: UUID = UUID.randomUUID(),
+    title: String = "Поход в кино",
+    condition: ConditionType = ConditionType.MEMBER_PAY,
+    category: CategoriesType = CategoriesType.ENTERTAINMENT,
+    duration: String = "2 часа",
+    type: MeetType = MeetType.GROUP,
+    dateTime: String = "2022-11-28T20:00:54.140Z",
+    organizer: OrganizerModel = DemoOrganizerModel,
+    isOnline: Boolean = false,
+    tags: List<TagModel> = DemoTagList,
+    description: String = "Описание вечеринки",
+    isPrivate: Boolean = false,
+    memberCount: Int = 4,
+    requirements: List<MeetingRequirementModel> =
+        ListDemoMeetingRequirementModel,
+    place: String = "Москва-сити",
+    address: String = "Москва, ул. Пушкина 42",
+    hideAddress: Boolean = false,
+    price: Int? = 600
+) = MeetingModel(
+    id, title, condition,
+    category, duration, type,
+    dateTime, organizer, isOnline,
+    tags, description, isPrivate,
+    memberCount, requirements,
+    place, address, hideAddress, price
+)
+
+val DemoMeetingModel =
+    getDemoMeetingModel()
+
 val DemoMeetingList = listOf(
-    DemoFullMeetingModel,
-    DemoFullMeetingModel,
-    DemoFullMeetingModel,
-    DemoFullMeetingModel,
-    DemoFullMeetingModel
+    getDemoMeetingModel(),
+    getDemoMeetingModel(),
+    getDemoMeetingModel(),
+    getDemoMeetingModel(),
+    getDemoMeetingModel()
 )

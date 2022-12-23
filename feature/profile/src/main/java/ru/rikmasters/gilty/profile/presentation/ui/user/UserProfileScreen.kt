@@ -9,7 +9,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.presentation.ui.lists.*
-import ru.rikmasters.gilty.profile.presentation.ui.mymeetings.MyMeetingScreen
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -30,16 +29,17 @@ fun UserProfileScreen(nav: NavState = get()) {
     GiltyTheme {
         val asm = get<AppStateModel>()
         val scope = rememberCoroutineScope()
+        var menuState by remember { mutableStateOf(false) }
         val historyState =
-            remember { mutableStateOf(false) }
-        val menuExpanded =
             remember { mutableStateOf(false) }
         val meets = DemoMeetingList
         val profileModel = DemoProfileModel
+        var description by
+        remember { mutableStateOf(profileModel.aboutMe) }
         val state = ProfileState(
             name = "${profileModel.username}, ${profileModel.age}",
             profilePhoto = profileModel.avatar.id,
-            description = profileModel.aboutMe,
+            description = description,
             rating = profileModel.rating.average,
             observers = 13500,
             observed = 128,
@@ -88,17 +88,29 @@ fun UserProfileScreen(nav: NavState = get()) {
                 )
             }
         val pairRespondsList =
-            remember { mutableStateOf(Pair(DemoFullMeetingModel, respondsList)) }
+            remember { mutableStateOf(Pair(DemoMeetingModel, respondsList)) }
         val tabState = remember { mutableStateListOf(true, false) }
         UserProfile(
             UserProfileState(
                 state, meets, meets,
                 meets.first(), (respondsList.size),
-                historyState.value, menuExpanded.value,
-                stateList, alert
+                historyState.value,
+                stateList, alert, menuState
             ), Modifier, object: UserProfileCallback {
                 override fun menu(state: Boolean) {
-                    menuExpanded.value = !menuExpanded.value
+                    nav.navigate("settings")
+                }
+                
+                override fun onNameChange(text: String) {
+                    Toast.makeText(
+                        context,
+                        "Имя пока что не меняем",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                
+                override fun onDescriptionChange(text: String) {
+                    description = text
                 }
                 
                 override fun onObserveClick() {
@@ -139,10 +151,29 @@ fun UserProfileScreen(nav: NavState = get()) {
                     }
                 }
                 
+                override fun onMenuClick(it: Boolean) {
+                    menuState = it
+                }
+                
+                override fun onMenuItemClick(point: Int) {
+                    when(point) {
+                        0 -> nav.navigate("avatar")
+                        
+                        else -> Toast.makeText(
+                            context,
+                            "Тут будет возможность выбрать другое фото",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                
                 override fun onHistoryClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheetState.expand {
-                            MyMeetingScreen(asm, scope)
+                            MyMeetingScreen(
+                                profileModel, meet,
+                                asm, scope
+                            )
                         }
                     }
                 }
@@ -150,31 +181,22 @@ fun UserProfileScreen(nav: NavState = get()) {
                 override fun onMeetingClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheetState.expand {
-                            MyMeetingScreen(asm, scope)
+                            MyMeetingScreen(
+                                profileModel, meet,
+                                asm, scope
+                            )
                         }
                     }
                 }
                 
                 override fun profileImage() {
-                    nav.navigate("photo")
+                    menuState = true
                 }
                 
                 override fun hiddenImages() {
                     Toast.makeText(
                         context,
                         "Ваши скрытые фото",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                
-                override fun onSettingsClick() {
-                    nav.navigate("settings")
-                }
-                
-                override fun onWatchPhotoClick() {
-                    Toast.makeText(
-                        context,
-                        "Фото пока что нет",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -227,8 +249,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                                     repeat(tabsState.size) { index ->
                                         tabsState[index] = it == index
                                     }
-                                })
-                            {
+                                }) {
                                 scope.launch {
                                     asm.bottomSheetState.collapse()
                                 }

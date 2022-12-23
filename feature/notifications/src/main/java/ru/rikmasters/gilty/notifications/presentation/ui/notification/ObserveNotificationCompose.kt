@@ -61,7 +61,7 @@ fun ObserveNotification(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
 ) {
     Column(modifier) {
-        if (model.type != NotificationType.RESPOND_ACCEPT)
+        if(model.type != NotificationType.RESPOND_ACCEPT)
             Item(
                 NotificationItemState(
                     model, DragRowState(1f), MaterialTheme.shapes.medium,
@@ -104,17 +104,18 @@ private fun Participant(
     Card(
         { onClick?.let { it(index) } },
         Modifier.fillMaxWidth(), (true),
-        when (index) {
+        when(index) {
             0 -> shapes.largeTopRoundedShape
             size - 1 -> shapes.largeBottomRoundedShape
             else -> shapes.zero
         }, cardColors(colorScheme.primaryContainer)
     ) {
-        Column {
+        Column(Modifier.padding(bottom = 12.dp)) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 12.dp)
+                    .padding(top = 12.dp),
                 SpaceBetween, CenterVertically
             ) {
                 BrieflyRow(
@@ -123,15 +124,15 @@ private fun Participant(
                     member.emoji,
                 )
                 Icon(
-                    if (unwrap) Filled.KeyboardArrowDown
+                    if(unwrap) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
                     (null), Modifier.size(24.dp),
                     colorScheme.onTertiary
                 )
             }
-            if (unwrap) EmojiRow(Modifier.padding(start = 60.dp, end = 20.dp))
+            if(unwrap) EmojiRow(Modifier.padding(start = 60.dp, end = 20.dp))
             { emoji -> onEmojiClick?.let { it(emoji) } }
         }
-    }; if (index < size - 1)
+    }; if(index < size - 1)
         Divider(Modifier.padding(start = 60.dp))
 }

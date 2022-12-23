@@ -1,38 +1,37 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
-import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<ShortCategoryModel>,
-    val selectCategories: List<ShortCategoryModel>,
+    val categoryList: List<CategoriesType>,
+    val selectCategories: List<CategoriesType>,
     val alert: Boolean
 )
 
 interface CategoriesCallback {
     
-    fun onCategoryClick(category: ShortCategoryModel) {}
-    fun onNext() {}
+    fun onCategoryClick(category: CategoriesType) {}
     fun onClose() {}
     fun onCloseAlert(it: Boolean) {}
 }
@@ -68,25 +67,20 @@ fun CategoriesContent(
                 ) { callback?.onCategoryClick(element) }
             }
         }
-        Column(
-            Modifier
+        Dashes(
+            (4), (0), Modifier
+                .fillMaxWidth()
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            Center, CenterHorizontally
-        ) {
-            GradientButton(
-                Modifier, stringResource(R.string.next_button)
-            ) { callback?.onNext() }
-            Dashes((5), (0), Modifier.padding(top = 16.dp))
-        }
+            color = if(MEETING.isOnline)
+                colorScheme.secondary
+            else colorScheme.primary
+        )
     }
-    GAlert(state.alert, { callback?.onCloseAlert(false) },
-        stringResource(R.string.add_meet_exit_alert_title),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button))
-        { callback?.onCloseAlert(false); callback?.onClose() },
-        cancel = Pair(stringResource(R.string.cancel_button))
-        { callback?.onCloseAlert(false) })
+    CloseAddMeetAlert(
+        state.alert,
+        { callback?.onCloseAlert(false) },
+        { callback?.onCloseAlert(false); callback?.onClose() })
 }
 
 @Composable
@@ -126,7 +120,10 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(DemoShortCategoryModelList, arrayListOf(), false)
+            CategoriesState(
+                CategoriesType.values().toList(),
+                arrayListOf(), false
+            )
         )
     }
 }

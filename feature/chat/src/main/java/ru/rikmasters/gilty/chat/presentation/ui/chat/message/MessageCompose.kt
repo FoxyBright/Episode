@@ -1,231 +1,228 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.End
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
-import ru.rikmasters.gilty.chat.presentation.ui.AnswerContent
-import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.format
-import ru.rikmasters.gilty.shared.model.profile.ImageModel
-import ru.rikmasters.gilty.shared.theme.Gradients
+import ru.rikmasters.gilty.shared.R.drawable.ic_reply
+import ru.rikmasters.gilty.shared.common.extentions.DragRowState
+import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
+import ru.rikmasters.gilty.shared.model.chat.MessageList
+import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
+import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
+import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
+@Preview
 @Composable
-private fun MyMessage() {
-    GiltyTheme { Message(DemoMessageModelLongMessage, true) }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
-@Composable
-private fun MyMessageWithAttach() {
+fun MessPreview() {
     GiltyTheme {
-        Message(
-            DemoMessageModel, (true),
-            DemoImageMessage
-        )
+        LazyColumn {
+            items(MessageList) {
+                Message(
+                    MessState(
+                        it, (false),
+                        DragRowState(0f),
+                        shapes.large, (true)
+                    ),
+                    Modifier
+                        .background(colorScheme.background)
+                        .padding(
+                            16.dp, if(it.type
+                                != NOTIFICATION
+                            ) 2.dp else 10.dp
+                        ),
+                )
+            }
+        }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
-@Composable
-private fun MessagePreview() {
-    GiltyTheme { Message(DemoMessageModelLongMessage, false) }
-}
+data class MessState(
+    val message: MessageModel,
+    val sender: Boolean,
+    val dragState: DragRowState,
+    val shape: Shape,
+    val avatar: Boolean,
+)
 
-@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
-@Composable
-private fun MessageImage() {
-    GiltyTheme { Message(DemoImageMessage, false) }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF4B4B4B)
-@Composable
-private fun MessageAnswer() {
-    GiltyTheme {
-        Message(
-            DemoMessageModel, (false),
-            DemoMessageModelLongMessage
-        )
-    }
+interface MessCallBack {
+    
+    fun onImageClick(message: MessageModel) {}
+    fun onHiddenClick(message: MessageModel) {}
+    fun onSwipe(message: MessageModel) {}
 }
 
 @Composable
 fun Message(
-    messageModel: MessageModel, sender: Boolean,
-    answer: MessageModel? = null
+    state: MessState,
+    modifier: Modifier = Modifier,
+    callBack: MessCallBack? = null
 ) {
-    val back = MaterialTheme.colorScheme.primaryContainer
-    val state = if (sender)
-        MessageState(
-            (true), CenterEnd, Color.White,
-            Brush.linearGradient(Gradients.red()),
-        )
-    else MessageState(
-        (false), CenterStart, MaterialTheme.colorScheme.tertiary,
-        Brush.linearGradient(listOf(back, back)),
-    )
-    Box(Modifier.fillMaxWidth(), state.align) {
+    val message = state.message
+    val notification = message.type == NOTIFICATION
+    Row(
+        modifier
+            .swipeableRow(
+                if(message.type == MESSAGE)
+                    state.dragState
+                else DragRowState(0f)
+            ) { callBack?.onSwipe(message) },
+        SpaceBetween, CenterVertically
+    ) {
         Box(
             Modifier
-                .fillMaxWidth(0.8f)
-                .padding(10.dp, 4.dp), state.align
+                .weight(1f)
+                .offset(
+                    if(state.sender && !notification)
+                        40.dp else 0.dp
+                ), if(notification) Center
+            else if(state.sender) CenterEnd
+            else CenterStart
         ) {
-            Row(verticalAlignment = Bottom) {
-                if (sender) Content(state, messageModel, answer, Modifier.weight(1f))
-                AsyncImage(
-                    messageModel.sender.avatar.id, (null),
-                    Modifier
-                        .padding(horizontal = 6.dp)
-                        .size(24.dp)
-                        .clip(CircleShape), contentScale = Crop,
-                    placeholder = painterResource(R.drawable.gb)
-                ); if (!sender) Content(state, messageModel, answer, Modifier.weight(1f))
-            }
+            Content(
+                state, Modifier.fillMaxWidth(0.8f),
+                callBack
+            )
         }
+        if(!notification) Image(
+            painterResource(ic_reply),
+            (null), Modifier
+                .padding(start = 12.dp)
+                .size(28.dp)
+                .offset(50.dp)
+        )
     }
 }
 
 @Composable
 private fun Content(
-    state: MessageState,
-    messageModel: MessageModel,
-    answer: MessageModel?,
-    modifier: Modifier = Modifier
+    state: MessState,
+    modifier: Modifier = Modifier,
+    callback: MessCallBack? = null
 ) {
-    if (messageModel.attachments != null) ImageMessage(
-        state, messageModel,
-        messageModel.sender.avatar, modifier
-    ) else Message(state, messageModel, modifier, answer)
-}
-
-@Composable
-private fun ImageMessage(
-    state: MessageState,
-    messageModel: MessageModel,
-    image: ImageModel,
-    modifier: Modifier = Modifier
-) {
-    Box(modifier, state.align) {
-        Box(Modifier, BottomEnd) {
-            AsyncImage(
-                image.id, (null),
-                Modifier
-                    .size(220.dp)
-                    .clip(MaterialTheme.shapes.large),
-                contentScale = Crop,
-                placeholder = painterResource(R.drawable.gb)
-            )
+    val message = state.message
+    val sender = state.sender
+    val attach = message.attachments
+    Row(
+        modifier,
+        if(sender) End
+        else Start, Bottom
+    ) {
+        if(!state.sender &&
+            message.type != NOTIFICATION
+            && state.avatar
+        ) AsyncImage(
+            message.sender.avatar.id, (null),
+            Modifier
+                .padding(end = 6.dp)
+                .size(24.dp)
+                .clip(CircleShape),
+            contentScale = Crop,
+        ) else if(
+            !state.avatar &&
+            message.type != NOTIFICATION
+            && !state.sender
+        ) {
             Box(
                 Modifier
-                    .padding(6.dp)
-                    .clip(CircleShape)
-                    .background(state.background)
-            ) {
-                Status(
-                    state.textColor, state.sender, messageModel,
-                    Modifier.padding(4.dp, 2.dp)
-                )
-            }
+                    .size(30.dp)
+                    .padding(end = 6.dp)
+            )
         }
-    }
-}
-
-private data class MessageState(
-    val sender: Boolean,
-    val align: Alignment,
-    val textColor: Color,
-    val background: Brush
-)
-
-@Composable
-private fun Message(
-    state: MessageState,
-    messageModel: MessageModel,
-    modifier: Modifier = Modifier,
-    answer: MessageModel? = null
-) {
-    Box(modifier, state.align) {
-        Box(
-            Modifier.background(
-                state.background,
-                MaterialTheme.shapes.large
-            ), state.align
-        ) {
-            Box(Modifier.padding(8.dp), state.align) {
-                Column {
-                    answer?.let {
-                        AnswerContent(
-                            it, Modifier.padding(bottom = 4.dp),
-                            sender = state.sender
-                        )
-                    }
-                    Text(
-                        messageModel.text,
-                        Modifier.padding(
-                            end = if (state.sender) 40.dp else 30.dp
-                        ), state.textColor,
-                        style = MaterialTheme.typography.bodyMedium
+        
+        when(message.type) {
+            
+            NOTIFICATION -> SystemMessage(
+                state.message.notification
+            )
+            
+            MESSAGE -> {
+                when {
+                    (attach != null) -> Image(
+                        attach.type, message,
+                        sender, state.shape, callback,
+                    )
+                    
+                    (message.answer != null) -> Text(
+                        message, sender, state.shape,
+                        message.answer
+                    )
+                    
+                    else -> Text(
+                        message, sender,
+                        state.shape
                     )
                 }
-                Status(
-                    state.textColor, state.sender,
-                    messageModel, Modifier.align(BottomEnd)
-                )
             }
+            
+            WRITING -> WritingMessage()
         }
     }
 }
 
 @Composable
-private fun Status(
-    color: Color,
+private fun Image(
+    type: AttachmentType,
+    message: MessageModel,
     sender: Boolean,
-    messageModel: MessageModel,
-    modifier: Modifier = Modifier
+    shape: Shape,
+    callback: MessCallBack?
 ) {
-    Row(modifier, Start, CenterVertically) {
-        Text(
-            messageModel.createdAt.format("HH:mm"),
-            Modifier, color, style = MaterialTheme.typography.titleSmall,
-        ); if (sender && messageModel.isDelivered)
-        Icon(
-            painterResource(
-                if (messageModel.isRead) R.drawable.ic_sms_read
-                else R.drawable.ic_sms_delivered
-            ), (null),
-            Modifier
-                .padding(start = 2.dp)
-                .size(12.dp), Color.White
-        )
+    when(type) {
+        
+        PHOTO -> {
+            ImageMessage(
+                message, sender, shape
+            ) { callback?.onImageClick(message) }
+        }
+        
+        PRIVATE_PHOTO -> {
+            HiddenImageMessage(
+                message, sender, message.attachments
+                    ?.file?.hasAccess ?: false, shape
+            ) { callback?.onHiddenClick(message) }
+        }
+        
+        VIDEO -> {} // TODO Видео в чате
     }
+}
+
+@Composable
+private fun Text(
+    message: MessageModel,
+    sender: Boolean,
+    shape: Shape,
+    answer: MessageModel? = null
+) {
+    TextMessage(
+        message, sender,
+        Modifier, answer, shape
+    )
 }

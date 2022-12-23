@@ -14,7 +14,7 @@ data class HiddenPhotoModel(
     override val resolutionX: Int,
     override val resolutionY: Int,
     override val playtime: Number,
-    val access: Boolean
+    override val hasAccess: Boolean
 ) : ImageModel
 
 val DemoHiddenPhotoModel = HiddenPhotoModel(

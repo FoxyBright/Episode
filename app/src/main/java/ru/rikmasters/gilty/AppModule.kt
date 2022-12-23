@@ -25,7 +25,7 @@ object AppModule : FeatureDefinition() {
             
             Realm, Ktor
         )
-
+    
     override fun DeepNavGraphBuilder.navigation() {}
 
     override fun Module.koin() {}

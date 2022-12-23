@@ -13,10 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EmptyScreen(text: String, icon: Int, modifier: Modifier = Modifier) {
+fun EmptyScreen(
+    text: String, icon: Int,
+    modifier: Modifier = Modifier,
+    imageSize: Dp? = null,
+    betweenDistance: Dp = 26.dp
+) {
     Box(Modifier.fillMaxSize(), Alignment.Center) {
         Column(
             modifier.fillMaxWidth(),
@@ -24,10 +30,12 @@ fun EmptyScreen(text: String, icon: Int, modifier: Modifier = Modifier) {
         ) {
             Icon(
                 painterResource(icon), (null),
-                Modifier, colorScheme.onTertiary
+                if(imageSize != null)
+                    Modifier.size(imageSize)
+                else Modifier, colorScheme.onTertiary
             )
             Text(
-                text, Modifier.padding(top = 26.dp),
+                text, Modifier.padding(betweenDistance),
                 colorScheme.onTertiary,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold,

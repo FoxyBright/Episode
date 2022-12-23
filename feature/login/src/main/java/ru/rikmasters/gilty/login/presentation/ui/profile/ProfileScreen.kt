@@ -17,12 +17,11 @@ fun ProfileScreen(
     nav: NavState = get()
 ) {
     val occupiedName = remember { mutableStateOf(false) }
-    val lockState = remember { mutableStateOf(true) }
     val name = remember { mutableStateOf(UserName) }
     val description = remember { mutableStateOf(UserDescription) }
     val profileState = ProfileState(
         name.value, if (hiddenPhoto == "") Hidden else hiddenPhoto,
-        if (photo == "") Avatar else photo, lockState.value,
+        if (photo == "") Avatar else photo,
         description.value, "4.9",
         emoji = EmojiList.first(),
         enabled = true,
@@ -34,11 +33,7 @@ fun ProfileScreen(
             name.value = text
             occupiedName.value = name.value == "qwerty"
         }
-
-        override fun onLockClick(state: Boolean) {
-            lockState.value = state
-        }
-
+        
         override fun profileImage() {
             nav.navigateAbsolute("registration/gallery?multi=false")
         }

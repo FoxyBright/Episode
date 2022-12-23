@@ -2,19 +2,13 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -50,6 +44,7 @@ data class ChatAppBarState(
 )
 
 interface ChatAppBarCallback {
+    
     fun onBack() {}
     fun onAvatarClick() {}
     fun onKebabClick() {}
@@ -61,31 +56,35 @@ fun ChatAppBarContent(
     modifier: Modifier = Modifier,
     callback: ChatAppBarCallback? = null
 ) {
-    Row(
-        modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(20.dp, 14.dp)
-            .padding(top = 10.dp),
-        Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton({ callback?.onBack() }) {
+    Column() {
+        Row(
+            modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 14.dp),
+            Arrangement.SpaceBetween
+        ) {
+            Row(Modifier, Start, CenterVertically) {
+                IconButton({ callback?.onBack() }) {
+                    Icon(
+                        painterResource(R.drawable.ic_back), (null),
+                        Modifier.size(24.dp), colorScheme.tertiary
+                    )
+                }
+                Information(state, Modifier.padding(start = 10.dp))
+                { callback?.onAvatarClick() }
+            }
+            IconButton({ callback?.onKebabClick() }) {
                 Icon(
-                    painterResource(R.drawable.ic_back), (null),
-                    Modifier.size(24.dp), MaterialTheme.colorScheme.tertiary
+                    painterResource(R.drawable.ic_kebab), (null),
+                    Modifier.size(16.dp), colorScheme.tertiary
                 )
             }
-            Information(state, Modifier.padding(start = 10.dp))
-            { callback?.onAvatarClick() }
-        }
-        IconButton({ callback?.onKebabClick() }) {
-            Icon(
-                painterResource(R.drawable.ic_kebab), (null),
-                Modifier.size(16.dp), MaterialTheme.colorScheme.tertiary
-            )
         }
     }
+}
+
+@Composable
+private fun PinnedBar() {
 }
 
 @Composable
@@ -94,7 +93,7 @@ private fun Information(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier, verticalAlignment = CenterVertically) {
         AsyncImage(
             state.avatar.id,
             stringResource(R.string.meeting_avatar),
@@ -108,7 +107,7 @@ private fun Information(
             Text(
                 state.name,
                 Modifier.padding(start = 12.dp),
-                MaterialTheme.colorScheme.tertiary,
+                colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -126,7 +125,7 @@ private fun Information(
                     )
                 }",
                 Modifier.padding(start = 12.dp),
-                MaterialTheme.colorScheme.onTertiary,
+                colorScheme.onTertiary,
                 style = MaterialTheme.typography.labelSmall,
             )
         }

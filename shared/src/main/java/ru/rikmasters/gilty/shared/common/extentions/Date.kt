@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import ru.rikmasters.gilty.core.log.log
-
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -12,13 +10,14 @@ const val ZERO_TIME = "T00:00:00.000Z"
 const val TIME_START = "00"
 const val MINUTES_IN_HOUR = 60
 const val HOURS_IN_DAY = 24
-
+val NOW_DATE = "${LOCAL_DATE}T${LOCAL_TIME}.000Z"
+val TOMORROW = "${LOCAL_DATE.plusDays(1)}T${LOCAL_TIME}.000Z"
+val YESTERDAY = "${LOCAL_DATE.minusDays(1)}T${LOCAL_TIME}.000Z"
 fun getDate(period: Int = 150): List<String> {
     val list = arrayListOf<String>()
     getDateList(period).first.forEach { list.add(it) }
     list.reverse(); list.add(TODAY_LABEL)
     getDateList(period).second.forEach { list.add(it) }
-    list.forEach { log.v(it) }
     return list
 }
 
@@ -27,7 +26,7 @@ fun getDateList(times: Int): Pair<List<String>, List<String>> {
     val newList = arrayListOf<String>()
     var todayPlus = LOCAL_DATE.plusDays(1)
     var todayMinus = LOCAL_DATE.minusDays(1)
-    for (i in 1..times) {
+    for(i in 1..times) {
         newList.add("$todayPlus$ZERO_TIME".dateCalendar())
         lastList.add("$todayMinus$ZERO_TIME".dateCalendar())
         todayPlus = todayPlus.plusDays(1)
@@ -39,15 +38,15 @@ fun getDateList(times: Int): Pair<List<String>, List<String>> {
 fun getTime(range: Iterable<Int>, step: Int): List<String> {
     val list = arrayListOf<String>()
     list.add("start")
-    for (it in range as IntRange step step)
-        if (it.toString().length != 1) list.add(it.toString())
+    for(it in range as IntRange step step)
+        if(it.toString().length != 1) list.add(it.toString())
         else list.add("0${it}")
     list.add("end")
     return list
 }
 
 fun replacer(it: String, end: String): String {
-    return when (it) {
+    return when(it) {
         "start" -> end
         "end" -> TIME_START
         else -> it
@@ -62,10 +61,10 @@ fun getDifferenceOfTime(date: String): String {
     val list = arrayListOf<Int>()
     "${date.time().minusHour((3))}".split((":"))
         .forEach { list.add(it.toInt()) }
-    return if (todayControl(date))
-        if (LOCAL_TIME.hour() - list.first() > 0)
+    return if(todayControl(date))
+        if(LOCAL_TIME.hour() - list.first() > 0)
             "${LOCAL_TIME.hour() - list.first()} ч"
-        else if (LOCAL_TIME.minute() - list[1] > 0)
+        else if(LOCAL_TIME.minute() - list[1] > 0)
             "${LOCAL_TIME.minute() - list[1]} м"
         else "${LOCAL_TIME.second() - list.last()} с"
     else "${LOCAL_DATE.dayOfYear() - date.date().dayOfYear()} д"

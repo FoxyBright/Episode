@@ -13,6 +13,7 @@
     <string name="login_application">" приложения"</string>
     <string name="login_link_stub">Здесь должна быть ссылка на политику конфиденциальности</string>
     <string name="login_select_country">Страна</string>
+    <string name="login_select_city">Город</string>
     <string name="login_search_placeholder">Поиск</string>
     <string name="login_search_name">Страна и регион</string>
 
@@ -36,7 +37,8 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
-    <string name="profile_observers">Наблюдели</string>
+    <string name="profile_observers">Наблюдатели</string>
+    <string name="profile_observers_in_profile">Наблюдают</string>
     <string name="profile_observe">Наблюдает</string>
     <string name="profile_user_observe">Наблюдаете</string>
     <string name="profile_organizer_observe">Наблюдать</string>
@@ -80,10 +82,13 @@
     <string name="male_sex">Мужской</string>
     <string name="female_sex">Женский</string>
     <string name="others_sex">Другое</string>
+    <string name="male_sex_en">man</string>
+    <string name="female_sex_en">woman</string>
+    <string name="others_sex_en">other</string>
     <string name="personal_info_age_placeholder">Возраст</string>
 
     <!-- Recommendation -->
-    <string name="not_interesting">Не интересно</string>
+    <string name="not_interesting">Неинтересно</string>
     <string name="meeting_respond">Откликнуться</string>
     <string name="meeting_terms">Условия</string>
 
@@ -106,6 +111,8 @@
     <string name="meeting_personal_type">Персональная встреча</string>
     <string name="meeting_group_type">Групповая встреча</string>
     <string name="meeting_anon_type">Анонимная встреча</string>
+    <string name="meeting_private_type">Приватная встреча</string>
+    <string name="meeting_private_and_anon_type">Анонимная, приватная встреча</string>
     <string name="meeting_profile_bottom_today_label">Сегодня</string>
     <string name="meeting_profile_bottom_latest_label">Потом</string>
     <string name="meeting_avatar">Аватар</string>
@@ -163,6 +170,7 @@
     <string name="chats_message_answer_recipient">Ответить</string>
     <string name="chats_message_answer_photo_label">Фотография</string>
     <string name="chats_message_answer_video_label">Видео</string>
+    <string name="chats_empty_hidden_photos">Скрытых фото нет</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
@@ -175,7 +183,7 @@
     <string name="edit_button">Изменить</string>
     <string name="confirm_button">Применить</string>
 
-    <!-- TOASTS -->
+    <!-- Complaints -->
     <string name="complaints_title">Пожаловаться</string>
     <string name="complaints_lie_title">Ложная информация</string>
     <string name="complaints_spam_title">Это спам</string>
@@ -195,7 +203,7 @@
     <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
     <string name="complaints_button">Отправить жалобу</string>
 
-    <!-- ADD MEETS -->
+    <!-- Add Meets -->
     <string name="add_meet_create_title">Создать Meet</string>
     <string name="add_meet_create_description">Выберите категорию</string>
     <string name="add_meet_create_correct_description">Уточните чем именно хотите заняться</string>
@@ -203,6 +211,8 @@
     <string name="add_meet_conditions_online_meet">Сделать встречу онлайн</string>
     <string name="add_meet_conditions_additionally">Ещё</string>
     <string name="add_meet_conditions_hidden">Доступ к скрытым фото</string>
+    <string name="add_meet_restrict_chat">Ограничить чат</string>
+    <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
     <string name="add_meet_conditions_hidden_label">Участники встречи получат доступ к скрытым фото.</string>
@@ -237,20 +247,50 @@
     <string name="orientation_queer">Квир</string>
     <string name="add_meet_publish_button">Опубликовать</string>
 
-    <!-- CHATS -->
+    <!-- Chats -->
     <string name="chats_label">Чат встреч</string>
+    <string name="chats_ended_chats_label">Завершенные</string>
+    <string name="chats_delete">Удалить чат навсегда?</string>
+    <string name="chats_delete_label">Удалить чат</string>
+    <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
+    <string name="chats_hidden_photo">Фото</string>
 
-    <!-- ALERTS -->
+    <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>
     <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
+    <string name="delete_my_chat_button">Удалить у меня</string>
+    <string name="delete_my_and_other_chat_button">Удалить у всех участников</string>
     <string name="exit_button">Выйти</string>
+    <string name="out_button">Покинуть</string>
     <string name="cancel">Отмена</string>
+    <string name="answer_button">Ответить</string>
+    <string name="exit_from_meet">Покинуть meet</string>
+    <string name="respond_to_meet">Вы откликнулись</string>
+    <string name="exit_from_meet_label">Чат и отображение встречи в истории пропадут</string>
+    <string name="chat_send_complaint">Жалоба отправлена</string>
+    <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
 
-    <!-- TOASTS -->
+    <!-- Toasts -->
     <string name="login_google_toast">Вход через гугл временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
     <string name="login_terms_toast">Условий пока нет</string>
+
+    <!-- Categories -->
+    <string name="categories_sport">Спорт</string>
+    <string name="categories_business">Бизнес</string>
+    <string name="categories_travel">Путешествия</string>
+    <string name="categories_master_classes">Мастер\nклассы</string>
+    <string name="categories_entertainment">Развлечения</string>
+    <string name="categories_erotic">18+</string>
+    <string name="categories_party">Вечеринки</string>
+    <string name="categories_art">Культура\nи искусство</string>
+
+    <!-- Categories -->
+    <string name="sub_categories_restaurant">Ресторан</string>
+    <string name="sub_categories_cinema">Кино</string>
+    <string name="sub_categories_cafe">Кафе</string>
+    <string name="sub_categories_walking">Прогулки</string>
 
 </resources>

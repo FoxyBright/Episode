@@ -21,13 +21,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
 import ru.rikmasters.gilty.shared.common.MeetingStates
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -37,7 +39,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 fun CompleteContent() {
     GiltyTheme {
-        CompleteContent(DemoFullMeetingModel)
+        CompleteContent(DemoMeetingModel)
     }
 }
 
@@ -49,9 +51,8 @@ interface CompleteCallBack {
 
 @Composable
 fun CompleteContent(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean = false,
     callback: CompleteCallBack? = null
 ) {
     Column(
@@ -59,19 +60,23 @@ fun CompleteContent(
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        ActionBar("Meet создан")
+        ActionBar(
+            "Meet создан",
+            modifier = Modifier
+                .padding(top = 60.dp)
+        )
         PhoneContent(
             Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting, Modifier, online) }
-        Box(Modifier.fillMaxSize()) {
-            Buttons(
-                Modifier.align(Alignment.BottomCenter), online,
-                { callback?.onShare() }) { callback?.onClose() }
-        }
+        ) { MeetingCard(meeting, Modifier, MEETING.isOnline) }
+    }
+    Box(Modifier.fillMaxSize()) {
+        Buttons(
+            Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
+            { callback?.onShare() }) { callback?.onClose() }
     }
 }
 
@@ -106,7 +111,7 @@ private fun Buttons(
 
 @Composable
 private fun MeetingCard(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
     online: Boolean
 ) {
@@ -154,7 +159,7 @@ private fun PhoneContent(
 @Composable
 fun MeetBottom(
     modifier: Modifier,
-    meet: FullMeetingModel,
+    meet: MeetingModel,
     online: Boolean
 ) {
     Box(modifier) {
@@ -201,12 +206,12 @@ fun MeetBottom(
                             .padding(end = 8.dp)
                             .weight(1f),
                         stringResource(R.string.not_interesting),
-                        R.drawable.ic_cancel, online
+                        R.drawable.cross, online,
                     )
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
-                        R.drawable.ic_heart, online
+                        R.drawable.ic_heart, online,
                     )
                 }
             }
@@ -219,7 +224,8 @@ fun CardButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: Int,
-    online: Boolean
+    online: Boolean,
+    betweenDistance: Dp = 2.dp
 ) {
     val color = if(online) colorScheme.secondary
     else colorScheme.primary
@@ -238,9 +244,9 @@ fun CardButton(
                 Modifier.size(8.dp), color
             )
             Text(
-                text, Modifier.padding(top = 2.dp, start = 2.dp),
-                color, style = typography.displaySmall,
-                fontWeight = FontWeight.SemiBold
+                text, Modifier.padding(start = betweenDistance),
+                color, style = typography.titleSmall,
+                maxLines = 1
             )
         }
     }

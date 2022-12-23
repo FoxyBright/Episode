@@ -54,7 +54,7 @@ fun TrackCheckBox(
     val borderColor by animateColorAsState(
         if (checked) Color.Transparent
         else ThemeExtra.colors.secondaryTrackCheckBox,
-        tween(400)
+        tween(200)
     )
     Surface(
         { onCheckedChange(!checked) },
@@ -66,7 +66,7 @@ fun TrackCheckBox(
         animateColorAsState(
             if (checked) activeColor
             else ThemeExtra.colors.mainTrackCheckBox,
-            tween(400)
+            tween(200)
         ).value,
         border = BorderStroke(2.dp, borderColor)
     ) {

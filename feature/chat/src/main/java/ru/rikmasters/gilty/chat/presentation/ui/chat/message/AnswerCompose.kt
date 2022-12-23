@@ -1,14 +1,8 @@
-package ru.rikmasters.gilty.chat.presentation.ui
+package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -22,15 +16,19 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.model.DemoImageMessage
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModel
-import ru.rikmasters.gilty.chat.presentation.model.DemoMessageModelLongMessage
-import ru.rikmasters.gilty.chat.presentation.model.MessageModel
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
+import ru.rikmasters.gilty.shared.R.drawable.ic_image_empty
+import ru.rikmasters.gilty.shared.R.string.chats_message_answer_photo_label
+import ru.rikmasters.gilty.shared.R.string.chats_message_answer_video_label
+import ru.rikmasters.gilty.shared.R.string.profile_hidden_photo
+import ru.rikmasters.gilty.shared.model.chat.*
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
+import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -51,7 +49,7 @@ private fun MyAnswer() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
-            (true),  (false)
+            (true), (false)
         )
     }
 }
@@ -69,7 +67,7 @@ private fun ImageAnswerTextBox() {
 
 @Preview
 @Composable
-private fun AnswerTextBox() {
+private fun AnswerTextField() {
     GiltyTheme {
         AnswerContent(
             DemoMessageModel,
@@ -86,11 +84,14 @@ fun AnswerContent(
     sender: Boolean = false,
     textField: Boolean = false
 ) {
-    Row(modifier, Start, CenterVertically) {
+    Row(
+        modifier, Start,
+        CenterVertically
+    ) {
         Spacer(
             Modifier
                 .background(
-                    if (!sender)
+                    if(!sender)
                         colorScheme.primary
                     else White
                 )
@@ -98,22 +99,27 @@ fun AnswerContent(
                 .height(38.dp)
         )
         message.attachments?.let {
-            AsyncImage(
-                it.id, (null), Modifier
-                    .padding(start = 8.dp)
-                    .size(38.dp)
-                    .clip(shapes.small),
-                contentScale = Crop,
-                placeholder = painterResource(R.drawable.ic_image_empty)
-            )
+            it.file?.let { file ->
+                AsyncImage(
+                    file.id, (null), Modifier
+                        .padding(start = 8.dp)
+                        .size(38.dp)
+                        .clip(shapes.small),
+                    contentScale = Crop,
+                    placeholder = painterResource(
+                        ic_image_empty
+                    )
+                )
+            }
         }
         val user = message.sender.username
         Column(Modifier.padding(start = 12.dp)) {
             Text(
-                if (textField) "${
+                if(textField) "${
                     stringResource(R.string.chats_message_answer_recipient)
                 } $user" else user, Modifier,
-                if (!sender) colorScheme.primary else White,
+                if(!sender) colorScheme.primary
+                else White,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             ); Label(message, sender)
@@ -126,14 +132,22 @@ private fun Label(
     message: MessageModel,
     sender: Boolean,
     modifier: Modifier = Modifier,
-    max: Int = 30
 ) {
     Text(
-        if (message.attachments != null) stringResource(
-            if (message.attachments.type == PHOTO) R.string.chats_message_answer_photo_label else R.string.chats_message_answer_video_label
-        ) else if (message.text.length < max) message.text
-        else "${message.text.substring(0, max)}…",
-        modifier, if (!sender) colorScheme.onTertiary else White,
+        text = message.attachments?.let {
+            stringResource(
+                when(it.type) {
+                    PHOTO -> chats_message_answer_photo_label
+                    PRIVATE_PHOTO -> profile_hidden_photo
+                    VIDEO -> chats_message_answer_video_label
+                }
+            )
+        } ?: message.text,
+        modifier,
+        if(!sender) colorScheme.onTertiary
+        else White,
+        overflow = Ellipsis,
         style = typography.labelSmall,
+        maxLines = 1,
     )
 }

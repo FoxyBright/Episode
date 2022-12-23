@@ -1,16 +1,12 @@
 package ru.rikmasters.gilty.login.presentation.ui.categories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,21 +14,20 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
-import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<ShortCategoryModel>,
-    val selectCategories: List<ShortCategoryModel>
+    val categoryList: List<CategoriesType>,
+    val selectCategories: List<CategoriesType>
 )
 
 interface CategoriesCallback : NavigationInterface {
-    fun onCategoryClick(category: ShortCategoryModel) {}
+    fun onCategoryClick(category: CategoriesType) {}
 }
 
 @Composable
@@ -112,7 +107,7 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(DemoShortCategoryModelList, arrayListOf())
+            CategoriesState(CategoriesType.list(), arrayListOf())
         )
     }
 }

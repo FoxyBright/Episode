@@ -4,6 +4,8 @@ package ru.rikmasters.gilty.shared.theme.base
 
 import android.content.Context
 import android.os.Build
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.ColorScheme
@@ -39,6 +41,7 @@ object GiltyTheme : AppTheme {
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun GiltyTheme(
     darkMode: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
@@ -59,6 +62,7 @@ fun GiltyTheme(
             Shapes, Typography,
         ) {
             CompositionLocalProvider(
+                LocalOverscrollConfiguration provides null,
                 LocalRippleTheme provides Ripple,
                 content = content
             )

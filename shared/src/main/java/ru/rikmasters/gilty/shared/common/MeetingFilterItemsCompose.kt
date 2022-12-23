@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -12,30 +13,51 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.SliderDefaults.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.FullCategoryModel
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.GiltyChip
+import ru.rikmasters.gilty.shared.R.drawable.magnifier
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+
+@Composable
+fun Country(
+    country: String,
+    city: String,
+    onCountryClick: () -> Unit,
+    onCityClick: () -> Unit,
+) {
+    Column {
+        CardRow(
+            stringResource(R.string.login_select_country), country,
+            ThemeExtra.shapes.mediumTopRoundedShape
+        ) { onCountryClick() }
+        Divider(Modifier.padding(start = 16.dp))
+        CardRow(
+            stringResource(R.string.login_select_city), city,
+            ThemeExtra.shapes.mediumBottomRoundedShape
+        ) { onCityClick() }
+    }
+}
 
 @Composable
 fun Category(
-    categories: List<FullCategoryModel>,
+    categories: List<CategoriesType>,
     categoryStatus: List<Boolean>,
     onCategoryClick: (selected: Int) -> Unit,
     onAllCategoryClick: () -> Unit
@@ -52,14 +74,13 @@ fun Category(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), Arrangement.Absolute.SpaceBetween, CenterVertically
+                    .padding(16.dp),
+                SpaceBetween, CenterVertically
             ) {
                 Row {
-                    AsyncImage(
-                        category.emoji.path,
-                        null,
-                        Modifier.size(20.dp),
-                        placeholder = painterResource(R.drawable.cinema)
+                    GEmojiImage(
+                        category.emoji,
+                        Modifier.size(20.dp)
                     )
                     Text(
                         category.name,
@@ -75,22 +96,20 @@ fun Category(
                     tint = colorScheme.onTertiary
                 )
             }
-            category.subcategories?.let {
+            category.subs?.let {
                 if(categoryStatus[index]) {
-                    Divider()
-                    FlowLayout(
+                    Divider(); FlowLayout(
                         Modifier
                             .background(colorScheme.primaryContainer)
                             .padding(top = 16.dp)
-                            .padding(horizontal = 16.dp), 8.dp, 8.dp
+                            .padding(horizontal = 8.dp), 8.dp, 8.dp
                     ) {
                         it.forEach { category ->
                             GiltyChip(
                                 Modifier,
                                 category,
                                 false
-                            ) { //TODO: Выбор подкатегорий }
-                            }
+                            ) { /*TODO: Выбор подкатегорий*/ }
                         }
                     }
                 }
@@ -99,15 +118,17 @@ fun Category(
     }
     Card(
         Modifier
-            .fillMaxWidth()
-            .clickable { onAllCategoryClick() },
+            .clickable {
+                onAllCategoryClick()
+            },
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp), Arrangement.Absolute.SpaceBetween
+                .padding(16.dp),
+            SpaceBetween
         ) {
             Text(
                 stringResource(R.string.meeting_filter_show_all_categories),
@@ -145,7 +166,7 @@ fun TagSearch(
                     .padding(16.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.magnifier),
+                    painterResource(magnifier),
                     stringResource(R.string.login_search_placeholder),
                     Modifier.size(20.dp),
                     colorScheme.onTertiary
@@ -163,7 +184,7 @@ fun TagSearch(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(horizontal = 8.dp), 8.dp, 8.dp
             ) {
                 tagList.forEachIndexed { index, item ->
                     Box(
@@ -213,7 +234,7 @@ fun Distance(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp), Arrangement.Absolute.SpaceBetween,
+                .padding(vertical = 10.dp), SpaceBetween,
             verticalAlignment = CenterVertically
         ) {
             Text(
@@ -256,9 +277,10 @@ fun Distance(
                         .padding(horizontal = 16.dp)
                         .padding(top = 50.dp),
                     valueRange = 1f..50f, steps = 50,
-                    colors = SliderDefaults.colors(
-                        activeTickColor = Color.Transparent,
-                        inactiveTickColor = Color.Transparent
+                    colors = colors(
+                        activeTickColor = Transparent,
+                        inactiveTickColor = Transparent,
+                        inactiveTrackColor = colorScheme.outline
                     )
                 )
                 Row(
@@ -266,7 +288,7 @@ fun Distance(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 18.dp),
-                    Arrangement.SpaceBetween
+                    SpaceBetween
                 ) {
                     Text(
                         stringResource(R.string.meeting_filter_label_distance, 1),
@@ -308,7 +330,8 @@ fun MeetingType(
             FlowLayout(
                 Modifier
                     .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp, start = 16.dp), 8.dp, 8.dp
+                    .padding(top = 8.dp)
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingType.forEachIndexed { index, item ->
                     GiltyChip(
@@ -349,7 +372,7 @@ fun ConditionsSelect(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingTypes.forEachIndexed { index, item ->
                     GiltyChip(
@@ -394,7 +417,7 @@ fun GenderAndConditions(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedGenders.forEachIndexed { index, item ->
                     GiltyChip(
@@ -416,7 +439,7 @@ fun GenderAndConditions(
                 Modifier
                     .background(colorScheme.primaryContainer)
                     .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp), 8.dp, 8.dp
+                    .padding(8.dp), 8.dp, 8.dp
             ) {
                 selectedMeetingTypes.forEachIndexed { index, item ->
                     GiltyChip(

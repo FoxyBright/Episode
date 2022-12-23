@@ -1,41 +1,38 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.string.meeting_avatar
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Suppress("unused")
-private class UserShortModel(
-    val name: String, val age: Int, val emoji: EmojiModel, val avatar: AvatarModel
-)
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun BrieflyRowPreview() {
     GiltyTheme {
         val user = DemoProfileModel
         BrieflyRow(
             user.avatar, user.username, user.emoji,
-            Modifier.background(MaterialTheme.colorScheme.background)
+            Modifier.background(colorScheme.background)
         )
     }
 }
@@ -47,29 +44,28 @@ fun BrieflyRow(
     emoji: EmojiModel? = null,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier, Start, CenterVertically) {
         avatar?.let {
             AsyncImage(
                 avatar.id,
-                stringResource(R.string.meeting_avatar),
+                stringResource(meeting_avatar),
                 Modifier
+                    .padding(end = 12.dp)
                     .size(38.dp)
                     .clip(CircleShape),
-                contentScale = ContentScale.Crop
+                contentScale = Crop
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier, Start, CenterVertically) {
             Text(
-                text,
-                Modifier.padding(start = 12.dp),
-                MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
+                text, Modifier,
+                colorScheme.tertiary,
+                style = typography.bodyMedium,
+                fontWeight = SemiBold
             )
             emoji?.let {
-                AsyncImage(
-                    emoji.path, (null),
-                    Modifier
+                GEmojiImage(
+                    it, Modifier
                         .padding(6.dp)
                         .size(18.dp)
                 )
@@ -77,4 +73,3 @@ fun BrieflyRow(
         }
     }
 }
-

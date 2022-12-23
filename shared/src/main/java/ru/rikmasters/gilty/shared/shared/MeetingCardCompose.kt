@@ -1,12 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -16,11 +11,12 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,43 +28,58 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.categoriesListCard
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
-import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.Gradients.green
-import ru.rikmasters.gilty.shared.theme.Gradients.red
+import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
 private fun MeetingCardTodayPreview() {
-    MeetingCard(DemoFullMeetingModel, Modifier.padding(20.dp), true) {}
+    GiltyTheme {
+        MeetingCard(
+            DemoMeetingModel,
+            Modifier.padding(20.dp),
+            true
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun MeetingCardPreview() {
-    MeetingCard(DemoFullMeetingModel, Modifier.padding(20.dp)) {}
+    GiltyTheme {
+        MeetingCard(
+            DemoMeetingModel,
+            Modifier.padding(20.dp)
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun MeetingCategoryCardPreview() {
-    MeetingCategoryCard(DemoFullMeetingModel, Modifier.padding(20.dp)) {}
+    GiltyTheme {
+        MeetingCategoryCard(
+            DemoMeetingModel,
+            Modifier.padding(20.dp), old = false
+        ) {}
+    }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingCard(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
     today: Boolean = false,
-    onClick: () -> Unit
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        onClick,
-        modifier,
-        shape = shapes.large,
+        { onClick?.let { it() } },
+        modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
     )
     {
@@ -87,7 +98,7 @@ fun MeetingCard(
                 .padding(start = 14.dp)
         ) {
             DateTimeCard(meeting.dateTime, green(), today)
-            if (today)
+            if(today)
                 categoriesListCard(
                     Modifier.padding(start = 4.dp), meeting, true
                 )
@@ -106,13 +117,13 @@ fun MeetingCard(
                 placeholder = painterResource(R.drawable.gb),
                 contentScale = ContentScale.Crop
             )
-            val countDp = if (
+            val countDp = if(
                 meeting.condition != MEMBER_PAY
-            ) 32 else 0
-            if (!today)
+            ) 32 else 8
+            if(!today)
                 categoriesListCard(
                     Modifier
-                        .align(Alignment.TopEnd)
+                        .align(TopEnd)
                         .padding(top = 10.dp, end = countDp.dp),
                     meeting, true
                 )
@@ -123,14 +134,16 @@ fun MeetingCard(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingCategoryCard(
-    meeting: FullMeetingModel,
+    meeting: MeetingModel,
     modifier: Modifier = Modifier,
     today: Boolean = false,
     old: Boolean = false,
-    onClick: () -> Unit
+    onClick: (() -> Unit)? = null
 ) {
+    val color = meeting.category.color
     Card(
-        onClick, modifier, shape = shapes.large,
+        { onClick?.let { it() } },
+        modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
     )
     {
@@ -149,47 +162,53 @@ fun MeetingCategoryCard(
         ) {
             DateTimeCard(
                 meeting.dateTime,
-                if (old) gray()
-                else if (meeting.isOnline) green()
-                else red(), today
+                when {
+                    old -> gray()
+                    meeting.isOnline -> green()
+                    else -> listOf(color, color)
+                }, today
             )
-            if (today)
-                categoriesListCard(
-                    Modifier.padding(start = 4.dp),
-                    meeting, true
-                )
         }
         Box(
             Modifier
-                .offset(-(16).dp, 6.dp)
+                .padding(top = 10.dp, bottom = 4.dp)
+                .offset(-(8).dp)
                 .width(180.dp)
         ) {
             Box(
                 Modifier
                     .background(
-                        Brush.linearGradient(
-                            if (old) gray()
-                            else if (meeting.isOnline) green()
-                            else red()
+                        linearGradient(
+                            when {
+                                old -> gray()
+                                meeting.isOnline -> listOf(
+                                    colorScheme.secondary,
+                                    colorScheme.secondary
+                                )
+                    
+                                else -> listOf(color, color)
+                            }
                         ), CircleShape
                     )
-                    .size(135.dp),
-                Alignment.Center
+                    .size(135.dp), Center
             ) {
                 Text(
-                    meeting.category.name, Modifier, Color.White,
+                    meeting.category.display,
+                    Modifier, White,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
             }
-            val countDp = if (
+            val countDp = if(
                 meeting.condition != MEMBER_PAY
-            ) 32 else 0
-            if (!today) categoriesListCard(
+            ) 32 else 8
+            categoriesListCard(
                 Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 10.dp, end = countDp.dp), meeting,
-                true
+                    .align(TopEnd)
+                    .padding(
+                        top = 10.dp,
+                        end = countDp.dp
+                    ), meeting, (true)
             )
         }
     }

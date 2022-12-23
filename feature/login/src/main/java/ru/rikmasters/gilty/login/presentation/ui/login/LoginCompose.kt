@@ -38,11 +38,11 @@ import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.login.presentation.model.Countries
-import ru.rikmasters.gilty.login.presentation.model.Country
-import ru.rikmasters.gilty.login.presentation.model.DemoCountry
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.textMask
+import ru.rikmasters.gilty.shared.model.login.Countries
+import ru.rikmasters.gilty.shared.model.login.Country
+import ru.rikmasters.gilty.shared.model.login.DemoCountry
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -69,7 +69,7 @@ interface LoginCallback {
     fun termsOfApp() {}
     fun onPhoneChange(text: String) {}
     fun onClear() {}
-    fun openCountryBottomSheet() {}
+    fun openCountryBottomSheet() {} //Selector
 }
 
 data class LoginState(

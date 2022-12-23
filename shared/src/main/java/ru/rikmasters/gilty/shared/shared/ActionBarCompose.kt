@@ -49,7 +49,7 @@ fun ActionBar(
         Text(
             title,
             Modifier
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(start = 16.dp)
                 .fillMaxWidth(),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.tertiary
@@ -58,7 +58,7 @@ fun ActionBar(
             Text(
                 it, Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, start = 16.dp),
+                    .padding(top = 8.dp, start = 16.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onTertiary
             )
@@ -148,7 +148,7 @@ fun ClosableActionBar(
         Text(
             title,
             Modifier
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(start = 16.dp)
                 .fillMaxWidth(),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.tertiary
@@ -157,7 +157,7 @@ fun ClosableActionBar(
             Text(
                 it, Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, start = 16.dp),
+                    .padding(top = 8.dp, start = 16.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onTertiary
             )

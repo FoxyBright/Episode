@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ONLINE
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
@@ -22,7 +22,7 @@ fun RequirementsScreen(nav: NavState = get()) {
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     var hideMeetPlace by remember { mutableStateOf(false) }
-    var memberCount by remember { mutableStateOf("") }
+    var memberCount by remember { mutableStateOf("1") }
     var alert by remember { mutableStateOf(false) }
     var gender by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -62,11 +62,12 @@ fun RequirementsScreen(nav: NavState = get()) {
                 hideMeetPlace, memberCount,
                 gender, age, orientation,
                 selectedTabs, selectedMember,
-                alert, ONLINE
+                alert, MEETING.isOnline
             ),
             Modifier, object: RequirementsCallback {
                 override fun onHideMeetPlaceClick() {
                     hideMeetPlace = !hideMeetPlace
+                    MEETING.isPrivate = hideMeetPlace
                 }
                 
                 override fun onCloseAlert(it: Boolean) {
@@ -96,7 +97,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                         asm.bottomSheetState.expand {
                             SelectBottom(
                                 stringResource(R.string.sex),
-                                genderList, genderControl, ONLINE
+                                genderList, genderControl, MEETING.isOnline
                             ) {
                                 repeat(genderControl.size) { index ->
                                     genderControl[index] = index == it
@@ -111,7 +112,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             AgeBottom(from, to, Modifier,
-                                { from = it }, { to = it }, ONLINE
+                                { from = it }, { to = it }, MEETING.isOnline
                             )
                             {
                                 age = "от $from до $to"
@@ -127,7 +128,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                             SelectBottom(
                                 stringResource(R.string.orientation_title),
                                 orientationList,
-                                orientationControl, ONLINE
+                                orientationControl, MEETING.isOnline
                             ) {
                                 repeat(orientationControl.size) { index ->
                                     orientationControl[index] = index == it
@@ -155,6 +156,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                         
                     }
                     memberCount = text
+                    MEETING.memberCount = count
                 }
             })
     }

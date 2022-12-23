@@ -1,13 +1,7 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user.settings
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -16,14 +10,11 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmojiModel
-import ru.rikmasters.gilty.shared.model.profile.DemoGenderModel
-import ru.rikmasters.gilty.shared.model.profile.DemoOrientationModel
-import ru.rikmasters.gilty.shared.model.profile.DemoRatingModel
-import ru.rikmasters.gilty.shared.model.profile.GenderModel
-import ru.rikmasters.gilty.shared.model.profile.OrientationModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
+import ru.rikmasters.gilty.shared.model.enumeration.SexType
+import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.SexType.MALE
+import ru.rikmasters.gilty.shared.model.enumeration.SexType.OTHER
+import ru.rikmasters.gilty.shared.model.profile.*
 
 @Composable
 fun SettingsScreen(nav: NavState = get()) {
@@ -32,7 +23,7 @@ fun SettingsScreen(nav: NavState = get()) {
     val context = LocalContext.current
     var age by remember { mutableStateOf(18) }
     var orientation by remember { mutableStateOf(DemoOrientationModel) }
-    var gender by remember { mutableStateOf(DemoGenderModel) }
+    var gender by remember { mutableStateOf(FEMALE) }
     val orientationList = listOf(
         stringResource(R.string.orientation_hetero),
         stringResource(R.string.orientation_gay),
@@ -51,9 +42,9 @@ fun SettingsScreen(nav: NavState = get()) {
         )
     }
     val genderList = listOf(
-        stringResource(R.string.female_sex),
-        stringResource(R.string.male_sex),
-        stringResource(R.string.condition_no_matter)
+        FEMALE.display,
+        MALE.display,
+        OTHER.display
     )
     val genderState = remember {
         mutableStateListOf(false, true, false)
@@ -67,19 +58,19 @@ fun SettingsScreen(nav: NavState = get()) {
     )
     SettingsContent(
         SettingsState(profile, notification),
-        Modifier, object : SettingsCallback {
+        Modifier, object: SettingsCallback {
             override fun onBack() {
                 nav.navigate("main")
             }
-
+            
             override fun editCategories() {
                 nav.navigate("categories")
             }
-
+            
             override fun onNotificationChange(it: Boolean) {
                 notification = it
             }
-
+            
             override fun onAboutAppClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
@@ -96,7 +87,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onIconAppClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
@@ -113,7 +104,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onGenderClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
@@ -124,9 +115,7 @@ fun SettingsScreen(nav: NavState = get()) {
                             repeat(genderState.size) { index ->
                                 genderState[index] = it == index
                             }
-                            gender = GenderModel(
-                                "0", genderList[it]
-                            )
+                            gender = SexType.get(it)
                             scope.launch {
                                 asm.bottomSheetState.collapse()
                             }
@@ -134,7 +123,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onAgeClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
@@ -147,7 +136,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onOrientationClick() {
                 scope.launch {
                     asm.bottomSheetState.expand {
@@ -168,7 +157,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onPhoneClick() {
                 Toast.makeText(
                     context,
@@ -176,16 +165,16 @@ fun SettingsScreen(nav: NavState = get()) {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
+            
             override fun onExit() {
                 Toast.makeText(
                     context,
                     "Алерт будет позже",
                     Toast.LENGTH_SHORT
                 ).show()
-                nav.navigateAbsolute("authorization")
+                nav.navigateAbsolute("login")
             }
-
+            
             override fun onDelete() {
                 Toast.makeText(
                     context,

@@ -2,32 +2,21 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ONLINE
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBS
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSCallback
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DateTimeBSState
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.DurationBottomSheet
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapBottomSheet
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapCallback
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.MapState
+import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.*
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.common.extentions.TIME_START
-import ru.rikmasters.gilty.shared.common.extentions.TODAY_LABEL
+import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import java.util.UUID
 
 @Preview
 @Composable
@@ -64,6 +53,12 @@ fun DetailedScreen(nav: NavState = get()) {
         
         override fun onSave() {
             date = "$bsDate, $bsHour:$bsMinute"
+            val fullTime = "T$bsHour:$bsMinute:00Z"
+            val fullDate = if(bsDate == "Сегодня")
+                LOCAL_DATE.format("yyyy-MM-dd")
+            // TODO год всегда текущий, пересмотреть логику
+            else "${LOCAL_DATE.year()}-" + bsDate.format("dd MMMM", "MM-dd")
+            MEETING.dateTime = fullDate + fullTime
             scope.launch { asm.bottomSheetState.collapse() }
         }
     }
@@ -72,7 +67,7 @@ fun DetailedScreen(nav: NavState = get()) {
         DetailedContent(
             DetailedState(
                 time, date, description,
-                tagList, meetPlace, hideMeetPlace, alert, ONLINE
+                tagList, meetPlace, hideMeetPlace, alert, MEETING.isOnline
             ), Modifier, object: DetailedCallback {
                 override fun onBack() {
                     nav.navigate("conditions")
@@ -96,7 +91,7 @@ fun DetailedScreen(nav: NavState = get()) {
                             DateTimeBS(
                                 DateTimeBSState(
                                     bsDate, bsHour,
-                                    bsMinute, ONLINE
+                                    bsMinute, MEETING.isOnline
                                 ),
                                 Modifier
                                     .padding(16.dp)
@@ -112,7 +107,10 @@ fun DetailedScreen(nav: NavState = get()) {
                         asm.bottomSheetState.expand {
                             DurationBottomSheet(
                                 duration, Modifier.padding(16.dp),
-                                ONLINE, { duration = it })
+                                MEETING.isOnline, {
+                                    duration = it
+                                    MEETING.duration = it
+                                })
                             {
                                 scope.launch { asm.bottomSheetState.collapse() }
                                 time = duration
@@ -127,17 +125,23 @@ fun DetailedScreen(nav: NavState = get()) {
                 
                 override fun onTagDelete(tag: Int) {
                     tagList.removeAt(tag)
+                    val tags = arrayListOf<TagModel>()
+                    repeat(tagList.size) {
+                        tags.add(TagModel(UUID.randomUUID(), tagList[it]))
+                    }
+                    MEETING.tags = tags
                 }
                 
                 override fun onDescriptionChange(text: String) {
                     description = text
+                    MEETING.description = description
                 }
                 
                 override fun onMeetPlaceClick() {
                     scope.launch {
                         asm.bottomSheetState.expand {
                             MapBottomSheet(
-                                MapState(placeSearch, ONLINE), Modifier,
+                                MapState(placeSearch, MEETING.isOnline), Modifier,
                                 object: MapCallback {
                                     override fun onChange(text: String) {
                                         placeSearch = text
@@ -152,6 +156,8 @@ fun DetailedScreen(nav: NavState = get()) {
                                     
                                     override fun onItemClick(place: Pair<String, String>) {
                                         meetPlace = place
+                                        MEETING.address = place.first
+                                        MEETING.place = place.second
                                         scope.launch { asm.bottomSheetState.collapse() }
                                     }
                                     
@@ -166,10 +172,12 @@ fun DetailedScreen(nav: NavState = get()) {
                 
                 override fun onHideMeetPlaceClick() {
                     hideMeetPlace = !hideMeetPlace
+                    MEETING.hideAddress = hideMeetPlace
                 }
                 
                 override fun onDescriptionClear() {
                     description = ""
+                    MEETING.description = ""
                 }
             }
         )

@@ -11,7 +11,7 @@ data class TagModel(
 
 val DemoTag = TagModel(
     UUID.randomUUID(),
-    "Какой-то тег"
+    "Поход в кино"
 )
 
 val DemoTagList = listOf(DemoTag, DemoTag, DemoTag)

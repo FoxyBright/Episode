@@ -9,6 +9,9 @@ include(":data:realm")
 include(":data")
 
 
+include(":feature:animated")
+
+
 include(":feature:bubbles")
 
 

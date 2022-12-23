@@ -7,16 +7,13 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.TagSearch
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.TextFieldLabel
+import ru.rikmasters.gilty.shared.shared.*
 
 @Composable
 fun Tags(
@@ -61,15 +58,14 @@ fun Description(
                     Modifier.fillMaxWidth(),
                     shape = shapes.medium,
                     colors = DescriptionColors(state.online),
-                    label = if(state.description.isNotEmpty()) TextFieldLabel(
-                        true,
-                        stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                    ) else null,
-                    placeholder = TextFieldLabel(
+                    label = if(state.description.isNotEmpty())
+                        TextFieldLabel(
+                            true,
+                            stringResource(R.string.add_meet_detailed_meet_description_place_holder)
+                        ) else null, placeholder = TextFieldLabel(
                         false,
                         stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                    ),
-                    textStyle = typography.bodyMedium,
+                    ), textStyle = typography.bodyMedium,
                     clear = { callback?.onDescriptionClear() }
                 )
                 Text(
@@ -77,36 +73,14 @@ fun Description(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp),
-                    colorScheme.onTertiary, textAlign = TextAlign.End,
+                    colorScheme.onTertiary,
+                    textAlign = TextAlign.End,
                     style = typography.headlineSmall
                 )
             }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DescriptionColors(online: Boolean) =
-    TextFieldDefaults.textFieldColors(
-        textColor = colorScheme.tertiary,
-        cursorColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        containerColor = colorScheme.primaryContainer,
-        unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
-        focusedLabelColor = if(online) colorScheme.secondary
-        else colorScheme.tertiary,
-        disabledTrailingIconColor = Transparent,
-        focusedTrailingIconColor = Transparent,
-        unfocusedTrailingIconColor = Transparent,
-        focusedIndicatorColor = Transparent,
-        unfocusedIndicatorColor = Transparent,
-        disabledIndicatorColor = Transparent,
-        errorIndicatorColor = Transparent,
-        placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
-    )
 
 @Composable
 fun Additionally(

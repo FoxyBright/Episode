@@ -32,7 +32,7 @@ private fun CheckBoxCardPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckBoxCard(
+fun  CheckBoxCard(
     label: String,
     modifier: Modifier = Modifier,
     state: Boolean,
@@ -47,7 +47,7 @@ fun CheckBoxCard(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp, 10.dp),
             Arrangement.SpaceBetween,
             Alignment.CenterVertically
         ) {

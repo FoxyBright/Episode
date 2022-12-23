@@ -5,14 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
@@ -30,8 +30,7 @@ fun ConditionPreview() {
             ConditionState(
                 (false), (true), listOf(),
                 listOf(), ("100"),
-                TextFieldColors(),
-                (null), (false)
+                (false), (false)
             )
         )
     }
@@ -43,9 +42,8 @@ data class ConditionState(
     val meetingTypes: List<Boolean>,
     val conditionList: List<Boolean>,
     val text: String,
-    val priceColors: TextFieldColors,
-    val focus: FocusState?,
     val alert: Boolean,
+    val restrictChat: Boolean,
 )
 
 interface ConditionsCallback {
@@ -55,11 +53,11 @@ interface ConditionsCallback {
     fun onClose() {}
     fun onOnlineClick() {}
     fun onHiddenClick() {}
+    fun onRestrictClick() {}
     fun onPriceChange(price: String) {}
     fun onClear() {}
     fun onMeetingTypeSelect(it: Int) {}
     fun onConditionSelect(it: Int) {}
-    fun onPriceFocus(state: FocusState) {}
     fun onCloseAlert(it: Boolean) {}
 }
 
@@ -85,16 +83,13 @@ fun ConditionContent(
             Modifier
                 .padding(top = 32.dp, end = 16.dp)
                 .size(20.dp)
-                .align(Alignment.TopEnd)
+                .align(TopEnd)
         ) { callback?.onCloseAlert(true) }
     }
-    GAlert(state.alert, { callback?.onCloseAlert(false) },
-        stringResource(R.string.add_meet_exit_alert_title),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button))
-        { callback?.onCloseAlert(false); callback?.onClose() },
-        cancel = Pair(stringResource(R.string.cancel_button))
-        { callback?.onCloseAlert(false) })
+    CloseAddMeetAlert(
+        state.alert,
+        { callback?.onCloseAlert(false) },
+        { callback?.onCloseAlert(false); callback?.onClose() })
 }
 
 @Composable
@@ -145,7 +140,7 @@ private fun Conditions(
                     enabled, state.online
                 ) { callback?.onNext() }
                 Dashes(
-                    (5), (2), Modifier.padding(top = 16.dp),
+                    (4), (1), Modifier.padding(top = 16.dp),
                     if(state.online) colorScheme.secondary
                     else colorScheme.primary
                 )
@@ -189,8 +184,7 @@ private fun Price(
     return FilterModel(stringResource(R.string.add_meet_conditions_price)) {
         PriceTextField(state.text,
             { callback?.onPriceChange(it) },
-            { callback?.onClear() }, state.priceColors,
-            state.focus, { callback?.onPriceFocus(it) }
+            { callback?.onClear() }, state.online,
         )
     }
 }
@@ -215,6 +209,24 @@ private fun Additional(
                 colorScheme.onTertiary,
                 style = typography.headlineSmall
             )
+            if(state.online) {
+                CheckBoxCard(
+                    stringResource(R.string.add_meet_restrict_chat),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    state.restrictChat,
+                    online = true
+                ) { callback?.onRestrictClick() }
+                Text(
+                    stringResource(R.string.add_meet_restrict_chat_label),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, start = 16.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineSmall
+                )
+            }
         }
     }
 }

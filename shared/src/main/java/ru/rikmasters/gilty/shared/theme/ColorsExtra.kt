@@ -26,6 +26,16 @@ data class ExtraColors(
     val tabActive: Color = Color.Unspecified,
     val tabActiveOnline: Color = Color.Unspecified,
     val tabInactive: Color = Color.Unspecified,
+    
+    // Categories Colors
+    val sport: Color = Color.Unspecified,
+    val business: Color = Color.Unspecified,
+    val travel: Color = Color.Unspecified,
+    val masterClasses: Color = Color.Unspecified,
+    val entertainment: Color = Color.Unspecified,
+    val erotic: Color = Color.Unspecified,
+    val party: Color = Color.Unspecified,
+    val art: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
@@ -58,6 +68,16 @@ val LightExtraColors = ExtraColors(
     tabActive = Colors.GentlePinky,
     tabInactive = Colors.LightGray,
     tabActiveOnline = Colors.LightGreen,
+    
+    // Categories Colors
+    sport = Colors.Orange,
+    business = Colors.Blue,
+    travel = Colors.Cyan,
+    masterClasses = Colors.Yellow,
+    entertainment = Colors.AlmostRed,
+    erotic = Colors.Red,
+    party = Colors.Purple,
+    art = Colors.Orange,
     // Add colors in scheme from Colors-file
 )
 
@@ -90,5 +110,15 @@ val DarkExtraColors = ExtraColors(
     tabActive = Colors.RudePinky,
     tabInactive = Colors.Black,
     tabActiveOnline = Colors.LightGreen,
+    
+    // Categories Colors
+    sport = Colors.DarkOrange,
+    business = Colors.DarkBlue,
+    travel = Colors.DarkCyan,
+    masterClasses = Colors.DarkYellow,
+    entertainment = Colors.AlmostRed,
+    erotic = Colors.DarkRed,
+    party = Colors.DarkPurple,
+    art = Colors.DarkOrange,
     // Add colors in scheme from Colors-file
 )

@@ -1,17 +1,12 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user.settings.categories
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.model.meeting.DemoShortCategoryModelList
-import ru.rikmasters.gilty.shared.model.meeting.ShortCategoryModel
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 
 @Composable
 fun CategoriesScreen(nav: NavState = get()) {
@@ -20,7 +15,7 @@ fun CategoriesScreen(nav: NavState = get()) {
     CategoriesContent(
         Modifier,
         CategoriesState(
-            DemoShortCategoryModelList,
+            CategoriesType.list(),
             listOf(), alert
         ),
         object : CategoriesCallback {
@@ -33,7 +28,7 @@ fun CategoriesScreen(nav: NavState = get()) {
                 alert = it
             }
 
-            override fun onCategoryClick(category: ShortCategoryModel) {
+            override fun onCategoryClick(category: CategoriesType) {
                 Toast.makeText(
                     context, "Выбор категории временно не доступен",
                     Toast.LENGTH_SHORT
