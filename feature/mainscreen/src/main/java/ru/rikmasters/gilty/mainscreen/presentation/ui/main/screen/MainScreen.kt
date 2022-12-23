@@ -60,12 +60,12 @@ fun MainScreen(nav: NavState = get()) {
         
         override fun onMenuItemClick(index: Int) {
             scope.launch {
-                asm.bottomSheetState.expand {
+                asm.bottomSheet.expand {
                     menuState = false
                     clickedMeet?.let {
                         ComplainsContent(it) {
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }; alert = true
                         }
                     }
@@ -79,7 +79,7 @@ fun MainScreen(nav: NavState = get()) {
                     "main/reaction?avatar=${
                         it.organizer.avatar.id
                     }&meetType=${it.category.ordinal}"
-                ); scope.launch { asm.bottomSheetState.collapse() }
+                ); scope.launch { asm.bottomSheet.collapse() }
             }
         }
         
@@ -120,7 +120,7 @@ fun MainScreen(nav: NavState = get()) {
             override fun onMeetClick(meet: MeetingModel) {
                 clickedMeet = meet
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         MeetingBottomSheet(
                             MeetingBSState(
                                 menuState, meet,
@@ -161,7 +161,7 @@ fun MainScreen(nav: NavState = get()) {
             override fun onRespond(meet: MeetingModel) {
                 clickedMeet = meet
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         MeetingBottomSheet(
                             MeetingBSState(
                                 menuState, meet,
@@ -179,9 +179,9 @@ fun MainScreen(nav: NavState = get()) {
             
             override fun openFiltersBottomSheet() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         MeetingFilterContent {
-                            scope.launch { asm.bottomSheetState.collapse() }
+                            scope.launch { asm.bottomSheet.collapse() }
                         }
                     }
                 }

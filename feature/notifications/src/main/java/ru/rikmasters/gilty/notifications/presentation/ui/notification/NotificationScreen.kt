@@ -81,7 +81,7 @@ fun NotificationsScreen(nav: NavState = get()) {
                     Toast.LENGTH_SHORT
                 ).show()
                 if (respondsList.size == 0)
-                    scope.launch { asm.bottomSheetState.collapse() }
+                    scope.launch { asm.bottomSheet.collapse() }
             }
 
             override fun onArrowClick(index: Int) {
@@ -95,7 +95,7 @@ fun NotificationsScreen(nav: NavState = get()) {
                     Toast.LENGTH_SHORT
                 ).show()
                 if (respondsList.size == 0)
-                    scope.launch { asm.bottomSheetState.collapse() }
+                    scope.launch { asm.bottomSheet.collapse() }
             }
         }
 
@@ -139,7 +139,7 @@ fun NotificationsScreen(nav: NavState = get()) {
 
                 override fun onRespondsClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             NotificationRespondsContent(
                                 NotificationRespondsState(
                                     MeetSeparate(respondsList),

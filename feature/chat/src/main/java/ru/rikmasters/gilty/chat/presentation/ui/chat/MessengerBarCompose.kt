@@ -99,7 +99,11 @@ fun MessengerBar(
     answer: MessageModel? = null,
     callback: MessengerBarCallback? = null
 ) {
-    Column(modifier.background(colorScheme.primaryContainer)) {
+    Column(
+        modifier
+            .imePadding()
+            .background(colorScheme.primaryContainer)
+    ) {
         answer?.let {
             Answer(answer) { callback?.onCancelAnswer() }
         }

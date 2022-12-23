@@ -64,7 +64,7 @@ fun LoginScreen(nav: NavState = get()) {
 
             override fun openCountryBottomSheet() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         CountryBottomSheetContent(
                             CountryBottomSheetState(searchText, searchState, countries),
                             Modifier, object : CountryBottomSheetCallBack {
@@ -79,7 +79,7 @@ fun LoginScreen(nav: NavState = get()) {
                                 override fun onCountrySelect(country: Country) {
                                     selectCountry = country
                                     scope.launch {
-                                        asm.bottomSheetState.collapse()
+                                        asm.bottomSheet.collapse()
                                     }
                                 }
                             })

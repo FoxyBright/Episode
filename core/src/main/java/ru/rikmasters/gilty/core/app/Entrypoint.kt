@@ -1,13 +1,10 @@
 package ru.rikmasters.gilty.core.app
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -29,7 +26,7 @@ import ru.rikmasters.gilty.core.util.composable.getOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun appEntrypoint(
+fun AppEntrypoint(
     theme: AppTheme,
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
     snackbar: @Composable (SnackbarData) -> Unit
@@ -39,13 +36,15 @@ fun appEntrypoint(
     val systemUiController = rememberSystemUiController()
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetSwipeableState = rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
+    val keyboardController = rememberKeyboardController()
 
     val asm = remember {
         AppStateModel(
             isSystemInDarkMode,
             systemUiController,
             snackbarHostState,
-            BottomSheetState(bottomSheetSwipeableState)
+            BottomSheetState(bottomSheetSwipeableState),
+            keyboardController
         )
     }
 
@@ -68,13 +67,25 @@ fun appEntrypoint(
         asm.darkMode,
         asm.dynamicColor
     ) {
-        Box(Modifier.fillMaxSize()) {
+    
+        val backgroundColor = colorScheme.background
+        
+        LaunchedEffect(backgroundColor) {
+            asm.systemUi.setStatusBarColor(backgroundColor)
+        }
+        
+        Box(
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+        ) {
             BottomSheetLayout(
-                asm.bottomSheetState,
+                asm.bottomSheet,
                 Modifier,
                 bottomSheetBackground,
             ) {
-                Scaffold() {
+                Box(Modifier.background(backgroundColor)) {
                     DeepNavHost(navState) {
                         env.buildNavigation(this)
                     }

@@ -94,7 +94,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                 
                 override fun onGenderClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             SelectBottom(
                                 stringResource(R.string.sex),
                                 genderList, genderControl, MEETING.isOnline
@@ -102,7 +102,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                                 repeat(genderControl.size) { index ->
                                     genderControl[index] = index == it
                                     if(index == it) gender = genderList[index]
-                                }; scope.launch { asm.bottomSheetState.collapse() }
+                                }; scope.launch { asm.bottomSheet.collapse() }
                             }
                         }
                     }
@@ -110,13 +110,13 @@ fun RequirementsScreen(nav: NavState = get()) {
                 
                 override fun onAgeClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             AgeBottom(from, to, Modifier,
                                 { from = it }, { to = it }, MEETING.isOnline
                             )
                             {
                                 age = "от $from до $to"
-                                scope.launch { asm.bottomSheetState.collapse() }
+                                scope.launch { asm.bottomSheet.collapse() }
                             }
                         }
                     }
@@ -124,7 +124,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                 
                 override fun onOrientationClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             SelectBottom(
                                 stringResource(R.string.orientation_title),
                                 orientationList,
@@ -133,7 +133,7 @@ fun RequirementsScreen(nav: NavState = get()) {
                                 repeat(orientationControl.size) { index ->
                                     orientationControl[index] = index == it
                                     if(index == it) orientation = orientationList[index]
-                                }; scope.launch { asm.bottomSheetState.collapse() }
+                                }; scope.launch { asm.bottomSheet.collapse() }
                             }
                         }
                     }
