@@ -102,9 +102,7 @@ fun ChatContent(
         modifier, {
             ChatAppBarContent(
                 state.topState,
-                Modifier
-                    .navigationBarsPadding()
-                    .imePadding(), callback
+                Modifier, callback
             )
         }, {
             MessengerBar(

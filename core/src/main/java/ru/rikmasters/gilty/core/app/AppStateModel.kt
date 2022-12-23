@@ -14,13 +14,15 @@ class AppStateModel internal constructor(
 
     isSystemInDarkMode: Boolean,
 
-    val systemUiController: SystemUiController,
+    val systemUi: SystemUiController,
 
-    val snackbarHostState: SnackbarHostState,
+    val snackbar: SnackbarHostState,
 
-    val bottomSheetState: BottomSheetState,
+    val bottomSheet: BottomSheetState,
+    
+    val keyboard: KeyboardController,
 
-    ): Loggable {
+): Loggable {
 
     var darkMode by mutableStateOf(isSystemInDarkMode)
 

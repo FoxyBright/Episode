@@ -10,4 +10,5 @@ dependencies {
     androidBase()
     compose()
     implementation(project(":dataexample"))
+    implementation(project(":shared"))
 }

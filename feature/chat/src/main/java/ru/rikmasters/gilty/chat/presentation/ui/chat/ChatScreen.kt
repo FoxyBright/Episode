@@ -13,6 +13,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.SoftInputAdjust
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.presentation.ui.user.organizer
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
@@ -29,6 +30,12 @@ import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 fun ChatScreen(nav: NavState = get()) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    
+    DisposableEffect(Unit) {
+        asm.keyboard.setSoftInputMode(SoftInputAdjust.Nothing)
+        onDispose { asm.keyboard.resetSoftInputAdjust() }
+    }
+    
     var messageText by
     remember { mutableStateOf("") }
     var answer by
@@ -88,7 +95,7 @@ fun ChatScreen(nav: NavState = get()) {
         
         override fun onAvatarClick() {
             scope.launch {
-                asm.bottomSheetState.expand {
+                asm.bottomSheet.expand {
                     organizer(
                         DemoProfileModel, meet,
                         asm, scope
@@ -98,17 +105,17 @@ fun ChatScreen(nav: NavState = get()) {
         }
         
         override fun onBottomButtonClick(point: Int) {
-            scope.launch { asm.bottomSheetState.collapse() }
+            scope.launch { asm.bottomSheet.collapse() }
             meetOutAlert = true
         }
         
         override fun onMenuItemClick(index: Int) {
             scope.launch {
-                asm.bottomSheetState.expand {
+                asm.bottomSheet.expand {
                     menuState = false
                     ComplainsContent(meet) {
                         scope.launch {
-                            asm.bottomSheetState.collapse()
+                            asm.bottomSheet.collapse()
                         }; alert = true
                     }
                 }
@@ -192,7 +199,7 @@ fun ChatScreen(nav: NavState = get()) {
             override fun gallery() {
                 focusManager.clearFocus()
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         HiddenPhotoBottomSheet()
                     }
                 }
@@ -242,7 +249,7 @@ fun ChatScreen(nav: NavState = get()) {
             
             override fun onAvatarClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         MeetingBottomSheet(
                             MeetingBSState(
                                 menuState, meet,
@@ -262,11 +269,11 @@ fun ChatScreen(nav: NavState = get()) {
                 when(point) {
                     0 -> meetOutAlert = true
                     1 -> scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             menuState = false
                             ComplainsContent(meet) {
                                 scope.launch {
-                                    asm.bottomSheetState.collapse()
+                                    asm.bottomSheet.collapse()
                                 }; alert = true
                             }
                         }

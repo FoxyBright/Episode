@@ -115,7 +115,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 
                 override fun onObserveClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             ObserversListContent(
                                 ObserversListState(
                                     profileModel, observers,
@@ -169,7 +169,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 
                 override fun onHistoryClick(meet: MeetingModel) {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             MyMeetingScreen(
                                 profileModel, meet,
                                 asm, scope
@@ -180,7 +180,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 
                 override fun onMeetingClick(meet: MeetingModel) {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             MyMeetingScreen(
                                 profileModel, meet,
                                 asm, scope
@@ -203,7 +203,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 
                 override fun onRespondsClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             RespondsList(
                                 listOf(pairRespondsList.value),
                                 respondsState, tabsState,
@@ -251,7 +251,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                                     }
                                 }) {
                                 scope.launch {
-                                    asm.bottomSheetState.collapse()
+                                    asm.bottomSheet.collapse()
                                 }
                             }
                         }

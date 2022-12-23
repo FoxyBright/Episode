@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
-import ru.rikmasters.gilty.core.app.appEntrypoint
+import androidx.core.view.WindowCompat
+import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GSnackbar
@@ -16,7 +17,7 @@ class MainActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         setContent {
-            appEntrypoint(
+            AppEntrypoint(
                 GiltyTheme,
                 { GBottomSheetBackground(it) },
                 { GSnackbar(it) }

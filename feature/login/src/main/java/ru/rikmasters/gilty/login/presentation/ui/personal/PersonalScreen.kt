@@ -27,11 +27,11 @@ fun PersonalScreen(nav: NavState = get()) {
 
             override fun onAgeClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         BottomSheetContent(Modifier, age, { age = it })
                         {
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }

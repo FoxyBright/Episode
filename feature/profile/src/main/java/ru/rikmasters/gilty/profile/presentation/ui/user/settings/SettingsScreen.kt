@@ -73,7 +73,7 @@ fun SettingsScreen(nav: NavState = get()) {
             
             override fun onAboutAppClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         AboutAppBottom {
                             Toast.makeText(
                                 context,
@@ -81,7 +81,7 @@ fun SettingsScreen(nav: NavState = get()) {
                                 Toast.LENGTH_SHORT
                             ).show()
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }
@@ -90,7 +90,7 @@ fun SettingsScreen(nav: NavState = get()) {
             
             override fun onIconAppClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         IconsBottom {
                             Toast.makeText(
                                 context,
@@ -98,7 +98,7 @@ fun SettingsScreen(nav: NavState = get()) {
                                 Toast.LENGTH_SHORT
                             ).show()
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }
@@ -107,7 +107,7 @@ fun SettingsScreen(nav: NavState = get()) {
             
             override fun onGenderClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         SelectBottom(
                             stringResource(R.string.sex),
                             genderList, genderState
@@ -117,7 +117,7 @@ fun SettingsScreen(nav: NavState = get()) {
                             }
                             gender = SexType.get(it)
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }
@@ -126,11 +126,11 @@ fun SettingsScreen(nav: NavState = get()) {
             
             override fun onAgeClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         AgeBottom(Modifier, age, { age = it })
                         {
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }
@@ -139,7 +139,7 @@ fun SettingsScreen(nav: NavState = get()) {
             
             override fun onOrientationClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         SelectBottom(
                             stringResource(R.string.orientation_title),
                             orientationList, orientationState
@@ -151,7 +151,7 @@ fun SettingsScreen(nav: NavState = get()) {
                                 "0", orientationList[it]
                             )
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }
                         }
                     }

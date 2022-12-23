@@ -66,10 +66,10 @@ private fun meet(
             override fun onMenuItemClick(index: Int) {
                 menuState = false
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         ComplainsContent(DemoMeetingModel) {
                             scope.launch {
-                                asm.bottomSheetState.collapse()
+                                asm.bottomSheet.collapse()
                             }; alert = true
                         }
                     }
@@ -78,18 +78,18 @@ private fun meet(
             
             override fun onAllMembersClick() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         ParticipantsList(
                             DemoMeetingModel, DemoMemberModelList,
                             Modifier, {
                                 launch {
-                                    asm.bottomSheetState.expand {
+                                    asm.bottomSheet.expand {
                                         meet(user, meet, asm, scope)
                                     }
                                 }
                             }, {
                                 launch {
-                                    asm.bottomSheetState.expand {
+                                    asm.bottomSheet.expand {
                                         organizer(user, meet, asm, scope)
                                     }
                                 }
@@ -101,7 +101,7 @@ private fun meet(
             
             override fun onMemberClick(member: MemberModel) {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         organizer(user, meet, asm, scope)
                     }
                 }
@@ -161,7 +161,7 @@ fun organizer(
             
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         meet(user, meet, asm, scope)
                     }
                 }
@@ -169,7 +169,7 @@ fun organizer(
             
             override fun onBack() {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         meet(user, meet, asm, scope)
                     }
                 }

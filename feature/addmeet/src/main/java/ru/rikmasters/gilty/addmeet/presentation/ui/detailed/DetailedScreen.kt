@@ -59,7 +59,7 @@ fun DetailedScreen(nav: NavState = get()) {
             // TODO год всегда текущий, пересмотреть логику
             else "${LOCAL_DATE.year()}-" + bsDate.format("dd MMMM", "MM-dd")
             MEETING.dateTime = fullDate + fullTime
-            scope.launch { asm.bottomSheetState.collapse() }
+            scope.launch { asm.bottomSheet.collapse() }
         }
     }
     
@@ -87,7 +87,7 @@ fun DetailedScreen(nav: NavState = get()) {
                 
                 override fun onDateClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             DateTimeBS(
                                 DateTimeBSState(
                                     bsDate, bsHour,
@@ -104,7 +104,7 @@ fun DetailedScreen(nav: NavState = get()) {
                 
                 override fun onTimeClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             DurationBottomSheet(
                                 duration, Modifier.padding(16.dp),
                                 MEETING.isOnline, {
@@ -112,7 +112,7 @@ fun DetailedScreen(nav: NavState = get()) {
                                     MEETING.duration = it
                                 })
                             {
-                                scope.launch { asm.bottomSheetState.collapse() }
+                                scope.launch { asm.bottomSheet.collapse() }
                                 time = duration
                             }
                         }
@@ -139,7 +139,7 @@ fun DetailedScreen(nav: NavState = get()) {
                 
                 override fun onMeetPlaceClick() {
                     scope.launch {
-                        asm.bottomSheetState.expand {
+                        asm.bottomSheet.expand {
                             MapBottomSheet(
                                 MapState(placeSearch, MEETING.isOnline), Modifier,
                                 object: MapCallback {
@@ -158,11 +158,11 @@ fun DetailedScreen(nav: NavState = get()) {
                                         meetPlace = place
                                         MEETING.address = place.first
                                         MEETING.place = place.second
-                                        scope.launch { asm.bottomSheetState.collapse() }
+                                        scope.launch { asm.bottomSheet.collapse() }
                                     }
                                     
                                     override fun onBack() {
-                                        scope.launch { asm.bottomSheetState.collapse() }
+                                        scope.launch { asm.bottomSheet.collapse() }
                                     }
                                 }
                             )

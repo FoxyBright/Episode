@@ -44,7 +44,7 @@ fun OrganizerProfileScreen() {
             
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
-                    asm.bottomSheetState.expand {
+                    asm.bottomSheet.expand {
                         MyMeetingScreen(profileModel, meet, asm, scope)
                     }
                 }
