@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.R.drawable.ic_radio_active
+import ru.rikmasters.gilty.shared.R.drawable.ic_radio_inactive
 import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
 import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -116,8 +118,7 @@ fun GAlert(
         dismissButton = {
             cancel?.let {
                 Text(
-                    it.first,
-                    Modifier
+                    it.first, Modifier
                         .padding(end = 16.dp)
                         .clickable(
                             MutableInteractionSource(), (null)
@@ -175,19 +176,20 @@ private fun ListItem(
     accentColors: Color = colorScheme.primary,
     select: ((Int) -> Unit)? = null
 ) {
-    Row(Modifier, Start, CenterVertically) {
+    Row(Modifier.offset((-10).dp),
+        Start, CenterVertically) {
         CheckBox(
             item.second, Modifier.clip(CircleShape),
             listOf(
-                R.drawable.ic_radio_active,
-                R.drawable.ic_radio_inactive
+                ic_radio_active,
+                ic_radio_inactive
             ), if(item.second) accentColors
             else colorScheme.tertiary
         ) { select?.let { it(index) } }
         Text(
             item.first,
             Modifier
-                .padding(start = 14.dp)
+                .padding(start = 8.dp)
                 .clickable(
                     MutableInteractionSource(), (null)
                 ) { select?.let { it(index) } },

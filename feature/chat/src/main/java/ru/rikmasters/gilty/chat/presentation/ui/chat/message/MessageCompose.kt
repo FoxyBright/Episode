@@ -49,7 +49,7 @@ fun MessPreview() {
                     MessState(
                         it, (false),
                         DragRowState(0f),
-                        shapes.large, (true)
+                        shapes.large, (true), (false)
                     ),
                     Modifier
                         .background(colorScheme.background)
@@ -70,6 +70,7 @@ data class MessState(
     val dragState: DragRowState,
     val shape: Shape,
     val avatar: Boolean,
+    val isOnline: Boolean
 )
 
 interface MessCallBack {
@@ -167,17 +168,20 @@ private fun Content(
                 when {
                     (attach != null) -> Image(
                         attach.type, message,
-                        sender, state.shape, callback,
+                        sender, state.shape,
+                        state.isOnline, callback,
                     )
                     
                     (message.answer != null) -> Text(
                         message, sender, state.shape,
-                        message.answer
+                        state.isOnline,
+                        message.answer,
                     )
                     
                     else -> Text(
                         message, sender,
-                        state.shape
+                        state.shape,
+                        state.isOnline
                     )
                 }
             }
@@ -193,13 +197,14 @@ private fun Image(
     message: MessageModel,
     sender: Boolean,
     shape: Shape,
+    isOnline: Boolean,
     callback: MessCallBack?
 ) {
     when(type) {
         
         PHOTO -> {
             ImageMessage(
-                message, sender, shape
+                message, sender, shape, isOnline
             ) { callback?.onImageClick(message) }
         }
         
@@ -219,10 +224,12 @@ private fun Text(
     message: MessageModel,
     sender: Boolean,
     shape: Shape,
+    isOnline: Boolean,
     answer: MessageModel? = null
 ) {
     TextMessage(
         message, sender,
-        Modifier, answer, shape
+        Modifier, answer,
+        shape, isOnline
     )
 }

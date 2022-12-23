@@ -33,6 +33,9 @@ import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 fun ChatScreen(chatType: String, nav: NavState = get()) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    var type by remember {
+        mutableStateOf(PinnedBarType.valueOf(chatType))
+    }
     
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(SoftInputAdjust.Nothing)
@@ -68,7 +71,8 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     }
     //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
     var unReadCount by remember { mutableStateOf(5) }
-    val meet = DemoMeetingModel
+    val meet = if(type == TRANSLATION || type == TRANSLATION_AWAIT)
+        getDemoMeetingModel(isOnline = true) else DemoMeetingModel
     var alert by
     remember { mutableStateOf(false) }
     var meetOutAlert by
@@ -125,11 +129,6 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
         }
     }
-    
-    var type by remember {
-        mutableStateOf(PinnedBarType.valueOf(chatType))
-    }
-    
     fun Int.toTime(): String? {
         if(this == 0) {
             type = TRANSLATION

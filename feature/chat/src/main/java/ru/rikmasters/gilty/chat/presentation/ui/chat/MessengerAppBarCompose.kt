@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -94,6 +96,7 @@ fun ChatAppBarContent(
     modifier: Modifier = Modifier,
     callback: ChatAppBarCallback? = null
 ) {
+    
     Column(modifier.background(colorScheme.background)) {
         Row(
             Modifier
@@ -144,7 +147,11 @@ private fun PinnedBar(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    Box(modifier.background(colorScheme.background)) {
+    Card(
+        modifier, RectangleShape,
+        cardColors(colorScheme.background),
+        cardElevation(2.dp)
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()

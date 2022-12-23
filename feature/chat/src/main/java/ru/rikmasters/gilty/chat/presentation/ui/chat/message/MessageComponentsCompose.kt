@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -53,6 +54,7 @@ import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.badEmoji
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
+import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -66,11 +68,13 @@ private fun TextMessagePreview() {
         ) {
             TextMessage(
                 DemoMessageModelLongMessage,
-                (true), Modifier.padding(6.dp)
+                (true), Modifier.padding(6.dp),
+                isOnline = true
             )
             TextMessage(
                 DemoMessageModel,
-                (false), Modifier.padding(6.dp)
+                (false), Modifier.padding(6.dp),
+                isOnline = true
             )
         }
     }
@@ -99,12 +103,14 @@ private fun AnswerMessagePreview() {
             TextMessage(
                 DemoMessageModelLongMessage,
                 (true), Modifier.padding(6.dp),
-                DemoMessageModel
+                DemoMessageModel,
+                isOnline = true
             )
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoMessageModelLongMessage
+                DemoMessageModelLongMessage,
+                isOnline = true
             )
         }
     }
@@ -145,12 +151,12 @@ private fun AnswerImageMessagePreview() {
             TextMessage(
                 DemoMessageModelLongMessage,
                 (true), Modifier.padding(6.dp),
-                DemoImageMessage
+                DemoImageMessage, isOnline = true
             )
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoImageMessage
+                DemoImageMessage, isOnline = true
             )
         }
     }
@@ -168,12 +174,12 @@ private fun ImageMessagePreview() {
             ImageMessage(
                 DemoImageMessage,
                 (true), shapes.large,
-                Modifier.padding(6.dp)
+                (true), Modifier.padding(6.dp)
             )
             ImageMessage(
                 DemoImageMessage,
                 (false), shapes.large,
-                Modifier.padding(6.dp)
+                (true), Modifier.padding(6.dp)
             )
         }
     }
@@ -372,6 +378,7 @@ fun ImageMessage(
     message: MessageModel,
     sender: Boolean,
     shape: Shape = shapes.large,
+    isOnline: Boolean,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
@@ -408,8 +415,12 @@ fun ImageMessage(
                         .fillMaxSize()
                         .alpha(if(sender) 1f else 0.5f)
                         .background(
-                            if(sender) colorScheme.primary
-                            else colorScheme.outline,
+                            linearGradient(
+                                if(sender)
+                                    if(isOnline) green
+                                    else red()
+                                else outline
+                            ),
                             CircleShape
                         )
                 )
@@ -422,6 +433,23 @@ fun ImageMessage(
     }
 }
 
+private val green
+    @Composable get() = listOf(
+        colorScheme.secondary,
+        colorScheme.secondary
+    )
+
+private val outline
+    @Composable get() = listOf(
+        colorScheme.outline,
+        colorScheme.outline
+    )
+private val primaryContainer
+    @Composable get() = listOf(
+        colorScheme.primaryContainer,
+        colorScheme.primaryContainer
+    )
+
 @Composable
 fun TextMessage(
     message: MessageModel,
@@ -429,18 +457,23 @@ fun TextMessage(
     modifier: Modifier = Modifier,
     answer: MessageModel? = null,
     shape: Shape = shapes.large,
+    isOnline: Boolean
 ) {
     Box(
         modifier.background(
-            if(sender) colorScheme.primary
-            else colorScheme.primaryContainer, shape
+            linearGradient(
+                if(sender)
+                    if(isOnline) green
+                    else red()
+                else primaryContainer
+            ), shape
         )
     ) {
         Box(Modifier.padding(8.dp)) {
             Column {
                 answer?.let {
                     AnswerContent(
-                        it, Modifier.padding(bottom = 4.dp),
+                        it, Modifier.padding(bottom = 4.dp, end = 30.dp),
                         sender = sender
                     )
                 }; TextWidget(message, sender)

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -151,6 +152,7 @@ fun ChatContent(
                     Item(
                         mes.first, mes.second,
                         (state.user == mes.first.sender),
+                        state.meet.isOnline,
                         if(index < list.size - 1)
                             list[index + 1].first
                         else null, if(index in 1..list.size)
@@ -168,6 +170,7 @@ private fun Item(
     message: MessageModel,
     state: DragRowState,
     sender: Boolean,
+    isOnline: Boolean,
     last: MessageModel? = null,
     next: MessageModel? = null,
     callback: ChatCallback?
@@ -182,6 +185,7 @@ private fun Item(
     }
     var menuState by
     remember { mutableStateOf(false) }
+    shapes.large.bottomEnd
     Box(Modifier.pointerInput(Unit) {
         detectTapGestures(
             onLongPress = { off ->
@@ -198,7 +202,7 @@ private fun Item(
                 MessageShapes(
                     type, sender,
                     last, next,
-                ), avatar
+                ), avatar, isOnline
             ), Modifier
                 .padding(
                     16.dp, if(type != NOTIFICATION)
