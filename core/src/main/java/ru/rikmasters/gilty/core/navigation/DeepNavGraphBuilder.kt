@@ -1,17 +1,12 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import androidx.navigation.navOptions
-import androidx.navigation.navigation
 import ru.rikmasters.gilty.core.util.extension.slash
+import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import kotlin.collections.set
+import kotlin.reflect.KClass
 
 
 /**
@@ -37,25 +32,29 @@ class DeepNavGraphBuilder internal constructor(
         navOptions: NavOptionsBuilder.() -> Unit = { },
         content: @Composable (NavBackStackEntry) -> Unit
     ) {
-        destinations += Screen(route.deep(), arguments, deepLinks, navOptions, content)
+        destinations += SimpleScreen(route.deep(), arguments, deepLinks, navOptions, content)
     }
-
-    /**
-     * Реальный route будет сгенерирован по принципу $nested/$nested/.../$route
-     *
-     * @param navOptions параметры по умолчанию
-     *
-     * @see [NavGraphBuilder.dialog]
-     */
-    fun dialogScreen(
+    
+    inline fun <reified T: ViewModel> screen(
         route: String,
         arguments: List<NamedNavArgument> = emptyList(),
         deepLinks: List<NavDeepLink> = emptyList(),
-        dialogProperties: DialogProperties = DialogProperties(),
-        navOptions: NavOptionsBuilder.() -> Unit,
-        content: @Composable (NavBackStackEntry) -> Unit
+        noinline navOptions: NavOptionsBuilder.() -> Unit = { },
+        noinline content: @Composable (T, NavBackStackEntry) -> Unit
     ) {
-        destinations += Dialog(route.deep(), arguments, deepLinks, dialogProperties, navOptions, content)
+        screen(route, arguments, deepLinks, navOptions, T::class, content)
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T: ViewModel> screen(
+        route: String,
+        arguments: List<NamedNavArgument> = emptyList(),
+        deepLinks: List<NavDeepLink> = emptyList(),
+        navOptions: NavOptionsBuilder.() -> Unit = { },
+        vmClass: KClass<T>,
+        content: @Composable (T, NavBackStackEntry) -> Unit
+    ) {
+        destinations += VmScreen(route.deep(), arguments, deepLinks, navOptions, vmClass, content)
     }
 
     /**
@@ -78,19 +77,8 @@ class DeepNavGraphBuilder internal constructor(
                     processNavOptions(it.deepRoute, it.navOptions)
                     composable(
                         it.deepRoute,
-                        it.arguments,
+                        it.resolveNavArgs(),
                         it.deepLinks,
-                        it.content
-                    )
-                }
-
-                is Dialog -> {
-                    processNavOptions(it.deepRoute, it.navOptions)
-                    dialog(
-                        it.deepRoute,
-                        it.arguments,
-                        it.deepLinks,
-                        it.dialogProperties,
                         it.content
                     )
                 }
@@ -102,6 +90,27 @@ class DeepNavGraphBuilder internal constructor(
                     }
             }
         }
+    }
+    
+    private fun Screen.resolveNavArgs() =
+        resolveNavArgs(deepRoute, navArgs)
+    
+    private fun resolveNavArgs(
+        route: String,
+        args: List<NamedNavArgument>
+    ): List<NamedNavArgument> {
+        var result: MutableList<NamedNavArgument>? = null
+        val argsStr = route.substringAfter('?', "")
+        Regex("(\\w+)=\\{(\\w+)\\}").findAll(argsStr).forEach { res ->
+            val name = res.groups[2]?.value ?: return@forEach
+            if(args.any { it.name == name }) return@forEach
+            if(result == null) result = args.toMutableList()
+            result!! += navArgument(name) {
+                type = NavType.StringType
+                defaultValue = ""
+            }
+        }
+        return result ?: args
     }
 
     private fun processNavOptions(route: String, builder: NavOptionsBuilder.() -> Unit) {
