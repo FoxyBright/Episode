@@ -175,10 +175,7 @@ private fun ListItem(
     accentColors: Color = colorScheme.primary,
     select: ((Int) -> Unit)? = null
 ) {
-    Row(
-        Modifier.padding(horizontal = 16.dp),
-        Start, CenterVertically
-    ) {
+    Row(Modifier, Start, CenterVertically) {
         CheckBox(
             item.second, Modifier.clip(CircleShape),
             listOf(

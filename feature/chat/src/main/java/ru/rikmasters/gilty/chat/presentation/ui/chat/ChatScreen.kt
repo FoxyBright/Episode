@@ -8,8 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -26,7 +29,7 @@ import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
 @Composable
-fun ChatScreen(nav: NavState = get()) {
+fun ChatScreen(chatType: String, nav: NavState = get()) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     var messageText by
@@ -116,16 +119,48 @@ fun ChatScreen(nav: NavState = get()) {
         }
     }
     
+    var type by remember {
+        mutableStateOf(PinnedBarType.valueOf(chatType))
+    }
+    
+    fun Int.toTime(): String? {
+        if(this == 0) {
+            type = TRANSLATION
+            return null
+        }
+        val min = this / 60
+        val sec = this - 60 * min
+        return "${
+            if(min < 10) "0" else ""
+        }$min:${
+            if(sec < 10) "0" else ""
+        }$sec"
+    }
+    
     fun listToDown() {
         scope.launch {
             listState.animateScrollToItem(0)
         }
     }
     
+    val participants = 4
+    val viewers = if(type == TRANSLATION) 43 else null
+    var toTranslation by remember {
+        mutableStateOf(20) // TODO сюда время в секундах для таймера
+    }
+    LaunchedEffect(Unit) {
+        if(type == TRANSLATION_AWAIT)
+            while(toTranslation > 0) {
+                delay(1000L)
+                toTranslation -= 1
+            }
+    }
+    
     ChatContent(
         ChatState(
             ChatAppBarState(
-                meet.title, DemoAvatarModel, (2)
+                meet.title, DemoAvatarModel, participants,
+                type, viewers, toTranslation.toTime()
             ), answer, meet, messageText,
             messageList, sender, alert,
             meetOutAlert, kebabMenuState,
@@ -133,6 +168,21 @@ fun ChatScreen(nav: NavState = get()) {
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
+            }
+            
+            override fun onPinnedBarButtonClick() {
+                if(type == TRANSLATION) Toast.makeText(
+                    context,
+                    "Трансляции пока что не доступны",
+                    Toast.LENGTH_SHORT
+                ).show() else {
+                    Toast.makeText(
+                        context,
+                        "Чат для встречи ${meet.title} закрыт",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    nav.navigate("main")
+                }
             }
             
             override fun onImageClick(message: MessageModel) {
@@ -205,6 +255,7 @@ fun ChatScreen(nav: NavState = get()) {
                     Toast.LENGTH_SHORT
                 ).show()
                 meetOutAlert = false
+                nav.navigate("main")
             }
             
             override fun onMeetOutAlertDismiss() {

@@ -17,7 +17,16 @@ object Chat: FeatureDefinition() {
             
             screen("main") { ChatListScreen() }
             
-            screen("chat") { ChatScreen() }
+            screen(
+                "chat?type={type}", listOf(
+                    navArgument("type") {
+                        type = NavType.StringType; defaultValue = ""
+                    })
+            ) {
+                it.arguments?.getString("type")?.let { type ->
+                    ChatScreen(type)
+                }
+            }
             
             screen("photo?image={image}&type={type}", listOf(  //TODO Убрать лишние аргументы
                 navArgument("image") {

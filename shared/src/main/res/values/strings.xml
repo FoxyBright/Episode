@@ -165,12 +165,24 @@
 
     <!-- Chats -->
     <string name="chats_member_cases">участник%s</string>
+    <string name="chats_viewer_cases">зрител%s</string>
     <string name="chats_messenger_place_holder">Напишите сообщение…</string>
     <string name="chats_comment_place_holder">Комментарий</string>
     <string name="chats_message_answer_recipient">Ответить</string>
     <string name="chats_message_answer_photo_label">Фотография</string>
     <string name="chats_message_answer_video_label">Видео</string>
     <string name="chats_empty_hidden_photos">Скрытых фото нет</string>
+    <string name="chats_meet_ended_pinned_bar_label">Meet завершен</string>
+    <string name="chats_translation_pinned_bar_label">Трансляция</string>
+    <string name="chats_translation_await_pinned_bar_label">До начала трансляции</string>
+    <string name="chats_close_chat_pinned_bar_button">Закрыть чат</string>
+    <string name="chats_label">Чат встреч</string>
+    <string name="chats_ended_chats_label">Завершенные</string>
+    <string name="chats_delete">Удалить чат навсегда?</string>
+    <string name="chats_delete_label">Удалить чат</string>
+    <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
+    <string name="chats_hidden_photo">Фото</string>
+    <string name="chats_view_translation_button">Смотреть</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
@@ -246,14 +258,6 @@
     <string name="orientation_pansexual">Пансексуал(ка)</string>
     <string name="orientation_queer">Квир</string>
     <string name="add_meet_publish_button">Опубликовать</string>
-
-    <!-- Chats -->
-    <string name="chats_label">Чат встреч</string>
-    <string name="chats_ended_chats_label">Завершенные</string>
-    <string name="chats_delete">Удалить чат навсегда?</string>
-    <string name="chats_delete_label">Удалить чат</string>
-    <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
-    <string name="chats_hidden_photo">Фото</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

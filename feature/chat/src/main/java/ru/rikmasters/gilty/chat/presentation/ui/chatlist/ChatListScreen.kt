@@ -6,14 +6,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.MEET
+import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.MEET_FINISHED
+import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
 import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
-import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
-import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
-import ru.rikmasters.gilty.shared.common.extentions.YESTERDAY
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.getChatWithData
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -116,7 +117,14 @@ fun ChatListScreen(nav: NavState = get()) {
             }
             
             override fun onChatClick(chat: ChatModel) {
-                nav.navigate("chat")
+                val type = when {
+                    LocalDate.of(chat.dateTime)
+                        .isBefore(LOCAL_DATE) -> MEET_FINISHED
+                    
+                    chat.isOnline -> TRANSLATION_AWAIT
+                    else -> MEET
+                }
+                nav.navigate("chat?type=${type.name}")
             }
             
             override fun onEndedClick() {
