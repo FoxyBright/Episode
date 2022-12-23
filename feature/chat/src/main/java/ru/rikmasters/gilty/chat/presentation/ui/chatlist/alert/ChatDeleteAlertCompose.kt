@@ -64,8 +64,7 @@ fun ChatDeleteAlert(
         ); button = stringResource(meeting_filter_delete_tag_label)
     }
     GAlert(
-        active, onDismiss, title,
-        Modifier
+        active, onDismiss, title, Modifier
             .wrapContentHeight()
             .fillMaxWidth(), label,
         Pair(button, onSuccess),

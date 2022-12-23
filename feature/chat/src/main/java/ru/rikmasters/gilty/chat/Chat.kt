@@ -19,7 +19,7 @@ object Chat: FeatureDefinition() {
             
             screen("chat") { ChatScreen() }
             
-            screen("photo?image={image}&type={type}", listOf(
+            screen("photo?image={image}&type={type}", listOf(  //TODO Убрать лишние аргументы
                 navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 }, navArgument("type") {

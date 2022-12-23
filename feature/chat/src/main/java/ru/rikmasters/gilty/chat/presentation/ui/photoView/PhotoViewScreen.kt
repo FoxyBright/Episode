@@ -20,16 +20,14 @@ fun PhotoViewScreen(
         mutableStateOf(false)
     }
     LaunchedEffect(Unit) {
-        timer = true
+        if(type == 1) timer = true    // TODO Реализовать без LaunchEffect
+        //        val animateTimer = Animatable(0f)
+        //            .animateTo(1f)
+        //        nav.navigate("chat")
     }
-    val animateTimer =
-        animateFloatAsState(
-            if(timer) 1f else 0f,
-            tween(6000)
-        ) {
-            timer = false
-            nav.navigate("chat")
-        }.value
+    val animateTimer = animateFloatAsState(
+        if(timer) 1f else 0f, tween(6000)
+    ) { nav.navigate("chat") }.value
     PhotoView(
         PhotoViewState(
             image, ("1/1"), (false), type, animateTimer

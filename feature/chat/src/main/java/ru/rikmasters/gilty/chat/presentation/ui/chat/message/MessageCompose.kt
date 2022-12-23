@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Arrangement.End
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -44,13 +44,12 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 fun MessPreview() {
     GiltyTheme {
         LazyColumn {
-            itemsIndexed(MessageList)
-            { index, it ->
+            items(MessageList) {
                 Message(
                     MessState(
-                        it, (index % 2 == 0),
+                        it, (false),
                         DragRowState(0f),
-                        shapes.large
+                        shapes.large, (true)
                     ),
                     Modifier
                         .background(colorScheme.background)
@@ -69,7 +68,8 @@ data class MessState(
     val message: MessageModel,
     val sender: Boolean,
     val dragState: DragRowState,
-    val shape: Shape
+    val shape: Shape,
+    val avatar: Boolean,
 )
 
 interface MessCallBack {
@@ -137,15 +137,25 @@ private fun Content(
     ) {
         if(!state.sender &&
             message.type != NOTIFICATION
+            && state.avatar
         ) AsyncImage(
-            message.sender.avatar.id,
-            (null),
+            message.sender.avatar.id, (null),
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
                 .clip(CircleShape),
             contentScale = Crop,
-        )
+        ) else if(
+            !state.avatar &&
+            message.type != NOTIFICATION
+            && !state.sender
+        ) {
+            Box(
+                Modifier
+                    .size(30.dp)
+                    .padding(end = 6.dp)
+            )
+        }
         
         when(message.type) {
             
@@ -172,7 +182,7 @@ private fun Content(
                 }
             }
             
-            WRITING -> WritingMessage(state.shape)
+            WRITING -> WritingMessage()
         }
     }
 }

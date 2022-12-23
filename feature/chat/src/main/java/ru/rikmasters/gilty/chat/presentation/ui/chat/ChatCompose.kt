@@ -145,6 +145,7 @@ fun ChatContent(
                 state.listState,
                 reverseLayout = true
             ) {
+                item { Divider(Modifier, 28.dp, Transparent) }
                 itemsIndexed(
                     list,
                     { index, _ -> index }) // TODO проверку на сообщения (должны быть уникальны)
@@ -173,6 +174,8 @@ private fun Item(
     next: MessageModel? = null,
     callback: ChatCallback?
 ) {
+    val avatar =
+        message.sender != next?.sender
     val type = message.type
     val density = getSystem()
         .displayMetrics.density
@@ -196,8 +199,8 @@ private fun Item(
                 message, sender, state,
                 MessageShapes(
                     type, sender,
-                    last, next
-                )
+                    last, next,
+                ), avatar
             ), Modifier
                 .padding(
                     16.dp, if(type != NOTIFICATION)

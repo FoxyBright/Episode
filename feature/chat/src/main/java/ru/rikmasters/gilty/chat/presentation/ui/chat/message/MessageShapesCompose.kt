@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageType
+import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
@@ -23,11 +24,11 @@ fun MessageShapes(
     val zero = 0.dp
     
     val top = last?.let {
-        it.type != NOTIFICATION
+        it.type == MESSAGE
     } ?: false
     
     val bottom = next?.let {
-        it.type != NOTIFICATION
+        it.type == MESSAGE
     } ?: false
     
     return RoundedCornerShape(
