@@ -50,4 +50,8 @@ class NavState(
         // TODO Fast clicks
         navHostController.navigate(dest, routeOptions[dest])
     }
+    
+    fun navigationBack(){
+        navController.popBackStack()
+    }
 }

@@ -27,13 +27,13 @@ fun PhotoViewScreen(
     }
     val animateTimer = animateFloatAsState(
         if(timer) 1f else 0f, tween(6000)
-    ) { nav.navigate("chat") }.value
+    ) { nav.navigationBack() }.value
     PhotoView(
         PhotoViewState(
             image, ("1/1"), (false), type, animateTimer
         ), Modifier, object: PhotoViewCallback {
             override fun onBack() {
-                nav.navigate("chat")
+                nav.navigationBack()
             }
         }
     )

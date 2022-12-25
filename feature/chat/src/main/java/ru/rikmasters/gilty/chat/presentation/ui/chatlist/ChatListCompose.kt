@@ -110,13 +110,13 @@ fun ChatListContent(
             if(state.chats.first.isNotEmpty())
                 items(state.chats.first) {
                     Column {
-                        label(
+                        Label(
                             it.first, Modifier.padding(
                                 top = 28.dp,
                                 bottom = 18.dp
                             )
                         )
-                        list(it.second,
+                        List(it.second,
                             { callback?.onChatSwipe(it) }) {
                             callback?.onChatClick(it)
                         }
@@ -131,7 +131,7 @@ fun ChatListContent(
                             end = 16.dp
                         ), state.endedState
                     ) { callback?.onEndedClick() }
-                    if(state.endedState) list(state.chats.second,
+                    if(state.endedState) List(state.chats.second,
                         { callback?.onChatSwipe(it) })
                     { callback?.onChatClick(it) }
                 }
@@ -153,7 +153,7 @@ fun ChatListContent(
 }
 
 @Composable
-private fun list(
+private fun List(
     list: List<ChatModel>,
     onClick: (ChatModel) -> Unit,
     onSwipe: (ChatModel) -> Unit
@@ -191,17 +191,18 @@ private fun ActionRow(
             MutableInteractionSource(), (null)
         ) { onClick() }, Start, CenterVertically
     ) {
-        label(stringResource(chats_ended_chats_label))
+        Label(stringResource(chats_ended_chats_label))
         Icon(
             if(state) Filled.KeyboardArrowDown
             else Filled.KeyboardArrowRight,
-            (null), Modifier.size(24.dp)
+            (null), Modifier.size(24.dp),
+            colorScheme.tertiary
         )
     }
 }
 
 @Composable
-private fun label(
+private fun Label(
     text: String,
     modifier: Modifier = Modifier
 ) = Text(

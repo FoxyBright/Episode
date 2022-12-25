@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatlist
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
@@ -39,7 +38,7 @@ import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
-import java.util.Locale
+import java.util.Locale.getDefault
 
 @Preview
 @Composable
@@ -160,22 +159,27 @@ private fun ChatRowContent(
                 
                 LocalDate.of(chat.dateTime)
                     .isBefore(LOCAL_DATE) -> {
-                    val date = LocalDate.of(chat.dateTime)
+                    val date = LocalDate
+                        .of(chat.dateTime)
                     Text(
                         "${date.day()} ${
                             Month.of(date.month())
                                 .displayRodName()
-                                .lowercase(Locale.getDefault())
+                                .lowercase(getDefault())
                         }", Modifier
                             .align(TopEnd)
-                            .padding(top = 14.dp, end = 12.dp),
-                        colorScheme.tertiary, fontWeight = SemiBold,
+                            .padding(
+                                top = 14.dp,
+                                end = 12.dp
+                            ), colorScheme.tertiary,
+                        fontWeight = SemiBold,
                         style = typography.labelSmall
                     )
                 }
             }
             Text(
-                chat.lastMessage.createdAt.timeClock(),
+                chat.lastMessage
+                    .createdAt.timeClock(),
                 Modifier
                     .align(BottomEnd)
                     .padding(12.dp),
@@ -274,39 +278,43 @@ private fun Avatar(
                 .clip(CircleShape),
             contentScale = Crop
         )
-        if(unRead > 0) Card(
+        if(unRead > 0) Box(
             Modifier
+                .offset(6.dp, 6.dp)
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.medium
+                )
                 .align(BottomEnd)
-                .offset(6.dp, 6.dp), shapes.medium,
-            cardColors(colors.chipGray),
-            border = BorderStroke(
-                2.dp, colorScheme.primaryContainer
-            )
         ) {
-            val stringUnRead = "$unRead"
-            Text(
-                counter(stringUnRead),
-                Modifier.padding(
-                    when(stringUnRead.length) {
-                        1 -> 12.dp
-                        2 -> 8.dp
-                        else -> 4.dp
-                    }, 4.dp
-                ), colorScheme.onTertiary,
-                style = typography.headlineSmall,
-                fontWeight = SemiBold
-            )
+            Box(
+                Modifier
+                    .padding(2.dp)
+                    .background(
+                        colors.chipGray,
+                        shapes.medium
+                    )
+            ) {
+                Text(
+                    counter("$unRead"),
+                    Modifier.padding(
+                        when("$unRead".length) {
+                            1 -> 10.dp
+                            2 -> 6.dp
+                            else -> 2.dp
+                        }, 2.dp
+                    ), colorScheme.onTertiary,
+                    style = typography.headlineSmall,
+                    fontWeight = SemiBold
+                )
+            }
         }
     }
 }
 
-private fun counter(
-    count: String
-): String {
+private fun counter(count: String): String {
     return when(val size = count.length) {
-        
         in 0..3 -> count
-        
         in 4..6 -> count.substring(0, size - 3) +
                 ",${count[4]}" + "k"
         

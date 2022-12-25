@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -24,18 +25,19 @@ fun GPopUpMenu(
 ) {
     if(menuState) Box(modifier) {
         Popup(onDismissRequest = { collapse() }) {
-            Column(
-                Modifier
-                    .background(
+            Box(Modifier.shadow(1.dp, shapes.large)) {
+                Column(
+                    Modifier.background(
                         colorScheme.primaryContainer,
                         shapes.large
                     )
-            ) {
-                items.forEachIndexed { i, it ->
-                    Item(
-                        i, it.first, items.size,
-                        it.second, Modifier, it.third
-                    )
+                ) {
+                    items.forEachIndexed { i, it ->
+                        Item(
+                            i, it.first, items.size,
+                            it.second, Modifier, it.third
+                        )
+                    }
                 }
             }
         }

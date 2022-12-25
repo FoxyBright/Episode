@@ -96,7 +96,6 @@ fun ChatAppBarContent(
     modifier: Modifier = Modifier,
     callback: ChatAppBarCallback? = null
 ) {
-    
     Column(modifier.background(colorScheme.background)) {
         Row(
             Modifier
@@ -144,11 +143,10 @@ private fun PinnedBar(
     type: PinnedBarType,
     viewer: Int? = null,
     toTranslation: String? = null,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier, RectangleShape,
+        Modifier, RectangleShape,
         cardColors(colorScheme.background),
         cardElevation(2.dp)
     ) {
@@ -181,14 +179,13 @@ private fun PinnedBar(
 private fun PinedButton(
     type: PinnedBarType,
     toTranslation: String? = null,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     val viewString = stringResource(R.string.chats_view_translation_button)
     val meetType = type == MEET_FINISHED
     Card(
         { onClick?.let { it() } },
-        modifier, (type != TRANSLATION_AWAIT
+        Modifier, (type != TRANSLATION_AWAIT
                 || toTranslation == null),
         shapes.large, cardColors(Transparent)
     ) {

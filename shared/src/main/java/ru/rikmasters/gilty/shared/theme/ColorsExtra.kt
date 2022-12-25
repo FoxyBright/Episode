@@ -26,6 +26,7 @@ data class ExtraColors(
     val tabActive: Color = Color.Unspecified,
     val tabActiveOnline: Color = Color.Unspecified,
     val tabInactive: Color = Color.Unspecified,
+    val chatBack: Color = Color.Unspecified,
     
     // Categories Colors
     val sport: Color = Color.Unspecified,
@@ -68,6 +69,7 @@ val LightExtraColors = ExtraColors(
     tabActive = Colors.GentlePinky,
     tabInactive = Colors.LightGray,
     tabActiveOnline = Colors.LightGreen,
+    chatBack = Colors.BlackerWhite,
     
     // Categories Colors
     sport = Colors.Orange,
@@ -110,6 +112,7 @@ val DarkExtraColors = ExtraColors(
     tabActive = Colors.RudePinky,
     tabInactive = Colors.Black,
     tabActiveOnline = Colors.LightGreen,
+    chatBack = Colors.Black,
     
     // Categories Colors
     sport = Colors.DarkOrange,

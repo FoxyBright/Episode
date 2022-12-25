@@ -38,6 +38,7 @@ import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GDropMenu
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 data class ChatState(
     val topState: ChatAppBarState,
@@ -112,8 +113,12 @@ fun ChatContent(
             )
         },
         floatingActionButton = {
-            val first = state.listState
-                .firstVisibleItemIndex
+            val first = remember {
+                derivedStateOf {
+                    state.listState
+                        .firstVisibleItemIndex
+                }
+            }.value
             val unread = state.unReadCount
             DownButton(
                 if(unread <= first) unread
@@ -140,7 +145,9 @@ fun ChatContent(
                     mess to rememberDragRowState()
                 }
             LazyColumn(
-                Modifier.align(BottomCenter),
+                Modifier
+                    .background(ThemeExtra.colors.chatBack)
+                    .align(BottomCenter),
                 state.listState,
                 reverseLayout = true
             ) {
