@@ -78,6 +78,7 @@ interface MessCallBack {
     
     fun onImageClick(message: MessageModel) {}
     fun onHiddenClick(message: MessageModel) {}
+    fun onAnswerClick(message: MessageModel) {}
     fun onSwipe(message: MessageModel) {}
 }
 
@@ -95,7 +96,9 @@ fun Message(
                 if(message.type == MESSAGE)
                     state.dragState
                 else DragRowState(0f),
-                LocalContext.current
+                if(message.type == MESSAGE)
+                    LocalContext.current
+                else null
             ) {
                 callBack?.onSwipe(message)
             },
@@ -176,11 +179,14 @@ private fun Content(
                         state.isOnline, callback,
                     )
                     
-                    (message.answer != null) -> Text(
-                        message, sender, state.shape,
-                        state.isOnline,
-                        message.answer,
-                    )
+                    (message.answer != null) -> {
+                        message.answer?.let {
+                            Text(
+                                message, sender, state.shape,
+                                state.isOnline, it,
+                            ) { callback?.onAnswerClick(it) }
+                        }
+                    }
                     
                     else -> Text(
                         message, sender,
@@ -231,11 +237,12 @@ private fun Text(
     sender: Boolean,
     shape: Shape,
     isOnline: Boolean,
-    answer: MessageModel? = null
+    answer: MessageModel? = null,
+    onClick: (() -> Unit)? = null
 ) {
     TextMessage(
         message, sender,
         Modifier, answer,
         shape, isOnline
-    )
+    ) { onClick?.let { it() } }
 }

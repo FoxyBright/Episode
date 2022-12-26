@@ -179,6 +179,14 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                 nav.navigate("main")
             }
             
+            override fun onAnswerClick(message: MessageModel) {
+                scope.launch {
+                    listState.animateScrollToItem(
+                        messageList.indexOf(message)
+                    )
+                }
+            }
+            
             override fun onImageMenuDismiss() {
                 imageMenuState = false
             }

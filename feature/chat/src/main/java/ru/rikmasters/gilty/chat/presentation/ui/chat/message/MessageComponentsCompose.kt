@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
@@ -459,7 +460,8 @@ fun TextMessage(
     modifier: Modifier = Modifier,
     answer: MessageModel? = null,
     shape: Shape = shapes.large,
-    isOnline: Boolean
+    isOnline: Boolean,
+    onClick: (() -> Unit)? = null
 ) {
     Box(
         modifier.background(
@@ -475,7 +477,12 @@ fun TextMessage(
             Column {
                 answer?.let {
                     AnswerContent(
-                        it, Modifier.padding(bottom = 4.dp, end = 30.dp),
+                        it, Modifier
+                            .padding(
+                                bottom = 4.dp,
+                                end = 30.dp
+                            )
+                            .clickable { onClick?.let { it() } },
                         sender = sender
                     )
                 }; TextWidget(message, sender)
