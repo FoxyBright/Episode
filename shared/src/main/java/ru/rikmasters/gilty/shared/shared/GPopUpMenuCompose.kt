@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
+package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
 
 @Composable
 fun GPopUpMenu(

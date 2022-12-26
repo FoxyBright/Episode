@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat
+package ru.rikmasters.gilty.chat.presentation.ui.chat.chatInstance
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
@@ -11,12 +11,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION
-import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.ChatAppBarState
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.app.SoftInputAdjust
+import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.presentation.ui.user.organizer
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
@@ -38,7 +40,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     }
     
     DisposableEffect(Unit) {
-        asm.keyboard.setSoftInputMode(SoftInputAdjust.Nothing)
+        asm.keyboard.setSoftInputMode(Nothing)
         onDispose { asm.keyboard.resetSoftInputAdjust() }
     }
     

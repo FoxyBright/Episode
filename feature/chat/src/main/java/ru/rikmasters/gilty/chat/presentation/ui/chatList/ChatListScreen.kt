@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chatlist
+package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import android.widget.Toast
 import androidx.compose.runtime.*
@@ -6,11 +6,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.MEET
-import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.MEET_FINISHED
-import ru.rikmasters.gilty.chat.presentation.ui.chat.PinnedBarType.TRANSLATION_AWAIT
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.CONFIRM
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET_FINISHED
+import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION_AWAIT
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
 import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button

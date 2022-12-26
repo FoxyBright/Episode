@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert
+package ru.rikmasters.gilty.chat.presentation.ui.chatList.alert
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.CONFIRM
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme

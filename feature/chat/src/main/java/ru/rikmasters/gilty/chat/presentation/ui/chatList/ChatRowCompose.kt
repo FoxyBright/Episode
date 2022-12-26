@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chatlist
+package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

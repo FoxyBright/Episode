@@ -71,7 +71,7 @@ data class MessState(
     val dragState: DragRowState,
     val shape: Shape,
     val avatar: Boolean,
-    val isOnline: Boolean
+    val isOnline: Boolean,
 )
 
 interface MessCallBack {
@@ -115,7 +115,8 @@ fun Message(
             else CenterStart
         ) {
             Content(
-                state, Modifier.fillMaxWidth(0.8f),
+                state, Modifier
+                    .fillMaxWidth(0.8f),
                 callBack
             )
         }

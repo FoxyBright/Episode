@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chatlist
+package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,9 +24,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.AlertState.LIST
-import ru.rikmasters.gilty.chat.presentation.ui.chatlist.alert.ChatDeleteAlert
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label

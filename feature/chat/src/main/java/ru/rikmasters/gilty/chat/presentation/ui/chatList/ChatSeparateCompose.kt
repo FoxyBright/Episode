@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chatlist
+package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayRodName
