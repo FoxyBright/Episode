@@ -153,10 +153,14 @@ private fun PinnedBar(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 10.dp),
+                .padding(horizontal = 18.dp),
             SpaceBetween, CenterVertically
         ) {
-            Row(Modifier, Start, Top) {
+            Row(
+                Modifier, Start,
+                if(type == TRANSLATION) Top
+                else CenterVertically
+            ) {
                 if(type != MEET_FINISHED) Image(
                     painterResource(ic_video_active),
                     (null), Modifier
@@ -165,7 +169,7 @@ private fun PinnedBar(
                 )
                 PinedText(
                     type, viewer,
-                    Modifier.padding(start = 12.dp)
+                    Modifier.padding()
                 )
             }
             PinedButton(type, toTranslation)

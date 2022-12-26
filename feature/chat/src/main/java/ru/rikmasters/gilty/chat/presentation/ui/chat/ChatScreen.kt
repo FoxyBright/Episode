@@ -83,7 +83,8 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     remember { mutableStateOf(false) }
     var messageMenuState by
     remember { mutableStateOf(false) }
-    
+    var imageMenuState by
+    remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     
     LaunchedEffect(Unit) {
@@ -129,6 +130,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
         }
     }
+    
     fun Int.toTime(): String? {
         if(this == 0) {
             type = TRANSLATION
@@ -170,10 +172,31 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             ), answer, meet, messageText,
             messageList, sender, alert,
             meetOutAlert, kebabMenuState,
-            messageMenuState, listState, unReadCount
+            messageMenuState, imageMenuState,
+            listState, unReadCount
         ), Modifier, object: ChatCallback {
             override fun onBack() {
                 nav.navigate("main")
+            }
+            
+            override fun onImageMenuDismiss() {
+                imageMenuState = false
+            }
+            
+            override fun onImageMenuItemSelect(point: Int) {
+                when(point) {
+                    0, 1 -> Toast.makeText(
+                        context,
+                        "Функционал пока не доступен",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    
+                    else -> scope.launch {
+                        asm.bottomSheet.expand {
+                            HiddenPhotoBottomSheet()
+                        }
+                    }
+                }
             }
             
             override fun onPinnedBarButtonClick() {
@@ -247,11 +270,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             
             override fun gallery() {
                 focusManager.clearFocus()
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        HiddenPhotoBottomSheet()
-                    }
-                }
+                imageMenuState = true
             }
             
             override fun onMeetOut() {
@@ -316,6 +335,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
             
             override fun onMenuItemClick(point: Int) {
+                kebabMenuState = false
                 when(point) {
                     0 -> meetOutAlert = true
                     1 -> scope.launch {
@@ -329,7 +349,6 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                         }
                     }
                 }
-                kebabMenuState = !kebabMenuState
             }
             
             override fun onKebabClick() {

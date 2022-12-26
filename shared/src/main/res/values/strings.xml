@@ -183,6 +183,8 @@
     <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
     <string name="chats_hidden_photo">Фото</string>
     <string name="chats_view_translation_button">Смотреть</string>
+    <string name="chats_gallery_select_photo">Фото или видео</string>
+    <string name="chats_gallery_camera">Камера</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
@@ -296,5 +298,10 @@
     <string name="sub_categories_cinema">Кино</string>
     <string name="sub_categories_cafe">Кафе</string>
     <string name="sub_categories_walking">Прогулки</string>
+
+
+
+
+    <string name="text_text">Съешь ещё этих мягких французских булок, да выпей же чаю</string>
 
 </resources>

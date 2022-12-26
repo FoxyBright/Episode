@@ -34,20 +34,31 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_answer_arrow
 import ru.rikmasters.gilty.shared.R.drawable.ic_cross
+import ru.rikmasters.gilty.shared.R.string.text_text
 import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelLongMessage
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
+private val smthText
+    @Composable
+    get() = stringResource(text_text)
+
 @Preview
 @Composable
 private fun MessengerBarPreview() {
     GiltyTheme {
-        MessengerBar(
-            "Сообщение",
-            Modifier.padding(16.dp)
-        )
+        Column {
+            MessengerBar(
+                smthText,
+                Modifier.padding(6.dp)
+            )
+            MessengerBar(
+                "",
+                Modifier.padding(6.dp)
+            )
+        }
     }
 }
 
@@ -55,10 +66,16 @@ private fun MessengerBarPreview() {
 @Composable
 private fun MessengerBarWithAnswerPreview() {
     GiltyTheme {
-        MessengerBar(
-            "", Modifier.padding(16.dp),
-            DemoMessageModelLongMessage
-        )
+        Column {
+            MessengerBar(
+                smthText, Modifier.padding(6.dp),
+                DemoMessageModelLongMessage
+            )
+            MessengerBar(
+                "", Modifier.padding(6.dp),
+                DemoMessageModelLongMessage
+            )
+        }
     }
 }
 
@@ -66,21 +83,16 @@ private fun MessengerBarWithAnswerPreview() {
 @Composable
 fun CommentBarPreview() {
     GiltyTheme {
-        CommentBar(
-            "",
-            {}, Modifier.padding(10.dp)
-        )
-    }
-}
-
-@Preview
-@Composable
-fun CommentBarWithTextPreview() {
-    GiltyTheme {
-        CommentBar(
-            "Комментарий",
-            {}, Modifier.padding(10.dp)
-        )
+        Column {
+            CommentBar(
+                smthText, {},
+                Modifier.padding(10.dp)
+            )
+            CommentBar(
+                "", {},
+                Modifier.padding(10.dp)
+            )
+        }
     }
 }
 
@@ -114,7 +126,7 @@ fun MessengerBar(
             ) {
                 Icon(
                     painterResource(R.drawable.ic_image_empty),
-                    (null), Modifier.size(20.dp), colorScheme.tertiary
+                    (null), Modifier.size(24.dp), colorScheme.tertiary
                 )
             }
             MessageField(text, MESSAGE,
@@ -134,14 +146,17 @@ private fun Answer(
         SpaceBetween, CenterVertically
     ) {
         Row(
-            Modifier.padding(10.dp).weight(1f),
+            Modifier
+                .padding(top = 10.dp)
+                .padding(horizontal = 10.dp)
+                .weight(1f),
             Start, CenterVertically
         ) {
             Icon(
                 painterResource(ic_answer_arrow),
                 null, Modifier
-                    .padding(horizontal = 20.dp)
-                    .size(28.dp),
+                    .padding(start = 14.dp, end = 22.dp)
+                    .size(24.dp),
                 colorScheme.primary
             )
             answer?.let {
@@ -151,10 +166,15 @@ private fun Answer(
                 )
             }
         }
-        IconButton(onCancel, Modifier.padding(6.dp)) {
+        IconButton(
+            onCancel,
+            Modifier
+                .padding(horizontal = 6.dp)
+                .padding(top = 10.dp)
+        ) {
             Icon(
                 painterResource(ic_cross),
-                (null), Modifier.size(26.dp),
+                (null), Modifier.size(22.dp),
                 colorScheme.primary
             )
         }
