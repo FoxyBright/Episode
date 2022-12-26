@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
 @Composable
 fun ExampleContent(vm: ExampleViewModel) {

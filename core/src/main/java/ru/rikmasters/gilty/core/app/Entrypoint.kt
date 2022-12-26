@@ -26,14 +26,18 @@ import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getOrNull
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun appEntrypoint(
     theme: AppTheme,
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
-    snackbar: @Composable (SnackbarData) -> Unit
+    snackbar: @Composable (SnackbarData) -> Unit,
+    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null
 ) {
+    
+    LoadingTrait.loader = loader
 
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()

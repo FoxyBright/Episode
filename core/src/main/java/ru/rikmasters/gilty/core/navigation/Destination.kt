@@ -1,12 +1,11 @@
 package ru.rikmasters.gilty.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.*
 import org.koin.androidx.compose.getKoin
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.viewmodel.connector.rememberConnectorState
 import kotlin.reflect.KClass
 
 internal sealed interface Destination
@@ -36,7 +35,10 @@ internal data class VmScreen<T: ViewModel>(
     val vmContent: @Composable (T, NavBackStackEntry) -> Unit
 ): Screen {
     override val content: @Composable (NavBackStackEntry) -> Unit = {
-        vmContent(getKoin().get(vmClass), it)
+        val state = rememberConnectorState(getKoin().get(vmClass) as T)
+        Connector(state, vmClass) { vm ->
+            vmContent(vm, it)
+        }
     }
 }
 

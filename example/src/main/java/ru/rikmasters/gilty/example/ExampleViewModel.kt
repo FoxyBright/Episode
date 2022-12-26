@@ -1,15 +1,16 @@
 package ru.rikmasters.gilty.example
 
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.core.viewmodel.Strategy
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.data.example.repository.ExampleRepository
 
-class ExampleViewModel: ViewModel() {
+class ExampleViewModel: ViewModel(),
+    LoadingTrait {
     
     private val repository: ExampleRepository by inject()
     
-    suspend fun getDoors(forceWeb: Boolean = false) = single {
+    suspend fun getDoors(forceWeb: Boolean = false) = singleLoading {
         repository.getDoors(forceWeb)
     }
     
