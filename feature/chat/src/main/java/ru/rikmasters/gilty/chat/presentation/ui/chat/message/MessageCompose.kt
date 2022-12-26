@@ -204,13 +204,15 @@ private fun Image(
         
         PHOTO -> {
             ImageMessage(
-                message, sender, shape, isOnline
+                Modifier, message, sender,
+                shape, isOnline
             ) { callback?.onImageClick(message) }
         }
         
         PRIVATE_PHOTO -> {
             HiddenImageMessage(
-                message, sender, message.attachments
+                Modifier, message, sender,
+                message.attachments
                     ?.file?.hasAccess ?: false, shape
             ) { callback?.onHiddenClick(message) }
         }

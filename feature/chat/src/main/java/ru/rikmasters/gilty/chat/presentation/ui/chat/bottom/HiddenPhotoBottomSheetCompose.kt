@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.R.drawable.ic_camera
+import ru.rikmasters.gilty.shared.R.drawable.ic_image_box
 import ru.rikmasters.gilty.shared.R.string.chats_empty_hidden_photos
 import ru.rikmasters.gilty.shared.R.string.profile_hidden_photo
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
@@ -33,7 +33,7 @@ fun HiddenPhotoBottomSheet(
         )
         EmptyScreen(
             stringResource(chats_empty_hidden_photos),
-            ic_camera, Modifier, 50.dp, 16.dp
+            ic_image_box, Modifier, 50.dp, 4.dp,
         )
     }
 }

@@ -85,8 +85,8 @@ private fun TextMessagePreview() {
 private fun WritingMessagePreview() {
     GiltyTheme {
         WritingMessage(
-            shapes.large,
-            Modifier.padding(6.dp)
+            Modifier.padding(6.dp),
+            shapes.large
         )
     }
 }
@@ -126,14 +126,14 @@ private fun HiddenPhotoMessagePreview() {
             )
         ) {
             HiddenImageMessage(
+                Modifier.padding(6.dp),
                 DemoImageMessage,
-                (true), (false), shapes.large,
-                Modifier.padding(6.dp)
+                (true), (false), shapes.large
             )
             HiddenImageMessage(
+                Modifier.padding(6.dp),
                 DemoImageMessage,
-                (false), (true), shapes.large,
-                Modifier.padding(6.dp)
+                (false), (true), shapes.large
             )
         }
     }
@@ -172,14 +172,16 @@ private fun ImageMessagePreview() {
             )
         ) {
             ImageMessage(
+                Modifier.padding(6.dp),
                 DemoImageMessage,
                 (true), shapes.large,
-                (true), Modifier.padding(6.dp)
+                (true)
             )
             ImageMessage(
+                Modifier.padding(6.dp),
                 DemoImageMessage,
                 (false), shapes.large,
-                (true), Modifier.padding(6.dp)
+                (true)
             )
         }
     }
@@ -207,8 +209,8 @@ private fun SystemMessagePreview() {
 
 @Composable
 fun WritingMessage(
-    shape: Shape = shapes.large,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    shape: Shape = shapes.large
 ) {
     Box(
         modifier.background(
@@ -257,7 +259,7 @@ fun SystemMessage(
                                 " присоединил${
                                     if(it.gender == FEMALE)
                                         "aсь" else "ся"
-                                }  к встрече"
+                                } к встрече"
                             )
                         }
                     
@@ -327,11 +329,11 @@ fun SystemMessage(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun HiddenImageMessage(
+    modifier: Modifier = Modifier,
     message: MessageModel,
     sender: Boolean,
     hide: Boolean,
     shape: Shape = shapes.large,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     Card(
@@ -375,11 +377,11 @@ fun HiddenImageMessage(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ImageMessage(
+    modifier: Modifier = Modifier,
     message: MessageModel,
     sender: Boolean,
     shape: Shape = shapes.large,
     isOnline: Boolean,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     Card(
@@ -393,7 +395,7 @@ fun ImageMessage(
                     AsyncImage(
                         file.id, (null),
                         Modifier
-                            .size(220.dp)
+                            .size(224.dp)
                             .background(
                                 colorScheme.onTertiary,
                                 shape
