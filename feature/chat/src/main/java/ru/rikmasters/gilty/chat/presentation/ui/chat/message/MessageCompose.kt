@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -93,8 +94,11 @@ fun Message(
             .swipeableRow(
                 if(message.type == MESSAGE)
                     state.dragState
-                else DragRowState(0f)
-            ) { callBack?.onSwipe(message) },
+                else DragRowState(0f),
+                LocalContext.current
+            ) {
+                callBack?.onSwipe(message)
+            },
         SpaceBetween, CenterVertically
     ) {
         Box(

@@ -316,7 +316,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                 alert = false
             }
             
-            override fun onAvatarClick() {
+            override fun onTopBarClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
                         MeetingBottomSheet(

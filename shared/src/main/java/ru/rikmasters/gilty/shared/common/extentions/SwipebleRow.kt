@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
+import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
@@ -19,6 +20,7 @@ import kotlin.math.abs
 
 fun Modifier.swipeableRow(
     state: DragRowState,
+    context: Context? = null,
     onSwiped: (RowDirection) -> Unit,
 ) = pointerInput(Unit) {
     coroutineScope {
@@ -29,6 +31,7 @@ fun Modifier.swipeableRow(
                 if(abs(coercedOffset.x) < state.maxWidth / 4)
                     state.reset()
                 else {
+                    context?.let { vibrate(it) }
                     if(state.offset.targetValue.x < 0) {
                         state.swipe(RowDirection())
                         state.reset()

@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -85,7 +86,7 @@ data class ChatAppBarState(
 interface ChatAppBarCallback {
     
     fun onBack() {}
-    fun onAvatarClick() {}
+    fun onTopBarClick() {}
     fun onKebabClick() {}
     fun onPinnedBarButtonClick() {}
 }
@@ -100,23 +101,29 @@ fun ChatAppBarContent(
         Row(
             Modifier
                 .fillMaxWidth()
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { callback?.onTopBarClick() }
                 .padding(top = 24.dp, bottom = 14.dp),
-            SpaceBetween
+            Start, CenterVertically
         ) {
+            IconButton({ callback?.onBack() }) {
+                Icon(
+                    painterResource(ic_back),
+                    (null), Modifier.size(24.dp),
+                    colorScheme.tertiary
+                )
+            }
             Row(
-                Modifier, Start,
+                Modifier.weight(1f), Start,
                 CenterVertically
             ) {
-                IconButton({ callback?.onBack() }) {
-                    Icon(
-                        painterResource(ic_back),
-                        (null), Modifier.size(24.dp),
-                        colorScheme.tertiary
-                    )
-                }
                 Information(
-                    state, Modifier.padding(start = 10.dp)
-                ) { callback?.onAvatarClick() }
+                    Modifier
+                        .padding(start = 10.dp),
+                    state
+                )
             }
             IconButton({ callback?.onKebabClick() }) {
                 Icon(
@@ -273,9 +280,8 @@ private fun PinedText(
 
 @Composable
 private fun Information(
-    state: ChatAppBarState,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    state: ChatAppBarState
 ) {
     Row(modifier, verticalAlignment = CenterVertically) {
         AsyncImage(
@@ -283,8 +289,7 @@ private fun Information(
             stringResource(R.string.meeting_avatar),
             Modifier
                 .size(32.dp)
-                .clip(CircleShape)
-                .clickable { onClick?.let { it() } },
+                .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
         Column {

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -122,8 +123,9 @@ fun SwipeableChatRow(
             Modifier.align(CenterEnd)
         )
         Row(
-            Modifier.swipeableRow(state)
-            { onSwiped?.let { it(chat) } },
+            Modifier.swipeableRow(
+                state, LocalContext.current
+            ) { onSwiped?.let { it(chat) } },
             Center, CenterVertically
         ) {
             ChatRowContent(

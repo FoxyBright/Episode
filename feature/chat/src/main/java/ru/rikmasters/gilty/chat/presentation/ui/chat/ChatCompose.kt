@@ -19,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
@@ -31,6 +32,7 @@ import ru.rikmasters.gilty.shared.R.drawable.ic_down_arrow
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.common.extentions.vibrate
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
@@ -245,6 +247,7 @@ private fun Item(
     next: MessageModel? = null,
     callback: ChatCallback?
 ) {
+    val context = LocalContext.current
     val avatar =
         message.sender != next?.sender
     val type = message.type
@@ -260,6 +263,7 @@ private fun Item(
         detectTapGestures(
             onLongPress = { off ->
                 if(type == MESSAGE) {
+                    vibrate(context)
                     menuState = true
                     offset = off
                 }
