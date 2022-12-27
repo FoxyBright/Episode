@@ -13,4 +13,6 @@ dependencies {
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:bubbles"))
     implementation(project(":feature:animated"))
+    
+    implementation(project(":data:auth"))
 }

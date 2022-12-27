@@ -2,7 +2,10 @@ package ru.rikmasters.gilty.login
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import org.koin.core.component.inject
 import org.koin.core.module.Module
+import ru.rikmasters.gilty.auth.Auth
+import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -14,21 +17,22 @@ import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 
 object Login: FeatureDefinition() {
     
+    private val authManager: AuthManager by inject()
+    
+    private val authEntrypointResolver = EntrypointResolver {
+        if(authManager.isAuthorized())
+            "main/meetings"
+        else
+            "login"
+    }
+    
     override fun DeepNavGraphBuilder.navigation() {
         
-        //TODO Проверка на авторизованность пользователя
-        val userLogged = true
-        
-        screen("authorization") {
-            if(userLogged) MainScreen() else LoginScreen()
-        }
-        
         screen("login"){
-            LoginScreen() //TODO для выхода на экран авторизации. Позже убрать
+            LoginScreen()
         }
         
         nested("registration", "code") {
@@ -72,6 +76,10 @@ object Login: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        single { EntrypointResolver { "authorization" } }
+        this@koin.single { authEntrypointResolver }
     }
+    
+    override fun include() = setOf(
+        Auth,
+    )
 }
