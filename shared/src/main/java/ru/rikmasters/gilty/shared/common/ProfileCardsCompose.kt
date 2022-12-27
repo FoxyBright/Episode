@@ -15,26 +15,27 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion.Right
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.ic_image_box
-import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
-import ru.rikmasters.gilty.shared.R.drawable.transparency_circle
-import ru.rikmasters.gilty.shared.R.string.profile_observe
-import ru.rikmasters.gilty.shared.R.string.profile_observers_in_profile
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
@@ -45,6 +46,7 @@ import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -72,11 +74,22 @@ private fun ProfileImageContentPreview() {
 @Composable
 private fun ProfileStatisticContentPreview() {
     GiltyTheme {
-        ProfileStatisticContent(
-            Modifier.width(160.dp),
-            DemoProfileModel.rating.average,
-            (100), (100), DemoProfileModel.emoji
-        )
+        Column {
+            ProfileStatisticContent(
+                Modifier
+                    .padding(12.dp)
+                    .width(160.dp),
+                DemoProfileModel.rating.average,
+                (100), (100), USERPROFILE,
+                DemoProfileModel.emoji
+            )
+            ProfileStatisticContent(
+                Modifier
+                    .padding(12.dp)
+                    .width(160.dp),
+                ("0.0"), (0), (0), CREATE
+            )
+        }
     }
 }
 
@@ -102,25 +115,11 @@ fun HiddenPhotoContent(
         )
         Box(
             Modifier
-                .padding(start = 8.dp, top = 8.dp)
+                .padding(8.dp)
                 .size(26.dp)
                 .clip(CircleShape)
-                .align(TopStart),
-        ) {
-            if(profileType != USERPROFILE) {
-                Image(
-                    painterResource(transparency_circle),
-                    (null), Modifier.fillMaxSize()
-                )
-                Icon(
-                    painterResource(ic_lock_close),
-                    (null), Modifier
-                        .padding(4.dp)
-                        .size(24.dp),
-                    colorScheme.tertiary
-                )
-            }
-        }
+                .align(TopStart), Center
+        ) { if(profileType != USERPROFILE) Lock() }
         if(profileType == ORGANIZER)
             CreateProfileCardRow(
                 stringResource(R.string.profile_hidden_photo),
@@ -129,6 +128,34 @@ fun HiddenPhotoContent(
         else CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
             profileType
+        )
+    }
+}
+
+@Composable
+private fun Lock(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier
+            .height(IntrinsicSize.Max)
+            .width(IntrinsicSize.Max)
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .alpha(0.5f)
+                .background(
+                    colorScheme.outline,
+                    CircleShape
+                )
+        )
+        Icon(
+            painterResource(R.drawable.ic_lock_open),
+            (null), Modifier
+                .padding(6.dp)
+                .size(12.dp),
+            colorScheme.tertiary
         )
     }
 }
@@ -208,9 +235,8 @@ private fun CreateProfileCardRow(
                         )
                 ) {
                     Image(
-                        painterResource(ic_image_box),
-                        null,
-                        Modifier
+                        painterResource(R.drawable.ic_image_box),
+                        (null), Modifier
                             .fillMaxSize()
                             .padding(4.dp)
                     )
@@ -232,6 +258,7 @@ fun ProfileStatisticContent(
     rating: String,
     observers: Int,
     observed: Int,
+    profileType: ProfileType,
     emoji: EmojiModel? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -243,19 +270,15 @@ fun ProfileStatisticContent(
             .clip(shapes.large), (true),
         shapes.large, cardColors(colorScheme.primaryContainer)
     ) {
-        Column {
+        Column(Modifier, Top, CenterHorizontally) {
             Row(
                 Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 8.dp),
                 Start, CenterVertically
             ) {
-                Text(
-                    rating, Modifier.weight(1f),
-                    style = ThemeExtra.typography.RatingText,
-                    textAlign = Right
-                )
-                Cloud(Modifier.weight(1f), emoji)
+                RatingText(rating.toCharArray(), Modifier)
+                Cloud(profileType, Modifier, emoji)
             }
             Row(
                 Modifier
@@ -264,18 +287,43 @@ fun ProfileStatisticContent(
             ) {
                 Observe(
                     Modifier.weight(1f),
-                    stringResource(profile_observers_in_profile),
+                    stringResource(R.string.profile_observers_in_profile),
                     observers
                 )
                 Observe(
                     Modifier.weight(1f),
-                    stringResource(profile_observe),
+                    stringResource(R.string.profile_observe),
                     observed
                 )
             }
         }
     }
 }
+
+@Composable
+private fun RatingText(
+    text: CharArray,
+    modifier: Modifier = Modifier
+) {
+    val style = ThemeExtra.typography.RatingText
+    Text(
+        buildAnnotatedString {
+            withStyle(style.toSpanStyle()) {
+                append(text.first())
+            }
+            withStyle(
+                style.copy(fontSize = 42.sp)
+                    .toSpanStyle()
+            ) { append('.') }
+            withStyle(style.toSpanStyle()) {
+                append(text.last())
+            }
+        }, modifier, textAlign = Right,
+        style = ThemeExtra.typography.RatingText,
+        maxLines = 1
+    )
+}
+
 
 @Composable
 private fun Observe(
@@ -338,25 +386,49 @@ fun digitalConverter(digit: Int): String {
 }
 
 @Composable
-private fun Cloud(modifier: Modifier, emoji: EmojiModel?) {
+private fun Cloud(
+    profileType: ProfileType,
+    modifier: Modifier,
+    emoji: EmojiModel?
+) {
+    val create = profileType == CREATE
     Row(modifier, Start, Bottom) {
-        MiniCloud(Modifier.size(6.dp))
+        MiniCloud(Modifier.size(if(create) 4.dp else 6.dp))
         MiniCloud(
             Modifier
                 .padding(bottom = 4.dp)
                 .padding(horizontal = 2.dp)
-                .size(10.dp)
+                .size(if(create) 8.dp else 10.dp)
         )
         MiniCloud(
             Modifier.padding(bottom = 2.dp),
         ) {
+            val paddings: Pair<Dp, Dp>
+            val size: Dp
+            if(create) {
+                paddings = Pair(8.dp, 6.dp)
+                size = 18.dp
+            } else {
+                paddings = Pair(10.dp, 8.dp)
+                size = 24.dp
+            }
             emoji?.let {
                 GEmojiImage(
                     it, Modifier
-                        .padding(10.dp, 8.dp)
-                        .size(24.dp)
+                        .padding(
+                            paddings.first,
+                            paddings.second
+                        )
+                        .size(size)
                 )
-            }
+            } ?: Box(
+                Modifier
+                    .padding(
+                        paddings.first,
+                        paddings.second
+                    )
+                    .size(size)
+            )
         }
     }
 }
@@ -364,9 +436,11 @@ private fun Cloud(modifier: Modifier, emoji: EmojiModel?) {
 @Composable
 private fun MiniCloud(
     modifier: Modifier = Modifier,
-    content: @Composable (() -> Unit)? = null
+    content: @Composable
+    (() -> Unit)? = null
 ) = Box(
     modifier.background(
-        ThemeExtra.colors.chipGray, CircleShape
+        colors.chipGray,
+        CircleShape
     )
 ) { content?.invoke() }

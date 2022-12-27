@@ -1,42 +1,100 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+
+private val user = DemoProfileModel
+
+@Preview
+@Composable
+private fun EditProfilePreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            Profile(
+                ProfileState(),
+                Modifier.padding(16.dp)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OrganizerProfilePreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            Profile(
+                ProfileState(
+                    "${
+                        user.username
+                    }, ${user.age}",
+                    description = user.aboutMe,
+                    enabled = false,
+                    profileType = ORGANIZER
+                )
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun UserProfilePreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            Profile(
+                ProfileState(
+                    "${
+                        user.username
+                    }, ${user.age}",
+                    description = user.aboutMe,
+                    enabled = false,
+                    profileType = USERPROFILE
+                )
+            )
+        }
+    }
+}
 
 data class ProfileState(
     val name: String = "",
@@ -63,46 +121,7 @@ interface ProfileCallback: NavigationInterface {
     fun onObserveClick() {}
 }
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun EditProfilePreview() {
-    GiltyTheme { Profile(ProfileState()) }
-}
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-@Composable
-private fun OrganizerProfilePreview() {
-    GiltyTheme {
-        val user = DemoProfileModel
-        Profile(
-            ProfileState(
-                "${user.username}, ${user.age}",
-                description = user.aboutMe,
-                enabled = false,
-                profileType = ProfileType.ORGANIZER
-            )
-        )
-    }
-}
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-@Composable
-private fun UserProfilePreview() {
-    GiltyTheme {
-        val user = DemoProfileModel
-        Profile(
-            ProfileState(
-                "${user.username}, ${user.age}",
-                description = user.aboutMe,
-                enabled = false,
-                profileType = ProfileType.USERPROFILE
-            )
-        )
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun Profile(
     state: ProfileState,
     modifier: Modifier = Modifier,
@@ -110,47 +129,11 @@ fun Profile(
     onChange: ((Boolean) -> Unit)? = null
 ) {
     Column(modifier) {
-        Row {
-            if(state.profileType == ProfileType.ORGANIZER)
-                IconButton(
-                    { callback?.onBack() },
-                    Modifier.padding(top = 10.dp, end = 16.dp)
-                ) {
-                    Icon(
-                        painterResource(R.drawable.ic_back),
-                        stringResource(R.string.action_bar_button_back),
-                        Modifier,
-                        colorScheme.tertiary
-                    )
-                }
-            TextField(
-                state.name,
-                { callback?.onNameChange(it) },
-                Modifier
-                    .offset((-16).dp)
-                    .fillMaxWidth(),
-                colors = TransparentTextFieldColors(),
-                textStyle = typography.displayLarge,
-                placeholder = {
-                    Row(Modifier, Center, CenterVertically) {
-                        Text(
-                            stringResource(R.string.user_name),
-                            Modifier.padding(end = 8.dp),
-                            colorScheme.onTertiary,
-                            style = typography.titleLarge
-                        )
-                        Icon(
-                            painterResource(R.drawable.ic_edit),
-                            stringResource(R.string.edit_button),
-                            Modifier.padding(top = 4.dp),
-                            colorScheme.outlineVariant
-                        )
-                    }
-                },
-                readOnly = !state.enabled,
-                singleLine = true
-            )
-        }
+        TopBar(
+            state.name, state.profileType,
+            !state.enabled, Modifier,
+            { callback?.onBack() }
+        ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
                 stringResource(R.string.profile_user_name_is_occupied),
@@ -175,6 +158,7 @@ fun Profile(
                     state.rating,
                     state.observers,
                     state.observed,
+                    state.profileType,
                     state.emoji
                 ) { callback?.onObserveClick() }
                 Spacer(Modifier.height(18.dp))
@@ -185,27 +169,88 @@ fun Profile(
                 ) { callback?.hiddenImages() }
             }
         }
+        Description(
+            state.description, state.profileType,
+            Modifier.padding(top = 20.dp)
+        ) { callback?.onDescriptionChange(it) }
+    }
+}
+
+@Composable
+private fun TopBar(
+    text: String,
+    profileType: ProfileType,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+    onTextChange: (String) -> Unit,
+) {
+    Row(modifier) {
+        if(profileType == ORGANIZER)
+            IconButton(
+                onBack, Modifier.padding(
+                    top = 10.dp, end = 16.dp
+                )
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_back),
+                    stringResource(R.string.action_bar_button_back),
+                    Modifier, colorScheme.tertiary
+                )
+            }
+        GTextField(
+            text, { onTextChange(it) },
+            Modifier
+                .offset((-16).dp)
+                .fillMaxWidth(),
+            colors = TransparentTextFieldColors(),
+            textStyle = typography.displayLarge,
+            placeholder = {
+                Row(Modifier, Center, CenterVertically) {
+                    Text(
+                        stringResource(R.string.user_name),
+                        Modifier.padding(end = 8.dp),
+                        colorScheme.onTertiary,
+                        style = typography.titleLarge
+                    )
+                    Icon(
+                        painterResource(R.drawable.ic_edit),
+                        (null), Modifier.padding(top = 4.dp),
+                        colorScheme.outlineVariant
+                    )
+                }
+            }, readOnly = enabled, singleLine = true, maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun Description(
+    text: String,
+    profileType: ProfileType,
+    modifier: Modifier = Modifier,
+    onTextChange: (String) -> Unit
+) {
+    val focusManager =
+        LocalFocusManager.current
+    Column(modifier) {
         Text(
             stringResource(R.string.profile_about_me),
-            Modifier.padding(top = 20.dp),
-            colorScheme.tertiary,
+            Modifier, colorScheme.tertiary,
             style = typography.labelLarge
         )
-        val focusManager = LocalFocusManager.current
-        TextField(
-            state.description,
-            { callback?.onDescriptionChange(it) },
+        GTextField(
+            text, { onTextChange(it) },
             Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            readOnly = (state.profileType == ProfileType.ORGANIZER),
-            shape = MaterialTheme.shapes.large,
-            colors = TextFieldColors(),
+            readOnly = (profileType == ORGANIZER),
+            shape = shapes.large, colors = TextFieldColors(),
             textStyle = typography.bodyMedium,
-            keyboardActions = KeyboardActions { focusManager.clearFocus() },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Text
+            keyboardActions = KeyboardActions {
+                focusManager.clearFocus()
+            }, keyboardOptions = Default.copy(
+                imeAction = Done, keyboardType = Text
             ), placeholder = {
                 Text(
                     stringResource(R.string.about_me_placeholder),
