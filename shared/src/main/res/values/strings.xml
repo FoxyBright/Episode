@@ -4,6 +4,8 @@
     <!-- Login -->
     <string name="phone_number">Номер телефона</string>
     <string name="google_login">Войти через Google</string>
+    <string name="apple_login">Войти через Apple</string>
+    <string name="vk_login">Войти через VK</string>
     <string name="next_button">Далее</string>
     <string name="login_alternative_separator">или</string>
     <string name="login_privacy_police_agree">"Продолжая, вы соглашаетесь с "</string>
@@ -279,7 +281,9 @@
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
 
     <!-- Toasts -->
-    <string name="login_google_toast">Вход через гугл временно недоступен</string>
+    <string name="login_google_toast">Вход через Google временно недоступен</string>
+    <string name="login_apple_toast">Вход через Apple временно недоступен</string>
+    <string name="login_vk_toast">Вход через VK временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
     <string name="login_terms_toast">Условий пока нет</string>
 

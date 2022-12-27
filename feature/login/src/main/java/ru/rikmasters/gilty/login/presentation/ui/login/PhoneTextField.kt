@@ -1,11 +1,14 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,8 +40,10 @@ fun PhoneTextField(
     modifier: Modifier = Modifier,
     size: Int = 10,
     onClear: (() -> Unit)? = null,
-    onValueChanged: ((String) -> Unit)? = null
+    onValueChanged: ((String) -> Unit)? = null,
+    onDone: (() -> Unit)? = null
 ) {
+    val focusManager = LocalFocusManager.current
     GTextField(
         value,
         { text ->
@@ -51,7 +56,12 @@ fun PhoneTextField(
         ) else null, placeholder = TextFieldLabel(
             (false), stringResource(R.string.phone_number)
         ), textStyle = MaterialTheme.typography.bodyMedium,
-        keyboardOptions = KeyboardOptions(
+        keyboardActions = KeyboardActions {
+            focusManager.clearFocus()
+            onDone?.let { it() }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
             keyboardType = KeyboardType.NumberPassword
         ), visualTransformation = transform,
         clear = onClear, singleLine = true
