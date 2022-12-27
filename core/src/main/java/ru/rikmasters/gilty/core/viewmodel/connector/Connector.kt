@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.core.viewmodel.connector
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalInspectionMode
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.Trait
 import ru.rikmasters.gilty.core.viewmodel.trait.TraitWrapperFactory
@@ -35,17 +36,21 @@ fun <T: ViewModel> Connector(
 @Composable
 inline fun <reified T: ViewModel> Use(
     vararg traits: TraitWrapperFactory,
-    crossinline content: @Composable (T) -> Unit
-) = Use(T::class, *traits) { content(it) }
+    crossinline content: @Composable () -> Unit
+) = Use(T::class, *traits) { content() }
 
 @Composable
 fun <T: ViewModel> Use(
     clazz: KClass<T>,
     vararg traits: TraitWrapperFactory,
-    content: @Composable (T) -> Unit
+    content: @Composable () -> Unit
 ) {
+    if(LocalInspectionMode.current) {
+        content()
+        return
+    }
     val state = localConnectorOf(clazz)
-    Use(state.vm, *traits) { content(it) }
+    Use(state.vm, *traits) { content() }
 }
 
 @Composable

@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.auth
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
+import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.token.TokenStore
 import ru.rikmasters.gilty.auth.token.Tokens
@@ -22,5 +23,6 @@ object Auth: DataDefinition() {
     override fun Module.koin() {
         singleOf(::TokenStore).bind<TokenManager>()
         singleOf(::AuthManager)
+        singleOf(::LoginRepository)
     }
 }

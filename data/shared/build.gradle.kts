@@ -6,10 +6,8 @@ plugins {
 apply<DataPlugin>()
 
 baseConfig()
-compose()
 
 dependencies {
     androidBase()
     dataBase()
-    compose()
 }

@@ -10,4 +10,6 @@ baseConfig()
 dependencies {
     androidBase()
     dataBase()
+    
+    implementation(project(":data:shared"))
 }

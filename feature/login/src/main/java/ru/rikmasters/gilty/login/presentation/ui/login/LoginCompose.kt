@@ -1,25 +1,15 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -38,6 +28,10 @@ import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.auth.login.*
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.textMask
 import ru.rikmasters.gilty.shared.model.login.Countries
@@ -56,7 +50,12 @@ private fun LoginPreview() {
             LoginState(
                 textMask(mask), mask,
                 "9543422455", DemoCountry,
-                Countries(), 10
+                Countries(), 10,
+                listOf(
+                    Google(""),
+                    Apple(""),
+                    Vk(""),
+                )
             )
         )
     }
@@ -64,7 +63,7 @@ private fun LoginPreview() {
 
 interface LoginCallback {
     fun onNext() {}
-    fun googleLogin() {}
+    fun loginWith(method: LoginMethod) {}
     fun privatePolicy() {}
     fun termsOfApp() {}
     fun onPhoneChange(text: String) {}
@@ -78,7 +77,8 @@ data class LoginState(
     val phone: String,
     val country: Country,
     val allCountries: List<Country>,
-    val size: Int
+    val size: Int,
+    val methods: List<LoginMethod>
 )
 
 @Composable
@@ -129,7 +129,7 @@ fun LoginContent(
                         { callback?.onPhoneChange(it) })
                 }
             }
-            Buttons(Modifier.padding(top = 32.dp), state, callback)
+            Buttons(state.methods, Modifier.padding(top = 32.dp), callback)
         }
         ConfirmationPolicy(
             Modifier
@@ -144,11 +144,14 @@ fun LoginContent(
 
 @Composable
 private fun Buttons(
+    methods: List<LoginMethod>,
     modifier: Modifier = Modifier,
-    state: LoginState,
     callback: LoginCallback? = null
 ) {
-    Column(modifier, Top, CenterHorizontally) {
+    Column(
+        modifier.animateContentSize(),
+        Top, CenterHorizontally
+    ) {
         GradientButton(
             Modifier, stringResource(R.string.next_button),
             /*(state.phone.length > 9)*/ true, // TODO активность кнопки
@@ -159,23 +162,61 @@ private fun Buttons(
             style = typography.labelSmall,
             color = colorScheme.onTertiary
         )
-        Button(
-            { callback?.googleLogin() },
-            Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(Color.Transparent)
-        ) {
-            Image(
-                painterResource(R.drawable.ic_google),
-                stringResource(R.string.google_login),
-                Modifier.padding(end = 8.dp)
-            )
-            Text(
-                stringResource(R.string.google_login),
-                style = typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.tertiary
-            )
+        Use<LoginViewModel>(LoadingTrait) {
+            Column {
+                Spacer(Modifier.height(8.dp))
+                methods.forEach {
+                    LoginMethodButton(it) {
+                        callback?.loginWith(it)
+                    }
+                }
+            }
         }
+    }
+}
+
+
+private val LoginMethod.name
+@Composable get() = when(this) {
+    is Apple -> stringResource(R.string.login_via_apple)
+    is Google -> stringResource(R.string.login_via_google)
+    is Vk -> stringResource(R.string.login_via_vk)
+}
+
+private val LoginMethod.icon
+    @Composable get() = when(this) {
+        is Apple -> painterResource(R.drawable.ic_apple)
+        is Google -> painterResource(R.drawable.ic_google)
+        is Vk -> painterResource(R.drawable.ic_vk)
+    }
+
+@Composable
+private fun LoginMethodButton(
+    method: LoginMethod,
+    modifier: Modifier = Modifier,
+    onClick: (LoginMethod) -> Unit
+) {
+    Button(
+        { onClick(method) },
+        modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp),
+        colors = ButtonDefaults.buttonColors(colorScheme.primaryContainer)
+    ) {
+        Image(
+            method.icon,
+            null,
+            Modifier
+                .weight(1f / 3f)
+                .padding(vertical = 15.dp)
+        )
+        Text(
+            stringResource(R.string.login_via, method.name),
+            Modifier.weight(2f/3f),
+            style = typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.tertiary
+        )
     }
 }
 

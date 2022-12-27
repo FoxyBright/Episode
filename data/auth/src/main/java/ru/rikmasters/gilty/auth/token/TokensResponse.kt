@@ -1,8 +1,9 @@
 package ru.rikmasters.gilty.auth.token
 
+import ru.rikmasters.gilty.auth.token.Tokens
 import ru.rikmasters.gilty.core.data.entity.interfaces.WebEntity
 
-data class TokensResponse(
+internal data class TokensResponse(
 
     val tokenType: String,
     

@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.auth.token
 
-data class TokensRequest(
+internal data class TokensRequest(
     val grantType: GrantType,
     val clientId: String,
     val clientSecret: String,

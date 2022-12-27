@@ -3,7 +3,10 @@
 
     <!-- Login -->
     <string name="phone_number">Номер телефона</string>
-    <string name="google_login">Войти через Google</string>
+    <string name="login_via">Войти через %s</string>
+    <string name="login_via_google">Google</string>
+    <string name="login_via_apple">Apple</string>
+    <string name="login_via_vk">VK</string>
     <string name="next_button">Далее</string>
     <string name="login_alternative_separator">или</string>
     <string name="login_privacy_police_agree">"Продолжая, вы соглашаетесь с "</string>

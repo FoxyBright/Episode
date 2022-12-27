@@ -26,7 +26,7 @@ open class KtorSource: WebSource() {
         }
         install(HttpRequestRetry) {
             exponentialDelay()
-            maxRetries = 5
+            maxRetries = 3
             retryOnExceptionIf { _, throwable -> throwable is IOException }
         }
         install(ContentNegotiation) {
