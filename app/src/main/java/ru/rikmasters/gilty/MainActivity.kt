@@ -8,6 +8,7 @@ import androidx.core.view.WindowCompat
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
+import ru.rikmasters.gilty.ui.GLoader
 import ru.rikmasters.gilty.ui.GSnackbar
 
 @ExperimentalMaterial3Api
@@ -20,7 +21,8 @@ class MainActivity: ComponentActivity() {
             AppEntrypoint(
                 GiltyTheme,
                 { GBottomSheetBackground(it) },
-                { GSnackbar(it) }
+                { GSnackbar(it) },
+                { isLoading, content -> GLoader(isLoading, content) }
             )
         }
     }

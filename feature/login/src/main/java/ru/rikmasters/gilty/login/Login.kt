@@ -35,11 +35,6 @@ object Login: FeatureDefinition() {
             
             screen(
                 "profile?photo={photo}&hp={hp}",
-                listOf(navArgument("photo") {
-                    type = NavType.StringType; defaultValue = ""
-                }, navArgument("hp") {
-                    type = NavType.StringType; defaultValue = ""
-                })
             ) {
                 it.arguments?.getString("photo")?.let { avatar ->
                     it.arguments?.getString("hp")?.let { hiddenPhoto ->
