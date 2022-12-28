@@ -1,20 +1,25 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -83,23 +88,49 @@ fun ReactionContent(
                     .offset(12.dp, (-18).dp)
             )
         }
+        CloseButton(
+            Modifier
+                .padding(16.dp, 28.dp)
+                .align(TopEnd)
+        )
+        { onBack?.let { it() } }
+    }
+}
+
+@Composable
+private fun CloseButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier
+            .clip(CircleShape)
+            .clickable(
+                MutableInteractionSource(),
+                (null)
+            ) { onClick() }, Center
+    ) {
         Box(
             Modifier
-                .padding(16.dp)
-                .align(TopEnd)
+                .height(Max)
+                .width(Max)
         ) {
-            IconButton(
-                { onBack?.let { it() } }, Modifier
-                    .padding(16.dp)
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(colorScheme.primaryContainer)
-            ) {
-                Icon(
-                    Filled.Close, (null),
-                    Modifier.size(20.dp)
-                )
-            }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .alpha(0.5f)
+                    .background(
+                        colorScheme.outline,
+                        CircleShape
+                    )
+            )
+            Icon(
+                Filled.Close,
+                (null), Modifier
+                    .padding(10.dp)
+                    .size(20.dp),
+                White
+            )
         }
     }
 }

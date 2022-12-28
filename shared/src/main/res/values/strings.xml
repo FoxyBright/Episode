@@ -122,7 +122,7 @@
     <string name="condition_free">Вход свободный</string>
     <string name="condition_divide">Сумма делиться</string>
     <string name="condition_organizer_pay">Платит организатор</string>
-    <string name="condition_member_pay">Платят участники</string>
+    <string name="condition_member_pay">Платно</string>
     <string name="condition_no_matter">Не важно</string>
     <string name="meeting_join_button_name">Присоединиться</string>
     <string name="meeting_only_organizer_label">Только для организатора</string>

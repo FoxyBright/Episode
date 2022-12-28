@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -83,7 +83,7 @@ fun Category(
                         Modifier.size(20.dp)
                     )
                     Text(
-                        category.name,
+                        category.display,
                         Modifier.padding(start = 18.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
@@ -91,7 +91,7 @@ fun Category(
                     )
                 }
                 Icon(
-                    Icons.Filled.KeyboardArrowRight,
+                    Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
                     tint = colorScheme.onTertiary
                 )
@@ -137,7 +137,7 @@ fun Category(
                 fontWeight = SemiBold
             )
             Icon(
-                Icons.Filled.KeyboardArrowRight,
+                Filled.KeyboardArrowRight,
                 stringResource(R.string.next_button),
                 tint = colorScheme.onTertiary
             )
@@ -203,7 +203,7 @@ fun TagSearch(
                                 style = typography.labelSmall
                             )
                             Icon(
-                                Icons.Filled.Close,
+                                Filled.Close,
                                 stringResource(R.string.meeting_filter_delete_tag_label),
                                 Modifier.clickable { onDeleteTag(index) },
                                 Color.White
@@ -259,8 +259,8 @@ fun Distance(
                     )
                 }
                 Icon(
-                    if(state) Icons.Filled.KeyboardArrowDown
-                    else Icons.Filled.KeyboardArrowRight,
+                    if(state) Filled.KeyboardArrowDown
+                    else Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
                     Modifier.padding(horizontal = 16.dp),
                     colorScheme.onTertiary

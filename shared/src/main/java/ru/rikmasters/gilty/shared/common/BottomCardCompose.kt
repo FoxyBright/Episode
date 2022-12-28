@@ -121,13 +121,13 @@ fun CardButton(
     ) {
         Box(Modifier.fillMaxWidth(), Center) {
             Row(
-                Modifier.padding(18.dp, 10.dp),
+                Modifier.padding(10.dp),
                 Start, CenterVertically
             ) {
                 icon?.let {
                     Image(
                         painterResource(it), (null),
-                        Modifier.padding(end = 2.dp),
+                        Modifier.padding(end = 6.dp),
                         colorFilter = ColorFilter.tint(color)
                     )
                 }

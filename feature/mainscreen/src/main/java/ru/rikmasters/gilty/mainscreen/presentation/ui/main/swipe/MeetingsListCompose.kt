@@ -3,10 +3,8 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
 import ru.rikmasters.gilty.shared.common.MeetingCard
@@ -33,7 +31,7 @@ fun MeetingsListContent(
     ) -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
-        Box(Modifier.padding(16.dp)) {
+        Box(Modifier) {
             Content(
                 states, notInteresting,
                 onSelect, onClick

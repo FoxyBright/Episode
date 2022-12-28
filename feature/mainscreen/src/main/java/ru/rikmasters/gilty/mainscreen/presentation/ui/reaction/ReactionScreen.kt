@@ -12,5 +12,5 @@ fun ReactionScreen(
     nav: NavState = get()
 ) {
     ReactionContent(avatar, categoriesType)
-    { nav.navigateAbsolute("main/meetings") }
+    { nav.navigationBack() }
 }
