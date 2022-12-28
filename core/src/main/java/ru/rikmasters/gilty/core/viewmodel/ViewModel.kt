@@ -6,17 +6,13 @@ import ru.rikmasters.gilty.core.common.Component
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
-abstract class ViewModel: CoroutineController(), LoadingTrait, Component {
+abstract class ViewModel: CoroutineController(), Component, LoadingTrait {
     
-    data class Event(
-        val key: String,
-        val data: Any?
-    )
-    
-    private val eventBus = MutableSharedFlow<Pair<String, Any?>>()
-    internal val events = eventBus.asSharedFlow()
+    private val _events = MutableSharedFlow<Event>()
+    internal val events = _events.asSharedFlow()
     protected suspend fun event(key: String) = event(key to null)
-    protected suspend fun event(data: Pair<String, Any?>) = eventBus.emit(data)
+    protected suspend fun event(pair: Pair<String, Any?>) = event(Event(pair))
+    private suspend fun event(data: Event) = _events.emit(data)
     
     
     private val loadingMut = MutableStateFlow(false)
@@ -43,5 +39,5 @@ abstract class ViewModel: CoroutineController(), LoadingTrait, Component {
     protected fun <T> Flow<T>.state(
         initial: T,
         started: SharingStarted = SharingStarted.Lazily
-    ): StateFlow<T> = stateIn(scope, started, initial)
+    ): StateFlow<T> = stateIn(coroutineScope, started, initial)
 }

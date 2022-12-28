@@ -282,7 +282,6 @@
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
 
     <!-- Toasts -->
-    <string name="login_google_toast">Вход через гугл временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
     <string name="login_terms_toast">Условий пока нет</string>
 

@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import java.net.URI
+
 include(":data:shared")
 
 
@@ -62,6 +64,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = URI("https://jitpack.io") }
     }
 }
 rootProject.name = "gilty"

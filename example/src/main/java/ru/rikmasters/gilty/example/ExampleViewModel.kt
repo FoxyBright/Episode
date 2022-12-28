@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.example
 
+import org.koin.core.component.createScope
 import org.koin.core.component.inject
+import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.data.example.repository.ExampleRepository

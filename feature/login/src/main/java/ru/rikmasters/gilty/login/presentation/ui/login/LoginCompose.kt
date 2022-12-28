@@ -1,42 +1,35 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
-import ru.rikmasters.gilty.core.viewmodel.connector.Use
-import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
+import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.textMask
-import ru.rikmasters.gilty.shared.model.login.Countries
-import ru.rikmasters.gilty.shared.model.login.Country
-import ru.rikmasters.gilty.shared.model.login.DemoCountry
+import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -45,12 +38,11 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun LoginPreview() {
     GiltyTheme {
-        val mask = "+7 ### ###-##-##"
         LoginContent(
             LoginState(
-                textMask(mask), mask,
-                "9543422455", DemoCountry,
-                Countries(), 10,
+                "79543422455",
+                false,
+                DemoCountry,
                 listOf(
                     Google(""),
                     Apple(""),
@@ -62,22 +54,20 @@ private fun LoginPreview() {
 }
 
 interface LoginCallback {
-    fun onNext() {}
-    fun loginWith(method: LoginMethod) {}
-    fun privatePolicy() {}
-    fun termsOfApp() {}
-    fun onPhoneChange(text: String) {}
-    fun onClear() {}
-    fun openCountryBottomSheet() {} //Selector
+    fun onNext()
+    fun loginWith(method: LoginMethod)
+    fun privatePolicy()
+    fun termsOfApp()
+    fun onPhoneChange(text: String)
+    fun onClear()
+    fun changeCountry()
 }
 
+@Immutable
 data class LoginState(
-    val transform: VisualTransformation,
-    val mask: String,
     val phone: String,
+    val isNextActive: Boolean,
     val country: Country,
-    val allCountries: List<Country>,
-    val size: Int,
     val methods: List<LoginMethod>
 )
 
@@ -87,83 +77,116 @@ fun LoginContent(
     modifier: Modifier = Modifier,
     callback: LoginCallback? = null,
 ) {
-    Box(
+    Column(
         modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(colorScheme.background),
-        Center) {
+        verticalArrangement = SpaceBetween
+    ) {
         Column(
             Modifier
-                .verticalScroll(rememberScrollState())
+                .weight(1f)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = CenterHorizontally,
         ) {
-            Image(
-                painterResource(R.drawable.ic_logo),
-                stringResource(R.string.gilty_logo)
-            )
-            Box(
-                Modifier
-                    .padding(top = 80.dp)
-                    .clip(MaterialTheme.shapes.extraSmall)
-            ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(colorScheme.onPrimaryContainer),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painterResource(state.country.flag),
-                        stringResource(R.string.login_select_country),
-                        Modifier
-                            .padding(start = 10.dp)
-                            .size(20.dp)
-                            .clickable
-                            { callback?.openCountryBottomSheet() }
-                    )
-                    PhoneTextField(
-                        state.phone, state.transform,
-                        Modifier.fillMaxWidth(), state.size,
-                        { callback?.onClear() },
-                        { callback?.onPhoneChange(it) })
-                }
-            }
-            Buttons(state.methods, Modifier.padding(top = 32.dp), callback)
+            Logo(Modifier.weight(1f))
+            PhoneField(Modifier, state, callback)
+            NextButton(Modifier, state.isNextActive) { callback?.onNext() }
+            LoginMethodsButtons(Modifier, state.methods, callback)
         }
+        Spacer(Modifier.weight(0.1f))
         ConfirmationPolicy(
             Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 60.dp)
                 .padding(horizontal = 16.dp),
             callback
         )
+        Spacer(Modifier.weight(0.1f))
     }
 }
 
 @Composable
-private fun Buttons(
-    methods: List<LoginMethod>,
+private fun Logo(
+    modifier: Modifier = Modifier
+) {
+    Image(
+        painterResource(R.drawable.ic_logo),
+        stringResource(R.string.gilty_logo),
+        modifier.heightIn(64.dp, 210.dp)
+    )
+}
+
+@Composable
+private fun PhoneField(
     modifier: Modifier = Modifier,
+    state: LoginState,
     callback: LoginCallback? = null
 ) {
-    Column(
-        modifier.animateContentSize(),
-        Top, CenterHorizontally
+    Box(
+        modifier.clip(MaterialTheme.shapes.extraSmall)
     ) {
-        GradientButton(
-            Modifier, stringResource(R.string.next_button),
-            /*(state.phone.length > 9)*/ true, // TODO активность кнопки
-        ) { callback?.onNext() }
-        Text(
-            stringResource(R.string.login_alternative_separator),
-            Modifier.padding(top = 20.dp),
-            style = typography.labelSmall,
-            color = colorScheme.onTertiary
-        )
-        Use<LoginViewModel>(LoadingTrait) {
-            Column {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(colorScheme.onPrimaryContainer),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                state.country.flag,
+                stringResource(R.string.login_select_country),
+                Modifier
+                    .padding(start = 10.dp)
+                    .size(20.dp)
+                    .clickable
+                    { callback?.changeCountry() }
+            )
+            PhoneTextField(
+                state.phone,
+                state.country,
+                Modifier.fillMaxWidth(),
+                { callback?.onClear() },
+                { callback?.onPhoneChange(it) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun NextButton(
+    modifier: Modifier = Modifier,
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
+    GradientButton(
+        modifier.padding(top = 32.dp),
+        stringResource(R.string.next_button),
+        isActive,
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun LoginMethodsButtons(
+    modifier: Modifier = Modifier,
+    methods: List<LoginMethod>,
+    callback: LoginCallback? = null
+) {
+    Box(modifier.height(290.dp)) {
+        AnimatedVisibility(
+            methods.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                Modifier, Top, CenterHorizontally
+            ) {
+                Text(
+                    stringResource(R.string.login_alternative_separator),
+                    Modifier.padding(top = 20.dp),
+                    style = typography.labelSmall,
+                    color = colorScheme.onTertiary
+                )
                 Spacer(Modifier.height(8.dp))
                 methods.forEach {
                     LoginMethodButton(it) {
@@ -203,20 +226,26 @@ private fun LoginMethodButton(
             .padding(top = 12.dp),
         colors = ButtonDefaults.buttonColors(colorScheme.primaryContainer)
     ) {
-        Image(
-            method.icon,
-            null,
+        Row(
             Modifier
-                .weight(1f / 3f)
-                .padding(vertical = 15.dp)
-        )
-        Text(
-            stringResource(R.string.login_via, method.name),
-            Modifier.weight(2f/3f),
-            style = typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.tertiary
-        )
+                .padding(start = 8.dp)
+                .fillMaxWidth(3f / 4f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                method.icon,
+                null,
+                Modifier
+                    .padding(end = 18.dp)
+                    .padding(vertical = 15.dp)
+            )
+            Text(
+                stringResource(R.string.login_via, method.name),
+                style = typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.tertiary
+            )
+        }
     }
 }
 

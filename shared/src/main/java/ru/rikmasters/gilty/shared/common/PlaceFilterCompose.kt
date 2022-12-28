@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.login.Country
+import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState

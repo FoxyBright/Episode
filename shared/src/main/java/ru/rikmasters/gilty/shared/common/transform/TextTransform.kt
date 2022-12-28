@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.common.extentions
+package ru.rikmasters.gilty.shared.common.transform
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
@@ -6,7 +6,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlin.math.absoluteValue
 
-fun textMask(mask: String, endChar: String = "") = object: VisualTransformation {
+fun transformationOf(mask: String, endChar: String = "") = object: VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         var out = ""
         var maskIndex = 0
