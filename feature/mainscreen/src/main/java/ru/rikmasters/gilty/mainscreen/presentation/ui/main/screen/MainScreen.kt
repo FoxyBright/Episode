@@ -18,7 +18,9 @@ import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
-import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.*
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
@@ -40,10 +42,20 @@ fun MainScreen(nav: NavState = get()) {
             NEW, INACTIVE
         )
     }
-    var switcher by remember {
-        mutableStateOf(Pair(true, false))
+    
+    var today by remember {
+        mutableStateOf(true)
     }
-    val meetings = DemoMeetingList
+    val meetings = remember {
+        mutableStateListOf(
+            getDemoMeetingModel(category = ART),
+            getDemoMeetingModel(category = ENTERTAINMENT, isOnline = true),
+            getDemoMeetingModel(category = BUSINESS),
+            getDemoMeetingModel(category = MASTER_CLASSES),
+            getDemoMeetingModel(category = EROTIC)
+        )
+    }
+    
     val context = LocalContext.current
     var alert by remember { mutableStateOf(false) }
     val cardStates =
@@ -99,7 +111,7 @@ fun MainScreen(nav: NavState = get()) {
     
     MainContent(
         MainContentState(
-            grid, switcher, meetings,
+            grid, today, meetings,
             cardStates, stateList, alert
         ), Modifier, object: MainContentCallback {
             override fun onNavBarSelect(point: Int) {
@@ -115,6 +127,19 @@ fun MainScreen(nav: NavState = get()) {
                         4 -> nav.navigateAbsolute("profile/main")
                     }
                 }
+            }
+            
+            override fun onMeetsRepeatClick() {
+                val list = listOf(
+                    getDemoMeetingModel(category = ART),
+                    getDemoMeetingModel(category = ENTERTAINMENT, isOnline = true),
+                    getDemoMeetingModel(category = BUSINESS),
+                    getDemoMeetingModel(category = MASTER_CLASSES),
+                    getDemoMeetingModel(category = EROTIC)
+                ); list.forEach { meetings.add(it) }
+            }
+            
+            override fun onMeetMoreClick() {
             }
             
             override fun onMeetClick(meet: MeetingModel) {
@@ -142,20 +167,28 @@ fun MainScreen(nav: NavState = get()) {
                 ).show()
             }
             
-            override fun closeAlert() {
+            override fun onCloseAlert() {
                 alert = false
             }
             
-            override fun interesting(state: SwipeableCardState) {
-                scope.launch { state.swipe(DirectionType.RIGHT) }
+            override fun onInteresting(
+                meet: MeetingModel,
+                state: SwipeableCardState
+            ) {
+                scope.launch { state.swipe(RIGHT) }
+                meetings.remove(meet)
             }
             
-            override fun notInteresting(state: SwipeableCardState) {
-                scope.launch { state.swipe(DirectionType.LEFT) }
+            override fun onNotInteresting(
+                meet: MeetingModel,
+                state: SwipeableCardState
+            ) {
+                scope.launch { state.swipe(LEFT) }
+                meetings.remove(meet)
             }
             
             override fun onTodayChange() {
-                switcher = Pair(!switcher.first, !switcher.second)
+                today = !today
             }
             
             override fun onRespond(meet: MeetingModel) {
@@ -177,7 +210,7 @@ fun MainScreen(nav: NavState = get()) {
                 }
             }
             
-            override fun openFiltersBottomSheet() {
+            override fun onOpenFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheet.expand {
                         MeetingFilterContent {

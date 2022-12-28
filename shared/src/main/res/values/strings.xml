@@ -138,6 +138,9 @@
     <string name="meeting_distance_from_user">От вас</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
     <string name="meeting_complain">Пожаловаться</string>
+    <string name="meeting_repeat_button">Повторить</string>
+    <string name="meeting_get_more_button">Хочу еще</string>
+    <string name="meeting_empty_meet_label">Вы просмотрели все\nактуальные meets</string>
 
     <!--Meeting Filters-->
     <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>
@@ -302,8 +305,6 @@
     <string name="sub_categories_cinema">Кино</string>
     <string name="sub_categories_cafe">Кафе</string>
     <string name="sub_categories_walking">Прогулки</string>
-
-
 
 
     <string name="text_text">Съешь ещё этих мягких французских булок, да выпей же чаю</string>
