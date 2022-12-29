@@ -88,7 +88,7 @@ private fun LabelBar(
         }) {
             Icon(
                 painterResource(R.drawable.magnifier),
-                stringResource(R.string.login_search_placeholder),
+                stringResource(R.string.search_placeholder),
                 Modifier.size(22.dp),
                 colorScheme.tertiary
             )
@@ -138,7 +138,7 @@ fun SearchBar(
                 colors = SearchColors(state.online),
                 placeholder = {
                     Text(
-                        stringResource(R.string.login_search_placeholder),
+                        stringResource(R.string.search_placeholder),
                         color = colorScheme.onTertiary,
                         style = typography.bodyMedium,
                         fontWeight = Bold

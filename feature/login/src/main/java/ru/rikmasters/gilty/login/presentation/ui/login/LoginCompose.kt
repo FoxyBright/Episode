@@ -18,17 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
+import ru.rikmasters.gilty.login.R
+import ru.rikmasters.gilty.shared.R as SR
 import ru.rikmasters.gilty.shared.country.Country
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -111,8 +110,8 @@ private fun Logo(
     modifier: Modifier = Modifier
 ) {
     Image(
-        painterResource(R.drawable.ic_logo),
-        stringResource(R.string.gilty_logo),
+        painterResource(SR.drawable.ic_logo),
+        stringResource(SR.string.gilty_logo),
         modifier.heightIn(64.dp, 210.dp)
     )
 }
@@ -134,7 +133,7 @@ private fun PhoneField(
         ) {
             Image(
                 state.country.flag,
-                stringResource(R.string.login_select_country),
+                stringResource(SR.string.select_country),
                 Modifier
                     .padding(start = 10.dp)
                     .size(20.dp)
@@ -160,7 +159,7 @@ private fun NextButton(
 ) {
     GradientButton(
         modifier.padding(top = 32.dp),
-        stringResource(R.string.next_button),
+        stringResource(SR.string.next_button),
         isActive,
         onClick = onClick
     )
@@ -182,7 +181,7 @@ private fun LoginMethodsButtons(
                 Modifier, Top, CenterHorizontally
             ) {
                 Text(
-                    stringResource(R.string.login_alternative_separator),
+                    stringResource(R.string.alternative_separator),
                     Modifier.padding(top = 20.dp),
                     style = typography.labelSmall,
                     color = colorScheme.onTertiary
@@ -261,13 +260,23 @@ private fun ConfirmationPolicy(
     )
     val typography = typography.labelSmall.copy(fontWeight = SemiBold)
     val annotatedText = buildAnnotatedString {
-        withStyle(textStyle) { append(stringResource(R.string.login_privacy_police_agree)) }
-        pushStringAnnotation("terms", "")
-        withStyle(linkStyle) { append(stringResource(R.string.login_terms)) }
-        pop(); withStyle(textStyle) { append(stringResource(R.string.login_connector_terms_and_privacy_police)) }
-        pushStringAnnotation("policy", "")
-        withStyle(linkStyle) { append("\n" + stringResource(R.string.login_privacy_police)) }
-        pop(); withStyle(textStyle) { append(stringResource(R.string.login_application)) }
+        val terms = stringResource(R.string.terms)
+        val policy = stringResource(R.string.privacy_police)
+        val text = stringResource(
+            R.string.privacy_police_agree,
+            terms, policy
+        )
+        withStyle(textStyle) {
+            append(text)
+        }
+        text.indexOf(terms).let {
+            addStyle(linkStyle, it, it + terms.length)
+            addStringAnnotation("terms", "", it, it + terms.length)
+        }
+        text.indexOf(policy).let {
+            addStyle(linkStyle, it, it + policy.length)
+            addStringAnnotation("policy", "", it, it + policy.length)
+        }
     }
     ClickableText(annotatedText, modifier, typography) {
         annotatedText.getStringAnnotations(

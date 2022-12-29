@@ -118,7 +118,7 @@ fun Item(
                             .padding(12.dp, 8.dp)
                             .clip(CircleShape)
                             .size(40.dp),
-                        painterResource(R.drawable.gb),
+                        painterResource(R.drawable.ic_image_box),
                         contentScale = Crop
                     )
                     NotificationText(

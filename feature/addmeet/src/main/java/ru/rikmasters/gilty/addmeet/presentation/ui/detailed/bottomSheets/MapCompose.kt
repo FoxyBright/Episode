@@ -168,7 +168,7 @@ private fun Search(
                 shape = shapes.large,
                 colors = PlaceSearchColors(online),
                 placeholder = TextFieldLabel(
-                    (false), stringResource(R.string.login_search_placeholder)
+                    (false), stringResource(R.string.search_placeholder)
                 ),
                 textStyle = typography.bodyMedium.copy(fontWeight = Bold),
             )

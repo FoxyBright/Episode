@@ -65,7 +65,7 @@ fun CountryBottomSheetContent(
             .padding(16.dp, 20.dp)
     ) {
         SearchActionBar(SearchState(
-            stringResource(R.string.login_select_country),
+            stringResource(R.string.select_country),
             state.searchState, state.text,
             { callback?.onSearchTextChange(it) }
         ) { callback?.onSearchStateChange() })
