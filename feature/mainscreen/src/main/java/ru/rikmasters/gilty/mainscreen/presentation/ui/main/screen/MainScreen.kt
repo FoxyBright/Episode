@@ -234,16 +234,20 @@ fun MainScreen(nav: NavState = get()) {
                 meet: MeetingModel,
                 state: SwipeableCardState
             ) {
-                scope.launch { state.swipe(RIGHT) }
-                meetings.remove(meet)
+                scope.launch {
+                    state.swipe(RIGHT)
+                    meetings.remove(meet)
+                }
             }
             
             override fun onNotInteresting(
                 meet: MeetingModel,
                 state: SwipeableCardState
             ) {
-                scope.launch { state.swipe(LEFT) }
-                meetings.remove(meet)
+                scope.launch {
+                    state.swipe(LEFT)
+                    meetings.remove(meet)
+                }
             }
             
             override fun onTodayChange() {

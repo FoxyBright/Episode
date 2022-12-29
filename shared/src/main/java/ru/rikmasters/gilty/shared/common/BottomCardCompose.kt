@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.*
+import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
+import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
@@ -41,10 +42,12 @@ import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 private val meeting = DemoMeetingModel
@@ -60,8 +63,9 @@ private fun MeetingCardPreview() {
                     colorScheme.background
                 )
         ) {
-            MeetingCard(
-                meeting, Modifier.padding(16.dp)
+            MeetCard(
+                Modifier.padding(16.dp),
+                MEET, meeting
             )
         }
     }
@@ -189,117 +193,6 @@ private fun Icons(
 }
 
 @Composable
-fun MeetingCard(
-    meet: MeetingModel,
-    modifier: Modifier = Modifier,
-    offset: Float = 0f,
-    onSelect: ((DirectionType) -> Unit)? = null,
-) {
-    Card(
-        modifier, shapes.large,
-        cardColors(Transparent)
-    ) {
-        Box {
-            AsyncImage(
-                meet.organizer.avatar.id,
-                stringResource(R.string.meeting_avatar),
-                Modifier
-                    .clip(shapes.large)
-                    .fillMaxHeight(0.94f),
-                contentScale = Crop
-            )
-            MeetBottom(
-                Modifier
-                    .align(BottomCenter)
-                    .offset(y = 18.dp), meet, offset
-            ) { onSelect?.let { c -> c(it) } }
-        }
-    }
-}
-
-@Composable
-fun MeetBottom(
-    modifier: Modifier,
-    meet: MeetingModel,
-    offset: Float = 0f,
-    onSelect: (DirectionType) -> Unit
-) {
-    
-    
-    val leftSwipe = offset < -(50)
-    val rightSwipe = offset > 50
-    val swipe = leftSwipe || rightSwipe
-    val back = colors.meetButtonColors
-    val color = if(meet.isOnline)
-        colorScheme.secondary
-    else meet.category.color
-    val textColor: Color
-    val backColor: Color
-    if(swipe) {
-        textColor = White
-        backColor = color
-    } else {
-        textColor = color
-        backColor = back
-    }
-    
-    
-    Box(modifier) {
-        Image(
-            painterResource(
-                if(isSystemInDarkTheme())
-                    ic_back_rect_dark
-                else ic_back_rect
-            ), (null), Modifier
-                .fillMaxWidth()
-                .align(BottomCenter),
-            contentScale = FillWidth
-        )
-        Card(
-            Modifier
-                .align(BottomCenter)
-                .wrapContentHeight()
-                .offset(y = -(18).dp),
-            shapes.large,
-            cardColors(colorScheme.primaryContainer)
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    SpaceBetween
-                ) {
-                    Text(
-                        meet.title, Modifier.weight(1f),
-                        colorScheme.tertiary,
-                        style = typography.labelLarge
-                    ); MeetingStates(Modifier.weight(1f), meet)
-                }
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                ) {
-                    CardButton(
-                        Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp),
-                        stringResource(R.string.not_interesting),
-                        if(leftSwipe) textColor else color,
-                        ic_cancel, if(leftSwipe) backColor else back
-                    ) { onSelect(LEFT) }
-                    CardButton(
-                        Modifier.weight(1f),
-                        stringResource(R.string.meeting_respond),
-                        if(rightSwipe) textColor else color,
-                        ic_heart, if(rightSwipe) backColor else back
-                    ) { onSelect(RIGHT) }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun EmptyMeetCard(
     modifier: Modifier = Modifier,
     onMoreClick: (() -> Unit)? = null,
@@ -385,4 +278,197 @@ private fun ShadowBack(modifier: Modifier) {
                 )
             )
     )
+}
+
+enum class MeetCardType { EMPTY, MEET }
+
+@Composable
+fun MeetCard(
+    modifier: Modifier = Modifier,
+    type: MeetCardType,
+    meet: MeetingModel? = null,
+    offset: Float = 0f,
+    onMoreClick: (() -> Unit)? = null,
+    onRepeatClick: (() -> Unit)? = null,
+    onSelect: ((DirectionType) -> Unit)? = null
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .clip(shapes.large)
+    ) {
+        when(type) {
+            EMPTY -> {
+                EmptyTop(
+                    Modifier
+                        .weight(1f)
+                        .offset(y = 24.dp)
+                )
+                EmptyBottom(Modifier, {
+                    onRepeatClick?.let { it() }
+                }) { onMoreClick?.let { it() } }
+            }
+            
+            MEET -> {
+                meet?.let {
+                    MeetTop(
+                        it.organizer.avatar, Modifier
+                            .weight(1f)
+                            .offset(y = 24.dp)
+                    )
+                    MeetBottom(it, offset)
+                    { direction -> onSelect?.let { it(direction) } }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyTop(
+    modifier: Modifier
+) {
+    AnimatedImage(
+        if(isSystemInDarkTheme())
+            R.raw.corgi_night else
+            R.raw.corgi,
+        modifier
+            .fillMaxSize()
+            .background(
+                colorScheme.primaryContainer,
+                ThemeExtra.shapes.bigTopShapes
+            ),
+        contentScale = Crop
+    )
+}
+
+@Composable
+private fun MeetTop(
+    avatar: AvatarModel,
+    modifier: Modifier
+) {
+    AsyncImage(
+        avatar.id, stringResource(R.string.meeting_avatar),
+        modifier
+            .fillMaxSize()
+            .clip(ThemeExtra.shapes.bigTopShapes),
+        contentScale = Crop
+    )
+}
+
+@Composable
+private fun MeetBottom(
+    meet: MeetingModel,
+    offset: Float,
+    onSelect: ((DirectionType) -> Unit)? = null
+) {
+    val leftSwipe = offset < -(50)
+    val rightSwipe = offset > 50
+    val swipe = leftSwipe || rightSwipe
+    val back = colors.meetButtonColors
+    val color = if(meet.isOnline)
+        colorScheme.secondary
+    else meet.category.color
+    val textColor: Color
+    val backColor: Color
+    if(swipe) {
+        textColor = White
+        backColor = color
+    } else {
+        textColor = color
+        backColor = back
+    }
+    Box(
+        Modifier
+            .background(
+                colorScheme.primaryContainer,
+                ThemeExtra.shapes.bigShapes
+            )
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            MeetInfo(meet)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+            ) {
+                CardButton(
+                    Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    stringResource(R.string.not_interesting),
+                    if(leftSwipe) textColor else color,
+                    ic_cancel, if(leftSwipe) backColor else back
+                ) { onSelect?.let { it(LEFT) } }
+                CardButton(
+                    Modifier.weight(1f),
+                    stringResource(R.string.meeting_respond),
+                    if(rightSwipe) textColor else color,
+                    ic_heart, if(rightSwipe) backColor else back
+                ) {
+                    onSelect?.let { it(RIGHT) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyBottom(
+    modifier: Modifier,
+    onRepeatClick: (() -> Unit)? = null,
+    onMoreClick: (() -> Unit)? = null
+) {
+    Box(modifier.fillMaxWidth()) {
+        ShadowBack(Modifier.offset(y = (-30).dp))
+        Box(
+            Modifier.background(
+                colorScheme.primaryContainer,
+                ThemeExtra.shapes.bigShapes
+            )
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    stringResource(R.string.meeting_empty_meet_label),
+                    Modifier.fillMaxWidth(),
+                    colorScheme.tertiary,
+                    textAlign = TextAlign.Center,
+                    style = typography.labelLarge
+                )
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 22.dp)
+                ) {
+                    CardButton(
+                        Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp),
+                        stringResource(R.string.meeting_repeat_button),
+                        colorScheme.primary
+                    ) { onRepeatClick?.let { it() } }
+                    CardButton(
+                        Modifier.weight(1f),
+                        stringResource(R.string.meeting_get_more_button),
+                        colorScheme.primary
+                    ) { onMoreClick?.let { it() } }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MeetInfo(meet: MeetingModel) {
+    Row(
+        Modifier.fillMaxWidth(),
+        SpaceBetween
+    ) {
+        Text(
+            meet.title, Modifier.weight(1f),
+            colorScheme.tertiary,
+            style = typography.labelLarge
+        )
+        MeetingStates(Modifier.weight(1f), meet)
+    }
 }

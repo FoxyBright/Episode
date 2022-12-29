@@ -39,7 +39,6 @@ import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
@@ -156,7 +155,7 @@ private fun Meet(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier, ThemeExtra.shapes.cardShape,
+        modifier, shapes.large,
         cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier, Top, End) {

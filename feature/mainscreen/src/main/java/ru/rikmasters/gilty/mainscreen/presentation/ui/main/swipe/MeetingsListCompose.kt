@@ -1,13 +1,15 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.swipeableCard
-import ru.rikmasters.gilty.shared.common.MeetingCard
+import ru.rikmasters.gilty.shared.common.MeetCard
+import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
@@ -31,12 +33,10 @@ fun MeetingsListContent(
     ) -> Unit)? = null
 ) {
     Box(modifier.fillMaxSize()) {
-        Box(Modifier) {
-            Content(
-                states, notInteresting,
-                onSelect, onClick
-            )
-        }
+        Content(
+            states, notInteresting,
+            onSelect, onClick
+        )
     }
 }
 
@@ -78,16 +78,18 @@ private fun Content(
                         else -> {}
                     }
                 }
-                MeetingCard(
-                    meeting, Modifier
+                MeetCard(
+                    Modifier
                         .fillMaxSize()
-                        .clickable {
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) {
                             onClick?.let {
                                 it(meeting)
                             }
                         }
                         .swipeableCard({ swipe(it) }, state),
-                    xOffset
+                    MEET, meeting, xOffset
                 ) { swipe(it) }
             }
         }

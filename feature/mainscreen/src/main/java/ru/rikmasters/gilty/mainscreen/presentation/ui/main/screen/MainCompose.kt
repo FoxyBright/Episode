@@ -25,7 +25,8 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.EmptyMeetCard
+import ru.rikmasters.gilty.shared.common.MeetCard
+import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -120,7 +121,6 @@ fun MainContent(
                 state.grid, state.cardStates,
                 state.meetings,
                 Modifier
-                    .fillMaxSize()
                     .padding(top = padding.calculateTopPadding())
                     .padding(bottom = padding.calculateBottomPadding() - 28.dp)
                     .padding(horizontal = 16.dp),
@@ -184,15 +184,17 @@ private fun Content(
     callback: MainContentCallback?
 ) {
     if(meetings.isEmpty())
-        EmptyMeetCard(modifier, {
-            callback?.onMeetMoreClick()
-        }) { callback?.onMeetsRepeatClick() }
+        MeetCard(
+            modifier.fillMaxHeight(0.9f), EMPTY,
+            onMoreClick = { callback?.onMeetMoreClick() },
+            onRepeatClick = { callback?.onMeetsRepeatClick() }
+        )
     else {
         if(state) MeetingGridContent(
-            modifier, meetings
+            modifier.fillMaxSize(), meetings
         ) { callback?.onRespond(it) }
         else MeetingsListContent(
-            cardStates, modifier,
+            cardStates, modifier.fillMaxHeight(0.9f),
             { meet, it ->
                 callback?.onNotInteresting(
                     meet, it
