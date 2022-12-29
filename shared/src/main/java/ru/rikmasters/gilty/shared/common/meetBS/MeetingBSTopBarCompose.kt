@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
@@ -22,14 +24,10 @@ import androidx.compose.ui.layout.ContentScale.Companion.FillHeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.string.meeting_anon_type
-import ru.rikmasters.gilty.shared.R.string.meeting_private_and_anon_type
-import ru.rikmasters.gilty.shared.R.string.meeting_private_type
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
@@ -97,7 +95,6 @@ fun MeetingBSTopBarCompose(
     onAvatarClick: (() -> Unit)? = null,
 ) {
     val org = state.meet.organizer
-    val anonymous = state.meet.type == ANONYMOUS
     Column(modifier) {
         Row(Modifier.fillMaxWidth(), SpaceBetween) {
             Text(
@@ -128,25 +125,29 @@ fun MeetingBSTopBarCompose(
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
         }
-        Row(verticalAlignment = CenterVertically) {
+        Row(Modifier, Start, CenterVertically) {
             BrieflyRow((null), ("${org.username}, ${org.age}"), org.emoji)
             Text(
-                when {
-                    anonymous && state.meet.isPrivate ->
-                        stringResource(meeting_private_and_anon_type)
-                    
-                    anonymous ->
-                        stringResource(meeting_anon_type)
-                    
-                    state.meet.isPrivate ->
-                        stringResource(meeting_private_type)
-                    
-                    else -> ""
-                }, Modifier, colorScheme.onTertiary,
+                state.meet.display(),
+                Modifier, colorScheme.onTertiary,
                 style = typography.labelSmall
             )
         }
     }
+}
+
+@Composable
+private fun MeetingModel.display(): String {
+    val anonymous = this.type == ANONYMOUS
+    val private = isPrivate
+    return stringResource(
+        when {
+            private && anonymous -> R.string.meeting_private_and_anon_type
+            anonymous -> R.string.meeting_anon_type
+            private -> R.string.meeting_private_type
+            else -> R.string.empty_String
+        }
+    )
 }
 
 @Composable
@@ -187,9 +188,7 @@ private fun MeetDetails(
             Modifier.padding(bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = Bold,
-            maxLines = 1,
-            overflow = Ellipsis
+            fontWeight = Bold
         )
         Row(Modifier, SpaceBetween) {
             DateTimeCard(
@@ -200,21 +199,21 @@ private fun MeetDetails(
                 ) else listOf(
                     meet.category.color,
                     meet.category.color
-                ), (true)
+                ), (true), Modifier.weight(1f)
             )
             Box(
                 Modifier
+                    .weight(1f)
                     .padding(start = 4.dp)
                     .clip(shapes.extraSmall)
-                    .background(colorScheme.outlineVariant)
+                    .background(colorScheme.outlineVariant),
+                Center
             ) {
                 Text(
                     meet.duration,
-                    Modifier.padding(12.dp, 6.dp),
+                    Modifier.padding(6.dp),
                     White, fontWeight = SemiBold,
-                    style = typography.labelSmall,
-                    maxLines = 1,
-                    overflow = Ellipsis
+                    style = typography.labelSmall
                 )
             }
         }

@@ -89,7 +89,6 @@ data class MainContentState(
     val alert: Boolean,
 )
 
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainContent(

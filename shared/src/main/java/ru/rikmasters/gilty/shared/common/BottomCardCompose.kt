@@ -4,13 +4,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -21,13 +19,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -111,13 +110,14 @@ fun CardButton(
     text: String,
     color: Color,
     icon: Int? = null,
+    background: Color = colors.meetButtonColors,
     onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
         modifier, (true),
         shapes.extraLarge,
-        cardColors(colors.meetButtonColors)
+        cardColors(background)
     ) {
         Box(Modifier.fillMaxWidth(), Center) {
             Row(
@@ -128,13 +128,13 @@ fun CardButton(
                     Image(
                         painterResource(it), (null),
                         Modifier.padding(end = 6.dp),
-                        colorFilter = ColorFilter.tint(color)
+                        colorFilter = tint(color)
                     )
                 }
                 Text(
                     text, Modifier, color,
                     style = typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = SemiBold
                 )
             }
         }
@@ -192,6 +192,7 @@ private fun Icons(
 fun MeetingCard(
     meet: MeetingModel,
     modifier: Modifier = Modifier,
+    offset: Float = 0f,
     onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     Card(
@@ -210,7 +211,7 @@ fun MeetingCard(
             MeetBottom(
                 Modifier
                     .align(BottomCenter)
-                    .offset(y = 18.dp), meet
+                    .offset(y = 18.dp), meet, offset
             ) { onSelect?.let { c -> c(it) } }
         }
     }
@@ -220,8 +221,29 @@ fun MeetingCard(
 fun MeetBottom(
     modifier: Modifier,
     meet: MeetingModel,
+    offset: Float = 0f,
     onSelect: (DirectionType) -> Unit
 ) {
+    
+    
+    val leftSwipe = offset < -(50)
+    val rightSwipe = offset > 50
+    val swipe = leftSwipe || rightSwipe
+    val back = colors.meetButtonColors
+    val color = if(meet.isOnline)
+        colorScheme.secondary
+    else meet.category.color
+    val textColor: Color
+    val backColor: Color
+    if(swipe) {
+        textColor = White
+        backColor = color
+    } else {
+        textColor = color
+        backColor = back
+    }
+    
+    
     Box(modifier) {
         Image(
             painterResource(
@@ -262,19 +284,20 @@ fun MeetBottom(
                             .weight(1f)
                             .padding(end = 8.dp),
                         stringResource(R.string.not_interesting),
-                        meet.category.color, ic_cancel
+                        if(leftSwipe) textColor else color,
+                        ic_cancel, if(leftSwipe) backColor else back
                     ) { onSelect(LEFT) }
                     CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_respond),
-                        meet.category.color, ic_heart
+                        if(rightSwipe) textColor else color,
+                        ic_heart, if(rightSwipe) backColor else back
                     ) { onSelect(RIGHT) }
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun EmptyMeetCard(
