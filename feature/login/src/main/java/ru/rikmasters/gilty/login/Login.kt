@@ -4,7 +4,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.component.inject
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.auth.manager.AuthManager
@@ -20,8 +20,8 @@ import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
-import ru.rikmasters.gilty.shared.country.CountryManager
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
+import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
     
@@ -82,9 +82,12 @@ object Login: FeatureDefinition() {
     
     override fun Module.koin() {
         this@koin.single { authEntrypointResolver }
-        singleOf(::LoginViewModel)
-        singleOf(::CountryBsViewModel)
         singleOf(::CountryManager)
+        
+        scope<LoginViewModel> {
+            scopedOf(::LoginViewModel)
+            scopedOf(::CountryBsViewModel)
+        }
     }
     
     override fun include() = setOf(

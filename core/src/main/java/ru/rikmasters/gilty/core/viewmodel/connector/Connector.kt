@@ -2,23 +2,35 @@ package ru.rikmasters.gilty.core.viewmodel.connector
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalInspectionMode
+import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.core.viewmodel.trait.Trait
 import ru.rikmasters.gilty.core.viewmodel.trait.TraitWrapperFactory
 import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObjectInstance
+
+@Composable
+inline fun <reified T: ViewModel> Connector(
+    scope: Scope,
+    noinline content: @Composable (T) -> Unit
+) { Connector(T::class, scope, content) }
+
+@Composable
+inline fun <reified T: ViewModel> Connector(
+    noinline content: @Composable (T) -> Unit
+) { Connector(T::class, null, content) }
 
 @Composable
 inline fun <reified T: ViewModel> Connector(
     vm: T,
     noinline content: @Composable (T) -> Unit
-) { Connector(rememberConnectorState(vm), content) }
+) { Connector(rememberConnectorState(vm), T::class, content) }
 
 @Composable
-inline fun <reified T: ViewModel> Connector(
-    state: ConnectorState<T>,
-    noinline content: @Composable (T) -> Unit
-) { Connector(state, T::class, content) }
+fun <T: ViewModel> Connector(
+    clazz: KClass<T>,
+    scope: Scope? = null,
+    content: @Composable (T) -> Unit
+) { Connector(rememberConnectorState(clazz, scope), clazz, content) }
+
 
 @Composable
 fun <T: ViewModel> Connector(
@@ -26,8 +38,12 @@ fun <T: ViewModel> Connector(
     clazz: KClass<T>,
     content: @Composable (T) -> Unit
 ) {
+    DisposableEffect(state.vm.scope) {
+        onDispose { state.vm.scope.close() }
+    }
     CompositionLocalProvider(
-        localConnectorProviderOf(clazz) provides state
+        localConnectorProviderOf(clazz) provides state,
+        LocalScope provides state.vm.scope
     ) {
         content(state.vm)
     }

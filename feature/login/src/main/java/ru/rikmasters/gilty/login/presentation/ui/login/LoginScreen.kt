@@ -69,7 +69,7 @@ fun LoginScreen(vm: LoginViewModel) {
         override fun changeCountry() {
             scope.launch {
                 asm.bottomSheet.expand {
-                    Connector(get<CountryBsViewModel>()) {
+                    Connector<CountryBsViewModel>(vm.scope) {
                         CountryBs(it)
                     }
                 }

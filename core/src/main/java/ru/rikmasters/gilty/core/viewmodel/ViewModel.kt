@@ -2,11 +2,15 @@ package ru.rikmasters.gilty.core.viewmodel
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import ru.rikmasters.gilty.core.common.Component
+import org.koin.core.scope.Scope
+import org.koin.core.scope.ScopeCallback
 import ru.rikmasters.gilty.core.common.CoroutineController
+import ru.rikmasters.gilty.core.common.ScopeComponent
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
-abstract class ViewModel: CoroutineController(), Component, LoadingTrait {
+abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, LoadingTrait {
+    
+    override lateinit var scope: Scope
     
     private val _events = MutableSharedFlow<Event>()
     internal val events = _events.asSharedFlow()
@@ -27,17 +31,15 @@ abstract class ViewModel: CoroutineController(), Component, LoadingTrait {
         return res
     }
     
-    
     protected suspend inline fun <T> singleLoading(
         strategy: Strategy = DEFAULT_SINGLE_STRATEGY,
         noinline block: suspend CoroutineScope.() -> T
     ): T = loading { single(strategy, block) }
     
-    
-    
-    
     protected fun <T> Flow<T>.state(
         initial: T,
         started: SharingStarted = SharingStarted.Lazily
     ): StateFlow<T> = stateIn(coroutineScope, started, initial)
+    
+    override fun onScopeClose(scope: Scope) { /* Для очистки */ }
 }

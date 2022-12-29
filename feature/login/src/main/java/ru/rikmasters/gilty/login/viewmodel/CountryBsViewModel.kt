@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.login.viewmodel
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.CountryManager
@@ -10,11 +9,11 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 @OptIn(FlowPreview::class)
 class CountryBsViewModel(
     
-    private val countryManager: CountryManager
+    private val countryManager: CountryManager,
+    
+    private val loginVm: LoginViewModel
 
 ): ViewModel() {
-    
-    private val loginVm: LoginViewModel by inject()
     
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
