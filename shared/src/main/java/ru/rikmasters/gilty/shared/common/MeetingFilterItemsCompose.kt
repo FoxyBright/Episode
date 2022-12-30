@@ -44,12 +44,12 @@ fun Country(
 ) {
     Column {
         CardRow(
-            stringResource(R.string.login_select_country), country,
+            stringResource(R.string.select_country), country,
             ThemeExtra.shapes.mediumTopRoundedShape
         ) { onCountryClick() }
         Divider(Modifier.padding(start = 16.dp))
         CardRow(
-            stringResource(R.string.login_select_city), city,
+            stringResource(R.string.select_city), city,
             ThemeExtra.shapes.mediumBottomRoundedShape
         ) { onCityClick() }
     }
@@ -167,7 +167,7 @@ fun TagSearch(
             ) {
                 Icon(
                     painterResource(magnifier),
-                    stringResource(R.string.login_search_placeholder),
+                    stringResource(R.string.search_placeholder),
                     Modifier.size(20.dp),
                     colorScheme.onTertiary
                 )

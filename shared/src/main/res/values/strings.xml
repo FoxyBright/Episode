@@ -1,23 +1,11 @@
 <resources>
     <string name="app_name">Gilty</string>
 
-    <!-- Login -->
     <string name="phone_number">Номер телефона</string>
-    <string name="google_login">Войти через Google</string>
-    <string name="apple_login">Войти через Apple</string>
-    <string name="vk_login">Войти через VK</string>
+    <string name="select_country">Страна</string>
+    <string name="select_city">Город</string>
+    <string name="search_placeholder">Поиск</string>
     <string name="next_button">Далее</string>
-    <string name="login_alternative_separator">или</string>
-    <string name="login_privacy_police_agree">"Продолжая, вы соглашаетесь с "</string>
-    <string name="login_privacy_police"> Политикой конфиденциальности</string>
-    <string name="login_connector_terms_and_privacy_police">" и "</string>
-    <string name="login_terms">Условиями</string>
-    <string name="login_application">" приложения"</string>
-    <string name="login_link_stub">Здесь должна быть ссылка на политику конфиденциальности</string>
-    <string name="login_select_country">Страна</string>
-    <string name="login_select_city">Город</string>
-    <string name="login_search_placeholder">Поиск</string>
-    <string name="login_search_name">Страна и регион</string>
 
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>
@@ -122,7 +110,7 @@
     <string name="condition_free">Вход свободный</string>
     <string name="condition_divide">Сумма делиться</string>
     <string name="condition_organizer_pay">Платит организатор</string>
-    <string name="condition_member_pay">Платно</string>
+    <string name="condition_member_pay">Платят участники</string>
     <string name="condition_no_matter">Не важно</string>
     <string name="meeting_join_button_name">Присоединиться</string>
     <string name="meeting_only_organizer_label">Только для организатора</string>
@@ -138,9 +126,6 @@
     <string name="meeting_distance_from_user">От вас</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
     <string name="meeting_complain">Пожаловаться</string>
-    <string name="meeting_repeat_button">Повторить</string>
-    <string name="meeting_get_more_button">Хочу еще</string>
-    <string name="meeting_empty_meet_label">Вы просмотрели все\nактуальные meets</string>
 
     <!--Meeting Filters-->
     <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>
@@ -284,9 +269,6 @@
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
 
     <!-- Toasts -->
-    <string name="login_google_toast">Вход через Google временно недоступен</string>
-    <string name="login_apple_toast">Вход через Apple временно недоступен</string>
-    <string name="login_vk_toast">Вход через VK временно недоступен</string>
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
     <string name="login_terms_toast">Условий пока нет</string>
 
@@ -307,7 +289,8 @@
     <string name="sub_categories_walking">Прогулки</string>
 
 
+
+
     <string name="text_text">Съешь ещё этих мягких французских булок, да выпей же чаю</string>
-    <string name="empty_String"/>
 
 </resources>

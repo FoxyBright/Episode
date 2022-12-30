@@ -1,108 +1,83 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.auth.login.LoginMethod
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
+import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.textMask
-import ru.rikmasters.gilty.shared.model.login.Countries
-import ru.rikmasters.gilty.shared.model.login.Country
-import ru.rikmasters.gilty.shared.model.login.DemoCountry
 
 
 @Composable
-fun LoginScreen(nav: NavState = get()) {
+fun LoginScreen(vm: LoginViewModel) {
+    val nav = get<NavState>()
     val asm = get<AppStateModel>()
-    val context = LocalContext.current
-    var phone by remember { mutableStateOf("") }
-    var selectCountry by remember { mutableStateOf(DemoCountry) }
     val scope = rememberCoroutineScope()
-    val mask = "${selectCountry.code} ### ###-##-##"
-    val transform by remember(mask)
-    { mutableStateOf(textMask(mask)) }
-    var searchText by remember { mutableStateOf("") }
-    var searchState by remember { mutableStateOf(false) }
-    val countries = Countries()
+    val context = LocalContext.current
+    
+    val phone by vm.phone.collectAsState()
+    val country by vm.country.collectAsState()
+    val methods by vm.loginMethods.collectAsState()
+    
+    val isNextActive = remember(phone, country) {
+        val targetLength =
+            country.phoneMask.count { it == '#' } +
+                    country.clearPhoneDial.length
+        phone.length == targetLength
+    }
+    
+    LaunchedEffect(Unit) {
+        vm.loadLoginMethods()
+    }
+    
     LoginContent(LoginState(
-        transform, mask, phone,
-        selectCountry, Countries(),
-        mask.count { it == '#' }
-    ),
-        Modifier, object: LoginCallback {
-            override fun onPhoneChange(text: String) {
-                phone = text
-            }
-            
-            override fun onKeyboardDone() {
-                nav.navigate("registration/code")
-            }
-            
-            override fun onClear() {
-                phone = ""
-            }
-            
-            override fun onGoogleLogin() {
-                val toast = context.resources.getString(R.string.login_google_toast)
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onAppleLogin() {
-                val toast = context.resources.getString(R.string.login_apple_toast)
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onVkLogin() {
-                val toast = context.resources.getString(R.string.login_vk_toast)
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onPrivatePolicyClick() {
-                val toast = context.resources.getString(R.string.login_policy_toast)
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onTermsOfAppClick() {
-                val toast = context.resources.getString(R.string.login_terms_toast)
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onCountrySelector() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        CountryBottomSheetContent(
-                            CountryBottomSheetState(searchText, searchState, countries),
-                            Modifier, object: CountryBottomSheetCallBack {
-                                override fun onSearchTextChange(text: String) {
-                                    searchText = text
-                                }
-                                
-                                override fun onSearchStateChange() {
-                                    searchState = !searchState
-                                }
-                                
-                                override fun onCountrySelect(country: Country) {
-                                    selectCountry = country
-                                    scope.launch {
-                                        asm.bottomSheet.collapse()
-                                    }
-                                }
-                            })
+        phone,
+        isNextActive,
+        country,
+        methods.toList()
+    ), Modifier, object : LoginCallback {
+        
+        override fun onPhoneChange(text: String) {
+            scope.launch { vm.changePhone(text) }
+        }
+
+        override fun onClear() {
+            scope.launch { vm.clearPhone() }
+        }
+
+        override fun loginWith(method: LoginMethod) {
+            scope.launch { vm.loginVia(method) }
+        }
+
+        override fun privatePolicy() {
+            val toast = context.resources.getString(R.string.login_policy_toast)
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
+
+        override fun termsOfApp() {
+            val toast = context.resources.getString(R.string.login_terms_toast)
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
+
+        override fun changeCountry() {
+            scope.launch {
+                asm.bottomSheet.expand {
+                    Connector<CountryBsViewModel>(vm.scope) {
+                        CountryBs(it)
                     }
                 }
             }
-            
-            override fun onNext() {
-                nav.navigate("registration/code")
-            }
-        })
+        }
+
+        override fun onNext() {
+            nav.navigate("registration/code")
+        }
+    })
 }

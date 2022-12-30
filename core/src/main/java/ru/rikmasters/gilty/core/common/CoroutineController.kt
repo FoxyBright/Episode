@@ -10,7 +10,7 @@ abstract class CoroutineController {
         val DEFAULT_SINGLE_STRATEGY = Strategy.CANCEL
     }
     
-    protected val scope = CoroutineScope(SupervisorJob())
+    protected val coroutineScope = CoroutineScope(SupervisorJob())
     
     private val calls: MutableMap<String, Deferred<*>> = HashMap()
     
@@ -33,7 +33,7 @@ abstract class CoroutineController {
             }
         }
     
-        val deferred = scope.async { block() }
+        val deferred = coroutineScope.async { block() }
         calls[key] = deferred
         val res = deferred.await()
         calls.remove(key, deferred)

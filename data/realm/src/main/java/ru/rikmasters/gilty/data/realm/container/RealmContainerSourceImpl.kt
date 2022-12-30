@@ -58,8 +58,8 @@ internal class RealmContainerSourceImpl(
     
     private fun <T: Any> KClass<T>.hasPrimaryKey(): Boolean {
         if(this.allSupertypes.contains(DomainEntity::class.starProjectedType))
-            return this.declaredMemberFunctions.first { it.name == "primaryKey" }
-                .returnType.isMarkedNullable.not().also { log.v("Primary key for ${this.simpleName} = $it") }
+            return this.declaredMemberFunctions.find { it.name == "primaryKey" }
+                ?.returnType?.isMarkedNullable?.not() ?: false
         log.v("Primary key for ${this.simpleName} = false")
         return false
     }

@@ -114,7 +114,7 @@ fun MeetingCard(
                 Modifier
                     .clip(CircleShape)
                     .size(135.dp),
-                placeholder = painterResource(R.drawable.gb),
+                placeholder = painterResource(R.drawable.ic_image_box),
                 contentScale = ContentScale.Crop
             )
             val countDp = if(

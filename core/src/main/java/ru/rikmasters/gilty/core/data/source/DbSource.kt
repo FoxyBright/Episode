@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import kotlin.reflect.KClass
 
-abstract class DbSource: Source() {
+abstract class DbSource: Source {
     
     abstract suspend fun <T: DomainEntity> save(entity: T)
     

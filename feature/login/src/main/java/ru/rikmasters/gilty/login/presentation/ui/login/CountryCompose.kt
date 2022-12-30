@@ -3,13 +3,7 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -21,65 +15,70 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.login.Country
+import ru.rikmasters.gilty.login.R
+import ru.rikmasters.gilty.shared.country.Country
+import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Preview
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun CountryBottomSheetPreview() {
+private fun CountryPreview() {
     GiltyTheme {
         CountryBottomSheetContent(
             CountryBottomSheetState(
-                (""), (false), listOf()
+                "", false,
+                (0..20).map { DemoCountry }
             )
         )
     }
 }
 
-interface CountryBottomSheetCallBack {
-    fun onSearchTextChange(text: String) {}
-    fun onSearchStateChange() {}
-    fun onCountrySelect(country: Country) {}
+interface CountryCallBack {
+    fun onSearchTextChange(text: String)
+    fun onSearchStateChange()
+    fun onCountrySelect(country: Country)
 }
 
 data class CountryBottomSheetState(
     val text: String,
     val searchState: Boolean,
-    val Countries: List<Country>
+    val countries: List<Country>
 )
 
 @Composable
 fun CountryBottomSheetContent(
     state: CountryBottomSheetState,
     modifier: Modifier = Modifier,
-    callback: CountryBottomSheetCallBack? = null
+    callback: CountryCallBack? = null
 ) {
     Column(
         modifier
-            .fillMaxHeight(0.8f)
             .padding(16.dp, 20.dp)
     ) {
         SearchActionBar(SearchState(
-            stringResource(R.string.login_search_name),
+            stringResource(R.string.search_name),
             state.searchState, state.text,
             { callback?.onSearchTextChange(it) }
         ){ callback?.onSearchStateChange() })
-        if (state.Countries.isNotEmpty())
+        if (state.countries.isNotEmpty())
             LazyColumn(
                 Modifier
                     .padding(top = 10.dp)
+                    .fillMaxSize()
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                itemsIndexed(state.Countries) { index, item ->
+                itemsIndexed(
+                    state.countries,
+                    { _, it -> it.code },
+                    { _, _ -> 0 }
+                ) { index, item ->
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -95,12 +94,12 @@ fun CountryBottomSheetContent(
                         ) {
                             Row(Modifier.weight(1f)) {
                                 Image(
-                                    painterResource(item.flag),
-                                    item.country,
+                                    item.flag,
+                                    item.name,
                                     Modifier.size(24.dp)
                                 )
                                 Text(
-                                    item.country,
+                                    item.name,
                                     Modifier.padding(start = 16.dp),
                                     MaterialTheme.colorScheme.tertiary,
                                     style = MaterialTheme.typography.bodyMedium
@@ -108,7 +107,7 @@ fun CountryBottomSheetContent(
                             }
                             Row {
                                 Text(
-                                    item.code,
+                                    item.phoneDial,
                                     Modifier.padding(start = 16.dp, end = 8.dp),
                                     MaterialTheme.colorScheme.tertiary,
                                     style = MaterialTheme.typography.bodyMedium
@@ -120,7 +119,7 @@ fun CountryBottomSheetContent(
                             }
                         }
                     }
-                    if (index < state.Countries.size - 1) Divider(Modifier.padding(start = 54.dp))
+                    if (index < state.countries.size - 1) Divider(Modifier.padding(start = 54.dp))
                 }
             }
     }

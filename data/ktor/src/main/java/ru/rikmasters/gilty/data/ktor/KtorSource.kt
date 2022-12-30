@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.data.ktor
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
@@ -25,11 +26,13 @@ open class KtorSource: WebSource() {
         }
         install(HttpRequestRetry) {
             exponentialDelay()
-            maxRetries = 5
+            maxRetries = 3
             retryOnExceptionIf { _, throwable -> throwable is IOException }
         }
         install(ContentNegotiation) {
-            jackson()
+            jackson {
+                propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
+            }
         }
         defaultRequest {
             contentType(ContentType.Application.Json)
@@ -51,7 +54,7 @@ open class KtorSource: WebSource() {
                     tokenManager.getTokens()
                 }
                 refreshTokens {
-                    tokenManager.refreshTokens(unauthorizedClient)
+                    tokenManager.refreshTokens()
                 }
             }
             

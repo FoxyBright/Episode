@@ -1,20 +1,19 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.textMask
+import ru.rikmasters.gilty.shared.common.transform.transformationOf
+import ru.rikmasters.gilty.shared.country.Country
+import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.TextFieldLabel
 import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
@@ -24,11 +23,11 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun PhoneTextFieldPreview() {
     GiltyTheme {
-        val mask = "+7 ### ###-##-##"
         PhoneTextField(
             "9105152312",
-            textMask(mask),
+            DemoCountry,
             Modifier.padding(32.dp),
+            { }, { }
         )
     }
 }
@@ -36,34 +35,46 @@ private fun PhoneTextFieldPreview() {
 @Composable
 fun PhoneTextField(
     value: String,
-    transform: VisualTransformation,
+    country: Country,
     modifier: Modifier = Modifier,
-    size: Int = 10,
-    onClear: (() -> Unit)? = null,
-    onValueChanged: ((String) -> Unit)? = null,
-    onDone: (() -> Unit)? = null
+    onClear: () -> Unit,
+    onValueChanged: (String) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
+    val dial = country.phoneDial
+    val mask = remember(country.phoneMask, dial) {
+        country.phoneMask.replace(
+            dial,
+            dial.replace(Regex("\\d"), "#")
+        )
+    }
+    val length = remember(mask) {
+        mask.count { it == '#' }
+    }
+    val transform = remember(mask) {
+        transformationOf(mask)
+    }
+    
     GTextField(
         value,
         { text ->
-            if(text.length <= size && onValueChanged != null)
+            if(text.length <= length)
                 onValueChanged(text)
         }, modifier, shape = MaterialTheme.shapes.large,
         colors = TransparentTextFieldColors(),
-        label = if(value.isNotEmpty()) TextFieldLabel(
-            (true), stringResource(R.string.phone_number)
-        ) else null, placeholder = TextFieldLabel(
-            (false), stringResource(R.string.phone_number)
-        ), textStyle = MaterialTheme.typography.bodyMedium,
-        keyboardActions = KeyboardActions {
-            focusManager.clearFocus()
-            onDone?.let { it() }
-        },
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
+        label = if(value.isNotEmpty())
+            TextFieldLabel(
+                true, stringResource(R.string.phone_number)
+            )
+        else null,
+        placeholder = TextFieldLabel(
+            false, stringResource(R.string.phone_number)
+        ),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.NumberPassword
-        ), visualTransformation = transform,
-        clear = onClear, singleLine = true
+        ),
+        visualTransformation = transform,
+        clear = onClear,
+        singleLine = true
     )
 }

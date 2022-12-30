@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_via">Войти через %s</string>
+
+    <string name="login_via_google">Google</string>
+    <string name="login_via_apple">Apple</string>
+    <string name="login_via_vk">VK</string>
+
+    <string name="alternative_separator">или</string>
+
+    <string name="privacy_police_agree">Продолжая, вы соглашаетесь с %s и %s приложения</string>
+    <string name="privacy_police">\nПолитикой конфиденциальности</string>
+    <string name="terms">Условиями</string>
+
+    <string name="link_stub">Здесь должна быть ссылка на политику конфиденциальности</string>
+    <string name="search_name">Страна и регион</string>
+
+</resources>

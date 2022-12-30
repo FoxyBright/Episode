@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 // TODO транзакции (как внутренние, так и внешние)
 abstract class RealmSourceVariant(
     manager: RealmManager
-): Source() {
+): Source {
     
     companion object {
         const val DEFAULT_QUERY = "TRUEPREDICATE"

@@ -8,8 +8,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.text.isDigitsOnly
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.numberMask
-import ru.rikmasters.gilty.shared.common.extentions.textMask
+import ru.rikmasters.gilty.shared.common.transform.numberMask
+import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.PriceFieldColors
 import ru.rikmasters.gilty.shared.shared.TextFieldLabel
@@ -37,7 +37,7 @@ fun PriceTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.NumberPassword
         ), visualTransformation =
-        textMask(numberMask(value.length), if(value.isNotBlank()) " ₽" else "")
+        transformationOf(numberMask(value.length), if(value.isNotBlank()) " ₽" else "")
     
     )
 }

@@ -42,7 +42,7 @@ private fun TransparentCrossButtonPreview() {
     GiltyTheme {
         Box(Modifier.size(50.dp), Alignment.TopEnd) {
             Image(
-                painterResource(R.drawable.gb),
+                painterResource(R.drawable.ic_image_box),
                 (null), Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )

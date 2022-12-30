@@ -7,5 +7,5 @@ interface TokenManager {
     
     suspend fun getTokens(): BearerTokens
     
-    suspend fun refreshTokens(unauthorizedClient: HttpClient): BearerTokens
+    suspend fun refreshTokens(): BearerTokens
 }

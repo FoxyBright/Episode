@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -149,7 +151,7 @@ fun GTextField(
                 interactionSource, shape, colors
             ); if(value.isNotEmpty() && !isError)
             clear?.let {
-                IconButton({ it() }) {
+                IconButton({ it() }, Modifier.align(CenterEnd)) {
                     if(value.isNotEmpty()) {
                         Icon(
                             painterResource(R.drawable.ic_close),
