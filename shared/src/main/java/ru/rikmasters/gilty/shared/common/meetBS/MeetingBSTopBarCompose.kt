@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -13,7 +14,6 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
@@ -30,6 +30,8 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.Responds
+import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -81,7 +83,8 @@ data class MeetingBSTopBarState(
     val menuState: Boolean = false,
     val responds: Boolean = false,
     val respondsCount: Int? = null,
-    val lastRespond: RespondModel? = null
+    val lastRespond: RespondModel? = null,
+    val description: Boolean = false
 )
 
 @Composable
@@ -95,11 +98,16 @@ fun MeetingBSTopBarCompose(
 ) {
     val org = state.meet.organizer
     Column(modifier) {
-        Row(Modifier.fillMaxWidth(), SpaceBetween) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            SpaceBetween, CenterVertically
+        ) {
             Text(
                 state.meet.title,
                 Modifier, colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             GDropMenu(
                 state.menuState,
@@ -112,24 +120,44 @@ fun MeetingBSTopBarCompose(
         if(state.responds) Responds(
             stringResource(R.string.profile_responds_label),
             state.respondsCount,
-            state.lastRespond?.sender?.avatar
+            state.lastRespond?.sender?.avatar,
+            Modifier.padding(bottom = 12.dp)
         ) { onRespondsClick?.let { it() } }
-        Row(
-            Modifier
-                .padding(top = 12.dp)
-                .height(IntrinsicSize.Max)
-        ) {
+        Row(Modifier.height(IntrinsicSize.Max)) {
             Avatar(org.avatar, Modifier.weight(1f))
             { onAvatarClick?.let { it() } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
         }
-        Row(Modifier, Start, CenterVertically) {
-            BrieflyRow((null), ("${org.username}, ${org.age}"), org.emoji)
+        Row(
+            Modifier.padding(top = 10.dp, bottom = 12.dp),
+            Start, CenterVertically
+        ) {
+            BrieflyRow(
+                (null), ("${org.username}, ${org.age}"),
+                org.emoji
+            )
             Text(
                 state.meet.display(),
                 Modifier, colorScheme.onTertiary,
                 style = typography.labelSmall
+            )
+        }
+        if(state.description && state.meet
+                .description.isNotBlank()
+        ) Box(
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.large
+                )
+        ) {
+            Text(
+                state.meet.description,
+                Modifier.padding(14.dp),
+                colorScheme.tertiary,
+                style = typography.bodyMedium
             )
         }
     }
@@ -163,15 +191,12 @@ private fun Meet(
                 meet.category, (true),
                 Modifier.offset(12.dp, -(18).dp)
             )
-            Box(Modifier.fillMaxWidth()) {
-                MeetDetails(
-                    meet, Modifier
-                        .offset(y = -(12).dp)
-                        .align(BottomEnd)
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                )
-            }
+            MeetDetails(
+                meet, Modifier
+                    .offset(y = -(12).dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+            )
         }
     }
 }
@@ -183,7 +208,9 @@ private fun MeetDetails(
 ) {
     Column(modifier) {
         Text(
-            stringResource(R.string.meeting_profile_bottom_today_label),
+            if(todayControl(meet.dateTime))
+                stringResource(R.string.meeting_profile_bottom_today_label)
+            else meet.dateTime.dateCalendar(),
             Modifier.padding(bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
@@ -204,7 +231,7 @@ private fun MeetDetails(
                 Modifier
                     .weight(1f)
                     .padding(start = 4.dp)
-                    .clip(shapes.extraSmall)
+                    .clip(RoundedCornerShape(6.dp))
                     .background(colorScheme.outlineVariant),
                 Center
             ) {

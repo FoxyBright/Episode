@@ -182,22 +182,28 @@ fun MeetingBSMap(
             (true), shapes.medium,
             cardColors(colorScheme.primaryContainer)
         ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+            Row(
+                Modifier.padding(horizontal = 16.dp),
+                SpaceBetween, CenterVertically
             ) {
-                Text(
-                    meet.address, Modifier
-                        .padding(top = 8.dp),
-                    colorScheme.onTertiary,
-                    style = typography.headlineSmall
-                )
-                Text(
-                    meet.place, Modifier
-                        .padding(top = 2.dp, bottom = 10.dp),
-                    colorScheme.tertiary,
-                    style = typography.bodyMedium
+                Column(Modifier.fillMaxWidth().weight(1f)) {
+                    Text(
+                        meet.address, Modifier
+                            .padding(top = 8.dp),
+                        colorScheme.onTertiary,
+                        style = typography.headlineSmall
+                    )
+                    Text(
+                        meet.place, Modifier
+                            .padding(top = 2.dp, bottom = 10.dp),
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium
+                    )
+                }
+                Icon(
+                    Filled.KeyboardArrowRight,
+                    (null), Modifier,
+                    colorScheme.onTertiary
                 )
             }
         }
@@ -338,7 +344,7 @@ fun MeetingBSParticipants(
                         Icon(
                             Filled.KeyboardArrowRight,
                             (null), Modifier.padding(end = 16.dp),
-                            colorScheme.tertiary
+                            colorScheme.onTertiary
                         )
                     }
                     val subIndex = index.plus(1)

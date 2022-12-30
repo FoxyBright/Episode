@@ -66,7 +66,7 @@ fun BrieflyRow(
             emoji?.let {
                 GEmojiImage(
                     it, Modifier
-                        .padding(6.dp)
+                        .padding(start = 6.dp)
                         .size(18.dp)
                 )
             }

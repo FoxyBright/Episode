@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterConten
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsList
+import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsListCallback
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfile
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfileState
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
@@ -212,7 +213,7 @@ fun MainScreen(nav: NavState = get()) {
                                 distanceCalculator(meet)
                             ), Modifier
                                 .padding(16.dp)
-                                .padding(bottom = 40.dp),
+                                .padding(bottom = 40.dp, top = 14.dp),
                             meetBSCallback
                         )
                     }
@@ -267,7 +268,7 @@ fun MainScreen(nav: NavState = get()) {
                                 )
                             ), Modifier
                                 .padding(16.dp)
-                                .padding(bottom = 40.dp),
+                                .padding(bottom = 40.dp, top = 14.dp),
                             meetBSCallback
                         )
                     }
@@ -306,7 +307,7 @@ private fun Meet(
             DemoMemberModelList,
             distanceCalculator(meet),
             (true), (true), (true)
-        ), Modifier.padding(16.dp),
+        ), Modifier.padding(16.dp).padding(top = 14.dp),
         object: MeetingBSCallback {
             
             override fun closeAlert() {
@@ -333,22 +334,7 @@ private fun Meet(
             override fun onAllMembersClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        ParticipantsList(
-                            DemoMeetingModel, DemoMemberModelList,
-                            Modifier, {
-                                launch {
-                                    asm.bottomSheet.expand {
-                                        Meet(meet, asm, scope)
-                                    }
-                                }
-                            }, {
-                                launch {
-                                    asm.bottomSheet.expand {
-                                        Organizer(meet, asm, scope)
-                                    }
-                                }
-                            }
-                        )
+                        Participants(meet, asm, scope)
                     }
                 }
             }
@@ -380,6 +366,34 @@ private fun Meet(
                         "Вы отменили встречу",
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun Participants(
+    meet: MeetingModel,
+    asm: AppStateModel,
+    scope: CoroutineScope
+) {
+    ParticipantsList(
+        DemoMeetingModel, DemoMemberModelList,
+        Modifier, callback = object : ParticipantsListCallback{
+            override fun onBack() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Meet(meet, asm, scope)
+                    }
+                }
+            }
+        
+            override fun onMemberClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Organizer(meet, asm, scope)
+                    }
                 }
             }
         }

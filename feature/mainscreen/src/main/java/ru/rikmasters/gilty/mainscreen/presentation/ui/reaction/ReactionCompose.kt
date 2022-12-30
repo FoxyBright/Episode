@@ -1,13 +1,12 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons.Filled
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -21,6 +20,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +32,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 @Preview
@@ -97,6 +98,7 @@ fun ReactionContent(
     }
 }
 
+@SuppressLint("InvalidColorHexValue")
 @Composable
 private fun CloseButton(
     modifier: Modifier = Modifier,
@@ -118,17 +120,17 @@ private fun CloseButton(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .alpha(0.5f)
+                    .alpha(0.3f)
                     .background(
-                        colorScheme.outline,
+                        colors.meetTransparencyCircleColor,
                         CircleShape
                     )
             )
             Icon(
-                Filled.Close,
+                painterResource(R.drawable.ic_bold_cross),
                 (null), Modifier
                     .padding(10.dp)
-                    .size(20.dp),
+                    .size(10.dp),
                 White
             )
         }

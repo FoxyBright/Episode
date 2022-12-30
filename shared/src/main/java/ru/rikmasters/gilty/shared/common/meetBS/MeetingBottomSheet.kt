@@ -141,10 +141,15 @@ fun MeetingBottomSheet(
         
         item {
             MeetingBSTopBarCompose(
-                Modifier, MeetingBSTopBarState(
-                    meet, state.menuState
+                Modifier.padding(
+                    bottom = state.detailed
+                        ?.let { 28.dp } ?: 0.dp
+                ),
+                MeetingBSTopBarState(
+                    meet, state.menuState,
+                    description = state.detailed == null
                 ), { callback?.onKebabClick(it) },
-                { callback?.onMenuItemClick(it) }
+                { callback?.onMenuItemClick(it) },
             ) { callback?.onAvatarClick() }
         }
         

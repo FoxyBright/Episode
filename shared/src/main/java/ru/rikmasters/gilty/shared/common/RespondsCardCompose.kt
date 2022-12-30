@@ -45,12 +45,12 @@ fun Responds(
     text: String,
     size: Int?,
     image: ImageModel?,
+    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     Card(
-        { onClick?.let { it() } }, Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
+        { onClick?.let { it() } },
+        modifier.fillMaxWidth(),
         colors = cardColors(
             colorScheme.primaryContainer
         )
