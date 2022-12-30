@@ -5,14 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
@@ -24,11 +25,8 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.ic_calendar
-import ru.rikmasters.gilty.shared.R.drawable.ic_clock
-import ru.rikmasters.gilty.shared.R.string.complaints_moderate_sen_answer
-import ru.rikmasters.gilty.shared.R.string.complaints_send_answer
-import ru.rikmasters.gilty.shared.R.string.meeting_close_button
+import ru.rikmasters.gilty.shared.common.MeetCard
+import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -44,7 +42,7 @@ fun MainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
-                (true), Pair(true, false),
+                (true), (true),
                 DemoMeetingList, listOf(),
                 listOf(
                     INACTIVE, ACTIVE,
@@ -63,15 +61,29 @@ interface MainContentCallback {
     fun onRespond(meet: MeetingModel) {}
     fun onMeetClick(meet: MeetingModel) {}
     fun onNavBarSelect(point: Int) {}
-    fun openFiltersBottomSheet() {}
-    fun interesting(state: SwipeableCardState) {}
-    fun notInteresting(state: SwipeableCardState) {}
-    fun closeAlert()
+    fun onOpenFiltersBottomSheet() {}
+    fun onCloseAlert()
+    
+    fun onMeetsRepeatClick()
+    
+    fun onMeetMoreClick()
+    
+    fun onInteresting(
+        meet: MeetingModel,
+        state: SwipeableCardState
+    ) {
+    }
+    
+    fun onNotInteresting(
+        meet: MeetingModel,
+        state: SwipeableCardState
+    ) {
+    }
 }
 
 data class MainContentState(
     val grid: Boolean,
-    val switcher: Pair<Boolean, Boolean>,
+    val today: Boolean,
     val meetings: List<MeetingModel>,
     val cardStates: List<Pair<MeetingModel, SwipeableCardState>>,
     val navBarStates: List<NavIconState>,
@@ -79,93 +91,140 @@ data class MainContentState(
 )
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun MainContent(
     state: MainContentState,
     modifier: Modifier = Modifier,
     callback: MainContentCallback? = null,
 ) {
-    Column(modifier.background(colorScheme.background)) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp, bottom = 10.dp),
-            SpaceBetween
-        ) {
-            Row(
-                Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Bottom
-            ) {
-                GiltyString(
-                    Modifier.padding(end = 12.dp),
-                    stringResource(R.string.meeting_profile_bottom_today_label),
-                    state.switcher.first
-                ) { callback?.onTodayChange() }
-                GiltyString(
-                    Modifier,
-                    stringResource(R.string.meeting_profile_bottom_latest_label),
-                    state.switcher.second
-                ) { callback?.onTodayChange() }
+    Scaffold(modifier.background(colorScheme.background),
+        topBar = {
+            TopBar(
+                state.today, Modifier,
+                { callback?.onTodayChange() }
+            ) { callback?.onTimeFilterClick() }
+        },
+        bottomBar = {
+            Column(Modifier, Top, CenterHorizontally) {
+                // TODO - тут должен быть нормальный ботомщит с фильтрами
+                Filters { callback?.onOpenFiltersBottomSheet() }
+                NavBar(state.navBarStates)
+                { callback?.onNavBarSelect(it) }
             }
-            IconButton(
-                { callback?.onTimeFilterClick() }
-            ) {
-                Icon(
-                    if(state.switcher.first)
-                        painterResource(ic_clock)
-                    else painterResource(ic_calendar),
-                    null,
-                    Modifier.size(30.dp),
-                    colorScheme.tertiary
-                )
-            }
-        }
-        if(state.grid)
-            MeetingGridContent(
+        },
+        floatingActionButton = {
+            SquareCheckBox(!state.grid, Modifier)
+            { callback?.onStyleChange() }
+        },
+        content = { padding ->
+            Content(
+                state.grid, state.cardStates,
+                state.meetings,
                 Modifier
-                    .padding(16.dp)
-                    .fillMaxHeight(0.90f),
-                state.meetings
-            ) { callback?.onRespond(it) }
-        else {
-            MeetingsListContent(
-                state.cardStates,
-                Modifier.fillMaxHeight(0.84f),
-                { callback?.notInteresting(it) },
-                { meet, it ->
-                    callback?.onRespond(meet)
-                    callback?.interesting(it)
-                }
-            ) { callback?.onMeetClick(it) }
+                    .padding(top = padding.calculateTopPadding())
+                    .padding(bottom = padding.calculateBottomPadding() - 28.dp)
+                    .padding(horizontal = 16.dp),
+                callback
+            )
+        })
+    GAlert(
+        state.alert, { callback?.onCloseAlert() },
+        stringResource(R.string.complaints_send_answer),
+        label = stringResource(R.string.complaints_moderate_sen_answer),
+        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.onCloseAlert() }
+    )
+}
+
+@Composable
+private fun TopBar(
+    today: Boolean,
+    modifier: Modifier = Modifier,
+    onTodayChange: () -> Unit,
+    onTimeFilterClick: () -> Unit,
+) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .padding(top = 80.dp, bottom = 10.dp),
+        SpaceBetween
+    ) {
+        Row(
+            Modifier.padding(horizontal = 16.dp),
+            Start, Bottom
+        ) {
+            GiltyString(
+                Modifier.padding(end = 12.dp),
+                stringResource(R.string.meeting_profile_bottom_today_label),
+                today, onTodayChange
+            )
+            GiltyString(
+                Modifier, stringResource(R.string.meeting_profile_bottom_latest_label),
+                !today, onTodayChange
+            )
+        }
+        IconButton(onTimeFilterClick) {
+            Icon(
+                if(today) painterResource(R.drawable.ic_clock)
+                else painterResource(R.drawable.ic_calendar),
+                null,
+                Modifier.size(30.dp),
+                colorScheme.tertiary
+            )
         }
     }
-    Box(Modifier.fillMaxSize()) {
-        NavBar(
-            state.navBarStates,
-            Modifier.align(BottomCenter)
-        ) { callback?.onNavBarSelect(it) }
-        DividerBold( // TODO - тут должен быть нормальный ботомщит с фильтрами
+}
+
+@Composable
+private fun Content(
+    state: Boolean,
+    cardStates: List<Pair<MeetingModel,
+            SwipeableCardState>>,
+    meetings: List<MeetingModel>,
+    modifier: Modifier = Modifier,
+    callback: MainContentCallback?
+) {
+    if(meetings.isEmpty())
+        MeetCard(
+            modifier.fillMaxHeight(0.9f), EMPTY,
+            onMoreClick = { callback?.onMeetMoreClick() },
+            onRepeatClick = { callback?.onMeetsRepeatClick() }
+        )
+    else {
+        if(state) MeetingGridContent(
+            modifier.fillMaxSize(), meetings
+        ) { callback?.onRespond(it) }
+        else MeetingsListContent(
+            cardStates, modifier.fillMaxHeight(0.9f),
+            { meet, it ->
+                callback?.onNotInteresting(
+                    meet, it
+                )
+            },
+            { meet, it ->
+                callback?.onRespond(meet)
+                callback?.onInteresting(meet, it)
+            }
+        ) { callback?.onMeetClick(it) }
+    }
+}
+
+@Composable
+private fun Filters(
+    modifier: Modifier = Modifier,
+    onOpenFilters: () -> Unit
+) {
+    Box(modifier, BottomCenter) {
+        DividerBold(
             Modifier
-                .padding(horizontal = 180.dp)
-                .padding(bottom = 92.dp)
+                .width(40.dp)
+                .padding(bottom = 22.dp)
                 .clip(CircleShape)
-                .align(BottomCenter)
                 .pointerInput(Unit) {
                     detectVerticalDragGestures { _, _ ->
-                        callback?.openFiltersBottomSheet()
+                        onOpenFilters()
                     }
                 }
-                .clickable { callback?.openFiltersBottomSheet() }
+                .clickable { onOpenFilters() }
         )
-        SquareCheckBox(
-            !state.grid, Modifier
-                .align(BottomEnd)
-                .padding(end = 16.dp, bottom = 92.dp)
-        ) { callback?.onStyleChange() }
     }
-    GAlert(
-        state.alert, { callback?.closeAlert() },
-        stringResource(complaints_send_answer),
-        label = stringResource(complaints_moderate_sen_answer),
-        success = Pair(stringResource(meeting_close_button)) { callback?.closeAlert() }
-    )
 }

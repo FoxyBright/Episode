@@ -95,8 +95,12 @@ object Colors {
     val GentlePinky = Color(0xFFF8D3D3)
     val RudePinky = Color(0xFF330E0E)
     val AdditionalWhite = Color(0xFFFEFEFE)
+    val DoubleAddWhite = Color(0xFFEFEFEF)
     val LightGreen = Color(0xFFCFECD7)
     val BlackerWhite = Color(0xFFF0F0F0)
+    val DarkShadow = Color(0xFF212122)
+    val WhiteShadow = Color(0xFFF7F7F7)
+    val RatGray = Color(0xFF5E5E5E)
     // Add new colors
 }
 

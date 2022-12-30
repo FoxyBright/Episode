@@ -90,7 +90,7 @@ fun CategoryItem(
             Modifier
                 .size((CATEGORY_ELEMENT_SIZE / 3).dp)
                 .clip(CircleShape)
-                .background(White)
+                .background(colorScheme.primaryContainer)
                 .align(
                     if(iconBottomState)
                         BottomStart else TopEnd

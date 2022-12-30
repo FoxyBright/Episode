@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
@@ -14,15 +15,26 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
+import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsList
+import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsListCallback
+import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfile
+import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfileState
+import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
+import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
-import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.*
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.profile.DemoEmojiModel
+import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
 @Composable
 fun MainScreen(nav: NavState = get()) {
@@ -40,10 +52,24 @@ fun MainScreen(nav: NavState = get()) {
             NEW, INACTIVE
         )
     }
-    var switcher by remember {
-        mutableStateOf(Pair(true, false))
+    
+    var today by remember {
+        mutableStateOf(true)
     }
-    val meetings = DemoMeetingList
+    val meetings = remember {
+        mutableStateListOf(
+            getDemoMeetingModel(category = ART),
+            getDemoMeetingModel(category = ENTERTAINMENT, isOnline = true),
+            getDemoMeetingModel(category = BUSINESS),
+            getDemoMeetingModel(category = MASTER_CLASSES),
+            getDemoMeetingModel(category = EROTIC)
+        )
+    }
+    
+    var selectMeet by remember {
+        mutableStateOf<MeetingModel?>(null)
+    }
+    
     val context = LocalContext.current
     var alert by remember { mutableStateOf(false) }
     val cardStates =
@@ -56,6 +82,51 @@ fun MainScreen(nav: NavState = get()) {
     val meetBSCallback = object: MeetingBSCallback {
         override fun onKebabClick(state: Boolean) {
             menuState = state
+        }
+        
+        override fun onAllMembersClick() {
+            scope.launch {
+                asm.bottomSheet.expand {
+                    selectMeet?.let {
+                        ParticipantsList(
+                            DemoMeetingModel, DemoMemberModelList,
+                            Modifier, {
+                                launch {
+                                    asm.bottomSheet.expand {
+                                        Meet(it, asm, scope)
+                                    }
+                                }
+                            }, {
+                                launch {
+                                    asm.bottomSheet.expand {
+                                        Organizer(it, asm, scope)
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        override fun onMemberClick(member: MemberModel) {
+            scope.launch {
+                asm.bottomSheet.expand {
+                    selectMeet?.let {
+                        Organizer(it, asm, scope)
+                    }
+                }
+            }
+        }
+        
+        override fun onAvatarClick() {
+            selectMeet?.let {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Organizer(it, asm, scope)
+                    }
+                }
+            }
         }
         
         override fun onMenuItemClick(index: Int) {
@@ -99,7 +170,7 @@ fun MainScreen(nav: NavState = get()) {
     
     MainContent(
         MainContentState(
-            grid, switcher, meetings,
+            grid, today, meetings,
             cardStates, stateList, alert
         ), Modifier, object: MainContentCallback {
             override fun onNavBarSelect(point: Int) {
@@ -117,7 +188,21 @@ fun MainScreen(nav: NavState = get()) {
                 }
             }
             
+            override fun onMeetsRepeatClick() {
+                val list = listOf(
+                    getDemoMeetingModel(category = ART),
+                    getDemoMeetingModel(category = ENTERTAINMENT, isOnline = true),
+                    getDemoMeetingModel(category = BUSINESS),
+                    getDemoMeetingModel(category = MASTER_CLASSES),
+                    getDemoMeetingModel(category = EROTIC)
+                ); list.forEach { meetings.add(it) }
+            }
+            
+            override fun onMeetMoreClick() {
+            }
+            
             override fun onMeetClick(meet: MeetingModel) {
+                selectMeet = meet
                 clickedMeet = meet
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -128,7 +213,7 @@ fun MainScreen(nav: NavState = get()) {
                                 distanceCalculator(meet)
                             ), Modifier
                                 .padding(16.dp)
-                                .padding(bottom = 40.dp),
+                                .padding(bottom = 40.dp, top = 14.dp),
                             meetBSCallback
                         )
                     }
@@ -142,23 +227,36 @@ fun MainScreen(nav: NavState = get()) {
                 ).show()
             }
             
-            override fun closeAlert() {
+            override fun onCloseAlert() {
                 alert = false
             }
             
-            override fun interesting(state: SwipeableCardState) {
-                scope.launch { state.swipe(DirectionType.RIGHT) }
+            override fun onInteresting(
+                meet: MeetingModel,
+                state: SwipeableCardState
+            ) {
+                scope.launch {
+                    state.swipe(RIGHT)
+                    meetings.remove(meet)
+                }
             }
             
-            override fun notInteresting(state: SwipeableCardState) {
-                scope.launch { state.swipe(DirectionType.LEFT) }
+            override fun onNotInteresting(
+                meet: MeetingModel,
+                state: SwipeableCardState
+            ) {
+                scope.launch {
+                    state.swipe(LEFT)
+                    meetings.remove(meet)
+                }
             }
             
             override fun onTodayChange() {
-                switcher = Pair(!switcher.first, !switcher.second)
+                today = !today
             }
             
             override fun onRespond(meet: MeetingModel) {
+                selectMeet = meet
                 clickedMeet = meet
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -170,14 +268,14 @@ fun MainScreen(nav: NavState = get()) {
                                 )
                             ), Modifier
                                 .padding(16.dp)
-                                .padding(bottom = 40.dp),
+                                .padding(bottom = 40.dp, top = 14.dp),
                             meetBSCallback
                         )
                     }
                 }
             }
             
-            override fun openFiltersBottomSheet() {
+            override fun onOpenFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheet.expand {
                         MeetingFilterContent {
@@ -191,4 +289,163 @@ fun MainScreen(nav: NavState = get()) {
                 grid = !grid
             }
         })
+}
+
+@Composable
+private fun Meet(
+    meet: MeetingModel,
+    asm: AppStateModel = get(),
+    scope: CoroutineScope
+) {
+    val context = LocalContext.current
+    var menuState by remember { mutableStateOf(false) }
+    var alert by remember { mutableStateOf(false) }
+    
+    MeetingBottomSheet(
+        MeetingBSState(
+            menuState, meet,
+            DemoMemberModelList,
+            distanceCalculator(meet),
+            (true), (true), (true)
+        ), Modifier.padding(16.dp).padding(top = 14.dp),
+        object: MeetingBSCallback {
+            
+            override fun closeAlert() {
+                alert = false
+            }
+            
+            override fun onKebabClick(state: Boolean) {
+                menuState = state
+            }
+            
+            override fun onMenuItemClick(index: Int) {
+                menuState = false
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        ComplainsContent(DemoMeetingModel) {
+                            scope.launch {
+                                asm.bottomSheet.collapse()
+                            }; alert = true
+                        }
+                    }
+                }
+            }
+            
+            override fun onAllMembersClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Participants(meet, asm, scope)
+                    }
+                }
+            }
+            
+            override fun onMemberClick(member: MemberModel) {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Organizer(meet, asm, scope)
+                    }
+                }
+            }
+            
+            override fun onBottomButtonClick(point: Int) {
+                when(point) {
+                    1 -> Toast.makeText(
+                        context,
+                        "Вы покинули meet",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    
+                    2 -> Toast.makeText(
+                        context,
+                        "ВААААУ, Типа поделился) Съешь пирожок с полки",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    
+                    3 -> Toast.makeText(
+                        context,
+                        "Вы отменили встречу",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun Participants(
+    meet: MeetingModel,
+    asm: AppStateModel,
+    scope: CoroutineScope
+) {
+    ParticipantsList(
+        DemoMeetingModel, DemoMemberModelList,
+        Modifier, callback = object : ParticipantsListCallback{
+            override fun onBack() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Meet(meet, asm, scope)
+                    }
+                }
+            }
+        
+            override fun onMemberClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Organizer(meet, asm, scope)
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun Organizer(
+    meet: MeetingModel,
+    asm: AppStateModel = get(),
+    scope: CoroutineScope
+) {
+    val profileModel = DemoProfileModel
+    var observeState by remember { mutableStateOf(false) }
+    val currentMeetings = DemoMeetingList
+    val profileState = ProfileState(
+        name = "${profileModel.username}, ${profileModel.age}",
+        profilePhoto = profileModel.avatar.id,
+        description = profileModel.aboutMe,
+        rating = profileModel.rating.average,
+        emoji = DemoEmojiModel,
+        profileType = ProfileType.ORGANIZER,
+        observeState = observeState,
+        enabled = false
+    )
+    OrganizerProfile(
+        Modifier, OrganizerProfileState(
+            profileState, currentMeetings
+        ), object: UserProfileCallback {
+            override fun menu(state: Boolean) {}
+            override fun closeAlert() {}
+            
+            override fun onMeetingClick(meet: MeetingModel) {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Meet(meet, asm, scope)
+                    }
+                }
+            }
+            
+            override fun onBack() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Meet(meet, asm, scope)
+                    }
+                }
+            }
+            
+            override fun onObserveChange(state: Boolean) {
+                super.onObserveChange(observeState)
+                observeState = state
+            }
+        }
+    )
 }

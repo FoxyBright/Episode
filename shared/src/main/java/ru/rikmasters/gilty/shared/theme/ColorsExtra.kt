@@ -27,6 +27,9 @@ data class ExtraColors(
     val tabActiveOnline: Color = Color.Unspecified,
     val tabInactive: Color = Color.Unspecified,
     val chatBack: Color = Color.Unspecified,
+    val meetButtonColors: Color = Color.Unspecified,
+    val meetCardShadow: Color = Color.Unspecified,
+    val meetTransparencyCircleColor: Color = Color.Unspecified,
     
     // Categories Colors
     val sport: Color = Color.Unspecified,
@@ -70,6 +73,9 @@ val LightExtraColors = ExtraColors(
     tabInactive = Colors.LightGray,
     tabActiveOnline = Colors.LightGreen,
     chatBack = Colors.BlackerWhite,
+    meetButtonColors = Colors.DoubleAddWhite,
+    meetCardShadow = Colors.WhiteShadow,
+    meetTransparencyCircleColor = Colors.RatGray,
     
     // Categories Colors
     sport = Colors.Orange,
@@ -113,6 +119,9 @@ val DarkExtraColors = ExtraColors(
     tabInactive = Colors.Black,
     tabActiveOnline = Colors.LightGreen,
     chatBack = Colors.Black,
+    meetButtonColors = Colors.Lead,
+    meetCardShadow = Colors.DarkShadow,
+    meetTransparencyCircleColor = Colors.RatGray,
     
     // Categories Colors
     sport = Colors.DarkOrange,

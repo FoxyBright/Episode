@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -12,7 +14,7 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
@@ -22,16 +24,14 @@ import androidx.compose.ui.layout.ContentScale.Companion.FillHeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.string.meeting_anon_type
-import ru.rikmasters.gilty.shared.R.string.meeting_private_and_anon_type
-import ru.rikmasters.gilty.shared.R.string.meeting_private_type
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.Responds
+import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -41,7 +41,6 @@ import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 @Preview
 @Composable
@@ -84,7 +83,8 @@ data class MeetingBSTopBarState(
     val menuState: Boolean = false,
     val responds: Boolean = false,
     val respondsCount: Int? = null,
-    val lastRespond: RespondModel? = null
+    val lastRespond: RespondModel? = null,
+    val description: Boolean = false
 )
 
 @Composable
@@ -97,13 +97,17 @@ fun MeetingBSTopBarCompose(
     onAvatarClick: (() -> Unit)? = null,
 ) {
     val org = state.meet.organizer
-    val anonymous = state.meet.type == ANONYMOUS
     Column(modifier) {
-        Row(Modifier.fillMaxWidth(), SpaceBetween) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            SpaceBetween, CenterVertically
+        ) {
             Text(
                 state.meet.title,
                 Modifier, colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             GDropMenu(
                 state.menuState,
@@ -116,37 +120,61 @@ fun MeetingBSTopBarCompose(
         if(state.responds) Responds(
             stringResource(R.string.profile_responds_label),
             state.respondsCount,
-            state.lastRespond?.sender?.avatar
+            state.lastRespond?.sender?.avatar,
+            Modifier.padding(bottom = 12.dp)
         ) { onRespondsClick?.let { it() } }
-        Row(
-            Modifier
-                .padding(top = 12.dp)
-                .height(IntrinsicSize.Max)
-        ) {
+        Row(Modifier.height(IntrinsicSize.Max)) {
             Avatar(org.avatar, Modifier.weight(1f))
             { onAvatarClick?.let { it() } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
         }
-        Row(verticalAlignment = CenterVertically) {
-            BrieflyRow((null), ("${org.username}, ${org.age}"), org.emoji)
+        Row(
+            Modifier.padding(top = 10.dp, bottom = 12.dp),
+            Start, CenterVertically
+        ) {
+            BrieflyRow(
+                (null), ("${org.username}, ${org.age}"),
+                org.emoji
+            )
             Text(
-                when {
-                    anonymous && state.meet.isPrivate ->
-                        stringResource(meeting_private_and_anon_type)
-                    
-                    anonymous ->
-                        stringResource(meeting_anon_type)
-                    
-                    state.meet.isPrivate ->
-                        stringResource(meeting_private_type)
-                    
-                    else -> ""
-                }, Modifier, colorScheme.onTertiary,
+                state.meet.display(),
+                Modifier, colorScheme.onTertiary,
                 style = typography.labelSmall
             )
         }
+        if(state.description && state.meet
+                .description.isNotBlank()
+        ) Box(
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.large
+                )
+        ) {
+            Text(
+                state.meet.description,
+                Modifier.padding(14.dp),
+                colorScheme.tertiary,
+                style = typography.bodyMedium
+            )
+        }
     }
+}
+
+@Composable
+private fun MeetingModel.display(): String {
+    val anonymous = this.type == ANONYMOUS
+    val private = isPrivate
+    return stringResource(
+        when {
+            private && anonymous -> R.string.meeting_private_and_anon_type
+            anonymous -> R.string.meeting_anon_type
+            private -> R.string.meeting_private_type
+            else -> R.string.empty_String
+        }
+    )
 }
 
 @Composable
@@ -155,7 +183,7 @@ private fun Meet(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier, ThemeExtra.shapes.cardShape,
+        modifier, shapes.large,
         cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier, Top, End) {
@@ -163,15 +191,12 @@ private fun Meet(
                 meet.category, (true),
                 Modifier.offset(12.dp, -(18).dp)
             )
-            Box(Modifier.fillMaxWidth()) {
-                MeetDetails(
-                    meet, Modifier
-                        .offset(y = -(12).dp)
-                        .align(BottomEnd)
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                )
-            }
+            MeetDetails(
+                meet, Modifier
+                    .offset(y = -(12).dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+            )
         }
     }
 }
@@ -183,13 +208,13 @@ private fun MeetDetails(
 ) {
     Column(modifier) {
         Text(
-            stringResource(R.string.meeting_profile_bottom_today_label),
+            if(todayControl(meet.dateTime))
+                stringResource(R.string.meeting_profile_bottom_today_label)
+            else meet.dateTime.dateCalendar(),
             Modifier.padding(bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = Bold,
-            maxLines = 1,
-            overflow = Ellipsis
+            fontWeight = Bold
         )
         Row(Modifier, SpaceBetween) {
             DateTimeCard(
@@ -200,21 +225,21 @@ private fun MeetDetails(
                 ) else listOf(
                     meet.category.color,
                     meet.category.color
-                ), (true)
+                ), (true), Modifier.weight(1f)
             )
             Box(
                 Modifier
+                    .weight(1f)
                     .padding(start = 4.dp)
-                    .clip(shapes.extraSmall)
-                    .background(colorScheme.outlineVariant)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(colorScheme.outlineVariant),
+                Center
             ) {
                 Text(
                     meet.duration,
-                    Modifier.padding(12.dp, 6.dp),
+                    Modifier.padding(6.dp),
                     White, fontWeight = SemiBold,
-                    style = typography.labelSmall,
-                    maxLines = 1,
-                    overflow = Ellipsis
+                    style = typography.labelSmall
                 )
             }
         }

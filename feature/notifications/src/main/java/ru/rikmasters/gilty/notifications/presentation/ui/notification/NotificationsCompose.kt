@@ -147,19 +147,20 @@ private fun Notifications(
         if(state.myResponds != 0) item {
             Responds(
                 stringResource(R.string.notification_responds_on_user_meetings),
-                state.myResponds, state.lastRespond.organizer.avatar
+                state.myResponds, state.lastRespond.organizer.avatar,
+                Modifier.padding(vertical = 12.dp)
             ) { onRespondsClick?.let { it() } }
-        };if(todayList.isNotEmpty()) {; item { label(R.string.meeting_profile_bottom_today_label) }
+        };if(todayList.isNotEmpty()) {; item { Label(R.string.meeting_profile_bottom_today_label) }
         itemsIndexed(todayList) { i, not ->
             Item(i, todayList.size, not, { n -> onClick?.let { it(n) } },
                 { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
         }
-    }; if(weekList.isNotEmpty()) {; item { label(R.string.notification_on_this_week_label) }
+    }; if(weekList.isNotEmpty()) {; item { Label(R.string.notification_on_this_week_label) }
         itemsIndexed(weekList) { i, not ->
             Item(i, weekList.size, not, { n -> onClick?.let { it(n) } },
                 { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
         }
-    }; if(earlierList.isNotEmpty()) {; item { label(R.string.notification_earlier_label) }
+    }; if(earlierList.isNotEmpty()) {; item { Label(R.string.notification_earlier_label) }
         itemsIndexed(earlierList) { i, not ->
             Item(i, earlierList.size, not, { n -> onClick?.let { it(n) } },
                 { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
@@ -186,7 +187,7 @@ private fun Item(
 }
 
 @Composable
-private fun label(text: Int) {
+private fun Label(text: Int) {
     Text(
         stringResource(text), Modifier.padding(vertical = 20.dp),
         MaterialTheme.colorScheme.tertiary,

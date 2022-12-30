@@ -38,44 +38,58 @@ fun LoginScreen(nav: NavState = get()) {
         selectCountry, Countries(),
         mask.count { it == '#' }
     ),
-        Modifier, object : LoginCallback {
+        Modifier, object: LoginCallback {
             override fun onPhoneChange(text: String) {
                 phone = text
             }
-
+            
+            override fun onKeyboardDone() {
+                nav.navigate("registration/code")
+            }
+            
             override fun onClear() {
                 phone = ""
             }
-
-            override fun googleLogin() {
+            
+            override fun onGoogleLogin() {
                 val toast = context.resources.getString(R.string.login_google_toast)
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
-
-            override fun privatePolicy() {
+            
+            override fun onAppleLogin() {
+                val toast = context.resources.getString(R.string.login_apple_toast)
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            }
+            
+            override fun onVkLogin() {
+                val toast = context.resources.getString(R.string.login_vk_toast)
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            }
+            
+            override fun onPrivatePolicyClick() {
                 val toast = context.resources.getString(R.string.login_policy_toast)
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
-
-            override fun termsOfApp() {
+            
+            override fun onTermsOfAppClick() {
                 val toast = context.resources.getString(R.string.login_terms_toast)
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
-
-            override fun openCountryBottomSheet() {
+            
+            override fun onCountrySelector() {
                 scope.launch {
                     asm.bottomSheet.expand {
                         CountryBottomSheetContent(
                             CountryBottomSheetState(searchText, searchState, countries),
-                            Modifier, object : CountryBottomSheetCallBack {
+                            Modifier, object: CountryBottomSheetCallBack {
                                 override fun onSearchTextChange(text: String) {
                                     searchText = text
                                 }
-
+                                
                                 override fun onSearchStateChange() {
                                     searchState = !searchState
                                 }
-
+                                
                                 override fun onCountrySelect(country: Country) {
                                     selectCountry = country
                                     scope.launch {
@@ -86,7 +100,7 @@ fun LoginScreen(nav: NavState = get()) {
                     }
                 }
             }
-
+            
             override fun onNext() {
                 nav.navigate("registration/code")
             }

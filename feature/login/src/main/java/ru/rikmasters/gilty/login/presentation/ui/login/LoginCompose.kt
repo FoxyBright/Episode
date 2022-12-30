@@ -1,37 +1,29 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -47,29 +39,39 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun LoginPreview() {
     GiltyTheme {
         val mask = "+7 ### ###-##-##"
-        LoginContent(
-            LoginState(
-                textMask(mask), mask,
-                "9543422455", DemoCountry,
-                Countries(), 10
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(colorScheme.background)
+        ) {
+            LoginContent(
+                LoginState(
+                    textMask(mask), mask,
+                    ("9543422455"), DemoCountry,
+                    Countries(), (10)
+                )
             )
-        )
+        }
     }
 }
 
 interface LoginCallback {
+    
     fun onNext() {}
-    fun googleLogin() {}
-    fun privatePolicy() {}
-    fun termsOfApp() {}
+    fun onGoogleLogin() {}
+    fun onAppleLogin() {}
+    fun onVkLogin() {}
+    fun onPrivatePolicyClick() {}
+    fun onTermsOfAppClick() {}
     fun onPhoneChange(text: String) {}
     fun onClear() {}
-    fun openCountryBottomSheet() {} //Selector
+    fun onCountrySelector() {} 
+    fun onKeyboardDone() {}
 }
 
 data class LoginState(
@@ -91,45 +93,43 @@ fun LoginContent(
         modifier
             .fillMaxSize()
             .background(colorScheme.background),
-        Center) {
+        Center
+    ) {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = CenterHorizontally,
+            Top, CenterHorizontally,
         ) {
             Image(
                 painterResource(R.drawable.ic_logo),
-                stringResource(R.string.gilty_logo)
+                stringResource(R.string.gilty_logo),
+                Modifier.padding(bottom = 90.dp)
             )
-            Box(
-                Modifier
-                    .padding(top = 80.dp)
-                    .clip(MaterialTheme.shapes.extraSmall)
-            ) {
+            Box(Modifier.clip(shapes.extraSmall)) {
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .background(colorScheme.onPrimaryContainer),
-                    verticalAlignment = Alignment.CenterVertically
+                    Start, CenterVertically
                 ) {
                     Image(
                         painterResource(state.country.flag),
                         stringResource(R.string.login_select_country),
                         Modifier
-                            .padding(start = 10.dp)
+                            .padding(start = 12.dp)
+                            .padding(vertical = 20.dp)
                             .size(20.dp)
                             .clickable
-                            { callback?.openCountryBottomSheet() }
-                    )
-                    PhoneTextField(
-                        state.phone, state.transform,
-                        Modifier.fillMaxWidth(), state.size,
-                        { callback?.onClear() },
-                        { callback?.onPhoneChange(it) })
+                            { callback?.onCountrySelector() }
+                    ); PhoneTextField(
+                    state.phone, state.transform,
+                    Modifier.fillMaxWidth(), state.size,
+                    { callback?.onClear() },
+                    { callback?.onPhoneChange(it) })
+                { callback?.onKeyboardDone() }
                 }
-            }
-            Buttons(Modifier.padding(top = 32.dp), state, callback)
+            }; Buttons(Modifier.padding(top = 20.dp), callback)
         }
         ConfirmationPolicy(
             Modifier
@@ -145,36 +145,69 @@ fun LoginContent(
 @Composable
 private fun Buttons(
     modifier: Modifier = Modifier,
-    state: LoginState,
-    callback: LoginCallback? = null
+    callback: LoginCallback? = null,
+    active: Boolean = true
 ) {
     Column(modifier, Top, CenterHorizontally) {
         GradientButton(
-            Modifier, stringResource(R.string.next_button),
-            /*(state.phone.length > 9)*/ true, // TODO активность кнопки
+            Modifier, stringResource(R.string.next_button), active,
         ) { callback?.onNext() }
         Text(
             stringResource(R.string.login_alternative_separator),
-            Modifier.padding(top = 20.dp),
+            Modifier.padding(vertical = 20.dp),
             style = typography.labelSmall,
             color = colorScheme.onTertiary
         )
-        Button(
-            { callback?.googleLogin() },
-            Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(Color.Transparent)
-        ) {
-            Image(
-                painterResource(R.drawable.ic_google),
-                stringResource(R.string.google_login),
-                Modifier.padding(end = 8.dp)
-            )
-            Text(
-                stringResource(R.string.google_login),
-                style = typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.tertiary
-            )
+        AlternativeButton(
+            stringResource(R.string.google_login),
+            R.drawable.ic_google,
+        ) { callback?.onGoogleLogin() }
+        AlternativeButton(
+            stringResource(R.string.apple_login),
+            R.drawable.ic_apple,
+            Modifier.padding(vertical = 12.dp),
+            ColorFilter.tint(colorScheme.tertiary)
+        ) { callback?.onAppleLogin() }
+        AlternativeButton(
+            stringResource(R.string.vk_login),
+            R.drawable.ic_vk,
+        ) { callback?.onVkLogin() }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun AlternativeButton(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    filter: ColorFilter? = null,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick, modifier, (true), CircleShape,
+        cardColors(colorScheme.primaryContainer)
+    ) {
+        Box(Modifier.fillMaxWidth(), Center) {
+            Row(
+                Modifier
+                    .width(250.dp)
+                    .padding(16.dp),
+                Start,
+                CenterVertically
+            ) {
+                Image(
+                    painterResource(icon),
+                    (null), Modifier.size(24.dp),
+                    colorFilter = filter
+                )
+                Text(
+                    text, Modifier.padding(start = 20.dp),
+                    colorScheme.tertiary,
+                    style = typography.bodyMedium,
+                    fontWeight = Bold
+                )
+            }
         }
     }
 }
@@ -202,9 +235,9 @@ private fun ConfirmationPolicy(
     ClickableText(annotatedText, modifier, typography) {
         annotatedText.getStringAnnotations(
             "terms", it, it
-        ).firstOrNull()?.let { callback?.termsOfApp() }
+        ).firstOrNull()?.let { callback?.onTermsOfAppClick() }
         annotatedText.getStringAnnotations(
             "policy", it, it
-        ).firstOrNull()?.let { callback?.privatePolicy() }
+        ).firstOrNull()?.let { callback?.onPrivatePolicyClick() }
     }
 }

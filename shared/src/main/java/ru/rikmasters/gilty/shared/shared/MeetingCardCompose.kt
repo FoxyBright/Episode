@@ -105,7 +105,7 @@ fun MeetingCard(
         }
         Box(
             Modifier
-                .offset(-(20).dp, 10.dp)
+                .offset(-(26).dp, 10.dp)
                 .width(180.dp)
         ) {
             AsyncImage(

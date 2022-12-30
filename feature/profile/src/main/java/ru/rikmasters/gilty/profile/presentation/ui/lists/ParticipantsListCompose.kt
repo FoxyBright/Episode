@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.profile.presentation.ui.lists
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,13 +28,20 @@ private fun ParticipantsListPreview() {
     GiltyTheme { ParticipantsList(DemoMeetingModel, DemoMemberModelList) }
 }
 
+interface ParticipantsListCallback {
+    
+    fun onBack() {}
+    fun onMemberClick() {}
+}
+
 @Composable
 fun ParticipantsList(
     meet: MeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    onMemberClick: (() -> Unit)? = null
+    onMemberClick: (() -> Unit)? = null,
+    callback: ParticipantsListCallback? = null
 ) {
     LazyColumn(
         modifier
@@ -47,7 +53,10 @@ fun ParticipantsList(
             RowActionBar(
                 stringResource(R.string.meeting_members),
                 "${membersList.size}/${meet.memberCount}"
-            ) { onBack?.let { it() } }
+            ) {
+                onBack?.let { it() }
+                callback?.onBack()
+            }
         }
         itemsIndexed(membersList) { index, member ->
             Card(
@@ -63,9 +72,7 @@ fun ParticipantsList(
                 BrieflyRow(
                     meet.organizer.avatar,
                     "${member.username}, ${member.age}",
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clickable { onMemberClick?.let { it() } }
+                    modifier = Modifier.padding(16.dp)
                 ); if(index < membersList.size - 1)
                 Divider(Modifier.padding(start = 60.dp))
             }

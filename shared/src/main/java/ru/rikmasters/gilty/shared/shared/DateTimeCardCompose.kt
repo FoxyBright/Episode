@@ -44,7 +44,7 @@ fun DateTimeCard(
         modifier
             .background(
                 Brush.linearGradient(color),
-                shapes.large
+                shapes.medium
             ),
         Alignment.Center
     ) {
