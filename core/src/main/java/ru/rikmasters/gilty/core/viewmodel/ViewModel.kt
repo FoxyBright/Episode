@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.core.viewmodel
 
+import android.content.Context
+import androidx.annotation.StringRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.scope.Scope
@@ -17,6 +19,10 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
     protected suspend fun event(key: String) = event(key to null)
     protected suspend fun event(pair: Pair<String, Any?>) = event(Event(pair))
     private suspend fun event(data: Event) = _events.emit(data)
+    
+    protected suspend fun makeToast(text: String) = event("toast" to text)
+    protected suspend fun makeToast(@StringRes text: Int) =
+        makeToast(getKoin().get<Context>().getString(text))
     
     
     private val loadingMut = MutableStateFlow(false)

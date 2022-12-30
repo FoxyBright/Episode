@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":feature:notifications"))
     implementation(project(":feature:animated"))
     
+    implementation(project(":data:shared"))
     implementation(project(":data:realm"))
     implementation(project(":data:ktor"))
 }

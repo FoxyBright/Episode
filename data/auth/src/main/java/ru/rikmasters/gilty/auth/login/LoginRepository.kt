@@ -6,6 +6,7 @@ import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
+import ru.rikmasters.gilty.shared.BuildConfig
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class LoginRepository(
@@ -20,8 +21,8 @@ class LoginRepository(
         webSource.unauthorizedClient.get("/auth/externals") {
             url {
                 query(
-                    "client_id" to TokenStore.CLIENT_ID,
-                    "client_secret" to TokenStore.CLIENT_SECRET,
+                    "client_id" to BuildConfig.CLIENT_ID,
+                    "client_secret" to BuildConfig.CLIENT_SECRET,
                     "state" to state
                 )
             }

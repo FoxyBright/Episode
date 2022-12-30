@@ -22,6 +22,7 @@ import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.util.composable.getOrNull
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 

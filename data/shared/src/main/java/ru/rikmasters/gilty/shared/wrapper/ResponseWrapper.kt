@@ -1,15 +1,31 @@
 package ru.rikmasters.gilty.shared.wrapper
 
+import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonKey
+import com.fasterxml.jackson.annotation.JsonValue
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 
 data class ResponseWrapper<T: Any?>(
-    val status: String,
-    val data: T
+    val status: Status,
+    val data: T,
+    val error: Error?
 ) {
+    enum class Status {
+        @JsonAlias("success")
+        SUCCESS,
+        @JsonAlias("error")
+        ERROR
+    }
+    
+    data class Error(
+        val code: String,
+        val message: String
+    )
+    
     val dataChecked: T get() {
-        if(status != "success")
-            throw NotSuccessException(status)
+        if(status != Status.SUCCESS)
+            throw NotSuccessException(status, error)
         return data
     }
 }
