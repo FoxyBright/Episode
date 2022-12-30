@@ -13,7 +13,7 @@ fun CategoriesScreen(nav: NavState = get()) {
         CategoriesState(CategoriesType.list(), listOf()),
         object: CategoriesCallback {
             override fun onBack() {
-                nav.navigate("personal")
+                nav.navigationBack()
             }
             
             override fun onNext() {

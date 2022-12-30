@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.code
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CodeScreen(nav: NavState = get()) {
     val codeSize = 4
@@ -28,7 +30,7 @@ fun CodeScreen(nav: NavState = get()) {
     }
     CodeContent(CodeState(text, focuses, sec, blur.value), Modifier, object : CodeCallback {
         override fun onBack() {
-            nav.navigateAbsolute("authorization")
+            nav.navigationBack()
         }
 
         override fun onBlur() {

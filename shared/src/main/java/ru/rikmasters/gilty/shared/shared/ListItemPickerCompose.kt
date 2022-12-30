@@ -1,40 +1,24 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationResult
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.DecayAnimationSpec
-import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -56,8 +40,8 @@ fun <T> ListItemPicker(
     value: T, list: List<T>,
     modifier: Modifier = Modifier,
     label: (T) -> String = { it.toString() },
-    dividersColor: Color = MaterialTheme.colorScheme.outline,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    dividersColor: Color = colorScheme.outline,
+    textStyle: TextStyle = typography.bodyMedium,
     onValueChange: (T) -> Unit,
 ) {
     val minimumAlpha = 0.3f
@@ -65,9 +49,9 @@ fun <T> ListItemPicker(
     val numbersColumnHeight = 80.dp
     val halfNumbersColumnHeight = numbersColumnHeight / 2
     val halfNumbersColumnHeightPx = with(LocalDensity.current) { halfNumbersColumnHeight.toPx() }
-
+    
     val coroutineScope = rememberCoroutineScope()
-
+    
     val animatedOffset = remember { Animatable(0f) }
         .apply {
             val index = list.indexOf(value)
@@ -77,15 +61,15 @@ fun <T> ListItemPicker(
             }
             updateBounds(offsetRange.first, offsetRange.second)
         }
-
+    
     val coercedAnimatedOffset = animatedOffset.value % halfNumbersColumnHeightPx
-
+    
     val indexOfElement =
         getItemIndexForOffset(list, value, animatedOffset.value, halfNumbersColumnHeightPx)
-
+    
     var dividersWidth by remember { mutableStateOf(0.dp) }
-
-
+    
+    
     Layout(
         {
             Box(
@@ -101,18 +85,18 @@ fun <T> ListItemPicker(
             ) {
                 val baseLabelModifier = Modifier.align(Alignment.Center)
                 ProvideTextStyle(textStyle) {
-                    if (indexOfElement > 0)
-                        Label(
-                            text = label(list.elementAt(indexOfElement - 1)),
-                            modifier = baseLabelModifier
-                                .offset(y = -halfNumbersColumnHeight)
-                                .alpha(
-                                    maxOf(
-                                        minimumAlpha,
-                                        coercedAnimatedOffset / halfNumbersColumnHeightPx
-                                    )
+                    if(indexOfElement > 0) Label(
+                        text = label(list.elementAt(indexOfElement - 1)),
+                        modifier = baseLabelModifier
+                            .offset(y = -halfNumbersColumnHeight)
+                            .alpha(
+                                maxOf(
+                                    minimumAlpha,
+                                    coercedAnimatedOffset / halfNumbersColumnHeightPx
                                 )
-                        )
+                            ),
+                        typography.bodyLarge
+                    )
                     Label(
                         text = label(list.elementAt(indexOfElement)),
                         modifier = baseLabelModifier
@@ -121,20 +105,21 @@ fun <T> ListItemPicker(
                                     minimumAlpha,
                                     1 - abs(coercedAnimatedOffset) / halfNumbersColumnHeightPx
                                 ))
-                            )
+                            ),
+                        typography.displayLarge
                     )
-                    if (indexOfElement < list.count() - 1)
-                        Label(
-                            text = label(list.elementAt(indexOfElement + 1)),
-                            modifier = baseLabelModifier
-                                .offset(y = halfNumbersColumnHeight)
-                                .alpha(
-                                    maxOf(
-                                        minimumAlpha,
-                                        -coercedAnimatedOffset / halfNumbersColumnHeightPx
-                                    )
+                    if(indexOfElement < list.count() - 1) Label(
+                        text = label(list.elementAt(indexOfElement + 1)),
+                        modifier = baseLabelModifier
+                            .offset(y = halfNumbersColumnHeight)
+                            .alpha(
+                                maxOf(
+                                    minimumAlpha,
+                                    -coercedAnimatedOffset / halfNumbersColumnHeightPx
                                 )
-                        )
+                            ),
+                        typography.bodyLarge
+                    )
                 }
             }
             Box(
@@ -172,7 +157,7 @@ fun <T> ListItemPicker(
                                 coercedPoint + base
                             }
                         ).endState.value
-
+                    
                         val result = list.elementAt(
                             getItemIndexForOffset(list, value, endValue, halfNumbersColumnHeightPx)
                         )
@@ -189,13 +174,13 @@ fun <T> ListItemPicker(
             // Measure each children
             measurable.measure(constraints)
         }
-
+        
         dividersWidth = placeables
             .drop(1)
             .first()
             .width
             .toDp()
-
+        
         // Set the size of the layout as big as it can
         layout(dividersWidth.toPx().toInt(), placeables
             .sumOf {
@@ -204,13 +189,13 @@ fun <T> ListItemPicker(
         ) {
             // Track the y co-ord we have placed children up to
             var yPosition = 0
-
+            
             // Place children in the parent layout
             placeables.forEach { placeable ->
-
+                
                 // Position item on the screen
                 placeable.placeRelative(x = 0, y = yPosition)
-
+                
                 // Record the y co-ord placed up to
                 yPosition += placeable.height
             }
@@ -219,15 +204,15 @@ fun <T> ListItemPicker(
 }
 
 @Composable
-private fun Label(text: String, modifier: Modifier) {
+private fun Label(
+    text: String,
+    modifier: Modifier,
+    textStyle: TextStyle
+) {
     Text(
-        text,
-        modifier.pointerInput(Unit) {
-            detectTapGestures(onLongPress = {
-                // FIXME: Empty to disable text selection
-            })
-        }, color = MaterialTheme.colorScheme.tertiary,
-        textAlign = TextAlign.Center,
+        text, modifier, colorScheme.tertiary,
+        textAlign = Center,
+        style = textStyle
     )
 }
 
@@ -239,7 +224,7 @@ private suspend fun Animatable<Float, AnimationVector1D>.fling(
 ): AnimationResult<Float, AnimationVector1D> {
     val targetValue = animationSpec.calculateTargetValue(value, initialVelocity)
     val adjustedTarget = adjustTarget?.invoke(targetValue)
-    return if (adjustedTarget != null) {
+    return if(adjustedTarget != null) {
         animateTo(
             adjustedTarget,
             initialVelocity = initialVelocity,

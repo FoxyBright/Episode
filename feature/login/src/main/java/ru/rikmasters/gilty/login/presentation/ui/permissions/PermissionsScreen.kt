@@ -16,7 +16,7 @@ fun PermissionsScreen(nav: NavState = get()) {
     val state = PermissionsState(geopositionState, notificationState)
     PermissionsContent(state, Modifier, object : PermissionsCallback {
         override fun onBack() {
-            nav.navigate("categories")
+            nav.navigationBack()
         }
 
         override fun geopositionChange() {

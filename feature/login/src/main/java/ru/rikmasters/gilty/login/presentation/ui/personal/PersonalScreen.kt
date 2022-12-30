@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.personal
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +13,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun PersonalScreen(nav: NavState = get()) {
     var age by remember { mutableStateOf<Int?>(null) }
@@ -22,7 +24,7 @@ fun PersonalScreen(nav: NavState = get()) {
         PersonalInfoContentState(age, list),
         object : PersonalInfoContentCallback {
             override fun onBack() {
-                nav.navigate("profile")
+                nav.navigationBack()
             }
 
             override fun onAgeClick() {

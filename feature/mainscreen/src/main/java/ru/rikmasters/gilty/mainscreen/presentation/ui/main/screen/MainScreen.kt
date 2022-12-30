@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBS
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsList
@@ -70,7 +71,6 @@ fun MainScreen(nav: NavState = get()) {
         mutableStateOf<MeetingModel?>(null)
     }
     
-    val context = LocalContext.current
     var alert by remember { mutableStateOf(false) }
     val cardStates =
         meetings.map { it to rememberSwipeableCardState() }
@@ -221,10 +221,17 @@ fun MainScreen(nav: NavState = get()) {
             }
             
             override fun onTimeFilterClick() {
-                Toast.makeText(
-                    context, "Тут будет фильтрация по дате и времени",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if(today) {
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            TimeBS {
+                                scope.launch {
+                                    asm.bottomSheet.collapse()
+                                }
+                            }
+                        }
+                    }
+                } 
             }
             
             override fun onCloseAlert() {
@@ -307,7 +314,10 @@ private fun Meet(
             DemoMemberModelList,
             distanceCalculator(meet),
             (true), (true), (true)
-        ), Modifier.padding(16.dp).padding(top = 14.dp),
+        ),
+        Modifier
+            .padding(16.dp)
+            .padding(top = 14.dp),
         object: MeetingBSCallback {
             
             override fun closeAlert() {
@@ -380,7 +390,7 @@ private fun Participants(
 ) {
     ParticipantsList(
         DemoMeetingModel, DemoMemberModelList,
-        Modifier, callback = object : ParticipantsListCallback{
+        Modifier, callback = object: ParticipantsListCallback {
             override fun onBack() {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -388,7 +398,7 @@ private fun Participants(
                     }
                 }
             }
-        
+            
             override fun onMemberClick() {
                 scope.launch {
                     asm.bottomSheet.expand {

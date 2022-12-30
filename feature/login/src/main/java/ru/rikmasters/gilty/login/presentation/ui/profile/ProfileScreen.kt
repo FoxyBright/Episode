@@ -22,7 +22,7 @@ fun ProfileScreen(
     val profileState = ProfileState(
         name.value, if (hiddenPhoto == "") Hidden else hiddenPhoto,
         if (photo == "") Avatar else photo,
-        description.value, "4.9",
+        description.value, "0.0",
         emoji = EmojiList.first(),
         enabled = true,
         occupiedName = occupiedName.value
@@ -48,7 +48,7 @@ fun ProfileScreen(
         }
 
         override fun onBack() {
-            nav.navigateAbsolute("authorization")
+            nav.navigationBack()
         }
 
         override fun onNext() {
