@@ -183,29 +183,26 @@ private fun Content(
     modifier: Modifier = Modifier,
     callback: MainContentCallback?
 ) {
-    if(meetings.isEmpty())
-        MeetCard(
-            modifier.fillMaxHeight(0.9f), EMPTY,
-            onMoreClick = { callback?.onMeetMoreClick() },
-            onRepeatClick = { callback?.onMeetsRepeatClick() }
-        )
-    else {
-        if(state) MeetingGridContent(
-            modifier.fillMaxSize(), meetings
-        ) { callback?.onRespond(it) }
-        else MeetingsListContent(
-            cardStates, modifier.fillMaxHeight(0.9f),
-            { meet, it ->
-                callback?.onNotInteresting(
-                    meet, it
-                )
-            },
-            { meet, it ->
-                callback?.onRespond(meet)
-                callback?.onInteresting(meet, it)
-            }
-        ) { callback?.onMeetClick(it) }
-    }
+    if(meetings.size <= 2) MeetCard(
+        modifier.fillMaxHeight(0.9f), EMPTY,
+        onMoreClick = { callback?.onMeetMoreClick() },
+        onRepeatClick = { callback?.onMeetsRepeatClick() }
+    )
+    if(state) MeetingGridContent(
+        modifier.fillMaxSize(), meetings
+    ) { callback?.onRespond(it) }
+    else MeetingsListContent(
+        cardStates, modifier.fillMaxHeight(0.9f),
+        { meet, it ->
+            callback?.onNotInteresting(
+                meet, it
+            )
+        },
+        { meet, it ->
+            callback?.onRespond(meet)
+            callback?.onInteresting(meet, it)
+        }
+    ) { callback?.onMeetClick(it) }
 }
 
 @Composable

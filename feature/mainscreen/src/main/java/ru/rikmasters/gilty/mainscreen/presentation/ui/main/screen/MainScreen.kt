@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.GCalendarWidget
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBS
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
@@ -44,6 +45,8 @@ fun MainScreen(nav: NavState = get()) {
     var commentText by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val daysList =
+        remember { mutableStateListOf<String>() }
     var grid by remember {
         mutableStateOf(false)
     }
@@ -221,17 +224,26 @@ fun MainScreen(nav: NavState = get()) {
             }
             
             override fun onTimeFilterClick() {
-                if(today) {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            TimeBS {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        if(today) TimeBS {
+                            scope.launch {
+                                asm.bottomSheet.collapse()
+                            }
+                        }
+                        else GCalendarWidget(
+                            Modifier.padding(16.dp), daysList,
+                            {
+                                if(daysList.contains(it)) daysList.remove(it)
+                                else daysList.add(it)
+                            }, {
                                 scope.launch {
                                     asm.bottomSheet.collapse()
                                 }
-                            }
-                        }
+                            })
+                        { daysList.clear() }
                     }
-                } 
+                }
             }
             
             override fun onCloseAlert() {

@@ -2,6 +2,7 @@
 
 package ru.rikmasters.gilty.shared.common.extentions
 
+import android.annotation.SuppressLint
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.display
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,6 +26,7 @@ const val MILLIS_IN_DAY = 86_400_000
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 interface LocalDateCallBack {
+    
     fun year(date: Long): Int
     fun month(date: Long): Int
     fun day(date: Long): Int
@@ -40,7 +42,7 @@ interface LocalDateCallBack {
     fun dayOfWeek(date: Long): DayOfWeek
 }
 
-private val dateCallback = object : LocalDateCallBack {
+private val dateCallback = object: LocalDateCallBack {
     override fun year(date: Long): Int = part(date, "yyyy")
     override fun month(date: Long): Int = part(date, "MM")
     override fun day(date: Long): Int = part(date, "dd")
@@ -58,12 +60,13 @@ private val dateCallback = object : LocalDateCallBack {
 
 class LocalDate(private var millis: Long) {
     companion object {
+        
         /** Создает объект с указанными данными **/
         fun of(date: String) = LocalDate(date.long())
-
+        
         fun of(year: Int, month: Int = 1, day: Int = 1) =
             LocalDate("$year-$month-$day".long())
-
+        
         /** Выдает экземпляр с текущей датой **/
         private val now = c.time
         fun now() = LocalDate(
@@ -71,38 +74,53 @@ class LocalDate(private var millis: Long) {
                 now.month + 1
             }-${now.date}".long()
         )
-
+        
         val MIN = LocalDate(Long.MIN_VALUE)
-
+        
         val MAX = LocalDate(Long.MAX_VALUE)
     }
-
+    
     /** Возвращает дату в виде строки **/
     override fun toString() = LocalDate(millis).format(DATE_FORMAT)
-
+    
+    /** Возвращает количество дней в месяце **/
+    fun lengthOfMounth(): Int {
+        val cal = Calendar.getInstance()
+        cal.time = Date(this.toString().long())
+        return cal.getActualMaximum(DAY_OF_MONTH)
+    }
+    
+    fun monthName() = Month.of(this.month()).display()
+    
+    fun atStartOfMounth() = if(this.day() == 1) this
+        else this.minusDays(this.day() - 1)
+    
+    fun firstDayOfWeek() = this.atStartOfMounth().dayOfWeek()
+    
+    
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis).format(pattern)
-
+    
     /** Возвращает дату на начало дня */
     fun atStartOfDay() = LocalDateTime.of(LocalDate(millis), LocalTime(0))
-
+    
     /** Возвращает true если дата меньше, чем указаная для сравнения */
     fun isBefore(to: LocalDate) = Date(millis).before(Date(to.millis()))
-
+    
     /** Возвращает true если дата больше, чем указаная для сравнения */
     fun isAfter(to: LocalDate) = Date(millis).after(Date(to.millis()))
-
+    
     /** Возвращает -1    \    0    \     1 в зависимости от того равны даты или одна из них больше или меньше */
     fun compareTo(comp: LocalDate) =
         dateCallback.compareTo(millis, comp.millis())
-
+    
     fun dayOfYear(): Int {
         val cal = Calendar.getInstance()
         cal.clear()
         cal.time = Date(this.millis())
         return cal.get(Calendar.DAY_OF_YEAR)
     }
-
+    
     fun fistDayOfWeek(): LocalDate {
         val cal = Calendar.getInstance()
         cal.time = Date(this.millis())
@@ -111,45 +129,45 @@ class LocalDate(private var millis: Long) {
         cal.set(Calendar.WEEK_OF_MONTH, week)
         return LocalDate(cal.time.time)
     }
-
+    
     /** Прибавляет к дате день/месяц/год **/
     fun plusYears(count: Int) =
         LocalDate(dateCallback.plusYear(millis, count))
-
+    
     fun plusMonths(count: Int) =
         LocalDate(dateCallback.plusMonth(millis, count))
-
+    
     fun plusDays(count: Int) =
         LocalDate(dateCallback.plusDay(millis, count))
-
+    
     fun plusWeeks(count: Int) =
         LocalDate(dateCallback.plusDay(millis, 7) * count)
-
+    
     /** Отнимает от даты день/месяц/год **/
     fun minusYears(count: Int) =
         LocalDate(dateCallback.minusYear(millis, count))
-
+    
     fun minusMonths(count: Int) =
         LocalDate(dateCallback.minusMonth(millis, count))
-
+    
     fun minusDays(count: Int) =
         LocalDate(dateCallback.minusDay(millis, count))
-
+    
     /** Возвращает день/месяц/год от даты или дату в милисекундах **/
     fun year() = dateCallback.year(millis)
     fun month() = dateCallback.month(millis)
     fun day() = dateCallback.day(millis)
     fun dayOfWeek() = dateCallback.dayOfWeek(millis)
     fun millis() = millis
-
+    
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if(this === other) return true
+        if(javaClass != other?.javaClass) return false
         other as LocalDate
-        if (millis != other.millis) return false
+        if(millis != other.millis) return false
         return true
     }
-
+    
     override fun hashCode(): Int {
         return millis.hashCode()
     }
@@ -159,6 +177,7 @@ class LocalDate(private var millis: Long) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 interface LocalTimeCallBack {
+    
     fun hour(date: Long): Int
     fun minute(date: Long): Int
     fun second(date: Long): Int
@@ -171,7 +190,7 @@ interface LocalTimeCallBack {
     fun compareTo(date: Long, comp: Long): Int
 }
 
-private val timeCallback = object : LocalTimeCallBack {
+private val timeCallback = object: LocalTimeCallBack {
     override fun hour(date: Long) = part(date, "HH")
     override fun minute(date: Long) = part(date, "mm")
     override fun second(date: Long) = part(date, "ss")
@@ -186,44 +205,44 @@ private val timeCallback = object : LocalTimeCallBack {
 
 class LocalTime(private var millis: Long) {
     companion object {
-
+        
         /** Создает объект с указанными данными **/
         fun of(time: String) = LocalTime(time.long())
         fun of(hour: Int, minute: Int = 0, second: Int = 0) =
             LocalTime("$hour:$minute:$second".pattern(TIME_FORMAT) - offset)
-
+        
         /** Выдает экземпляр с текущей датой **/
         fun now() = LocalTime(c.time.time)
     }
-
+    
     /** Возвращает дату в виде строки **/
     override fun toString() = Date(millis + offset).format(TIME_FORMAT)
-
+    
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis).format(pattern)
-
+    
     fun compareTo(comp: LocalTime) = timeCallback.compareTo(millis, comp.millis())
-
+    
     /** Прибавляет к дате день/месяц/год **/
     fun plusHour(count: Int) =
         LocalTime(timeCallback.plusHour(millis, count))
-
+    
     fun plusMinute(count: Int) =
         LocalTime(timeCallback.plusMinute(millis, count))
-
+    
     fun plusSecond(count: Int) =
         LocalTime(timeCallback.plusSecond(millis, count))
-
+    
     /** Отнимает от даты день/месяц/год **/
     fun minusHour(count: Int) =
         LocalTime(timeCallback.minusHour(millis, count))
-
+    
     fun minusMinute(count: Int) =
         LocalTime(timeCallback.minusMinute(millis, count))
-
+    
     fun minusSecond(count: Int) =
         LocalTime(timeCallback.minusSecond(millis, count))
-
+    
     /** Возвращает день/месяц/год от даты или дату в милисекундах **/
     fun hour() = timeCallback.hour(millis)
     fun minute() = timeCallback.minute(millis)
@@ -240,16 +259,16 @@ val offset = c.get(Calendar.ZONE_OFFSET)
 class LocalDateTime(
     private val millis: Long
 ) {
-
+    
     /** Возвращает дату в виде строки **/
     override fun toString() = Date(millis + offset)
         .format(FULL_DATE_FORMAT_WIDTH_ZONE)
-
+    
     companion object {
-
+        
         /** Создает объект с указанными данными **/
         fun of(datetime: String) = LocalDateTime(datetime.long())
-
+        
         /** Создает объект с указанными данными **/
         fun of(localDate: LocalDate, localTime: LocalTime) = of(
             "${localDate.year()}-${localDate.month()}-${
@@ -258,21 +277,21 @@ class LocalDateTime(
                 localTime.second()
             }"
         )
-
+        
         /** Создает объект с указанными данными **/
         fun of(
             year: Int, month: Int = 1, day: Int = 1,
             hour: Int = 1, minute: Int = 1, second: Int = 1
         ) = of("$year-$month-$day" + "T" + "$hour:$minute:$second")
-
-
+        
+        
         /** Выдает экземпляр с текущей датой **/
         fun now() = LocalDateTime(c.time.time)
     }
-
+    
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis + offset).format(pattern)
-
+    
     /** Возвращает указанную часть даты **/
     fun year() = dateCallback.year(millis)
     fun month() = dateCallback.month(millis)
@@ -281,7 +300,7 @@ class LocalDateTime(
     fun minute() = timeCallback.minute(millis)
     fun second() = timeCallback.second(millis)
     fun millis() = millis
-
+    
     /** Прибавляет к дате выбранное количество единиц **/
     fun plusYear(count: Int) = LocalDateTime(dateCallback.plusYear(millis, count))
     fun plusMonth(count: Int) = LocalDateTime(dateCallback.plusMonth(millis, count))
@@ -289,7 +308,7 @@ class LocalDateTime(
     fun plusHour(count: Int) = LocalDateTime(timeCallback.plusHour(millis, count))
     fun plusMinute(count: Int) = LocalDateTime(timeCallback.plusMinute(millis, count))
     fun plusSecond(count: Int) = LocalDateTime(timeCallback.plusSecond(millis, count))
-
+    
     /** Отнимает от даты выбранное количество единиц **/
     fun minusYear(count: Int) = LocalDateTime(dateCallback.minusDay(millis, count))
     fun minusMonth(count: Int) = LocalDateTime(dateCallback.minusMonth(millis, count))
@@ -305,45 +324,45 @@ class LocalDateTime(
 enum class Month {
     /** Январь месяц с 31 днем. Имеет числовое значение 1 **/
     JANUARY,
-
+    
     /** Февраль месяц с 28 днями, или 29 в високосный год. Имеет числовое значение 2 **/
     FEBRUARY,
-
+    
     /** Март месяц с 31 днями. Имеет числовое значение 3 **/
     MARCH,
-
+    
     /** Апрель месяц с 30 днями. Имеет числовое значение 4 **/
     APRIL,
-
+    
     /** Май месяц с 31 днями. Имеет числовое значение 5 **/
     MAY,
-
+    
     /** Июнь месяц с 30 днями. Имеет числовое значение 6 **/
     JUNE,
-
+    
     /** Июль месяц с 31 днями. Имеет числовое значение 7 **/
     JULY,
-
+    
     /** Август месяц с 31 днями. Имеет числовое значение 8 **/
     AUGUST,
-
+    
     /** Сентябрь месяц с 30 днями. Имеет числовое значение 9 **/
     SEPTEMBER,
-
+    
     /** Октябрь месяц с 31 днями. Имеет числовое значение 10 **/
     OCTOBER,
-
+    
     /** Ноябрь месяц с 30 днями. Имеет числовое значение 11 **/
     NOVEMBER,
-
+    
     /** Декабрь месяц с 31 днями. Имеет числовое значение 12 **/
     DECEMBER;
-
+    
     companion object {
-
+        
         /** Частный кэш всех констант */
         private val enums = Month.values()
-
+        
         /** Список всех месяцев на русском */
         private val names = arrayOf(
             "Январь",
@@ -359,7 +378,7 @@ enum class Month {
             "Ноябрь",
             "Декабрь"
         )
-    
+        
         private val rodNames = arrayOf(
             "Января",
             "Февраля",
@@ -374,7 +393,7 @@ enum class Month {
             "Ноября",
             "Декабря"
         )
-
+        
         /** Получает экземпляр Month из значения Int */
         fun of(month: Int): Month {
             return when {
@@ -383,13 +402,13 @@ enum class Month {
                 else -> enums[month - 1]
             }
         }
-
+        
         /** Возвращает месяц года, с 1 (январь) по 12 (декабрь) */
         fun Month.getValue(): Int = ordinal + 1
-
+        
         /** Получает текстовое представление, такое как "Январь" или "Декабрь" */
         fun Month.display() = names[this.ordinal]
-    
+        
         fun Month.displayRodName() = rodNames[this.ordinal]
     }
 }
@@ -400,58 +419,60 @@ enum class Month {
 enum class DayOfWeek {
     /** Понедельник. Имеет числовое значение 1 */
     MONDAY,
-
+    
     /** Вторник. Имеет числовое значение 2 */
     TUESDAY,
-
+    
     /** Среда. Имеет числовое значение 3 */
     WEDNESDAY,
-
+    
     /** Четверг. Имеет числовое значение 4 */
     THURSDAY,
-
+    
     /** Пятница. Имеет числовое значение 5 */
     FRIDAY,
-
+    
     /** Суббота. Имеет числовое значение 6 */
     SATURDAY,
-
+    
     /** Воскресенье. Имеет числовое значение 7 */
     SUNDAY;
-
+    
     companion object {
-
+        
         /** Частный кэш всех констант */
-        private val enums = DayOfWeek.values()
-
+        private val enums = values()
+        
         /** Список всех дней недели на русском */
         private val names = arrayOf(
             "Понедельник", "Вторник", "Среда",
             "Четверг", "Пятница", "Суббота", "Воскресенье",
         )
-    
+        
         private val rodNames = arrayOf(
             "Понедельник", "Вторник", "Среду",
             "Четверг", "Пятницу", "Субботу", "Воскресенье",
         )
-
+        
         private val shortRuNames = arrayOf(
             "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"
         )
-
+        
         fun DayOfWeek.displayShort() = shortRuNames[this.ordinal]
         fun DayOfWeek.displayRodName() = rodNames[this.ordinal]
-
+        
+        fun list() = values().toList()
+        
         private val shortNames = arrayOf(
             "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
         )
-
+        
         fun dayOfWeek(day: String): DayOfWeek {
             shortNames.forEachIndexed { i, it ->
-                if (it == day) return enums[i]
+                if(it == day) return enums[i]
             }; return MONDAY
         }
-
+        
         /** Получает экземпляр DayOfWeek из значения Int */
         fun of(index: Int): DayOfWeek {
             return when {
@@ -460,13 +481,12 @@ enum class DayOfWeek {
                 else -> DayOfWeek.enums[index - 1]
             }
         }
-
+        
         /** Возвращает день недели, с 1 (Понедельник) по 7 (Воскресенье) */
         fun DayOfWeek.value() = ordinal + 1
-
+        
         /** Получает текстовое представление, такое как "Понедельник" или "Воскресенье" */
         fun DayOfWeek.display() = names[this.ordinal]
-
     }
 }
 
@@ -485,6 +505,7 @@ private fun plus(date: Long, field: Int, count: Int): Long {
 }
 
 /** Задает определенный формат для объекта класса Date(). Возвращает строку**/
+@SuppressLint("SimpleDateFormat")
 fun Date.format(pattern: String): String = SimpleDateFormat(pattern).format(this)
 
 /** Задает определенный формат для даты в строке в формате ISO-8601. Возвращает строку**/
@@ -502,12 +523,13 @@ fun Long.toMinutes() = this / 60_000
 
 class Duration {
     companion object {
+        
         fun between(from: LocalDateTime, to: LocalDateTime) =
             abs(from.millis() - to.millis())
-
+        
         fun between(from: LocalTime, to: LocalTime) =
             abs(from.millis() - to.millis())
-
+        
         fun between(from: LocalDate, to: LocalDate) =
             abs(from.millis() - to.millis())
     }
@@ -517,10 +539,10 @@ class Duration {
 fun String.long(): Long {
     return try {
         this.pattern(FULL_DATE_FORMAT)
-    } catch (e: Exception) {
+    } catch(e: Exception) {
         try {
             this.pattern(TIME_FORMAT)
-        } catch (e: Exception) {
+        } catch(e: Exception) {
             this.pattern(DATE_FORMAT)
         }
     } - this.timeZoneOffset()
@@ -532,11 +554,11 @@ private fun String.timeZoneOffset(): Long {
         this.contains('+') -> this.timeZone('+')
         else -> {
             val last = this.timeZone('-')
-            if (last.length != 5) "+00:00"
+            if(last.length != 5) "+00:00"
             else last
         }
     }
-
+    
     return tzText.getLongTime(tzText.first())
 }
 
@@ -544,16 +566,18 @@ private fun String.getLongTime(sign: Char): Long {
     val hours = (this.substring(1, 3).toInt())
     val minutes = (this.substring(4, 6).toInt())
     val long = (hours * 3_600_000).toLong() + (minutes * 60000)
-    return if (sign == '-') (-1) * long else long
+    return if(sign == '-') (-1) * long else long
 }
 
 private fun String.timeZone(symbol: Char) =
     this.substring(this.lastIndexOf(symbol), this.length)
 
+@SuppressLint("SimpleDateFormat")
 fun String.format(from: String, to: String): String {
     val date = SimpleDateFormat(from).parse(this)!!
     return date.format(to)
 }
 
+@SuppressLint("SimpleDateFormat")
 fun String.pattern(pattern: String): Long =
     SimpleDateFormat(pattern).parse(this)!!.time

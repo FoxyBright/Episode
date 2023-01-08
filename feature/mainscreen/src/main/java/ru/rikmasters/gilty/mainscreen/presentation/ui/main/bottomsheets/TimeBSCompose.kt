@@ -27,7 +27,7 @@ private const val START_TIME = "00"
     "UnusedTransitionTargetStateParameter",
     "UnrememberedMutableState"
 )
-fun TimeBS(
+fun TimeBS( // TODO Пока заглушка - переписать в нормальном виде
     modifier: Modifier = Modifier,
     onSave: ((String) -> Unit)? = null
 ) {
