@@ -59,9 +59,7 @@ fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
         }
 
         override fun onBack() {
-            if (multiple) nav.navigateAbsolute("registration/hidden")
-            else nav.navigateAbsolute("registration/profile")
-
+            nav.navigationBack()
         }
 
 //        override fun menuItemClick(item: String) {
@@ -94,6 +92,6 @@ fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             "Прикрепить"
-        ) { nav.navigateAbsolute("registration/hidden") }
+        ) { nav.navigationBack() }
     }
 }

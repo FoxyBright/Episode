@@ -53,13 +53,16 @@ fun GradientButton(
     onClick: () -> Unit
 ) {
     val inverse = listOf(
-        colorScheme.inverseSurface,
-        colorScheme.inverseSurface
+        colorScheme.inversePrimary,
+        colorScheme.inversePrimary
     )
     Button(
         onClick, modifier.fillMaxWidth(),
-        enabled, shape, buttonColors(Transparent),
-        contentPadding = PaddingValues(),
+        enabled, shape,
+        buttonColors(
+            containerColor = Transparent,
+            disabledContainerColor = Transparent
+        ), contentPadding = PaddingValues(),
     ) {
         Box(
             Modifier

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.profile
+package ru.rikmasters.gilty.shared.common
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image

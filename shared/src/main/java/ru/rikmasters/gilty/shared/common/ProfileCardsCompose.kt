@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -102,7 +103,10 @@ fun HiddenPhotoContent(
 ) {
     Box(
         modifier
-            .height(118.dp)
+            .height(
+                if(profileType == CREATE)
+                    93.dp else 118.dp
+            )
             .fillMaxWidth()
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
@@ -171,7 +175,10 @@ fun ProfileImageContent(
 ) {
     Box(
         modifier
-            .height(254.dp)
+            .height(
+                if(profileType == CREATE)
+                    200.dp else 254.dp
+            )
             .fillMaxWidth(0.45f)
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
@@ -219,25 +226,30 @@ private fun CreateProfileCardRow(
     ) {
         if(profileType != ORGANIZER)
             Text(
-                text, Modifier.padding(end = 4.dp),
-                colorScheme.onTertiary,
-                style = typography.headlineSmall,
-                fontWeight = SemiBold
-            )
+                text,
+                Modifier
+                    .weight(1f)
+                    .padding(end = 4.dp),
+                if(profileType != CREATE) White
+                else colorScheme.onTertiary,
+                style = if(profileType == CREATE)
+                    typography.headlineSmall
+                else typography.bodyMedium,
+                fontWeight = SemiBold,
+                
+                )
         when(profileType) {
             CREATE -> {
                 Box(
-                    Modifier
-                        .size(26.dp)
-                        .background(
-                            colorScheme.primary,
-                            CircleShape
-                        )
+                    Modifier.background(
+                        colorScheme.primary,
+                        CircleShape
+                    )
                 ) {
                     Image(
                         painterResource(R.drawable.ic_image_box),
                         (null), Modifier
-                            .fillMaxSize()
+                            .size(22.dp)
                             .padding(4.dp)
                     )
                 }
@@ -265,7 +277,10 @@ fun ProfileStatisticContent(
     Card(
         { onClick?.let { it() } },
         modifier
-            .height(118.dp)
+            .height(
+                if(profileType == CREATE)
+                    93.dp else 118.dp
+            )
             .fillMaxWidth()
             .clip(shapes.large), (true),
         shapes.large, cardColors(colorScheme.primaryContainer)
@@ -273,25 +288,30 @@ fun ProfileStatisticContent(
         Column(Modifier, Top, CenterHorizontally) {
             Row(
                 Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 4.dp)
                     .padding(top = 8.dp),
                 Start, CenterVertically
             ) {
-                RatingText(rating.toCharArray(), Modifier)
+                RatingText(rating, profileType)
                 Cloud(profileType, Modifier, emoji)
             }
             Row(
                 Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(
+                        horizontal = if(profileType == CREATE)
+                            14.dp else 16.dp
+                    )
                     .padding(bottom = 8.dp, top = 4.dp)
             ) {
                 Observe(
                     Modifier.weight(1f),
+                    profileType,
                     stringResource(R.string.profile_observers_in_profile),
                     observers
                 )
                 Observe(
                     Modifier.weight(1f),
+                    profileType,
                     stringResource(R.string.profile_observe),
                     observed
                 )
@@ -302,24 +322,29 @@ fun ProfileStatisticContent(
 
 @Composable
 private fun RatingText(
-    text: CharArray,
+    text: String,
+    profileType: ProfileType,
     modifier: Modifier = Modifier
 ) {
-    val style = ThemeExtra.typography.RatingText
+    val style = if(profileType == CREATE)
+        ThemeExtra.typography.RatingSmallText
+    else ThemeExtra.typography.RatingText
     Text(
         buildAnnotatedString {
             withStyle(style.toSpanStyle()) {
                 append(text.first())
             }
             withStyle(
-                style.copy(fontSize = 42.sp)
-                    .toSpanStyle()
+                style.copy(
+                    fontSize = if(profileType == CREATE)
+                        38.sp else 42.sp
+                ).toSpanStyle()
             ) { append('.') }
             withStyle(style.toSpanStyle()) {
                 append(text.last())
             }
         }, modifier, textAlign = Right,
-        style = ThemeExtra.typography.RatingText,
+        style = style,
         maxLines = 1
     )
 }
@@ -328,6 +353,7 @@ private fun RatingText(
 @Composable
 private fun Observe(
     modifier: Modifier = Modifier,
+    profileType: ProfileType,
     text: String, count: Int
 ) {
     Column(
@@ -336,14 +362,18 @@ private fun Observe(
         Text(
             digitalConverter(count),
             Modifier, colorScheme.tertiary,
-            style = typography.labelSmall,
+            style = if(profileType == CREATE)
+                typography.headlineSmall
+            else typography.labelSmall,
             fontWeight = SemiBold,
             textAlign = TextAlign.Center,
         )
         Text(
             text, Modifier,
             colorScheme.tertiary,
-            style = typography.titleSmall,
+            style = if(profileType == CREATE)
+                typography.displaySmall
+            else typography.titleSmall,
             textAlign = TextAlign.Center
         )
     }

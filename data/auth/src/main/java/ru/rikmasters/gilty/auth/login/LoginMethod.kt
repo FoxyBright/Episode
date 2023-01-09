@@ -4,11 +4,11 @@ sealed interface LoginMethod {
     val url: String
 }
 
-data class Apple(
+data class Google(
     override val url: String
 ): LoginMethod
 
-data class Google(
+data class Apple(
     override val url: String
 ): LoginMethod
 

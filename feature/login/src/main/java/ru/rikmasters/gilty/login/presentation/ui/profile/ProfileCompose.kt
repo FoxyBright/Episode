@@ -1,17 +1,13 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,11 +32,9 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null
 ) {
-    Box(Modifier.fillMaxSize()) {
-        Column(modifier.fillMaxSize()) {
-            ActionBar(
-                stringResource(R.string.create_profile_title)
-            )
+    Box(modifier) {
+        Column {
+            ActionBar(stringResource(R.string.create_profile_title))
             { callback?.onBack() }
             Card(
                 Modifier
@@ -48,12 +42,13 @@ fun ProfileContent(
                     .padding(horizontal = 32.dp)
                     .fillMaxSize(),
                 RoundedCornerShape(30.dp),
-                CardDefaults.cardColors(MaterialTheme.colorScheme.background),
-                border = BorderStroke(6.dp, MaterialTheme.colorScheme.primaryContainer)
+                CardDefaults.cardColors(colorScheme.background),
+                border = BorderStroke(6.dp, colorScheme.primaryContainer)
             ) {
                 Profile(
                     state,
                     Modifier
+                        .fillMaxHeight(0.8f)
                         .padding(horizontal = 16.dp)
                         .padding(top = 50.dp),
                     callback
@@ -62,13 +57,10 @@ fun ProfileContent(
         }
         GradientButton(
             Modifier
+                .align(BottomCenter)
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 48.dp)
-                .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button),
-//            (state.name.isNotBlank() &&
-//                    !state.occupiedName) // TODO условия активации кнопки
+                .padding(bottom = 46.dp),
+            stringResource(R.string.next_button)
         ) { callback?.onNext() }
     }
 }
-

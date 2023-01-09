@@ -1,9 +1,11 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -39,6 +41,7 @@ fun UserProfileScreen(nav: NavState = get()) {
         val state = ProfileState(
             name = "${profileModel.username}, ${profileModel.age}",
             profilePhoto = profileModel.avatar.id,
+            hiddenPhoto = profileModel.avatar.id,
             description = description,
             rating = profileModel.rating.average,
             observers = 13500,
@@ -102,11 +105,6 @@ fun UserProfileScreen(nav: NavState = get()) {
                 }
                 
                 override fun onNameChange(text: String) {
-                    Toast.makeText(
-                        context,
-                        "Имя пока что не меняем",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
                 
                 override fun onDescriptionChange(text: String) {
@@ -120,7 +118,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                                 ObserversListState(
                                     profileModel, observers,
                                     observed, tabState
-                                ), Modifier,
+                                ), Modifier.padding(top = 28.dp),
                                 object: ObserversListCallback {
                                     override fun onTabChange(point: Int) {
                                         repeat(tabsState.size)
@@ -159,11 +157,9 @@ fun UserProfileScreen(nav: NavState = get()) {
                     when(point) {
                         0 -> nav.navigate("avatar")
                         
-                        else -> Toast.makeText(
-                            context,
-                            "Тут будет возможность выбрать другое фото",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        else -> nav.navigateAbsolute(
+                            "registration/gallery?multi=false"
+                        )
                     }
                 }
                 
@@ -194,11 +190,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 }
                 
                 override fun hiddenImages() {
-                    Toast.makeText(
-                        context,
-                        "Ваши скрытые фото",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    nav.navigate("hidden")
                 }
                 
                 override fun onRespondsClick() {

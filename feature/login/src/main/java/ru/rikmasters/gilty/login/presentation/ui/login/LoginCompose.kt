@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
@@ -53,6 +54,7 @@ private fun LoginPreview() {
 }
 
 interface LoginCallback {
+    
     fun onNext()
     fun loginWith(method: LoginMethod)
     fun privatePolicy()
@@ -79,14 +81,14 @@ fun LoginContent(
     Column(
         modifier
             .fillMaxSize()
+            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
             .background(colorScheme.background),
         verticalArrangement = SpaceBetween
     ) {
         Column(
             Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp),
+                .weight(1f),
             horizontalAlignment = CenterHorizontally,
         ) {
             Logo(Modifier.weight(1f))
@@ -96,9 +98,7 @@ fun LoginContent(
         }
         Spacer(Modifier.weight(0.1f))
         ConfirmationPolicy(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            Modifier.fillMaxWidth(),
             callback
         )
         Spacer(Modifier.weight(0.1f))
@@ -158,7 +158,7 @@ private fun NextButton(
     onClick: () -> Unit
 ) {
     GradientButton(
-        modifier.padding(top = 32.dp),
+        modifier.padding(top = 20.dp),
         stringResource(SR.string.next_button),
         isActive,
         onClick = onClick
@@ -188,8 +188,8 @@ private fun LoginMethodsButtons(
                 )
                 Spacer(Modifier.height(8.dp))
                 methods.forEach {
-                    LoginMethodButton(it) {
-                        callback?.loginWith(it)
+                    LoginMethodButton(it) { method ->
+                        callback?.loginWith(method)
                     }
                 }
             }
@@ -199,11 +199,11 @@ private fun LoginMethodsButtons(
 
 
 private val LoginMethod.name
-@Composable get() = when(this) {
-    is Apple -> stringResource(R.string.login_via_apple)
-    is Google -> stringResource(R.string.login_via_google)
-    is Vk -> stringResource(R.string.login_via_vk)
-}
+    @Composable get() = when(this) {
+        is Google -> stringResource(R.string.login_via_google)
+        is Apple -> stringResource(R.string.login_via_apple)
+        is Vk -> stringResource(R.string.login_via_vk)
+    }
 
 private val LoginMethod.icon
     @Composable get() = when(this) {
@@ -223,7 +223,7 @@ private fun LoginMethodButton(
         modifier
             .fillMaxWidth()
             .padding(top = 12.dp),
-        colors = ButtonDefaults.buttonColors(colorScheme.primaryContainer)
+        colors = buttonColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
@@ -236,7 +236,7 @@ private fun LoginMethodButton(
                 null,
                 Modifier
                     .padding(end = 18.dp)
-                    .padding(vertical = 15.dp)
+                    .padding(vertical = 10.dp)
             )
             Text(
                 stringResource(R.string.login_via, method.name),

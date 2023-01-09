@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -105,7 +106,7 @@ data class ProfileState(
     val observers: Int = 0,
     val observed: Int = 0,
     val emoji: EmojiModel? = null,
-    val profileType: ProfileType = ProfileType.CREATE,
+    val profileType: ProfileType = CREATE,
     var observeState: Boolean = false,
     val enabled: Boolean = true,
     val occupiedName: Boolean = false
@@ -151,7 +152,12 @@ fun Profile(
                 state.observeState,
                 { bool -> onChange?.let { it(bool) } },
                 { callback?.profileImage() })
-            Spacer(Modifier.width(14.dp))
+            Spacer(
+                Modifier.width(
+                    if(state.profileType == CREATE)
+                        14.dp else 16.dp
+                )
+            )
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
                     Modifier,
@@ -161,7 +167,12 @@ fun Profile(
                     state.profileType,
                     state.emoji
                 ) { callback?.onObserveClick() }
-                Spacer(Modifier.height(18.dp))
+                Spacer(
+                    Modifier.height(
+                        if(state.profileType == CREATE)
+                            14.dp else 18.dp
+                    )
+                )
                 HiddenPhotoContent(
                     Modifier,
                     state.hiddenPhoto,
@@ -176,6 +187,7 @@ fun Profile(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
     text: String,
@@ -186,40 +198,38 @@ private fun TopBar(
     onTextChange: (String) -> Unit,
 ) {
     Row(modifier) {
-        if(profileType == ORGANIZER)
-            IconButton(
-                onBack, Modifier.padding(
-                    top = 10.dp, end = 16.dp
-                )
-            ) {
-                Icon(
-                    painterResource(R.drawable.ic_back),
-                    stringResource(R.string.action_bar_button_back),
-                    Modifier, colorScheme.tertiary
-                )
-            }
-        GTextField(
-            text, { onTextChange(it) },
-            Modifier
+        if(profileType == ORGANIZER) IconButton(
+            onBack, Modifier.padding(
+                top = 10.dp, end = 16.dp
+            )
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_back),
+                stringResource(R.string.action_bar_button_back),
+                Modifier, colorScheme.tertiary
+            )
+        }
+        TextField(
+            text, onTextChange, Modifier
                 .offset((-16).dp)
                 .fillMaxWidth(),
             colors = TransparentTextFieldColors(),
-            textStyle = typography.displayLarge,
+            textStyle = typography.headlineLarge,
             placeholder = {
                 Row(Modifier, Center, CenterVertically) {
                     Text(
                         stringResource(R.string.user_name),
                         Modifier.padding(end = 8.dp),
                         colorScheme.onTertiary,
-                        style = typography.titleLarge
+                        style = typography.headlineLarge
                     )
                     Icon(
                         painterResource(R.drawable.ic_edit),
                         (null), Modifier.padding(top = 4.dp),
-                        colorScheme.outlineVariant
+                        colorScheme.onTertiary
                     )
                 }
-            }, readOnly = enabled, singleLine = true, maxLines = 1
+            }, readOnly = enabled, singleLine = true
         )
     }
 }

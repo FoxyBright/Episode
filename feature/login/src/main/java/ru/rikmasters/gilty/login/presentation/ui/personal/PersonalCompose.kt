@@ -123,7 +123,7 @@ fun BottomSheetContent(
     modifier: Modifier = Modifier,
     value: Int?,
     onValueChange: (Int) -> Unit,
-    range: IntRange = 18..100,
+    range: IntRange = 18..99,
     onSave: () -> Unit
 ) {
     Box(
