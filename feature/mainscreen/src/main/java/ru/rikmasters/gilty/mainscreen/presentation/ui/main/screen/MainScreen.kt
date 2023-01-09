@@ -60,6 +60,7 @@ fun MainScreen(nav: NavState = get()) {
     var today by remember {
         mutableStateOf(true)
     }
+    var timeSelect by remember { mutableStateOf("") }
     val meetings = remember {
         mutableStateListOf(
             getDemoMeetingModel(category = ART),
@@ -173,7 +174,8 @@ fun MainScreen(nav: NavState = get()) {
     
     MainContent(
         MainContentState(
-            grid, today, meetings,
+            grid, today, daysList.isNotEmpty(),
+            timeSelect.isNotBlank(), meetings,
             cardStates, stateList, alert
         ), Modifier, object: MainContentCallback {
             override fun onNavBarSelect(point: Int) {
@@ -227,6 +229,7 @@ fun MainScreen(nav: NavState = get()) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         if(today) TimeBS {
+                            timeSelect = it
                             scope.launch {
                                 asm.bottomSheet.collapse()
                             }

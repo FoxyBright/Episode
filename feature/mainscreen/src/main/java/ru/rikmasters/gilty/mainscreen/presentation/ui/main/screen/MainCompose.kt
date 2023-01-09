@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -42,7 +43,7 @@ fun MainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
-                (true), (true),
+                (true), (true), (false), (false),
                 DemoMeetingList, listOf(),
                 listOf(
                     INACTIVE, ACTIVE,
@@ -84,6 +85,8 @@ interface MainContentCallback {
 data class MainContentState(
     val grid: Boolean,
     val today: Boolean,
+    val selectDate: Boolean,
+    val selectTime: Boolean,
     val meetings: List<MeetingModel>,
     val cardStates: List<Pair<MeetingModel, SwipeableCardState>>,
     val navBarStates: List<NavIconState>,
@@ -100,7 +103,8 @@ fun MainContent(
     Scaffold(modifier.background(colorScheme.background),
         topBar = {
             TopBar(
-                state.today, Modifier,
+                state.today, state.selectDate,
+                state.selectTime, Modifier,
                 { callback?.onTodayChange() }
             ) { callback?.onTimeFilterClick() }
         },
@@ -131,13 +135,16 @@ fun MainContent(
         state.alert, { callback?.onCloseAlert() },
         stringResource(R.string.complaints_send_answer),
         label = stringResource(R.string.complaints_moderate_sen_answer),
-        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.onCloseAlert() }
+        success = Pair(stringResource(R.string.meeting_close_button))
+        { callback?.onCloseAlert() }
     )
 }
 
 @Composable
 private fun TopBar(
     today: Boolean,
+    selectDate: Boolean,
+    selectTime: Boolean,
     modifier: Modifier = Modifier,
     onTodayChange: () -> Unit,
     onTimeFilterClick: () -> Unit,
@@ -163,12 +170,15 @@ private fun TopBar(
             )
         }
         IconButton(onTimeFilterClick) {
-            Icon(
-                if(today) painterResource(R.drawable.ic_clock)
-                else painterResource(R.drawable.ic_calendar),
-                null,
-                Modifier.size(30.dp),
-                colorScheme.tertiary
+            Image(
+                painterResource(
+                    when {
+                        today && !selectTime -> R.drawable.ic_clock
+                        today && selectTime -> R.drawable.ic_clock_indicator
+                        selectDate -> R.drawable.ic_calendar_indicator
+                        else -> R.drawable.ic_calendar
+                    }
+                ), (null), Modifier.size(30.dp)
             )
         }
     }
