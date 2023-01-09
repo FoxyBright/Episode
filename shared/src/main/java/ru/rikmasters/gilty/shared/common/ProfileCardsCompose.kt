@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
@@ -150,16 +151,14 @@ private fun Lock(
                 .fillMaxSize()
                 .alpha(0.5f)
                 .background(
-                    colorScheme.outline,
-                    CircleShape
+                    Black, CircleShape
                 )
         )
         Icon(
             painterResource(R.drawable.ic_lock_open),
             (null), Modifier
                 .padding(6.dp)
-                .size(12.dp),
-            colorScheme.tertiary
+                .size(12.dp), White
         )
     }
 }
@@ -312,7 +311,7 @@ fun ProfileStatisticContent(
                 Observe(
                     Modifier.weight(1f),
                     profileType,
-                    stringResource(R.string.profile_observe),
+                    stringResource(R.string.profile_user_observe),
                     observed
                 )
             }

@@ -188,21 +188,21 @@ private fun Content(
         onMoreClick = { callback?.onMeetMoreClick() },
         onRepeatClick = { callback?.onMeetsRepeatClick() }
     )
-    if(state) MeetingGridContent(
-        modifier.fillMaxSize(), meetings
+    if(state && meetings.isNotEmpty()) MeetingGridContent(
+        modifier
+            .background(colorScheme.background)
+            .fillMaxSize(), meetings
     ) { callback?.onRespond(it) }
-    else MeetingsListContent(
-        cardStates, modifier.fillMaxHeight(0.9f),
-        { meet, it ->
-            callback?.onNotInteresting(
-                meet, it
-            )
-        },
-        { meet, it ->
-            callback?.onRespond(meet)
-            callback?.onInteresting(meet, it)
-        }
-    ) { callback?.onMeetClick(it) }
+    else {
+        MeetingsListContent(
+            cardStates, modifier.fillMaxHeight(0.9f),
+            { meet, it -> callback?.onNotInteresting(meet, it) },
+            { meet, it ->
+                callback?.onRespond(meet)
+                callback?.onInteresting(meet, it)
+            }
+        ) { callback?.onMeetClick(it) }
+    }
 }
 
 @Composable

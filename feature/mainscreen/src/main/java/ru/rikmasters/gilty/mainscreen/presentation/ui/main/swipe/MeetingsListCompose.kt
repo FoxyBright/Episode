@@ -57,7 +57,7 @@ private fun Content(
     ) -> Unit)? = null
 ) {
     var xOffset by remember { mutableStateOf(0f) }
-    states.forEach { (
+    states.forEachIndexed { index, (
         meeting,
         state) ->
         run {
@@ -89,7 +89,7 @@ private fun Content(
                             }
                         }
                         .swipeableCard({ swipe(it) }, state),
-                    MEET, meeting, xOffset
+                    MEET, (index == states.size - 3), meeting, xOffset
                 ) { swipe(it) }
             }
         }

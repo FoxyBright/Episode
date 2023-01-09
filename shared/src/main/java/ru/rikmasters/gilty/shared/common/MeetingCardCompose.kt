@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
@@ -32,7 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.*
 import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
@@ -65,7 +66,7 @@ private fun MeetingCardPreview() {
         ) {
             MeetCard(
                 Modifier.padding(16.dp),
-                MEET, meeting
+                MEET, (true), meeting
             )
         }
     }
@@ -92,7 +93,7 @@ private fun CardButtonPreview() {
         CardButton(
             Modifier.width(150.dp),
             stringResource(R.string.meeting_respond),
-            meeting.category.color, ic_heart
+            meeting.category.color, R.drawable.ic_heart
         )
     }
 }
@@ -286,38 +287,55 @@ enum class MeetCardType { EMPTY, MEET }
 fun MeetCard(
     modifier: Modifier = Modifier,
     type: MeetCardType,
+    stack: Boolean = true,
     meet: MeetingModel? = null,
     offset: Float = 0f,
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
     onSelect: ((DirectionType) -> Unit)? = null
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .clip(shapes.large)
-    ) {
-        when(type) {
-            EMPTY -> {
-                EmptyTop(
-                    Modifier
-                        .weight(1f)
-                        .offset(y = 24.dp)
+    Box(modifier) {
+        if(type == MEET) Image(
+            painterResource(
+                if(isSystemInDarkTheme())
+                    R.drawable.ic_back_rect_dark
+                else R.drawable.ic_back_rect
+            ), (null), Modifier
+                .align(BottomCenter)
+                .offset(
+                    y = animateDpAsState(
+                        if(stack) 16.dp
+                        else 0.dp, tween(800)
+                    ).value
                 )
-                EmptyBottom(Modifier, {
-                    onRepeatClick?.let { it() }
-                }) { onMoreClick?.let { it() } }
-            }
-            
-            MEET -> {
-                meet?.let {
-                    MeetTop(
-                        it.organizer.avatar, Modifier
+        )
+        Column(
+            Modifier
+                .fillMaxSize()
+                .clip(shapes.large)
+        ) {
+            when(type) {
+                EMPTY -> {
+                    EmptyTop(
+                        Modifier
                             .weight(1f)
                             .offset(y = 24.dp)
                     )
-                    MeetBottom(it, offset)
-                    { direction -> onSelect?.let { it(direction) } }
+                    EmptyBottom(Modifier, {
+                        onRepeatClick?.let { it() }
+                    }) { onMoreClick?.let { it() } }
+                }
+                
+                MEET -> {
+                    meet?.let {
+                        MeetTop(
+                            it.organizer.avatar, Modifier
+                                .weight(1f)
+                                .offset(y = 24.dp)
+                        )
+                        MeetBottom(it, offset)
+                        { direction -> onSelect?.let { it(direction) } }
+                    }
                 }
             }
         }
@@ -398,13 +416,13 @@ private fun MeetBottom(
                         .padding(end = 8.dp),
                     stringResource(R.string.not_interesting),
                     if(leftSwipe) textColor else color,
-                    ic_cancel, if(leftSwipe) backColor else back
+                    R.drawable.ic_cancel, if(leftSwipe) backColor else back
                 ) { onSelect?.let { it(LEFT) } }
                 CardButton(
                     Modifier.weight(1f),
                     stringResource(R.string.meeting_respond),
                     if(rightSwipe) textColor else color,
-                    ic_heart, if(rightSwipe) backColor else back
+                    R.drawable.ic_heart, if(rightSwipe) backColor else back
                 ) {
                     onSelect?.let { it(RIGHT) }
                 }

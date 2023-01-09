@@ -15,7 +15,7 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.navigation:navigation-compose:2.5.2",
     "io.coil-kt:coil-compose:2.2.2",
     "androidx.compose.ui:ui:$composeVer",
-) and debugImplementation(
+) and implementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer"
