@@ -42,6 +42,10 @@ class AuthManager(
     suspend fun getAuth(): AuthSaga =
         dbSource.find() ?: startAuth()
     
+    
+    suspend fun updateAuth(update: AuthSaga.() -> AuthSaga) =
+        dbSource.save(getAuth().update())
+    
     private suspend fun generateExternalState(): String =
         randomAlphanumericString(32)
 

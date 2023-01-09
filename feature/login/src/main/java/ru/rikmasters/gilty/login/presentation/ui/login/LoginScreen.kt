@@ -87,7 +87,10 @@ fun LoginScreen(vm: LoginViewModel) {
         }
 
         override fun onNext() {
-            nav.navigate("registration/code")
+            scope.launch {
+                vm.sendCode()
+                nav.navigate("registration/code")
+            }
         }
     })
 }

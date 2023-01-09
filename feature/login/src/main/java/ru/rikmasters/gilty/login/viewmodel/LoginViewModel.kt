@@ -61,4 +61,11 @@ class LoginViewModel(
         }
         return false
     }
+    
+    suspend fun sendCode() =
+        repository.sendCode(_phone.value).let { // TODO Сделать механизм саги
+            authManager.updateAuth {
+                copy(sendCode = it)
+            }
+        }
 }
