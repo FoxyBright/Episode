@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -23,11 +23,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private const val START_TIME = "00"
 
 @Composable
-@SuppressLint(
-    "UnusedTransitionTargetStateParameter",
-    "UnrememberedMutableState"
-)
-fun TimeBS( // TODO Пока заглушка - переписать в нормальном виде
+fun TimeBS(
     modifier: Modifier = Modifier,
     onSave: ((String) -> Unit)? = null
 ) {
@@ -80,7 +76,7 @@ fun TimeBS( // TODO Пока заглушка - переписать в норм
             Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 32.dp),
-            stringResource(R.string.save_button), true
+            stringResource(R.string.save_button), (true)
         ) {
             resetTime = time
             onSave?.let { it(time) }
@@ -92,6 +88,10 @@ fun TimeBS( // TODO Пока заглушка - переписать в норм
 @Composable
 private fun TimeBSPreview() {
     GiltyTheme {
-        TimeBS()
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) { TimeBS() }
     }
 }

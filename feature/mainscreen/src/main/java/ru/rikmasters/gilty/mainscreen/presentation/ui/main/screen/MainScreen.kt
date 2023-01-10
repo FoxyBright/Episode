@@ -171,7 +171,6 @@ fun MainScreen(nav: NavState = get()) {
             commentText = ""
         }
     }
-    
     MainContent(
         MainContentState(
             grid, today, daysList.isNotEmpty(),

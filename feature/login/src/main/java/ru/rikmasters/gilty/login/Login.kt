@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
 import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.country.CountryManager
@@ -72,7 +73,9 @@ object Login: FeatureDefinition() {
                     ?.let { multi -> ProfileSelectPhotoScreen(multi) }
             }
             
-            screen("code") { CodeScreen() }
+            screen<CodeViewModel>("code") { vm, _ ->
+                CodeScreen(vm)
+            }
             screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }
@@ -83,6 +86,10 @@ object Login: FeatureDefinition() {
     override fun Module.koin() {
         this@koin.single { authEntrypointResolver }
         singleOf(::CountryManager)
+        
+        scope<CodeViewModel> {
+            scopedOf(::CodeViewModel)
+        }
         
         scope<LoginViewModel> {
             scopedOf(::LoginViewModel)

@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.spacedBy
@@ -112,10 +111,9 @@ fun GCalendarWidget(
             )
             if(dateLIst.isNotEmpty()) Text(
                 stringResource(R.string.meeting_filter_clear),
-                Modifier.clickable(
-                    MutableInteractionSource(), (null)
-                ) { onClear?.let { it() } },
-                colorScheme.primary,
+                Modifier.clickable {
+                    onClear?.let { it() }
+                }, colorScheme.primary,
                 style = typography.bodyMedium,
                 fontWeight = Medium
             )

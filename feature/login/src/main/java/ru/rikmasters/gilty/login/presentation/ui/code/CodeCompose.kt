@@ -39,10 +39,15 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun CodePreview() {
     GiltyTheme {
+        val focuses =
+            arrayListOf<FocusRequester>()
+        repeat(4) {
+            focuses.add(FocusRequester())
+        }
         CodeContent(
             CodeState(
-                "1234",
-                listOf(), 60, false
+                ("736"), focuses,
+                (37), (false)
             )
         )
     }
@@ -55,10 +60,12 @@ data class CodeState(
     val blur: Boolean
 )
 
-interface CodeCallback : NavigationInterface {
-    fun onCodeChange(index: Int, it: String)
-    fun onCodeSend() {}
-    fun onBlur() {}
+interface CodeCallback {
+    
+    fun onCodeChange(index: Int, text: String)
+    fun onCodeSend()
+    fun onBlur()
+    fun onBack()
 }
 
 @Composable
@@ -79,7 +86,7 @@ fun CodeContent(
             { callback?.onCodeSend() }
         }
     }
-    if (state.blur)
+    if(state.blur)
         BackBlur(
             Modifier
                 .fillMaxSize()
@@ -115,7 +122,7 @@ private fun DigitCode(
     Row {
         focuses.forEachIndexed { index, focus ->
             TextField(
-                if (code.length > index)
+                if(code.length > index)
                     code[index].toString() else "",
                 { onChange(index, it) }, modifier
                     .padding(10.dp)
@@ -143,14 +150,14 @@ private fun ButtonTimer(
         modifier
             .fillMaxWidth()
             .clip(CircleShape)
-            .clickable { if (sec <= 0) onResend() },
+            .clickable { if(sec <= 0) onResend() },
         Center
     ) {
         Text(
-            (if (sec > 0) "${stringResource(R.string.call_again)} \n$sec сек"
+            (if(sec > 0) "${stringResource(R.string.call_again)} \n$sec сек"
             else stringResource(R.string.call_again)),
             Modifier.padding(6.dp),
-            if (sec > 0) colorScheme.primary
+            if(sec > 0) colorScheme.primary
             else colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = SemiBold,

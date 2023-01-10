@@ -48,7 +48,7 @@ fun ProfileScreen(
         }
 
         override fun onBack() {
-            nav.navigationBack()
+            nav.navigateAbsolute("login")
         }
 
         override fun onNext() {

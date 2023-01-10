@@ -3,66 +3,64 @@ package ru.rikmasters.gilty.login.presentation.ui.code
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun CodeScreen(nav: NavState = get()) {
+fun CodeScreen(vm: CodeViewModel) {
+    
+    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
-    val codeSize = 4
-    var text by remember { mutableStateOf("") }
-    val blur = remember { mutableStateOf(false) }
-    val focusList = arrayListOf<FocusRequester>()
-    repeat(codeSize) { focusList.add(FocusRequester()) }
-    val focuses by remember { mutableStateOf(focusList) }
-    var sec by remember { mutableStateOf(60) }
+    
+    val timer by vm.timer.collectAsState()
+    
     LaunchedEffect(Unit) {
-        while(sec > 0) {
-            delay(1000L); sec--
+        while(timer > 0) {
+            delay(1000L)
+            vm.onTimerChange(timer - 1)
         }
     }
-    CodeContent(CodeState(text, focuses, sec, blur.value), Modifier, object: CodeCallback {
-        override fun onBack() {
-            nav.navigationBack()
-        }
-        
-        override fun onBlur() {
-            nav.navigate("profile")
-            /*blur.value = false*/
-        }
-        
-        override fun onCodeSend() {
-            sec = 60
-        }
-        
-        override fun onCodeChange(index: Int, it: String) {
-            if(text.length <= focuses.size) {
-                if(it.length == focuses.size) {
-                    text = it
-                } else if(it.length < 2) {
-                    if(it == "") {
-                        text = text.substring(0, text.lastIndex)
-                        if(index - 1 >= 0)
-                            focuses[index - 1].requestFocus()
-                    } else {
-                        text += it
-                        if(index + 1 < focuses.size)
-                            focuses[index + 1].requestFocus()
-                    }
+    
+    val code by vm.code.collectAsState()
+    val blur by vm.blur.collectAsState()
+    val focuses by vm.focuses.collectAsState()
+    
+    CodeContent(
+        CodeState(code, focuses, timer, blur),
+        Modifier, object: CodeCallback {
+            override fun onBack() {
+                nav.navigationBack()
+            }
+            
+            override fun onBlur() {
+                scope.launch {
+                    vm.onBlur(false)
+                    nav.navigate("profile")
                 }
-            } else text = ""
-            if(text.length == codeSize)
-                if(text == "code") nav.navigate("profile")
-                else {
-                    scope.launch { asm.keyboard.hide() }
-                    blur.value = true
+            }
+            
+            override fun onCodeSend() {
+                scope.launch { vm.onTimerChange(60) }
+            }
+            
+            override fun onCodeChange(index: Int, text: String) {
+                scope.launch {
+                    vm.onCodeChange(index, text)
+                    val codeCheck = vm.code.value
+                    if(codeCheck.length == vm.codeLength.value)
+                        if(codeCheck == vm.correctCode.value)
+                            nav.navigate("profile")
+                        else {
+                            asm.keyboard.hide()
+                            vm.onBlur(true)
+                        }
                 }
-        }
-    })
+            }
+        })
 }
