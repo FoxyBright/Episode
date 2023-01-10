@@ -9,7 +9,9 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.auth.login.LoginMethod
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.R
@@ -33,6 +35,14 @@ fun LoginScreen(vm: LoginViewModel) {
         phone.length == targetLength
     }
     
+    val activity = getActivity()
+    LaunchedEffect(activity.intent) {
+        activity.intent?.data?.let {
+            if(vm.handle(it))
+                activity.intent = null
+        }
+    }
+    
     LaunchedEffect(Unit) {
         vm.loadLoginMethods()
     }
@@ -53,7 +63,7 @@ fun LoginScreen(vm: LoginViewModel) {
         }
 
         override fun loginWith(method: LoginMethod) {
-            scope.launch { vm.loginVia(method) }
+            scope.launch { openInWeb(context, method.url) }
         }
 
         override fun privatePolicy() {
@@ -77,7 +87,10 @@ fun LoginScreen(vm: LoginViewModel) {
         }
 
         override fun onNext() {
-            nav.navigate("registration/code")
+            scope.launch {
+                vm.sendCode()
+                nav.navigate("registration/code")
+            }
         }
     })
 }

@@ -11,6 +11,7 @@ dependencies {
     compose()
     
     implementation(kotlin("reflect"))
+    implementation("androidx.browser:browser:1.4.0")
     
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     testImplementation("com.google.truth:truth:1.1.3")

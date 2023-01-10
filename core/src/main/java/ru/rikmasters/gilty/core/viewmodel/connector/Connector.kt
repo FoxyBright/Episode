@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.core.viewmodel.connector
 
+import android.widget.Toast
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -38,6 +40,14 @@ fun <T: ViewModel> Connector(
     clazz: KClass<T>,
     content: @Composable (T) -> Unit
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(state.vm) {
+        state.vm.events.collect {
+            when(it.key) {
+                "toast" -> Toast.makeText(context, it.data as String, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     DisposableEffect(state.vm.scope) {
         onDispose { state.vm.scope.close() }
     }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.data.ktor
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -32,11 +33,12 @@ open class KtorSource: WebSource() {
         install(ContentNegotiation) {
             jackson {
                 propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
+                setSerializationInclusion(JsonInclude.Include.NON_NULL)
             }
         }
         defaultRequest {
             contentType(ContentType.Application.Json)
-            host = env[ENV_HOST] ?: ""
+            host = env[ENV_BASE_URL] ?: ""
         }
         install(UserAgent) {
             agent = env[ENV_USER_AGENT] ?: ""

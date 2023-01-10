@@ -1,10 +1,12 @@
 package ru.rikmasters.gilty.login.viewmodel
 
+import android.net.Uri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.login.LoginMethod
 import ru.rikmasters.gilty.auth.login.LoginRepository
-import ru.rikmasters.gilty.core.util.random.randomAlphanumericString
+import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.CountryManager
@@ -17,14 +19,7 @@ class LoginViewModel(
 
 ): ViewModel() {
     
-    private val externalState = MutableStateFlow<String?>(null)
-    
-    private suspend fun generateExternalState(): String {
-        randomAlphanumericString(32).let {
-            externalState.emit(it)
-            return it
-        }
-    }
+    private val authManager: AuthManager by inject()
     
     private val _country = MutableStateFlow(countryManager.defaultCountry)
     val country = _country.asStateFlow()
@@ -38,13 +33,9 @@ class LoginViewModel(
     val loginMethods = _loginMethods.asStateFlow()
     
     suspend fun loadLoginMethods() = singleLoading {
-        repository.getLoginMethods(generateExternalState()).let {
+        repository.getLoginMethods(authManager.getAuth().externalState).let {
             _loginMethods.emit(it)
         }
-    }
-    
-    suspend fun loginVia(method: LoginMethod) {
-        // TODO
     }
     
     private val _phone = MutableStateFlow(country.value.clearPhoneDial)
@@ -59,4 +50,22 @@ class LoginViewModel(
     suspend fun clearPhone() {
         _phone.emit(country.value.clearPhoneDial)
     }
+    
+    suspend fun handle(deepLink: Uri): Boolean {
+        if(deepLink.host != "external") return false
+        if(deepLink.getQueryParameter("state") != authManager.getAuth().externalState) return false
+        deepLink.getQueryParameter("token")?.let {
+            if(authManager.isExternalLinked(it)) makeToast("Привязан")
+            else makeToast("Не привязан")
+            return true
+        }
+        return false
+    }
+    
+    suspend fun sendCode() =
+        repository.sendCode(_phone.value).let { // TODO Сделать механизм саги
+            authManager.updateAuth {
+                copy(sendCode = it)
+            }
+        }
 }
