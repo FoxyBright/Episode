@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -90,6 +91,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                     DemoMemberModel
                 )
             }
+        val listState = rememberLazyListState()
         val pairRespondsList =
             remember { mutableStateOf(Pair(DemoMeetingModel, respondsList)) }
         val tabState = remember { mutableStateListOf(true, false) }
@@ -98,7 +100,7 @@ fun UserProfileScreen(nav: NavState = get()) {
                 state, meets, meets,
                 meets.first(), (respondsList.size),
                 historyState.value,
-                stateList, alert, menuState
+                stateList, alert, menuState, listState
             ), Modifier, object: UserProfileCallback {
                 override fun menu(state: Boolean) {
                     nav.navigate("settings")
@@ -252,6 +254,9 @@ fun UserProfileScreen(nav: NavState = get()) {
                 
                 override fun openHistory(state: Boolean) {
                     historyState.value = !state
+                    scope.launch {
+                        listState.animateScrollToItem(5)
+                    }
                 }
             }
         )

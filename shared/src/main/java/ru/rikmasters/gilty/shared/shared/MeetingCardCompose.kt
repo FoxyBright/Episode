@@ -17,8 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -27,9 +26,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.categoriesListCard
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.getDemoMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -52,7 +53,7 @@ private fun MeetingCardTodayPreview() {
 private fun MeetingCardPreview() {
     GiltyTheme {
         MeetingCard(
-            DemoMeetingModel,
+            getDemoMeetingModel(condition = FREE),
             Modifier.padding(20.dp)
         )
     }
@@ -64,7 +65,21 @@ private fun MeetingCategoryCardPreview() {
     GiltyTheme {
         MeetingCategoryCard(
             DemoMeetingModel,
-            Modifier.padding(20.dp), old = false
+            Modifier.padding(20.dp),
+            old = true
+        ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun MeetingCategoryCardTodayPreview() {
+    GiltyTheme {
+        MeetingCategoryCard(
+            getDemoMeetingModel(condition = FREE),
+            Modifier.padding(20.dp),
+            today = true,
+            old = false
         ) {}
     }
 }
@@ -81,32 +96,30 @@ fun MeetingCard(
         { onClick?.let { it() } },
         modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
-    )
-    {
+    ) {
         Text(
             meeting.title,
             Modifier
-                .width(180.dp)
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = Bold
         )
-        Row(
-            Modifier
-                .padding(start = 14.dp)
-        ) {
-            DateTimeCard(meeting.dateTime, green(), today)
-            if(today)
-                categoriesListCard(
-                    Modifier.padding(start = 4.dp), meeting, true
-                )
+        Row(Modifier.padding(start = 14.dp)) {
+            DateTimeCard(
+                meeting.dateTime,
+                green(), today
+            )
+            if(today) categoriesListCard(
+                Modifier.padding(start = 4.dp),
+                meeting, (true)
+            )
         }
         Box(
             Modifier
                 .offset(-(26).dp, 10.dp)
-                .width(180.dp)
+                .width(156.dp)
         ) {
             AsyncImage(
                 meeting.organizer.avatar.id,
@@ -114,19 +127,20 @@ fun MeetingCard(
                 Modifier
                     .clip(CircleShape)
                     .size(135.dp),
-                placeholder = painterResource(R.drawable.ic_image_box),
-                contentScale = ContentScale.Crop
+                contentScale = Crop
             )
-            val countDp = if(
-                meeting.condition != MEMBER_PAY
-            ) 32 else 8
-            if(!today)
-                categoriesListCard(
-                    Modifier
-                        .align(TopEnd)
-                        .padding(top = 10.dp, end = countDp.dp),
-                    meeting, true
-                )
+            if(!today) categoriesListCard(
+                Modifier
+                    .offset(18.dp)
+                    .align(TopEnd)
+                    .padding(
+                        top = 10.dp, end = if(
+                            meeting.condition
+                            != MEMBER_PAY
+                        ) 28.dp else 0.dp
+                    ),
+                meeting, (true)
+            )
         }
     }
 }
@@ -145,21 +159,16 @@ fun MeetingCategoryCard(
         { onClick?.let { it() } },
         modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
-    )
-    {
+    ) {
         Text(
             meeting.title, Modifier
-                .width(180.dp)
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = Bold
         )
-        Row(
-            Modifier
-                .padding(start = 14.dp)
-        ) {
+        Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
                 meeting.dateTime,
                 when {
@@ -173,7 +182,7 @@ fun MeetingCategoryCard(
             Modifier
                 .padding(top = 10.dp, bottom = 4.dp)
                 .offset(-(8).dp)
-                .width(180.dp)
+                .width(156.dp)
         ) {
             Box(
                 Modifier
@@ -190,7 +199,7 @@ fun MeetingCategoryCard(
                             }
                         ), CircleShape
                     )
-                    .size(135.dp), Center
+                    .size(126.dp), Center
             ) {
                 Text(
                     meeting.category.display,
@@ -199,16 +208,16 @@ fun MeetingCategoryCard(
                     fontWeight = SemiBold
                 )
             }
-            val countDp = if(
-                meeting.condition != MEMBER_PAY
-            ) 32 else 8
             categoriesListCard(
                 Modifier
                     .align(TopEnd)
                     .padding(
-                        top = 10.dp,
-                        end = countDp.dp
-                    ), meeting, (true)
+                        top = 10.dp, end = if(
+                            meeting.condition
+                            != MEMBER_PAY
+                        ) 28.dp else 0.dp
+                    ),
+                meeting, (true)
             )
         }
     }

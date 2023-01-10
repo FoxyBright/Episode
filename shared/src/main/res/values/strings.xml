@@ -35,7 +35,7 @@
     <string name="profile_about_me">О себе</string>
     <string name="profile_responds_label">Отклики</string>
     <string name="about_me_placeholder">Расскажите кратко о себе</string>
-    <string name="profile_actual_meetings_label">Актуальные встречи</string>
+    <string name="profile_actual_meetings_label">Актуальные</string>
     <string name="profile_meeting_history_label">История</string>
     <string name="profile_menu_settings_button">Настройки</string>
     <string name="profile_menu_watch_photo_button">Смотреть фото</string>

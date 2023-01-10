@@ -3,25 +3,28 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
@@ -48,7 +51,8 @@ data class UserProfileState(
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
     val alert: Boolean,
-    val menuState: Boolean = false
+    val menuState: Boolean = false,
+    val listState: LazyListState
 )
 
 interface UserProfileCallback: ProfileCallback {
@@ -89,19 +93,21 @@ private fun UserProfilePreview() {
                     NavIconState.INACTIVE,
                     NavIconState.INACTIVE,
                     NavIconState.ACTIVE
-                ), alert = false
+                ), alert = false,
+                listState = rememberLazyListState()
             )
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
     state: UserProfileState,
     modifier: Modifier = Modifier,
     callback: UserProfileCallback? = null
 ) {
-    Box() {
+    Box {
         GDropMenu(
             state.menuState,
             { callback?.onMenuClick(false) },
@@ -114,11 +120,31 @@ fun UserProfile(
             )
         )
     }
+    Scaffold(
+        modifier, bottomBar = {
+            NavBar(state.stateList)
+            { callback?.onNavBarSelect(it) }
+        }
+    ) { Content(state, Modifier.padding(it), callback) }
+    GAlert(
+        state.alert, { callback?.closeAlert() },
+        "Отлично, ваша жалоба отправлена!",
+        label = "Модераторы скоро рассмотрят\nвашу жалобу",
+        success = Pair("Закрыть") { callback?.closeAlert() }
+    )
+}
+
+@Composable
+private fun Content(
+    state: UserProfileState,
+    modifier: Modifier = Modifier,
+    callback: UserProfileCallback? = null
+) {
     LazyColumn(
         modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.9f)
-            .background(colorScheme.background)
+            .fillMaxSize()
+            .background(colorScheme.background),
+        state.listState
     ) {
         item {
             Box(
@@ -160,35 +186,26 @@ fun UserProfile(
         item {
             Responds(
                 state.notifications, state.lastRespond,
-                Modifier.padding(horizontal = 16.dp)
+                Modifier.padding(16.dp, 12.dp)
             ) { callback?.onRespondsClick() }
         }
         if(state.currentMeetings.isNotEmpty()) item {
             LazyRow {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
-                    MeetingCategoryCard(it, Modifier.padding(horizontal = 4.dp))
-                    { callback?.onMeetingClick(it) }
+                    MeetingCategoryCard(
+                        it, Modifier.padding(horizontal = 4.dp)
+                    ) { callback?.onMeetingClick(it) }
                 }
             }
         }
-        if(state.meetingsHistory.isNotEmpty()) item {
-            meetHistory(state.historyState, state.meetingsHistory,
+        if(state.meetingsHistory.isNotEmpty()) item(5) {
+            MeetHistory(state.historyState, state.meetingsHistory,
                 { callback?.openHistory(state.historyState) })
             { callback?.onHistoryClick(it) }
         }
+        item { Divider(Modifier.fillMaxWidth(), 20.dp, Transparent) }
     }
-    Box(Modifier.fillMaxSize()) {
-        NavBar(
-            state.stateList, Modifier.align(Alignment.BottomCenter)
-        ) { callback?.onNavBarSelect(it) }
-    }
-    GAlert(
-        state.alert, { callback?.closeAlert() },
-        "Отлично, ваша жалоба отправлена!",
-        label = "Модераторы скоро рассмотрят\nвашу жалобу",
-        success = Pair("Закрыть") { callback?.closeAlert() }
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,52 +213,51 @@ fun UserProfile(
 private fun Responds(
     size: Int,
     last: MeetingModel,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onClick: () -> Unit
 ) {
+    val style = typography.labelSmall
+        .copy(fontWeight = SemiBold)
     Card(
-        onClick, modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        colors = CardDefaults.cardColors(colorScheme.primaryContainer)
+        onClick, modifier.fillMaxWidth(),
+        colors = cardColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            Arrangement.SpaceBetween,
-            Alignment.CenterVertically,
+                .padding(start = 12.dp, end = 20.dp)
+                .padding(vertical = 8.dp),
+            SpaceBetween,
+            CenterVertically,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = CenterVertically) {
                 AsyncImage(
-                    last.organizer.id, (null), Modifier
+                    last.organizer.id,
+                    (null), Modifier
                         .size(40.dp)
                         .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    contentScale = Crop
                 )
                 Text(
                     stringResource(R.string.profile_responds_label),
                     Modifier.padding(start = 16.dp),
-                    colorScheme.tertiary,
-                    style = typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold
+                    colorScheme.tertiary, style = style
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = CenterVertically) {
                 if(size > 0) Box(
                     Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
+                        .clip(shapes.extraSmall)
                         .background(colorScheme.primary)
                 ) {
                     Text(
                         size.toString(),
-                        Modifier.padding(12.dp, 6.dp), Color.White,
-                        style = typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold
+                        Modifier.padding(10.dp, 4.dp),
+                        White, style = style
                     )
                 }
                 Icon(
-                    Icons.Filled.KeyboardArrowRight,
+                    Filled.KeyboardArrowRight,
                     stringResource(R.string.profile_responds_label),
                     Modifier, colorScheme.onTertiary
                 )
@@ -251,7 +267,7 @@ private fun Responds(
 }
 
 @Composable
-private fun meetHistory(
+private fun MeetHistory(
     historyState: Boolean,
     historyList: List<MeetingModel>,
     openHistory: () -> Unit,
@@ -260,22 +276,22 @@ private fun meetHistory(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(top = 28.dp)
+            .padding(top = 28.dp, bottom = 12.dp)
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
             .clickable { openHistory() },
-        Arrangement.Start, Alignment.CenterVertically
+        Arrangement.Start, CenterVertically
     ) {
         Text(
             stringResource(R.string.profile_meeting_history_label),
-            Modifier.padding(8.dp),
+            Modifier.padding(end = 12.dp, bottom = 2.dp),
             color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         Icon(
-            if(!historyState) Icons.Filled.KeyboardArrowRight
-            else Icons.Filled.KeyboardArrowDown, (null),
-            tint = colorScheme.onTertiary
+            if(!historyState) Filled.KeyboardArrowRight
+            else Filled.KeyboardArrowDown, (null),
+            Modifier.size(24.dp), colorScheme.tertiary
         )
     }
     if(historyState) LazyRow {
