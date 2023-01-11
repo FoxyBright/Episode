@@ -16,8 +16,8 @@ class LoginViewModel(
     private val repository: LoginRepository,
     
     countryManager: CountryManager,
-
-): ViewModel() {
+    
+    ): ViewModel() {
     
     private val authManager: AuthManager by inject()
     
@@ -47,25 +47,27 @@ class LoginViewModel(
         else
             _phone.emit(text)
     }
+    
     suspend fun clearPhone() {
         _phone.emit(country.value.clearPhoneDial)
     }
     
     suspend fun handle(deepLink: Uri): Boolean {
         if(deepLink.host != "external") return false
-        if(deepLink.getQueryParameter("state") != authManager.getAuth().externalState) return false
+        if(deepLink.getQueryParameter("state") !=
+            authManager.getAuth().externalState) return false
+        
         deepLink.getQueryParameter("token")?.let {
             if(authManager.isExternalLinked(it)) makeToast("Привязан")
             else makeToast("Не привязан")
             return true
         }
+        
         return false
     }
     
     suspend fun sendCode() =
         repository.sendCode(_phone.value).let { // TODO Сделать механизм саги
-            authManager.updateAuth {
-                copy(sendCode = it)
-            }
+            authManager.updateAuth { copy(phone = _phone.value, sendCode = it) }
         }
 }

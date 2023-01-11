@@ -3,15 +3,16 @@ package ru.rikmasters.gilty.login.viewmodel
 import androidx.compose.ui.focus.FocusRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 class CodeViewModel: ViewModel() {
     
+    private val authManager: AuthManager by inject()
+    
     private val _codeLength = MutableStateFlow(4)
     val codeLength = _codeLength.asStateFlow()
-    
-    private val _correctCode = MutableStateFlow("0000")
-    val correctCode = _correctCode.asStateFlow()
     
     private val _code = MutableStateFlow("")
     val code = _code.asStateFlow()
@@ -28,6 +29,13 @@ class CodeViewModel: ViewModel() {
         focuses
     }.value)
     val focuses = _focuses.asStateFlow()
+    
+    suspend fun getCode() = authManager.getSendCode()
+    
+    suspend fun onCodeClear() {
+        _code.emit("")
+        focuses.value[0].requestFocus()
+    }
     
     suspend fun onCodeChange(index: Int, text: String) {
         if(code.value.length <= codeLength.value) {
@@ -47,6 +55,13 @@ class CodeViewModel: ViewModel() {
         } else _code.emit("")
     }
     
+    suspend fun onOtpAuthentication(code: String) {
+        authManager.onOtpAuthentication(code)
+    }
+    
+    suspend fun isUserRegistered(): Boolean =
+        authManager.isUserRegistered()
+    
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)
     }
@@ -54,5 +69,4 @@ class CodeViewModel: ViewModel() {
     suspend fun onTimerChange(sec: Int) {
         _timer.emit(sec)
     }
-    
 }

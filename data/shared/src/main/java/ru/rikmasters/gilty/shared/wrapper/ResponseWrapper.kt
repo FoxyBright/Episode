@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.shared.wrapper
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import com.fasterxml.jackson.annotation.JsonKey
-import com.fasterxml.jackson.annotation.JsonValue
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 

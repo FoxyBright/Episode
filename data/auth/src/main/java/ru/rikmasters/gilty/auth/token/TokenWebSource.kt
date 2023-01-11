@@ -23,15 +23,16 @@ class TokenWebSource: KtorSource() {
     ) = unauthorizedClient.post(
         "http://" + BuildConfig.HOST + "/oauth/token"
     ) {
-        setBody(TokensRequest(
-            grantType.value,
-            BuildConfig.CLIENT_ID,
-            BuildConfig.CLIENT_SECRET,
-            refreshToken = refreshToken,
-            token = token,
-            phone = phone,
-            code = code
-        ))
+        setBody(
+            TokensRequest(
+                grantType.value,
+                BuildConfig.CLIENT_ID,
+                BuildConfig.CLIENT_SECRET,
+                refreshToken,
+                token,
+                phone,
+                code
+            )
+        )
     }.body<TokensResponse?>()?.domain()
-    
 }

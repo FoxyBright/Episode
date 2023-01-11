@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.auth.token
 
-import ru.rikmasters.gilty.auth.token.Tokens
 import ru.rikmasters.gilty.core.data.entity.interfaces.WebEntity
 
 internal data class TokensResponse(
