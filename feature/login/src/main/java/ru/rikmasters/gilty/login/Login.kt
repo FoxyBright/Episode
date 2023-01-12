@@ -19,9 +19,7 @@ import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
-import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
-import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
-import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
+import ru.rikmasters.gilty.login.viewmodel.*
 import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
@@ -29,10 +27,10 @@ object Login: FeatureDefinition() {
     private val authManager: AuthManager by inject()
     
     private val authEntrypointResolver = EntrypointResolver {
-        if(authManager.isAuthorized())
-            "main/meetings"
-        else
-            "login"
+        if(
+            authManager.isAuthorized() &&
+            authManager.isUserRegistered()
+        ) "main/meetings" else "login"
     }
     
     override fun DeepNavGraphBuilder.navigation() {
@@ -76,10 +74,14 @@ object Login: FeatureDefinition() {
             screen<CodeViewModel>("code") { vm, _ ->
                 CodeScreen(vm)
             }
+            
+            screen<PermissionViewModel>("permissions") { vm, _ ->
+                PermissionsScreen(vm)
+            }
+            
             screen("hidden") { HiddenPhotoScreen() }
             screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }
-            screen("permissions") { PermissionsScreen() }
         }
     }
     
@@ -89,6 +91,10 @@ object Login: FeatureDefinition() {
         
         scope<CodeViewModel> {
             scopedOf(::CodeViewModel)
+        }
+        
+        scope<PermissionViewModel> {
+            scopedOf(::PermissionViewModel)
         }
         
         scope<LoginViewModel> {

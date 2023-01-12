@@ -73,10 +73,10 @@ class AuthManager(
         return tokens != null
     }
     
-    suspend fun isUserRegistered() =
+    suspend fun isUserRegistered(): Boolean =
         profileWebSource.isUserRegistered()
     
-    suspend fun onOtpAuthentication(code: String): Boolean {
+    suspend fun onOtpAuthentication(code: String?): Boolean {
         val tokens = kotlin.runCatching {
             tokenWebSource.getOauthTokens(
                 TokenWebSource.GrantType.Otp,

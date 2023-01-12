@@ -6,7 +6,7 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) = implement
     "androidx.core:core-ktx:1.9.0",
     "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
     "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
-)and koin() and implementationIf(!excludeCore, project(":core"))
+) and koin() and implementationIf(!excludeCore, project(":core"))
 
 const val composeVer = Config.kotlinCompilerExtensionVersion
 fun DependencyHandlerScope.compose() = implementation(
@@ -18,12 +18,17 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and implementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
-    "androidx.compose.ui:ui-test-manifest:$composeVer"
-) and accompanist()
+    "androidx.compose.ui:ui-test-manifest:$composeVer",
+) and accompanist() and accompanistPermissions()
 
 const val accompanistVer = "0.26.5-rc"
 fun DependencyHandlerScope.accompanist() = implementation(
     "com.google.accompanist:accompanist-systemuicontroller:$accompanistVer"
+)
+
+const val accompanistPermissionsVer = "0.20.3"
+fun DependencyHandlerScope.accompanistPermissions() = implementation(
+    "com.google.accompanist:accompanist-permissions:$accompanistPermissionsVer"
 )
 
 const val koinVer = "3.2.1"
@@ -61,7 +66,8 @@ fun DependencyHandlerScope.ktor() = implementation(
 )
 
 @Suppress("UNUSED_PARAMETER")
-private infix fun Unit.and(o: Unit) { }
+private infix fun Unit.and(o: Unit) {
+}
 
 private fun DependencyHandler.implementationIf(condition: Boolean, dependencyNotation: Any) {
     if(condition) implementation(dependencyNotation)
