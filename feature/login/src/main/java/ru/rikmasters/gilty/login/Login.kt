@@ -75,12 +75,15 @@ object Login: FeatureDefinition() {
                 CodeScreen(vm)
             }
             
+            screen<PersonalViewModel>("personal") { vm, _ ->
+                PersonalScreen(vm)
+            }
+            
             screen<PermissionViewModel>("permissions") { vm, _ ->
                 PermissionsScreen(vm)
             }
             
             screen("hidden") { HiddenPhotoScreen() }
-            screen("personal") { PersonalScreen() }
             screen("categories") { CategoriesScreen() }
         }
     }
@@ -91,6 +94,11 @@ object Login: FeatureDefinition() {
         
         scope<CodeViewModel> {
             scopedOf(::CodeViewModel)
+        }
+        
+        scope<PersonalViewModel> {
+            scopedOf(::PersonalViewModel)
+            scopedOf(::AgeBsViewModel)
         }
         
         scope<PermissionViewModel> {

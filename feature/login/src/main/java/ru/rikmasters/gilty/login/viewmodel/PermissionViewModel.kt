@@ -9,8 +9,7 @@ private var NOTIFICATION_PERMISSION = true
 
 class PermissionViewModel: ViewModel() {
     
-    private val _notification =
-        MutableStateFlow(NOTIFICATION_PERMISSION)
+    private val _notification = MutableStateFlow(NOTIFICATION_PERMISSION)
     val notification = _notification.asStateFlow()
     
     suspend fun setNotificationPermission() {

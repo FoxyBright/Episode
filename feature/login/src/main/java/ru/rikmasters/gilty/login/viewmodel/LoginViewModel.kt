@@ -15,9 +15,9 @@ class LoginViewModel(
     
     private val repository: LoginRepository,
     
-    countryManager: CountryManager,
-    
-    ): ViewModel() {
+    countryManager: CountryManager
+
+): ViewModel() {
     
     private val authManager: AuthManager by inject()
     
@@ -55,7 +55,8 @@ class LoginViewModel(
     suspend fun handle(deepLink: Uri): Boolean {
         if(deepLink.host != "external") return false
         if(deepLink.getQueryParameter("state") !=
-            authManager.getAuth().externalState) return false
+            authManager.getAuth().externalState
+        ) return false
         
         deepLink.getQueryParameter("token")?.let {
             if(authManager.isExternalLinked(it)) makeToast("Привязан")

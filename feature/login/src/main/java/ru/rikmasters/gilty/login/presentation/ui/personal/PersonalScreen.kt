@@ -1,57 +1,51 @@
 package ru.rikmasters.gilty.login.presentation.ui.personal
 
-import android.annotation.SuppressLint
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.login.viewmodel.AgeBsViewModel
+import ru.rikmasters.gilty.login.viewmodel.PersonalViewModel
 
-@SuppressLint("MutableCollectionMutableState")
 @Composable
-fun PersonalScreen(nav: NavState = get()) {
-    var age by remember { mutableStateOf<Int?>(null) }
+fun PersonalScreen(vm: PersonalViewModel) {
+    
+    val nav = get<NavState>()
     val asm = get<AppStateModel>()
-    var list by remember { mutableStateOf(arrayListOf(false, false, false)) }
     val scope = rememberCoroutineScope()
-    PersonalInfoContent(
-        PersonalInfoContentState(age, list),
-        object : PersonalInfoContentCallback {
+    
+    val age by vm.age.collectAsState()
+    val gender by vm.gender.collectAsState()
+    
+    PersonalContent(
+        PersonalState(age, gender),
+        Modifier, object: PersonalCallback {
             override fun onBack() {
                 nav.navigationBack()
             }
-
+            
             override fun onAgeClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        BottomSheetContent(Modifier, age, { age = it })
-                        {
-                            scope.launch {
-                                asm.bottomSheet.collapse()
-                            }
+                        Connector<AgeBsViewModel>(vm.scope) {
+                            AgeBs(it)
                         }
                     }
                 }
             }
-
-            override fun onAgeChange(it: Int) {
-                age = it
-            }
-
+            
             override fun onGenderChange(index: Int) {
-                val array = arrayListOf<Boolean>()
-                list.forEachIndexed { it, _ -> array.add(index == it) }
-                list = array
+                scope.launch { vm.setGender(index) }
             }
-
+            
             override fun onNext() {
-                nav.navigate("categories")
+                scope.launch {
+                    vm.updateProfile()
+                    nav.navigate("categories")
+                }
             }
         })
 }
