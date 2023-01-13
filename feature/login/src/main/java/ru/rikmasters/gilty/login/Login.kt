@@ -8,7 +8,6 @@ import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.auth.manager.AuthManager
-import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -26,12 +25,12 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 object Login: FeatureDefinition() {
     
     private val authManager by inject<AuthManager>()
-    private val regManager by inject<RegistrationManager>()
+//    private val regManager by inject<RegistrationManager>()
     
     private val authEntrypointResolver = EntrypointResolver {
         if(
-            authManager.isAuthorized() &&
-            regManager.isUserRegistered()
+            authManager.isAuthorized() /*&&
+            regManager.isUserRegistered()*/ //TODO Добавить проверку на завершенность регистрации
         ) "main/meetings" else "login"
     }
     
