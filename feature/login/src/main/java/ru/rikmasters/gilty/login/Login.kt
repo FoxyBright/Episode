@@ -8,6 +8,7 @@ import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.auth.manager.AuthManager
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -24,12 +25,13 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
     
-    private val authManager: AuthManager by inject()
+    private val authManager by inject<AuthManager>()
+    private val regManager by inject<RegistrationManager>()
     
     private val authEntrypointResolver = EntrypointResolver {
         if(
             authManager.isAuthorized() &&
-            authManager.isUserRegistered()
+            regManager.isUserRegistered()
         ) "main/meetings" else "login"
     }
     
@@ -41,25 +43,31 @@ object Login: FeatureDefinition() {
         
         nested("registration", "code") {
             
-            screen(
-                "profile?photo={photo}&hp={hp}",
-            ) {
+            screen<CodeViewModel>("code") { vm, _ ->
+                CodeScreen(vm)
+            }
+            
+            screen<ProfileViewModel>(
+                "profile?photo={photo}&hp={hp}&jjj",
+            ) { vm, it ->
                 it.arguments?.getString("photo")?.let { avatar ->
                     it.arguments?.getString("hp")?.let { hiddenPhoto ->
-                        ProfileScreen(avatar, hiddenPhoto)
+                        ProfileScreen(vm, avatar, hiddenPhoto)
                     }
                 }
             }
             
-            screen( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
+            screen<ProfileViewModel>( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
                 "resize?photo={photo}",
                 listOf(navArgument("photo") {
                     type = NavType.StringType; defaultValue = ""
                 })
-            ) {
+            ) { vm, it ->
                 it.arguments?.getString("photo")
-                    ?.let { avatar -> ProfileScreen(avatar) }
+                    ?.let { avatar -> ProfileScreen(vm, avatar) }
             }
+            
+            screen("hidden") { HiddenPhotoScreen() }
             
             screen(
                 "gallery?multi={multi}",
@@ -71,20 +79,15 @@ object Login: FeatureDefinition() {
                     ?.let { multi -> ProfileSelectPhotoScreen(multi) }
             }
             
-            screen<CodeViewModel>("code") { vm, _ ->
-                CodeScreen(vm)
-            }
-            
             screen<PersonalViewModel>("personal") { vm, _ ->
                 PersonalScreen(vm)
             }
             
+            screen("categories") { CategoriesScreen() }
+            
             screen<PermissionViewModel>("permissions") { vm, _ ->
                 PermissionsScreen(vm)
             }
-            
-            screen("hidden") { HiddenPhotoScreen() }
-            screen("categories") { CategoriesScreen() }
         }
     }
     
@@ -94,6 +97,10 @@ object Login: FeatureDefinition() {
         
         scope<CodeViewModel> {
             scopedOf(::CodeViewModel)
+        }
+        
+        scope<ProfileViewModel> {
+            scopedOf(::ProfileViewModel)
         }
         
         scope<PersonalViewModel> {
@@ -111,7 +118,5 @@ object Login: FeatureDefinition() {
         }
     }
     
-    override fun include() = setOf(
-        Auth,
-    )
+    override fun include() = setOf(Auth)
 }

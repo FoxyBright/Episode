@@ -36,7 +36,7 @@ val DemoCountry = Country(
 
 class CountryManager: Component {
     
-    private val context: Context by inject()
+    private val context by inject<Context>()
     
     val defaultCountry: Country by lazy {
         countryFrom(Locale.getDefault())

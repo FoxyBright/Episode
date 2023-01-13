@@ -43,7 +43,7 @@ fun PermissionsScreen(vm: PermissionViewModel) {
                 }
             }
             
-            override fun onNext() {
+            override fun onComplete() {
                 nav.navigateAbsolute("main/meetings")
             }
         })

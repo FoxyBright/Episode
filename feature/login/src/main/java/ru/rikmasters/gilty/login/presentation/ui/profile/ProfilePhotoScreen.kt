@@ -17,13 +17,6 @@ import ru.rikmasters.gilty.shared.common.GalleryCallback
 import ru.rikmasters.gilty.shared.common.GalleryContent
 import ru.rikmasters.gilty.shared.common.GalleryState
 import ru.rikmasters.gilty.shared.shared.GradientButton
-import java.io.File
-
-var Avatar: String = ""
-var Hidden: String = ""
-var UserName: String = ""
-var UserDescription: String = ""
-var ListHidden: List<File> = listOf()
 
 @Composable
 fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
@@ -39,7 +32,6 @@ fun ProfileSelectPhotoScreen(multiple: Boolean = false, nav: NavState = get()) {
 
     val menuItems = arrayListOf(
         "Все медиа",
-        "Все видео",
         "WhatsApp images",
         "Screenshots",
         "Viber",

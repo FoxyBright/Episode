@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.profile.viewmodel.SettingsViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.SexType
 import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
@@ -17,7 +18,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.SexType.OTHER
 import ru.rikmasters.gilty.shared.model.profile.*
 
 @Composable
-fun SettingsScreen(nav: NavState = get()) {
+fun SettingsScreen(vm: SettingsViewModel) {
+    val nav = get<NavState>()
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -172,6 +174,7 @@ fun SettingsScreen(nav: NavState = get()) {
                     "Алерт будет позже",
                     Toast.LENGTH_SHORT
                 ).show()
+                scope.launch { vm.logout() }
                 nav.navigateAbsolute("login")
             }
             

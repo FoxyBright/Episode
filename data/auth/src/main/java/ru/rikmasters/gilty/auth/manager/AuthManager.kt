@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.auth.manager
 
 import io.ktor.client.plugins.auth.providers.BearerTokens
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource
 import ru.rikmasters.gilty.auth.saga.AuthSaga
 import ru.rikmasters.gilty.auth.token.TokenStore
 import ru.rikmasters.gilty.auth.token.TokenWebSource
@@ -16,8 +15,6 @@ import ru.rikmasters.gilty.core.viewmodel.Strategy
 class AuthManager(
     
     private val tokenWebSource: TokenWebSource,
-    
-    private val profileWebSource: ProfileWebSource,
     
     private val dbSource: DbSource,
     
@@ -72,9 +69,6 @@ class AuthManager(
         
         return tokens != null
     }
-    
-    suspend fun isUserRegistered(): Boolean =
-        profileWebSource.isUserRegistered()
     
     suspend fun onOtpAuthentication(code: String?): Boolean {
         val tokens = kotlin.runCatching {

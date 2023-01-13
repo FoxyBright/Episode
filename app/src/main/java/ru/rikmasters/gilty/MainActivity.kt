@@ -6,12 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
-import androidx.core.view.WindowCompat
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.data.source.WebSource
 import ru.rikmasters.gilty.core.env.Environment
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.shared.BuildConfig
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
@@ -21,7 +19,7 @@ import ru.rikmasters.gilty.ui.GSnackbar
 @ExperimentalMaterial3Api
 class MainActivity: ComponentActivity() {
     
-    private val env: Environment by inject()
+    private val env by inject<Environment>()
     
     private var _intent: Intent? by mutableStateOf(null)
     

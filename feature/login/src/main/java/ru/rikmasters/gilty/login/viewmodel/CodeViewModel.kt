@@ -5,11 +5,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 class CodeViewModel: ViewModel() {
     
-    private val authManager: AuthManager by inject()
+    private val authManager by inject<AuthManager>()
+    private val regManager by inject<RegistrationManager>()
     
     private val _codeLength = MutableStateFlow(4)
     val codeLength = _codeLength.asStateFlow()
@@ -60,7 +62,7 @@ class CodeViewModel: ViewModel() {
     }
     
     suspend fun isUserRegistered(): Boolean =
-        authManager.isUserRegistered()
+        regManager.isUserRegistered()
     
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)

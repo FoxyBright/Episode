@@ -19,7 +19,7 @@ class LoginViewModel(
 
 ): ViewModel() {
     
-    private val authManager: AuthManager by inject()
+    private val authManager by inject<AuthManager>()
     
     private val _country = MutableStateFlow(countryManager.defaultCountry)
     val country = _country.asStateFlow()

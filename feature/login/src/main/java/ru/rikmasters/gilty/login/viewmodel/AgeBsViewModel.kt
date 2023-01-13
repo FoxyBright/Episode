@@ -7,7 +7,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 class AgeBsViewModel(
     
     private val personalVm: PersonalViewModel
-
+    
 ): ViewModel() {
     
     private val _age = MutableStateFlow(18)

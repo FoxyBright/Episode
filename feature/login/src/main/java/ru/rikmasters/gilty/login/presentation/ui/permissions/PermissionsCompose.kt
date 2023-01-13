@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.animated.AnimatedImage
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.map
 import ru.rikmasters.gilty.shared.R.raw.find_more
@@ -45,8 +44,9 @@ data class PermissionsState(
     val notificationState: Boolean = false
 )
 
-interface PermissionsCallback: NavigationInterface {
-    
+interface PermissionsCallback {
+    fun onBack()
+    fun onComplete()
     fun requestPermission()
     fun notificationChange()
 }
@@ -98,7 +98,7 @@ fun PermissionsContent(
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.permissions_finish_button)
-        ) { callback?.onNext() }
+        ) { callback?.onComplete() }
     }
 }
 
