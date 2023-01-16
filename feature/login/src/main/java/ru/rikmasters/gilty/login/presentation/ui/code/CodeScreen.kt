@@ -52,7 +52,9 @@ fun CodeScreen(vm: CodeViewModel) {
             }
             
             override fun onCodeSend() {
-                scope.launch { vm.onTimerChange(60) }
+                scope.launch {
+                    vm.updateSendCode()
+                }
             }
             
             override fun onCodeChange(index: Int, text: String) {

@@ -12,6 +12,7 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
+import ru.rikmasters.gilty.login.presentation.ui.login.country.CountryBs
 import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.R
@@ -52,30 +53,33 @@ fun LoginScreen(vm: LoginViewModel) {
         isNextActive,
         country,
         methods.toList()
-    ), Modifier, object : LoginCallback {
+    ), Modifier, object: LoginCallback {
         
         override fun onPhoneChange(text: String) {
             scope.launch { vm.changePhone(text) }
         }
-
+        
         override fun onClear() {
             scope.launch { vm.clearPhone() }
         }
-
+        
         override fun loginWith(method: LoginMethod) {
-            scope.launch { openInWeb(context, method.url) }
+            scope.launch {
+                openInWeb(context, method.url)
+                nav.navigateAbsolute("registration/external")
+            }
         }
-
+        
         override fun privatePolicy() {
             val toast = context.resources.getString(R.string.login_policy_toast)
             Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
         }
-
+        
         override fun termsOfApp() {
             val toast = context.resources.getString(R.string.login_terms_toast)
             Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
         }
-
+        
         override fun changeCountry() {
             scope.launch {
                 asm.bottomSheet.expand {
@@ -85,7 +89,7 @@ fun LoginScreen(vm: LoginViewModel) {
                 }
             }
         }
-
+        
         override fun onNext() {
             scope.launch {
                 vm.sendCode()

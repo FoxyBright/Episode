@@ -8,31 +8,33 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
 import ru.rikmasters.gilty.login.R
-import ru.rikmasters.gilty.shared.R as SR
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
-import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.R as SR
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
@@ -56,9 +58,9 @@ private fun LoginPreview() {
 interface LoginCallback {
     
     fun onNext()
-    fun loginWith(method: LoginMethod)
-    fun privatePolicy()
-    fun termsOfApp()
+    fun loginWith(method: LoginMethod){}
+    fun privatePolicy(){}
+    fun termsOfApp(){}
     fun onPhoneChange(text: String)
     fun onClear()
     fun changeCountry()
@@ -92,7 +94,7 @@ fun LoginContent(
             horizontalAlignment = CenterHorizontally,
         ) {
             Logo(Modifier.weight(1f))
-            PhoneField(Modifier, state, callback)
+            PhoneField(Modifier, state.phone, state.country, callback)
             NextButton(Modifier, state.isNextActive) { callback?.onNext() }
             LoginMethodsButtons(Modifier, state.methods, callback)
         }
@@ -113,55 +115,6 @@ private fun Logo(
         painterResource(SR.drawable.ic_logo),
         stringResource(SR.string.gilty_logo),
         modifier.heightIn(64.dp, 210.dp)
-    )
-}
-
-@Composable
-private fun PhoneField(
-    modifier: Modifier = Modifier,
-    state: LoginState,
-    callback: LoginCallback? = null
-) {
-    Box(
-        modifier.clip(MaterialTheme.shapes.extraSmall)
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .background(colorScheme.onPrimaryContainer),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                state.country.flag,
-                stringResource(SR.string.select_country),
-                Modifier
-                    .padding(start = 10.dp)
-                    .size(20.dp)
-                    .clickable
-                    { callback?.changeCountry() }
-            )
-            PhoneTextField(
-                state.phone,
-                state.country,
-                Modifier.fillMaxWidth(),
-                { callback?.onClear() },
-                { callback?.onPhoneChange(it) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun NextButton(
-    modifier: Modifier = Modifier,
-    isActive: Boolean,
-    onClick: () -> Unit
-) {
-    GradientButton(
-        modifier.padding(top = 20.dp),
-        stringResource(SR.string.next_button),
-        isActive,
-        onClick = onClick
     )
 }
 
@@ -197,7 +150,6 @@ private fun LoginMethodsButtons(
     }
 }
 
-
 private val LoginMethod.name
     @Composable get() = when(this) {
         is Google -> stringResource(R.string.login_via_google)
@@ -229,7 +181,7 @@ private fun LoginMethodButton(
             Modifier
                 .padding(start = 8.dp)
                 .fillMaxWidth(3f / 4f),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = CenterVertically
         ) {
             Image(
                 method.icon,

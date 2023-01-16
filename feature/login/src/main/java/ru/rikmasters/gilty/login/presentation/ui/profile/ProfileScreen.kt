@@ -9,8 +9,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,7 +20,6 @@ import ru.rikmasters.gilty.login.viewmodel.Hidden
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -48,7 +45,6 @@ fun ProfileScreen(
         profilePhoto = if(photo == "") Avatar else photo,
         description = description,
         rating = "0.0",
-        emoji = EmojiList.first(),
         enabled = true,
         occupiedName = occupied
     )
@@ -56,11 +52,6 @@ fun ProfileScreen(
     val imageData = remember {
         mutableStateOf<Uri?>(null)
     }
-    
-    val launcher =
-        rememberLauncherForActivityResult(GetContent()) {
-            imageData.value = it
-        }
     
     val context = LocalContext.current
     
@@ -82,8 +73,7 @@ fun ProfileScreen(
             }
             
             override fun profileImage() {
-                launcher.launch("image/*") // TODO Сделать нормальный доступ к фото
-                //nav.navigateAbsolute("registration/gallery?multi=false")
+                nav.navigateAbsolute("registration/gallery?multi=false")
             }
             
             override fun hiddenImages() {

@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.auth.manager
 
 import io.ktor.client.plugins.auth.providers.BearerTokens
+import ru.rikmasters.gilty.auth.login.SendCode
 import ru.rikmasters.gilty.auth.saga.AuthSaga
 import ru.rikmasters.gilty.auth.token.TokenStore
 import ru.rikmasters.gilty.auth.token.TokenWebSource
@@ -42,8 +43,8 @@ class AuthManager(
         }
     }
     
-    suspend fun getSendCode(): String? =
-        getAuth().sendCode?.code
+    suspend fun getSendCode(): SendCode? =
+        getAuth().sendCode
     
     suspend fun getAuth(): AuthSaga =
         dbSource.find() ?: startAuth()
@@ -82,6 +83,10 @@ class AuthManager(
         tokens?.let { login(it) }
         
         return tokens != null
+    }
+    
+    suspend fun linkExternal(token: String) {
+        tokenWebSource.linkExternal(token)
     }
     
     suspend fun getTokens() =

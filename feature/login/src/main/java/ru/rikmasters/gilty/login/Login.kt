@@ -8,29 +8,31 @@ import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.auth.manager.AuthManager
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
+import ru.rikmasters.gilty.login.presentation.ui.login.external.ExternalScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
-import ru.rikmasters.gilty.login.presentation.ui.profile.HiddenPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
-import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.login.viewmodel.*
 import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
     
     private val authManager by inject<AuthManager>()
-//    private val regManager by inject<RegistrationManager>()
+    private val regManager by inject<RegistrationManager>()
     
     private val authEntrypointResolver = EntrypointResolver {
         if(
-            authManager.isAuthorized() /*&&
-            regManager.isUserRegistered()*/ //TODO Добавить проверку на завершенность регистрации
+            authManager.isAuthorized() &&
+            regManager.isUserRegistered()
         ) "main/meetings" else "login"
     }
     
@@ -41,6 +43,10 @@ object Login: FeatureDefinition() {
         }
         
         nested("registration", "code") {
+            
+            screen<LoginViewModel>("external") { vm, _ ->
+                ExternalScreen(vm, "Google", "token")
+            }
             
             screen<CodeViewModel>("code") { vm, _ ->
                 CodeScreen(vm)
@@ -68,14 +74,14 @@ object Login: FeatureDefinition() {
             
             screen("hidden") { HiddenPhotoScreen() }
             
-            screen(
+            screen<GalereyViewModel>(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
                     type = NavType.BoolType; defaultValue = false
                 })
-            ) {
+            ) { vm, it ->
                 it.arguments?.getBoolean("multi")
-                    ?.let { multi -> ProfileSelectPhotoScreen(multi) }
+                    ?.let { multi -> ProfileSelectPhotoScreen(vm, multi) }
             }
             
             screen<PersonalViewModel>("personal") { vm, _ ->
@@ -94,6 +100,15 @@ object Login: FeatureDefinition() {
         this@koin.single { authEntrypointResolver }
         singleOf(::CountryManager)
         
+        scope<LoginViewModel> {
+            scopedOf(::LoginViewModel)
+            scopedOf(::CountryBsViewModel)
+        }
+        
+        scope<GalereyViewModel> {
+            scopedOf(::GalereyViewModel)
+        }
+        
         scope<CodeViewModel> {
             scopedOf(::CodeViewModel)
         }
@@ -109,11 +124,6 @@ object Login: FeatureDefinition() {
         
         scope<PermissionViewModel> {
             scopedOf(::PermissionViewModel)
-        }
-        
-        scope<LoginViewModel> {
-            scopedOf(::LoginViewModel)
-            scopedOf(::CountryBsViewModel)
         }
     }
     

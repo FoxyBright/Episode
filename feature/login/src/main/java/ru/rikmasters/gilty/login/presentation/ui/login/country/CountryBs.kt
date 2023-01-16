@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.login
+package ru.rikmasters.gilty.login.presentation.ui.login.country
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

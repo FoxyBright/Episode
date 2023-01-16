@@ -4,7 +4,9 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig
+import ru.rikmasters.gilty.shared.BuildConfig.HOST
 
 class TokenWebSource: KtorSource() {
     
@@ -14,6 +16,12 @@ class TokenWebSource: KtorSource() {
         External("external")
     }
     
+    suspend fun linkExternal(
+        token: String
+    ) = client.post(
+        "http://$HOST/oauth/token"
+    ) { url { query("token" to token) } }
+    
     suspend fun getOauthTokens(
         grantType: GrantType,
         refreshToken: String? = null,
@@ -21,7 +29,7 @@ class TokenWebSource: KtorSource() {
         phone: String? = null,
         code: String? = null,
     ) = unauthorizedClient.post(
-        "http://" + BuildConfig.HOST + "/oauth/token"
+        "http://$HOST/oauth/token"
     ) {
         setBody(
             TokensRequest(

@@ -4,11 +4,16 @@ import androidx.compose.ui.focus.FocusRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
-class CodeViewModel: ViewModel() {
+class CodeViewModel(
+    
+    private val repository: LoginRepository
+
+): ViewModel() {
     
     private val authManager by inject<AuthManager>()
     private val regManager by inject<RegistrationManager>()
@@ -32,7 +37,27 @@ class CodeViewModel: ViewModel() {
     }.value)
     val focuses = _focuses.asStateFlow()
     
-    suspend fun getCode() = authManager.getSendCode()
+    suspend fun updateSendCode() {
+        
+        authManager.getAuth().phone?.let { phone ->
+            repository.sendCode(phone).let {
+                authManager.updateAuth { copy(phone = phone, sendCode = it) }
+            }
+        }
+        
+        val senCode = authManager.getSendCode()
+        
+        senCode?.codeTimeout?.let { _timer.emit(it) }
+        senCode?.codeLength?.let { _codeLength.emit(it) }
+        
+        makeToast("Ваш код: ${getCode()}")
+    }
+    
+    suspend fun getCode() = authManager.getSendCode()?.code
+    
+    suspend fun link(token: String){
+        authManager.linkExternal(token)
+    }
     
     suspend fun onCodeClear() {
         _code.emit("")

@@ -20,48 +20,54 @@ import java.io.IOException
 
 open class KtorSource: WebSource() {
     
-    private val baseClient by lazy { HttpClient(OkHttp) {
-        install(Logging) {
-            level = LogLevel.BODY
-            logger = LogAdapter
-        }
-        install(HttpRequestRetry) {
-            exponentialDelay()
-            maxRetries = 3
-            retryOnExceptionIf { _, throwable -> throwable is IOException }
-        }
-        install(ContentNegotiation) {
-            jackson {
-                propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
-                setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    private val baseClient by lazy {
+        HttpClient(OkHttp) {
+            install(Logging) {
+                level = LogLevel.BODY
+                logger = LogAdapter
             }
-        }
-        defaultRequest {
-            contentType(ContentType.Application.Json)
-            host = env[ENV_BASE_URL] ?: ""
-        }
-        install(UserAgent) {
-            agent = env[ENV_USER_AGENT] ?: ""
-        }
-    } }
-    
-    val unauthorizedClient by lazy { baseClient.config {
-    
-    } }
-
-    val client by lazy { baseClient.config {
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    tokenManager.getTokens()
-                }
-                refreshTokens {
-                    tokenManager.refreshTokens()
+            install(HttpRequestRetry) {
+                exponentialDelay()
+                maxRetries = 3
+                retryOnExceptionIf { _, throwable -> throwable is IOException }
+            }
+            install(ContentNegotiation) {
+                jackson {
+                    propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
+                    setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 }
             }
-            
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+                host = env[ENV_BASE_URL] ?: ""
+            }
+            install(UserAgent) {
+                agent = env[ENV_USER_AGENT] ?: ""
+            }
         }
-    } }
+    }
+    
+    val unauthorizedClient by lazy {
+        baseClient.config {
+        
+        }
+    }
+    
+    val client by lazy {
+        baseClient.config {
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        tokenManager.getTokens()
+                    }
+                    refreshTokens {
+                        tokenManager.refreshTokens()
+                    }
+                }
+                
+            }
+        }
+    }
     
     private val tokenManager
         get() = getKoin()

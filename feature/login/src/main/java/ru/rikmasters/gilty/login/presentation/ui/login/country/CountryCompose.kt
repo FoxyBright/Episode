@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.login
+package ru.rikmasters.gilty.login.presentation.ui.login.country
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

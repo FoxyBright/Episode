@@ -45,6 +45,7 @@ data class PermissionsState(
 )
 
 interface PermissionsCallback {
+    
     fun onBack()
     fun onComplete()
     fun requestPermission()
@@ -77,14 +78,10 @@ fun PermissionsContent(
                     .padding(horizontal = 16.dp)
                     .background(colorScheme.background)
             ) {
-                //                val launcher = checkPermissionsLauncher()
                 PermItem(
                     stringResource(R.string.permission_geoposition_label),
                     0, state.geopositionState
-                ) {
-                    callback?.requestPermission()
-                    //                    launcher.launch(ACCESS_FINE_LOCATION)
-                }
+                ) { callback?.requestPermission() }
                 Divider(Modifier.padding(start = 16.dp))
                 PermItem(
                     stringResource(R.string.notification_screen_name),
@@ -154,14 +151,3 @@ private fun PermItem(
         }
     }
 }
-
-//@Composable
-//private fun checkPermissionsLauncher(
-//): ManagedActivityResultLauncher<String, Boolean> {
-//    return rememberLauncherForActivityResult(
-//        ActivityResultContracts.RequestPermission()
-//    ) {
-//        if(it) log.d("PERMISSION GRANTED")
-//        else log.d("PERMISSION DENIED")
-//    }
-//}

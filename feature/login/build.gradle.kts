@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":feature:animated"))
     
     implementation(project(":data:auth"))
+    implementation("com.vanniktech:android-image-cropper:4.5.0") // TODO сделать свое решение
 }

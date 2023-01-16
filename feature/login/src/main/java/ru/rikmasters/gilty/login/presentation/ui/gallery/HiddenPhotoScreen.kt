@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.profile
+package ru.rikmasters.gilty.login.presentation.ui.gallery
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf

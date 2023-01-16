@@ -33,19 +33,24 @@ class LoginViewModel(
     val loginMethods = _loginMethods.asStateFlow()
     
     suspend fun loadLoginMethods() = singleLoading {
-        repository.getLoginMethods(authManager.getAuth().externalState).let {
-            _loginMethods.emit(it)
-        }
+        repository.getLoginMethods(
+            authManager.getAuth().externalState
+        ).let { _loginMethods.emit(it) }
     }
     
     private val _phone = MutableStateFlow(country.value.clearPhoneDial)
     val phone = _phone.asStateFlow()
     
     suspend fun changePhone(text: String) {
-        if(text.length >= phone.value.length && !text.startsWith(country.value.clearPhoneDial))
-            _phone.emit(country.value.clearPhoneDial.substring(0, text.length))
-        else
-            _phone.emit(text)
+        val dial = country.value.clearPhoneDial
+        val length = text.length
+        
+        _phone.emit(
+            if(length >= phone.value.length &&
+                !text.startsWith(dial)
+            ) dial.substring(0, length)
+            else text
+        )
     }
     
     suspend fun clearPhone() {
