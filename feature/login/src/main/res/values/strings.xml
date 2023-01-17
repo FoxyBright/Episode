@@ -3,9 +3,8 @@
 
     <string name="login_via">Войти через %s</string>
 
-    <string name="login_via_google">Google</string>
-    <string name="login_via_apple">Apple</string>
-    <string name="login_via_vk">VK</string>
+    <string name="login_external_bar">Введите номер</string>
+    <string name="login_external_bar_details">Вы вошли через %s, но нам все еще нужен\nваш номер телефона</string>
 
     <string name="alternative_separator">или</string>
 

@@ -7,8 +7,6 @@
     <string name="select_city">Город</string>
     <string name="search_placeholder">Поиск</string>
     <string name="next_button">Далее</string>
-    <string name="login_external_bar">Введите номер</string>
-    <string name="login_external_bar_details">Вы вошли через %s, но нам все еще нужен\nваш номер телефона</string>
     <string name="login_blocked_profile_title">Профиль заблокирован</string>
     <string name="login_blocked_profile_label">Ваш профиль заблокирован\nза нарушение условий использования\nприложения. Узнайте, как можно\nвосстановить аккаунт</string>
 

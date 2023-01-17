@@ -18,6 +18,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -32,35 +33,68 @@ import ru.rikmasters.gilty.auth.login.*
 import ru.rikmasters.gilty.login.R
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
+import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.R as SR
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+private val loginMethods = listOf(
+    Google("", ""),
+    Apple("", ""),
+    Vk("", ""),
+)
+
+@Preview
 @Composable
 private fun LoginPreview() {
     GiltyTheme {
-        LoginContent(
-            LoginState(
-                "79543422455",
-                false,
-                DemoCountry,
-                listOf(
-                    Google(""),
-                    Apple(""),
-                    Vk(""),
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            LoginContent(
+                LoginState(
+                    "79543422455",
+                    false,
+                    DemoCountry,
+                    loginMethods
                 )
             )
-        )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ExternalPreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            LoginContent(
+                LoginState(
+                    "79543422455",
+                    false,
+                    DemoCountry,
+                    loginMethods,
+                    true,
+                    "Google"
+                )
+            )
+        }
     }
 }
 
 interface LoginCallback {
     
+    fun onBack()
     fun onNext()
-    fun loginWith(method: LoginMethod){}
-    fun privatePolicy(){}
-    fun termsOfApp(){}
+    fun loginWith(method: LoginMethod) {}
+    fun privatePolicy() {}
+    fun termsOfApp() {}
     fun onPhoneChange(text: String)
     fun onClear()
     fun changeCountry()
@@ -71,7 +105,9 @@ data class LoginState(
     val phone: String,
     val isNextActive: Boolean,
     val country: Country,
-    val methods: List<LoginMethod>
+    val methods: List<LoginMethod>,
+    val externalScreen: Boolean = false,
+    val method: String? = null,
 )
 
 @Composable
@@ -80,30 +116,42 @@ fun LoginContent(
     modifier: Modifier = Modifier,
     callback: LoginCallback? = null,
 ) {
+    val external = if(state.externalScreen)
+        null else "external"
     Column(
         modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
             .background(colorScheme.background),
-        verticalArrangement = SpaceBetween
+        SpaceBetween
     ) {
         Column(
-            Modifier
-                .weight(1f),
-            horizontalAlignment = CenterHorizontally,
+            Modifier.weight(1f),
+            Top, CenterHorizontally,
         ) {
-            Logo(Modifier.weight(1f))
-            PhoneField(Modifier, state.phone, state.country, callback)
-            NextButton(Modifier, state.isNextActive) { callback?.onNext() }
-            LoginMethodsButtons(Modifier, state.methods, callback)
+            external?.let { Logo(Modifier.weight(1f)) }
+            
+            if(external.isNullOrBlank())
+                TopBar(state.method) { callback?.onBack() }
+            
+            Column(
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 36.dp)) {
+                PhoneField(Modifier, state.phone, state.country, callback)
+                NextButton(Modifier, state.isNextActive) { callback?.onNext() }
+            }
+            
+            external?.let { LoginMethodsButtons(Modifier, state.methods, callback) }
         }
-        Spacer(Modifier.weight(0.1f))
-        ConfirmationPolicy(
-            Modifier.fillMaxWidth(),
-            callback
-        )
-        Spacer(Modifier.weight(0.1f))
+        external?.let {
+            Spacer(Modifier.weight(0.1f))
+            ConfirmationPolicy(
+                Modifier.fillMaxWidth(),
+                callback
+            )
+            Spacer(Modifier.weight(0.1f))
+        }
     }
 }
 
@@ -114,8 +162,24 @@ private fun Logo(
     Image(
         painterResource(SR.drawable.ic_logo),
         stringResource(SR.string.gilty_logo),
-        modifier.heightIn(64.dp, 210.dp)
+        modifier
+            .heightIn(64.dp, 210.dp)
+            .padding(horizontal = 16.dp)
     )
+}
+
+@Composable
+private fun TopBar(
+    method: String?,
+    onBack: (() -> Unit)? = null
+) {
+    ActionBar(
+        stringResource(R.string.login_external_bar),
+        stringResource(
+            R.string.login_external_bar_details,
+            (method ?: "")
+        )
+    ) { onBack?.let { it() } }
 }
 
 @Composable
@@ -124,7 +188,11 @@ private fun LoginMethodsButtons(
     methods: List<LoginMethod>,
     callback: LoginCallback? = null
 ) {
-    Box(modifier.height(290.dp)) {
+    Box(
+        modifier
+            .height(290.dp)
+            .padding(horizontal = 16.dp)
+    ) {
         AnimatedVisibility(
             methods.isNotEmpty(),
             enter = fadeIn(),
@@ -150,19 +218,14 @@ private fun LoginMethodsButtons(
     }
 }
 
-private val LoginMethod.name
-    @Composable get() = when(this) {
-        is Google -> stringResource(R.string.login_via_google)
-        is Apple -> stringResource(R.string.login_via_apple)
-        is Vk -> stringResource(R.string.login_via_vk)
-    }
-
 private val LoginMethod.icon
-    @Composable get() = when(this) {
-        is Apple -> painterResource(R.drawable.ic_apple)
-        is Google -> painterResource(R.drawable.ic_google)
-        is Vk -> painterResource(R.drawable.ic_vk)
-    }
+    @Composable get() = painterResource(
+        when(this) {
+            is Apple -> R.drawable.ic_apple
+            is Google -> R.drawable.ic_google
+            is Vk -> R.drawable.ic_vk
+        }
+    )
 
 @Composable
 private fun LoginMethodButton(
@@ -174,7 +237,8 @@ private fun LoginMethodButton(
         { onClick(method) },
         modifier
             .fillMaxWidth()
-            .padding(top = 12.dp),
+            .padding(top = 12.dp)
+            .padding(horizontal = 16.dp),
         colors = buttonColors(colorScheme.primaryContainer)
     ) {
         Row(
@@ -188,7 +252,9 @@ private fun LoginMethodButton(
                 null,
                 Modifier
                     .padding(end = 18.dp)
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 10.dp),
+                colorFilter = if(method.name != "Apple")
+                    null else tint(colorScheme.tertiary)
             )
             Text(
                 stringResource(R.string.login_via, method.name),
@@ -230,7 +296,7 @@ private fun ConfirmationPolicy(
             addStringAnnotation("policy", "", it, it + policy.length)
         }
     }
-    ClickableText(annotatedText, modifier, typography) {
+    ClickableText(annotatedText, modifier.padding(horizontal = 16.dp), typography) {
         annotatedText.getStringAnnotations(
             "terms", it, it
         ).firstOrNull()?.let { callback?.termsOfApp() }

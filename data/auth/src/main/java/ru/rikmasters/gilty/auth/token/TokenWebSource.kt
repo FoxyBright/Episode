@@ -3,10 +3,12 @@ package ru.rikmasters.gilty.auth.token
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 
 class TokenWebSource: KtorSource() {
     
@@ -16,11 +18,21 @@ class TokenWebSource: KtorSource() {
         External("external")
     }
     
+    suspend fun logout(): HttpResponse {
+        updateClientToken()
+        return client.post(
+            "http://$HOST/auth/logout"
+        ) {}
+    }
+    
     suspend fun linkExternal(
         token: String
-    ) = client.post(
-        "http://$HOST/oauth/token"
-    ) { url { query("token" to token) } }
+    ): HttpResponse {
+        updateClientToken()
+        return client.post(
+            "http://$HOST$PREFIX_URL/auth/externals/link"
+        ) { url { query("token" to token) } }
+    }
     
     suspend fun getOauthTokens(
         grantType: GrantType,

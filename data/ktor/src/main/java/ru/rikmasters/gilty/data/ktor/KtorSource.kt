@@ -53,8 +53,14 @@ open class KtorSource: WebSource() {
         }
     }
     
-    val client by lazy {
-        baseClient.config {
+    var client = getTokens()
+    
+    fun updateClientToken(){
+        client = getTokens()
+    }
+    
+    private fun getTokens(): HttpClient {
+        return baseClient.config {
             install(Auth) {
                 bearer {
                     loadTokens {
@@ -64,13 +70,11 @@ open class KtorSource: WebSource() {
                         tokenManager.refreshTokens()
                     }
                 }
-                
             }
         }
     }
     
     private val tokenManager
-        get() = getKoin()
-            .getOrNull<TokenManager>()
+        get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
 }

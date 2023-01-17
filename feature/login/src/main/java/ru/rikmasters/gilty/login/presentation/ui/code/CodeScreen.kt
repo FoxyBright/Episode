@@ -53,12 +53,11 @@ fun CodeScreen(vm: CodeViewModel) {
             override fun onCodeChange(index: Int, text: String) {
                 scope.launch {
                     vm.onCodeChange(index, text)
-                    
-                    val codeCheck = vm.code.value
-                    
-                    if(codeCheck.length == vm.codeLength.value) {
+        
+                    if(vm.code.value.length == vm.codeLength.value) {
                         try {
-                            vm.onOtpAuthentication(codeCheck)
+                            vm.onOtpAuthentication(vm.code.value)
+                            vm.linkExternalToken()
                             if(vm.isUserRegistered())
                                 nav.navigateAbsolute("main/meetings")
                             else

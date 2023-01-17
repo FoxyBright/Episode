@@ -66,8 +66,10 @@ class CodeViewModel(
         sendCode?.codeLength?.let { _codeLength.emit(it) }
     }
     
-    suspend fun link(token: String) {
-        authManager.linkExternal(token)
+    suspend fun linkExternalToken() {
+        authManager.getAuth().externalToken?.let {
+            authManager.linkExternal(it)
+        }
     }
     
     suspend fun onCodeClear() {
@@ -97,8 +99,9 @@ class CodeViewModel(
         authManager.onOtpAuthentication(code)
     }
     
-    suspend fun isUserRegistered(): Boolean =
-        regManager.isUserRegistered()
+    suspend fun isUserRegistered(): Boolean {
+        return regManager.isUserRegistered()
+    }
     
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)

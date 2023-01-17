@@ -36,6 +36,19 @@ class LoginViewModel(
     private val _loginMethods = MutableStateFlow<Set<LoginMethod>>(emptySet())
     val loginMethods = _loginMethods.asStateFlow()
     
+    private val _externalLogin = MutableStateFlow(false)
+    val externalLogin = _externalLogin.asStateFlow()
+    
+    private val _loginMethod = MutableStateFlow("")
+    val loginMethod = _loginMethod.asStateFlow()
+    suspend fun changeLoginScreen() {
+        _externalLogin.emit(!externalLogin.value)
+    }
+    
+    suspend fun setLoginMethod(method: String) {
+        _loginMethod.emit(method)
+    }
+    
     suspend fun loadLoginMethods() = singleLoading {
         repository.getLoginMethods(
             authManager.getAuth().externalState
@@ -64,22 +77,33 @@ class LoginViewModel(
         _phone.emit(country.value.clearPhoneDial)
     }
     
-    suspend fun handle(deepLink: Uri): Boolean {
-        if(deepLink.host != "external") return false
+    suspend fun handle(
+        deepLink: Uri
+    ): Pair<Boolean, Boolean> {
+        
+        if(deepLink.host != "external")
+            return Pair(false, false)
+        
         if(deepLink.getQueryParameter("state") !=
             authManager.getAuth().externalState
-        ) return false
+        ) return Pair(false, false)
         
         deepLink.getQueryParameter("token")?.let {
-            if(authManager.isExternalLinked(it)) makeToast("Привязан")
-            else makeToast("Не привязан")
-            return true
+            authManager.updateAuth { copy(externalToken = it) }
+            
+            if(authManager.isExternalLinked(it)) {
+                makeToast("Привязан")
+                return Pair(true, true)
+            } else {
+                makeToast("Не привязан")
+                return Pair(true, false)
+            }
         }
         
-        return false
+        return Pair(false, false)
     }
     
-    suspend fun sendCode() { // TODO Сделать механизм саги
+    suspend fun sendCode() {
         repository.sendCode(_phone.value)
             .let { (sendCode, message) ->
                 

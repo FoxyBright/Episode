@@ -7,9 +7,13 @@ import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.wrapper.Status
+import ru.rikmasters.gilty.shared.wrapper.errorWrapped
+import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
 
 
@@ -75,13 +79,20 @@ class ProfileWebSource: KtorSource() {
         )
     }.body<String?>()
     
-    suspend fun isUserRegistered(): Boolean = client.get(
-        "http://$HOST$PREFIX_URL/profile"
-    ).body<String?>()?.let {
-        when {
-            it.contains("\"status\":\"error\"") -> false // TODO Сделать нормальный парсер
-            it.contains("\"username\":null") -> false
-            else -> true
+    suspend fun isUserRegistered(): Boolean {
+        updateClientToken()
+        val response = client.get(
+            "http://$HOST$PREFIX_URL/profile"
+        )
+        
+        log.d(response.body())
+        
+        return try {
+            response.wrapped<ProfileResponse>().is_completed == true
+        } catch(_: Exception) {
+            response.errorWrapped().status != Status.ERROR
+        } catch(_: Exception) {
+            false
         }
-    } ?: false
+    }
 }

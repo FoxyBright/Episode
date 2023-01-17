@@ -30,8 +30,8 @@ class AuthManager(
         primarySource.saveTokens(tokens)
     }
     
-    @Suppress("unused")
     suspend fun logout() {
+        tokenWebSource.logout()
         primarySource.deleteTokens()
     }
     

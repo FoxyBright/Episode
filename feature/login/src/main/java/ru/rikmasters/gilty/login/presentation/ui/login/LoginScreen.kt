@@ -28,6 +28,8 @@ fun LoginScreen(vm: LoginViewModel) {
     val phone by vm.phone.collectAsState()
     val country by vm.country.collectAsState()
     val methods by vm.loginMethods.collectAsState()
+    val externalLogin by vm.externalLogin.collectAsState()
+    val loginMethod by vm.loginMethod.collectAsState()
     
     val isNextActive = remember(phone, country) {
         val targetLength =
@@ -39,8 +41,13 @@ fun LoginScreen(vm: LoginViewModel) {
     val activity = getActivity()
     LaunchedEffect(activity.intent) {
         activity.intent?.data?.let {
-            if(vm.handle(it))
+            val handle = vm.handle(it)
+            if(handle.first)
                 activity.intent = null
+            if(handle.second)
+                nav.navigate("main/meetings")
+            else
+                vm.changeLoginScreen()
         }
     }
     
@@ -48,12 +55,14 @@ fun LoginScreen(vm: LoginViewModel) {
         vm.loadLoginMethods()
     }
     
-    LoginContent(LoginState(
-        phone,
-        isNextActive,
-        country,
-        methods.toList()
-    ), Modifier, object: LoginCallback {
+    val callback = object: LoginCallback {
+        
+        override fun onBack() {
+            scope.launch {
+                vm.changeLoginScreen()
+                vm.setLoginMethod("")
+            }
+        }
         
         override fun onPhoneChange(text: String) {
             scope.launch { vm.changePhone(text) }
@@ -66,7 +75,7 @@ fun LoginScreen(vm: LoginViewModel) {
         override fun loginWith(method: LoginMethod) {
             scope.launch {
                 openInWeb(context, method.url)
-                nav.navigateAbsolute("registration/external")
+                vm.setLoginMethod(method.name)
             }
         }
         
@@ -98,5 +107,13 @@ fun LoginScreen(vm: LoginViewModel) {
                 }
             }
         }
-    })
+    }
+    
+    LoginContent(
+        LoginState(
+            phone, isNextActive,
+            country, methods.toList(),
+            externalLogin, loginMethod
+        ), Modifier, callback
+    )
 }

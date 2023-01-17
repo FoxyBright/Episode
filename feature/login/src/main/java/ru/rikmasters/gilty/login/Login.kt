@@ -14,13 +14,12 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
-import ru.rikmasters.gilty.login.presentation.ui.login.external.ExternalScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.login.viewmodel.*
 import ru.rikmasters.gilty.shared.country.CountryManager
 
@@ -43,10 +42,6 @@ object Login: FeatureDefinition() {
         }
         
         nested("registration", "code") {
-            
-            screen<LoginViewModel>("external") { vm, _ ->
-                ExternalScreen(vm, "Google", "token")
-            }
             
             screen<CodeViewModel>("code") { vm, _ ->
                 CodeScreen(vm)
