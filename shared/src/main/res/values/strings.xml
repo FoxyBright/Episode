@@ -12,6 +12,11 @@
     <string name="login_blocked_profile_title">Профиль заблокирован</string>
     <string name="login_blocked_profile_label">Ваш профиль заблокирован\nза нарушение условий использования\nприложения. Узнайте, как можно\nвосстановить аккаунт</string>
 
+    <string name="login_error_invalid_phone">Набранный номер не существует</string>
+    <string name="login_error_nothing_error">Неизвестная ошибка</string>
+    <string name="login_error_parameters_error">Ошибка при вводе номера телефона</string>
+    <string name="login_error_timeout">Пожалуйста подождите перед повторной отправкой кода</string>
+
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>
     <string name="interested_you_details">Выберите какие категории встреч\nвам интересны</string>

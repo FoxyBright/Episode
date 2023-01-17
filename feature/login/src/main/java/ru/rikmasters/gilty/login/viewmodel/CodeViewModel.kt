@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.viewmodel
 
+import android.content.Context
 import androidx.compose.ui.focus.FocusRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -8,6 +9,7 @@ import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.login.LoginErrorMessage
 
 class CodeViewModel(
     
@@ -17,6 +19,7 @@ class CodeViewModel(
     
     private val authManager by inject<AuthManager>()
     private val regManager by inject<RegistrationManager>()
+    private val context = getKoin().get<Context>()
     
     private val _codeLength = MutableStateFlow(4)
     val codeLength = _codeLength.asStateFlow()
@@ -38,24 +41,32 @@ class CodeViewModel(
     val focuses = _focuses.asStateFlow()
     
     suspend fun updateSendCode() {
-        
         authManager.getAuth().phone?.let { phone ->
-            repository.sendCode(phone).let {
-                authManager.updateAuth { copy(phone = phone, sendCode = it) }
-            }
+            repository.sendCode(phone)
+                .let { (sendCode, message) ->
+                    
+                    if(sendCode == null)
+                        message?.let {
+                            makeToast(
+                                LoginErrorMessage(it, context).message
+                            )
+                        }
+                    
+                    authManager.updateAuth {
+                        copy(
+                            phone = phone,
+                            sendCode = sendCode
+                        )
+                    }
+                }
         }
         
-        val senCode = authManager.getSendCode()
-        
-        senCode?.codeTimeout?.let { _timer.emit(it) }
-        senCode?.codeLength?.let { _codeLength.emit(it) }
-        
-        makeToast("Ваш код: ${getCode()}")
+        val sendCode = authManager.getSendCode()
+        sendCode?.codeTimeout?.let { _timer.emit(it) }
+        sendCode?.codeLength?.let { _codeLength.emit(it) }
     }
     
-    suspend fun getCode() = authManager.getSendCode()?.code
-    
-    suspend fun link(token: String){
+    suspend fun link(token: String) {
         authManager.linkExternal(token)
     }
     
@@ -93,7 +104,7 @@ class CodeViewModel(
         _blur.emit(state)
     }
     
-    suspend fun onTimerChange(sec: Int) {
-        _timer.emit(sec)
+    suspend fun onTimerChange() {
+        _timer.emit(timer.value - 1)
     }
 }

@@ -1,13 +1,16 @@
 package ru.rikmasters.gilty.login.viewmodel
 
+import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.login.LoginMethod
 import ru.rikmasters.gilty.auth.login.LoginRepository
+import ru.rikmasters.gilty.auth.login.SendCode
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.login.LoginErrorMessage
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.CountryManager
 
@@ -20,6 +23,7 @@ class LoginViewModel(
 ): ViewModel() {
     
     private val authManager by inject<AuthManager>()
+    private val context = getKoin().get<Context>()
     
     private val _country = MutableStateFlow(countryManager.defaultCountry)
     val country = _country.asStateFlow()
@@ -40,6 +44,9 @@ class LoginViewModel(
     
     private val _phone = MutableStateFlow(country.value.clearPhoneDial)
     val phone = _phone.asStateFlow()
+    
+    suspend fun getSendCode(): SendCode? =
+        authManager.getSendCode()
     
     suspend fun changePhone(text: String) {
         val dial = country.value.clearPhoneDial
@@ -72,8 +79,23 @@ class LoginViewModel(
         return false
     }
     
-    suspend fun sendCode() =
-        repository.sendCode(_phone.value).let { // TODO Сделать механизм саги
-            authManager.updateAuth { copy(phone = _phone.value, sendCode = it) }
-        }
+    suspend fun sendCode() { // TODO Сделать механизм саги
+        repository.sendCode(_phone.value)
+            .let { (sendCode, message) ->
+                
+                if(sendCode == null)
+                    message?.let {
+                        makeToast(
+                            LoginErrorMessage(it, context).message
+                        )
+                    }
+                
+                authManager.updateAuth {
+                    copy(
+                        phone = _phone.value,
+                        sendCode = sendCode
+                    )
+                }
+            }
+    }
 }

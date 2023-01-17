@@ -1,10 +1,8 @@
 package ru.rikmasters.gilty.login.presentation.ui.code
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -19,7 +17,6 @@ fun CodeScreen(vm: CodeViewModel) {
     val nav = get<NavState>()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
-    val context = LocalContext.current
     
     val code by vm.code.collectAsState()
     val blur by vm.blur.collectAsState()
@@ -27,13 +24,9 @@ fun CodeScreen(vm: CodeViewModel) {
     val timer by vm.timer.collectAsState()
     
     LaunchedEffect(Unit) {
-        Toast.makeText(
-            context, "Ваш код: ${vm.getCode()}",
-            Toast.LENGTH_LONG
-        ).show()
-        while(timer > 0) {
+        while(true) { // TODO Пока единственный рабочий метод постоянной работы таймера - исправить
             delay(1000L)
-            vm.onTimerChange(timer - 1)
+            vm.onTimerChange()
         }
     }
     
@@ -63,17 +56,24 @@ fun CodeScreen(vm: CodeViewModel) {
                     
                     val codeCheck = vm.code.value
                     
-                    if(codeCheck.length == vm.codeLength.value)
-                        if(codeCheck == vm.getCode()) {
+                    if(codeCheck.length == vm.codeLength.value) {
+                        try {
                             vm.onOtpAuthentication(codeCheck)
                             if(vm.isUserRegistered())
                                 nav.navigateAbsolute("main/meetings")
                             else
                                 nav.navigate("profile")
-                        } else {
-                            asm.keyboard.hide()
-                            vm.onBlur(true)
+                        } catch(_: Exception) {
+                            badCode()
                         }
+                    }
+                }
+            }
+            
+            private suspend fun badCode() {
+                scope.launch {
+                    asm.keyboard.hide()
+                    vm.onBlur(true)
                 }
             }
         })
