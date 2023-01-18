@@ -91,13 +91,10 @@ class LoginViewModel(
         deepLink.getQueryParameter("token")?.let {
             authManager.updateAuth { copy(externalToken = it) }
             
-            if(authManager.isExternalLinked(it)) {
-                makeToast("Привязан")
+            if(authManager.isExternalLinked(it))
                 return Pair(true, true)
-            } else {
-                makeToast("Не привязан")
+            else
                 return Pair(true, false)
-            }
         }
         
         return Pair(false, false)

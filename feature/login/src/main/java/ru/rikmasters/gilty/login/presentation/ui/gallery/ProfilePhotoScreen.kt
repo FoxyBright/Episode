@@ -11,6 +11,7 @@ import com.canhub.cropper.CropImageOptions
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.permission.PermissionUtils.requestPermissions
 import ru.rikmasters.gilty.login.viewmodel.GalereyViewModel
@@ -41,6 +42,10 @@ fun ProfileSelectPhotoScreen(
             if(result.isSuccessful) {
                 scope.launch {
                     val image = result.getUriFilePath(context) ?: ""
+                    
+                    result.cropPoints.forEach {
+                        log.d("array points --->>> $it")
+                    }
                     vm.imageClick(image)
                     nav.navigationBack()
                 }

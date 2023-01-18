@@ -1,17 +1,7 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
-import android.content.ContextWrapper
-import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat.JPEG
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -20,10 +10,6 @@ import ru.rikmasters.gilty.login.viewmodel.Hidden
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
-import java.util.UUID
 
 @Composable
 fun ProfileScreen(
@@ -48,18 +34,6 @@ fun ProfileScreen(
         enabled = true,
         occupiedName = occupied
     )
-    
-    val imageData = remember {
-        mutableStateOf<Uri?>(null)
-    }
-    
-    val context = LocalContext.current
-    
-    LaunchedEffect(Unit) {
-        scope.launch {
-            vm.setAvatar(getImageFile(imageData.value, context))
-        }
-    }
     
     ProfileContent(
         profileState, Modifier,
@@ -88,35 +62,4 @@ fun ProfileScreen(
                 nav.navigate("personal")
             }
         })
-}
-
-@Suppress("deprecation")
-private fun getImageFile(imageData: Uri?, context: Context): File {
-    
-    var imageBitmap: Bitmap? = null
-    
-    val file = File(
-        ContextWrapper(context).getDir(
-            "Images", MODE_PRIVATE
-        ), ("${UUID.randomUUID()}.jpg")
-    )
-    
-    val stream: OutputStream = FileOutputStream(file)
-    
-    imageData?.let {
-        imageBitmap = if(Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images
-                .Media.getBitmap(context.contentResolver, it)
-        } else {
-            ImageDecoder.decodeBitmap(
-                ImageDecoder
-                    .createSource(context.contentResolver, it)
-            )
-        }
-    }
-    
-    imageBitmap?.compress(JPEG, 25, stream)
-    stream.flush()
-    stream.close()
-    return file
 }

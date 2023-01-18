@@ -2,20 +2,14 @@ package ru.rikmasters.gilty.login.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import java.io.File
 
-var AvatarFile: File? = null
 var Avatar: String = ""
 var Hidden: String = ""
 var UserName: String = ""
 var UserDescription: String = ""
 
 class ProfileViewModel: ViewModel() {
-    
-    private val regManager by inject<RegistrationManager>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -30,11 +24,6 @@ class ProfileViewModel: ViewModel() {
         _username.emit(text)
         UserName = text
         _occupied.emit(checkUsernameOccupied())
-    }
-    
-    suspend fun setAvatar(file: File) {
-        AvatarFile = file
-        regManager.setAvatar(file)
     }
     
     private fun checkUsernameOccupied(): Boolean {

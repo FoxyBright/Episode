@@ -33,6 +33,7 @@ class AuthManager(
     suspend fun logout() {
         tokenWebSource.logout()
         primarySource.deleteTokens()
+        updateAuth { copy(externalToken = null) }
     }
     
     private suspend fun startAuth(): AuthSaga {

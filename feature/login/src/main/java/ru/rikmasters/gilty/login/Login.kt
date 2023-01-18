@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenScreen
 import ru.rikmasters.gilty.login.presentation.ui.gallery.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
@@ -57,17 +57,9 @@ object Login: FeatureDefinition() {
                 }
             }
             
-            screen<ProfileViewModel>( /* TODO Этот экран нужен для обрезания фотки под рамкку*/
-                "resize?photo={photo}",
-                listOf(navArgument("photo") {
-                    type = NavType.StringType; defaultValue = ""
-                })
-            ) { vm, it ->
-                it.arguments?.getString("photo")
-                    ?.let { avatar -> ProfileScreen(vm, avatar) }
+            screen<HiddenViewModel>("hidden") { vm, _ ->
+                HiddenScreen(vm)
             }
-            
-            screen("hidden") { HiddenPhotoScreen() }
             
             screen<GalereyViewModel>(
                 "gallery?multi={multi}",
@@ -102,6 +94,10 @@ object Login: FeatureDefinition() {
         
         scope<GalereyViewModel> {
             scopedOf(::GalereyViewModel)
+        }
+        
+        scope<HiddenViewModel> {
+            scopedOf(::HiddenViewModel)
         }
         
         scope<CodeViewModel> {

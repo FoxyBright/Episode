@@ -81,6 +81,7 @@ class GalereyViewModel: ViewModel() {
     }
     
     fun attach() {
+        ListHidden = selected.value
         Hidden = selected.value.first()
     }
 }

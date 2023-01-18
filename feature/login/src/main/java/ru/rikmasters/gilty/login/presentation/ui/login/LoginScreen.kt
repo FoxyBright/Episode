@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.R
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
     val nav = get<NavState>()
@@ -108,7 +110,6 @@ fun LoginScreen(vm: LoginViewModel) {
             }
         }
     }
-    
     LoginContent(
         LoginState(
             phone, isNextActive,

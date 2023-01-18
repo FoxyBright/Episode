@@ -54,7 +54,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 private fun HiddenPhotoContentPreview() {
     GiltyTheme {
-        HiddenPhotoContent(
+        HiddenContent(
             Modifier.width(160.dp),
             (null), CREATE
         ) {}
@@ -96,7 +96,7 @@ private fun ProfileStatisticContentPreview() {
 }
 
 @Composable
-fun HiddenPhotoContent(
+fun HiddenContent(
     modifier: Modifier,
     image: String?,
     profileType: ProfileType,

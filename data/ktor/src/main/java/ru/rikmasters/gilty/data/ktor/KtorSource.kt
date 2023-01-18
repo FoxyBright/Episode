@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.data.ktor
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -33,6 +34,7 @@ open class KtorSource: WebSource() {
             }
             install(ContentNegotiation) {
                 jackson {
+                    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
                     setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 }

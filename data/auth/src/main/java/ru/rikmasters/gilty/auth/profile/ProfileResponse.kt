@@ -25,3 +25,4 @@ data class ProfileResponse(
     val is_anonymous: Any?,
     val status: Any?
 )
+

@@ -173,7 +173,7 @@ fun Profile(
                             14.dp else 18.dp
                     )
                 )
-                HiddenPhotoContent(
+                HiddenContent(
                     Modifier,
                     state.hiddenPhoto,
                     state.profileType

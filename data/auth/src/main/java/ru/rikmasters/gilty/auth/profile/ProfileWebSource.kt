@@ -4,10 +4,10 @@ import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
@@ -30,34 +30,66 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
+    suspend fun setHidden(
+        files: List<File>
+    ): HttpResponse {
+        updateClientToken()
+        val album = getUserAlbumPrivateId()
+        val response = client.post(
+            "http://$HOST$PREFIX_URL/albums/$album/upload"
+        ) {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("type", "PHOTO")
+                        files.forEach {
+                            append(
+                                "photos[]", it.readBytes(),
+                                Headers.build {
+                                    append(ContentType, "image/jpg")
+                                    append(ContentDisposition, "filename=\"${it.name}\"")
+                                },
+                            )
+                        }
+                    }, "WebAppBoundary"
+                )
+            )
+        }
+        
+        return response
+    }
+    
+    
     suspend fun setUserAvatar(
         avatar: File,
         cropX: Int = 100,
         cropY: Int = 100,
         cropWidth: Int = 100,
         cropHeight: Int = 100
-    ) = client.post(
-        "http://$HOST$PREFIX_URL/profile/avatar"
-    ) {
-        setBody(
-            MultiPartFormDataContent(
-                formData {
-                    append(
-                        "photo", avatar.readBytes(),
-                        Headers.build {
-                            append(ContentType, "image/jpg")
-                            append(ContentDisposition, "filename=\"photo.jpg\"")
-                        },
-                    )
-                    append("crop_x", cropX)
-                    append("crop_y", cropY)
-                    append("crop_width", cropWidth)
-                    append("crop_height", cropHeight)
-                },
-                boundary = "WebAppBoundary"
+    ): HttpResponse {
+        updateClientToken()
+        return client.post(
+            "http://$HOST$PREFIX_URL/profile/avatar"
+        ) {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            "photo", avatar.readBytes(),
+                            Headers.build {
+                                append(ContentType, "image/jpg")
+                                append(ContentDisposition, "filename=\"photo.jpg\"")
+                            },
+                        )
+                        append("crop_x", cropX)
+                        append("crop_y", cropY)
+                        append("crop_width", cropWidth)
+                        append("crop_height", cropHeight)
+                    }, "WebAppBoundary"
+                )
             )
-        )
-    }.body<String?>()
+        }
+    }
     
     suspend fun setUserData(
         username: String? = null,
@@ -79,14 +111,28 @@ class ProfileWebSource: KtorSource() {
         )
     }.body<String?>()
     
+    private suspend fun getUserAlbumPrivateId(): String {
+        
+        data class AlbumPrivate( // TODO сделать красиво без этих костылей
+            val id: String
+        )
+        
+        data class User(
+            val albumPrivate: AlbumPrivate
+        )
+        
+        updateClientToken()
+        val response = client.get(
+            "http://$HOST$PREFIX_URL/profile"
+        )
+        return response.wrapped<User>().albumPrivate.id
+    }
+    
     suspend fun isUserRegistered(): Boolean {
         updateClientToken()
         val response = client.get(
             "http://$HOST$PREFIX_URL/profile"
         )
-        
-        log.d(response.body())
-        
         return try {
             response.wrapped<ProfileResponse>().is_completed == true
         } catch(_: Exception) {

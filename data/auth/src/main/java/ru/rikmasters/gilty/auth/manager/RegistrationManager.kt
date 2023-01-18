@@ -17,6 +17,10 @@ class RegistrationManager(
         profileWebSource.setUserAvatar(file)
     }
     
+    suspend fun setHidden(files: List<File>) {
+        profileWebSource.setHidden(files)
+    }
+    
     suspend fun userUpdateData(
         username: String? = null,
         aboutMe: String? = null,

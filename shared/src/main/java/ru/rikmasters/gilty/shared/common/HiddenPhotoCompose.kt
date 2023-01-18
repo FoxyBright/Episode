@@ -1,28 +1,22 @@
 package ru.rikmasters.gilty.shared.common
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -30,44 +24,55 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.NavigationInterface
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import java.io.File
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun HiddenPhotoPreview() {
     GiltyTheme {
-        HiddenPhotoContent(HiddenPhotoState(listOf(File(""))))
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            HiddenContent(
+                HiddenState(listOf())
+            )
+        }
     }
 }
 
-data class HiddenPhotoState(
-    val photoList: List<File>
+data class HiddenState(
+    val photoList: List<String>
 )
 
-interface HiddenPhotoCallback : NavigationInterface {
-    fun onSelectImage(file: File) {}
-    fun onDeleteImage(file: File) {}
+interface HiddenCallback {
+    
+    fun onNext() {}
+    fun onBack() {}
+    fun onSelectImage(image: String) {}
+    fun onDeleteImage(image: String) {}
     fun openGallery() {}
 }
 
 @Composable
-fun HiddenPhotoContent(
-    state: HiddenPhotoState,
+fun HiddenContent(
+    state: HiddenState,
     modifier: Modifier = Modifier,
-    callback: HiddenPhotoCallback? = null
+    callback: HiddenCallback? = null
 ) {
     Column(
         modifier
@@ -80,17 +85,18 @@ fun HiddenPhotoContent(
             Modifier.padding(bottom = 20.dp)
         ) { callback?.onBack() }
         LazyVerticalGrid(
-            GridCells.Fixed(3), Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            GridCells.Fixed(3),
+            Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = spacedBy(4.dp),
+            horizontalArrangement = spacedBy(4.dp)
         ) {
-            items(state.photoList) { file ->
+            item { GalleryButton(callback) }
+            items(state.photoList) { image ->
                 LazyItem(
-                    file, Modifier,
+                    image, Modifier,
                     { callback?.onSelectImage(it) })
                 { callback?.onDeleteImage(it) }
             }
-            item { GalleryButton(callback) }
         }
     }
     Box(Modifier.fillMaxSize()) {
@@ -107,29 +113,28 @@ fun HiddenPhotoContent(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun GalleryButton(callback: HiddenPhotoCallback?) {
+private fun GalleryButton(callback: HiddenCallback?) {
     Card(
         { callback?.openGallery() },
         Modifier.size(130.dp),
-        shape = MaterialTheme.shapes.large,
+        shape = shapes.large,
     ) {
         Box(
             Modifier
                 .fillMaxSize()
-                .background(ThemeExtra.colors.grayButton),
+                .background(colors.grayButton),
             Center
         ) {
             Box(
                 Modifier
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(colorScheme.primary)
             ) {
                 Icon(
                     painterResource(R.drawable.ic_image_box),
-                    null,
-                    Modifier
+                    (null), Modifier
                         .padding(6.dp)
-                        .size(32.dp), Color.White
+                        .size(32.dp), White
                 )
             }
         }
@@ -139,42 +144,42 @@ private fun GalleryButton(callback: HiddenPhotoCallback?) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LazyItem(
-    file: File,
+    image: String,
     modifier: Modifier = Modifier,
-    onSelect: (File) -> Unit,
-    onDelete: (File) -> Unit
+    onSelect: (String) -> Unit,
+    onDelete: (String) -> Unit
 ) {
-    val image =
-        BitmapFactory.decodeFile(file.canonicalPath)
     Box(
         modifier
             .size(130.dp)
-            .clip(MaterialTheme.shapes.small)
-            .clickable { onSelect(file) },
+            .clip(shapes.small)
+            .clickable { onSelect(image) },
         TopEnd
     ) {
         Image(
-            image.asImageBitmap(), (null),
-            Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
+            rememberAsyncImagePainter(File(image)),
+            (null), Modifier.fillMaxSize(),
+            contentScale = Crop,
         )
         Card(
-            { onDelete(file) },
+            { onDelete(image) },
             Modifier
                 .padding(4.dp)
                 .size(26.dp)
                 .clip(CircleShape)
                 .align(TopEnd)
                 .alpha(50f),
-            colors = CardDefaults
-                .cardColors(Color.Transparent)
+            colors = cardColors(Transparent)
         ) {
             Box(Modifier, Center) {
                 Image(
                     painterResource(R.drawable.transparency_circle),
                     (null), Modifier.fillMaxSize()
                 )
-                Icon(Icons.Filled.Close, null, Modifier.size(16.dp), Color.White)
+                Icon(
+                    Filled.Close, (null),
+                    Modifier.size(16.dp), White
+                )
             }
         }
     }

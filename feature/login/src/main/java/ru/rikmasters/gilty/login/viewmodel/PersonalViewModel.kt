@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.GenderType
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import java.io.File
 
 var UserAge: Int? = null
 var UserGender: GenderType? = null
@@ -27,17 +27,26 @@ class PersonalViewModel: ViewModel() {
     }
     
     suspend fun setAge(it: Int) {
-        log.d(it.toString())
-        _age.emit(it) // TODO При перезапуске окна не работает
+        _age.emit(it)
         UserAge = it
     }
     
     suspend fun updateProfile() {
-        
-        val username = UserName.ifBlank { null }
-        
-        val description = UserDescription.ifBlank { null }
-        
-        regManager.userUpdateData(username, description, UserAge, UserGender)
+        regManager.userUpdateData(
+            UserName.ifBlank { null },
+            UserDescription.ifBlank { null },
+            UserAge,
+            UserGender
+        )
+        try {
+            regManager.setAvatar(File(Avatar))
+        } catch(e: Exception) {
+            logE(e.toString())
+        }
+        try {
+            regManager.setHidden(ListHidden.map(::File))
+        } catch(e: Exception) {
+            logE(e.toString())
+        }
     }
 }

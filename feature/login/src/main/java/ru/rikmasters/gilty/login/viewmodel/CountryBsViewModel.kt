@@ -11,7 +11,7 @@ class CountryBsViewModel(
     
     private val countryManager: CountryManager,
     
-    private val loginVm: LoginViewModel
+    val loginVm: LoginViewModel
 
 ): ViewModel() {
     
