@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.profile.presentation.ui.lists.ParticipantsList
+import ru.rikmasters.gilty.profile.presentation.ui.lists.participants.ParticipantsList
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfile
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfileState
 import ru.rikmasters.gilty.shared.common.ProfileState

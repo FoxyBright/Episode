@@ -47,7 +47,8 @@ private fun ReceivedResponds() {
 }
 
 interface RespondCallback {
-    
+    fun onTabChange(tab: Int){}
+    fun onBack(){}
     fun onCancelClick(respond: RespondModel) {}
     fun onRespondClick(meet: MeetingModel) {}
     fun onAcceptClick(respond: RespondModel) {}

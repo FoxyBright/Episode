@@ -58,7 +58,6 @@ class ProfileWebSource: KtorSource() {
         return response
     }
     
-    
     suspend fun setUserAvatar(
         avatar: File,
         cropX: Int = 100,
@@ -123,23 +122,18 @@ class ProfileWebSource: KtorSource() {
                 aboutMe
             )
         )
-    }.body<String?>()
+    }
     
     private suspend fun getUserAlbumPrivateId(): String {
-        
-        data class AlbumPrivate( // TODO сделать красиво без этих костылей
-            val id: String
-        )
-        
-        data class User(
-            val albumPrivate: AlbumPrivate
-        )
-        
+        val profile = getUserData()
+        return profile.album_private?.id!!
+    }
+    
+    suspend fun getUserData(): ProfileResponse {
         updateClientToken()
-        val response = client.get(
+        return client.get(
             "http://$HOST$PREFIX_URL/profile"
-        )
-        return response.wrapped<User>().albumPrivate.id
+        ) {}.wrapped()
     }
     
     suspend fun isUserRegistered(): Boolean {

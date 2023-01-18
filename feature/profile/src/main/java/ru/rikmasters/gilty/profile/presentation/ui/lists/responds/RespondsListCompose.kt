@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.lists
+package ru.rikmasters.gilty.profile.presentation.ui.lists.responds
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -52,8 +52,6 @@ fun RespondsList(
     selectTabs: List<Boolean>,
     modifier: Modifier = Modifier,
     callback: RespondCallback? = null,
-    onTabChange: ((Int) -> Unit)? = null,
-    onBack: (() -> Unit)? = null
 ) {
     Column(
         modifier
@@ -64,13 +62,13 @@ fun RespondsList(
             stringResource(R.string.profile_responds_label),
             modifier = Modifier.padding(top = 28.dp),
             distanceBetween = 0.dp
-        ) { onBack?.let { it() } }
+        ) { callback?.onBack() }
         GiltyTab(
             listOf(
                 stringResource(R.string.profile_sent_responds),
                 stringResource(R.string.profile_received_responds)
             ), selectTabs, Modifier.padding(horizontal = 16.dp)
-        ) { onTabChange?.let { c -> c(it) } }
+        ) { callback?.onTabChange(it) }
         if(selectTabs.last())
             ReceivedResponds(
                 responds, respondsStates,

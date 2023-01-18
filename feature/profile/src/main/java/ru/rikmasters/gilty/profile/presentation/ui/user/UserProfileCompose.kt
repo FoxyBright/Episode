@@ -58,7 +58,7 @@ data class UserProfileState(
 interface UserProfileCallback: ProfileCallback {
     
     fun menu(state: Boolean) {}
-    fun openHistory(state: Boolean) {}
+    fun onHistoryShow() {}
     fun onMeetingClick(meet: MeetingModel) {}
     fun onHistoryClick(meet: MeetingModel) {}
     fun onRespondsClick() {}
@@ -201,7 +201,7 @@ private fun Content(
         }
         if(state.meetingsHistory.isNotEmpty()) item(5) {
             MeetHistory(state.historyState, state.meetingsHistory,
-                { callback?.openHistory(state.historyState) })
+                { callback?.onHistoryShow() })
             { callback?.onHistoryClick(it) }
         }
         item { Divider(Modifier.fillMaxWidth(), 20.dp, Transparent) }

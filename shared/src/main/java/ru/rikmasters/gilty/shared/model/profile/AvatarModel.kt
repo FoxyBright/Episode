@@ -14,7 +14,7 @@ sealed interface ImageModel {
     val height: Int
     val resolutionX: Int
     val resolutionY: Int
-    val playtime: Number
+    val playtime: Number?
     val hasAccess: Boolean
 }
 
@@ -29,7 +29,7 @@ data class AvatarModel(
     override val height: Int,
     override val resolutionX: Int,
     override val resolutionY: Int,
-    override val playtime: Number,
+    override val playtime: Number? = null,
     override val hasAccess: Boolean
 ): ImageModel
 

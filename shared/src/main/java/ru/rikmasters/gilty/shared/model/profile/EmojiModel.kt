@@ -25,6 +25,23 @@ fun getCategoryIcons(icon: String): EmojiModel = when(icon) {
     else -> EmojiModel("D", "$ic_image_empty")
 }
 
+fun getEmoji(emojiType: String) = when(emojiType) {
+    "HEART_EYES" -> EmojiModel("", "$ic_love")
+    "FIRE" -> EmojiModel("", "$ic_fire")
+    "HEART_FACE" -> EmojiModel("", "$ic_cuty")
+    "BUTTERFLY" -> EmojiModel("", "$ic_batterfly")
+    "STAR_EYES" -> EmojiModel("", "$ic_admiration")
+    "WATER_DROPS" -> EmojiModel("", "$ic_drops")
+    "MONEY_FACE" -> EmojiModel("", "$ic_money_love")
+    "DEVIL" -> EmojiModel("", "$ic_devil")
+    "BROKEN_HEART" -> EmojiModel("", "$ic_brocken_heart")
+    "CLOWN" -> EmojiModel("", "$ic_clown")
+    "EYE_ROLL" -> EmojiModel("", "$ic_sarcasm")
+    "EXPRESSIONLESS" -> EmojiModel("", "$ic_bad")
+    "CRYING" -> EmojiModel("", "$ic_cry")
+    else -> EmojiModel("D", "$ic_image_empty")
+}
+
 val EmojiList = listOf(
     EmojiModel("D", "$ic_love"),
     EmojiModel("D", "$ic_bad"),

@@ -23,8 +23,11 @@ class AuthManager(
 
 ): Repository<TokenStore>(primarySource) {
     
-    suspend fun isAuthorized() =
-        primarySource.getTokensOrNull() != null
+    suspend fun isAuthorized(): Boolean {
+        val token = primarySource.getTokensOrNull()
+        logD("YOUR TOKENS: ----->>> $token")
+        return token != null
+    }
     
     private suspend fun login(tokens: Tokens) {
         primarySource.saveTokens(tokens)
