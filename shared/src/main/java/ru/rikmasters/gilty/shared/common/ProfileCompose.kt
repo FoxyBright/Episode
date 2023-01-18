@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
@@ -112,8 +111,10 @@ data class ProfileState(
     val occupiedName: Boolean = false
 )
 
-interface ProfileCallback: NavigationInterface {
+interface ProfileCallback {
     
+    fun onBack() {}
+    fun onNext() {}
     fun profileImage() {}
     fun hiddenImages() {}
     fun onNameChange(text: String) {}

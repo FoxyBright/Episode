@@ -19,12 +19,14 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.model.profile.getCategoryIcons
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -37,9 +39,10 @@ private fun CategoryItemTopPreview() {
     GiltyTheme {
         Box(Modifier.background(colorScheme.background)) {
             CategoryItem(
-                CategoriesType.ENTERTAINMENT,
-                (false), Modifier.padding(16.dp),
-                (false)
+                "Развлечения",
+                getCategoryIcons("POPCORN"),
+                colorScheme.primary, (false),
+                Modifier.padding(16.dp), (false)
             )
         }
     }
@@ -52,7 +55,9 @@ fun CategoryItemBottomPreview() {
     GiltyTheme {
         val iconState = remember { mutableStateOf(true) }
         CategoryItem(
-            CategoriesType.ENTERTAINMENT,
+            "Развлечения",
+            getCategoryIcons("POPCORN"),
+            colorScheme.primary,
             iconState.value
         ) { iconState.value = it }
     }
@@ -60,7 +65,9 @@ fun CategoryItemBottomPreview() {
 
 @Composable
 fun CategoryItem(
-    item: CategoriesType,
+    name: String,
+    icon: EmojiModel,
+    color: Color,
     state: Boolean,
     modifier: Modifier = Modifier,
     iconBottomState: Boolean = true,
@@ -72,7 +79,7 @@ fun CategoryItem(
                 .size(CATEGORY_ELEMENT_SIZE.dp)
                 .clip(CircleShape)
                 .background(
-                    if(state) item.color
+                    if(state) color
                     else colorScheme.outlineVariant
                 )
                 .align(BottomCenter)
@@ -80,7 +87,7 @@ fun CategoryItem(
             Center
         ) {
             Text(
-                item.display, Modifier, White,
+                name, Modifier, White,
                 style = typography.labelSmall,
                 textAlign = TextAlign.Center,
                 fontWeight = Bold
@@ -97,8 +104,7 @@ fun CategoryItem(
                 ), Center
         ) {
             GEmojiImage(
-                item.emoji,
-                Modifier.size(
+                icon, Modifier.size(
                     (CATEGORY_ELEMENT_SIZE / 6).dp
                 )
             )

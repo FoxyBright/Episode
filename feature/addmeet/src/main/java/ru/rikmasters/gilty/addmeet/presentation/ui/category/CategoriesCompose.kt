@@ -61,7 +61,8 @@ fun CategoriesContent(
                 Modifier.padding(top = 8.dp),
             ) { element ->
                 CategoryItem(
-                    element,
+                    element.name, element.emoji,
+                    element.color,
                     state.selectCategories.contains(element),
                     modifier
                 ) { callback?.onCategoryClick(element) }
@@ -104,7 +105,8 @@ private fun BubblesForPreview(
                 ) {
                     for(element in item)
                         CategoryItem(
-                            element,
+                            element.name, element.emoji,
+                            element.color,
                             state.selectCategories.contains(element)
                         ) { callback?.onCategoryClick(element) }
                 }

@@ -13,6 +13,18 @@ data class EmojiModel(
 @Suppress("unused")
 val DemoEmojiModelURL = EmojiModel("URL", "https://placekitten.com/1200/800")
 
+fun getCategoryIcons(icon: String): EmojiModel = when(icon) {
+    "BASKETBALL" -> EmojiModel("D", "$ic_sport")
+    "BRIEFCASE" -> EmojiModel("D", "$ic_business")
+    "EIFFEL_TOWER" -> EmojiModel("D", "$ic_travel")
+    "BRUSH" -> EmojiModel("D", "$ic_master_classes")
+    "POPCORN" -> EmojiModel("D", "$ic_entertainment")
+    "ADULT" -> EmojiModel("D", "$ic_18")
+    "COCKTAIL" -> EmojiModel("D", "$ic_party")
+    "VASE" -> EmojiModel("D", "$ic_art")
+    else -> EmojiModel("D", "$ic_image_empty")
+}
+
 val EmojiList = listOf(
     EmojiModel("D", "$ic_love"),
     EmojiModel("D", "$ic_bad"),

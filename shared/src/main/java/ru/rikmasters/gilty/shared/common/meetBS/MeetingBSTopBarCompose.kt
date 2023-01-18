@@ -187,8 +187,10 @@ private fun Meet(
         cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier, Top, End) {
+            val category = meet.category
             CategoryItem(
-                meet.category, (true),
+                category.display, category.emoji,
+                category.color, (true),
                 Modifier.offset(12.dp, -(18).dp)
             )
             MeetDetails(

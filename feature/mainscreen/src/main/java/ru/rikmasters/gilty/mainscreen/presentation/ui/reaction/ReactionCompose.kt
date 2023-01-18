@@ -84,7 +84,10 @@ fun ReactionContent(
                 )
             }
             CategoryItem(
-                categoriesType, (true), Modifier
+                categoriesType.display,
+                categoriesType.emoji,
+                categoriesType.color,
+                (true), Modifier
                     .align(TopEnd)
                     .offset(12.dp, (-18).dp)
             )

@@ -75,7 +75,9 @@ object Login: FeatureDefinition() {
                 PersonalScreen(vm)
             }
             
-            screen("categories") { CategoriesScreen() }
+            screen<CategoryViewModel>("categories") { vm, _ ->
+                CategoriesScreen(vm)
+            }
             
             screen<PermissionViewModel>("permissions") { vm, _ ->
                 PermissionsScreen(vm)
@@ -90,6 +92,10 @@ object Login: FeatureDefinition() {
         scope<LoginViewModel> {
             scopedOf(::LoginViewModel)
             scopedOf(::CountryBsViewModel)
+        }
+        
+        scope<CategoryViewModel> {
+            scopedOf(::CategoryViewModel)
         }
         
         scope<GalereyViewModel> {

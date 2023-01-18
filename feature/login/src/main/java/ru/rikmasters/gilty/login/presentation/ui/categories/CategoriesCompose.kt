@@ -7,27 +7,33 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
+import ru.rikmasters.gilty.auth.categories.Category
 import ru.rikmasters.gilty.bubbles.Bubbles
-import ru.rikmasters.gilty.shared.NavigationInterface
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.profile.getCategoryIcons
+import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<CategoriesType>,
-    val selectCategories: List<CategoriesType>
+    val categoryList: List<Category>,
+    val selectCategories: List<Category>
 )
 
-interface CategoriesCallback : NavigationInterface {
-    fun onCategoryClick(category: CategoriesType) {}
+interface CategoriesCallback {
+    
+    fun onBack() {}
+    fun onNext() {}
+    fun onCategoryClick(category: Category) {}
 }
 
 @Composable
@@ -54,7 +60,9 @@ fun CategoriesContent(
                 Modifier.padding(top = 8.dp),
             ) { element ->
                 CategoryItem(
-                    element,
+                    element.name,
+                    getCategoryIcons(element.iconType),
+                    Color(element.color.toColorInt()),
                     state.selectCategories.contains(element),
                     modifier
                 ) { callback?.onCategoryClick(element) }
@@ -85,13 +93,15 @@ private fun BubblesForPreview(
             Box(Modifier.fillMaxHeight()) {
                 Column(
                     Modifier.align(
-                        if (index % 3 != 0) Alignment.TopCenter
+                        if(index % 3 != 0) Alignment.TopCenter
                         else Alignment.BottomCenter
                     )
                 ) {
-                    for (element in item)
+                    for(element in item)
                         CategoryItem(
-                            element,
+                            element.name,
+                            getCategoryIcons(element.iconType),
+                            Color(element.color.toColorInt()),
                             state.selectCategories.contains(element)
                         ) { callback?.onCategoryClick(element) }
                 }
@@ -107,7 +117,13 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(CategoriesType.list(), arrayListOf())
+            CategoriesState(CategoriesType.list().map {
+                Category(
+                    it.name, it.display,
+                    it.color.toString(),
+                    it.name, listOf()
+                )
+            }, arrayListOf())
         )
     }
 }
