@@ -2,6 +2,8 @@ package ru.rikmasters.gilty.login.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 var Avatar: String = ""
@@ -10,6 +12,8 @@ var UserName: String = ""
 var UserDescription: String = ""
 
 class ProfileViewModel: ViewModel() {
+    
+    private val regManager by inject<RegistrationManager>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -23,11 +27,9 @@ class ProfileViewModel: ViewModel() {
     suspend fun usernameChange(text: String) {
         _username.emit(text)
         UserName = text
-        _occupied.emit(checkUsernameOccupied())
-    }
-    
-    private fun checkUsernameOccupied(): Boolean {
-        return username.value == "qwerty" //TODO Написать запрос-проверку на наличие имени
+        _occupied.emit(
+            regManager.isNameOccupied(username.value)
+        )
     }
     
     suspend fun descriptionChange(text: String) {

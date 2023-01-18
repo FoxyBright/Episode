@@ -9,11 +9,10 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
-import ru.rikmasters.gilty.shared.wrapper.Status
-import ru.rikmasters.gilty.shared.wrapper.errorWrapped
-import ru.rikmasters.gilty.shared.wrapper.wrapped
+import ru.rikmasters.gilty.shared.wrapper.*
 import java.io.File
 
 
@@ -88,6 +87,21 @@ class ProfileWebSource: KtorSource() {
                     }, "WebAppBoundary"
                 )
             )
+        }
+    }
+    
+    suspend fun checkUserName(username: String): Boolean {
+        updateClientToken()
+        val response = client.get(
+            "http://$HOST$PREFIX_URL/profile/checkname"
+        ) { url { query("username" to username) } }
+        
+        data class Status(val status: String)
+        
+        return try {
+            response.body<Status>().status == "error"
+        } catch(_: Exception) {
+            false
         }
     }
     

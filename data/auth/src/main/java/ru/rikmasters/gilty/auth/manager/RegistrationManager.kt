@@ -21,6 +21,10 @@ class RegistrationManager(
         profileWebSource.setHidden(files)
     }
     
+    suspend fun isNameOccupied(name: String): Boolean =
+        profileWebSource.checkUserName(name)
+    
+    
     suspend fun userUpdateData(
         username: String? = null,
         aboutMe: String? = null,
