@@ -21,10 +21,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
-import org.koin.java.KoinJavaComponent.getKoin
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.ui.fork.*
-import ru.rikmasters.gilty.core.log.log
 import java.lang.Float.max
 import kotlin.math.roundToInt
 
@@ -36,16 +33,22 @@ enum class BottomSheetSwipeState {
 class BottomSheetState(
     internal val swipeableState: SwipeableState<BottomSheetSwipeState>,
 ) {
+    
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
     
     suspend fun expand() = animateTo(BottomSheetSwipeState.EXPANDED)
     suspend fun halfExpand() = animateTo(BottomSheetSwipeState.HALF_EXPANDED)
     suspend fun collapse() = animateTo(BottomSheetSwipeState.COLLAPSED)
-
+    
     suspend fun expand(content: @Composable () -> Unit) {
         animateTo(content, BottomSheetSwipeState.EXPANDED)
     }
-
+    
+    suspend fun collapsed() {
+        animateTo(BottomSheetSwipeState.COLLAPSED)
+        content = null
+    }
+    
     suspend fun halfExpand(content: @Composable () -> Unit) {
         animateTo(content, BottomSheetSwipeState.HALF_EXPANDED)
     }
@@ -58,7 +61,7 @@ class BottomSheetState(
         this.content = content
         animateTo(swipeState)
     }
-
+    
     private suspend fun animateTo(
         swipeState: BottomSheetSwipeState
     ) {
@@ -66,9 +69,9 @@ class BottomSheetState(
             throw IllegalStateException("Открытие нижней панели без содержимого")
         swipeableState.animateTo(swipeState, tween())
     }
-
+    
     val offset: Float by swipeableState.offset
-
+    
     var gripLightColor: @Composable () -> Color
             by mutableStateOf({ MaterialTheme.colorScheme.outlineVariant })
     var gripDarkColor: @Composable () -> Color
@@ -86,40 +89,40 @@ fun BottomSheetLayout(
     content: @Composable () -> Unit,
 ) {
     BoxWithConstraints(modifier) {
-
+        
         val screenHeight = with(LocalDensity.current) {
             this@BoxWithConstraints.maxHeight.toPx()
         }
-
+        
         var bottomSheetHeight by remember { mutableStateOf<Float?>(null) }
-
+        
         val anchors = remember(bottomSheetHeight, screenHeight) {
             val height = bottomSheetHeight ?: screenHeight
             val anchors = mapOf(
                 max(0f, screenHeight - height) to BottomSheetSwipeState.EXPANDED,
-                screenHeight - height / 2f to BottomSheetSwipeState.HALF_EXPANDED,
+                //                screenHeight - height / 2f to BottomSheetSwipeState.HALF_EXPANDED,
                 screenHeight to BottomSheetSwipeState.COLLAPSED
             )
-
+            
             state.swipeableState.minBound = anchors.keys.min()
             state.swipeableState.maxBound = anchors.keys.max()
             anchors
         }
-
+        
         val offset = state.swipeableState.offset.value.roundToInt()
-
+        
         val connection = remember { state.swipeableState.PreUpPostDownNestedScrollConnection }
-
+        
         val scope = rememberCoroutineScope()
-
+        
         val scrimColor by animateColorAsState(
-            if (state.swipeableState.targetValue == BottomSheetSwipeState.COLLAPSED)
+            if(state.swipeableState.targetValue == BottomSheetSwipeState.COLLAPSED)
                 Color.Transparent else state.scrim().copy(alpha = 0.5f),
             tween(500)
         )
-
+        
         content()
-        if (scrimColor != Color.Transparent)
+        if(scrimColor != Color.Transparent)
             Box(
                 Modifier
                     .fillMaxSize()
@@ -143,7 +146,7 @@ fun BottomSheetLayout(
                     resistance = null
                 )
                 .nestedScroll(connection)
-
+        
         ) {
             val focusManager = LocalFocusManager.current
             LaunchedEffect(state.swipeableState.targetValue) {
@@ -151,11 +154,11 @@ fun BottomSheetLayout(
             }
             
             val gripColor by animateColorAsState(
-                if (state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
+                if(state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
                     state.gripDarkColor() else state.gripLightColor()
             )
             val gripOffset by animateDpAsState(
-                if (state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
+                if(state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
                     21.dp else 0.dp
             )
             Box(

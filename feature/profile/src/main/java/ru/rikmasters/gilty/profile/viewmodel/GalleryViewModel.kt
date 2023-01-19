@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.viewmodel
+package ru.rikmasters.gilty.profile.viewmodel
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Context
@@ -8,13 +8,17 @@ import android.os.Environment.isExternalStorageManager
 import androidx.core.content.ContextCompat.checkSelfPermission
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.common.getImages
+import java.io.File
 
 
-class GalereyViewModel: ViewModel() {
+class GalleryViewModel: ViewModel() {
     
     private val context = getKoin().get<Context>()
+    private val regManager by inject<RegistrationManager>()
     
     private val imagesList = getImages(context)
     private val _images = MutableStateFlow(imagesList)
@@ -76,12 +80,15 @@ class GalereyViewModel: ViewModel() {
         _menuState.emit(false)
     }
     
-    fun imageClick(image: String) {
-        Avatar = image
+    suspend fun imageClick(image: String, points: List<Int>) {
+        regManager.setAvatar(File(image), points)
     }
     
-    fun attach() {
-        ListHidden = selected.value
-        Hidden = selected.value.first()
+    suspend fun attach() {
+        try {
+            regManager.setHidden(selected.value.map(::File))
+        } catch(_: Exception) {
+        
+        }
     }
 }

@@ -29,6 +29,23 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
+    suspend fun deleteHidden(image: Image) {
+        updateClientToken()
+        val album = getUserAlbumPrivateId()
+        val imageId = image.id
+        client.delete(
+            "http://$HOST$PREFIX_URL/albums/$album/files/$imageId"
+        ) {}
+    }
+    
+    suspend fun getProfileHiddens(): List<Image> {
+        updateClientToken()
+        val album = getUserAlbumPrivateId()
+        return client.get(
+            "http://$HOST$PREFIX_URL/albums/$album/files"
+        ) {}.wrapped()
+    }
+    
     suspend fun setHidden(
         files: List<File>
     ): HttpResponse {
@@ -60,10 +77,10 @@ class ProfileWebSource: KtorSource() {
     
     suspend fun setUserAvatar(
         avatar: File,
-        cropX: Int = 100,
-        cropY: Int = 100,
-        cropWidth: Int = 100,
-        cropHeight: Int = 100
+        cropX: Int,
+        cropY: Int,
+        cropWidth: Int,
+        cropHeight: Int
     ): HttpResponse {
         updateClientToken()
         return client.post(

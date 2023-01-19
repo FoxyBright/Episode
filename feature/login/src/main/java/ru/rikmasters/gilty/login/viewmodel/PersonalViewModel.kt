@@ -39,7 +39,7 @@ class PersonalViewModel: ViewModel() {
             UserGender
         )
         try {
-            regManager.setAvatar(File(Avatar))
+            regManager.setAvatar(File(Avatar), ListPoints)
         } catch(e: Exception) {
             logE(e.toString())
         }

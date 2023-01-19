@@ -91,7 +91,12 @@ class UserProfileViewModel: ViewModel() {
     private val _observeGroupStates = MutableStateFlow(listOf(true, false))
     val observeGroupStates = _observeGroupStates.asStateFlow()
     
-    private val _profileState = MutableStateFlow(ProfileState())
+    private val _profileState = MutableStateFlow(
+        ProfileState(
+            profileType = ProfileType.USERPROFILE,
+            enabled = true
+        )
+    )
     val profileState = _profileState.asStateFlow()
     
     suspend fun changeObserversTab(tab: Int) {
@@ -114,24 +119,26 @@ class UserProfileViewModel: ViewModel() {
     
     // TODO /////////////////////////////////////////////////
     
-    suspend fun drawProfile (){
+    suspend fun drawProfile() {
         val profile = profileManager.getProfile()
         logD("profile WEB ----->>> $profile")
         val userProfile = profile.map()
         logD("profile THIS ----->>> $userProfile")
-    
-        _profileState.emit(ProfileState(
-            name = "${userProfile.username}, ${userProfile.age}",
-            profilePhoto = userProfile.avatar.id,
-            hiddenPhoto = profile.album_private?.preview?.thumbnail?.url.toString(),
-            description = userProfile.aboutMe,
-            rating = userProfile.rating.average,
-            observers = profile.count_watchers?: 0,
-            observed = profile.count_watching?: 0,
-            emoji = userProfile.rating.frequent,
-            profileType = ProfileType.USERPROFILE,
-            enabled = true,
-        ))
+        
+        _profileState.emit(
+            ProfileState(
+                name = "${userProfile.username}, ${userProfile.age}",
+                profilePhoto = userProfile.avatar.id,
+                hiddenPhoto = profile.album_private?.preview?.thumbnail?.url.toString(),
+                description = userProfile.aboutMe,
+                rating = userProfile.rating.average,
+                observers = profile.count_watchers ?: 0,
+                observed = profile.count_watching ?: 0,
+                emoji = userProfile.rating.frequent,
+                profileType = ProfileType.USERPROFILE,
+                enabled = true,
+            )
+        )
     }
     
     

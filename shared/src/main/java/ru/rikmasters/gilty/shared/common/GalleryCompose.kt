@@ -241,10 +241,7 @@ fun getImages(
 ): MutableList<String> {
     val imgList: MutableList<String> = ArrayList()
     val storage = getExternalStorageState()
-    log.d(storage)
-    if(
-        storage == MEDIA_MOUNTED
-    ) {
+    if(storage == MEDIA_MOUNTED) {
         context.contentResolver.query(
             Media.EXTERNAL_CONTENT_URI,
             arrayOf(DATA, _ID),

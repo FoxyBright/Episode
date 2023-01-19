@@ -29,9 +29,7 @@ fun AvatarScreen(
             override fun onMenuItemClick(point: Int) {
                 scope.launch {
                     vm.showMenu(false)
-                    nav.navigateAbsolute(
-                        "registration/gallery?multi=false"
-                    )
+                    nav.navigate("gallery?multi=false")
                 }
             }
             

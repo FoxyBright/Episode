@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.gallery
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween

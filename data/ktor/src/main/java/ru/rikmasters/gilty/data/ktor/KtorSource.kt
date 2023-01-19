@@ -18,11 +18,17 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import ru.rikmasters.gilty.core.data.source.WebSource
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 open class KtorSource: WebSource() {
     
     private val baseClient by lazy {
         HttpClient(OkHttp) {
+            engine {
+                config {
+                    writeTimeout(5, TimeUnit.MINUTES)
+                }
+            }
             install(Logging) {
                 level = LogLevel.BODY
                 logger = LogAdapter

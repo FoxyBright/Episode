@@ -11,10 +11,13 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListCallback
 import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListContent
 import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListState
 import ru.rikmasters.gilty.profile.presentation.ui.lists.responds.RespondsList
+import ru.rikmasters.gilty.profile.presentation.ui.user.gallerey.HiddenBsScreen
+import ru.rikmasters.gilty.profile.viewmodel.HiddenBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
@@ -142,11 +145,12 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         }
         
         override fun onMenuItemClick(point: Int) {
+            val image = profileState.profilePhoto
             when(point) {
-                0 -> nav.navigate("avatar?image=${profileState.profilePhoto}")
+                0 -> nav.navigate("avatar?image=$image")
                 
-                else -> nav.navigateAbsolute(
-                    "registration/gallery?multi=false"
+                else -> nav.navigate(
+                    "gallery?multi=false"
                 )
             }
         }
@@ -178,7 +182,13 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         }
         
         override fun hiddenImages() {
-            nav.navigate("hidden")
+            scope.launch {
+                asm.bottomSheet.expand {
+                    Connector<HiddenBsViewModel>(vm.scope) {
+                        HiddenBsScreen(it)
+                    }
+                }
+            }
         }
         
         override fun onHistoryShow() {

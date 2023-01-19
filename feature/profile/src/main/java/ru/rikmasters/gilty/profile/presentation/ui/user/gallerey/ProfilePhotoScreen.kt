@@ -1,19 +1,24 @@
-package ru.rikmasters.gilty.login.presentation.ui.gallery
+package ru.rikmasters.gilty.profile.presentation.ui.user.gallerey
 
+import android.graphics.Rect
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.canhub.cropper.CropImageContract
-import com.canhub.cropper.CropImageContractOptions
-import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.*
+import com.canhub.cropper.CropImageView.CropCornerShape.OVAL
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.permission.PermissionUtils.requestPermissions
-import ru.rikmasters.gilty.login.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
 import ru.rikmasters.gilty.shared.common.*
 import java.io.File
 
@@ -38,12 +43,20 @@ fun ProfileSelectPhotoScreen(
         rememberLauncherForActivityResult(CropImageContract()) { result ->
             if(result.isSuccessful) {
                 scope.launch {
-                    val image = result.getUriFilePath(context) ?: ""
-                    vm.imageClick(image, result.cropPoints.toList().map { it.toInt() })
+                    val image = result.originalUri?.toFile()?.path ?: ""
+                    val rect = result.cropRect ?: Rect()
+                    vm.imageClick(
+                        image, listOf(
+                            (rect.width() - rect.centerX() * 2),
+                            (rect.height() - rect.centerY() * 2),
+                            rect.width(), rect.height()
+                        )
+                    )
                     nav.navigationBack()
                 }
             }
         }
+    
     LaunchedEffect(Unit) {
         if(!permissions)
             asm.bottomSheet.expand {
@@ -96,8 +109,16 @@ fun ProfileSelectPhotoScreen(
                     CropImageContractOptions(
                         File(image).toUri(),
                         CropImageOptions(
-                            aspectRatioX = 200,
-                            aspectRatioY = 100
+                            aspectRatioX = 2,
+                            aspectRatioY = 3,
+                            guidelinesColor = Transparent.toArgb(),
+                            cropCornerRadius = 0f,
+                            cornerShape = OVAL,
+                            cropShape = CropImageView.CropShape.RECTANGLE,
+                            scaleType = CropImageView.ScaleType.CENTER_CROP,
+                            progressBarColor = Color(0xFFFF4745).toArgb(),
+                            fixAspectRatio = true,
+                            activityBackgroundColor = Black.toArgb()
                         )
                     )
                 )

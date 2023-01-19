@@ -61,7 +61,7 @@ object Login: FeatureDefinition() {
                 HiddenScreen(vm)
             }
             
-            screen<GalereyViewModel>(
+            screen<GalleryViewModel>(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
                     type = NavType.BoolType; defaultValue = false
@@ -98,8 +98,8 @@ object Login: FeatureDefinition() {
             scopedOf(::CategoryViewModel)
         }
         
-        scope<GalereyViewModel> {
-            scopedOf(::GalereyViewModel)
+        scope<GalleryViewModel> {
+            scopedOf(::GalleryViewModel)
         }
         
         scope<HiddenViewModel> {

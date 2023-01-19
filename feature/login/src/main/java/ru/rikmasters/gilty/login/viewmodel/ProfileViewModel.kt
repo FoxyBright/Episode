@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 var Avatar: String = ""
+var ListPoints: List<Int> = listOf()
 var Hidden: String = ""
 var UserName: String = ""
 var UserDescription: String = ""

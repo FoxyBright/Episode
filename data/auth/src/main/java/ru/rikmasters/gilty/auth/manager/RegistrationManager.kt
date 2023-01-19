@@ -20,8 +20,14 @@ class RegistrationManager(
     suspend fun isUserRegistered(): Boolean =
         profileWebSource.isUserRegistered()
     
-    suspend fun setAvatar(file: File) {
-        profileWebSource.setUserAvatar(file)
+    suspend fun setAvatar(file: File, points: List<Int>) {
+        profileWebSource.setUserAvatar(
+            file,
+            points[0],
+            points[1],
+            points[3],
+            points[2],
+        )
     }
     
     suspend fun setHidden(files: List<File>) {

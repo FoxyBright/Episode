@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.data.ktor.Ktor.logD
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel

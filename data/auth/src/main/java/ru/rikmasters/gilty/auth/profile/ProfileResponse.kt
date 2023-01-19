@@ -75,5 +75,5 @@ data class Thumbnail(
 
 data class AlbumPrivate(
     val id: String,
-    val preview: Image,
+    val preview: Image? = null,
 )
