@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.lists.participants
+package ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

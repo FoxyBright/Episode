@@ -20,7 +20,7 @@ import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.profile.presentation.ui.user.organizer
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.organizer
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState

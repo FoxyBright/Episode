@@ -17,8 +17,8 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.GCalenda
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBS
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
-import ru.rikmasters.gilty.profile.presentation.ui.lists.participants.ParticipantsList
-import ru.rikmasters.gilty.profile.presentation.ui.lists.participants.ParticipantsListCallback
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsList
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsListCallback
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfile
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfileState
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback

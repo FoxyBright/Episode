@@ -1,27 +1,24 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListCallback
-import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListContent
-import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserversListState
-import ru.rikmasters.gilty.profile.presentation.ui.lists.responds.RespondsList
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MyMeetingScreen
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserversBs
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.responds.RespondsList
 import ru.rikmasters.gilty.profile.presentation.ui.user.gallerey.HiddenBsScreen
 import ru.rikmasters.gilty.profile.viewmodel.HiddenBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
@@ -45,7 +42,6 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val meets by vm.meets.collectAsState()
     val history by vm.history.collectAsState()
     
-    val observersTab by vm.observersSelectTab.collectAsState()
     val respondsSelectTab by vm.respondsSelectTab.collectAsState()
     val observeGroupStates by vm.observeGroupStates.collectAsState()
     
@@ -64,25 +60,6 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 DemoSendRespondsModel
             )
         }
-    
-    val observers =
-        remember {
-            mutableStateListOf(
-                DemoMemberModel,
-                DemoMemberModel,
-                DemoMemberModel,
-                DemoMemberModel
-            )
-        }
-    
-    val observed = remember {
-        mutableStateListOf(
-            DemoMemberModel,
-            DemoMemberModel,
-            DemoMemberModel,
-            DemoMemberModel
-        )
-    }
     
     val pairRespondsList =
         remember { mutableStateOf(Pair(DemoMeetingModel, respondsList)) }
@@ -111,17 +88,9 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         override fun onObserveClick() {
             scope.launch {
                 asm.bottomSheet.expand {
-                    ObserversListContent(
-                        ObserversListState(
-                            profile, observers,
-                            observed, observersTab
-                        ), Modifier.padding(top = 28.dp),
-                        object: ObserversListCallback {
-                            override fun onTabChange(point: Int) {
-                                scope.launch { vm.changeObserversTab(point) }
-                            }
-                        }
-                    )
+                    Connector<ObserverBsViewModel>(vm.scope) {
+                        ObserversBs(it, profileState.name)
+                    }
                 }
             }
         }

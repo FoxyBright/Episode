@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -47,7 +48,7 @@ fun BrieflyRow(
     Row(modifier, Start, CenterVertically) {
         avatar?.let {
             AsyncImage(
-                avatar.id,
+                it.id,
                 stringResource(meeting_avatar),
                 Modifier
                     .padding(end = 12.dp)
@@ -61,7 +62,9 @@ fun BrieflyRow(
                 text, Modifier,
                 colorScheme.tertiary,
                 style = typography.bodyMedium,
-                fontWeight = SemiBold
+                fontWeight = SemiBold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
             emoji?.let {
                 GEmojiImage(

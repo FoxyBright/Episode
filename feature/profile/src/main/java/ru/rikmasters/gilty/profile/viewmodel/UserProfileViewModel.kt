@@ -82,9 +82,6 @@ class UserProfileViewModel: ViewModel() {
     
     // TODO ИЗМЕНИТЬ /////////////////////////////////////////
     
-    private val _observersSelectTab = MutableStateFlow(listOf(true, false))
-    val observersSelectTab = _observersSelectTab.asStateFlow()
-    
     private val _respondsSelectTab = MutableStateFlow(listOf(true, false))
     val respondsSelectTab = _respondsSelectTab.asStateFlow()
     
@@ -98,12 +95,6 @@ class UserProfileViewModel: ViewModel() {
         )
     )
     val profileState = _profileState.asStateFlow()
-    
-    suspend fun changeObserversTab(tab: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(observersSelectTab.value.size) { list.add(it == tab) }
-        _observersSelectTab.emit(list)
-    }
     
     suspend fun changeRespondsTab(tab: Int) {
         val list = arrayListOf<Boolean>()

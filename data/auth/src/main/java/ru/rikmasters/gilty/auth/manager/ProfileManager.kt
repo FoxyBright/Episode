@@ -9,6 +9,9 @@ class ProfileManager(
 
 ) {
     
+    suspend fun getObservers(type: ProfileWebSource.ObserversType) =
+        profileWebSource.getObservers(type)
+    
     suspend fun getProfile() =
         profileWebSource.getUserData()
     
@@ -18,5 +21,4 @@ class ProfileManager(
     suspend fun deleteHidden(image: Image) {
         profileWebSource.deleteHidden(image)
     }
-    
 }

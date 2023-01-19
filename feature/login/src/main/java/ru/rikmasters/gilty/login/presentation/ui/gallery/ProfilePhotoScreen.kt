@@ -1,9 +1,11 @@
 package ru.rikmasters.gilty.login.presentation.ui.gallery
 
+import android.graphics.Rect
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
@@ -38,8 +40,15 @@ fun ProfileSelectPhotoScreen(
         rememberLauncherForActivityResult(CropImageContract()) { result ->
             if(result.isSuccessful) {
                 scope.launch {
-                    val image = result.getUriFilePath(context) ?: ""
-                    vm.imageClick(image, result.cropPoints.toList().map { it.toInt() })
+                    val image = result.originalUri?.toFile()?.path ?: ""
+                    val rect = result.cropRect ?: Rect()
+                    vm.imageClick(
+                        image, listOf(
+                            (rect.width() - rect.centerX() * 2),
+                            (rect.height() - rect.centerY() * 2),
+                            rect.width(), rect.height()
+                        )
+                    )
                     nav.navigationBack()
                 }
             }

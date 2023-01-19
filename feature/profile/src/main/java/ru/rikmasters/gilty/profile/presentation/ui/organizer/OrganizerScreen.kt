@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.profile.presentation.ui.user.MyMeetingScreen
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MyMeetingScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType

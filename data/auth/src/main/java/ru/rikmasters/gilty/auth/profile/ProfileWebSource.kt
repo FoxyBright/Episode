@@ -12,6 +12,7 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.wrapper.*
 import java.io.File
 
@@ -27,6 +28,20 @@ class ProfileWebSource: KtorSource() {
             
             fun valueOf(index: Int) = values()[index]
         }
+    }
+    
+    enum class ObserversType(val value: String){
+        OBSERVERS("watchers"),
+        OBSERVABLES("watch")
+    }
+    
+    suspend fun getObservers(
+        type: ObserversType
+    ): List<MemberModel> {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/profile/${type.value}"
+        ) {}.wrapped<List<MemberResponse>>().map { it.map() }
     }
     
     suspend fun deleteHidden(image: Image) {

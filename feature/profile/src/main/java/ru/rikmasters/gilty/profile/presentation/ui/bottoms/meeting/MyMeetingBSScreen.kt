@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.user
+package ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
@@ -11,9 +11,10 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.profile.presentation.ui.lists.participants.ParticipantsList
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsList
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfile
 import ru.rikmasters.gilty.profile.presentation.ui.organizer.OrganizerProfileState
+import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback

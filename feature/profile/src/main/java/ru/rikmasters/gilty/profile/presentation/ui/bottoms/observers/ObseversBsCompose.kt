@@ -1,12 +1,8 @@
-package ru.rikmasters.gilty.profile.presentation.ui.lists.observers
+package ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
@@ -22,20 +18,14 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserveType.OBSERVED
-import ru.rikmasters.gilty.profile.presentation.ui.lists.observers.ObserveType.OBSERVERS
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserveType.OBSERVED
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserveType.OBSERVERS
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
-import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.BrieflyRow
-import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.GiltyTab
-import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
-import ru.rikmasters.gilty.shared.shared.SmallButton
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -44,7 +34,7 @@ fun ObserversListPreview() {
     GiltyTheme {
         ObserversListContent(
             ObserversListState(
-                DemoProfileModel,
+                DemoProfileModel.username,
                 DemoMemberModelList, DemoMemberModelList,
                 listOf(true, false)
             )
@@ -53,7 +43,7 @@ fun ObserversListPreview() {
 }
 
 data class ObserversListState(
-    val user: ProfileModel,
+    val user: String,
     val observers: List<MemberModel>,
     val observed: List<MemberModel>,
     val selectTab: List<Boolean>,
@@ -77,10 +67,7 @@ fun ObserversListContent(
             .background(colorScheme.background)
     ) {
         ActionBar(
-            "${
-                state.user.username
-            }, ${state.user.age}",
-            (null),
+            state.user, (null),
             Modifier.padding(bottom = 22.dp)
         )
         GiltyTab(
@@ -157,7 +144,7 @@ private fun ObserveItem(
                 }, ${
                     member.age
                 }",
-                member.emoji, Modifier
+                member.emoji, Modifier.weight(1f)
             )
             SmallButton(
                 stringResource(

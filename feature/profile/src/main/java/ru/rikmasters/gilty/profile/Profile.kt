@@ -77,6 +77,7 @@ object Profile: FeatureDefinition() {
         scope<UserProfileViewModel> {
             scopedOf(::UserProfileViewModel)
             scopedOf(::HiddenBsViewModel)
+            scopedOf(::ObserverBsViewModel)
         }
     }
     
