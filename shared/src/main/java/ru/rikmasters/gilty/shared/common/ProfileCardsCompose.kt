@@ -114,25 +114,27 @@ fun HiddenContent(
             .clickable { onCardClick() }, BottomCenter
     ) {
         AsyncImage(
-            image, stringResource(R.string.profile_hidden_photo),
+            image, (null),
             Modifier.fillMaxSize(),
             contentScale = Crop
         )
+        val emptyImage = image.isNullOrBlank()
+                || image.contains("null")  //TODO Появляется null в строке - поправить
         Box(
             Modifier
                 .padding(8.dp)
                 .size(26.dp)
                 .clip(CircleShape)
                 .align(TopStart), Center
-        ) { if(profileType != USERPROFILE) Lock() }
-        if(profileType == ORGANIZER)
-            CreateProfileCardRow(
-                stringResource(R.string.profile_hidden_photo),
-                USERPROFILE
-            )
-        else CreateProfileCardRow(
+        ) { if(profileType != USERPROFILE || emptyImage) Lock() }
+        CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
-            profileType
+            when(profileType) {
+                ORGANIZER -> USERPROFILE
+                CREATE -> CREATE
+                USERPROFILE -> if(emptyImage)
+                    CREATE else USERPROFILE
+            }
         )
     }
 }
@@ -235,8 +237,8 @@ private fun CreateProfileCardRow(
                     typography.headlineSmall
                 else typography.bodyMedium,
                 fontWeight = SemiBold,
-                
-                )
+                textAlign = TextAlign.Center
+            )
         when(profileType) {
             CREATE -> {
                 Box(

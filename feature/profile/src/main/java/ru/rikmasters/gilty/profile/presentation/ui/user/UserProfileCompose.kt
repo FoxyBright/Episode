@@ -46,8 +46,7 @@ data class UserProfileState(
     val profileState: ProfileState,
     val currentMeetings: List<MeetingModel>,
     val meetingsHistory: List<MeetingModel>,
-    val lastRespond: MeetingModel,
-    val notifications: Int,
+    val lastRespond: Pair<Int, String>,
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
     val alert: Boolean,
@@ -86,8 +85,8 @@ private fun UserProfilePreview() {
                     emoji = EmojiList.first(),
                     profileType = ProfileType.USERPROFILE,
                     enabled = false,
-                ), meets, meets, meets.first(),
-                (3), (false), listOf(
+                ), meets, meets, Pair(4, "image"),
+                (false), listOf(
                     NavIconState.INACTIVE,
                     NavIconState.NEW,
                     NavIconState.INACTIVE,
@@ -185,7 +184,7 @@ private fun Content(
         }
         item {
             Responds(
-                state.notifications, state.lastRespond,
+                state.lastRespond,
                 Modifier.padding(16.dp, 12.dp)
             ) { callback?.onRespondsClick() }
         }
@@ -211,8 +210,7 @@ private fun Content(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Responds(
-    size: Int,
-    last: MeetingModel,
+    last: Pair<Int, String>,
     modifier: Modifier,
     onClick: () -> Unit
 ) {
@@ -231,27 +229,28 @@ private fun Responds(
             CenterVertically,
         ) {
             Row(verticalAlignment = CenterVertically) {
-                AsyncImage(
-                    last.organizer.id,
-                    (null), Modifier
+                if(last.second.isNotBlank()) AsyncImage(
+                    last.second, (null), Modifier
                         .size(40.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .padding(end = 16.dp),
                     contentScale = Crop
                 )
                 Text(
                     stringResource(R.string.profile_responds_label),
-                    Modifier.padding(start = 16.dp),
-                    colorScheme.tertiary, style = style
+                    Modifier.padding(vertical = 12.dp),
+                    colorScheme.tertiary,
+                    style = style
                 )
             }
             Row(verticalAlignment = CenterVertically) {
-                if(size > 0) Box(
+                if(last.first > 0) Box(
                     Modifier
                         .clip(shapes.extraSmall)
                         .background(colorScheme.primary)
                 ) {
                     Text(
-                        size.toString(),
+                        last.first.toString(),
                         Modifier.padding(10.dp, 4.dp),
                         White, style = style
                     )

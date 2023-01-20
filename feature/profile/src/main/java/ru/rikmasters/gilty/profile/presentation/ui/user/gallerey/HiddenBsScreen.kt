@@ -20,7 +20,6 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
     LaunchedEffect(Unit) {
         vm.uploadPhotoList()
     }
-    
     HiddenBsContent(
         photoList, Modifier,
         object: HiddenBsCallback {
@@ -28,7 +27,7 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
             override fun onSelectImage(image: Image) {
                 scope.launch {
                     asm.bottomSheet.collapsed()
-                    nav.navigate("avatar?image=${image.thumbnail.url}")
+                    nav.navigate("avatar?image=${image.url}")
                 }
             }
             

@@ -43,7 +43,7 @@ object Profile: FeatureDefinition() {
                     }
                 }
             }
-    
+            
             screen<GalleryViewModel>(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
@@ -65,7 +65,7 @@ object Profile: FeatureDefinition() {
         scope<AvatarViewModel> {
             scopedOf(::AvatarViewModel)
         }
-    
+        
         scope<GalleryViewModel> {
             scopedOf(::GalleryViewModel)
         }
@@ -78,6 +78,7 @@ object Profile: FeatureDefinition() {
             scopedOf(::UserProfileViewModel)
             scopedOf(::HiddenBsViewModel)
             scopedOf(::ObserverBsViewModel)
+            scopedOf(::RespondsBsViewModel)
         }
     }
     

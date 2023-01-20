@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.model.profile
 
 import ru.rikmasters.gilty.shared.model.enumeration.SexType
 import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.SexType.MALE
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 
@@ -54,6 +55,20 @@ val DemoProfileModel = ProfileModel(
     "Instagram @cristi",
     DemoAvatarModel,
     DemoRatingModel,
+    true
+)
+
+val DemoEmptyProfileModel = ProfileModel(
+    "",
+    "",
+    "",
+    getEmoji(""),
+    MALE,
+    OrientationModel("", ""),
+    0,
+    "",
+    getDemoAvatarModel(id = ""),
+    RatingModel("", getEmoji("")),
     true
 )
 

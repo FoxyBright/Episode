@@ -4,33 +4,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.ProfileManager
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel.ImageType.AVATAR
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel.ImageType.HIDDEN
-import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
+import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
+import ru.rikmasters.gilty.shared.model.profile.getEmoji
 
 class UserProfileViewModel: ViewModel() {
-    
-    //FIXME тут данные /////////////////////////////////////
-    
+
     private val profileManager by inject<ProfileManager>()
+    private val regManager by inject<RegistrationManager>()
+    private suspend fun getUserProfile() = profileManager.getProfile()
     
-    private val profileModel = DemoProfileModel
+    private val profileModel = DemoEmptyProfileModel
     private val meetingList = DemoMeetingList
-    private val respond = DemoMeetingModel
+    
     private val navBarStateList = listOf(
         INACTIVE, NEW, INACTIVE, NEW, ACTIVE
     )
-    
-    //TODO/////////////////////////////////////////////////////////
     
     private val _avatar = MutableStateFlow(profileModel.avatar.id)
     val avatar = _avatar.asStateFlow()
@@ -47,6 +45,9 @@ class UserProfileViewModel: ViewModel() {
     private val _rating = MutableStateFlow("0.0")
     val rating = _rating.asStateFlow()
     
+    private val _occupied = MutableStateFlow(false)
+    val occupied = _occupied.asStateFlow()
+    
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
@@ -56,7 +57,7 @@ class UserProfileViewModel: ViewModel() {
     private val _history = MutableStateFlow(false)
     val history = _history.asStateFlow()
     
-    private val _profile = MutableStateFlow(profileModel)
+    private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
     
     private val _description = MutableStateFlow(profileModel.aboutMe)
@@ -71,7 +72,7 @@ class UserProfileViewModel: ViewModel() {
     private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
-    private val _lastRespond = MutableStateFlow(respond)
+    private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
     
     private val _observers = MutableStateFlow(0)
@@ -79,59 +80,6 @@ class UserProfileViewModel: ViewModel() {
     
     private val _observed = MutableStateFlow(0)
     val observed = _observed.asStateFlow()
-    
-    // TODO ИЗМЕНИТЬ /////////////////////////////////////////
-    
-    private val _respondsSelectTab = MutableStateFlow(listOf(true, false))
-    val respondsSelectTab = _respondsSelectTab.asStateFlow()
-    
-    private val _observeGroupStates = MutableStateFlow(listOf(true, false))
-    val observeGroupStates = _observeGroupStates.asStateFlow()
-    
-    private val _profileState = MutableStateFlow(
-        ProfileState(
-            profileType = ProfileType.USERPROFILE,
-            enabled = true
-        )
-    )
-    val profileState = _profileState.asStateFlow()
-    
-    suspend fun changeRespondsTab(tab: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(respondsSelectTab.value.size) { list.add(it == tab) }
-        _respondsSelectTab.emit(list)
-    }
-    
-    suspend fun changeObserveGroupStates(tab: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(observeGroupStates.value.size) { list.add(it == tab) }
-        _observeGroupStates.emit(list)
-    }
-    
-    // TODO /////////////////////////////////////////////////
-    
-    suspend fun drawProfile() {
-        val profile = profileManager.getProfile()
-        logD("profile WEB ----->>> $profile")
-        val userProfile = profile.map()
-        logD("profile THIS ----->>> $userProfile")
-        
-        _profileState.emit(
-            ProfileState(
-                name = "${userProfile.username}, ${userProfile.age}",
-                profilePhoto = userProfile.avatar.id,
-                hiddenPhoto = profile.album_private?.preview?.thumbnail?.url.toString(),
-                description = userProfile.aboutMe,
-                rating = userProfile.rating.average,
-                observers = profile.count_watchers ?: 0,
-                observed = profile.count_watching ?: 0,
-                emoji = userProfile.rating.frequent,
-                profileType = ProfileType.USERPROFILE,
-                enabled = true,
-            )
-        )
-    }
-    
     
     private suspend fun navBarSetStates(
         states: List<NavIconState>
@@ -162,7 +110,7 @@ class UserProfileViewModel: ViewModel() {
     
     enum class ImageType { HIDDEN, AVATAR }
     
-    suspend fun changeImage(
+    private suspend fun changeImage(
         image: String,
         type: ImageType
     ) {
@@ -178,11 +126,35 @@ class UserProfileViewModel: ViewModel() {
     
     suspend fun changeDescription(text: String) {
         _description.emit(text)
+        regManager.userUpdateData(
+            username.value.substringBefore(','),
+            description.value,
+            age.value
+        )
     }
     
-    suspend fun changeUsername(text: String) {
-        _username.emit(text)
-        drawProfile()
+    suspend fun setUserDate() {
+        val user = getUserProfile()
+        _username.emit("${user.username}, ${user.age}")
+        _description.emit(user.about_me ?: "")
+        _rating.emit(user.average.toString())
+        _age.emit(user.age ?: 0)
+        _emoji.emit(getEmoji(user.emoji_type.toString()))
+        _observed.emit(user.count_watching ?: 0)
+        _observers.emit(user.count_watchers ?: 0)
+        _lastRespond.emit(Pair(user.responds?.count ?: 0, user.responds?.thumbnail?.url ?: ""))
+        user.avatar?.url?.let { changeImage(it, AVATAR) }
+        user.album_private?.preview?.url?.let { changeImage(it, HIDDEN) }
+    }
+    
+    suspend fun changeUsername(name: String) {
+        if(!name.contains(',')) return
+        val text = name.substringBefore(',')
+        _username.emit("$text, ${age.value}")
+        _occupied.emit(regManager.isNameOccupied(text))
+        if(!occupied.value) regManager.userUpdateData(
+            text, description.value, age.value
+        )
     }
     
     suspend fun showHistory() {

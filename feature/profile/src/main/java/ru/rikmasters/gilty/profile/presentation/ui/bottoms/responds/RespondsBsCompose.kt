@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,7 +23,6 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.GiltyTab
-import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -58,11 +59,17 @@ fun RespondsList(
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        RowActionBar(
+        Text(
             stringResource(R.string.profile_responds_label),
-            modifier = Modifier.padding(top = 28.dp),
-            distanceBetween = 0.dp
-        ) { callback?.onBack() }
+            Modifier
+                .padding(
+                    start = 56.dp,
+                    bottom = 24.dp,
+                    top = 12.dp
+                ),
+            colorScheme.tertiary,
+            style = typography.labelLarge
+        )
         GiltyTab(
             listOf(
                 stringResource(R.string.profile_sent_responds),
@@ -71,22 +78,21 @@ fun RespondsList(
         ) { callback?.onTabChange(it) }
         if(selectTabs.last())
             ReceivedResponds(
-                responds, respondsStates,
-                callback, Modifier
-                    .padding(16.dp, 8.dp)
+                Modifier.padding(16.dp, 8.dp),
+                responds, respondsStates, callback
             )
         else SentResponds(
-            responds, callback,
-            Modifier.padding(16.dp, 8.dp)
+            Modifier.padding(16.dp, 8.dp),
+            responds, callback
         )
     }
 }
 
 @Composable
 private fun SentResponds(
+    modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<RespondModel>>>,
-    callback: RespondCallback? = null,
-    modifier: Modifier = Modifier
+    callback: RespondCallback? = null
 ) {
     val sentResponds =
         arrayListOf<RespondModel>()
@@ -114,10 +120,10 @@ private fun SentResponds(
 
 @Composable
 private fun ReceivedResponds(
+    modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<RespondModel>>>,
     respondsStates: List<Boolean>,
-    callback: RespondCallback? = null,
-    modifier: Modifier = Modifier
+    callback: RespondCallback? = null
 ) {
     val listOfResponds =
         arrayListOf<RespondModel>()

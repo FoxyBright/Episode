@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
@@ -67,16 +68,15 @@ fun HiddenImage(
         ) else AsyncImage(
             image.id, (null),
             Modifier
-                .background(
-                    colorScheme.onTertiary
-                )
+                .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,
         )
         CheckBox(
-            !hidden, Modifier.size(24.dp), listOf(
-                ic_lock_open, ic_lock_close
-            ), White
+            !hidden, Modifier
+                .size(24.dp)
+                .align(Center),
+            listOf(ic_lock_open, ic_lock_close), White
         ) { onClick?.let { it(image) } }
     }
 }
