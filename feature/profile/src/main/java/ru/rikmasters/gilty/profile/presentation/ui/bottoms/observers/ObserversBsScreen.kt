@@ -6,6 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
 @Composable
 fun ObserversBs(
@@ -16,7 +18,6 @@ fun ObserversBs(
     val scope = rememberCoroutineScope()
     
     val observersTab by vm.observersSelectTab.collectAsState()
-    
     val observed by vm.observables.collectAsState()
     val observers by vm.observers.collectAsState()
     
@@ -31,12 +32,14 @@ fun ObserversBs(
             observed, observersTab
         ), Modifier.padding(top = 28.dp),
         object: ObserversListCallback {
-            override fun onDelete() {
-                super.onDelete()
+            
+            override fun onButtonClick(
+                member: MemberModel, type: SubscribeType
+            ) {
+                scope.launch { vm.onSubScribe(member, type) }
             }
             
-            override fun onClick() {
-                super.onClick()
+            override fun onClick(member: MemberModel) {
             }
             
             override fun onTabChange(point: Int) {

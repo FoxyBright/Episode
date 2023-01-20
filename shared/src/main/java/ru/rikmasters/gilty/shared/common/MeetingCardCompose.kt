@@ -186,7 +186,7 @@ private fun Icons(
     meet: MeetingModel,
     imageSize: Dp = 20.dp
 ) {
-    categoriesListCard(
+    CategoriesListCard(
         modifier,
         meet, (false),
         imageSize
@@ -329,7 +329,7 @@ fun MeetCard(
                 MEET -> {
                     meet?.let {
                         MeetTop(
-                            it.organizer.avatar, Modifier
+                            it.organizer?.avatar, Modifier
                                 .weight(1f)
                                 .offset(y = 24.dp)
                         )
@@ -362,11 +362,11 @@ private fun EmptyTop(
 
 @Composable
 private fun MeetTop(
-    avatar: AvatarModel,
+    avatar: AvatarModel?,
     modifier: Modifier
 ) {
     AsyncImage(
-        avatar.id, stringResource(R.string.meeting_avatar),
+        avatar?.id, stringResource(R.string.meeting_avatar),
         modifier
             .fillMaxSize()
             .clip(ThemeExtra.shapes.bigTopShapes),

@@ -8,7 +8,6 @@ import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.util.Log
 
-@Suppress("unused")
 fun internetCheck(context: Context): Boolean {
     val connectivityManager =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager

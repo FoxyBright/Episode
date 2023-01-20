@@ -124,7 +124,7 @@ fun MeetingBSTopBarCompose(
             Modifier.padding(bottom = 12.dp)
         ) { onRespondsClick?.let { it() } }
         Row(Modifier.height(IntrinsicSize.Max)) {
-            Avatar(org.avatar, Modifier.weight(1f))
+            Avatar(org?.avatar, Modifier.weight(1f))
             { onAvatarClick?.let { it() } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
@@ -134,8 +134,8 @@ fun MeetingBSTopBarCompose(
             Start, CenterVertically
         ) {
             BrieflyRow(
-                (null), ("${org.username}, ${org.age}"),
-                org.emoji
+                (null), ("${org?.username}, ${org?.age}"),
+                org?.emoji
             )
             Text(
                 state.meet.display(),
@@ -250,7 +250,7 @@ private fun MeetDetails(
 
 @Composable
 private fun Avatar(
-    avatar: AvatarModel,
+    avatar: AvatarModel?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -262,7 +262,7 @@ private fun Avatar(
             )
     ) {
         AsyncImage(
-            avatar.id, (null),
+            avatar?.id, (null),
             Modifier
                 .fillMaxWidth()
                 .clip(shapes.large)

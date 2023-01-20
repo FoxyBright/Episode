@@ -5,6 +5,9 @@ import androidx.compose.ui.res.stringResource
 import ru.rikmasters.gilty.shared.R.string.meeting_anon_type
 import ru.rikmasters.gilty.shared.R.string.meeting_group_type
 import ru.rikmasters.gilty.shared.R.string.meeting_personal_type
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
 
 enum class MeetType {
     
@@ -20,5 +23,10 @@ enum class MeetType {
         )
 }
 
+fun getMeetType(name: String) = when(name) {
+    "PERSONAL" -> PERSONAL
+    "ANONYMOUS" -> ANONYMOUS
+    else -> GROUP
+}
 
 

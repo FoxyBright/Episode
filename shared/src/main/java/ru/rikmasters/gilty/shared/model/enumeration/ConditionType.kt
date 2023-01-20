@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.enumeration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import ru.rikmasters.gilty.shared.R.string.*
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.*
 
 enum class ConditionType {
     
@@ -19,4 +20,12 @@ enum class ConditionType {
                 NO_MATTER -> condition_no_matter
             }
         )
+}
+
+fun getConditionType(name: String) = when(name) {
+    "ORGANIZER_PAY" -> ORGANIZER_PAY
+    "MEMBER_PAY" -> MEMBER_PAY
+    "DIVIDE" -> DIVIDE
+    "FREE" -> FREE
+    else -> NO_MATTER
 }

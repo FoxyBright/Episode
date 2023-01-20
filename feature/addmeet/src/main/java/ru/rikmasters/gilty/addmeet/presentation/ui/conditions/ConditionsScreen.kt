@@ -13,7 +13,7 @@ import ru.rikmasters.gilty.shared.model.meeting.*
 import java.util.UUID.randomUUID
 
 var MEETING: MeetingModel = MeetingModel(
-    id = randomUUID(),
+    id = randomUUID().toString(),
     title = DemoTag.title,
     condition = FREE,
     category = ENTERTAINMENT,
@@ -26,7 +26,7 @@ var MEETING: MeetingModel = MeetingModel(
     description = "",
     isPrivate = false,
     memberCount = 4,
-    requirements = ListDemoMeetingRequirementModel,
+    requirements = DemoMeetingRequirementModel,
     place = "",
     address = "",
     hideAddress = false,

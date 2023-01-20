@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.ACTUAL
+import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.HISTORY
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel.ImageType.AVATAR
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel.ImageType.HIDDEN
@@ -13,12 +15,13 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.model.profile.getEmoji
 
 class UserProfileViewModel: ViewModel() {
-
+    
     private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
     private suspend fun getUserProfile() = profileManager.getProfile()
@@ -48,11 +51,17 @@ class UserProfileViewModel: ViewModel() {
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
     
+    private val _errorConnection = MutableStateFlow(false)
+    val errorConnection = _errorConnection.asStateFlow()
+    
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
-    private val _meets = MutableStateFlow(meetingList)
+    private val _meets = MutableStateFlow(listOf<MeetingModel>())
     val meets = _meets.asStateFlow()
+    
+    private val _meetsHistory = MutableStateFlow(listOf<MeetingModel>())
+    val meetsHistory = _meetsHistory.asStateFlow()
     
     private val _history = MutableStateFlow(false)
     val history = _history.asStateFlow()
@@ -82,9 +91,13 @@ class UserProfileViewModel: ViewModel() {
     val observed = _observed.asStateFlow()
     
     private suspend fun navBarSetStates(
-        states: List<NavIconState>
+        states: List<NavIconState>,
     ) {
         _navBar.emit(states)
+    }
+    
+    suspend fun errorConnection(state: Boolean) {
+        _errorConnection.emit(state)
     }
     
     suspend fun navBarNavigate(point: Int): String {
@@ -112,7 +125,7 @@ class UserProfileViewModel: ViewModel() {
     
     private suspend fun changeImage(
         image: String,
-        type: ImageType
+        type: ImageType,
     ) {
         when(type) {
             HIDDEN -> _hidden.emit(image)
@@ -133,6 +146,11 @@ class UserProfileViewModel: ViewModel() {
         )
     }
     
+    private suspend fun getUserMeets() {
+        _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
+        _meets.emit(profileManager.getUserMeets(ACTUAL))
+    }
+    
     suspend fun setUserDate() {
         val user = getUserProfile()
         _username.emit("${user.username}, ${user.age}")
@@ -145,6 +163,7 @@ class UserProfileViewModel: ViewModel() {
         _lastRespond.emit(Pair(user.responds?.count ?: 0, user.responds?.thumbnail?.url ?: ""))
         user.avatar?.url?.let { changeImage(it, AVATAR) }
         user.album_private?.preview?.url?.let { changeImage(it, HIDDEN) }
+        getUserMeets()
     }
     
     suspend fun changeUsername(name: String) {

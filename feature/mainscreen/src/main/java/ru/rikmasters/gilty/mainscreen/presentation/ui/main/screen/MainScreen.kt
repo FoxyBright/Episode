@@ -152,7 +152,7 @@ fun MainScreen(nav: NavState = get()) {
             clickedMeet?.let {
                 nav.navigateAbsolute(
                     "main/reaction?avatar=${
-                        it.organizer.avatar.id
+                        it.organizer?.avatar?.id
                     }&meetType=${it.category.ordinal}"
                 ); scope.launch { asm.bottomSheet.collapse() }
             }

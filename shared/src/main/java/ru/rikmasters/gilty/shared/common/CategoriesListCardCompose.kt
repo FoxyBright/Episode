@@ -13,18 +13,18 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.R.drawable.ic_fire
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R.drawable.ic_money
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Composable
-fun categoriesListCard(
+fun CategoriesListCard(
     modifier: Modifier,
     meeting: MeetingModel,
     border: Boolean,
-    imageSize: Dp = 20.dp
+    imageSize: Dp = 20.dp,
 ) {
     Surface(
         modifier, shapes.medium,
@@ -37,8 +37,12 @@ fun categoriesListCard(
             Modifier, Arrangement.SpaceEvenly,
             Alignment.CenterVertically
         ) {
+            val emoji = meeting.category.emoji
             Image(
-                painterResource(ic_fire), (null),
+                if(emoji.type == "D")
+                    painterResource(emoji.path.toInt())
+                else rememberAsyncImagePainter(emoji.path),
+                (null),
                 Modifier
                     .padding(6.dp)
                     .size(imageSize),

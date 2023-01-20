@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.R.drawable.*
+import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.*
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
@@ -77,4 +78,15 @@ enum class CategoriesType {
             PARTY -> null
             ART -> null
         }
+}
+
+fun getCategoriesType(name: String) = when(name) {
+    "BASKETBALL" -> SPORT
+    "BRIEFCASE" -> BUSINESS
+    "EIFFEL_TOWER" -> TRAVEL
+    "BRUSH" -> MASTER_CLASSES
+    "POPCORN" -> ENTERTAINMENT
+    "ADULT" -> EROTIC
+    "COCKTAIL" -> PARTY
+    else -> ART
 }

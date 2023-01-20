@@ -8,12 +8,18 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
+import ru.rikmasters.gilty.auth.meetings.MeetingResponse
+import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVABLES
+import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
-import ru.rikmasters.gilty.shared.wrapper.*
+import ru.rikmasters.gilty.shared.wrapper.Status
+import ru.rikmasters.gilty.shared.wrapper.errorWrapped
+import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
 
 
@@ -30,13 +36,53 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
-    enum class ObserversType(val value: String){
+    enum class MeetingsType { ACTUAL, HISTORY }
+    
+    enum class ObserversType(val value: String) {
         OBSERVERS("watchers"),
         OBSERVABLES("watch")
     }
     
+    suspend fun getUserMeets(
+        type: MeetingsType,
+    ): List<MeetingModel> {
+        updateClientToken()
+        val response = client.get(
+            "http://$HOST$PREFIX_URL/profile/meetings"
+        ) { url { query("is_completed" to type.ordinal.toString()) } }
+        response.wrapped<List<MeetingResponse>>().map { it.map() }
+        return response.wrapped<List<MeetingResponse>>().map { it.map() }
+    }
+    
+    suspend fun subscribeToUser(
+        member: MemberModel,
+    ): HttpResponse {
+        updateClientToken()
+        return client.post(
+            "http://$HOST$PREFIX_URL/profile/$OBSERVABLES"
+        ) { url { query("user_id" to member.id) } }
+    }
+    
+    suspend fun unsubscribeFromUser(
+        member: MemberModel,
+    ): HttpResponse {
+        updateClientToken()
+        return client.delete(
+            "http://$HOST$PREFIX_URL/profile/$OBSERVABLES"
+        ) { url { query("user_id" to member.id) } }
+    }
+    
+    suspend fun deleteObserver(
+        member: MemberModel,
+    ): HttpResponse {
+        updateClientToken()
+        return client.delete(
+            "http://$HOST$PREFIX_URL/profile/$OBSERVERS"
+        ) { url { query("user_id" to member.id) } }
+    }
+    
     suspend fun getObservers(
-        type: ObserversType
+        type: ObserversType,
     ): List<MemberModel> {
         updateClientToken()
         return client.get(
@@ -62,7 +108,7 @@ class ProfileWebSource: KtorSource() {
     }
     
     suspend fun setHidden(
-        files: List<File>
+        files: List<File>,
     ): HttpResponse {
         updateClientToken()
         val album = getUserAlbumPrivateId()
@@ -95,7 +141,7 @@ class ProfileWebSource: KtorSource() {
         cropX: Int,
         cropY: Int,
         cropWidth: Int,
-        cropHeight: Int
+        cropHeight: Int,
     ): HttpResponse {
         updateClientToken()
         return client.post(
@@ -141,7 +187,7 @@ class ProfileWebSource: KtorSource() {
         aboutMe: String? = null,
         age: Int? = null,
         gender: GenderType? = null,
-        orientationId: String? = "HETERO"
+        orientationId: String? = "HETERO",
     ) = client.patch(
         "http://$HOST$PREFIX_URL/profile"
     ) {

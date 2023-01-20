@@ -75,13 +75,13 @@ private fun RESPOND_ACCEPT() {
 
 @Composable
 fun NotificationText(
-    organizer: OrganizerModel,
+    organizer: OrganizerModel?,
     type: NotificationType,
     meet: MeetingModel,
     duration: String,
     modifier: Modifier = Modifier
 ) {
-    val user = "${organizer.username}, ${organizer.age}"
+    val user = "${organizer?.username}, ${organizer?.age}"
     val message = when (type) {
         MEETING_OVER -> buildAnnotatedString {
             withStyle(Text(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }

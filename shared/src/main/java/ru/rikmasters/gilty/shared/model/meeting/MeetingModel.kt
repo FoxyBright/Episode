@@ -6,20 +6,20 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import java.util.UUID
 
 data class MeetingModel( // TODO заменить VAR на VAL сделано для верстки
-    var id: UUID,
+    var id: String,
     var title: String,
     var condition: ConditionType,
     var category: CategoriesType,
     var duration: String,
     var type: MeetType,
     var dateTime: String,
-    var organizer: OrganizerModel,
+    var organizer: OrganizerModel?,
     var isOnline: Boolean,
     var tags: List<TagModel>,
     var description: String,
     var isPrivate: Boolean,
     var memberCount: Int,
-    var requirements: List<MeetingRequirementModel>,
+    var requirements: MeetingRequirementModel,
     var place: String,
     var address: String,
     var hideAddress: Boolean,
@@ -29,7 +29,7 @@ data class MeetingModel( // TODO заменить VAR на VAL сделано д
 enum class MeetStatus { ACTIVE, INACTIVE }
 
 fun getDemoMeetingModel(
-    id: UUID = UUID.randomUUID(),
+    id: String = UUID.randomUUID().toString(),
     title: String = "Поход в кино",
     condition: ConditionType = ConditionType.MEMBER_PAY,
     category: CategoriesType = CategoriesType.ENTERTAINMENT,
@@ -42,8 +42,8 @@ fun getDemoMeetingModel(
     description: String = "Описание вечеринки",
     isPrivate: Boolean = false,
     memberCount: Int = 4,
-    requirements: List<MeetingRequirementModel> =
-        ListDemoMeetingRequirementModel,
+    requirements: MeetingRequirementModel =
+        DemoMeetingRequirementModel,
     place: String = "Москва-сити",
     address: String = "Москва, ул. Пушкина 42",
     hideAddress: Boolean = false,

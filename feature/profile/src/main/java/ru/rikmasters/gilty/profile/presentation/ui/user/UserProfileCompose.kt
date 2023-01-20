@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
+import ru.rikmasters.gilty.core.app.ui.ErrorConnection
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.Profile
@@ -51,7 +52,8 @@ data class UserProfileState(
     val stateList: List<NavIconState>,
     val alert: Boolean,
     val menuState: Boolean = false,
-    val listState: LazyListState
+    val listState: LazyListState,
+    val errorState: Boolean = false,
 )
 
 interface UserProfileCallback: ProfileCallback {
@@ -104,7 +106,7 @@ private fun UserProfilePreview() {
 fun UserProfile(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null
+    callback: UserProfileCallback? = null,
 ) {
     Box {
         GDropMenu(
@@ -131,13 +133,14 @@ fun UserProfile(
         label = "Модераторы скоро рассмотрят\nвашу жалобу",
         success = Pair("Закрыть") { callback?.closeAlert() }
     )
+    if(state.errorState) ErrorConnection()
 }
 
 @Composable
 private fun Content(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null
+    callback: UserProfileCallback? = null,
 ) {
     LazyColumn(
         modifier
@@ -212,7 +215,7 @@ private fun Content(
 private fun Responds(
     last: Pair<Int, String>,
     modifier: Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val style = typography.labelSmall
         .copy(fontWeight = SemiBold)
@@ -270,7 +273,7 @@ private fun MeetHistory(
     historyState: Boolean,
     historyList: List<MeetingModel>,
     openHistory: () -> Unit,
-    onSelect: (MeetingModel) -> Unit
+    onSelect: (MeetingModel) -> Unit,
 ) {
     Row(
         Modifier

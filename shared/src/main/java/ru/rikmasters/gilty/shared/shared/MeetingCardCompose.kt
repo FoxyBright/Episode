@@ -21,11 +21,12 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.categoriesListCard
+import ru.rikmasters.gilty.shared.common.CategoriesListCard
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
@@ -111,7 +112,7 @@ fun MeetingCard(
                 meeting.dateTime,
                 green(), today
             )
-            if(today) categoriesListCard(
+            if(today) CategoriesListCard(
                 Modifier.padding(start = 4.dp),
                 meeting, (true)
             )
@@ -122,14 +123,14 @@ fun MeetingCard(
                 .width(156.dp)
         ) {
             AsyncImage(
-                meeting.organizer.avatar.id,
+                meeting.organizer?.avatar?.id,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(CircleShape)
                     .size(135.dp),
                 contentScale = Crop
             )
-            if(!today) categoriesListCard(
+            if(!today) CategoriesListCard(
                 Modifier
                     .offset(18.dp)
                     .align(TopEnd)
@@ -162,11 +163,14 @@ fun MeetingCategoryCard(
     ) {
         Text(
             meeting.title, Modifier
+                .width(150.dp)
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = Bold
+            fontWeight = Bold,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
@@ -208,7 +212,7 @@ fun MeetingCategoryCard(
                     fontWeight = SemiBold
                 )
             }
-            categoriesListCard(
+            CategoriesListCard(
                 Modifier
                     .align(TopEnd)
                     .padding(

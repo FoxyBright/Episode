@@ -79,7 +79,7 @@ data class ProfileResponse(
         RatingModel(
             average.toString(),
             getEmoji(emoji_type.toString())
-        ), is_completed as Boolean
+        ), is_completed == true
     )
 }
 

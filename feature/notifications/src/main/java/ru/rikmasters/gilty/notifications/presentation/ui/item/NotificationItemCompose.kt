@@ -112,7 +112,7 @@ fun Item(
                     Start, CenterVertically
                 ) {
                     AsyncImage(
-                        notify.meeting.organizer.avatar.id,
+                        notify.meeting.organizer?.avatar?.id,
                         stringResource(R.string.meeting_avatar),
                         Modifier
                             .padding(12.dp, 8.dp)

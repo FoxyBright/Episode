@@ -62,7 +62,7 @@ fun ParticipantsList(
                     colors = cardColors(colorScheme.primaryContainer)
                 ) {
                     BrieflyRow(
-                        meet.organizer.avatar,
+                        meet.organizer?.avatar,
                         "${member.username}, ${member.age}",
                         modifier = Modifier.padding(16.dp)
                     ); if(index < membersList.size - 1)

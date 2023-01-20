@@ -18,8 +18,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserveType.OBSERVED
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserveType.OBSERVERS
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.DELETE
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.SUB
+import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
@@ -50,9 +52,10 @@ data class ObserversListState(
 )
 
 interface ObserversListCallback {
+    
     fun onTabChange(point: Int) {}
-    fun onDelete() {}
-    fun onClick() {}
+    fun onButtonClick(member: MemberModel, type: SubscribeType) {}
+    fun onClick(member: MemberModel) {}
 }
 
 @Composable
@@ -61,6 +64,8 @@ fun ObserversListContent(
     modifier: Modifier = Modifier,
     callback: ObserversListCallback? = null
 ) {
+    val controlList = arrayListOf<MemberModel>()
+    state.observed.forEach { controlList.add(it) }
     Column(
         modifier
             .fillMaxSize()
@@ -90,25 +95,32 @@ fun ObserversListContent(
                     shapes.medium
                 )
         ) {
-            if (state.selectTab.first())
-                itemsIndexed(state.observers) { index, it ->
+            if(state.selectTab.first())
+                itemsIndexed(state.observers) { index, member ->
                     Column {
                         ObserveItem(
-                            it, OBSERVERS,
+                            Modifier, DELETE, member,
                             LazyItemsShapes(index, state.observers.size),
-                            { callback?.onClick() }
-                        ) { callback?.onDelete() }
-                        if (index < state.observers.size - 1)
+                            { callback?.onClick(member) }
+                        ) { callback?.onButtonClick(member, DELETE) }
+                        if(index < state.observers.size - 1)
                             Divider(Modifier.padding(start = 16.dp))
                     }
-                } else itemsIndexed(state.observed) { index, it ->
+                } else itemsIndexed(controlList) { index, member ->
                 Column {
+                    val subType =
+                        if(controlList.contains(member)) UNSUB else SUB
                     ObserveItem(
-                        it, OBSERVED,
+                        Modifier, subType, member,
                         LazyItemsShapes(index, state.observed.size),
-                        { callback?.onClick() }
-                    ) { callback?.onDelete() }
-                    if (index < state.observed.size - 1)
+                        { callback?.onClick(member) }
+                    ) {
+                        if(controlList.contains(member))
+                            controlList.remove(member)
+                        else controlList.add(member)
+                        callback?.onButtonClick(member, subType)
+                    }
+                    if(index < state.observed.size - 1)
                         Divider(Modifier.padding(start = 16.dp))
                 }
             }
@@ -116,15 +128,14 @@ fun ObserversListContent(
     }
 }
 
-private enum class ObserveType { OBSERVERS, OBSERVED }
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun ObserveItem(
-    member: MemberModel, type: ObserveType,
-    shape: Shape, onItemClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    onDeleteClick: (() -> Unit)? = null
+    button: SubscribeType,
+    member: MemberModel,
+    shape: Shape, onItemClick: (() -> Unit)? = null,
+    onButtonClick: (() -> Unit)? = null
 ) {
     Card(
         { onItemClick?.let { it() } },
@@ -148,11 +159,15 @@ private fun ObserveItem(
             )
             SmallButton(
                 stringResource(
-                    if (type == OBSERVERS) R.string.meeting_filter_delete_tag_label
-                    else R.string.profile_user_observe
-                ), colorScheme.outlineVariant,
+                    when(button) {
+                        SUB -> R.string.profile_organizer_observe
+                        UNSUB -> R.string.profile_user_observe
+                        DELETE -> R.string.meeting_filter_delete_tag_label
+                    }
+                ), if(button == SUB) colorScheme.primary
+                else colorScheme.outlineVariant,
                 Color.White, Modifier
-            ) { onDeleteClick?.let { it() } }
+            ) { onButtonClick?.let { it() } }
         }
     }
 }

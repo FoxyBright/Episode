@@ -3,9 +3,11 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MyMeetingScreen
@@ -31,6 +33,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val menuState by vm.menu.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val meets by vm.meets.collectAsState()
+    val meetsHistory by vm.meetsHistory.collectAsState()
     val history by vm.history.collectAsState()
     
     val profile by vm.profile.collectAsState()
@@ -44,13 +47,15 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val observed by vm.observed.collectAsState()
     val occupied by vm.occupied.collectAsState()
     
+    val errorState by vm.errorConnection.collectAsState()
+    
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
-        vm.setUserDate()
+        if(internetCheck(context)) {
+            vm.errorConnection(false)
+            vm.setUserDate()
+        } else vm.errorConnection(true)
     }
-    
-    //TODO История - Встречи - Отклики - Обозреватели
-    //        1         1         4            3
-    
     
     val state = UserProfileState(
         ProfileState(
@@ -65,10 +70,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             profileType = USERPROFILE,
             enabled = true,
             occupiedName = occupied
-        ), meets, meets,
+        ), meets, meetsHistory,
         lastRespond,
         history, navBar, alert,
-        menuState, listState
+        menuState, listState, errorState
     )
     
     UserProfile(state, Modifier,

@@ -147,7 +147,7 @@ private fun Notifications(
         if(state.myResponds != 0) item {
             Responds(
                 stringResource(R.string.notification_responds_on_user_meetings),
-                state.myResponds, state.lastRespond.organizer.avatar,
+                state.myResponds, state.lastRespond.organizer?.avatar,
                 Modifier.padding(vertical = 12.dp)
             ) { onRespondsClick?.let { it() } }
         };if(todayList.isNotEmpty()) {; item { Label(R.string.meeting_profile_bottom_today_label) }

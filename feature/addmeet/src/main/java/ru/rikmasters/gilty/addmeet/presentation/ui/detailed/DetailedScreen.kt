@@ -127,7 +127,7 @@ fun DetailedScreen(nav: NavState = get()) {
                     tagList.removeAt(tag)
                     val tags = arrayListOf<TagModel>()
                     repeat(tagList.size) {
-                        tags.add(TagModel(UUID.randomUUID(), tagList[it]))
+                        tags.add(TagModel(UUID.randomUUID().toString(), tagList[it]))
                     }
                     MEETING.tags = tags
                 }

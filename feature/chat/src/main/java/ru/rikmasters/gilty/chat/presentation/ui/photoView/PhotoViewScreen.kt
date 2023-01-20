@@ -21,9 +21,6 @@ fun PhotoViewScreen(
     }
     LaunchedEffect(Unit) {
         if(type == 1) timer = true    // TODO Реализовать без LaunchEffect
-        //        val animateTimer = Animatable(0f)
-        //            .animateTo(1f)
-        //        nav.navigate("chat")
     }
     val animateTimer = animateFloatAsState(
         if(timer) 1f else 0f, tween(6000)

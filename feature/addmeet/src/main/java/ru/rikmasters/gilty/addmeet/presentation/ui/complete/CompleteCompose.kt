@@ -118,7 +118,7 @@ private fun MeetingCard(
     Box(modifier) {
         Box {
             AsyncImage(
-                meeting.organizer.avatar.id,
+                meeting.organizer?.avatar?.id,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(shapes.large)
