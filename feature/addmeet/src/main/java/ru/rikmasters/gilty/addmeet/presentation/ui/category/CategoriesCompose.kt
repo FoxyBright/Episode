@@ -1,9 +1,9 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,32 +15,34 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
+import ru.rikmasters.gilty.auth.Auth.logD
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<CategoriesType>,
-    val selectCategories: List<CategoriesType>,
-    val alert: Boolean
+    val categoryList: List<CategoryModel>,
+    val selectCategory: CategoryModel?,
+    val alert: Boolean = false,
 )
 
 interface CategoriesCallback {
     
-    fun onCategoryClick(category: CategoriesType) {}
-    fun onClose() {}
-    fun onCloseAlert(it: Boolean) {}
+    fun onCategoryClick(category: CategoryModel)
+    fun onClose()
+    fun onCloseAlert(state: Boolean)
 }
 
 @Composable
 fun CategoriesContent(
     modifier: Modifier = Modifier,
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     Column(
         modifier.fillMaxSize(),
@@ -53,6 +55,7 @@ fun CategoriesContent(
                 stringResource(R.string.add_meet_create_description),
                 Modifier, { callback?.onCloseAlert(true) }
             )
+            logD("list ${state.categoryList}")
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
             else Bubbles(
@@ -61,11 +64,9 @@ fun CategoriesContent(
                 Modifier.padding(top = 8.dp),
             ) { element ->
                 CategoryItem(
-                    element.name, element.emoji,
-                    element.color,
-                    state.selectCategories.contains(element),
-                    modifier
-                ) { callback?.onCategoryClick(element) }
+                    element.name, element.emoji, element.color,
+                    (element == state.selectCategory), modifier
+                ) { callback?.onCategoryClick(DemoCategoryModel) }
             }
         }
         Dashes(
@@ -87,7 +88,7 @@ fun CategoriesContent(
 @Composable
 private fun BubblesForPreview(
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     LazyRow(
         Modifier
@@ -103,29 +104,32 @@ private fun BubblesForPreview(
                         else Alignment.BottomCenter
                     )
                 ) {
-                    for(element in item)
-                        CategoryItem(
-                            element.name, element.emoji,
-                            element.color,
-                            state.selectCategories.contains(element)
-                        ) { callback?.onCategoryClick(element) }
+                    for(element in item) CategoryItem(
+                        element.name, element.emoji, element.color,
+                        (element == state.selectCategory)
+                    ) { callback?.onCategoryClick(element) }
                 }
             }
         }
     }
 }
 
+@Preview
 @Composable
-@ExperimentalMaterial3Api
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 private fun CategoriesPreview() {
     GiltyTheme {
-        CategoriesContent(
-            Modifier,
-            CategoriesState(
-                CategoriesType.values().toList(),
-                arrayListOf(), false
+        Box(
+            Modifier.background(
+                colorScheme.background
             )
-        )
+        ) {
+            CategoriesContent(
+                Modifier,
+                CategoriesState(
+                    listOf(DemoCategoryModel),
+                    DemoCategoryModel
+                )
+            )
+        }
     }
 }

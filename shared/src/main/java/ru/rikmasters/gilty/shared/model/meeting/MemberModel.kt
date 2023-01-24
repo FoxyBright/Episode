@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
-import ru.rikmasters.gilty.shared.model.enumeration.SexType
-import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
-import ru.rikmasters.gilty.shared.model.enumeration.SexType.MALE
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
 import ru.rikmasters.gilty.shared.model.profile.*
 
 data class MemberModel(
@@ -11,7 +11,7 @@ data class MemberModel(
     val emoji: EmojiModel,
     val avatar: AvatarModel,
     val age: Int,
-    val gender: SexType
+    val gender: GenderType
 )
 
 val DemoMemberModel = MemberModel(

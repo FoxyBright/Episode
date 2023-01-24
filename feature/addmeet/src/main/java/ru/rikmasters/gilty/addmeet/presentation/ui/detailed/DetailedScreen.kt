@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets.*
+import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.*
@@ -18,9 +18,10 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import java.util.UUID
 
-@Preview
 @Composable
-fun DetailedScreen(nav: NavState = get()) {
+fun DetailedScreen(vm: DetailedViewModel) {
+    
+    val nav= get<NavState>()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     var bsDate by remember { mutableStateOf(TODAY_LABEL) }

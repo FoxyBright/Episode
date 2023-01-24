@@ -6,10 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.viewmodel.CompleteViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
 
 @Composable
-fun CompleteScreen(nav: NavState = get()) {
+fun CompleteScreen(vm: CompleteViewModel) {
+    
+    val nav= get<NavState>()
     val context = LocalContext.current
     CompleteContent(MEETING, Modifier, object: CompleteCallBack {
         override fun onShare() {

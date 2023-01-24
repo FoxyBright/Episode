@@ -9,12 +9,13 @@ import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.profile.presentation.ui.organizer.photo.AvatarScreen
+import ru.rikmasters.gilty.profile.presentation.ui.photo.AvatarScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
-import ru.rikmasters.gilty.profile.presentation.ui.user.gallerey.ProfileSelectPhotoScreen
-import ru.rikmasters.gilty.profile.presentation.ui.user.settings.SettingsScreen
-import ru.rikmasters.gilty.profile.presentation.ui.user.settings.categories.CategoriesScreen
+import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
 
 object Profile: FeatureDefinition() {
     
@@ -79,6 +80,9 @@ object Profile: FeatureDefinition() {
             scopedOf(::HiddenBsViewModel)
             scopedOf(::ObserverBsViewModel)
             scopedOf(::RespondsBsViewModel)
+            scopedOf(::MeetingBsViewModel)
+            scopedOf(::ParticipantsBsViewModel)
+            scopedOf(::OrganizerBsViewModel)
         }
     }
     

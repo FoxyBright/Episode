@@ -32,7 +32,7 @@ private fun BrieflyRowPreview() {
     GiltyTheme {
         val user = DemoProfileModel
         BrieflyRow(
-            user.avatar, user.username, user.emoji,
+            user.avatar.map(), user.username ?: "", user.rating.emoji,
             Modifier.background(colorScheme.background)
         )
     }

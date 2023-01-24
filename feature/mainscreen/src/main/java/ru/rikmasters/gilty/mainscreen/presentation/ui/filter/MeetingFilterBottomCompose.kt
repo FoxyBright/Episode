@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -31,7 +32,7 @@ fun MeetingFilterBottomPreview() {
                 listOf(false, false, false),
                 listOf(false, false, false, false, false),
                 listOf("kaif", "pain", "fast", "launch"),
-                CategoriesType.list(),
+                listOf(DemoCategoryModel),
                 listOf(false, false, false),
                 ("Россия"), ("Москва"),
             )
@@ -99,7 +100,7 @@ data class FilterListState(
     val genderList: List<Boolean>,
     val conditionList: List<Boolean>,
     val tagList: List<String>,
-    val categoryList: List<CategoriesType>,
+    val categoryList: List<CategoryModel>,
     val categoryStateList: List<Boolean>,
     val country: String,
     val city: String

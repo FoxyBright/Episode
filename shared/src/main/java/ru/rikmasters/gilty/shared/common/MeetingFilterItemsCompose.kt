@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -57,7 +57,7 @@ fun Country(
 
 @Composable
 fun Category(
-    categories: List<CategoriesType>,
+    categories: List<CategoryModel>,
     categoryStatus: List<Boolean>,
     onCategoryClick: (selected: Int) -> Unit,
     onAllCategoryClick: () -> Unit
@@ -83,7 +83,7 @@ fun Category(
                         Modifier.size(20.dp)
                     )
                     Text(
-                        category.display,
+                        category.name,
                         Modifier.padding(start = 18.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
@@ -96,7 +96,7 @@ fun Category(
                     tint = colorScheme.onTertiary
                 )
             }
-            category.subs?.let {
+            category.children?.let {
                 if(categoryStatus[index]) {
                     Divider(); FlowLayout(
                         Modifier
@@ -107,7 +107,7 @@ fun Category(
                         it.forEach { category ->
                             GiltyChip(
                                 Modifier,
-                                category,
+                                category.name,
                                 false
                             ) { /*TODO: Выбор подкатегорий*/ }
                         }

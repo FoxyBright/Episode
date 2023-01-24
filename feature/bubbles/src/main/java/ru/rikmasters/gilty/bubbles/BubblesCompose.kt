@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.bubbles
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.*
@@ -12,12 +12,10 @@ import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -46,7 +44,7 @@ private class PhysicsController: Physics.OnBodyCreatedListener {
     fun onHorizontalDrag(change: PointerInputChange, amount: Float) {
         change.consume()
         bodies.forEach {
-            val force = amount/5
+            val force = amount / 5
             val addRandom = abs(force) > 5f
             it.applyForce(
                 Vec2(
@@ -71,18 +69,17 @@ const val COLUMN_OFFSET_FACTOR = 0.2f
 const val COLUMN_SPACE_FACTOR = 0.1f
 
 @Composable
+@SuppressLint("InflateParams")
 fun <T> Bubbles(
     data: List<T>,
     elementSize: Dp,
     modifier: Modifier = Modifier,
-    factory: @Composable (T) -> Unit
+    factory: @Composable (T) -> Unit,
 ) {
     val layoutMutex = Mutex(true)
     var width = 0f
     var height = 0f
-    val elementSize = LocalDensity.current.run {
-        elementSize.toPx()
-    }
+    val size = LocalDensity.current.run { elementSize.toPx() }
     
     val controller = remember { PhysicsController() }
     
@@ -108,26 +105,26 @@ fun <T> Bubbles(
             
             layout.physics.apply { globalConfig() }
                 .setOnBodyCreatedListener(controller)
-    
+            
             scope.launch {
                 layoutMutex.lock()
-        
-                val rowHeight = elementSize * (1f + ROW_SPACE_FACTOR)
-                val rowOffsetHeight = elementSize * ROW_OFFSET_FACTOR
+                
+                val rowHeight = size * (1f + ROW_SPACE_FACTOR)
+                val rowOffsetHeight = size * ROW_OFFSET_FACTOR
                 val rows = ((height - rowOffsetHeight) / rowHeight).toInt()
-        
+                
                 val columns = (data.size.toFloat() / rows).ceilToInt()
-                val columnWidth = elementSize * (1f + COLUMN_SPACE_FACTOR + COLUMN_OFFSET_FACTOR * rows)
+                val columnWidth = size * (1f + COLUMN_SPACE_FACTOR + COLUMN_OFFSET_FACTOR * rows)
                 val actualWidth = columnWidth * columns
-        
+                
                 log.v("Width: $width Height: $height")
                 log.v("Actual width: $actualWidth")
                 log.v("Size: ${data.size} Rows: $rows Columns: $columns")
-                log.v("Element size: $elementSize")
-        
+                log.v("Element size: $size")
+                
                 layout.createBounds(width, height, actualWidth)
-        
-                layout.createElements(data, factory, elementSize, rows, columns)
+                
+                layout.createElements(data, factory, size, rows)
             }
             
             return@AndroidView layout
@@ -146,21 +143,20 @@ private fun PhysicsFrameLayout.createBounds(width: Float, height: Float, actualW
     val verticalParams = ViewGroup.LayoutParams(1, height.ceilToInt())
     
     val top = 0f
-    val bottom = height
-    val start = -overflow/2
-    val end = width + overflow/2
+    val start = -overflow / 2
+    val end = width + overflow / 2
     
-    log.v("Top: $top Bottom: $bottom Start: $start End: $end")
-
+    log.v("Top: $top Bottom: $height Start: $start End: $end")
+    
     createBoundView(horizontalParams, start, top) // Top horizontal
-    createBoundView(horizontalParams, start, bottom) // Bottom horizontal
+    createBoundView(horizontalParams, start, height) // Bottom horizontal
     createBoundView(verticalParams, start, top) // Start vertical
-    createBoundView(verticalParams, end, top)// End vertical
+    createBoundView(verticalParams, end, top) // End vertical
 }
 
 private fun PhysicsFrameLayout.createBoundView(
     params: ViewGroup.LayoutParams,
-    xPos: Float, yPos: Float
+    xPos: Float, yPos: Float,
 ) = View(context).apply {
     layoutParams = params
     x = xPos
@@ -174,7 +170,7 @@ private fun PhysicsFrameLayout.createBoundView(
 private suspend fun <T> PhysicsFrameLayout.createElements(
     data: List<T>, factory: @Composable (T) -> Unit,
     elementSize: Float,
-    rows: Int, columns: Int
+    rows: Int,
 ) {
     this.physics.giveRandomImpulse()
     data.chunked(rows)
@@ -194,7 +190,6 @@ private suspend fun <T> PhysicsFrameLayout.createElements(
         }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private fun <T> createBubbleView(
     context: Context,
     factory: @Composable (T) -> Unit,
@@ -207,9 +202,11 @@ private fun <T> createBubbleView(
     setContent {
         val alpha = remember { Animatable(0.1f) }
         LaunchedEffect(Unit) {
-            alpha.animateTo(1f, spring(
-                Spring.DampingRatioNoBouncy, Spring.StiffnessLow
-            ))
+            alpha.animateTo(
+                1f, spring(
+                    Spring.DampingRatioNoBouncy, Spring.StiffnessLow
+                )
+            )
         }
         
         Box(

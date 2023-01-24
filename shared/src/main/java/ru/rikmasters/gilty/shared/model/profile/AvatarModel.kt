@@ -15,7 +15,14 @@ sealed interface ImageModel {
     val resolutionX: Int
     val resolutionY: Int
     val playtime: Number?
-    val hasAccess: Boolean
+    val hasAccess: Boolean;
+    
+    fun map() = AvatarModel(
+        id, albumId, ownerId,
+        type, mimeType, fileSize,
+        width, height, resolutionX,
+        resolutionY, playtime, hasAccess
+    )
 }
 
 data class AvatarModel(
@@ -30,7 +37,7 @@ data class AvatarModel(
     override val resolutionX: Int,
     override val resolutionY: Int,
     override val playtime: Number? = null,
-    override val hasAccess: Boolean
+    override val hasAccess: Boolean,
 ): ImageModel
 
 fun getDemoAvatarModel(
@@ -45,7 +52,7 @@ fun getDemoAvatarModel(
     resolutionX: Int = 400,
     resolutionY: Int = 800,
     playtime: Number = 0,
-    hasAccess: Boolean = false
+    hasAccess: Boolean = false,
 ) = AvatarModel(
     id, albumId, ownerId,
     type, mimeType, fileSize,

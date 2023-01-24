@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -23,14 +24,20 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ProfilePreview() {
-    GiltyTheme { ProfileContent(ProfileState()) }
+    GiltyTheme {
+        ProfileContent(
+            ProfileState(
+                DemoProfileModel
+            )
+        )
+    }
 }
 
 @Composable
 fun ProfileContent(
     state: ProfileState,
     modifier: Modifier = Modifier,
-    callback: ProfileCallback? = null
+    callback: ProfileCallback? = null,
 ) {
     Box(modifier) {
         Column {

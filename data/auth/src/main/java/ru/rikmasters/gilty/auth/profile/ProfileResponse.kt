@@ -1,102 +1,97 @@
 package ru.rikmasters.gilty.auth.profile
 
-import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.enumeration.SexType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
 import ru.rikmasters.gilty.shared.model.profile.*
-import java.lang.Exception
 
 data class ProfileResponse(
     
     val id: String,
-    val phone: String?,
-    val username: String?,
-    val gender: Any?,
-    val orientation: Any?,
-    val age: Int?,
-    val about_me: String?,
-    val emoji_type: String?,
-    val average: Any?,
+    val phone: String? = null,
+    val username: String? = null,
+    val gender: String? = null,
+    val orientation: OrientationModel? = null,
+    val age: Int? = null,
+    val aboutMe: String? = null,
+    val emoji_type: String? = null,
+    val average: String? = null,
     val avatar: Image? = null,
-    val subscription_expired_at: Any?,
+    val subscriptionExpiredAt: String? = null,
     val thumbnail: Thumbnail? = null,
-    val responds: Responds?,
-    val album_private: AlbumPrivate? = null,
-    val count_watchers: Int?,
-    val count_watching: Int?,
-    val is_watching: Any?,
-    val unblock_at: Any?,
-    val is_completed: Any?,
-    val is_online: Any?,
-    val is_anonymous: Any?,
-    val status: Any?
+    val responds: Responds? = null,
+    val albumPrivate: AlbumPrivate? = null,
+    val countWatchers: Int? = null,
+    val countWatching: Int? = null,
+    val isWatching: Boolean? = null,
+    val unblockAt: String? = null,
+    val isCompleted: Boolean? = null,
+    val is_online: Boolean? = null,
+    val is_anonymous: Boolean? = null,
+    val status: String? = null,
 ) {
     
-    @Suppress("unused")
-    fun mapToProfileState(
-        type: ProfileType,
-        enabled: Boolean
-    ) = ProfileState(
-        name = "${username}, $age",
-        profilePhoto = avatar?.url,
-        hiddenPhoto = album_private?.preview?.url.toString(),
-        description = about_me ?: "",
-        rating = average.toString(),
-        observers = count_watchers ?: 0,
-        observed = count_watching ?: 0,
-        emoji = getEmoji(emoji_type.toString()),
-        profileType = type,
-        enabled = enabled
-    )
-    @Suppress("unused")
-    fun mapToProfileModel() = ProfileModel(
-        id,
-        phone.toString(),
-        username.toString(),
-        getEmoji(emoji_type.toString()),
-        try {
-            SexType.valueOf(gender.toString())
+    fun map() = ProfileModel(
+        id = id,
+        phone = phone,
+        username = username,
+        gender = try {
+            GenderType.valueOf(gender.toString())
         } catch(_: Exception) {
-            SexType.MALE
+            GenderType.MALE
         },
-        OrientationModel("", "HETERO"),
-        age ?: 0,
-        about_me.toString(),
-        AvatarModel(
-            avatar?.url.toString(),
-            "", id,
-            PhotoType.PHOTO,
-            "photo/jpeg",
-            0,
-            0,
-            0,
-            0,
-            0,
-            null,
-            true
+        orientation = orientation,
+        age = age ?: 0,
+        aboutMe = aboutMe,
+        rating = RatingModel(
+            average = average ?: "0.0",
+            emoji = getEmoji(emoji_type.toString())
         ),
-        RatingModel(
-            average.toString(),
-            getEmoji(emoji_type.toString())
-        ), is_completed == true
+        avatar = getImage(avatar?.url.toString(), avatar?.albumId),
+        thumbnail = getImage(thumbnail?.url.toString()),
+        isComplete = isCompleted == true,
+        subscriptionExpiredAt = subscriptionExpiredAt,
+        respondsCount = responds?.count,
+        respondsImage = getImage(responds?.thumbnail?.url),
+        hidden = getImage(albumPrivate?.preview?.url, albumPrivate?.preview?.albumId),
+        count_watchers = countWatchers,
+        count_watching = countWatching,
+        is_watching = isWatching,
+        unblock_at = unblockAt,
+        is_completed = isCompleted,
+        is_online = is_online,
+        is_anonymous = is_anonymous,
+        status = status
+    )
+    
+    private fun getImage(
+        image: String?,
+        album: String? = null,
+    ) = AvatarModel(
+        id = image ?: "",
+        albumId = album ?: "",
+        ownerId = id,
+        type = PHOTO,
+        mimeType = "photo/jpeg",
+        (0), (0), (0), (0), (0),
+        (null), (true)
     )
 }
 
 data class Image(
     val id: String,
+    val albumId: String,
     val thumbnail: Thumbnail,
-    val url: String
+    val url: String,
 )
 
 data class Responds(
     val count: Int? = null,
-    val thumbnail: Thumbnail? = null
+    val thumbnail: Thumbnail? = null,
 )
 
 data class Thumbnail(
     val id: String,
-    val url: String
+    val url: String,
 )
 
 data class AlbumPrivate(

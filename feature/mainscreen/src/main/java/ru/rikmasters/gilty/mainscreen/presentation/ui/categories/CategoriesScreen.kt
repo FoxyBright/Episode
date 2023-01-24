@@ -6,22 +6,23 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 @Composable
 fun CategoriesScreen(
     categoryFilters: (
-        List<CategoriesType>,
-        List<Pair<CategoriesType, String>>
+        List<CategoryModel>,
+        List<Pair<CategoryModel, String>>
     ) -> Unit
 ) {
-    val allCategories = CategoriesType.values().toList()
+    val allCategories = listOf(DemoCategoryModel)
     val stateList =
         remember { mutableStateListOf<Boolean>() }
     val categories =
-        remember { mutableStateListOf<CategoriesType>() }
+        remember { mutableStateListOf<CategoryModel>() }
     val subCategories =
-        remember { mutableStateListOf<Pair<CategoriesType, String>>() }
+        remember { mutableStateListOf<Pair<CategoryModel, String>>() }
     repeat(allCategories.size) { stateList.add(false) }
     CategoryList(
         CategoryListState(
@@ -36,7 +37,7 @@ fun CategoriesScreen(
                 stateList[index] = !it
             }
 
-            override fun onSubSelect(category: CategoriesType, sub: String?) {
+            override fun onSubSelect(category: CategoryModel, sub: String?) {
                 if (sub.isNullOrBlank()) categories.add(category)
                 else subCategories.add(Pair(category, sub))
             }

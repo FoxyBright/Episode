@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -42,7 +42,7 @@ fun ReactionPreview() {
         Box(Modifier.background(colorScheme.background)) {
             ReactionContent(
                 DemoAvatarModel.id,
-                ENTERTAINMENT
+                DemoCategoryModel
             )
         }
     }
@@ -51,7 +51,7 @@ fun ReactionPreview() {
 @Composable
 fun ReactionContent(
     avatar: String,
-    categoriesType: CategoriesType,
+    categoryModel: CategoryModel,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null
 ) {
@@ -84,9 +84,9 @@ fun ReactionContent(
                 )
             }
             CategoryItem(
-                categoriesType.display,
-                categoriesType.emoji,
-                categoriesType.color,
+                categoryModel.name,
+                categoryModel.emoji,
+                categoryModel.color,
                 (true), Modifier
                     .align(TopEnd)
                     .offset(12.dp, (-18).dp)

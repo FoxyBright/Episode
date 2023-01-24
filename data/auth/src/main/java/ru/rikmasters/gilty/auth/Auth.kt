@@ -3,9 +3,9 @@ package ru.rikmasters.gilty.auth
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
-import ru.rikmasters.gilty.auth.categories.CategoriesWebSource
 import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.manager.*
+import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource
 import ru.rikmasters.gilty.auth.saga.AuthSaga
 import ru.rikmasters.gilty.auth.token.*
@@ -25,7 +25,7 @@ object Auth: DataDefinition() {
     override fun Module.koin() {
         singleOf(::TokenWebSource)
         singleOf(::ProfileWebSource)
-        singleOf(::CategoriesWebSource)
+        singleOf(::MeetingWebSource)
         singleOf(::TokenStore)
         singleOf(::AuthManager)
         singleOf(::RegistrationManager)

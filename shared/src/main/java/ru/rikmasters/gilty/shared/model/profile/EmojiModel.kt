@@ -58,6 +58,10 @@ val EmojiList = listOf(
     EmojiModel("D", "$ic_sarcasm"),
 )
 
+val DemoCategoryEmoji = EmojiModel(
+    "D", "$ic_sport"
+)
+
 val badEmoji = EmojiModel(
     "D", "$ic_bad"
 )

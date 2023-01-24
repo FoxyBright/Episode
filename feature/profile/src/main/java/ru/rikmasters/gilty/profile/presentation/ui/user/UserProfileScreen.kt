@@ -10,11 +10,12 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MyMeetingScreen
+import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MeetingBs
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserversBs
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.responds.RespondsBs
-import ru.rikmasters.gilty.profile.presentation.ui.user.gallerey.HiddenBsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -35,18 +36,9 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val meets by vm.meets.collectAsState()
     val meetsHistory by vm.meetsHistory.collectAsState()
     val history by vm.history.collectAsState()
-    
     val profile by vm.profile.collectAsState()
-    val username by vm.username.collectAsState()
-    val avatar by vm.avatar.collectAsState()
-    val hidden by vm.hidden.collectAsState()
-    val description by vm.description.collectAsState()
-    val rating by vm.rating.collectAsState()
-    val emoji by vm.emoji.collectAsState()
-    val observers by vm.observers.collectAsState()
-    val observed by vm.observed.collectAsState()
-    val occupied by vm.occupied.collectAsState()
     
+    val occupied by vm.occupied.collectAsState()
     val errorState by vm.errorConnection.collectAsState()
     
     val context = LocalContext.current
@@ -59,21 +51,12 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val state = UserProfileState(
         ProfileState(
-            name = username,
-            profilePhoto = avatar,
-            hiddenPhoto = hidden,
-            description = description,
-            rating = rating,
-            observers = observers,
-            observed = observed,
-            emoji = emoji,
-            profileType = USERPROFILE,
-            enabled = true,
-            occupiedName = occupied
+            profile, USERPROFILE,
+            (false), occupied
         ), meets, meetsHistory,
-        lastRespond,
-        history, navBar, alert,
-        menuState, listState, errorState
+        lastRespond, history,
+        navBar, alert, menuState,
+        listState, errorState
     )
     
     UserProfile(state, Modifier,
@@ -120,7 +103,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun onMenuItemClick(point: Int) {
                 when(point) {
-                    0 -> nav.navigate("avatar?image=$avatar")
+                    0 -> nav.navigate("avatar?image=${profile?.avatar?.id}")
                     else -> nav.navigate("gallery?multi=false")
                 }
             }
@@ -128,11 +111,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onHistoryClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        profile?.let {
-                            MyMeetingScreen(
-                                it, meet,
-                                asm, scope
-                            )
+                        Connector<MeetingBsViewModel>(vm.scope) {
+                            MeetingBs(it, meet)
                         }
                     }
                 }
@@ -141,8 +121,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        profile?.let {
-                            MyMeetingScreen(it, meet, asm, scope)
+                        Connector<MeetingBsViewModel>(vm.scope) {
+                            MeetingBs(it, meet)
                         }
                     }
                 }
@@ -162,7 +142,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Connector<ObserverBsViewModel>(vm.scope) {
-                            ObserversBs(it, username)
+                            ObserversBs(it, profile?.username ?: "")
                         }
                     }
                 }

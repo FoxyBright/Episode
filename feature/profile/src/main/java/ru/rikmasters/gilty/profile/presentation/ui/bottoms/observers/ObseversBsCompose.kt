@@ -18,10 +18,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.DELETE
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.SUB
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType.UNSUB
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
@@ -36,7 +36,7 @@ fun ObserversListPreview() {
     GiltyTheme {
         ObserversListContent(
             ObserversListState(
-                DemoProfileModel.username,
+                DemoProfileModel.username ?: "",
                 DemoMemberModelList, DemoMemberModelList,
                 listOf(true, false)
             )
@@ -62,10 +62,8 @@ interface ObserversListCallback {
 fun ObserversListContent(
     state: ObserversListState,
     modifier: Modifier = Modifier,
-    callback: ObserversListCallback? = null
+    callback: ObserversListCallback? = null,
 ) {
-    val controlList = arrayListOf<MemberModel>()
-    state.observed.forEach { controlList.add(it) }
     Column(
         modifier
             .fillMaxSize()
@@ -106,20 +104,15 @@ fun ObserversListContent(
                         if(index < state.observers.size - 1)
                             Divider(Modifier.padding(start = 16.dp))
                     }
-                } else itemsIndexed(controlList) { index, member ->
+                } else itemsIndexed(state.observed) { index, member ->
                 Column {
                     val subType =
-                        if(controlList.contains(member)) UNSUB else SUB
+                        if(state.observed.contains(member)) UNSUB else SUB
                     ObserveItem(
                         Modifier, subType, member,
                         LazyItemsShapes(index, state.observed.size),
                         { callback?.onClick(member) }
-                    ) {
-                        if(controlList.contains(member))
-                            controlList.remove(member)
-                        else controlList.add(member)
-                        callback?.onButtonClick(member, subType)
-                    }
+                    ) { callback?.onButtonClick(member, subType) }
                     if(index < state.observed.size - 1)
                         Divider(Modifier.padding(start = 16.dp))
                 }
@@ -135,7 +128,7 @@ private fun ObserveItem(
     button: SubscribeType,
     member: MemberModel,
     shape: Shape, onItemClick: (() -> Unit)? = null,
-    onButtonClick: (() -> Unit)? = null
+    onButtonClick: (() -> Unit)? = null,
 ) {
     Card(
         { onItemClick?.let { it() } },

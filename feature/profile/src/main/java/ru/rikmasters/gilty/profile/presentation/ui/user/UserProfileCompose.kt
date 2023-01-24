@@ -35,11 +35,10 @@ import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiList
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -74,19 +73,11 @@ interface UserProfileCallback: ProfileCallback {
 private fun UserProfilePreview() {
     GiltyTheme {
         val meets = DemoMeetingList
-        val profileModel = DemoProfileModel
         UserProfile(
             UserProfileState(
                 ProfileState(
-                    name = "${profileModel.username}, ${profileModel.age}",
-                    profilePhoto = profileModel.avatar.id,
-                    description = profileModel.aboutMe,
-                    rating = profileModel.rating.average,
-                    observers = 13500,
-                    observed = 128,
-                    emoji = EmojiList.first(),
-                    profileType = ProfileType.USERPROFILE,
-                    enabled = false,
+                    DemoProfileModel,
+                    USERPROFILE
                 ), meets, meets, Pair(4, "image"),
                 (false), listOf(
                     NavIconState.INACTIVE,

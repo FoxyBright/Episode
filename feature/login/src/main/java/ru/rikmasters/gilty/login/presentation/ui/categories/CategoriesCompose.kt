@@ -7,40 +7,37 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
-import ru.rikmasters.gilty.auth.categories.Category
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
-import ru.rikmasters.gilty.shared.model.profile.getCategoryIcons
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
-    val categoryList: List<Category>,
-    val selectCategories: List<Category>
+    val categoryList: List<CategoryModel>,
+    val selectCategories: List<CategoryModel>,
 )
 
 interface CategoriesCallback {
     
     fun onBack() {}
     fun onNext() {}
-    fun onCategoryClick(category: Category) {}
+    fun onCategoryClick(category: CategoryModel) {}
 }
 
 @Composable
 fun CategoriesContent(
     modifier: Modifier = Modifier,
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     Column(
         modifier.fillMaxSize(),
@@ -60,11 +57,8 @@ fun CategoriesContent(
                 Modifier.padding(top = 8.dp),
             ) { element ->
                 CategoryItem(
-                    element.name,
-                    getCategoryIcons(element.iconType),
-                    Color(element.color.toColorInt()),
-                    state.selectCategories.contains(element),
-                    modifier
+                    element.name, element.emoji, element.color,
+                    state.selectCategories.contains(element), modifier
                 ) { callback?.onCategoryClick(element) }
             }
         }
@@ -81,7 +75,7 @@ fun CategoriesContent(
 @Composable
 private fun BubblesForPreview(
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     LazyRow(
         Modifier
@@ -99,9 +93,7 @@ private fun BubblesForPreview(
                 ) {
                     for(element in item)
                         CategoryItem(
-                            element.name,
-                            getCategoryIcons(element.iconType),
-                            Color(element.color.toColorInt()),
+                            element.name, element.emoji, element.color,
                             state.selectCategories.contains(element)
                         ) { callback?.onCategoryClick(element) }
                 }
@@ -117,13 +109,10 @@ private fun CategoriesPreview() {
     GiltyTheme {
         CategoriesContent(
             Modifier,
-            CategoriesState(CategoriesType.list().map {
-                Category(
-                    it.name, it.display,
-                    it.color.toString(),
-                    it.name, listOf()
-                )
-            }, arrayListOf())
+            CategoriesState(
+                listOf(DemoCategoryModel),
+                emptyList()
+            )
         )
     }
 }

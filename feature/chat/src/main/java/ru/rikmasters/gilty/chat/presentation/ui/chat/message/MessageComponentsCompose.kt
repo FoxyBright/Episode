@@ -49,7 +49,7 @@ import ru.rikmasters.gilty.shared.R.string.chats_hidden_photo
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.chat.SystemMessageType.*
-import ru.rikmasters.gilty.shared.model.enumeration.SexType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.badEmoji

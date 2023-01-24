@@ -10,12 +10,15 @@ import ru.rikmasters.gilty.login.viewmodel.Hidden
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
 
 @Composable
 fun ProfileScreen(
     vm: ProfileViewModel,
     photo: String = "",
-    hiddenPhoto: String = ""
+    hiddenPhoto: String = "",
 ) {
     
     val nav = get<NavState>()
@@ -26,12 +29,29 @@ fun ProfileScreen(
     val description by vm.description.collectAsState()
     
     val profileState = ProfileState(
-        name = username,
-        hiddenPhoto = if(hiddenPhoto == "") Hidden else hiddenPhoto,
-        profilePhoto = if(photo == "") Avatar else photo,
-        description = description,
-        rating = "0.0",
-        enabled = true,
+        DemoEmptyProfileModel.copy(
+            username = username,
+            hidden = AvatarModel(
+                id = if(hiddenPhoto == "") Hidden
+                else hiddenPhoto,
+                albumId = "",
+                ownerId = "",
+                type = PHOTO,
+                mimeType = "photo/jpeg",
+                (0), (0), (0), (0), (0),
+                (null), (true)
+            ),
+            avatar = AvatarModel(
+                id = if(photo == "") Avatar else photo,
+                albumId = "",
+                ownerId = "",
+                type = PHOTO,
+                mimeType = "photo/jpeg",
+                (0), (0), (0), (0), (0),
+                (null), (true)
+            ),
+            aboutMe = description,
+            ),
         occupiedName = occupied
     )
     

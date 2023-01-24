@@ -4,9 +4,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.auth.categories.Category
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.login.viewmodel.CategoryViewModel
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 @Composable
 fun CategoriesScreen(vm: CategoryViewModel) {
@@ -17,12 +17,16 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val selected by vm.selected.collectAsState()
     val categories by vm.categories.collectAsState()
     
+    LaunchedEffect(Unit) {
+        vm.getCategories()
+    }
+    
     CategoriesContent(
         Modifier, CategoriesState(
             categories, selected
         ), object: CategoriesCallback {
             
-            override fun onCategoryClick(category: Category) {
+            override fun onCategoryClick(category: CategoryModel) {
                 scope.launch { vm.selectCategory(category) }
             }
             

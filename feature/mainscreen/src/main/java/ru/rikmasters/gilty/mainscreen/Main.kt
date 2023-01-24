@@ -7,7 +7,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 object Main: FeatureDefinition() {
     
@@ -29,7 +29,7 @@ object Main: FeatureDefinition() {
             ) {
                 it.arguments?.getString("avatar")?.let { avatar ->
                     it.arguments?.getInt("meetType")?.let { meetType ->
-                        ReactionScreen(avatar, CategoriesType.get(meetType))
+                        ReactionScreen(avatar, DemoCategoryModel)
                     }
                 }
             }

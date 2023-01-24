@@ -3,8 +3,8 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.conditions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.addmeet.viewmodel.ConditionViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType.ENTERTAINMENT
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
@@ -16,7 +16,7 @@ var MEETING: MeetingModel = MeetingModel(
     id = randomUUID().toString(),
     title = DemoTag.title,
     condition = FREE,
-    category = ENTERTAINMENT,
+    category = DemoCategoryModel,
     duration = "",
     type = GROUP,
     dateTime = "1970-01-01T00:00:00Z",
@@ -34,7 +34,9 @@ var MEETING: MeetingModel = MeetingModel(
 )
 
 @Composable
-fun ConditionsScreen(nav: NavState = get()) {
+fun ConditionsScreen(vm: ConditionViewModel) {
+    
+    val nav= get<NavState>()
     var text by remember { mutableStateOf("") }
     var alert by remember { mutableStateOf(false) }
     var online by remember { mutableStateOf(MEETING.isOnline) }

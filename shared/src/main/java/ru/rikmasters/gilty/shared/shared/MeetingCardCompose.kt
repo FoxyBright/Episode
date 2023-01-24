@@ -206,7 +206,7 @@ fun MeetingCategoryCard(
                     .size(126.dp), Center
             ) {
                 Text(
-                    meeting.category.display,
+                    meeting.category.name,
                     Modifier, White,
                     style = typography.labelSmall,
                     fontWeight = SemiBold

@@ -4,7 +4,7 @@ data class RatingModel(
 
     val average: String,
 
-    val frequent: EmojiModel
+    val emoji: EmojiModel
 
 )
 

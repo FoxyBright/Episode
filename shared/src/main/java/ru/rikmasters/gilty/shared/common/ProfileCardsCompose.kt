@@ -83,7 +83,7 @@ private fun ProfileStatisticContentPreview() {
                     .width(160.dp),
                 DemoProfileModel.rating.average,
                 (100), (100), USERPROFILE,
-                DemoProfileModel.emoji
+                DemoProfileModel.rating.emoji
             )
             ProfileStatisticContent(
                 Modifier
@@ -330,10 +330,11 @@ private fun RatingText(
     val style = if(profileType == CREATE)
         ThemeExtra.typography.RatingSmallText
     else ThemeExtra.typography.RatingText
+    val string = text.ifBlank { "0.0" }
     Text(
         buildAnnotatedString {
             withStyle(style.toSpanStyle()) {
-                append(text.first())
+                append(string.first())
             }
             withStyle(
                 style.copy(
@@ -342,7 +343,7 @@ private fun RatingText(
                 ).toSpanStyle()
             ) { append('.') }
             withStyle(style.toSpanStyle()) {
-                append(text.last())
+                append(string.last())
             }
         }, modifier, textAlign = Right,
         style = style,

@@ -28,7 +28,8 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.enabled_check_box
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -38,8 +39,8 @@ private fun CategoryListPreview() {
     GiltyTheme {
         CategoryList(
             CategoryListState(
-                CategoriesType.values().toList(),
-                listOf(), listOf()
+                listOf(DemoCategoryModel),
+                emptyList(), emptyList()
             ), Modifier.padding(16.dp)
         )
     }
@@ -48,16 +49,16 @@ private fun CategoryListPreview() {
 interface CategoryListCallback {
     
     fun onCategoryClick(index: Int, it: Boolean)
-    fun onSubSelect(category: CategoriesType, sub: String?) {}
+    fun onSubSelect(category: CategoryModel, sub: String?) {}
     fun onBack() {}
     fun onDone() {}
     fun onClear() {}
 }
 
 data class CategoryListState(
-    val categoryList: List<CategoriesType>,
+    val categoryList: List<CategoryModel>,
     val categoryListState: List<Boolean>,
-    val subCategories: List<Pair<CategoriesType, String>>
+    val subCategories: List<Pair<CategoryModel, String>>
 )
 
 @Composable
@@ -142,9 +143,9 @@ private fun Buttons(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Item(
-    category: CategoriesType,
+    category: CategoryModel,
     select: Boolean,
-    subCategories: List<Pair<CategoriesType, String>>,
+    subCategories: List<Pair<CategoryModel, String>>,
     onSubSelect: (String) -> Unit,
     onClick: () -> Unit,
 ) {
@@ -176,7 +177,7 @@ private fun Item(
                         fontWeight = SemiBold
                     )
                 }
-                if(category.subs != null) Icon(
+                if(category.children != null) Icon(
                     if(select) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
                     stringResource(R.string.next_button),
@@ -184,7 +185,7 @@ private fun Item(
                 ) else if(select)
                     Image(painterResource(enabled_check_box), (null))
             }
-            category.subs?.let { list ->
+            category.children?.let { list ->
                 if(select) (SubCategories(category, list, subCategories)
                 { onSubSelect(it) })
             }
@@ -194,10 +195,10 @@ private fun Item(
 
 @Composable
 private fun SubCategories(
-    category: CategoriesType,
-    subCategories: List<String>,
+    category: CategoryModel,
+    subCategories: List<CategoryModel>,
     selectBubCategories:
-    List<Pair<CategoriesType, String>>,
+    List<Pair<CategoryModel, String>>,
     onSelect: (String) -> Unit
 ) {
     Divider()
@@ -209,9 +210,9 @@ private fun SubCategories(
     ) {
         subCategories.forEach {
             GiltyChip(
-                Modifier, it, selectBubCategories
-                    .contains(Pair(category, it))
-            ) { onSelect(it) }
+                Modifier, it.name, selectBubCategories
+                    .contains(Pair(category, it.name))
+            ) { onSelect(it.name) }
         }
     }
 }

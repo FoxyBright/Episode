@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchScreen
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 @Composable
 fun MeetingFilterContent(
@@ -26,7 +26,7 @@ fun MeetingFilterContent(
     val tagList =
         remember { mutableStateListOf("kaif", "pain", "fast", "launch") }
     val categoryList =
-        remember { mutableStateOf(CategoriesType.values().toList()) }
+        remember { mutableStateOf(listOf(DemoCategoryModel)) }
     val categoryStateList =
         remember { mutableStateListOf<Boolean>() }
     repeat(categoryList.value.size) { categoryStateList.add(false) }

@@ -21,13 +21,18 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview
 @Composable
 private fun ParticipantsListPreview() {
-    GiltyTheme { ParticipantsList(DemoMeetingModel, DemoMemberModelList) }
+    GiltyTheme {
+        ParticipantsList(
+            DemoMeetingModel,
+            DemoMemberModelList
+        )
+    }
 }
 
 interface ParticipantsListCallback {
     
     fun onBack() {}
-    fun onMemberClick() {}
+    fun onMemberClick(member: MemberModel) {}
 }
 
 @Composable
@@ -36,18 +41,13 @@ fun ParticipantsList(
     meet: MeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null,
-    onMemberClick: ((MemberModel) -> Unit)? = null,
-    callback: ParticipantsListCallback? = null
+    callback: ParticipantsListCallback? = null,
 ) {
     Column(modifier) {
         RowActionBar(
             stringResource(R.string.meeting_members),
             "${membersList.size}/${meet.memberCount}"
-        ) {
-            onBack?.let { it() }
-            callback?.onBack()
-        }
+        ) { callback?.onBack() }
         LazyColumn(
             Modifier
                 .padding(16.dp)
@@ -56,7 +56,7 @@ fun ParticipantsList(
         ) {
             itemsIndexed(membersList) { index, member ->
                 Card(
-                    { onMemberClick?.let { c -> c(member) } },
+                    { callback?.onMemberClick(member) },
                     Modifier.fillMaxWidth(),
                     shape = LazyItemsShapes(index, membersList.size, 14.dp),
                     colors = cardColors(colorScheme.primaryContainer)

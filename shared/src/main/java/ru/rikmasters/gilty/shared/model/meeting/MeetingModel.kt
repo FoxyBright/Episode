@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
-import ru.rikmasters.gilty.shared.model.enumeration.CategoriesType
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import java.util.UUID
@@ -9,7 +8,7 @@ data class MeetingModel( // TODO заменить VAR на VAL сделано д
     var id: String,
     var title: String,
     var condition: ConditionType,
-    var category: CategoriesType,
+    var category: CategoryModel,
     var duration: String,
     var type: MeetType,
     var dateTime: String,
@@ -32,7 +31,7 @@ fun getDemoMeetingModel(
     id: String = UUID.randomUUID().toString(),
     title: String = "Поход в кино",
     condition: ConditionType = ConditionType.MEMBER_PAY,
-    category: CategoriesType = CategoriesType.ENTERTAINMENT,
+    category: CategoryModel = DemoCategoryModel,
     duration: String = "2 часа",
     type: MeetType = MeetType.GROUP,
     dateTime: String = "2022-11-28T20:00:54.140Z",

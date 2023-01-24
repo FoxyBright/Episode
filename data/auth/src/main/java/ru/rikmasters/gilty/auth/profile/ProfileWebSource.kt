@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.wrapper.Status
 import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
@@ -59,7 +60,7 @@ class ProfileWebSource: KtorSource() {
     ): HttpResponse {
         updateClientToken()
         return client.post(
-            "http://$HOST$PREFIX_URL/profile/$OBSERVABLES"
+            "http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}"
         ) { url { query("user_id" to member.id) } }
     }
     
@@ -68,7 +69,7 @@ class ProfileWebSource: KtorSource() {
     ): HttpResponse {
         updateClientToken()
         return client.delete(
-            "http://$HOST$PREFIX_URL/profile/$OBSERVABLES"
+            "http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}"
         ) { url { query("user_id" to member.id) } }
     }
     
@@ -77,7 +78,7 @@ class ProfileWebSource: KtorSource() {
     ): HttpResponse {
         updateClientToken()
         return client.delete(
-            "http://$HOST$PREFIX_URL/profile/$OBSERVERS"
+            "http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}"
         ) { url { query("user_id" to member.id) } }
     }
     
@@ -204,14 +205,14 @@ class ProfileWebSource: KtorSource() {
     
     private suspend fun getUserAlbumPrivateId(): String {
         val profile = getUserData()
-        return profile.album_private?.id!!
+        return profile.hidden?.albumId!!
     }
     
-    suspend fun getUserData(): ProfileResponse {
+    suspend fun getUserData(): ProfileModel {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile"
-        ) {}.wrapped()
+        ) {}.wrapped<ProfileResponse>().map()
     }
     
     suspend fun isUserRegistered(): Boolean {
@@ -220,7 +221,7 @@ class ProfileWebSource: KtorSource() {
             "http://$HOST$PREFIX_URL/profile"
         )
         return try {
-            response.wrapped<ProfileResponse>().is_completed == true
+            response.wrapped<ProfileResponse>().isCompleted == true
         } catch(_: Exception) {
             response.errorWrapped().status != Status.ERROR
         } catch(_: Exception) {

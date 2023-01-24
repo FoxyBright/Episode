@@ -20,16 +20,14 @@ import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.organizer
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSCallback
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBSState
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBottomSheet
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsCallback
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsContent
+import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsState
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
 @Composable
 fun ChatScreen(chatType: String, nav: NavState = get()) {
@@ -98,7 +96,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     
-    val meetBsCallback = object: MeetingBSCallback {
+    val meetBsCallback = object: MeetingBsCallback {
         override fun onKebabClick(state: Boolean) {
             menuState = state
         }
@@ -106,10 +104,10 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
         override fun onAvatarClick() {
             scope.launch {
                 asm.bottomSheet.expand {
-                    organizer(
-                        DemoProfileModel, meet,
-                        asm, scope
-                    )
+//                    Organizer(
+//                        DemoProfileModel, meet,
+//                        asm, scope
+//                    )
                 }
             }
         }
@@ -329,8 +327,8 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             override fun onTopBarClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        MeetingBottomSheet(
-                            MeetingBSState(
+                        MeetingBsContent(
+                            MeetingBsState(
                                 menuState, meet,
                                 DemoMemberModelList,
                                 distanceCalculator(meet),

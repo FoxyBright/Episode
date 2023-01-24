@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.auth.meetings
 
 import ru.rikmasters.gilty.auth.profile.ProfileResponse
 import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
-import ru.rikmasters.gilty.shared.model.enumeration.getCategoriesType
 import ru.rikmasters.gilty.shared.model.enumeration.getConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.getMeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingRequirementModel
@@ -19,20 +18,13 @@ data class Tag(
     )
 }
 
-data class Category(
-    val id: String,
-    val name: String? = null,
-    val color: String? = null,
-    val icon_type: String? = null,
-)
-
 data class MeetingResponse(
     val id: String,
     val status: String? = null,
     val type: String? = null,
     val tags: List<Tag>? = null,
     val condition: String? = null,
-    val category: Category? = null,
+    val category: Category,
     val datetime: String? = null,
     val duration: Int? = null,
     val organizer: ProfileResponse? = null,
@@ -44,10 +36,10 @@ data class MeetingResponse(
     fun map(): MeetingModel = MeetingModel(
         id, tags?.first()?.title.toString(),
         getConditionType(condition.toString()),
-        getCategoriesType(category?.icon_type.toString()),
+        category.map(),
         duration.toString(), getMeetType(type.toString()),
         datetime.toString(),
-        organizer?.mapToProfileModel()?.mapToOrganizerModel(),
+        organizer?.map()?.mapToOrganizerModel(),
         anyLog(isOnline) == true,
         tags?.map { it.map() } ?: listOf(),
         "", isAnonymous == true, 0,

@@ -25,13 +25,11 @@ import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-
-private val user = DemoProfileModel
 
 @Preview
 @Composable
@@ -43,7 +41,7 @@ private fun EditProfilePreview() {
             )
         ) {
             Profile(
-                ProfileState(),
+                ProfileState(DemoProfileModel),
                 Modifier.padding(16.dp)
             )
         }
@@ -61,11 +59,7 @@ private fun OrganizerProfilePreview() {
         ) {
             Profile(
                 ProfileState(
-                    "${
-                        user.username
-                    }, ${user.age}",
-                    description = user.aboutMe,
-                    enabled = false,
+                    DemoProfileModel,
                     profileType = ORGANIZER
                 )
             )
@@ -84,11 +78,7 @@ private fun UserProfilePreview() {
         ) {
             Profile(
                 ProfileState(
-                    "${
-                        user.username
-                    }, ${user.age}",
-                    description = user.aboutMe,
-                    enabled = false,
+                    DemoProfileModel,
                     profileType = USERPROFILE
                 )
             )
@@ -97,18 +87,10 @@ private fun UserProfilePreview() {
 }
 
 data class ProfileState(
-    val name: String = "",
-    val hiddenPhoto: String? = null,
-    val profilePhoto: String? = null,
-    val description: String = "",
-    val rating: String = "0",
-    val observers: Int = 0,
-    val observed: Int = 0,
-    val emoji: EmojiModel? = null,
+    val profile: ProfileModel?,
     val profileType: ProfileType = CREATE,
     var observeState: Boolean = false,
-    val enabled: Boolean = true,
-    val occupiedName: Boolean = false
+    val occupiedName: Boolean = false,
 )
 
 interface ProfileCallback {
@@ -128,13 +110,13 @@ fun Profile(
     state: ProfileState,
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null,
-    onChange: ((Boolean) -> Unit)? = null
+    onChange: ((Boolean) -> Unit)? = null,
 ) {
     Column(modifier) {
         TopBar(
-            state.name, state.profileType,
-            !state.enabled, Modifier,
-            { callback?.onBack() }
+            (state.profile?.username ?: ""),
+            state.profileType,
+            Modifier, { callback?.onBack() }
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
@@ -148,7 +130,7 @@ fun Profile(
         Row {
             ProfileImageContent(
                 Modifier.weight(1f),
-                state.profilePhoto ?: "",
+                (state.profile?.avatar?.id ?: ""),
                 state.profileType,
                 state.observeState,
                 { bool -> onChange?.let { it(bool) } },
@@ -162,11 +144,11 @@ fun Profile(
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
                     Modifier,
-                    state.rating,
-                    state.observers,
-                    state.observed,
+                    (state.profile?.rating?.average ?: ""),
+                    state.profile?.count_watchers ?: 0,
+                    state.profile?.count_watching ?: 0,
                     state.profileType,
-                    state.emoji
+                    state.profile?.rating?.emoji
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
@@ -176,13 +158,14 @@ fun Profile(
                 )
                 HiddenContent(
                     Modifier,
-                    state.hiddenPhoto,
+                    state.profile?.hidden?.id,
                     state.profileType
                 ) { callback?.hiddenImages() }
             }
         }
         Description(
-            state.description, state.profileType,
+            (state.profile?.aboutMe ?: ""),
+            state.profileType,
             Modifier.padding(top = 20.dp)
         ) { callback?.onDescriptionChange(it) }
     }
@@ -193,7 +176,6 @@ fun Profile(
 private fun TopBar(
     text: String,
     profileType: ProfileType,
-    enabled: Boolean,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onTextChange: (String) -> Unit,
@@ -230,7 +212,8 @@ private fun TopBar(
                         colorScheme.onTertiary
                     )
                 }
-            }, readOnly = enabled, singleLine = true
+            }, readOnly = profileType == ORGANIZER,
+            singleLine = true
         )
     }
 }
@@ -240,7 +223,7 @@ private fun Description(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
-    onTextChange: (String) -> Unit
+    onTextChange: (String) -> Unit,
 ) {
     val focusManager =
         LocalFocusManager.current

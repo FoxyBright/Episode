@@ -1,21 +1,21 @@
 package ru.rikmasters.gilty.auth.manager
 
-import ru.rikmasters.gilty.auth.categories.CategoriesWebSource
-import ru.rikmasters.gilty.auth.categories.Category
+import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.GenderType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import java.io.File
 
 class RegistrationManager(
     
     private val profileWebSource: ProfileWebSource,
     
-    private val categoryWebSource: CategoriesWebSource
+    private val meetWebSource: MeetingWebSource
 
 ) {
     
-    suspend fun getCategoriesList(): List<Category> =
-        categoryWebSource.getCategoriesList()
+    suspend fun getCategoriesList(): List<CategoryModel> =
+        meetWebSource.getCategoriesList()
     
     suspend fun isUserRegistered(): Boolean =
         profileWebSource.isUserRegistered()

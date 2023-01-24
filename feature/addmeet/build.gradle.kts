@@ -11,4 +11,5 @@ dependencies {
     compose()
     implementation(project(":shared"))
     implementation(project(":feature:bubbles"))
+    implementation(project(":data:auth"))
 }

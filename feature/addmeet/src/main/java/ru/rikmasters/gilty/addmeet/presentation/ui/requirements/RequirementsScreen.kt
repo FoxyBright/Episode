@@ -1,24 +1,21 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Composable
-fun RequirementsScreen(nav: NavState = get()) {
+fun RequirementsScreen(vm: RequirementsViewModel) {
+    
+    val nav = get<NavState>()
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     var hideMeetPlace by remember { mutableStateOf(false) }

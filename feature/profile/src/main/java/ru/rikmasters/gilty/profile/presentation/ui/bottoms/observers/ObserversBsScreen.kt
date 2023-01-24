@@ -5,8 +5,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.ObserverBsViewModel.SubscribeType
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
 @Composable
