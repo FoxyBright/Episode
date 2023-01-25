@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -91,7 +92,7 @@ fun GiltyChip(
     text: String,
     isSelected: Boolean = false,
     online: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val primary = colorScheme.primary
     val empty = colorScheme.primaryContainer
@@ -144,7 +145,7 @@ fun GiltyChip(
 private fun Modifier.sur(
     shape: Shape,
     backgroundColor: Color,
-    border: BorderStroke?
+    border: BorderStroke?,
 ) = this
     .shadow(0.dp, shape, clip = false)
     .then(
@@ -160,7 +161,7 @@ fun GiltyString(
     modifier: Modifier = Modifier,
     text: String,
     isSelected: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier
@@ -184,24 +185,22 @@ fun GiltyString(
 @Preview
 @Composable
 private fun GiltyTab() {
-    val list =
-        remember { mutableStateListOf(true, false, false, false) }
     GiltyTheme {
-        GiltyTab(listOf("Ко всем", "К каждому", "Ко мне"), list) {
-            repeat(list.size) { index ->
-                list[index] = it == index
-            }
-        }
+        GiltyTab(
+            listOf("Ко всем", "К каждому", "Ко мне"),
+            0, unEnabled = listOf(2)
+        )
     }
 }
 
 @Composable
 fun GiltyTab(
     tabs: List<String>,
-    isSelected: List<Boolean>,
+    isSelected: Int,
     modifier: Modifier = Modifier,
     online: Boolean = false,
-    onClick: (Int) -> Unit
+    unEnabled: List<Int> = emptyList(),
+    onClick: ((Int) -> Unit)? = null,
 ) {
     Card(
         modifier, CircleShape,
@@ -211,14 +210,15 @@ fun GiltyTab(
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Max)
+                .height(Max)
         ) {
-            repeat(tabs.size) {
+            repeat(tabs.size) { tab ->
                 GiltyTabElement(
-                    tabs[it], Modifier.weight(1f),
-                    isSelected[it], online
-                ) { onClick(it) }
-                if(it < tabs.size - 1) Box(
+                    tabs[tab], Modifier.weight(1f),
+                    (isSelected == tab), online,
+                    !unEnabled.contains(tab)
+                ) { onClick?.let { it(tab) } }
+                if(tab < tabs.size - 1) Box(
                     Modifier
                         .width(1.dp)
                         .fillMaxHeight()
@@ -235,29 +235,33 @@ private fun GiltyTabElement(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     online: Boolean,
-    onClick: () -> Unit
+    enabled: Boolean,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier
             .background(
                 animateColorAsState(
-                    if(isSelected)
-                        if(online) colors.tabActiveOnline
-                        else colors.tabActive
+                    if(!enabled) colorScheme.background
+                    else if(isSelected) if(online)
+                        colors.tabActiveOnline
+                    else colors.tabActive
                     else colors.tabInactive,
                     tween(400)
                 ).value
             )
-            .clickable { onClick() },
+            .clickable { if(enabled) onClick() },
     ) {
         Text(
             text,
             Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            colorScheme.tertiary, fontWeight = Bold,
+            if(enabled) colorScheme.tertiary
+            else colorScheme.onTertiary,
+            style = typography.labelSmall,
             textAlign = TextAlign.Center,
-            style = typography.labelSmall
+            fontWeight = Bold
         )
     }
 }

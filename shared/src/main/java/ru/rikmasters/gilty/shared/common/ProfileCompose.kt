@@ -27,8 +27,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.TextFieldColors
-import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
+import ru.rikmasters.gilty.shared.shared.textFieldColors
+import ru.rikmasters.gilty.shared.shared.transparentTextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -196,7 +196,7 @@ private fun TopBar(
             text, onTextChange, Modifier
                 .offset((-16).dp)
                 .fillMaxWidth(),
-            colors = TransparentTextFieldColors(),
+            colors = transparentTextFieldColors(),
             textStyle = typography.headlineLarge,
             placeholder = {
                 Row(Modifier, Center, CenterVertically) {
@@ -239,7 +239,7 @@ private fun Description(
                 .fillMaxWidth()
                 .padding(top = 12.dp),
             readOnly = (profileType == ORGANIZER),
-            shape = shapes.large, colors = TextFieldColors(),
+            shape = shapes.large, colors = textFieldColors(),
             textStyle = typography.bodyMedium,
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()

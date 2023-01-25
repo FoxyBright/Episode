@@ -7,21 +7,16 @@ import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
-class ObserverBsViewModel(
-    
-    private val profileVm: UserProfileViewModel
-
-): ViewModel() {
+class ObserverBsViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
     
-    private val _observersSelectTab = MutableStateFlow(listOf(true, false))
+    private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
     private val _observers = MutableStateFlow(listOf<MemberModel>())
@@ -31,9 +26,7 @@ class ObserverBsViewModel(
     val observables = _observables.asStateFlow()
     
     suspend fun changeObserversTab(tab: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(observersSelectTab.value.size) { list.add(it == tab) }
-        _observersSelectTab.emit(list)
+        _observersSelectTab.emit(tab)
     }
     
     suspend fun getObservers() {

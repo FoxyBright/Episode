@@ -37,8 +37,7 @@ fun ObserversListPreview() {
         ObserversListContent(
             ObserversListState(
                 DemoProfileModel.username ?: "",
-                DemoMemberModelList, DemoMemberModelList,
-                listOf(true, false)
+                DemoMemberModelList, DemoMemberModelList, (0)
             )
         )
     }
@@ -48,7 +47,7 @@ data class ObserversListState(
     val user: String,
     val observers: List<MemberModel>,
     val observed: List<MemberModel>,
-    val selectTab: List<Boolean>,
+    val selectTab: Int,
 )
 
 interface ObserversListCallback {
@@ -93,7 +92,7 @@ fun ObserversListContent(
                     shapes.medium
                 )
         ) {
-            if(state.selectTab.first())
+            if(state.selectTab == 0)
                 itemsIndexed(state.observers) { index, member ->
                     Column {
                         ObserveItem(

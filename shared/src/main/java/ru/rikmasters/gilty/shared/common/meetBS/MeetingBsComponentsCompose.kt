@@ -371,11 +371,11 @@ fun MeetingBsComment(
             text, { if(it.length <= 120) onTextChange(it) },
             Modifier.fillMaxWidth(),
             shape = shapes.medium,
-            colors = DescriptionColors(online),
-            label = if(text.isNotEmpty()) TextFieldLabel(
+            colors = descriptionColors(online),
+            label = if(text.isNotEmpty()) textFieldLabel(
                 (true), stringResource(meeting_comment_text_holder)
             ) else null,
-            placeholder = TextFieldLabel(
+            placeholder = textFieldLabel(
                 (false), stringResource(meeting_comment_text_holder)
             ), textStyle = typography.bodyMedium,
             clear = onTextClear

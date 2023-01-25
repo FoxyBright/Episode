@@ -31,7 +31,7 @@ import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.RowActionBar
-import ru.rikmasters.gilty.shared.shared.TextFieldColors
+import ru.rikmasters.gilty.shared.shared.textFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private val list = listOf("item 1", "item 1", "item 1")
@@ -42,9 +42,9 @@ private val listBoolean = listOf(true, false, false)
 private fun ComplainSelectPreview() {
     GiltyTheme {
         ComplainElements(
-            ("Заголовок"), list, (null),
+            ("Заголовок"), list,
             Modifier.padding(16.dp),
-            listBoolean, {}
+            (null), listBoolean, {}
         )
     }
 }
@@ -54,8 +54,9 @@ private fun ComplainSelectPreview() {
 private fun ComplainElementsPreview() {
     GiltyTheme {
         ComplainElements(
-            ("Заголовок"), list, ("Описание"),
-            Modifier.padding(16.dp)
+            ("Заголовок"), list,
+            Modifier.padding(16.dp),
+            ("Описание")
         )
     }
 }
@@ -94,9 +95,9 @@ fun ComplainTextBox(
         GTextField(
             text, { onTextChange(it) },
             Modifier.fillMaxWidth(),
-            colors = TextFieldColors(),
+            colors = textFieldColors(),
             clear = onClear,
-            label = if (text.isNotEmpty())
+            label = if(text.isNotEmpty())
                 label(true) else null,
             placeholder = label()
         )
@@ -105,12 +106,12 @@ fun ComplainTextBox(
 
 @Composable
 private fun label(
-    label: Boolean = false
+    label: Boolean = false,
 ): @Composable (() -> Unit) {
     return {
         Text(
             stringResource(R.string.complaints_send_placeholder),
-            Modifier, style = if (label)
+            Modifier, style = if(label)
                 typography.headlineSmall
             else typography.bodyMedium
         )
@@ -121,11 +122,11 @@ private fun label(
 fun ComplainElements(
     title: String,
     list: List<String>,
-    description: String? = null,
     modifier: Modifier = Modifier,
+    description: String? = null,
     selectedList: List<Boolean>? = null,
     onBack: (() -> Unit)? = null,
-    onSelect: ((index: Int) -> Unit)? = null
+    onSelect: ((index: Int) -> Unit)? = null,
 ) {
     Column(
         modifier
@@ -144,9 +145,11 @@ fun ComplainElements(
         ) {
             itemsIndexed(list) { i, item ->
                 Column {
-                    ComplainItem(i, item, list.size, selectedList?.get(i))
-                    { index -> onSelect?.let { it(index) } }
-                    if (i < list.size - 1)
+                    ComplainItem(
+                        i, item, list.size,
+                        Modifier, selectedList?.get(i)
+                    ) { index -> onSelect?.let { it(index) } }
+                    if(i < list.size - 1)
                         Divider(Modifier.padding(start = 16.dp))
                 }
             }
@@ -157,10 +160,12 @@ fun ComplainElements(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ComplainItem(
-    index: Int, item: String,
-    size: Int, select: Boolean? = null,
+    index: Int,
+    item: String,
+    size: Int,
     modifier: Modifier = Modifier,
-    onClick: ((Int) -> Unit)? = null
+    select: Boolean? = null,
+    onClick: ((Int) -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it(index) } },
@@ -178,23 +183,25 @@ private fun ComplainItem(
                 colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Icon(select)
+            Icon(Modifier, select)
         }
     }
 }
 
 @Composable
 private fun Icon(
+    modifier: Modifier = Modifier,
     select: Boolean? = null,
-    modifier: Modifier = Modifier
 ) {
-    if (select == null) Icon(
+    select?.let {
+        if(it) Icon(
+            painterResource(R.drawable.ic_done),
+            (null), modifier.size(24.dp),
+            colorScheme.primary
+        )
+    } ?: Icon(
         Icons.Filled.KeyboardArrowRight,
         (null), modifier.size(24.dp),
         colorScheme.onTertiary
-    ) else if (select) Icon(
-        painterResource(R.drawable.ic_done),
-        (null), modifier.size(24.dp),
-        colorScheme.primary
     )
 }

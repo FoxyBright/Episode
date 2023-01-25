@@ -5,18 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.components.Buttons
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -27,16 +26,21 @@ data class RequirementsState(
     val gender: String?,
     val age: String?,
     val orientation: String?,
-    val selectedTabs: List<Boolean>,
-    val selectedMember: List<Boolean>,
+    val selectTab: Int,
+    val selectedMember: Int,
     val alert: Boolean,
+    val meetType: MeetType?,
     val online: Boolean,
     val isActive: Boolean,
+    val withoutRespond: Boolean,
+    val memberLimited: Boolean,
 )
 
 interface RequirementsCallback {
     
     fun onHideMeetPlaceClick() {}
+    fun onWithoutRespondClick() {}
+    fun onMemberLimit() {}
     fun onCountChange(text: String) {}
     fun onClose() {}
     fun onBack() {}
@@ -58,8 +62,9 @@ fun RequirementsContent() {
             RequirementsState(
                 (false), ("1"),
                 matter, matter, matter,
-                listOf(true), listOf(true),
-                (false), (false), (true)
+                (0), (1), (false),
+                GROUP, (false), (true),
+                (true), (true)
             ), Modifier.background(colorScheme.background)
         )
     }
@@ -90,34 +95,24 @@ fun RequirementsContent(
                 .fillMaxHeight(0.88f)
                 .padding(top = it.calculateTopPadding())
         ) {
-            if(MEETING.type != PERSONAL) item {
+            if(state.meetType != PERSONAL) item {
                 Element(
-                    memberCountInput(state.memberCount, state.online)
+                    memberCountInput(
+                        state.memberCount, state.online,
+                        state.memberLimited, Modifier,
+                        { callback?.onMemberLimit() }
+                    )
                     { count -> callback?.onCountChange(count) },
                     Modifier.padding(bottom = 12.dp)
                 )
             }
             item {
-                CheckBoxCard(
+                TrackCard(
                     stringResource(R.string.requirements_private_check),
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    state.private, online = state.online
-                ) { callback?.onHideMeetPlaceClick() }
-            }
-            item {
-                Text(
                     stringResource(R.string.requirements_private_check_label),
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = 4.dp, start = 32.dp,
-                            bottom = 12.dp
-                        ),
-                    colorScheme.onTertiary,
-                    style = typography.headlineSmall
-                )
+                    state.online, state.private,
+                    Modifier.padding(horizontal = 16.dp)
+                ) { callback?.onHideMeetPlaceClick() }
             }
             if(state.memberCount.isNotBlank()
                 && !state.private
@@ -127,6 +122,11 @@ fun RequirementsContent(
                     Modifier.padding(horizontal = 16.dp),
                     callback
                 )
+            }
+            item {
+                Element(responds(state.online, state.withoutRespond) {
+                    callback?.onWithoutRespondClick()
+                })
             }
             item {
                 Spacer(

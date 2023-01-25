@@ -32,6 +32,14 @@ class CategoryViewModel: ViewModel() {
     }
     
     suspend fun getCategories() {
-        _categories.emit(manager.getCategoriesList())
+        val categories = arrayListOf<CategoryModel>()
+        manager.getCategoriesList().forEach { parent ->
+            categories.add(parent)
+            if(!parent.children.isNullOrEmpty())
+                parent.children!!.forEach { child ->
+                    categories.add(child)
+                }
+        }
+        _categories.emit(categories)
     }
 }

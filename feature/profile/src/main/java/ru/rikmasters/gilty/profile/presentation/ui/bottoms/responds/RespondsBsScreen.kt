@@ -15,9 +15,9 @@ import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
 
 @Composable
-fun RespondsBs(vm: RespondsBsViewModel){
+fun RespondsBs(vm: RespondsBsViewModel) {
     
-    val respondsSelectTab by vm.respondsSelectTab.collectAsState()
+    val tabs by vm.tabs.collectAsState()
     val observeGroupStates by vm.observeGroupStates.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -35,10 +35,10 @@ fun RespondsBs(vm: RespondsBsViewModel){
     
     val pairRespondsList =
         remember { mutableStateOf(Pair(DemoMeetingModel, respondsList)) }
-
+    
     RespondsList(
         listOf(pairRespondsList.value),
-        respondsSelectTab, observeGroupStates,
+        observeGroupStates, tabs,
         Modifier, object: RespondCallback {
             override fun onCancelClick(respond: RespondModel) {
                 respondsList.remove(respond)
@@ -75,11 +75,11 @@ fun RespondsBs(vm: RespondsBsViewModel){
             }
             
             override fun onTabChange(tab: Int) {
-                scope.launch { vm.changeObserveGroupStates(tab) }
+                scope.launch { vm.selectTab(tab) }
             }
             
             override fun onArrowClick(index: Int) {
-                scope.launch { vm.changeRespondsTab(index) }
+                scope.launch { vm.expandGroup(index) }
             }
         })
 }

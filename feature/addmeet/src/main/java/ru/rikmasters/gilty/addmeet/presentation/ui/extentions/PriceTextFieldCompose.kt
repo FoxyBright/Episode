@@ -11,8 +11,8 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.transform.numberMask
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.PriceFieldColors
-import ru.rikmasters.gilty.shared.shared.TextFieldLabel
+import ru.rikmasters.gilty.shared.shared.priceFieldColors
+import ru.rikmasters.gilty.shared.shared.textFieldLabel
 
 @Composable
 fun PriceTextField(
@@ -27,11 +27,11 @@ fun PriceTextField(
                 || it.isBlank()
             ) onChange(onNull(it))
         }, Modifier.fillMaxWidth(),
-        colors = PriceFieldColors(online),
+        colors = priceFieldColors(online),
         clear = onClear, label =
-        if(value.isNotEmpty()) TextFieldLabel(
+        if(value.isNotEmpty()) textFieldLabel(
             true, stringResource(R.string.add_meet_conditions_price_description)
-        ) else null, placeholder = TextFieldLabel(
+        ) else null, placeholder = textFieldLabel(
             false, stringResource(R.string.add_meet_conditions_price_description)
         ), singleLine = true,
         keyboardOptions = KeyboardOptions(

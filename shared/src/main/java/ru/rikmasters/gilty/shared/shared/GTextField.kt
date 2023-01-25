@@ -1,18 +1,20 @@
 package ru.rikmasters.gilty.shared.shared
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterEnd
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -33,7 +35,7 @@ private fun GTextFieldPlaceHolder() {
         GTextField(
             (""), {}, Modifier.padding(20.dp),
             placeholder = { Placeholder() },
-            colors = PreviewColors(),
+            colors = previewColors(),
             clear = {}
         )
     }
@@ -47,7 +49,7 @@ private fun GTextFieldText() {
             ("Текст"), {},
             Modifier.padding(20.dp),
             label = { Label() },
-            colors = PreviewColors(),
+            colors = previewColors(),
         )
     }
 }
@@ -59,9 +61,10 @@ private fun GTextFieldError() {
         GTextField(
             ("Текст"), {}, Modifier.padding(20.dp),
             label = { Label() },
-            colors = PreviewColors(),
+            colors = previewColors(),
             isError = true,
-            errorBottomText = "Ошибка при вводе текста"
+            errorBottomText = "Ошибка при вводе текста",
+            clear = {}
         )
     }
 }
@@ -74,7 +77,7 @@ private fun GTextFieldManyText() {
             ("Если в текстбоксе очень много текста, " +
                     "то он его переносит на следующую строку"),
             {}, Modifier.padding(20.dp), label = { Label() },
-            colors = PreviewColors(),
+            colors = previewColors(),
         )
     }
 }
@@ -96,9 +99,9 @@ private fun Placeholder() {
 }
 
 @Composable
-fun TextFieldLabel(
+fun textFieldLabel(
     label: Boolean = false,
-    text: String? = null
+    text: String? = null,
 ): @Composable (() -> Unit) {
     return {
         text?.let {
@@ -123,8 +126,8 @@ fun GTextField(
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? =
-        { Icon(painterResource(R.drawable.ic_trailing), (null)) },
+    trailingIcon: @Composable (() -> Unit)? = null, // TODO Иконка Error пока не применима
+        /*{ Icon(painterResource(R.drawable.ic_trailing), (null)) },*/
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -135,29 +138,37 @@ fun GTextField(
     interactionSource: MutableInteractionSource =
         remember { MutableInteractionSource() },
     shape: Shape = shapes.large,
-    colors: TextFieldColors = TextFieldColors(),
+    colors: TextFieldColors = textFieldColors(),
     clear: (() -> Unit)? = null,
-    errorBottomText: String? = null
+    errorBottomText: String? = null,
 ) {
     Column(modifier) {
-        Box(Modifier, Alignment.TopEnd) {
-            TextField(
-                value, { onValueChange(it) },
-                Modifier.fillMaxWidth(), enabled, readOnly,
-                textStyle, label, placeholder, leadingIcon,
-                trailingIcon, supportingText, isError,
-                visualTransformation, keyboardOptions,
-                keyboardActions, singleLine, maxLines,
-                interactionSource, shape, colors
-            ); if(value.isNotEmpty() && !isError)
-            clear?.let {
-                IconButton({ it() }, Modifier.align(CenterEnd)) {
-                    if(value.isNotEmpty()) {
-                        Icon(
-                            painterResource(R.drawable.ic_close),
-                            stringResource(R.string.clear),
-                            Modifier.size(24.dp), colorScheme.scrim
-                        )
+        
+        Card(
+            colors = cardColors(Transparent),
+            border = if(isError)
+                BorderStroke(1.dp, colorScheme.primary)
+            else null
+        ) {
+            Box(Modifier, TopEnd) {
+                TextField(
+                    value, { onValueChange(it) },
+                    Modifier.fillMaxWidth(), enabled, readOnly,
+                    textStyle, label, placeholder, leadingIcon,
+                    trailingIcon, supportingText, isError,
+                    visualTransformation, keyboardOptions,
+                    keyboardActions, singleLine, maxLines,
+                    interactionSource, shape, colors
+                )
+                if(value.isNotEmpty()) clear?.let {
+                    IconButton({ it() }, Modifier.align(CenterEnd)) {
+                        if(value.isNotEmpty()) {
+                            Icon(
+                                painterResource(R.drawable.ic_close),
+                                stringResource(R.string.clear),
+                                Modifier.size(24.dp), colorScheme.scrim
+                            )
+                        }
                     }
                 }
             }
@@ -172,9 +183,9 @@ fun GTextField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextFieldColors() = TextFieldDefaults.textFieldColors(
+@OptIn(ExperimentalMaterial3Api::class)
+fun textFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = colorScheme.onTertiary,
@@ -187,13 +198,14 @@ fun TextFieldColors() = TextFieldDefaults.textFieldColors(
     unfocusedIndicatorColor = Transparent,
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
+    errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
     disabledPlaceholderColor = Transparent,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
+@OptIn(ExperimentalMaterial3Api::class)
+fun transparentTextFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = Transparent,
     unfocusedLabelColor = colorScheme.onTertiary,
@@ -206,13 +218,14 @@ fun TransparentTextFieldColors() = TextFieldDefaults.textFieldColors(
     unfocusedIndicatorColor = Transparent,
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
+    errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
     disabledPlaceholderColor = Transparent,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PreviewColors() = TextFieldDefaults.textFieldColors(
+@OptIn(ExperimentalMaterial3Api::class)
+private fun previewColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = Color(0xFF98989F),
@@ -225,14 +238,15 @@ private fun PreviewColors() = TextFieldDefaults.textFieldColors(
     unfocusedIndicatorColor = Transparent,
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
+    errorLabelColor = colorScheme.primary,
     placeholderColor = Color(0xFF98989F),
     disabledPlaceholderColor = Transparent,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DescriptionColors(online: Boolean) =
-    TextFieldDefaults.textFieldColors(
+@OptIn(ExperimentalMaterial3Api::class)
+fun descriptionColors(online: Boolean) =
+    textFieldColors(
         textColor = colorScheme.tertiary,
         cursorColor = if(online) colorScheme.secondary
         else colorScheme.primary,
@@ -247,14 +261,15 @@ fun DescriptionColors(online: Boolean) =
         unfocusedIndicatorColor = Transparent,
         disabledIndicatorColor = Transparent,
         errorIndicatorColor = Transparent,
+        errorLabelColor = colorScheme.primary,
         placeholderColor = colorScheme.onTertiary,
         disabledPlaceholderColor = Transparent,
     )
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun PriceFieldColors(online: Boolean = false) =
-    TextFieldDefaults.textFieldColors(
+fun priceFieldColors(online: Boolean = false) =
+    textFieldColors(
         textColor = if(online) colorScheme.secondary
         else colorScheme.primary,
         cursorColor = if(online) colorScheme.secondary
@@ -270,6 +285,7 @@ fun PriceFieldColors(online: Boolean = false) =
         unfocusedIndicatorColor = Transparent,
         disabledIndicatorColor = Transparent,
         errorIndicatorColor = Transparent,
+        errorLabelColor = colorScheme.primary,
         placeholderColor = colorScheme.onTertiary,
         disabledPlaceholderColor = Transparent,
     )

@@ -15,8 +15,8 @@ import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.TextFieldLabel
-import ru.rikmasters.gilty.shared.shared.TransparentTextFieldColors
+import ru.rikmasters.gilty.shared.shared.textFieldLabel
+import ru.rikmasters.gilty.shared.shared.transparentTextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
@@ -60,13 +60,13 @@ fun PhoneTextField(
             if(text.length <= length)
                 onValueChanged(text)
         }, modifier, shape = MaterialTheme.shapes.large,
-        colors = TransparentTextFieldColors(),
+        colors = transparentTextFieldColors(),
         label = if(value.isNotEmpty())
-            TextFieldLabel(
+            textFieldLabel(
                 true, stringResource(R.string.phone_number)
             )
         else null,
-        placeholder = TextFieldLabel(
+        placeholder = textFieldLabel(
             false, stringResource(R.string.phone_number)
         ),
         textStyle = MaterialTheme.typography.bodyMedium,

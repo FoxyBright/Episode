@@ -16,17 +16,18 @@ private enum class ComplainType { LIE, CHEAT, SPAM, OTHER }
 @Composable
 fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
     var tag by remember { mutableStateOf<ComplainType?>(null) }
-    if (tag == null) {
+    if(tag == null) {
         ComplainElements(
             (stringResource(R.string.complaints_title)), listOf(
                 stringResource(R.string.complaints_lie_title),
                 stringResource(R.string.complaints_spam_title),
                 stringResource(R.string.complaints_cheater_title),
                 stringResource(R.string.others_sex),
-            ), (stringResource(R.string.complaints_description)),
-            Modifier.padding(16.dp), onBack = null
+            ), Modifier.padding(16.dp),
+            (stringResource(R.string.complaints_description)),
+            onBack = null
         ) {
-            tag = when (it) {
+            tag = when(it) {
                 0 -> LIE
                 1 -> SPAM
                 2 -> CHEAT
@@ -42,7 +43,7 @@ fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
             remember { mutableStateListOf<Boolean>() }
         repeat(itemList.second.size)
         { select.add(false) }
-        if (tag == OTHER) ComplainTextBox(
+        if(tag == OTHER) ComplainTextBox(
             stringResource(R.string.others_sex),
             text, Modifier
                 .fillMaxWidth()
@@ -52,8 +53,8 @@ fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
         else {
             ComplainElements(
                 itemList.first, itemList.second,
-                (null), Modifier.padding(16.dp), select,
-                { tag = null }
+                Modifier.padding(16.dp), (null),
+                select, { tag = null }
             ) {
                 repeat(select.size)
                 { item -> select[item] = it == item }
@@ -66,14 +67,18 @@ fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
                     .padding(bottom = 48.dp)
                     .align(BottomCenter),
                 stringResource(R.string.complaints_button),
-            ) { tag = null; send() }
+            ) {
+                tag = null
+                meet.id // TODO жалоба на meet
+                send()
+            }
         }
     }
 }
 
 @Composable
 private fun list(tag: ComplainType): Pair<String, List<String>> {
-    return when (tag) {
+    return when(tag) {
         LIE -> Pair(
             stringResource(R.string.complaints_lie_title), listOf(
                 stringResource(R.string.complaints_lie_anything_photo_label),
@@ -83,7 +88,7 @@ private fun list(tag: ComplainType): Pair<String, List<String>> {
                 stringResource(R.string.others_sex)
             )
         )
-
+        
         CHEAT -> Pair(
             stringResource(R.string.complaints_cheater_title), listOf(
                 stringResource(R.string.complaints_cheater_fraud_label),
@@ -91,14 +96,14 @@ private fun list(tag: ComplainType): Pair<String, List<String>> {
                 stringResource(R.string.complaints_cheater_delusion_label)
             )
         )
-
+        
         SPAM -> Pair(
             stringResource(R.string.complaints_spam_title), listOf(
                 stringResource(R.string.complaints_spam_advertisement_label),
                 stringResource(R.string.complaints_spam_sending_label),
             )
         )
-
+        
         else -> Pair(stringResource(R.string.others_sex), listOf())
     }
 }

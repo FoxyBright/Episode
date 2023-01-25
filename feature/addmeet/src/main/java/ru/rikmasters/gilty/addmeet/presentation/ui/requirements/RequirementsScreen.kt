@@ -7,6 +7,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.AgeBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.GenderBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.OrientationBs
+import ru.rikmasters.gilty.addmeet.viewmodel.MeetingType
 import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
@@ -30,9 +31,10 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val count by vm.memberCount.collectAsState()
     val hideMeetPlace by vm.hideMeetPlace.collectAsState()
     val alert by vm.alert.collectAsState()
-    
-    val selectedTabs = remember { mutableStateListOf(true, false) }
-    val selectedMember = remember { mutableStateListOf(true) }
+    val tabs by vm.tabs.collectAsState()
+    val member by vm.selectMember.collectAsState()
+    val withoutRespond by vm.withoutRespond.collectAsState()
+    val memberLimited by vm.memberLimited.collectAsState()
     
     val isActive = /*memberCount.isNotEmpty()
                     && memberCount.toInt() != 0
@@ -47,9 +49,10 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     RequirementsContent(
         RequirementsState(
             hideMeetPlace, count,
-            getGender(gender), age, orientation,
-            selectedTabs, selectedMember,
-            alert, Online, isActive
+            getGender(gender), age,
+            orientation, tabs, member,
+            alert, MeetingType, Online,
+            isActive, withoutRespond, memberLimited
         ), Modifier, object: RequirementsCallback {
             
             override fun onGenderClick() {
@@ -82,9 +85,16 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                 }
             }
             
+            override fun onWithoutRespondClick() {
+                scope.launch { vm.withoutRespondChange() }
+            }
+            
+            override fun onMemberLimit() {
+                scope.launch { vm.limitMembers() }
+            }
+            
             override fun onTabClick(tab: Int) {
-                repeat(selectedTabs.size)
-                { index -> selectedTabs[index] = tab == index }
+                scope.launch { vm.changeTab(tab) }
             }
             
             override fun onCountChange(text: String) {
@@ -100,9 +110,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             }
             
             override fun onMemberClick(member: Int) {
-                repeat(selectedMember.size) { index ->
-                    selectedMember[index] = member == index
-                }
+                scope.launch { vm.selectMember(member) }
             }
             
             override fun onClose() {

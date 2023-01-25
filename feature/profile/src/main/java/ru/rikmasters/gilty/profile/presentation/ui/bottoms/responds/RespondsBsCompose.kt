@@ -40,8 +40,7 @@ fun RespondsListPreview() {
                         DemoSendRespondsModel
                     )
                 )
-            ), listOf(true, false),
-            listOf(true, false)
+            ), listOf(true, false), (0)
         )
     }
 }
@@ -50,7 +49,7 @@ fun RespondsListPreview() {
 fun RespondsList(
     responds: List<Pair<MeetingModel, List<RespondModel>>>,
     respondsStates: List<Boolean>,
-    selectTabs: List<Boolean>,
+    selectTab: Int,
     modifier: Modifier = Modifier,
     callback: RespondCallback? = null,
 ) {
@@ -74,16 +73,15 @@ fun RespondsList(
             listOf(
                 stringResource(R.string.profile_sent_responds),
                 stringResource(R.string.profile_received_responds)
-            ), selectTabs, Modifier.padding(horizontal = 16.dp)
+            ), selectTab, Modifier.padding(horizontal = 16.dp)
         ) { callback?.onTabChange(it) }
-        if(selectTabs.last())
-            ReceivedResponds(
-                Modifier.padding(16.dp, 8.dp),
-                responds, respondsStates, callback
-            )
-        else SentResponds(
+        if(selectTab == 0) SentResponds(
             Modifier.padding(16.dp, 8.dp),
             responds, callback
+        )
+        else ReceivedResponds(
+            Modifier.padding(16.dp, 8.dp),
+            responds, respondsStates, callback
         )
     }
 }
@@ -92,7 +90,7 @@ fun RespondsList(
 private fun SentResponds(
     modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<RespondModel>>>,
-    callback: RespondCallback? = null
+    callback: RespondCallback? = null,
 ) {
     val sentResponds =
         arrayListOf<RespondModel>()
@@ -123,7 +121,7 @@ private fun ReceivedResponds(
     modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<RespondModel>>>,
     respondsStates: List<Boolean>,
-    callback: RespondCallback? = null
+    callback: RespondCallback? = null,
 ) {
     val listOfResponds =
         arrayListOf<RespondModel>()

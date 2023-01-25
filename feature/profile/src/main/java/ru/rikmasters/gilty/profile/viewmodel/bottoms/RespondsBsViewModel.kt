@@ -6,22 +6,20 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 class RespondsBsViewModel: ViewModel() {
     
-    private val _respondsSelectTab = MutableStateFlow(listOf(true, false))
-    val respondsSelectTab = _respondsSelectTab.asStateFlow()
+    private val _tabs = MutableStateFlow(0)
+    val tabs = _tabs.asStateFlow()
     
     private val _observeGroupStates = MutableStateFlow(listOf(true, false))
     val observeGroupStates = _observeGroupStates.asStateFlow()
     
-    suspend fun changeRespondsTab(tab: Int) {
+    suspend fun expandGroup(index: Int) {
         val list = arrayListOf<Boolean>()
-        repeat(respondsSelectTab.value.size) { list.add(it == tab) }
-        _respondsSelectTab.emit(list)
+        repeat(observeGroupStates.value.size) { list.add(it == index) }
+        _observeGroupStates.emit(list)
     }
     
-    suspend fun changeObserveGroupStates(tab: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(observeGroupStates.value.size) { list.add(it == tab) }
-        _observeGroupStates.emit(list)
+    suspend fun selectTab(tab: Int) {
+        _tabs.emit(tab)
     }
     
 }

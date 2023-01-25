@@ -55,12 +55,12 @@ fun description(
                 },
                 Modifier.fillMaxWidth(),
                 shape = shapes.medium,
-                colors = DescriptionColors(state.online),
+                colors = descriptionColors(state.online),
                 label = if(state.description.isNotEmpty())
-                    TextFieldLabel(
+                    textFieldLabel(
                         true,
                         stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                    ) else null, placeholder = TextFieldLabel(
+                    ) else null, placeholder = textFieldLabel(
                     false,
                     stringResource(R.string.add_meet_detailed_meet_description_place_holder)
                 ), textStyle = typography.bodyMedium,

@@ -31,7 +31,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.*
 import ru.rikmasters.gilty.shared.common.BackBlur
 import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.TextFieldColors
+import ru.rikmasters.gilty.shared.shared.textFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -133,7 +133,7 @@ private fun DigitCode(
                     keyboardType = NumberPassword
                 ),
                 textStyle = ThemeExtra.typography.CodeText,
-                colors = TextFieldColors(),
+                colors = textFieldColors(),
                 singleLine = true
             )
         }
