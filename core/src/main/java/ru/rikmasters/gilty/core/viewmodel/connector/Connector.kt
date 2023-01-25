@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import org.koin.core.qualifier.TypeQualifier
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.TraitWrapperFactory
@@ -49,7 +50,12 @@ fun <T: ViewModel> Connector(
         }
     }
     DisposableEffect(state.vm.scope) {
-        onDispose { state.vm.scope.close() }
+        onDispose {
+            state.vm.scope.scopeQualifier.let{
+                if(it is TypeQualifier && it.type == state.vm::class)
+                    state.vm.scope.close()
+            }
+        }
     }
     CompositionLocalProvider(
         localConnectorProviderOf(clazz) provides state,

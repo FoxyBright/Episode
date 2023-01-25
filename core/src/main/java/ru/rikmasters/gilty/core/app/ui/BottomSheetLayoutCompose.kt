@@ -41,7 +41,6 @@ class BottomSheetState(
     
     suspend fun collapse() {
         animateTo(BottomSheetSwipeState.COLLAPSED)
-        content = null
     }
     
     suspend fun expand(content: @Composable () -> Unit) {
@@ -150,6 +149,11 @@ fun BottomSheetLayout(
             val focusManager = LocalFocusManager.current
             LaunchedEffect(state.swipeableState.targetValue) {
                 focusManager.clearFocus()
+            }
+    
+            LaunchedEffect(state.swipeableState.currentValue) {
+                if(state.swipeableState.currentValue == BottomSheetSwipeState.COLLAPSED)
+                    state.content = null
             }
             
             val gripColor by animateColorAsState(
