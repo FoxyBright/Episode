@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
@@ -127,7 +126,7 @@ fun GTextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null, // TODO Иконка Error пока не применима
-        /*{ Icon(painterResource(R.drawable.ic_trailing), (null)) },*/
+    /*{ Icon(painterResource(R.drawable.ic_trailing), (null)) },*/
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -189,7 +188,7 @@ fun textFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = colorScheme.onTertiary,
-    disabledLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
     focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
@@ -200,7 +199,8 @@ fun textFieldColors() = textFieldColors(
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
-    disabledPlaceholderColor = Transparent,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -209,7 +209,7 @@ fun transparentTextFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = Transparent,
     unfocusedLabelColor = colorScheme.onTertiary,
-    disabledLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
     focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
@@ -220,7 +220,8 @@ fun transparentTextFieldColors() = textFieldColors(
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
-    disabledPlaceholderColor = Transparent,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -228,9 +229,9 @@ fun transparentTextFieldColors() = textFieldColors(
 private fun previewColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
-    unfocusedLabelColor = Color(0xFF98989F),
-    disabledLabelColor = Color(0xFF98989F),
-    focusedLabelColor = Color(0xFF000000),
+    unfocusedLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
+    focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -239,8 +240,9 @@ private fun previewColors() = textFieldColors(
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
-    placeholderColor = Color(0xFF98989F),
-    disabledPlaceholderColor = Transparent,
+    placeholderColor = colorScheme.onTertiary,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -252,7 +254,7 @@ fun descriptionColors(online: Boolean) =
         else colorScheme.primary,
         containerColor = colorScheme.primaryContainer,
         unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.scrim,
         focusedLabelColor = colorScheme.tertiary,
         disabledTrailingIconColor = Transparent,
         focusedTrailingIconColor = Transparent,
@@ -263,7 +265,8 @@ fun descriptionColors(online: Boolean) =
         errorIndicatorColor = Transparent,
         errorLabelColor = colorScheme.primary,
         placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
+        disabledPlaceholderColor = colorScheme.scrim,
+        disabledTextColor = colorScheme.scrim,
     )
 
 @Composable
@@ -276,7 +279,7 @@ fun priceFieldColors(online: Boolean = false) =
         else colorScheme.primary,
         containerColor = colorScheme.primaryContainer,
         unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.scrim,
         focusedLabelColor = colorScheme.tertiary,
         disabledTrailingIconColor = Transparent,
         focusedTrailingIconColor = Transparent,
@@ -287,5 +290,6 @@ fun priceFieldColors(online: Boolean = false) =
         errorIndicatorColor = Transparent,
         errorLabelColor = colorScheme.primary,
         placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
+        disabledPlaceholderColor = colorScheme.scrim,
+        disabledTextColor = colorScheme.scrim,
     )

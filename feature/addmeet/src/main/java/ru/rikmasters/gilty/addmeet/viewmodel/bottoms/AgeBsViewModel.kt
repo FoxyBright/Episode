@@ -12,10 +12,14 @@ class AgeBsViewModel(
     private val reqVm: RequirementsViewModel = RequirementsViewModel(),
 ): ViewModel() {
     
-    private val _from = MutableStateFlow(AgeFrom)
+    private val _from = MutableStateFlow(
+        AgeFrom.let { it.ifBlank { "18" } }
+    )
     val from = _from.asStateFlow()
     
-    private val _to = MutableStateFlow(AgeTo)
+    private val _to = MutableStateFlow(
+        AgeTo.let { it.ifBlank { "18" } }
+    )
     val to = _to.asStateFlow()
     
     suspend fun changeFrom(from: String) {

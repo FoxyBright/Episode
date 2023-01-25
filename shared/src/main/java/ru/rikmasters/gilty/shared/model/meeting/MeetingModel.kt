@@ -18,7 +18,7 @@ data class MeetingModel( // TODO заменить VAR на VAL сделано д
     var description: String,
     var isPrivate: Boolean,
     var memberCount: Int,
-    var requirements: MeetingRequirementModel,
+    var requirements: RequirementModel,
     var place: String,
     var address: String,
     var hideAddress: Boolean,
@@ -41,8 +41,8 @@ fun getDemoMeetingModel(
     description: String = "Описание вечеринки",
     isPrivate: Boolean = false,
     memberCount: Int = 4,
-    requirements: MeetingRequirementModel =
-        DemoMeetingRequirementModel,
+    requirements: RequirementModel =
+        DemoRequirementModel,
     place: String = "Москва-сити",
     address: String = "Москва, ул. Пушкина 42",
     hideAddress: Boolean = false,

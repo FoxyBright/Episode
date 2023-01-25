@@ -41,9 +41,9 @@ data class Requirement(
     
     val gender: String,
     
-    val AgeMin: Int,
+    val ageMin: Int,
     
-    val AgeMax: Int,
+    val ageMax: Int,
     
     val orientationId: String,
 )

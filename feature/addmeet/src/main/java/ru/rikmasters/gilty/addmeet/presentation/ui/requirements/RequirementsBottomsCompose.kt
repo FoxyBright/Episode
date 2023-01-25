@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -17,13 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.GiltyChip
-import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.shared.ListItemPicker
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -63,7 +61,15 @@ fun OrientationPreview() {
 @Composable
 fun AgePreview() {
     GiltyTheme {
-        AgeBottom("19", "40")
+        Box(
+            Modifier.background(
+                colorScheme.background,
+                RoundedCornerShape(
+                    topStart = 14.dp,
+                    topEnd = 14.dp
+                )
+            )
+        ) { AgeBottom("19", "40") }
     }
 }
 
@@ -82,7 +88,7 @@ fun SelectBottom(
                     colorScheme.primaryContainer,
                     shapes.large
                 )
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(8.dp), 8.dp
         ) {
             repeat(list.size) {
                 GiltyChip(
@@ -156,7 +162,7 @@ private fun DivText(text: String) {
         Div(); Text(
         text, Modifier.padding(vertical = 8.dp),
         colorScheme.tertiary,
-        style = typography.bodyMedium
+        style = typography.displayLarge
     ); Div()
     }
 }
@@ -164,7 +170,7 @@ private fun DivText(text: String) {
 @Composable
 private fun Div() {
     Divider(
-        Modifier.width(22.dp),
+        Modifier.width(30.dp),
         2.dp, colorScheme.outline
     )
 }

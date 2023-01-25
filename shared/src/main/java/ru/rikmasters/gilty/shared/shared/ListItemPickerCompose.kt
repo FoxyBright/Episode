@@ -29,7 +29,7 @@ private fun <T> getItemIndexForOffset(
     range: List<T>,
     value: T,
     offset: Float,
-    halfNumbersColumnHeightPx: Float
+    halfNumbersColumnHeightPx: Float,
 ): Int {
     val indexOf = range.indexOf(value) - (offset / halfNumbersColumnHeightPx).toInt()
     return maxOf(0, minOf(indexOf, range.count() - 1))
@@ -48,7 +48,8 @@ fun <T> ListItemPicker(
     val verticalMargin = 8.dp
     val numbersColumnHeight = 80.dp
     val halfNumbersColumnHeight = numbersColumnHeight / 2
-    val halfNumbersColumnHeightPx = with(LocalDensity.current) { halfNumbersColumnHeight.toPx() }
+    val halfNumbersColumnHeightPx = with(LocalDensity.current)
+    { halfNumbersColumnHeight.toPx() }
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -207,7 +208,7 @@ fun <T> ListItemPicker(
 private fun Label(
     text: String,
     modifier: Modifier,
-    textStyle: TextStyle
+    textStyle: TextStyle,
 ) {
     Text(
         text, modifier, colorScheme.tertiary,

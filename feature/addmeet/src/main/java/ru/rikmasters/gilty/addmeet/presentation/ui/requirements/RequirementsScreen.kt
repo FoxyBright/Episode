@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 @Composable
 fun RequirementsScreen(vm: RequirementsViewModel) {
@@ -25,33 +26,40 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     
-    val gender by vm.gender.collectAsState()
-    val orientation by vm.orientation.collectAsState()
-    val age by vm.age.collectAsState()
+    val memberLimited by vm.memberLimited.collectAsState()
     val count by vm.memberCount.collectAsState()
+    
     val hideMeetPlace by vm.hideMeetPlace.collectAsState()
-    val alert by vm.alert.collectAsState()
+    
     val tabs by vm.tabs.collectAsState()
+    val gender by vm.gender.collectAsState()
+    val age by vm.age.collectAsState()
+    val orientation by vm.orientation.collectAsState()
+    
+    val alert by vm.alert.collectAsState()
+    
     val member by vm.selectMember.collectAsState()
     val withoutRespond by vm.withoutRespond.collectAsState()
-    val memberLimited by vm.memberLimited.collectAsState()
     
-    val isActive = /*memberCount.isNotEmpty()
-                    && memberCount.toInt() != 0
-                    && gender.isNotEmpty()
-                    && age.isNotEmpty()
-                    && orientation.isNotEmpty()
+    val isActive = /*count.isNotBlank()
+                    && count.toInt() != 0
+                    && gender != null
+                    && age.isNotBlank()
+                    && !orientation.isNullOrBlank()
                     || hideMeetPlace*/ true
     
     fun getGender(index: Int?) =
         index?.let { GenderType.get(it).value }
     
+    fun getOrientation(orientation: OrientationModel?) =
+        orientation?.name ?: ""
+    
     RequirementsContent(
         RequirementsState(
             hideMeetPlace, count,
             getGender(gender), age,
-            orientation, tabs, member,
-            alert, MeetingType, Online,
+            getOrientation(orientation),
+            tabs, member, alert, MeetingType, Online,
             isActive, withoutRespond, memberLimited
         ), Modifier, object: RequirementsCallback {
             
@@ -85,12 +93,20 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                 }
             }
             
+            override fun onClearCount() {
+                scope.launch { vm.clearCount() }
+            }
+            
             override fun onWithoutRespondClick() {
                 scope.launch { vm.withoutRespondChange() }
             }
             
             override fun onMemberLimit() {
-                scope.launch { vm.limitMembers() }
+                scope.launch {
+                    vm.limitMembers()
+                    vm.changeMemberCount("")
+                    vm.changeTab(0)
+                }
             }
             
             override fun onTabClick(tab: Int) {

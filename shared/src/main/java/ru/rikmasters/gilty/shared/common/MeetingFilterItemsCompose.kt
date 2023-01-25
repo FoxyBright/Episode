@@ -47,11 +47,11 @@ fun Country(
     Column {
         CardRow(
             stringResource(R.string.select_country), country,
-            ThemeExtra.shapes.mediumTopRoundedShape
+            Modifier, ThemeExtra.shapes.mediumTopRoundedShape
         ) { onCountryClick() }
         Divider(Modifier.padding(start = 16.dp))
         CardRow(
-            stringResource(R.string.select_city), city,
+            stringResource(R.string.select_city), city, Modifier,
             ThemeExtra.shapes.mediumBottomRoundedShape
         ) { onCityClick() }
     }
@@ -312,7 +312,7 @@ fun Distance(
 fun MeetingType(
     checkState: Boolean,
     selected: List<Int>,
-    CheckLabel: String,
+    checkLabel: String,
     online: Boolean = false,
     onOnlyOnlineClick: (Boolean) -> Unit,
     onMeetingTypeSelect: (Int) -> Unit,
@@ -337,7 +337,7 @@ fun MeetingType(
         }
     }
     CheckBoxCard(
-        CheckLabel,
+        checkLabel,
         Modifier
             .padding(top = 12.dp)
             .fillMaxWidth(), checkState,

@@ -4,7 +4,7 @@ import ru.rikmasters.gilty.auth.profile.ProfileResponse
 import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingRequirementModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoRequirementModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
@@ -44,6 +44,6 @@ data class MeetingResponse(
         anyLog(isOnline) == true,
         tags?.map { it.map() } ?: listOf(),
         "", isAnonymous == true, 0,
-        DemoMeetingRequirementModel, "", "", false
+        DemoRequirementModel, "", "", false
     )
 }

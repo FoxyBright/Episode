@@ -42,6 +42,7 @@ interface RequirementsCallback {
     fun onWithoutRespondClick() {}
     fun onMemberLimit() {}
     fun onCountChange(text: String) {}
+    fun onClearCount() {}
     fun onClose() {}
     fun onBack() {}
     fun onNext() {}
@@ -100,9 +101,9 @@ fun RequirementsContent(
                     memberCountInput(
                         state.memberCount, state.online,
                         state.memberLimited, Modifier,
-                        { callback?.onMemberLimit() }
-                    )
-                    { count -> callback?.onCountChange(count) },
+                        { callback?.onMemberLimit() },
+                        { callback?.onClearCount() }
+                    ) { count -> callback?.onCountChange(count) },
                     Modifier.padding(bottom = 12.dp)
                 )
             }
@@ -114,9 +115,7 @@ fun RequirementsContent(
                     Modifier.padding(horizontal = 16.dp)
                 ) { callback?.onHideMeetPlaceClick() }
             }
-            if(state.memberCount.isNotBlank()
-                && !state.private
-            ) item {
+            if(!state.private) item {
                 RequirementsList(
                     state,
                     Modifier.padding(horizontal = 16.dp),

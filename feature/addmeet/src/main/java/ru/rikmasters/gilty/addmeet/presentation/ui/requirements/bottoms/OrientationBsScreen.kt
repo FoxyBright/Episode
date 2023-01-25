@@ -27,7 +27,8 @@ fun OrientationBs(vm: OrientationBsViewModel) {
     
     SelectBottom(
         stringResource(R.string.orientation_title),
-        orientations, getSelect(), Online
+        orientations.map { it.name },
+        getSelect(), Online
     ) {
         scope.launch {
             vm.selectOrientation(it)

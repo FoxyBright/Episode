@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 fun CardRow(
     label: String, text: String,
-    shape: Shape, online: Boolean = false,
     modifier: Modifier = Modifier,
+    shape: Shape, online: Boolean = false,
     onClick: () -> Unit
 ) {
     Card(

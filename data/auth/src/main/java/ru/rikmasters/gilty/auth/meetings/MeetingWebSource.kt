@@ -20,13 +20,13 @@ class MeetingWebSource: KtorSource() {
         val place: String,
     )
     
-    suspend fun getOrientations(): List<String> {
+    suspend fun getOrientations(): List<OrientationModel> {
         updateClientToken()
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/orientations"
-            ) {}.wrapped<List<OrientationModel>>().map { it.name }
-        } catch(_: Exception) {
+            ) {}.wrapped()
+        } catch(e: Exception) {
             emptyList()
         }
     }
@@ -39,7 +39,7 @@ class MeetingWebSource: KtorSource() {
             ) {}.wrapped<List<Location>>().map {
                 Pair(it.address, it.place)
             }
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             emptyList()
         }
     }
@@ -58,7 +58,7 @@ class MeetingWebSource: KtorSource() {
                     }
                 }
             }.wrapped<List<Tag>>().map { it.title }
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             emptyList()
         }
     }
@@ -78,7 +78,7 @@ class MeetingWebSource: KtorSource() {
             ) {
                 url { query("query" to tag) }
             }.wrapped<List<Tag>>().map { it.title }
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             emptyList()
         }
     }

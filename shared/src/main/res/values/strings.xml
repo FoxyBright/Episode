@@ -272,8 +272,10 @@
     <string name="age_to">до</string>
     <string name="add_meet_without_respond_title">Участие без отклика</string>
     <string name="add_meet_without_respond_label">Участники не присоединятся к meet без вашего\nсогласия</string>
+    <string name="add_meet_with_respond_label">Участники могут присоединиться к meet\nбез вашего согласия</string>
     <string name="add_meet_member_limit_title">Ограничение участников</string>
     <string name="add_meet_member_limit_label">Введите количество участников</string>
+    <string name="add_meet_member_not_limited_label">У вашего meet не будет ограничения участников</string>
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
 
     <!-- Alerts -->

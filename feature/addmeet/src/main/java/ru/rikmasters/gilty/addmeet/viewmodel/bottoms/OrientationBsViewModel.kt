@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.addmeet.viewmodel.Orientation
 import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class OrientationBsViewModel(
     
@@ -15,7 +16,7 @@ class OrientationBsViewModel(
     
     private val meetManager by inject<MeetingManager>()
     
-    private val _orientations = MutableStateFlow(emptyList<String>())
+    private val _orientations = MutableStateFlow(emptyList<OrientationModel>())
     val orientations = _orientations.asStateFlow()
     
     private val _select = MutableStateFlow(Orientation)
@@ -27,6 +28,8 @@ class OrientationBsViewModel(
     }
     
     suspend fun selectOrientation(orientation: Int) {
-        reqVm.selectOrientation(orientations.value[orientation])
+        val orient = orientations.value[orientation]
+        _select.emit(orient)
+        reqVm.selectOrientation(orient)
     }
 }

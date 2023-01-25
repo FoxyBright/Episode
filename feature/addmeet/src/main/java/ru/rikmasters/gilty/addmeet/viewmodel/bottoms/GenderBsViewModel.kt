@@ -25,6 +25,7 @@ class GenderBsViewModel(
     }
     
     suspend fun selectGender(gender: Int) {
+        _select.emit(gender)
         reqVm.selectGender(gender)
     }
 }
