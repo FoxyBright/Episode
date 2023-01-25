@@ -38,15 +38,14 @@ class BottomSheetState(
     
     suspend fun expand() = animateTo(BottomSheetSwipeState.EXPANDED)
     suspend fun halfExpand() = animateTo(BottomSheetSwipeState.HALF_EXPANDED)
-    suspend fun collapse() = animateTo(BottomSheetSwipeState.COLLAPSED)
+    
+    suspend fun collapse() {
+        animateTo(BottomSheetSwipeState.COLLAPSED)
+        content = null
+    }
     
     suspend fun expand(content: @Composable () -> Unit) {
         animateTo(content, BottomSheetSwipeState.EXPANDED)
-    }
-    
-    suspend fun collapsed() {
-        animateTo(BottomSheetSwipeState.COLLAPSED)
-        content = null
     }
     
     suspend fun halfExpand(content: @Composable () -> Unit) {

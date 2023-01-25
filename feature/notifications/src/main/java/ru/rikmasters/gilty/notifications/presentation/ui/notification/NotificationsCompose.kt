@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -179,7 +179,7 @@ private fun Item(
 ) {
     Item(
         NotificationItemState(
-            item.first, item.second, LazyItemsShapes(index, size),
+            item.first, item.second, lazyItemsShapes(index, size),
             getDifferenceOfTime(item.first.date)
         ), Modifier, onClick = { onClick(item.first) },
         onEmojiClick = { onEmojiClick(it) },

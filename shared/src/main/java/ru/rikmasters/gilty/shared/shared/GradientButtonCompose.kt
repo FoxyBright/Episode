@@ -50,9 +50,12 @@ fun GradientButton(
     shape: CornerBasedShape = shapes.extraLarge,
     smallText: String? = null,
     icon: Int? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-    val inverse = listOf(
+    val inverse = if(online) listOf(
+        colorScheme.inverseSurface,
+        colorScheme.inverseSurface
+    ) else listOf(
         colorScheme.inversePrimary,
         colorScheme.inversePrimary
     )
@@ -62,7 +65,8 @@ fun GradientButton(
         buttonColors(
             containerColor = Transparent,
             disabledContainerColor = Transparent
-        ), contentPadding = PaddingValues(),
+        ),
+        contentPadding = PaddingValues(),
     ) {
         Box(
             Modifier

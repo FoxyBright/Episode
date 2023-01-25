@@ -54,7 +54,7 @@ private fun Item(
         modifier
             .fillMaxWidth(0.6f)
             .clip(
-                LazyItemsShapes(
+                lazyItemsShapes(
                     index, size, 14.dp
                 )
             )

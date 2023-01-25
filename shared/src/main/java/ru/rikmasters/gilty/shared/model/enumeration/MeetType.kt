@@ -2,31 +2,37 @@ package ru.rikmasters.gilty.shared.model.enumeration
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import ru.rikmasters.gilty.shared.R.string.meeting_anon_type
-import ru.rikmasters.gilty.shared.R.string.meeting_group_type
-import ru.rikmasters.gilty.shared.R.string.meeting_personal_type
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
+import ru.rikmasters.gilty.shared.R
 
 enum class MeetType {
     
-    PERSONAL, ANONYMOUS, GROUP;
+    PERSONAL,
+    GROUP,
+    ANONYMOUS;
+    
+    companion object {
+        
+        val list = values().toList()
+        fun get(index: Int) = list[index]
+    }
     
     val display
         @Composable get() = stringResource(
             when(this) {
-                PERSONAL -> meeting_personal_type
-                ANONYMOUS -> meeting_anon_type
-                GROUP -> meeting_group_type
+                PERSONAL -> R.string.meeting_personal_type
+                ANONYMOUS -> R.string.meeting_anon_type
+                GROUP -> R.string.meeting_group_type
             }
         )
-}
-
-fun getMeetType(name: String) = when(name) {
-    "PERSONAL" -> PERSONAL
-    "ANONYMOUS" -> ANONYMOUS
-    else -> GROUP
+    
+    val displayShort
+        @Composable get() = stringResource(
+            when(this) {
+                PERSONAL -> R.string.meeting_filter_select_meeting_type_personal
+                ANONYMOUS -> R.string.meeting_filter_select_meeting_type_anonymous
+                GROUP -> R.string.meeting_filter_select_meeting_type_grouped
+            }
+        )
 }
 
 

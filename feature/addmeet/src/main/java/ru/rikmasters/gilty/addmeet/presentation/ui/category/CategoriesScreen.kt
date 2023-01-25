@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
+import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
@@ -19,7 +20,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val categories by vm.categories.collectAsState()
     val selected by vm.selected.collectAsState()
     
-    //TODO - Не вызывается рекомпозиция блока с пузырями. Костыль с задержкой
+    // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
     var sleep by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
@@ -43,7 +44,9 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             override fun onCategoryClick(category: CategoryModel) {
                 scope.launch {
                     vm.selectCategory(category)
-                    nav.navigate("conditions")
+                    SelectCategory?.let {
+                        nav.navigate("conditions")
+                    }
                 }
             }
         })

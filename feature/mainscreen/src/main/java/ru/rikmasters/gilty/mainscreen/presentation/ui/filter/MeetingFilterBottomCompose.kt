@@ -28,8 +28,7 @@ fun MeetingFilterBottomPreview() {
         MeetingFilterBottom(
             Modifier, (26), FilterListState(
                 (false), (25), (false),
-                listOf(false, false, false),
-                listOf(false, false, false),
+                listOf(0, 2), listOf(false, false, false),
                 listOf(false, false, false, false, false),
                 listOf("kaif", "pain", "fast", "launch"),
                 listOf(DemoCategoryModel),
@@ -45,7 +44,7 @@ fun MeetingFilterBottom(
     modifier: Modifier = Modifier,
     find: Int? = null,
     state: FilterListState,
-    callback: MeetingFilterBottomCallback? = null
+    callback: MeetingFilterBottomCallback? = null,
 ) {
     val list = filterList(state, callback)
     Box(modifier.fillMaxSize()) {
@@ -96,17 +95,18 @@ data class FilterListState(
     val distanceState: Boolean,
     val distance: Int,
     val onlyOnline: Boolean,
-    val meetingTypes: List<Boolean>,
+    val meetType: List<Int>,
     val genderList: List<Boolean>,
     val conditionList: List<Boolean>,
     val tagList: List<String>,
     val categoryList: List<CategoryModel>,
     val categoryStateList: List<Boolean>,
     val country: String,
-    val city: String
+    val city: String,
 )
 
 interface MeetingFilterBottomCallback {
+    
     fun onNext() {}
     fun onBack() {}
     fun onCategoryClick(index: Int) {}
@@ -116,7 +116,7 @@ interface MeetingFilterBottomCallback {
     fun onDistanceClick() {}
     fun onDistanceValueChange(it: Int) {}
     fun onOnlyOnlineClick() {}
-    fun onMeetingTypeSelect(it: Int, status: Boolean) {}
+    fun onMeetingTypeSelect(it: Int) {}
     fun onGenderSelect(it: Int, status: Boolean) {}
     fun onConditionSelect(it: Int, status: Boolean) {}
     fun onCountryClick() {}
@@ -127,7 +127,7 @@ interface MeetingFilterBottomCallback {
 @Composable
 private fun filterList(
     state: FilterListState,
-    callback: MeetingFilterBottomCallback? = null
+    callback: MeetingFilterBottomCallback? = null,
 ): List<FilterModel> {
     return listOf(
         FilterModel(stringResource(add_meet_detailed_meet_place)) {
@@ -160,12 +160,10 @@ private fun filterList(
         FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
             MeetingType(
                 state.onlyOnline,
-                state.meetingTypes,
+                state.meetType,
                 stringResource(R.string.meeting_only_online_meetings_button),
                 (false), { callback?.onOnlyOnlineClick() },
-                { it, status ->
-                    callback?.onMeetingTypeSelect(it, status)
-                }
+                { callback?.onMeetingTypeSelect(it) }
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_gender_and_conditions)) {

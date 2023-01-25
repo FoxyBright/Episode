@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.shared.TextFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -164,7 +164,7 @@ private fun ComplainItem(
 ) {
     Card(
         { onClick?.let { it(index) } },
-        modifier, (true), LazyItemsShapes(index, size),
+        modifier, (true), lazyItemsShapes(index, size),
         CardDefaults.cardColors(colorScheme.primaryContainer)
     ) {
         Row(

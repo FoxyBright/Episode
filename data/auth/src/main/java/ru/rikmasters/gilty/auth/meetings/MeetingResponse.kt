@@ -2,8 +2,8 @@ package ru.rikmasters.gilty.auth.meetings
 
 import ru.rikmasters.gilty.auth.profile.ProfileResponse
 import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
-import ru.rikmasters.gilty.shared.model.enumeration.getConditionType
-import ru.rikmasters.gilty.shared.model.enumeration.getMeetType
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingRequirementModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
@@ -35,9 +35,10 @@ data class MeetingResponse(
     
     fun map(): MeetingModel = MeetingModel(
         id, tags?.first()?.title.toString(),
-        getConditionType(condition.toString()),
+        ConditionType.valueOf(condition.toString()),
         category.map(),
-        duration.toString(), getMeetType(type.toString()),
+        duration.toString(),
+        MeetType.valueOf(type.toString()),
         datetime.toString(),
         organizer?.map()?.mapToOrganizerModel(),
         anyLog(isOnline) == true,

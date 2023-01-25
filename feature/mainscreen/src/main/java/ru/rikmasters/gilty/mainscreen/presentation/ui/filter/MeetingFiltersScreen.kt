@@ -17,8 +17,7 @@ fun MeetingFilterContent(
     val distance = remember { mutableStateOf(25) }
     val onlyOnline =
         remember { mutableStateOf(false) }
-    val meetingTypes =
-        remember { mutableStateListOf(false, false, false) }
+    val meetType = remember { mutableStateListOf<Int>() }
     val genderList =
         remember { mutableStateListOf(false, false, false) }
     val conditionList =
@@ -34,7 +33,7 @@ fun MeetingFilterContent(
     val city = remember { mutableStateOf("") }
     val state = FilterListState(
         distanceState.value, distance.value,
-        onlyOnline.value, meetingTypes,
+        onlyOnline.value, meetType,
         genderList, conditionList,
         tagList, categoryList.value,
         categoryStateList, country.value,
@@ -106,8 +105,10 @@ fun MeetingFilterContent(
                     onlyOnline.value = !onlyOnline.value
                 }
                 
-                override fun onMeetingTypeSelect(it: Int, status: Boolean) {
-                    meetingTypes[it] = !status
+                override fun onMeetingTypeSelect(it: Int) {
+                    if(meetType.contains(it))
+                        meetType.remove(it)
+                    else meetType.add(it)
                 }
                 
                 override fun onGenderSelect(it: Int, status: Boolean) {

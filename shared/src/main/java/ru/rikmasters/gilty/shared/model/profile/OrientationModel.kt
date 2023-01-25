@@ -11,7 +11,7 @@ data class OrientationModel(
     
     val display
         @Composable get() = stringResource(
-            when(name) {
+            when(id) {
                 "DEMISEXUAL" -> orientation_demisexual
                 "PANSEXUAL" -> orientation_pansexual
                 "BISEXUAL" -> orientation_bisexual

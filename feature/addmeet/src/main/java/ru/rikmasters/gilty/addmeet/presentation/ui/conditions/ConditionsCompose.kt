@@ -1,19 +1,20 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.conditions
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.addmeet.presentation.ui.components.Buttons
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ConditionsSelect
@@ -28,10 +29,10 @@ fun ConditionPreview() {
     GiltyTheme {
         ConditionContent(
             ConditionState(
-                (false), (true), listOf(),
-                listOf(), ("100"),
-                (false), (false)
-            )
+                (true), (true), listOf(2),
+                listOf(3), ("1000"),
+                (false), (true), (true)
+            ), Modifier.background(colorScheme.background)
         )
     }
 }
@@ -39,11 +40,12 @@ fun ConditionPreview() {
 data class ConditionState(
     val online: Boolean,
     val hiddenPhoto: Boolean,
-    val meetingTypes: List<Boolean>,
-    val conditionList: List<Boolean>,
-    val text: String,
+    val meetType: List<Int>,
+    val condition: List<Int>,
+    val price: String,
     val alert: Boolean,
     val restrictChat: Boolean,
+    val isActive: Boolean,
 )
 
 interface ConditionsCallback {
@@ -56,177 +58,162 @@ interface ConditionsCallback {
     fun onRestrictClick() {}
     fun onPriceChange(price: String) {}
     fun onClear() {}
-    fun onMeetingTypeSelect(it: Int) {}
-    fun onConditionSelect(it: Int) {}
-    fun onCloseAlert(it: Boolean) {}
+    fun onMeetingTypeSelect(type: Int) {}
+    fun onConditionSelect(condition: Int) {}
+    fun onCloseAlert(state: Boolean) {}
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun ConditionContent(
     state: ConditionState,
     modifier: Modifier = Modifier,
-    callback: ConditionsCallback? = null
+    callback: ConditionsCallback? = null,
 ) {
-    Box(modifier) {
-        Column(Modifier.fillMaxSize()) {
-            ClosableActionBar(
-                stringResource(R.string.add_meet_conditions_continue),
-                (null), Modifier.padding(bottom = 10.dp),
-                { callback?.onClose() }
-            ) { callback?.onBack() }
-            Conditions(
-                Modifier.fillMaxSize(),
-                state, callback
-            )
-        }
-        CrossButton(
+    Scaffold(modifier, {
+        ClosableActionBar(
+            stringResource(R.string.add_meet_conditions_continue),
+            (null), Modifier.padding(bottom = 10.dp),
+            { callback?.onCloseAlert(true) }
+        ) { callback?.onBack() }
+    }, {
+        Buttons(
+            Modifier, state.online,
+            state.isActive, (1)
+        ) { callback?.onNext() }
+    }) {
+        Content(
             Modifier
-                .padding(top = 32.dp, end = 16.dp)
-                .size(20.dp)
-                .align(TopEnd)
-        ) { callback?.onCloseAlert(true) }
+                .fillMaxWidth()
+                .fillMaxHeight(0.88f)
+                .padding(top = it.calculateTopPadding()),
+            state, callback
+        )
     }
     CloseAddMeetAlert(
-        state.alert,
-        { callback?.onCloseAlert(false) },
-        { callback?.onCloseAlert(false); callback?.onClose() })
+        state.alert, {
+            callback?.onCloseAlert(false)
+        }, {
+            callback?.onCloseAlert(false)
+            callback?.onClose()
+        })
 }
 
 @Composable
-private fun Conditions(
+private fun Content(
     modifier: Modifier = Modifier,
     state: ConditionState,
-    callback: ConditionsCallback?
+    callback: ConditionsCallback?,
 ) {
-    val pay = state.conditionList.component4()
+    val pay = state.condition.contains(3)
     LazyColumn(modifier) {
         item {
             Element(
-                Type(state, callback),
+                type(state, callback),
                 Modifier.padding(top = 18.dp)
             )
         }
         item {
             Element(
-                Conditions(state, callback),
+                conditions(state, callback),
                 Modifier.padding(top = 28.dp)
             )
         }
         if(pay)
             item {
                 Element(
-                    Price(state, callback),
+                    price(state, callback),
                     Modifier.padding(top = 28.dp)
                 )
             }
         item {
             Element(
-                Additional(state, callback),
+                additional(state, callback),
                 Modifier.padding(top = 28.dp)
             )
         }
         item {
-            Column(
+            Spacer(
                 Modifier
-                    .padding(bottom = 48.dp, top = 28.dp)
-                    .padding(horizontal = 16.dp),
-                Arrangement.Center, Alignment.CenterHorizontally
-            ) {
-                val enabled = /*(state.conditionList.contains(true)
-                        && state.meetingTypes.contains(true))
-                        && if (pay) state.text.isNotEmpty() else */true
-                GradientButton(
-                    Modifier, stringResource(R.string.next_button),
-                    enabled, state.online
-                ) { callback?.onNext() }
-                Dashes(
-                    (4), (1), Modifier.padding(top = 16.dp),
-                    if(state.online) colorScheme.secondary
-                    else colorScheme.primary
-                )
-            }
+                    .fillMaxWidth()
+                    .height(40.dp)
+            )
         }
     }
 }
 
 @Composable
-private fun Type(
+private fun type(
     state: ConditionState,
-    callback: ConditionsCallback? = null
-): FilterModel {
-    return FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
-        MeetingType(
-            state.online,
-            state.meetingTypes,
-            stringResource(R.string.meeting_only_online_meetings_button), state.online,
-            { callback?.onOnlineClick() },
-            { it, _ -> callback?.onMeetingTypeSelect(it) }
+    callback: ConditionsCallback? = null,
+) = FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
+    MeetingType(
+        state.online,
+        state.meetType,
+        stringResource(R.string.meeting_only_online_meetings_button),
+        state.online,
+        { callback?.onOnlineClick() },
+        { callback?.onMeetingTypeSelect(it) }
+    )
+}
+
+@Composable
+private fun conditions(
+    state: ConditionState,
+    callback: ConditionsCallback? = null,
+) = FilterModel(stringResource(R.string.meeting_terms)) {
+    ConditionsSelect(state.condition, state.online)
+    { callback?.onConditionSelect(it) }
+}
+
+@Composable
+private fun price(
+    state: ConditionState,
+    callback: ConditionsCallback? = null,
+) = FilterModel(stringResource(R.string.add_meet_conditions_price)) {
+    PriceTextField(
+        state.price,
+        { callback?.onPriceChange(it) },
+        { callback?.onClear() }, state.online,
+    )
+}
+
+@Composable
+private fun additional(
+    state: ConditionState,
+    callback: ConditionsCallback? = null,
+) = FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
+    Column {
+        CheckBoxCard(
+            stringResource(R.string.add_meet_conditions_hidden),
+            Modifier.fillMaxWidth(), state.hiddenPhoto,
+            online = state.online
+        ) { callback?.onHiddenClick() }
+        Text(
+            stringResource(R.string.add_meet_conditions_hidden_label),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, start = 16.dp),
+            colorScheme.onTertiary,
+            style = typography.headlineSmall
         )
-    }
-}
-
-@Composable
-private fun Conditions(
-    state: ConditionState,
-    callback: ConditionsCallback? = null
-): FilterModel {
-    return FilterModel(stringResource(R.string.meeting_terms)) {
-        ConditionsSelect(state.conditionList, state.online)
-        { it, _ -> callback?.onConditionSelect(it) }
-    }
-}
-
-@Composable
-private fun Price(
-    state: ConditionState,
-    callback: ConditionsCallback? = null
-): FilterModel {
-    return FilterModel(stringResource(R.string.add_meet_conditions_price)) {
-        PriceTextField(state.text,
-            { callback?.onPriceChange(it) },
-            { callback?.onClear() }, state.online,
-        )
-    }
-}
-
-@Composable
-private fun Additional(
-    state: ConditionState,
-    callback: ConditionsCallback? = null
-): FilterModel {
-    return FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-        Column {
+        if(state.online) {
             CheckBoxCard(
-                stringResource(R.string.add_meet_conditions_hidden),
-                Modifier.fillMaxWidth(), state.hiddenPhoto,
-                online = state.online
-            ) { callback?.onHiddenClick() }
+                stringResource(R.string.add_meet_restrict_chat),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                state.restrictChat,
+                online = true
+            ) { callback?.onRestrictClick() }
             Text(
-                stringResource(R.string.add_meet_conditions_hidden_label),
+                stringResource(R.string.add_meet_restrict_chat_label),
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 16.dp),
                 colorScheme.onTertiary,
                 style = typography.headlineSmall
             )
-            if(state.online) {
-                CheckBoxCard(
-                    stringResource(R.string.add_meet_restrict_chat),
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    state.restrictChat,
-                    online = true
-                ) { callback?.onRestrictClick() }
-                Text(
-                    stringResource(R.string.add_meet_restrict_chat_label),
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, start = 16.dp),
-                    colorScheme.onTertiary,
-                    style = typography.headlineSmall
-                )
-            }
         }
     }
 }

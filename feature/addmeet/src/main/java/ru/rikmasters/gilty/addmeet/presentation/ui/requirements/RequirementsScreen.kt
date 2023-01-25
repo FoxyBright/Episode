@@ -2,15 +2,20 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
+import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.AgeBs
+import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.GenderBs
+import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.OrientationBs
+import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
+import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
+import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.GenderBsViewModel
+import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.OrientationBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 
 @Composable
 fun RequirementsScreen(vm: RequirementsViewModel) {
@@ -18,143 +23,98 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val nav = get<NavState>()
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
-    var hideMeetPlace by remember { mutableStateOf(false) }
-    var memberCount by remember { mutableStateOf("1") }
-    var alert by remember { mutableStateOf(false) }
-    var gender by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var from by remember { mutableStateOf("18") }
-    var to by remember { mutableStateOf("18") }
-    var orientation by remember { mutableStateOf("") }
+    
+    val gender by vm.gender.collectAsState()
+    val orientation by vm.orientation.collectAsState()
+    val age by vm.age.collectAsState()
+    val count by vm.memberCount.collectAsState()
+    val hideMeetPlace by vm.hideMeetPlace.collectAsState()
+    val alert by vm.alert.collectAsState()
+    
     val selectedTabs = remember { mutableStateListOf(true, false) }
     val selectedMember = remember { mutableStateListOf(true) }
-    val genderList = listOf(
-        stringResource(R.string.female_sex),
-        stringResource(R.string.male_sex),
-        stringResource(R.string.condition_no_matter)
-    )
-    val genderControl =
-        remember { mutableStateListOf(false, false, true) }
-    val orientationList = listOf(
-        stringResource(R.string.orientation_hetero),
-        stringResource(R.string.orientation_gay),
-        stringResource(R.string.orientation_lesbian),
-        stringResource(R.string.orientation_bisexual),
-        stringResource(R.string.orientation_asexual),
-        stringResource(R.string.orientation_demisexual),
-        stringResource(R.string.orientation_pansexual),
-        stringResource(R.string.orientation_queer),
-        stringResource(R.string.condition_no_matter),
-    )
-    val orientationControl =
-        remember {
-            mutableStateListOf(
-                false, false, false, false,
-                false, false, false, false, true
-            )
-        }
-    GiltyTheme {
-        RequirementsContent(
-            RequirementsState(
-                hideMeetPlace, memberCount,
-                gender, age, orientation,
-                selectedTabs, selectedMember,
-                alert, MEETING.isOnline
-            ),
-            Modifier, object: RequirementsCallback {
-                override fun onHideMeetPlaceClick() {
-                    hideMeetPlace = !hideMeetPlace
-                    MEETING.isPrivate = hideMeetPlace
-                }
-                
-                override fun onCloseAlert(it: Boolean) {
-                    alert = it
-                }
-                
-                override fun onMemberClick(it: Int) {
-                    repeat(selectedMember.size) { index ->
-                        selectedMember[index] = it == index
-                    }
-                }
-                
-                override fun onClose() {
-                    nav.navigateAbsolute("main/meetings")
-                }
-                
-                override fun onBack() {
-                    nav.navigate("detailed")
-                }
-                
-                override fun onNext() {
-                    nav.navigate("complete")
-                }
-                
-                override fun onGenderClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            SelectBottom(
-                                stringResource(R.string.sex),
-                                genderList, genderControl, MEETING.isOnline
-                            ) {
-                                repeat(genderControl.size) { index ->
-                                    genderControl[index] = index == it
-                                    if(index == it) gender = genderList[index]
-                                }; scope.launch { asm.bottomSheet.collapse() }
-                            }
+    
+    val isActive = /*memberCount.isNotEmpty()
+                    && memberCount.toInt() != 0
+                    && gender.isNotEmpty()
+                    && age.isNotEmpty()
+                    && orientation.isNotEmpty()
+                    || hideMeetPlace*/ true
+    
+    fun getGender(index: Int?) =
+        index?.let { GenderType.get(it).value }
+    
+    RequirementsContent(
+        RequirementsState(
+            hideMeetPlace, count,
+            getGender(gender), age, orientation,
+            selectedTabs, selectedMember,
+            alert, Online, isActive
+        ), Modifier, object: RequirementsCallback {
+            
+            override fun onGenderClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<GenderBsViewModel>(vm.scope) {
+                            GenderBs(it)
                         }
                     }
                 }
-                
-                override fun onAgeClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            AgeBottom(from, to, Modifier,
-                                { from = it }, { to = it }, MEETING.isOnline
-                            )
-                            {
-                                age = "от $from до $to"
-                                scope.launch { asm.bottomSheet.collapse() }
-                            }
+            }
+            
+            override fun onAgeClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<AgeBsViewModel>(vm.scope) {
+                            AgeBs(it)
                         }
                     }
                 }
-                
-                override fun onOrientationClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            SelectBottom(
-                                stringResource(R.string.orientation_title),
-                                orientationList,
-                                orientationControl, MEETING.isOnline
-                            ) {
-                                repeat(orientationControl.size) { index ->
-                                    orientationControl[index] = index == it
-                                    if(index == it) orientation = orientationList[index]
-                                }; scope.launch { asm.bottomSheet.collapse() }
-                            }
+            }
+            
+            override fun onOrientationClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<OrientationBsViewModel>(vm.scope) {
+                            OrientationBs(it)
                         }
                     }
                 }
-                
-                override fun onTabClick(it: Int) {
-                    repeat(selectedTabs.size)
-                    { index -> selectedTabs[index] = it == index }
+            }
+            
+            override fun onTabClick(tab: Int) {
+                repeat(selectedTabs.size)
+                { index -> selectedTabs[index] = tab == index }
+            }
+            
+            override fun onCountChange(text: String) {
+                scope.launch { vm.changeMemberCount(text) }
+            }
+            
+            override fun onHideMeetPlaceClick() {
+                scope.launch { vm.hideMeetPlace() }
+            }
+            
+            override fun onCloseAlert(state: Boolean) {
+                scope.launch { vm.alertDismiss(state) }
+            }
+            
+            override fun onMemberClick(member: Int) {
+                repeat(selectedMember.size) { index ->
+                    selectedMember[index] = member == index
                 }
-                
-                override fun onCountChange(text: String) {
-                    val count = if(text.isNotBlank()) text.toInt() else 1
-                    when {
-                        count > selectedMember.size ->
-                            repeat(count) { selectedMember.add(false) }
-                        
-                        count < selectedMember.size -> if(count > 1)
-                            repeat(selectedMember.size - count)
-                            { selectedMember.removeLast() }
-                        
-                    }
-                    memberCount = text
-                    MEETING.memberCount = count
-                }
-            })
-    }
+            }
+            
+            override fun onClose() {
+                nav.navigateAbsolute("main/meetings")
+            }
+            
+            override fun onBack() {
+                nav.navigationBack()
+            }
+            
+            override fun onNext() {
+                nav.navigate("complete")
+            }
+        })
 }

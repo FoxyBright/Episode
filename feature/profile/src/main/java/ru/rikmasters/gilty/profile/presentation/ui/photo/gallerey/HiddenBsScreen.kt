@@ -26,7 +26,7 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
             
             override fun onSelectImage(image: Image) {
                 scope.launch {
-                    asm.bottomSheet.collapsed()
+                    asm.bottomSheet.collapse()
                     nav.navigate("avatar?image=${image.url}")
                 }
             }
@@ -37,7 +37,7 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
             
             override fun openGallery() {
                 scope.launch {
-                    asm.bottomSheet.collapsed()
+                    asm.bottomSheet.collapse()
                     nav.navigate("gallery?multi=true")
                 }
             }

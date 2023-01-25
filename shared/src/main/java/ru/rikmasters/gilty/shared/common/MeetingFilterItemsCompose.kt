@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
@@ -60,7 +62,7 @@ fun Category(
     categories: List<CategoryModel>,
     categoryStatus: List<Boolean>,
     onCategoryClick: (selected: Int) -> Unit,
-    onAllCategoryClick: () -> Unit
+    onAllCategoryClick: () -> Unit,
 ) {
     categories.forEachIndexed { index, category ->
         Card(
@@ -150,7 +152,7 @@ fun TagSearch(
     tagList: List<String>,
     onClick: () -> Unit,
     online: Boolean = false,
-    onDeleteTag: (Int) -> Unit
+    onDeleteTag: (Int) -> Unit,
 ) {
     Card(
         Modifier
@@ -179,36 +181,34 @@ fun TagSearch(
                     fontWeight = Bold
                 )
             }
-        else Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(horizontal = 8.dp), 8.dp, 8.dp
-            ) {
-                tagList.forEachIndexed { index, item ->
-                    Box(
-                        Modifier
-                            .clip(shapes.large)
-                            .background(linearGradient(if(online) green() else red()))
+        else FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 8.dp)
+                .padding(horizontal = 8.dp), 8.dp, 8.dp
+        ) {
+            tagList.forEachIndexed { index, item ->
+                Box(
+                    Modifier
+                        .clip(shapes.large)
+                        .background(linearGradient(if(online) green() else red()))
+                ) {
+                    Row(
+                        Modifier.padding(12.dp, 6.dp),
+                        Arrangement.Center, CenterVertically
                     ) {
-                        Row(
-                            Modifier.padding(12.dp, 6.dp),
-                            Arrangement.Center, CenterVertically
-                        ) {
-                            Text(
-                                item,
-                                Modifier.padding(end = 10.dp),
-                                Color.White,
-                                style = typography.labelSmall
-                            )
-                            Icon(
-                                Filled.Close,
-                                stringResource(R.string.meeting_filter_delete_tag_label),
-                                Modifier.clickable { onDeleteTag(index) },
-                                Color.White
-                            )
-                        }
+                        Text(
+                            item,
+                            Modifier.padding(end = 10.dp),
+                            Color.White,
+                            style = typography.labelSmall
+                        )
+                        Icon(
+                            Filled.Close,
+                            stringResource(R.string.meeting_filter_delete_tag_label),
+                            Modifier.clickable { onDeleteTag(index) },
+                            Color.White
+                        )
                     }
                 }
             }
@@ -222,7 +222,7 @@ fun Distance(
     distance: Int,
     state: Boolean,
     onClick: () -> Unit,
-    onValueChange: (value: Int) -> Unit
+    onValueChange: (value: Int) -> Unit,
 ) {
     Card(
         Modifier
@@ -311,33 +311,28 @@ fun Distance(
 @Composable
 fun MeetingType(
     checkState: Boolean,
-    selectedMeetingType: List<Boolean>,
+    selected: List<Int>,
     CheckLabel: String,
     online: Boolean = false,
     onOnlyOnlineClick: (Boolean) -> Unit,
-    onMeetingTypeSelect: (Int, Boolean) -> Unit
+    onMeetingTypeSelect: (Int) -> Unit,
 ) {
-    val typeList = listOf(
-        stringResource(R.string.meeting_filter_select_meeting_type_personal),
-        stringResource(R.string.meeting_filter_select_meeting_type_grouped),
-        stringResource(R.string.meeting_filter_select_meeting_type_anonymous)
-    )
+    val types = MeetType.list
     Card(
         Modifier.fillMaxWidth(), shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedMeetingType.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier, typeList[index], item, online
-                    ) { onMeetingTypeSelect(index, item) }
-                }
+        FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 8.dp)
+                .padding(8.dp), 8.dp, 8.dp
+        ) {
+            repeat(types.size) {
+                GiltyChip(
+                    Modifier, types[it].displayShort,
+                    selected.contains(it), online
+                ) { onMeetingTypeSelect(it) }
             }
         }
     }
@@ -352,35 +347,27 @@ fun MeetingType(
 
 @Composable
 fun ConditionsSelect(
-    selectedMeetingTypes: List<Boolean>,
+    selected: List<Int>,
     online: Boolean = false,
-    onConditionSelect: (Int, Boolean) -> Unit
+    onConditionSelect: (Int) -> Unit,
 ) {
-    val conditionList = listOf(
-        stringResource(R.string.meeting_filter_select_meeting_type_free),
-        stringResource(R.string.meeting_filter_select_meeting_type_divide_amount),
-        stringResource(R.string.meeting_filter_select_meeting_type_organizer_pays),
-        stringResource(R.string.meeting_filter_select_meeting_type_paid),
-        stringResource(R.string.meeting_filter_select_meeting_type_does_not_matter)
-    )
+    val conditions = ConditionType.list
     Card(
         Modifier.fillMaxWidth(), shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedMeetingTypes.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier,
-                        conditionList[index],
-                        item, online
-                    ) { onConditionSelect(index, item) }
-                }
+        FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 8.dp)
+                .padding(8.dp), 8.dp, 8.dp
+        ) {
+            repeat(conditions.size) {
+                GiltyChip(
+                    Modifier,
+                    conditions[it].display,
+                    selected.contains(it), online
+                ) { onConditionSelect(it) }
             }
         }
     }
@@ -391,7 +378,7 @@ fun GenderAndConditions(
     selectedGenders: List<Boolean>,
     selectedMeetingTypes: List<Boolean>,
     onGenderSelect: (Int, Boolean) -> Unit,
-    onConditionSelect: (Int, Boolean) -> Unit
+    onConditionSelect: (Int, Boolean) -> Unit,
 ) {
     val genderList = listOf(
         stringResource(R.string.female_sex),

@@ -126,7 +126,7 @@ private fun PermItem(
 ) {
     Card(
         { onClick() }, Modifier, (true),
-        LazyItemsShapes(index, 2),
+        lazyItemsShapes(index, 2),
         cardColors(colorScheme.primaryContainer)
     ) {
         Row(

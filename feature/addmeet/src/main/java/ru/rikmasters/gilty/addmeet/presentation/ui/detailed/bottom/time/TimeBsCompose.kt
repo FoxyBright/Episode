@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets
+package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -48,7 +48,7 @@ data class DateTimeBSState(
     val date: String,
     val hour: String,
     val minute: String,
-    val online: Boolean
+    val online: Boolean,
 )
 
 interface DateTimeBSCallback {
@@ -63,16 +63,24 @@ interface DateTimeBSCallback {
 fun DateTimeBS(
     state: DateTimeBSState,
     modifier: Modifier = Modifier,
-    callback: DateTimeBSCallback? = null
+    callback: DateTimeBSCallback? = null,
 ) {
-    Column(modifier.fillMaxWidth()) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .padding(top = 10.dp)
+    ) {
         Text(
             "Дата и время встречи",
             Modifier.padding(bottom = 16.dp),
             colorScheme.tertiary,
             style = typography.labelLarge
         )
-        DateTimePickerContent(state, callback, Modifier.fillMaxWidth())
+        DateTimePickerContent(
+            Modifier.fillMaxWidth(),
+            state, callback
+        )
         GradientButton(
             Modifier.padding(vertical = 28.dp),
             stringResource(R.string.save_button),
@@ -83,9 +91,9 @@ fun DateTimeBS(
 
 @Composable
 private fun DateTimePickerContent(
+    modifier: Modifier = Modifier,
     state: DateTimeBSState,
     callback: DateTimeBSCallback? = null,
-    modifier: Modifier = Modifier
 ) {
     Box(
         modifier.background(colorScheme.background),

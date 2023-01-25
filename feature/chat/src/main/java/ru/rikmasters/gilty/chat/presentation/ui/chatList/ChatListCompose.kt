@@ -38,7 +38,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.LazyItemsShapes
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -169,7 +169,7 @@ private fun List(
         }.forEachIndexed { index, it ->
             SwipeableChatRow(
                 it.second, it.first,
-                LazyItemsShapes(
+                lazyItemsShapes(
                     index, list.size
                 ), index, //TODO <- Сюда кол-во непрочитанных
                 Modifier, { onSwipe(it) }

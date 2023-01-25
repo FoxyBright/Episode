@@ -2,13 +2,12 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.conditions
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.ConditionViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.*
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
 import ru.rikmasters.gilty.shared.model.meeting.*
 import java.util.UUID.randomUUID
 
@@ -36,83 +35,69 @@ var MEETING: MeetingModel = MeetingModel(
 @Composable
 fun ConditionsScreen(vm: ConditionViewModel) {
     
-    val nav= get<NavState>()
-    var text by remember { mutableStateOf("") }
-    var alert by remember { mutableStateOf(false) }
-    var online by remember { mutableStateOf(MEETING.isOnline) }
-    val hiddenPhoto = remember { mutableStateOf(false) }
-    var restrictChat by remember { mutableStateOf(false) }
-    val meetingTypes =
-        remember { mutableStateListOf(false, false, false) }
-    val conditionList =
-        remember { mutableStateListOf(false, false, false, false, false) }
-    val state = ConditionState(
-        online, hiddenPhoto.value,
-        meetingTypes, conditionList,
-        text, alert, restrictChat
-    )
-    ConditionContent(state, Modifier,
-        object: ConditionsCallback {
-            override fun onOnlineClick() {
-                online = !online
-                MEETING.isOnline = online
-            }
-            
-            override fun onRestrictClick() {
-                restrictChat = !restrictChat
-            }
-            
-            override fun onCloseAlert(it: Boolean) {
-                alert = it
-            }
-            
-            override fun onPriceChange(price: String) {
-                text = price
-            }
-            
-            override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
-            }
-            
-            override fun onClear() {
-                text = ""
-                MEETING.price = 0
-            }
-            
-            override fun onHiddenClick() {
-                hiddenPhoto.value = !hiddenPhoto.value
-            }
-            
-            override fun onBack() {
-                nav.navigate("category")
-            }
-            
-            override fun onNext() {
-                nav.navigate("detailed")
-            }
-            
-            override fun onConditionSelect(it: Int) {
-                repeat(conditionList.size) { item ->
-                    conditionList[item] = it == item
-                }
-                MEETING.condition = when(it) {
-                    0 -> FREE
-                    1 -> DIVIDE
-                    2 -> ORGANIZER_PAY
-                    3 -> MEMBER_PAY
-                    else -> NO_MATTER
-                }
-            }
-            
-            override fun onMeetingTypeSelect(it: Int) {
-                repeat(meetingTypes.size) { item ->
-                    meetingTypes[item] = it == item
-                }
-                MEETING.type = when(it) {
-                    0 -> PERSONAL
-                    1 -> GROUP
-                    else -> ANONYMOUS
-                }
-            }
-        })
+    val nav = get<NavState>()
+    val scope = rememberCoroutineScope()
+    
+    val price by vm.price.collectAsState()
+    val alert by vm.alert.collectAsState()
+    val hidden by vm.hidden.collectAsState()
+    val online by vm.online.collectAsState()
+    val meetType by vm.meetType.collectAsState()
+    val condition by vm.condition.collectAsState()
+    val restrictChat by vm.restrictChat.collectAsState()
+    
+    val isActive = /*condition.isNotEmpty()
+            && meetType.isNotEmpty()
+            && if(condition.contains(3))
+        price.isNotBlank()
+    else */true
+   
+    ConditionContent(ConditionState(
+        online, hidden, meetType, condition,
+        price, alert, restrictChat, isActive
+    ), Modifier, object: ConditionsCallback {
+        override fun onOnlineClick() {
+            scope.launch { vm.changeOnline() }
+        }
+        
+        override fun onRestrictClick() {
+            scope.launch { vm.changeRestrictChat() }
+        }
+        
+        override fun onCloseAlert(state: Boolean) {
+            scope.launch { vm.alertDismiss(state) }
+        }
+        
+        override fun onPriceChange(price: String) {
+            scope.launch { vm.changePrice(price) }
+        }
+        
+        override fun onClose() {
+            nav.navigateAbsolute("main/meetings")
+        }
+        
+        override fun onClear() {
+            scope.launch { vm.clearPrice() }
+        }
+        
+        override fun onHiddenClick() {
+            scope.launch { vm.changeHidden() }
+        }
+        
+        override fun onBack() {
+            nav.navigationBack()
+        }
+        
+        override fun onNext() {
+            nav.navigate("detailed")
+        }
+        
+        override fun onConditionSelect(condition: Int) {
+            scope.launch { vm.changeCondition(condition) }
+        }
+        
+        override fun onMeetingTypeSelect(type: Int) {
+            scope.launch { vm.changeMeetType(type) }
+        }
+    })
 }

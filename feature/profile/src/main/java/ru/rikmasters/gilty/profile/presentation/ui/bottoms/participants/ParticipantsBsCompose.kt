@@ -58,7 +58,7 @@ fun ParticipantsList(
                 Card(
                     { callback?.onMemberClick(member) },
                     Modifier.fillMaxWidth(),
-                    shape = LazyItemsShapes(index, membersList.size, 14.dp),
+                    shape = lazyItemsShapes(index, membersList.size, 14.dp),
                     colors = cardColors(colorScheme.primaryContainer)
                 ) {
                     BrieflyRow(

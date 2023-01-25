@@ -1,13 +1,9 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -16,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +35,7 @@ fun GenderPreview() {
                 stringResource(R.string.female_sex),
                 stringResource(R.string.male_sex),
                 stringResource(R.string.others_sex)
-            ), listOf(false, false, true), false
+            ), (1), false
         )
     }
 }
@@ -57,10 +54,7 @@ fun OrientationPreview() {
                 stringResource(R.string.orientation_demisexual),
                 stringResource(R.string.orientation_pansexual),
                 stringResource(R.string.orientation_queer)
-            ), listOf(
-                false, false, false, false,
-                false, false, false, true
-            ), false
+            ), (2), false
         )
     }
 }
@@ -69,19 +63,17 @@ fun OrientationPreview() {
 @Composable
 fun AgePreview() {
     GiltyTheme {
-        AgeBottom("19", "40", Modifier,
-            {}, {}, false
-        ) {}
+        AgeBottom("19", "40")
     }
 }
 
 @Composable
 fun SelectBottom(
     title: String,
-    genderList: List<String>,
-    list: List<Boolean>,
+    list: List<String>,
+    select: Int?,
     online: Boolean,
-    onItemClick: ((Int) -> Unit)? = null
+    onItemClick: ((Int) -> Unit)? = null,
 ) {
     BottomContainer(title) {
         FlowLayout(
@@ -90,13 +82,13 @@ fun SelectBottom(
                     colorScheme.primaryContainer,
                     shapes.large
                 )
-                .padding(8.dp)
+                .padding(8.dp), 8.dp, 8.dp
         ) {
-            list.forEachIndexed { index, it ->
+            repeat(list.size) {
                 GiltyChip(
                     Modifier.padding(end = 12.dp),
-                    genderList[index], it, online
-                ) { onItemClick?.let { c -> c(index) } }
+                    list[it], (select == it), online
+                ) { onItemClick?.let { c -> c(it) } }
             }
         }
     }
@@ -107,10 +99,10 @@ fun AgeBottom(
     from: String,
     to: String,
     modifier: Modifier = Modifier,
-    fromChange: (String) -> Unit,
-    toChange: (String) -> Unit,
-    online: Boolean,
-    onSave: () -> Unit
+    online: Boolean = false,
+    fromChange: ((String) -> Unit)? = null,
+    toChange: ((String) -> Unit)? = null,
+    onSave: (() -> Unit)? = null,
 ) {
     BottomContainer(stringResource(R.string.personal_info_age_placeholder)) {
         Column {
@@ -122,22 +114,21 @@ fun AgeBottom(
                     Modifier.fillMaxWidth(),
                     Center, CenterVertically
                 ) {
-                    DivText("от")
+                    DivText(stringResource(R.string.age_from))
                     ListItemPicker(
                         from, listGenerator(), Modifier
-                    ) { fromChange(it) }
-                    DivText("до")
+                    ) { f -> fromChange?.let { it(f) } }
+                    DivText(stringResource(R.string.age_to))
                     ListItemPicker(
                         to, listGenerator(), Modifier
-                    ) { toChange(it) }
+                    ) { t -> toChange?.let { it(t) } }
                 }
             }
             GradientButton(
-                Modifier
-                    .padding(top = 20.dp),
+                Modifier.padding(top = 20.dp),
                 stringResource(R.string.save_button),
                 online = online
-            ) { onSave() }
+            ) { onSave?.let { it() } }
         }
     }
 }
@@ -146,13 +137,13 @@ fun AgeBottom(
 private fun BottomContainer(
     title: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Element(
         FilterModel(title) {
             Box {
                 Box(Modifier.padding(bottom = 40.dp)) {
-                    content.invoke()
+                    content()
                 }
             }
         }, modifier.padding(16.dp, 28.dp)
@@ -161,19 +152,25 @@ private fun BottomContainer(
 
 @Composable
 private fun DivText(text: String) {
-    Column(horizontalAlignment = Alignment.End) {
-        Divider(Modifier.width(22.dp), 2.dp, colorScheme.outline)
-        Text(
-            text, Modifier.padding(vertical = 8.dp),
-            colorScheme.tertiary,
-            style = typography.bodyMedium
-        )
-        Divider(Modifier.width(22.dp), 2.dp, colorScheme.outline)
+    Column(Modifier, Top, End) {
+        Div(); Text(
+        text, Modifier.padding(vertical = 8.dp),
+        colorScheme.tertiary,
+        style = typography.bodyMedium
+    ); Div()
     }
 }
 
+@Composable
+private fun Div() {
+    Divider(
+        Modifier.width(22.dp),
+        2.dp, colorScheme.outline
+    )
+}
+
 private fun listGenerator(
-    range: IntRange = 18..100
+    range: IntRange = 18..99,
 ): List<String> {
     val list = arrayListOf<String>()
     range.forEach { list.add(it.toString()) }

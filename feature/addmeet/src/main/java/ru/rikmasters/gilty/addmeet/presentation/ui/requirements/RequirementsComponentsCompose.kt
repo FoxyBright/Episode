@@ -24,7 +24,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 fun RequirementsList(
     state: RequirementsState,
     modifier: Modifier = Modifier,
-    callback: RequirementsCallback? = null
+    callback: RequirementsCallback? = null,
 ) {
     Column(modifier) {
         val selected = state.selectedMember
@@ -48,18 +48,20 @@ fun RequirementsList(
             }
         }
         CardRow(
-            stringResource(R.string.sex), state.gender,
+            stringResource(R.string.sex), state.gender ?: "",
             ThemeExtra.shapes.mediumTopRoundedShape,
             state.online, Modifier.padding(top = 8.dp),
         ) { callback?.onGenderClick() }
         Divider(Modifier.padding(start = 16.dp))
         CardRow(
-            stringResource(R.string.personal_info_age_placeholder), state.age,
+            stringResource(R.string.personal_info_age_placeholder),
+            state.age ?: "",
             ThemeExtra.shapes.zero, state.online
         ) { callback?.onAgeClick() }
         Divider(Modifier.padding(start = 16.dp))
         CardRow(
-            stringResource(R.string.orientation_title), state.orientation,
+            stringResource(R.string.orientation_title),
+            state.orientation ?: "",
             ThemeExtra.shapes.mediumBottomRoundedShape,
             state.online
         ) { callback?.onOrientationClick() }
@@ -67,30 +69,28 @@ fun RequirementsList(
 }
 
 @Composable
-fun MemberCountInput(
+fun memberCountInput(
     text: String,
     online: Boolean,
-    onChange: ((String) -> Unit)? = null
-): FilterModel {
-    return FilterModel(stringResource(R.string.requirements_member_count_label)) {
-        GTextField(
-            text, {
-                if(it.matches(Regex("^\\d+\$"))
-                    || it.isEmpty()
-                ) onChange?.let { text -> text(onNull(it)) }
-            }, Modifier.fillMaxWidth(),
-            shape = shapes.medium,
-            colors = DescriptionColors(online),
-            label = if(text.isNotEmpty()) TextFieldLabel(
-                (true), stringResource(R.string.requirements_member_count_place_holder)
-            ) else null, placeholder = TextFieldLabel(
-                (false), stringResource(R.string.requirements_member_count_place_holder)
-            ), textStyle = typography.bodyMedium,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = NumberPassword
-            ), visualTransformation = transformationOf(
-                numberMask(text.length)
-            )
+    onChange: ((String) -> Unit)? = null,
+) = FilterModel(stringResource(R.string.requirements_member_count_label)) {
+    GTextField(
+        text, {
+            if(it.matches(Regex("^\\d+\$"))
+                || it.isEmpty()
+            ) onChange?.let { text -> text(onNull(it)) }
+        }, Modifier.fillMaxWidth(),
+        shape = shapes.medium,
+        colors = DescriptionColors(online),
+        label = if(text.isNotEmpty()) TextFieldLabel(
+            (true), stringResource(R.string.requirements_member_count_place_holder)
+        ) else null, placeholder = TextFieldLabel(
+            (false), stringResource(R.string.requirements_member_count_place_holder)
+        ), textStyle = typography.bodyMedium,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = NumberPassword
+        ), visualTransformation = transformationOf(
+            numberMask(text.length)
         )
-    }
+    )
 }

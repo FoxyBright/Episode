@@ -12,10 +12,9 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.auth.Auth.logD
+import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
@@ -44,18 +43,13 @@ fun CategoriesContent(
     state: CategoriesState,
     callback: CategoriesCallback? = null,
 ) {
-    Column(
-        modifier.fillMaxSize(),
-    ) {
-        Column(
-            Modifier.weight(1f)
-        ) {
+    Column(modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f)) {
             ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
                 stringResource(R.string.add_meet_create_description),
                 Modifier, { callback?.onCloseAlert(true) }
             )
-            logD("list ${state.categoryList}")
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
             else Bubbles(
@@ -66,7 +60,7 @@ fun CategoriesContent(
                 CategoryItem(
                     element.name, element.emoji, element.color,
                     (element == state.selectCategory), modifier
-                ) { callback?.onCategoryClick(DemoCategoryModel) }
+                ) { callback?.onCategoryClick(element) }
             }
         }
         Dashes(
@@ -74,7 +68,7 @@ fun CategoriesContent(
                 .fillMaxWidth()
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            color = if(MEETING.isOnline)
+            color = if(Online)
                 colorScheme.secondary
             else colorScheme.primary
         )

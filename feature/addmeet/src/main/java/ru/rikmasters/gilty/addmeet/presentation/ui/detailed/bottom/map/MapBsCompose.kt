@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottomSheets
+package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,24 +29,32 @@ import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-private val placeList =
-    listOf(
-        Pair("ул. Большая Дмитровская, д 13, Москва", "Kaif Provance"),
-        Pair("ул. Ленина, д 117, Москва", "Eifel Burbershop"),
-        Pair("ул. Льва Толстого, д 18, Калуга", "Дом Мудрых")
-    )
-
 @Preview
 @Composable
 private fun SearchPreview() {
     GiltyTheme {
-        MapBottomSheet(MapState("", false))
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            MapBottomSheet(
+                MapState(
+                    listOf(
+                        Pair("ул. Большая Дмитровская, д 13, Москва", "Kaif Provance"),
+                        Pair("ул. Ленина, д 117, Москва", "Eifel Burbershop"),
+                        Pair("ул. Льва Толстого, д 18, Калуга", "Дом Мудрых")
+                    ), "", false
+                )
+            )
+        }
     }
 }
 
 data class MapState(
+    val lastPlaces: List<Pair<String, String>>,
     val text: String,
-    val online: Boolean
+    val online: Boolean,
 )
 
 interface MapCallback {
@@ -61,7 +69,7 @@ interface MapCallback {
 fun MapBottomSheet(
     state: MapState,
     modifier: Modifier = Modifier,
-    callback: MapCallback? = null
+    callback: MapCallback? = null,
 ) {
     Element(
         FilterModel(stringResource(R.string.add_meet_detailed_meet_place)) {
@@ -74,24 +82,27 @@ fun MapBottomSheet(
 private fun Content(
     state: MapState,
     modifier: Modifier = Modifier,
-    callback: MapCallback? = null
+    callback: MapCallback? = null,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
-    ) {
+    Column(modifier.fillMaxSize()) {
         Search(state.text, Modifier.padding(bottom = 20.dp),
             state.online, { callback?.onChange(it) },
             { callback?.onMapClick() })
         { callback?.onBack() }
-        LazyColumn(Modifier.fillMaxWidth()) {
-            itemsIndexed(placeList) { index, it ->
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.medium
+                )
+        ) {
+            itemsIndexed(state.lastPlaces) { index, it ->
                 Item(
                     it, Modifier,
-                    LazyItemsShapes(index, placeList.size)
+                    lazyItemsShapes(index, state.lastPlaces.size)
                 ) { callback?.onItemClick(it) }
-                if(index < placeList.size.minus(1))
+                if(index < state.lastPlaces.size.minus(1))
                     Divider(Modifier.padding(start = 16.dp))
             }
         }
@@ -104,10 +115,11 @@ private fun Item(
     text: Pair<String, String>,
     modifier: Modifier,
     shape: Shape,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
-        onClick, modifier.fillMaxWidth(), (true), shape,
+        onClick, modifier.fillMaxWidth(),
+        (true), shape,
         cardColors(colorScheme.primaryContainer)
     ) {
         Row(
@@ -144,7 +156,7 @@ private fun Search(
     online: Boolean,
     onChange: ((String) -> Unit)? = null,
     onMapClick: (() -> Unit)? = null,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
 ) {
     Card(
         modifier, shapes.large,
@@ -166,7 +178,7 @@ private fun Search(
                     .fillMaxWidth()
                     .weight(1f),
                 shape = shapes.large,
-                colors = PlaceSearchColors(online),
+                colors = placeSearchColors(online),
                 placeholder = TextFieldLabel(
                     (false), stringResource(R.string.search_placeholder)
                 ),
@@ -183,9 +195,9 @@ private fun Search(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaceSearchColors(online: Boolean) =
+@OptIn(ExperimentalMaterial3Api::class)
+fun placeSearchColors(online: Boolean) =
     TextFieldDefaults.textFieldColors(
         textColor = colorScheme.tertiary,
         cursorColor = if(online) colorScheme.secondary

@@ -247,7 +247,7 @@
     <string name="add_meet_detailed_tags_description">Первый тег будет отображаться в названии встречи</string>
     <string name="add_meet_detailed_meet_description">Описание</string>
     <string name="add_meet_detailed_meet_description_place_holder">Краткое описание встречи</string>
-    <string name="add_meet_detailed_meet_place">Место встречи</string>
+    <string name="add_meet_detailed_meet_place">Место meet</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место встречи будет видно только участникам</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место встречи</string>
     <string name="requirements_title">Требования к\nучастникам</string>
@@ -267,6 +267,9 @@
     <string name="orientation_pansexual">Пансексуал(ка)</string>
     <string name="orientation_queer">Квир</string>
     <string name="add_meet_publish_button">Опубликовать</string>
+    <string name="add_meet_meet_duration_label">Длительность встречи</string>
+    <string name="age_from">от</string>
+    <string name="age_to">до</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

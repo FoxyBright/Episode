@@ -98,7 +98,7 @@ fun ObserversListContent(
                     Column {
                         ObserveItem(
                             Modifier, DELETE, member,
-                            LazyItemsShapes(index, state.observers.size),
+                            lazyItemsShapes(index, state.observers.size),
                             { callback?.onClick(member) }
                         ) { callback?.onButtonClick(member, DELETE) }
                         if(index < state.observers.size - 1)
@@ -110,7 +110,7 @@ fun ObserversListContent(
                         if(state.observed.contains(member)) UNSUB else SUB
                     ObserveItem(
                         Modifier, subType, member,
-                        LazyItemsShapes(index, state.observed.size),
+                        lazyItemsShapes(index, state.observed.size),
                         { callback?.onClick(member) }
                     ) { callback?.onButtonClick(member, subType) }
                     if(index < state.observed.size - 1)
