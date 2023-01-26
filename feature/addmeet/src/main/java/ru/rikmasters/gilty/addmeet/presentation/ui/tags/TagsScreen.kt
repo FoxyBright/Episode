@@ -5,9 +5,9 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.Online
+import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.common.tagSearch.*
 
 @Composable
 fun TagsScreen(vm: TagsViewModel) {
@@ -17,7 +17,6 @@ fun TagsScreen(vm: TagsViewModel) {
     
     val selected by vm.selected.collectAsState()
     val search by vm.search.collectAsState()
-    val popularVisible by vm.popularVisible.collectAsState()
     val popular by vm.popular.collectAsState()
     val tags by vm.tags.collectAsState()
     
@@ -25,24 +24,24 @@ fun TagsScreen(vm: TagsViewModel) {
         vm.getPopular()
     }
     
-    TagSearchContent(TagState(
-        selected, popular,
-        popularVisible,
-        search, tags, Online
-    ), Modifier, object: TagSearchCallback {
-        override fun onSearchChange(text: String) {
+    TagsContent(TagsState(
+        search, selected, popular,
+        Online, tags, SelectCategory
+    ), Modifier, object: TagsCallback {
+        
+        override fun onAddTag(text: String) {
             scope.launch { vm.searchChange(text) }
         }
         
-        override fun onBack() {
-            nav.navigationBack()
-        }
-        
-        override fun onNext() {
+        override fun onSave() {
             scope.launch {
                 vm.onSave()
                 nav.navigationBack()
             }
+        }
+        
+        override fun onBack() {
+            nav.navigationBack()
         }
         
         override fun onDeleteTag(tag: String) {
@@ -50,7 +49,12 @@ fun TagsScreen(vm: TagsViewModel) {
         }
         
         override fun onTagClick(tag: String) {
-            scope.launch { vm.selectTag(tag) }
+            scope.launch {
+                vm.selectTag(tag)
+                if(!popular.contains(tag))
+                    vm.addToPopular(tag)
+                vm.searchClear()
+            }
         }
     })
 }

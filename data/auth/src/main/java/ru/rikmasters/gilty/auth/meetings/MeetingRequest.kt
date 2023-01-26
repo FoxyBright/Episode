@@ -2,61 +2,61 @@ package ru.rikmasters.gilty.auth.meetings
 
 data class MeetingRequest(
     
-    val categoryId: String,
+    val categoryId: String?,
     
-    val type: String,
+    val type: String?,
     
-    val isOnline: Boolean,
+    val isOnline: Boolean?,
     
-    val condition: String,
+    val condition: String?,
     
-    val price: Int,
+    val price: Int?,
     
-    val photoAccess: Boolean,
+    val photoAccess: Boolean?,
     
-    val chatForbidden: Boolean,
+    val chatForbidden: Boolean?,
     
-    val tags: List<String>,
+    val tags: List<String>?,
     
-    val description: String,
+    val description: String?,
     
-    val dateTime: String,
+    val datetime: String?,
     
-    val duration: Int,
+    val duration: Int?,
     
-    val location: Location,
+    val location: Location?,
     
-    val isPrivate: Boolean,
+    val isPrivate: Boolean?,
     
-    val memberCount: Int,
+    val membersCount: Int?,
     
-    val requirementsType: String,
+    val requirementsType: String?,
     
-    val requirements: List<Requirement>,
+    val requirements: List<Requirement>?,
     
-    val withoutResponds: Boolean,
+    val withoutResponds: Boolean?,
 )
 
 data class Requirement(
     
-    val gender: String,
+    val gender: String?,
     
-    val ageMin: Int,
+    val ageMin: Int?,
     
-    val ageMax: Int,
+    val ageMax: Int?,
     
-    val orientationId: String,
+    val orientationId: String?,
 )
 
 data class Location(
     
-    val hide: Boolean,
+    val hide: Boolean?,
     
-    val lat: Int,
+    val lat: Int?,
     
-    val lng: Int,
+    val lng: Int?,
     
-    val place: String,
+    val place: String?,
     
-    val address: String,
+    val address: String?,
 )

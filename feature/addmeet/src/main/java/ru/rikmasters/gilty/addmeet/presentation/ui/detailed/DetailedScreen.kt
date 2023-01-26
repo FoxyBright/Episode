@@ -31,13 +31,12 @@ fun DetailedScreen(vm: DetailedViewModel) {
     val tags by vm.tags.collectAsState()
     val place by vm.place.collectAsState()
     
-    val isActive = /*date.isNotBlank()
+    val isActive = date.isNotBlank()
             && duration.isNotBlank()
             && tags.isNotEmpty()
-            && description.isNotBlank()
             && if(!Online)
         place != null
-    else */true
+    else true
     
     DetailedContent(
         DetailedState(

@@ -265,7 +265,7 @@ private fun TagList(
 }
 
 @Composable
-private fun Tag(
+fun Tag(
     tag: String,
     online: Boolean,
     onDeleteTag: () -> Unit,

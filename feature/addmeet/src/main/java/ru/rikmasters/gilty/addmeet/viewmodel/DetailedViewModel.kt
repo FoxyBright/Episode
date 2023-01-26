@@ -21,7 +21,7 @@ class DetailedViewModel: ViewModel() {
         if(todayControl(Date))
             "Сегодня, ${Date.format("HH:mm")}"
         else Date.format("dd MMMM, HH:mm")
-    } catch(_: Exception) {
+    } catch(e: Exception) {
         ""
     }
     

@@ -12,6 +12,7 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
 import ru.rikmasters.gilty.auth.manager.MeetingManager
+import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -51,6 +52,7 @@ object AddMeet: FeatureDefinition() {
         
         singleOf(::MeetingWebSource)
         singleOf(::MeetingManager)
+        singleOf(::ProfileManager)
         
         scope<CategoryViewModel> {
             scopedOf(::CategoryViewModel)

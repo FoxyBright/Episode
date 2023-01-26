@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.shared
 
-import android.content.res.Resources
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -9,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -45,7 +44,8 @@ data class SearchState(
     val text: String,
     val onChangeText: (it: String) -> Unit,
     val online: Boolean = false,
-    val onExpandSearch: ((Boolean) -> Unit)? = null
+    val placeHolder: String? = null,
+    val onExpandSearch: ((Boolean) -> Unit)? = null,
 )
 
 @Composable
@@ -88,7 +88,7 @@ private fun LabelBar(
         }) {
             Icon(
                 painterResource(R.drawable.magnifier),
-                stringResource(R.string.search_placeholder),
+                (state.placeHolder ?: stringResource(R.string.search_placeholder)),
                 Modifier.size(22.dp),
                 colorScheme.tertiary
             )
@@ -135,10 +135,10 @@ fun SearchBar(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 shape = shapes.large,
-                colors = SearchColors(state.online),
+                colors = searchColors(state.online),
                 placeholder = {
                     Text(
-                        stringResource(R.string.search_placeholder),
+                        (state.placeHolder ?: stringResource(R.string.search_placeholder)),
                         color = colorScheme.onTertiary,
                         style = typography.bodyMedium,
                         fontWeight = Bold
@@ -154,7 +154,7 @@ fun SearchBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchColors(online: Boolean) = TextFieldDefaults.textFieldColors(
+private fun searchColors(online: Boolean) = textFieldColors(
     textColor = colorScheme.tertiary,
     cursorColor = if(online) colorScheme.secondary
     else colorScheme.primary,

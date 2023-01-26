@@ -4,11 +4,13 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -24,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
 import ru.rikmasters.gilty.shared.common.MeetingStates
@@ -39,7 +40,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 fun CompleteContent() {
     GiltyTheme {
-        CompleteContent(DemoMeetingModel)
+        CompleteContent(DemoMeetingModel, (false))
     }
 }
 
@@ -52,6 +53,7 @@ interface CompleteCallBack {
 @Composable
 fun CompleteContent(
     meeting: MeetingModel,
+    isOnline: Boolean,
     modifier: Modifier = Modifier,
     callback: CompleteCallBack? = null
 ) {
@@ -71,11 +73,11 @@ fun CompleteContent(
                 .fillMaxHeight(0.8f)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting, Modifier, MEETING.isOnline) }
+        ) { MeetingCard(meeting, Modifier, isOnline) }
     }
     Box(Modifier.fillMaxSize()) {
         Buttons(
-            Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
+            Modifier.align(Alignment.BottomCenter), isOnline,
             { callback?.onShare() }) { callback?.onClose() }
     }
 }

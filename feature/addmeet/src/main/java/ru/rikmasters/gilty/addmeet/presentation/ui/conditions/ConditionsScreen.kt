@@ -6,31 +6,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.ConditionViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
-import ru.rikmasters.gilty.shared.model.meeting.*
-import java.util.UUID.randomUUID
-
-var MEETING: MeetingModel = MeetingModel(
-    id = randomUUID().toString(),
-    title = DemoTag.title,
-    condition = FREE,
-    category = DemoCategoryModel,
-    duration = "",
-    type = GROUP,
-    dateTime = "1970-01-01T00:00:00Z",
-    organizer = DemoOrganizerModel,
-    isOnline = false,
-    tags = DemoTagList,
-    description = "",
-    isPrivate = false,
-    memberCount = 4,
-    requirements = DemoRequirementModel,
-    place = "",
-    address = "",
-    hideAddress = false,
-    price = 0
-)
 
 @Composable
 fun ConditionsScreen(vm: ConditionViewModel) {
@@ -46,11 +21,11 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     val condition by vm.condition.collectAsState()
     val restrictChat by vm.restrictChat.collectAsState()
     
-    val isActive = /*condition.isNotEmpty()
+    val isActive = condition.isNotEmpty()
             && meetType.isNotEmpty()
             && if(condition.contains(3))
         price.isNotBlank()
-    else */true
+    else true
    
     ConditionContent(ConditionState(
         online, hidden, meetType, condition,

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.addmeet.presentation.ui.components
+package ru.rikmasters.gilty.addmeet.presentation.ui.extentions
 
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GradientButton
 

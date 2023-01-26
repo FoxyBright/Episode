@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.components.Buttons
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Buttons
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.*

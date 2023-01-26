@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 @Composable
@@ -29,24 +30,43 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val memberLimited by vm.memberLimited.collectAsState()
     val count by vm.memberCount.collectAsState()
     
-    val hideMeetPlace by vm.hideMeetPlace.collectAsState()
+    val private by vm.private.collectAsState()
     
     val tabs by vm.tabs.collectAsState()
     val gender by vm.gender.collectAsState()
     val age by vm.age.collectAsState()
     val orientation by vm.orientation.collectAsState()
+    val requirements by vm.requirements.collectAsState()
     
     val alert by vm.alert.collectAsState()
     
     val member by vm.selectMember.collectAsState()
     val withoutRespond by vm.withoutRespond.collectAsState()
     
-    val isActive = /*count.isNotBlank()
-                    && count.toInt() != 0
-                    && gender != null
-                    && age.isNotBlank()
-                    && !orientation.isNullOrBlank()
-                    || hideMeetPlace*/ true
+    fun reqControl(it: RequirementModel) = when {
+        it.gender.isBlank() -> true
+        it.ageMin == 0 -> true
+        it.ageMax == 0 -> true
+        it.orientation == null -> true
+        else -> false
+    }
+    
+    fun checkRequirements(): Boolean {
+        if(tabs == 0) reqControl(requirements.first())
+        else requirements.forEach {
+            if(reqControl(it)) return false
+        }
+        return true
+    }
+    
+    val countCheck = (if(memberLimited) count.isNotBlank()
+            && count.toInt() > 1 else true)
+    val isActive = (private && countCheck)
+            || countCheck
+            && gender != null
+            && age.isNotBlank()
+            && orientation != null
+            && checkRequirements()
     
     fun getGender(index: Int?) =
         index?.let { GenderType.get(it).value }
@@ -56,7 +76,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     
     RequirementsContent(
         RequirementsState(
-            hideMeetPlace, count,
+            private, count,
             getGender(gender), age,
             getOrientation(orientation),
             tabs, member, alert, MeetingType, Online,
@@ -106,6 +126,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                     vm.limitMembers()
                     vm.changeMemberCount("")
                     vm.changeTab(0)
+                    vm.selectMember(0)
                 }
             }
             
@@ -118,7 +139,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             }
             
             override fun onHideMeetPlaceClick() {
-                scope.launch { vm.hideMeetPlace() }
+                scope.launch { vm.changePrivate() }
             }
             
             override fun onCloseAlert(state: Boolean) {

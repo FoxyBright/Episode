@@ -15,7 +15,7 @@ class MeetingWebSource: KtorSource() {
     
     private data class Tag(val title: String)
     
-    private data class Location(
+    private data class ShortLocation(
         val address: String,
         val place: String,
     )
@@ -36,7 +36,7 @@ class MeetingWebSource: KtorSource() {
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/meetings/places"
-            ) {}.wrapped<List<Location>>().map {
+            ) {}.wrapped<List<ShortLocation>>().map {
                 Pair(it.address, it.place)
             }
         } catch(e: Exception) {
@@ -90,16 +90,39 @@ class MeetingWebSource: KtorSource() {
         ).wrapped<List<Category>>().map { it.map() }
     }
     
-    suspend fun addMeet() {
+    suspend fun addMeet(
+        categoryId: String?,
+        type: String?,
+        isOnline: Boolean?,
+        condition: String?,
+        price: Int?,
+        photoAccess: Boolean?,
+        chatForbidden: Boolean?,
+        tags: List<String>?,
+        description: String?,
+        dateTime: String?,
+        duration: Int?,
+        location: Location?,
+        isPrivate: Boolean?,
+        memberCount: Int?,
+        requirementsType: String?,
+        requirements: List<Requirement>?,
+        withoutResponds: Boolean?,
+    ) {
         updateClientToken()
         client.post(
             "http://$HOST$PREFIX_URL/meetings"
         ) {
-            //            setBody(
-            //                MeetingRequest(
-            //
-            //                )
-            //            )
+            setBody(
+                MeetingRequest(
+                    categoryId, type, isOnline, condition,
+                    price, photoAccess, chatForbidden,
+                    tags, description, dateTime,
+                    duration, location, isPrivate,
+                    memberCount, requirementsType,
+                    requirements, withoutResponds
+                )
+            )
         }
     }
 }

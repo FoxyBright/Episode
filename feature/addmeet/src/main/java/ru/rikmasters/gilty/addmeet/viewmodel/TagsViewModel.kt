@@ -22,21 +22,27 @@ class TagsViewModel: ViewModel() {
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
     
-    private val _popularVisible = MutableStateFlow(true)
-    val popularVisible = _popularVisible.asStateFlow()
-    
     suspend fun searchChange(text: String) {
         _search.emit(text)
         _tags.emit(meetManager.searchTags(text))
-        _popularVisible.emit(text.isBlank())
     }
     
+    suspend fun searchClear() {
+        _search.emit("")
+        _tags.emit(meetManager.searchTags(""))
+    }
+    
+    
     suspend fun getPopular() {
-        val categoriesId =
+        var categoriesId =
             meetManager.getPopularTags(
                 listOf(SelectCategory?.id)
             )
-        _popular.emit(categoriesId)
+        categoriesId.forEach {
+            if(Tags.contains(it))
+                categoriesId = categoriesId - it
+        }
+        _popular.emit(Tags + categoriesId)
     }
     
     suspend fun selectTag(tag: String) {
@@ -48,6 +54,10 @@ class TagsViewModel: ViewModel() {
                 list + tag
             else list
         )
+    }
+    
+    suspend fun addToPopular(tag: String) {
+        _popular.emit(popular.value + tag)
     }
     
     suspend fun deleteTag(tag: String) {

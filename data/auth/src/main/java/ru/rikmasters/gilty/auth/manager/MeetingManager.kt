@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.auth.manager
 
+import ru.rikmasters.gilty.auth.meetings.Location
 import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
+import ru.rikmasters.gilty.auth.meetings.Requirement
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 class MeetingManager(
@@ -26,7 +28,32 @@ class MeetingManager(
     suspend fun getCategoriesList(): List<CategoryModel> =
         web.getCategoriesList()
     
-    suspend fun addMeet() {
-        web.addMeet()
+    suspend fun addMeet(
+        categoryId: String?,
+        type: String?,
+        isOnline: Boolean?,
+        condition: String?,
+        price: Int?,
+        photoAccess: Boolean?,
+        chatForbidden: Boolean?,
+        tags: List<String>?,
+        description: String?,
+        dateTime: String?,
+        duration: Int?,
+        location: Location?,
+        isPrivate: Boolean?,
+        memberCount: Int?,
+        requirementsType: String?,
+        requirements: List<Requirement>?,
+        withoutResponds: Boolean?,
+    ) {
+        web.addMeet(
+            categoryId, type, isOnline,
+            condition, price, photoAccess,
+            chatForbidden, tags, description,
+            dateTime, duration, location,
+            isPrivate, memberCount, requirementsType,
+            requirements, withoutResponds
+        )
     }
 }

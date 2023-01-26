@@ -36,14 +36,17 @@ class RequirementsViewModel: ViewModel() {
     private val _memberLimited = MutableStateFlow(MemberLimited)
     val memberLimited = _memberLimited.asStateFlow()
     
-    private val _hideMeetPlace = MutableStateFlow(Private)
-    val hideMeetPlace = _hideMeetPlace.asStateFlow()
+    private val _private = MutableStateFlow(Private)
+    val private = _private.asStateFlow()
     
     private val _gender = MutableStateFlow(Gender)
     val gender = _gender.asStateFlow()
     
     private val _orientation = MutableStateFlow(Orientation)
     val orientation = _orientation.asStateFlow()
+    
+    private val _requirements = MutableStateFlow(Requirements)
+    val requirements = _requirements.asStateFlow()
     
     private val _age = MutableStateFlow(
         if(AgeFrom.isBlank() || AgeTo.isBlank())
@@ -81,6 +84,10 @@ class RequirementsViewModel: ViewModel() {
         _orientation.emit(req.orientation)
     }
     
+    private suspend fun updateRequirements() {
+        _requirements.emit(Requirements)
+    }
+    
     suspend fun limitMembers() {
         _memberLimited.emit(!memberLimited.value)
         MemberLimited = memberLimited.value
@@ -105,8 +112,7 @@ class RequirementsViewModel: ViewModel() {
                     GenderType.get(it).name
                 } ?: ""
             )
-        logD("Участников ${Requirements.size}")
-        logD("Требования: $Requirements")
+        updateRequirements()
     }
     
     suspend fun selectOrientation(orientation: OrientationModel) {
@@ -116,8 +122,7 @@ class RequirementsViewModel: ViewModel() {
             Requirements[selectMember.value].copy(
                 orientation = Orientation
             )
-        logD("Участников ${Requirements.size}")
-        logD("Требования: $Requirements")
+        updateRequirements()
     }
     
     suspend fun selectAge(age: Pair<String, String>) {
@@ -138,17 +143,16 @@ class RequirementsViewModel: ViewModel() {
             Requirements[selectMember.value].copy(
                 ageMin = ageMin, ageMax = ageMax
             )
-        logD("Участников ${Requirements.size}")
-        logD("Требования: $Requirements")
+        updateRequirements()
     }
     
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }
     
-    suspend fun hideMeetPlace() {
-        _hideMeetPlace.emit(!hideMeetPlace.value)
-        Private = hideMeetPlace.value
+    suspend fun changePrivate() {
+        _private.emit(!private.value)
+        Private = private.value
     }
     
     suspend fun changeMemberCount(text: String) {
@@ -191,8 +195,7 @@ class RequirementsViewModel: ViewModel() {
             Requirements.clear()
             Requirements.add(req)
         }
-        logD("Участников ${Requirements.size}")
-        logD("Требования: $Requirements")
+        updateRequirements()
     }
     
     suspend fun clearCount() {
