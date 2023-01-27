@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_open
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.ImageModel
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -48,10 +48,10 @@ private fun HiddenImageUnlockPreview() {
 
 @Composable
 fun HiddenImage(
-    image: ImageModel,
+    image: AvatarModel,
     modifier: Modifier = Modifier,
     hidden: Boolean = true,
-    onClick: ((ImageModel) -> Unit)? = null
+    onClick: ((AvatarModel) -> Unit)? = null
 ) {
     Box(
         modifier
@@ -66,7 +66,7 @@ fun HiddenImage(
                 .background(linearGradient(red()))
                 .fillMaxSize()
         ) else AsyncImage(
-            image.id, (null),
+            image.url, (null),
             Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),

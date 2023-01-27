@@ -31,7 +31,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.getDemoMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -54,7 +53,7 @@ private fun MeetingCardTodayPreview() {
 private fun MeetingCardPreview() {
     GiltyTheme {
         MeetingCard(
-            getDemoMeetingModel(condition = FREE),
+            DemoMeetingModel.copy(condition = FREE),
             Modifier.padding(20.dp)
         )
     }
@@ -77,7 +76,7 @@ private fun MeetingCategoryCardPreview() {
 private fun MeetingCategoryCardTodayPreview() {
     GiltyTheme {
         MeetingCategoryCard(
-            getDemoMeetingModel(condition = FREE),
+            DemoMeetingModel.copy(condition = FREE),
             Modifier.padding(20.dp),
             today = true,
             old = false

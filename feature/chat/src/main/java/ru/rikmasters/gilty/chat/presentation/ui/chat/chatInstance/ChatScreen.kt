@@ -72,7 +72,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
     var unReadCount by remember { mutableStateOf(5) }
     val meet = if(type == TRANSLATION || type == TRANSLATION_AWAIT)
-        getDemoMeetingModel(isOnline = true) else DemoMeetingModel
+        DemoMeetingModel.copy(isOnline = true) else DemoMeetingModel
     var alert by
     remember { mutableStateOf(false) }
     var meetOutAlert by

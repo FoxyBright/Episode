@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.meetings.Location
 import ru.rikmasters.gilty.auth.meetings.Requirement
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
@@ -62,11 +63,11 @@ class CompleteViewModel: ViewModel() {
                 null
             } else null,
             photoAccess = Hidden,
-            chatForbidden = if(Online) RestrictChat else null,
+            chatForbidden = RestrictChat,
             tags = Tags,
             description = Description.ifBlank { null },
             dateTime = Date,
-            duration = getMinutes(Duration),
+            duration = durationToMinutes(Duration),
             location = if(!Online)
                 Location(HideAddress, (0), (0), Place, Address)
             else null,
@@ -89,7 +90,7 @@ class CompleteViewModel: ViewModel() {
                 val req = Requirements.first()
                 listOf(
                     Requirement(
-                        req.gender, req.ageMin,
+                        req.gender?.name, req.ageMin,
                         req.ageMax, (req.orientation!!.id)
                     )
                 )
@@ -97,32 +98,10 @@ class CompleteViewModel: ViewModel() {
             
             else -> Requirements.map {
                 Requirement(
-                    it.gender, it.ageMin,
+                    it.gender?.name, it.ageMin,
                     it.ageMax, (it.orientation!!.id)
                 )
             }
-        }
-    }
-    
-    private fun getMinutes(duration: String)
-            : Int {
-        if(duration == "Сутки") return 1440
-        val hourCheck = duration.contains("час")
-        val minuteCheck = duration.contains("минут")
-        
-        fun String.getHours() = this.substringBefore("час")
-            .replace(" ", "").toInt()
-        
-        fun String.getMinutes() = this.reversed().substring(6, 8)
-            .reversed().replace(" ", "").toInt()
-        
-        return when {
-            hourCheck && minuteCheck ->
-                duration.getHours() * 60 + duration.getMinutes()
-            
-            hourCheck -> duration.getHours() * 60
-            minuteCheck -> duration.getMinutes()
-            else -> 0
         }
     }
     

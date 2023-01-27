@@ -10,8 +10,8 @@ plugins {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:8.1.0-alpha01")
-    implementation("com.android.tools.build:gradle-api:8.1.0-alpha01")
+    implementation("com.android.tools.build:gradle:8.1.0-alpha02")
+    implementation("com.android.tools.build:gradle-api:8.1.0-alpha02")
 
     val kotlinVer = "1.7.21"
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer")

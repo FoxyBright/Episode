@@ -13,7 +13,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel() {
@@ -23,7 +22,7 @@ class UserProfileViewModel: ViewModel() {
     
     private suspend fun getUserProfile() = profileManager.getProfile()
     
-    private val profileModel = DemoEmptyProfileModel
+    private val profileModel = ProfileModel.empty
     
     private val navBarStateList = listOf(
         INACTIVE, NEW, INACTIVE, NEW, ACTIVE

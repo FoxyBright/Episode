@@ -3,11 +3,13 @@ package ru.rikmasters.gilty.auth.meetings
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import ru.rikmasters.gilty.auth.profile.MemberResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -19,6 +21,28 @@ class MeetingWebSource: KtorSource() {
         val address: String,
         val place: String,
     )
+    
+    suspend fun getDetailedMeet(
+        meet: String,
+    ): DetailedMeetResponse {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/meetings/$meet"
+        ) {}.wrapped()
+    }
+    
+    suspend fun getMeetMembers(
+        meet: String,
+    ): List<MemberModel> {
+        updateClientToken()
+        return try {
+            client.get(
+                "http://$HOST$PREFIX_URL/meetings/$meet/members"
+            ) {}.wrapped<List<MemberResponse>>().map { it.map() }
+        } catch(e: Exception) {
+            emptyList()
+        }
+    }
     
     suspend fun getOrientations(): List<OrientationModel> {
         updateClientToken()

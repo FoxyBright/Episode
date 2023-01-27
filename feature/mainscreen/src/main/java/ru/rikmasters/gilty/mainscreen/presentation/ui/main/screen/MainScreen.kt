@@ -61,11 +61,11 @@ fun MainScreen(nav: NavState = get()) {
     var timeSelect by remember { mutableStateOf("") }
     val meetings = remember {
         mutableStateListOf(
-            getDemoMeetingModel(),
-            getDemoMeetingModel(),
-            getDemoMeetingModel(isOnline = true),
-            getDemoMeetingModel(),
-            getDemoMeetingModel(),
+            DemoMeetingModel,
+            DemoMeetingModel,
+            DemoMeetingModel.copy(isOnline = true),
+            DemoMeetingModel,
+            DemoMeetingModel,
         )
     }
     
@@ -180,11 +180,11 @@ fun MainScreen(nav: NavState = get()) {
             
             override fun onMeetsRepeatClick() {
                 val list = listOf(
-                    getDemoMeetingModel(),
-                    getDemoMeetingModel(),
-                    getDemoMeetingModel(isOnline = true),
-                    getDemoMeetingModel(),
-                    getDemoMeetingModel()
+                    DemoMeetingModel,
+                    DemoMeetingModel,
+                    DemoMeetingModel.copy(isOnline = true),
+                    DemoMeetingModel,
+                    DemoMeetingModel,
                 ); list.forEach { meetings.add(it) }
             }
             

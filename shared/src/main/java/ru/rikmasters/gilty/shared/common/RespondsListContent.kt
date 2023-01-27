@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -47,12 +47,13 @@ private fun ReceivedResponds() {
 }
 
 interface RespondCallback {
-    fun onTabChange(tab: Int){}
-    fun onBack(){}
+    
+    fun onTabChange(tab: Int) {}
+    fun onBack() {}
     fun onCancelClick(respond: RespondModel) {}
     fun onRespondClick(meet: MeetingModel) {}
     fun onAcceptClick(respond: RespondModel) {}
-    fun onImageClick(image: HiddenPhotoModel) {}
+    fun onImageClick(image: AvatarModel) {}
     fun onArrowClick(index: Int) {}
 }
 
@@ -67,8 +68,8 @@ fun RespondsListContent(
         itemsIndexed(responds) { i, it ->
             GroupList(
                 i, it.first, it.second,
-                respondsStates[i],
-                Modifier, callback
+                Modifier, respondsStates[i],
+                callback
             )
         }
     }
@@ -79,9 +80,9 @@ private fun GroupList(
     index: Int,
     meet: MeetingModel,
     responds: List<RespondModel>,
-    state: Boolean = false,
     modifier: Modifier = Modifier,
-    callback: RespondCallback?
+    state: Boolean = false,
+    callback: RespondCallback?,
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {

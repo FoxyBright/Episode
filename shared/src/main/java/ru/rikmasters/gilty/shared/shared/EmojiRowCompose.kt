@@ -15,8 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R.drawable.ic_cloud_part
-import ru.rikmasters.gilty.shared.model.profile.EmojiList
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Composable
@@ -37,7 +36,7 @@ fun EmojiRow(
                 ), Center
         ) {
             LazyRow(Modifier.clip(CircleShape)) {
-                items(EmojiList) {
+                items(EmojiModel.list) {
                     GEmojiImage(it, Modifier
                         .padding(10.dp)
                         .size(30.dp)

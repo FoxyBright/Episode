@@ -35,7 +35,6 @@ import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.getDemoMeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -50,7 +49,7 @@ private fun MeetingBsTopBarPreview() {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    getDemoMeetingModel(
+                    DemoMeetingModel.copy(
                         type = ANONYMOUS,
                         isPrivate = true
                     ), (false), respondsCount = 3,
@@ -70,7 +69,7 @@ private fun MeetingBsTopBarOnlinePreview() {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    getDemoMeetingModel(isOnline = true),
+                    DemoMeetingModel.copy(isOnline = true),
                     (false)
                 )
             )
@@ -186,7 +185,8 @@ private fun Meet(
             val category = meet.category
             CategoryItem(
                 category.name, category.emoji,
-                category.color, (true),
+                if(meet.isOnline) colorScheme.secondary
+                else category.color, (true),
                 Modifier.offset(12.dp, -(18).dp)
             )
             MeetDetails(

@@ -1,13 +1,7 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
@@ -18,19 +12,13 @@ import ru.rikmasters.gilty.notifications.presentation.ui.responds.NotificationRe
 import ru.rikmasters.gilty.notifications.presentation.ui.responds.NotificationRespondsState
 import ru.rikmasters.gilty.shared.common.RespondCallback
 import ru.rikmasters.gilty.shared.common.extentions.MeetSeparate
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
-import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.DemoTodayNotificationRespondAccept
-import ru.rikmasters.gilty.shared.model.notification.NotificationModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Composable

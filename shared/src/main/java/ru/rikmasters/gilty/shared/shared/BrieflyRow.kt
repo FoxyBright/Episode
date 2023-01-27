@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.shared
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Row
@@ -21,9 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.string.meeting_avatar
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -32,13 +33,14 @@ private fun BrieflyRowPreview() {
     GiltyTheme {
         val user = DemoProfileModel
         BrieflyRow(
-            user.avatar.map(), user.username ?: "", user.rating.emoji,
+            user.avatar, (user.username ?: ""), user.rating.emoji,
             Modifier.background(colorScheme.background)
         )
     }
 }
 
 @Composable
+@SuppressLint("ModifierParameter")
 fun BrieflyRow(
     avatar: AvatarModel? = null,
     text: String,
@@ -48,7 +50,7 @@ fun BrieflyRow(
     Row(modifier, Start, CenterVertically) {
         avatar?.let {
             AsyncImage(
-                it.id,
+                it.url,
                 stringResource(meeting_avatar),
                 Modifier
                     .padding(end = 12.dp)

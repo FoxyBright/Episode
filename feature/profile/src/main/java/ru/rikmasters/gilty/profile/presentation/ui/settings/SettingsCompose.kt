@@ -1,31 +1,18 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -66,6 +53,7 @@ data class SettingsState(
 )
 
 interface SettingsCallback {
+    
     fun onBack()
     fun editCategories()
     fun onNotificationChange(it: Boolean)
@@ -83,7 +71,7 @@ interface SettingsCallback {
 fun SettingsContent(
     state: SettingsState,
     modifier: Modifier = Modifier,
-    callback: SettingsCallback? = null
+    callback: SettingsCallback? = null,
 ) {
     LazyColumn(
         modifier
@@ -103,7 +91,7 @@ fun SettingsContent(
 @Composable
 private fun Categories(
     modifier: Modifier = Modifier,
-    callback: SettingsCallback? = null
+    callback: SettingsCallback? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
         IconButton(
@@ -150,7 +138,7 @@ private fun Categories(
 private fun Information(
     state: SettingsState,
     modifier: Modifier = Modifier,
-    callback: SettingsCallback? = null
+    callback: SettingsCallback? = null,
 ) {
     Element(FilterModel(stringResource(R.string.personal_info_title)) {
         Column(
@@ -163,26 +151,26 @@ private fun Information(
         ) {
             Card(
                 stringResource(R.string.sex),
-                state.profile.gender.value,
-                ThemeExtra.shapes.mediumTopRoundedShape
+                ThemeExtra.shapes.mediumTopRoundedShape,
+                Modifier, state.profile.gender.value
             ) { callback?.onGenderClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.personal_info_age_placeholder),
-                "${state.profile.age} лет",
-                ThemeExtra.shapes.zero
+                ThemeExtra.shapes.zero,
+                Modifier, "${state.profile.age} лет"
             ) { callback?.onAgeClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.orientation_title),
-                state.profile.orientation?.display,
-                ThemeExtra.shapes.zero
+                ThemeExtra.shapes.zero,
+                Modifier, state.profile.orientation?.name
             ) { callback?.onOrientationClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.phone_number),
-                state.profile.phone,
                 ThemeExtra.shapes.mediumBottomRoundedShape,
+                Modifier, state.profile.phone,
                 arrow = false
             ) { callback?.onPhoneClick() }
         }
@@ -193,7 +181,7 @@ private fun Information(
 private fun Additionally(
     state: SettingsState,
     modifier: Modifier = Modifier,
-    callback: SettingsCallback? = null
+    callback: SettingsCallback? = null,
 ) {
     Element(FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
         Column(
@@ -206,12 +194,14 @@ private fun Additionally(
         ) {
             Card(
                 stringResource(R.string.settings_about_app_label),
-                (null), ThemeExtra.shapes.mediumTopRoundedShape
+                ThemeExtra.shapes.mediumTopRoundedShape,
+                Modifier, (null)
             ) { callback?.onAboutAppClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.settings_app_icon_label),
-                (null), ThemeExtra.shapes.zero
+                ThemeExtra.shapes.zero,
+                Modifier, (null)
             ) { callback?.onIconAppClick() }
             Divider(Modifier.padding(start = 16.dp))
             CheckBoxCard(
@@ -228,11 +218,11 @@ private fun Additionally(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun Card(
     label: String,
-    text: String? = null,
     shape: Shape,
     modifier: Modifier = Modifier,
+    text: String? = null,
     arrow: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         onClick, modifier.fillMaxWidth(), (true), shape,
@@ -250,11 +240,11 @@ private fun Card(
                 style = typography.bodyMedium
             )
             Row(verticalAlignment = CenterVertically) {
-                if (!text.isNullOrBlank()) Text(
+                if(!text.isNullOrBlank()) Text(
                     text, Modifier, colorScheme.primary,
                     style = typography.bodyMedium,
                 )
-                if (arrow) Icon(
+                if(arrow) Icon(
                     Icons.Filled.KeyboardArrowRight,
                     (null), Modifier, colorScheme.onTertiary
                 )
@@ -266,7 +256,7 @@ private fun Card(
 @Composable
 private fun Buttons(
     modifier: Modifier = Modifier,
-    callback: SettingsCallback? = null
+    callback: SettingsCallback? = null,
 ) {
     Column(
         modifier.fillMaxWidth(),

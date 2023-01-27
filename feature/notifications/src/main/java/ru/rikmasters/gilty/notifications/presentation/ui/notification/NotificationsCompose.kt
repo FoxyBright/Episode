@@ -23,14 +23,14 @@ import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.NavBar
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)

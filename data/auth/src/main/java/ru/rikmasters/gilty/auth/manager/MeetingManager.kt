@@ -13,6 +13,10 @@ class MeetingManager(
     suspend fun getPopularTags(list: List<String?>) =
         web.getPopularTags(list)
     
+    
+    suspend fun getDetailedMeet(meetId: String) =
+        web.getDetailedMeet(meetId)
+    
     suspend fun getLastPlaces() =
         web.getLastPlaces()
     
@@ -22,11 +26,15 @@ class MeetingManager(
     suspend fun searchTags(tag: String) =
         web.searchTags(tag)
     
+    @Suppress("unused")
     suspend fun addNewTag(tag: String) =
         web.addNewTag(tag)
     
     suspend fun getCategoriesList(): List<CategoryModel> =
         web.getCategoriesList()
+    
+    suspend fun getMeetMembers(meetId: String) =
+        web.getMeetMembers(meetId)
     
     suspend fun addMeet(
         categoryId: String?,

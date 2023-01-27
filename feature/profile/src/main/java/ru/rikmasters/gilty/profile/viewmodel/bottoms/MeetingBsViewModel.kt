@@ -2,18 +2,47 @@ package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.MeetingBsViewModel.MeetNavigation.MEET
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
-class MeetingBsViewModel(
+class MeetingBsViewModel: ViewModel() {
     
-    val profileVm: UserProfileViewModel = UserProfileViewModel()
-
-): ViewModel() {
+    private val meetManager by inject<MeetingManager>()
+    
+    enum class MeetNavigation { MEET, PROFILE, PARTICIPANTS, COMPLAINTS }
+    
+    private val _screen = MutableStateFlow(MEET)
+    val screen = _screen.asStateFlow()
+    
+    private val _navigationStack = MutableStateFlow(emptyList<MeetNavigation>())
+    private val navigationStack = _navigationStack.asStateFlow()
+    suspend fun navigate(screen: MeetNavigation) {
+        _navigationStack.emit(navigationStack.value + screen)
+        _screen.emit(screen)
+    }
+    
+    suspend fun navigateBack() {
+        if(navigationStack.value.isNotEmpty()) {
+            _navigationStack.emit(
+                navigationStack.value - navigationStack.value[navigationStack.value.size - 1]
+            )
+            _screen.emit(
+                if(navigationStack.value.isEmpty()) MEET
+                else navigationStack.value.last()
+            )
+        }
+    }
+    
+    
+    // NAVIGATION
+    
     
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
@@ -28,7 +57,7 @@ class MeetingBsViewModel(
     val distance = _distance.asStateFlow()
     
     suspend fun drawMeet(meet: MeetingModel) {
-        _memberList.emit(DemoMemberModelList)
+        _memberList.emit(meetManager.getMeetMembers(meet.id))
         _distance.emit(distanceCalculator(meet))
     }
     
@@ -49,6 +78,25 @@ class MeetingBsViewModel(
     }
     
     suspend fun sharedMeet() {
-        makeToast("ВААААУ, Типа поделился) Съешь пирожок с полки")
+        makeToast("Поделиться")
+    }
+    
+    // ORGANIZER
+    private val _profile = MutableStateFlow(DemoProfileModel)
+    val profile = _profile.asStateFlow()
+    
+    private val _observe = MutableStateFlow(false)
+    val observe = _observe.asStateFlow()
+    
+    private val _meets = MutableStateFlow(listOf<MeetingModel>())
+    val meets = _meets.asStateFlow()
+    
+    suspend fun drawProfile() {
+        _observe.emit(false)
+        _meets.emit(DemoMeetingList)
+    }
+    
+    suspend fun observeUser(state: Boolean) {
+        _observe.emit(state)
     }
 }

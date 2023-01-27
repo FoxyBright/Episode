@@ -17,7 +17,7 @@ var WithoutRespond: Boolean = false
 var MemberLimited: Boolean = false
 var Requirements = arrayListOf(
     RequirementModel(
-        gender = "",
+        gender = null,
         ageMin = 0,
         ageMax = 0,
         orientation = null
@@ -76,7 +76,7 @@ class RequirementsViewModel: ViewModel() {
         )
         _gender.emit(
             try {
-                GenderType.valueOf(req.gender).ordinal
+                GenderType.valueOf(req.gender?.name.toString()).ordinal
             } catch(e: Exception) {
                 null
             }
@@ -108,9 +108,11 @@ class RequirementsViewModel: ViewModel() {
         Gender = gender
         Requirements[selectMember.value] =
             Requirements[selectMember.value].copy(
-                gender = Gender?.let {
-                    GenderType.get(it).name
-                } ?: ""
+                gender = try {
+                    Gender?.let { GenderType.get(it) }
+                } catch(e: Exception) {
+                    null
+                }
             )
         updateRequirements()
     }
@@ -175,7 +177,7 @@ class RequirementsViewModel: ViewModel() {
                     repeat(count.minus(size)) {
                         Requirements.add(
                             RequirementModel(
-                                gender = "",
+                                gender = null,
                                 ageMin = 0,
                                 ageMax = 0,
                                 orientation = null

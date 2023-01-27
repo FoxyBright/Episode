@@ -130,7 +130,7 @@ fun Profile(
         Row {
             ProfileImageContent(
                 Modifier.weight(1f),
-                (state.profile?.avatar?.id ?: ""),
+                (state.profile?.avatar?.thumbnail?.url.toString()),
                 state.profileType,
                 state.observeState,
                 { bool -> onChange?.let { it(bool) } },
@@ -144,9 +144,9 @@ fun Profile(
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
                     Modifier,
-                    (state.profile?.rating?.average ?: ""),
-                    state.profile?.count_watchers ?: 0,
-                    state.profile?.count_watching ?: 0,
+                    (state.profile?.rating?.average.toString()),
+                    state.profile?.countWatchers ?: 0,
+                    state.profile?.countWatching ?: 0,
                     state.profileType,
                     state.profile?.rating?.emoji
                 ) { callback?.onObserveClick() }
@@ -158,7 +158,7 @@ fun Profile(
                 )
                 HiddenContent(
                     Modifier,
-                    state.profile?.hidden?.id,
+                    state.profile?.hidden?.thumbnail?.url,
                     state.profileType
                 ) { callback?.hiddenImages() }
             }

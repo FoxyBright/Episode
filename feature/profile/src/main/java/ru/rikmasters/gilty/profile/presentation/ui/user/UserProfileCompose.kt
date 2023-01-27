@@ -120,9 +120,9 @@ fun UserProfile(
     ) { Content(state, Modifier.padding(it), callback) }
     GAlert(
         state.alert, { callback?.closeAlert() },
-        "Отлично, ваша жалоба отправлена!",
-        label = "Модераторы скоро рассмотрят\nвашу жалобу",
-        success = Pair("Закрыть") { callback?.closeAlert() }
+        stringResource(R.string.complaints_send_answer),
+        label = stringResource(R.string.complaints_moderate_sen_answer),
+        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
     )
     if(state.errorState) ErrorConnection()
 }

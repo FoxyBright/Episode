@@ -8,6 +8,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
+import ru.rikmasters.gilty.auth.meetings.Avatar
 import ru.rikmasters.gilty.auth.meetings.MeetingResponse
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVERS
@@ -17,6 +18,7 @@ import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.wrapper.Status
 import ru.rikmasters.gilty.shared.wrapper.errorWrapped
@@ -91,7 +93,7 @@ class ProfileWebSource: KtorSource() {
         ) {}.wrapped<List<MemberResponse>>().map { it.map() }
     }
     
-    suspend fun deleteHidden(image: Image) {
+    suspend fun deleteHidden(image: AvatarModel) {
         updateClientToken()
         val album = getUserAlbumPrivateId()
         val imageId = image.id
@@ -100,7 +102,7 @@ class ProfileWebSource: KtorSource() {
         ) {}
     }
     
-    suspend fun getProfileHiddens(): List<Image> {
+    suspend fun getProfileHiddens(): List<Avatar> {
         updateClientToken()
         val album = getUserAlbumPrivateId()
         return client.get(
@@ -178,7 +180,7 @@ class ProfileWebSource: KtorSource() {
         
         return try {
             response.body<Status>().status == "error"
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             false
         }
     }
@@ -222,9 +224,9 @@ class ProfileWebSource: KtorSource() {
         )
         return try {
             response.wrapped<ProfileResponse>().isCompleted == true
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             response.errorWrapped().status != Status.ERROR
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             false
         }
     }

@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.image.EmojiModel
 
 @Composable
 fun GEmojiImage(

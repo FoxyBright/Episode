@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.auth.meetings
 
+import ru.rikmasters.gilty.shared.model.meeting.LocationModel
+
 data class MeetingRequest(
     
     val categoryId: String?,
@@ -50,13 +52,18 @@ data class Requirement(
 
 data class Location(
     
-    val hide: Boolean?,
+    val hide: Boolean? = null,
     
-    val lat: Int?,
+    val lat: Int? = null,
     
-    val lng: Int?,
+    val lng: Int? = null,
     
-    val place: String?,
+    val place: String? = null,
     
-    val address: String?,
-)
+    val address: String? = null,
+) {
+    
+    fun map() = LocationModel(
+        hide, lat, lng, place, address
+    )
+}

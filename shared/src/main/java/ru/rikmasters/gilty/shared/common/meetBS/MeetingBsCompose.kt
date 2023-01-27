@@ -1,9 +1,7 @@
 package ru.rikmasters.gilty.shared.common.meetBS
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -13,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.meeting_question_comment_or_assess
 import ru.rikmasters.gilty.shared.R.string.respond_to_meet
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
@@ -25,7 +24,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MeetingBsDetailed() {
     GiltyTheme {
-        val meet = getDemoMeetingModel()
+        val meet = DemoMeetingModel
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsContent(
                 MeetingBsState(
@@ -41,7 +40,7 @@ private fun MeetingBsDetailed() {
 @Composable
 private fun MeetingBsObserve() {
     GiltyTheme {
-        val meet = getDemoMeetingModel()
+        val meet = DemoMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
@@ -61,7 +60,7 @@ private fun MeetingBsObserve() {
 @Composable
 private fun MeetingBsShared() {
     GiltyTheme {
-        val meet = getDemoMeetingModel()
+        val meet = DemoMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
@@ -87,7 +86,7 @@ private fun MeetingBsWhenUser() {
                 .fillMaxSize()
                 .background(colorScheme.background)
         ) {
-            val meet = getDemoMeetingModel(
+            val meet = DemoMeetingModel.copy(
                 type = ANONYMOUS,
                 isPrivate = true,
                 isOnline = true
@@ -207,11 +206,14 @@ fun MeetingBsContent(
                 (null), stringResource(respond_to_meet)
             )
         }
+        item {
+            Spacer(Modifier.height(40.dp))
+        }
     }
     GAlert(
         state.alert, { callback?.closeAlert() },
-        "Отлично, ваша жалоба отправлена!",
-        label = "Модераторы скоро рассмотрят\nвашу жалобу",
-        success = Pair("Закрыть") { callback?.closeAlert() }
+        stringResource(R.string.complaints_send_answer),
+        label = stringResource(R.string.complaints_moderate_sen_answer),
+        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
     )
 }

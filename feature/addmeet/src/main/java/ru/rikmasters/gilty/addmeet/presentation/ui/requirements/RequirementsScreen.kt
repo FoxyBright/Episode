@@ -44,7 +44,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val withoutRespond by vm.withoutRespond.collectAsState()
     
     fun reqControl(it: RequirementModel) = when {
-        it.gender.isBlank() -> true
+        it.gender == null -> true
         it.ageMin == 0 -> true
         it.ageMax == 0 -> true
         it.orientation == null -> true

@@ -25,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.model.profile.getCategoryIcons
+import ru.rikmasters.gilty.shared.image.EmojiModel
+import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.categoryIcon
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -40,7 +40,7 @@ private fun CategoryItemTopPreview() {
         Box(Modifier.background(colorScheme.background)) {
             CategoryItem(
                 "Развлечения",
-                getCategoryIcons("POPCORN"),
+                categoryIcon("POPCORN"),
                 colorScheme.primary, (false),
                 Modifier.padding(16.dp), (false)
             )
@@ -56,7 +56,7 @@ fun CategoryItemBottomPreview() {
         val iconState = remember { mutableStateOf(true) }
         CategoryItem(
             "Развлечения",
-            getCategoryIcons("POPCORN"),
+            categoryIcon("POPCORN"),
             colorScheme.primary,
             iconState.value
         ) { iconState.value = it }

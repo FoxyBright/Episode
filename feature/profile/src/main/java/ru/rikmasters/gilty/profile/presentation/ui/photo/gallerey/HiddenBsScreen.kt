@@ -4,10 +4,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.auth.profile.Image
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @Composable
 fun HiddenBsScreen(vm: HiddenBsViewModel) {
@@ -24,14 +24,14 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
         photoList, Modifier,
         object: HiddenBsCallback {
             
-            override fun onSelectImage(image: Image) {
+            override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     asm.bottomSheet.collapse()
                     nav.navigate("avatar?image=${image.url}")
                 }
             }
             
-            override fun onDeleteImage(image: Image) {
+            override fun onDeleteImage(image: AvatarModel) {
                 scope.launch { vm.deleteImage(image) }
             }
             

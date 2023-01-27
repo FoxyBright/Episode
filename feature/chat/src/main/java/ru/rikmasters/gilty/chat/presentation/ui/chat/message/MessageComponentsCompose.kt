@@ -47,12 +47,12 @@ import ru.rikmasters.gilty.shared.R.drawable.ic_write
 import ru.rikmasters.gilty.shared.R.raw.typing_dots
 import ru.rikmasters.gilty.shared.R.string.chats_hidden_photo
 import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.image.EmojiModel
+import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.chat.SystemMessageType.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.model.profile.badEmoji
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -211,7 +211,7 @@ private fun SystemMessagePreview() {
 @Composable
 fun WritingMessage(
     modifier: Modifier = Modifier,
-    shape: Shape = shapes.large
+    shape: Shape = shapes.large,
 ) {
     Box(
         modifier.background(
@@ -335,7 +335,7 @@ fun HiddenImageMessage(
     sender: Boolean,
     hide: Boolean,
     shape: Shape = shapes.large,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -383,7 +383,7 @@ fun ImageMessage(
     sender: Boolean,
     shape: Shape = shapes.large,
     isOnline: Boolean,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -461,7 +461,7 @@ fun TextMessage(
     answer: MessageModel? = null,
     shape: Shape = shapes.large,
     isOnline: Boolean,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         modifier.background(
@@ -498,10 +498,11 @@ fun TextMessage(
 }
 
 @Composable
-private fun TextWidget(  // TODO Переписать под TextFlow
+private fun TextWidget(
+    // TODO Переписать под TextFlow
     message: MessageModel,
     sender: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         message.text, modifier
@@ -519,7 +520,7 @@ private fun MessageStatus(
     color: Color,
     sender: Boolean,
     messageModel: MessageModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier, Start,

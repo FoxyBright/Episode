@@ -81,7 +81,7 @@ private fun MeetingBsParticipantsPreview() {
     GiltyTheme {
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsParticipants(
-                getDemoMeetingModel(isOnline = true),
+                DemoMeetingModel.copy(isOnline = true),
                 DemoMemberModelList,
                 Modifier.padding(16.dp)
             )
@@ -121,14 +121,13 @@ fun MeetingBsButtons(
     userInMeet: Boolean = false,
     online: Boolean = false,
     shared: Boolean = false,
-    modifier: Modifier = Modifier,
-    onClick: ((Int) -> Unit)? = null
+    onClick: ((Int) -> Unit)? = null,
 ) {
     when {
         shared -> {
             Column {
                 GradientButton(
-                    modifier.padding(top = 20.dp, bottom = 12.dp),
+                    Modifier.padding(top = 20.dp, bottom = 12.dp),
                     stringResource(meeting_shared_button), online = online,
                     icon = ic_shared
                 ) { onClick?.let { it(2) } }
@@ -148,7 +147,7 @@ fun MeetingBsButtons(
         ) { onClick?.let { it(1) } }
         
         else -> GradientButton(
-            modifier.padding(top = 20.dp, bottom = 12.dp),
+            Modifier.padding(top = 20.dp, bottom = 12.dp),
             stringResource(meeting_respond), online = online
         ) { onClick?.let { it(0) } }
     }
@@ -160,7 +159,7 @@ fun MeetingBsMap(
     meet: MeetingModel,
     distance: String,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Column(modifier) {
         Row(Modifier.padding(bottom = 18.dp)) {
@@ -187,7 +186,11 @@ fun MeetingBsMap(
                 Modifier.padding(horizontal = 16.dp),
                 SpaceBetween, CenterVertically
             ) {
-                Column(Modifier.fillMaxWidth().weight(1f)) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
                     Text(
                         meet.address, Modifier
                             .padding(top = 8.dp),
@@ -214,7 +217,7 @@ fun MeetingBsMap(
 @Composable
 fun MeetingBsConditions(
     meet: MeetingModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Text(
@@ -278,7 +281,7 @@ fun MeetingBsParticipants(
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
     onAllViewClick: (() -> Unit)? = null,
-    onMemberClick: ((MemberModel) -> Unit)? = null
+    onMemberClick: ((MemberModel) -> Unit)? = null,
 ) {
     Column(modifier) {
         Row(
@@ -329,30 +332,27 @@ fun MeetingBsParticipants(
                 .clip(shapes.large)
                 .background(colorScheme.primaryContainer)
         ) {
-            membersList.forEachIndexed { index, member ->
-                if(index < 3) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable { onMemberClick?.let { it(member) } },
-                        SpaceBetween, CenterVertically
-                    ) {
-                        BrieflyRow(
-                            member.avatar,
-                            "${member.username}, ${member.age}",
-                            (null), Modifier.padding(12.dp, 8.dp)
-                        )
-                        Icon(
-                            Filled.KeyboardArrowRight,
-                            (null), Modifier.padding(end = 16.dp),
-                            colorScheme.onTertiary
-                        )
-                    }
-                    val subIndex = index.plus(1)
-                    if(subIndex < 3 ||
-                        (membersList.size in subIndex..3)
-                    ) Divider(Modifier.padding(start = 60.dp))
-                }
+            val list = if(membersList.size > 3)
+                membersList.take(3) else membersList
+            list.forEachIndexed { index, member ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onMemberClick?.let { it(member) } },
+                    SpaceBetween, CenterVertically
+                ) {
+                    BrieflyRow(
+                        member.avatar,
+                        "${member.username}, ${member.age}",
+                        (null), Modifier.padding(12.dp, 8.dp)
+                    )
+                    Icon(
+                        Filled.KeyboardArrowRight,
+                        (null), Modifier.padding(end = 16.dp),
+                        colorScheme.onTertiary
+                    )
+                }; if(list.size > 1 && index <= list.size - 2)
+                Divider(Modifier.padding(start = 60.dp))
             }
         }
     }
@@ -364,7 +364,7 @@ fun MeetingBsComment(
     online: Boolean,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onTextClear: () -> Unit
+    onTextClear: () -> Unit,
 ) {
     Column(modifier) {
         GTextField(
@@ -393,7 +393,7 @@ fun MeetingBsHidden(
     modifier: Modifier = Modifier,
     state: Boolean,
     online: Boolean,
-    onChange: (Boolean) -> Unit
+    onChange: (Boolean) -> Unit,
 ) {
     Column(modifier) {
         CheckBoxCard(
@@ -411,7 +411,7 @@ fun MeetingBsHidden(
 fun BoxLabel(
     text: String,
     modifier: Modifier = Modifier,
-    align: TextAlign = TextAlign.Start
+    align: TextAlign = TextAlign.Start,
 ) {
     Text(
         text, modifier.fillMaxWidth(),
@@ -426,7 +426,7 @@ fun TextButton(
     modifier: Modifier = Modifier,
     online: Boolean? = null,
     text: String,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Text(
         text, modifier

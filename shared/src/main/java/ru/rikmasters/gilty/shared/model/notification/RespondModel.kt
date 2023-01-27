@@ -1,12 +1,9 @@
 package ru.rikmasters.gilty.shared.model.notification
 
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
-import ru.rikmasters.gilty.shared.model.profile.DemoHiddenPhotoModel
-import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
+import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 
 data class RespondModel(
     val id: Int,
@@ -14,7 +11,7 @@ data class RespondModel(
     val comment: String?,
     val sender: OrganizerModel,
     val type: RespondType,
-    val hiddenPhoto: List<Pair<HiddenPhotoModel, Boolean>>?
+    val hiddenPhoto: List<Pair<AvatarModel, Boolean>>?
 )
 
 val DemoSendRespondsModel = RespondModel(
@@ -32,10 +29,10 @@ val DemoReceivedRespondsModel = RespondModel(
     DemoOrganizerModel,
     RespondType.RECEIVED,
     listOf(
-        Pair(DemoHiddenPhotoModel, true),
-        Pair(DemoHiddenPhotoModel, true),
-        Pair(DemoHiddenPhotoModel, false),
-        Pair(DemoHiddenPhotoModel, false)
+        Pair(DemoAvatarModel, true),
+        Pair(DemoAvatarModel, true),
+        Pair(DemoAvatarModel, false),
+        Pair(DemoAvatarModel, false)
     )
 )
 

@@ -3,8 +3,8 @@ package ru.rikmasters.gilty.auth.meetings
 import android.graphics.Color.parseColor
 import androidx.compose.ui.graphics.Color
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
+import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.categoryIcon
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.profile.getCategoryIcons
 
 data class Category(
     
@@ -23,7 +23,7 @@ data class Category(
         id = id,
         name = name,
         color = Color(color.getColor()),
-        emoji = getCategoryIcons(iconType),
+        emoji = categoryIcon(iconType),
         children = children.childMap()
     )
     

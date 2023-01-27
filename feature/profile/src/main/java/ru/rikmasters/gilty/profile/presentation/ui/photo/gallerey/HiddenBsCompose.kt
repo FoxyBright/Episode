@@ -29,20 +29,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.auth.profile.Image
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 interface HiddenBsCallback {
     
-    fun onSelectImage(image: Image) {}
-    fun onDeleteImage(image: Image) {}
+    fun onSelectImage(image: AvatarModel) {}
+    fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
 }
 
 @Composable
 fun HiddenBsContent(
-    photoList: List<Image>,
+    photoList: List<AvatarModel>,
     modifier: Modifier = Modifier,
     callback: HiddenBsCallback? = null
 ) {

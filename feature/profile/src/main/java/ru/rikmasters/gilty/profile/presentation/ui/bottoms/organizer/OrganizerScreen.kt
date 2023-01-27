@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import kotlin.coroutines.CoroutineContext
 
 @Composable
+@Suppress("unused")
 fun OrganizerBs(
     vm: OrganizerBsViewModel,
     meet: MeetingModel,
@@ -31,7 +32,7 @@ fun OrganizerBs(
     val profile by vm.profile.collectAsState()
     
     LaunchedEffect(Unit) {
-        vm.drawOrganizer(meet.organizer)
+        vm.drawOrganizer()
     }
     
     val profileState = ProfileState(
@@ -58,7 +59,7 @@ fun OrganizerBs(
             override fun onBack() {
                 scope.launch(coroutineContext) {
                     asm.bottomSheet.expand {
-                        Connector(vm.meetVm) {
+                        Connector<MeetingBsViewModel>(vm.scope) {
                             MeetingBs(it, meet)
                         }
                     }

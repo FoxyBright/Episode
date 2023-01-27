@@ -5,13 +5,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
-class OrganizerBsViewModel(
-    
-    val meetVm: MeetingBsViewModel = MeetingBsViewModel(),
-): ViewModel() {
+class OrganizerBsViewModel: ViewModel() {
     
     private val _profile = MutableStateFlow(DemoProfileModel)
     val profile = _profile.asStateFlow()
@@ -22,7 +18,7 @@ class OrganizerBsViewModel(
     private val _meets = MutableStateFlow(listOf<MeetingModel>())
     val meets = _meets.asStateFlow()
     
-    suspend fun drawOrganizer(organizer: OrganizerModel?) {
+    suspend fun drawOrganizer() {
         _observe.emit(false)
         _meets.emit(DemoMeetingList)
     }

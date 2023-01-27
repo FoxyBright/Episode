@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.login.presentation.ui.code
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,17 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.*
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.BackBlur
+import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.textFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -57,7 +57,7 @@ data class CodeState(
     val code: String,
     val focuses: List<FocusRequester>,
     val sec: Int,
-    val blur: Boolean
+    val blur: Boolean,
 )
 
 interface CodeCallback {
@@ -72,7 +72,7 @@ interface CodeCallback {
 fun CodeContent(
     state: CodeState,
     modifier: Modifier = Modifier,
-    callback: CodeCallback? = null
+    callback: CodeCallback? = null,
 ) {
     Box(modifier.background(colorScheme.background)) {
         Column(Modifier.fillMaxSize(), Top, CenterHorizontally) {
@@ -96,10 +96,7 @@ fun CodeContent(
                 Modifier.align(Center),
                 horizontalAlignment = CenterHorizontally
             ) {
-                Image(
-                    painterResource(R.drawable.ic_bad),
-                    null, Modifier.size(40.dp)
-                )
+                GEmojiImage(badEmoji, Modifier.size(40.dp))
                 Text(
                     stringResource(R.string.code_is_bad_code_notification),
                     Modifier.padding(top = 16.dp),
@@ -117,7 +114,7 @@ private fun DigitCode(
     modifier: Modifier = Modifier,
     code: String,
     focuses: List<FocusRequester>,
-    onChange: (Int, String) -> Unit
+    onChange: (Int, String) -> Unit,
 ) {
     Row {
         focuses.forEachIndexed { index, focus ->

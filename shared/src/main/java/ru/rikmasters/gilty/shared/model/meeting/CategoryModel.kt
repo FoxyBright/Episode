@@ -1,10 +1,10 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Red
-import ru.rikmasters.gilty.shared.model.profile.DemoCategoryEmoji
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.image.DemoCategoryEmoji
+import ru.rikmasters.gilty.shared.image.EmojiModel
 
 data class CategoryModel(
     
@@ -26,7 +26,7 @@ private val DemoChildCategoryModel = CategoryModel(
 
 val DemoCategoryModel = CategoryModel(
     "0", "Развлечения",
-    Green, DemoCategoryEmoji,
+    Blue, DemoCategoryEmoji,
     listOf(
         DemoChildCategoryModel,
         DemoChildCategoryModel,

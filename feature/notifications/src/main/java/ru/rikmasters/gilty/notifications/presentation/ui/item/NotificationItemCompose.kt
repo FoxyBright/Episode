@@ -27,10 +27,10 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.LEAVE_EMOTIONS
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.MEETING_OVER
 import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.shared.EmojiRow
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 

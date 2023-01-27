@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -13,12 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SEND
 import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
 import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -41,6 +42,7 @@ private fun ReceivedWithoutPhotosResponds() {
 }
 
 @Composable
+@SuppressLint("ModifierParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 fun Respond(
     respond: RespondModel,
@@ -101,7 +103,7 @@ private fun MeetRow(
 private fun HiddenPhoto(
     respond: RespondModel,
     modifier: Modifier = Modifier,
-    onClick: (HiddenPhotoModel) -> Unit
+    onClick: (AvatarModel) -> Unit
 ) {
     respond.hiddenPhoto?.let {
         LazyRow(modifier) {

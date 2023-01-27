@@ -12,7 +12,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.RespondModel
-import ru.rikmasters.gilty.shared.model.profile.HiddenPhotoModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @Composable
 fun RespondsBs(vm: RespondsBsViewModel) {
@@ -66,7 +66,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
                 ).show()
             }
             
-            override fun onImageClick(image: HiddenPhotoModel) {
+            override fun onImageClick(image: AvatarModel) {
                 Toast.makeText(
                     context,
                     "Фото смотреть нельзя",

@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MeetingBs
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserversBs
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
-import ru.rikmasters.gilty.profile.viewmodel.*
+import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
@@ -94,6 +94,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun onNavBarSelect(point: Int) {
+                if(point !in 0..3) return
                 scope.launch {
                     nav.navigateAbsolute(
                         vm.navBarNavigate(point)
@@ -103,7 +104,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun onMenuItemClick(point: Int) {
                 when(point) {
-                    0 -> nav.navigate("avatar?image=${profile?.avatar?.id}")
+                    0 -> nav.navigate("avatar?image=${profile?.avatar?.url}")
                     else -> nav.navigate("gallery?multi=false")
                 }
             }

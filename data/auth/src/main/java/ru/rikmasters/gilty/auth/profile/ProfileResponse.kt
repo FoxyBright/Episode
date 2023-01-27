@@ -1,8 +1,12 @@
 package ru.rikmasters.gilty.auth.profile
 
+import ru.rikmasters.gilty.auth.meetings.Avatar
+import ru.rikmasters.gilty.auth.meetings.Thumbnail
+import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
-import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
-import ru.rikmasters.gilty.shared.model.profile.*
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
 data class ProfileResponse(
     
@@ -13,11 +17,11 @@ data class ProfileResponse(
     val orientation: OrientationModel? = null,
     val age: Int? = null,
     val aboutMe: String? = null,
-    val emoji_type: String? = null,
+    val emojiType: String? = null,
     val average: String? = null,
-    val avatar: Image? = null,
+    val avatar: Avatar,
     val subscriptionExpiredAt: String? = null,
-    val thumbnail: Thumbnail? = null,
+    val thumbnail: Thumbnail,
     val responds: Responds? = null,
     val albumPrivate: AlbumPrivate? = null,
     val countWatchers: Int? = null,
@@ -25,8 +29,8 @@ data class ProfileResponse(
     val isWatching: Boolean? = null,
     val unblockAt: String? = null,
     val isCompleted: Boolean? = null,
-    val is_online: Boolean? = null,
-    val is_anonymous: Boolean? = null,
+    val isOnline: Boolean? = null,
+    val isAnonymous: Boolean? = null,
     val status: String? = null,
 ) {
     
@@ -36,7 +40,7 @@ data class ProfileResponse(
         username = username,
         gender = try {
             GenderType.valueOf(gender.toString())
-        } catch(_: Exception) {
+        } catch(e: Exception) {
             GenderType.MALE
         },
         orientation = orientation,
@@ -44,57 +48,31 @@ data class ProfileResponse(
         aboutMe = aboutMe,
         rating = RatingModel(
             average = average ?: "0.0",
-            emoji = getEmoji(emoji_type.toString())
+            emoji = getEmoji(emojiType.toString())
         ),
-        avatar = getImage(avatar?.url.toString(), avatar?.albumId),
-        thumbnail = getImage(thumbnail?.url.toString()),
-        isComplete = isCompleted == true,
+        avatar = avatar.map(),
+        thumbnail = thumbnail.map(),
+        isCompleted = isCompleted == true,
         subscriptionExpiredAt = subscriptionExpiredAt,
         respondsCount = responds?.count,
-        respondsImage = getImage(responds?.thumbnail?.url),
-        hidden = getImage(albumPrivate?.preview?.url, albumPrivate?.preview?.albumId),
-        count_watchers = countWatchers,
-        count_watching = countWatching,
-        is_watching = isWatching,
-        unblock_at = unblockAt,
-        is_completed = isCompleted,
-        is_online = is_online,
-        is_anonymous = is_anonymous,
+        respondsImage = responds?.thumbnail?.map(),
+        hidden = albumPrivate?.preview?.map(),
+        countWatchers = countWatchers,
+        countWatching = countWatching,
+        isWatching = isWatching,
+        unblockAt = unblockAt,
+        isOnline = isOnline,
+        isAnonymous = isAnonymous,
         status = status
     )
-    
-    private fun getImage(
-        image: String?,
-        album: String? = null,
-    ) = AvatarModel(
-        id = image ?: "",
-        albumId = album ?: "",
-        ownerId = id,
-        type = PHOTO,
-        mimeType = "photo/jpeg",
-        (0), (0), (0), (0), (0),
-        (null), (true)
-    )
 }
-
-data class Image(
-    val id: String,
-    val albumId: String,
-    val thumbnail: Thumbnail,
-    val url: String,
-)
 
 data class Responds(
     val count: Int? = null,
     val thumbnail: Thumbnail? = null,
 )
 
-data class Thumbnail(
-    val id: String,
-    val url: String,
-)
-
 data class AlbumPrivate(
     val id: String,
-    val preview: Image? = null,
+    val preview: Avatar? = null,
 )

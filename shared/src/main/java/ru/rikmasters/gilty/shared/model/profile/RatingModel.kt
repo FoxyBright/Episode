@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.shared.model.profile
 
+import ru.rikmasters.gilty.shared.image.DemoEmojiModel
+import ru.rikmasters.gilty.shared.image.EmojiModel
+
 data class RatingModel(
 
     val average: String,
