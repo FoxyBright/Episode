@@ -19,7 +19,7 @@ data class ProfileModel(
     val age: Int,
     val aboutMe: String?,
     val rating: RatingModel,
-    val avatar: AvatarModel,
+    val avatar: AvatarModel? = null,
     val thumbnail: ThumbnailModel,
     val isCompleted: Boolean,
     val subscriptionExpiredAt: String?,
@@ -42,7 +42,7 @@ data class ProfileModel(
             gender = MALE,
             orientation = null,
             age = 0, aboutMe = null,
-            rating = RatingModel(average = "", getEmoji(icon = "")),
+            rating = RatingModel(average = "0.0", getEmoji(icon = "")),
             avatar = DemoAvatarModel.copy(
                 url = "",
                 thumbnail = DemoThumbnailModel.copy(url = "")
@@ -69,6 +69,7 @@ data class ProfileModel(
         username = username.toString(),
         emoji = rating.emoji,
         avatar = avatar,
+        thumbnail = thumbnail,
         age = age,
         isAnonymous = isAnonymous == true,
         isOnline = isOnline == true
@@ -81,6 +82,7 @@ data class ProfileModel(
         username = username.toString(),
         emoji = rating.emoji,
         avatar = avatar,
+        thumbnail = thumbnail,
         age = age,
         isAnonymous = isAnonymous == true,
         isOnline = isOnline == true

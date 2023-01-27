@@ -13,9 +13,19 @@ class MeetingManager(
     suspend fun getPopularTags(list: List<String?>) =
         web.getPopularTags(list)
     
+    suspend fun getUserActualMeets(userId: String) =
+        web.getUserActualMeets(userId)
     
     suspend fun getDetailedMeet(meetId: String) =
         web.getDetailedMeet(meetId)
+    
+    suspend fun leaveMeet(meetId: String) {
+        web.leaveMeet(meetId)
+    }
+    
+    suspend fun cancelMeet(meetId: String) {
+        web.cancelMeet(meetId)
+    }
     
     suspend fun getLastPlaces() =
         web.getLastPlaces()

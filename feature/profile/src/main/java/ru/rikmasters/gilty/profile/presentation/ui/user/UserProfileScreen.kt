@@ -104,7 +104,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun onMenuItemClick(point: Int) {
                 when(point) {
-                    0 -> nav.navigate("avatar?image=${profile?.avatar?.url}")
+                    0 -> nav.navigate("avatar?type=0&image=${profile?.avatar?.url}")
                     else -> nav.navigate("gallery?multi=false")
                 }
             }
@@ -113,7 +113,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet)
+                            MeetingBs(it, meet.id)
                         }
                     }
                 }
@@ -123,7 +123,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet)
+                            MeetingBs(it, meet.id)
                         }
                     }
                 }

@@ -86,12 +86,12 @@ fun MainScreen(nav: NavState = get()) {
             menuState = state
         }
         
-        override fun onAllMembersClick() {
+        override fun onAllMembersClick(meetId: String) {
             scope.launch {
                 asm.bottomSheet.expand {
                     selectMeet?.let {
                         ParticipantsList(
-                            DemoMeetingModel, DemoMemberModelList,
+                            DemoMeetingModel.map(), DemoMemberModelList,
                             Modifier, object: ParticipantsListCallback {}
                         )
                     }
@@ -109,7 +109,7 @@ fun MainScreen(nav: NavState = get()) {
             }
         }
         
-        override fun onAvatarClick() {
+        override fun onAvatarClick(organizerId: String) {
             selectMeet?.let {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -119,12 +119,12 @@ fun MainScreen(nav: NavState = get()) {
             }
         }
         
-        override fun onMenuItemClick(index: Int) {
+        override fun onMenuItemClick(index: Int, meetId: String) {
             scope.launch {
                 asm.bottomSheet.expand {
                     menuState = false
                     clickedMeet?.let {
-                        ComplainsContent(it) {
+                        ComplainsContent(it.id) {
                             scope.launch {
                                 asm.bottomSheet.collapse()
                             }; alert = true
@@ -134,7 +134,7 @@ fun MainScreen(nav: NavState = get()) {
             }
         }
         
-        override fun onBottomButtonClick(point: Int) {
+        override fun onRespondClick(meetId: String) {
             clickedMeet?.let {
                 nav.navigateAbsolute(
                     "main/reaction?avatar=${
@@ -143,7 +143,6 @@ fun MainScreen(nav: NavState = get()) {
                 ); scope.launch { asm.bottomSheet.collapse() }
             }
         }
-        
         
         override fun onHiddenPhotoActive(hidden: Boolean) {
             hiddenPhoto = hidden
@@ -198,7 +197,7 @@ fun MainScreen(nav: NavState = get()) {
                     asm.bottomSheet.expand {
                         MeetingBsContent(
                             MeetingBsState(
-                                menuState, meet,
+                                menuState, meet.map(),
                                 DemoMemberModelList,
                                 distanceCalculator(meet)
                             ), Modifier
@@ -269,7 +268,7 @@ fun MainScreen(nav: NavState = get()) {
                     asm.bottomSheet.expand {
                         MeetingBsContent(
                             MeetingBsState(
-                                menuState, meet,
+                                menuState, meet.map(),
                                 detailed = Pair(
                                     commentText, hiddenPhoto
                                 )
@@ -310,7 +309,7 @@ private fun Meet(
     
     MeetingBsContent(
         MeetingBsState(
-            menuState, meet,
+            menuState, meet.map(),
             DemoMemberModelList,
             distanceCalculator(meet),
             (true), (true), (true)
@@ -320,19 +319,15 @@ private fun Meet(
             .padding(top = 14.dp),
         object: MeetingBsCallback {
             
-            override fun closeAlert() {
-                alert = false
-            }
-            
             override fun onKebabClick(state: Boolean) {
                 menuState = state
             }
             
-            override fun onMenuItemClick(index: Int) {
+            override fun onMenuItemClick(index: Int, meetId: String) {
                 menuState = false
                 scope.launch {
                     asm.bottomSheet.expand {
-                        ComplainsContent(DemoMeetingModel) {
+                        ComplainsContent(DemoMeetingModel.id) {
                             scope.launch {
                                 asm.bottomSheet.collapse()
                             }; alert = true
@@ -341,7 +336,7 @@ private fun Meet(
                 }
             }
             
-            override fun onAllMembersClick() {
+            override fun onAllMembersClick(meetId: String) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Participants(meet, asm, scope)
@@ -357,26 +352,12 @@ private fun Meet(
                 }
             }
             
-            override fun onBottomButtonClick(point: Int) {
-                when(point) {
-                    1 -> Toast.makeText(
-                        context,
-                        "Вы покинули meet",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    
-                    2 -> Toast.makeText(
-                        context,
-                        "ВААААУ, Типа поделился) Съешь пирожок с полки",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    
-                    3 -> Toast.makeText(
-                        context,
-                        "Вы отменили встречу",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            override fun onRespondClick(meetId: String) {
+                Toast.makeText(
+                    context,
+                    "Вы откликнулись на meet",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     )
@@ -389,7 +370,7 @@ private fun Participants(
     scope: CoroutineScope,
 ) {
     ParticipantsList(
-        DemoMeetingModel, DemoMemberModelList,
+        DemoMeetingModel.map(), DemoMemberModelList,
         Modifier, callback = object: ParticipantsListCallback {
             override fun onBack() {
                 scope.launch {

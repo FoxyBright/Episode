@@ -1,15 +1,12 @@
 package ru.rikmasters.gilty.auth.meetings
 
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
+import io.ktor.client.request.*
 import ru.rikmasters.gilty.auth.profile.MemberResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
-import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -22,13 +19,36 @@ class MeetingWebSource: KtorSource() {
         val place: String,
     )
     
+    suspend fun leaveMeet(meetId: String) {
+        updateClientToken()
+        client.patch(
+            "http://$HOST$PREFIX_URL/meetings/$meetId/leave"
+        ) {}
+    }
+    
+    suspend fun cancelMeet(meetId: String) {
+        updateClientToken()
+        client.patch(
+            "http://$HOST$PREFIX_URL/meetings/$meetId/cancel"
+        ) {}
+    }
+    
+    suspend fun getUserActualMeets(
+        userId: String,
+    ): List<MeetingModel> {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/users/$userId/meetings"
+        ) {}.wrapped<List<MeetingResponse>>().map { it.map() }
+    }
+    
     suspend fun getDetailedMeet(
         meet: String,
-    ): DetailedMeetResponse {
+    ): FullMeetingModel {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/meetings/$meet"
-        ) {}.wrapped()
+        ) {}.wrapped<DetailedMeetResponse>().map()
     }
     
     suspend fun getMeetMembers(

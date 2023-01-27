@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons.Filled
@@ -273,7 +274,7 @@ private fun MeetHistory(
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
             .clickable { openHistory() },
-        Arrangement.Start, CenterVertically
+        Start, CenterVertically
     ) {
         Text(
             stringResource(R.string.profile_meeting_history_label),

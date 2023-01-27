@@ -13,7 +13,8 @@ import ru.rikmasters.gilty.shared.common.PhotoViewState
 @Composable
 fun AvatarScreen(
     vm: AvatarViewModel,
-    avatar: String
+    avatar: String,
+    type: Int,
 ) {
     
     val nav = get<NavState>()
@@ -23,7 +24,7 @@ fun AvatarScreen(
     
     PhotoView(
         PhotoViewState(
-            avatar, ("1/1"), menu, (0)
+            avatar, ("1/1"), menu, type
         ), Modifier, object: PhotoViewCallback {
             
             override fun onMenuItemClick(point: Int) {

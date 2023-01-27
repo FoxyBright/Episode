@@ -27,7 +27,7 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     asm.bottomSheet.collapse()
-                    nav.navigate("avatar?image=${image.url}")
+                    nav.navigate("avatar?type=0&image=${image.url}")
                 }
             }
             

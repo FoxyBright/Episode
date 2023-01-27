@@ -148,7 +148,7 @@ private fun Content(
             message.type != NOTIFICATION
             && state.avatar
         ) AsyncImage(
-            message.sender.avatar.id, (null),
+            message.sender.avatar?.id, (null),
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)

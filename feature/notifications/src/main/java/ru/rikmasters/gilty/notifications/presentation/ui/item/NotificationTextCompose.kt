@@ -8,21 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.BOLD
-import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.MEET
-import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.TEXT
-import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.TIME
-import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.USER
+import ru.rikmasters.gilty.notifications.presentation.ui.item.CustomText.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
@@ -30,10 +23,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.LEAVE_EMOTIONS
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.MEETING_OVER
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.RESPOND_ACCEPT
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -42,7 +32,7 @@ private fun LEAVE_EMOTIONS() {
     GiltyTheme {
         NotificationText(
             DemoOrganizerModel, LEAVE_EMOTIONS, DemoMeetingModel,
-            getDifferenceOfTime(DemoMeetingModel.dateTime),
+            getDifferenceOfTime(DemoMeetingModel.datetime),
             Modifier.padding(20.dp)
         )
     }
@@ -54,7 +44,7 @@ private fun MEETING_OVER() {
     GiltyTheme {
         NotificationText(
             DemoOrganizerModel, MEETING_OVER, DemoMeetingModel,
-            getDifferenceOfTime(DemoMeetingModel.dateTime),
+            getDifferenceOfTime(DemoMeetingModel.datetime),
             Modifier.padding(20.dp)
         )
     }
@@ -66,7 +56,7 @@ private fun RESPOND_ACCEPT() {
     GiltyTheme {
         NotificationText(
             DemoOrganizerModel, RESPOND_ACCEPT, DemoMeetingModel,
-            getDifferenceOfTime(DemoMeetingModel.dateTime),
+            getDifferenceOfTime(DemoMeetingModel.datetime),
             Modifier.padding(20.dp)
         )
     }
@@ -107,7 +97,7 @@ fun NotificationText(
             withStyle(Text(TEXT)) {
                 append(
                     "${
-                        meet.dateTime.dateCalendar()
+                        meet.datetime.dateCalendar()
                     }. ${stringResource(R.string.notification_organizer_label)} "
                 )
             }

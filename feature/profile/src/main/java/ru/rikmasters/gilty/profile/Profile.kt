@@ -10,10 +10,10 @@ import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.profile.presentation.ui.photo.AvatarScreen
-import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.ProfileSelectPhotoScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
+import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
 
@@ -31,16 +31,20 @@ object Profile: FeatureDefinition() {
             }
             
             screen<AvatarViewModel>(
-                "avatar?image={image}&hash={hash}",
+                "avatar?type={type}&image={image}&hash={hash}",
                 listOf(navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 }, navArgument("hash") {
                     type = NavType.StringType; defaultValue = ""
+                }, navArgument("type") {
+                    type = NavType.IntType; defaultValue = 0
                 })
             ) { vm, it ->
                 it.arguments?.getString("image")?.let { image ->
                     it.arguments?.getString("hash")?.let { hash ->
-                        AvatarScreen(vm, "$image&hash=$hash")
+                        it.arguments?.getInt("type")?.let { type ->
+                            AvatarScreen(vm, "$image&hash=$hash", type)
+                        }
                     }
                 }
             }

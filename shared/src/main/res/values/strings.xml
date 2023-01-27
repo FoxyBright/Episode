@@ -110,6 +110,7 @@
     <string name="notification_send_emotion">Оставьте эмоции участникам встречи</string>
 
     <!-- Meeting -->
+    <string name="meeting_canceled">Отменить meet</string>
     <string name="meeting_personal_type">Персональная встреча</string>
     <string name="meeting_group_type">Групповая встреча</string>
     <string name="meeting_anon_type">Анонимная встреча</string>
@@ -142,6 +143,7 @@
     <string name="meeting_empty_meet_label">Вы просмотрели все\nактуальные meets</string>
     <string name="meeting_repeat_button">Повторить</string>
     <string name="meeting_get_more_button">Хочу еще</string>
+    <string name="meeting_anonymous_members_label">Так как meet анонимный, профили участников\nне будут видны на протяжении всего meet</string>
 
 
     <!--Meeting Filters-->

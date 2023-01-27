@@ -50,7 +50,7 @@ fun OrganizerBs(
                 scope.launch(coroutineContext) {
                     asm.bottomSheet.expand {
                         Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet)
+                            MeetingBs(it, meet.id)
                         }
                     }
                 }
@@ -60,7 +60,7 @@ fun OrganizerBs(
                 scope.launch(coroutineContext) {
                     asm.bottomSheet.expand {
                         Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet)
+                            MeetingBs(it, meet.id)
                         }
                     }
                 }

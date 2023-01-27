@@ -23,16 +23,16 @@ fun durationToMinutes(duration: String): Int {
 
 fun durationToString(duration: Int): String {
     val hours = (duration - (duration % 60)) / 60
-    val minutes = duration - hours
+    val minutes = duration - hours * 60
     val hoursLabel = when("$hours".last()) {
         '1' -> "час"
         '2', '3', '4' -> "часа"
         else -> "часов"
     }
     return when {
-        hours > 0 && minutes > 0 -> "$hours:$minutes"
+        hours > 0 && minutes > 0 -> "$hours:$minutes ч"
         hours > 0 -> "$hours $hoursLabel"
-        minutes > 0 -> "$$minutes мин"
+        minutes > 0 -> "$minutes мин"
         else -> ""
     }
 }

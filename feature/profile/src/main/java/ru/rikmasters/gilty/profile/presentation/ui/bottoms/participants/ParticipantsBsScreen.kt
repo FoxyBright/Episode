@@ -9,12 +9,13 @@ import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MeetingBs
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.MeetingBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ParticipantsBsViewModel
-import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 
 @Composable
 fun ParticipantsBs(
     vm: ParticipantsBsViewModel,
-    meet: MeetingModel,
+    meet: FullMeetingModel,
 ) {
     
     val asm = get<AppStateModel>()
@@ -29,7 +30,7 @@ fun ParticipantsBs(
                 scope.launch {
                     asm.bottomSheet.expand {
                         Connector<MeetingBsViewModel> {
-                            MeetingBs(it, meet)
+                            MeetingBs(it, meet.id)
                         }
                     }
                 }

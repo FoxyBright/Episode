@@ -42,12 +42,12 @@ class ObserverBsViewModel: ViewModel() {
     suspend fun onSubScribe(member: MemberModel, type: SubscribeType) {
         when(type) {
             SUB -> {
-                profileManager.subscribeToUser(member)
+                profileManager.subscribeToUser(member.id)
                 _observers.emit(observables.value - member)
             }
             
             UNSUB -> {
-                profileManager.unsubscribeFromUser(member)
+                profileManager.unsubscribeFromUser(member.id)
                 _observables.emit(observables.value - member)
             }
             

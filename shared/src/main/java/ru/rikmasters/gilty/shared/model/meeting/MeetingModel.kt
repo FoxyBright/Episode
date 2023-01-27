@@ -1,9 +1,9 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import java.util.UUID.randomUUID
 
 data class MeetingModel(
@@ -13,7 +13,7 @@ data class MeetingModel(
     val category: CategoryModel,
     val duration: String,
     val type: MeetType,
-    val dateTime: String,
+    val datetime: String,
     val organizer: OrganizerModel?,
     val isOnline: Boolean,
     val tags: List<TagModel>,
@@ -25,9 +25,37 @@ data class MeetingModel(
     val address: String,
     val hideAddress: Boolean,
     val price: Int? = null,
-)
+) {
+    
+    fun map() = FullMeetingModel( // TODO - поправить на нормальные данные
+        id = id,
+        userId = id,
+        condition = condition,
+        category = category,
+        duration = duration,
+        type = type,
+        datetime = datetime,
+        organizer = organizer ?: DemoOrganizerModel,
+        isOnline = isOnline,
+        tags = tags,
+        description = description,
+        isPrivate = isPrivate,
+        requirements = requirements?.let { listOf(it) } ?: emptyList(),
+        place = place,
+        membersCount = memberCount,
+        address = address,
+        hideAddress = hideAddress,
+        price = price,
+        withoutResponds = false,
+        status = ACTIVE,
+        membersMax = 0,
+        members = emptyList(),
+        location = null,
+        memberState = IS_MEMBER
+    )
+}
 
-data class FullMeetModel(
+data class FullMeetingModel(
     val id: String,
     val userId: String,
     val organizer: OrganizerModel,
@@ -50,7 +78,56 @@ data class FullMeetModel(
     val location: LocationModel? = null,
     val place: String? = null,
     val address: String? = null,
-    val memberState: String,
+    val memberState: MemberStateType,
+    val price: Int? = null,
+) {
+    
+    fun map() = MeetingModel(
+        id = id,
+        title = tags.first().title,
+        condition = condition,
+        category = category,
+        duration = duration,
+        type = type,
+        datetime = datetime,
+        organizer = organizer,
+        isOnline = isOnline,
+        tags = tags,
+        description = description,
+        isPrivate = isPrivate,
+        memberCount = membersCount,
+        requirements = requirements?.first(),
+        place = place ?: "",
+        address = address ?: "",
+        hideAddress = hideAddress == true,
+        price = price,
+    )
+}
+
+val DemoFullMeetingModel = FullMeetingModel(
+    id = randomUUID().toString(),
+    userId = randomUUID().toString(),
+    condition = MEMBER_PAY,
+    category = DemoCategoryModel,
+    duration = "2 часа",
+    type = MeetType.GROUP,
+    organizer = DemoOrganizerModel,
+    isOnline = true,
+    tags = DemoTagList,
+    datetime = "2022-11-28T20:00:54.140Z",
+    description = "Описание вечеринки",
+    isPrivate = false,
+    requirements = DemoRequirementModelList,
+    place = "Москва-сити",
+    address = "Москва, ул. Пушкина 42",
+    hideAddress = false,
+    withoutResponds = false,
+    status = ACTIVE,
+    membersCount = DemoMemberModelList.size,
+    membersMax = 10,
+    members = DemoMemberModelList,
+    location = DemoLocationModel,
+    memberState = IS_MEMBER
 )
 
 val DemoMeetingModel = MeetingModel(
@@ -60,7 +137,7 @@ val DemoMeetingModel = MeetingModel(
     category = DemoCategoryModel,
     duration = "2 часа",
     type = MeetType.GROUP,
-    dateTime = "2022-11-28T20:00:54.140Z",
+    datetime = "2022-11-28T20:00:54.140Z",
     organizer = DemoOrganizerModel,
     isOnline = false,
     tags = DemoTagList,

@@ -19,7 +19,7 @@ data class ProfileResponse(
     val aboutMe: String? = null,
     val emojiType: String? = null,
     val average: String? = null,
-    val avatar: Avatar,
+    val avatar: Avatar? = null,
     val subscriptionExpiredAt: String? = null,
     val thumbnail: Thumbnail,
     val responds: Responds? = null,
@@ -50,7 +50,7 @@ data class ProfileResponse(
             average = average ?: "0.0",
             emoji = getEmoji(emojiType.toString())
         ),
-        avatar = avatar.map(),
+        avatar = avatar?.map(),
         thumbnail = thumbnail.map(),
         isCompleted = isCompleted == true,
         subscriptionExpiredAt = subscriptionExpiredAt,

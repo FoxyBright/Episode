@@ -152,12 +152,12 @@ fun MeetingStates(
     meet: MeetingModel,
     small: Boolean = false
 ) {
-    val today = todayControl(meet.dateTime)
+    val today = todayControl(meet.datetime)
     Box(modifier) {
         Row(Modifier.align(Alignment.CenterEnd)) {
             Column(horizontalAlignment = Alignment.End) {
                 DateTimeCard(
-                    meet.dateTime,
+                    meet.datetime,
                     if(meet.isOnline) Gradients.green()
                     else Gradients.red(), today, Modifier,
                     if(small) typography.displaySmall

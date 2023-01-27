@@ -40,9 +40,7 @@ import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
@@ -130,7 +128,7 @@ fun HiddenContent(
         CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
             when(profileType) {
-                ORGANIZER -> USERPROFILE
+                ORGANIZER, ANONYMOUS_ORGANIZER -> USERPROFILE
                 CREATE -> CREATE
                 USERPROFILE -> if(emptyImage)
                     CREATE else USERPROFILE
@@ -141,7 +139,7 @@ fun HiddenContent(
 
 @Composable
 private fun Lock(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier
@@ -172,7 +170,7 @@ fun ProfileImageContent(
     profileType: ProfileType,
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier
@@ -207,7 +205,7 @@ fun ProfileImageContent(
                 ) { onObserveChange(it) }
             }
             
-            USERPROFILE -> {}
+            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
         }
     }
 }
@@ -217,7 +215,7 @@ private fun CreateProfileCardRow(
     text: String,
     profileType: ProfileType,
     observeState: Boolean = false,
-    onClick: ((Boolean) -> Unit)? = null
+    onClick: ((Boolean) -> Unit)? = null,
 ) {
     Row(
         Modifier
@@ -259,7 +257,7 @@ private fun CreateProfileCardRow(
             ORGANIZER -> ObserveCheckBox(observeState)
             { bool -> onClick?.let { it(bool) } }
             
-            USERPROFILE -> {}
+            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
         }
     }
 }
@@ -273,7 +271,7 @@ fun ProfileStatisticContent(
     observed: Int,
     profileType: ProfileType,
     emoji: EmojiModel? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -325,7 +323,7 @@ fun ProfileStatisticContent(
 private fun RatingText(
     text: String,
     profileType: ProfileType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val style = if(profileType == CREATE)
         ThemeExtra.typography.RatingSmallText
@@ -356,7 +354,7 @@ private fun RatingText(
 private fun Observe(
     modifier: Modifier = Modifier,
     profileType: ProfileType,
-    text: String, count: Int
+    text: String, count: Int,
 ) {
     Column(
         modifier, Top, CenterHorizontally
@@ -421,7 +419,7 @@ fun digitalConverter(digit: Int): String {
 private fun Cloud(
     profileType: ProfileType,
     modifier: Modifier,
-    emoji: EmojiModel?
+    emoji: EmojiModel?,
 ) {
     val create = profileType == CREATE
     Row(modifier, Start, Bottom) {
@@ -469,7 +467,7 @@ private fun Cloud(
 private fun MiniCloud(
     modifier: Modifier = Modifier,
     content: @Composable
-    (() -> Unit)? = null
+    (() -> Unit)? = null,
 ) = Box(
     modifier.background(
         colors.chipGray,

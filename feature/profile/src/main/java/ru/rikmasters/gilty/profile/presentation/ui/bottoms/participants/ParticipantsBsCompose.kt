@@ -23,7 +23,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun ParticipantsListPreview() {
     GiltyTheme {
         ParticipantsList(
-            DemoMeetingModel,
+            DemoFullMeetingModel,
             DemoMemberModelList
         )
     }
@@ -38,7 +38,7 @@ interface ParticipantsListCallback {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ParticipantsList(
-    meet: MeetingModel,
+    meet: FullMeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
     callback: ParticipantsListCallback? = null,
@@ -46,7 +46,7 @@ fun ParticipantsList(
     Column(modifier) {
         RowActionBar(
             stringResource(R.string.meeting_members),
-            "${membersList.size}/${meet.memberCount}"
+            "${membersList.size}/${meet.membersCount}"
         ) { callback?.onBack() }
         LazyColumn(
             Modifier
@@ -62,7 +62,7 @@ fun ParticipantsList(
                     colors = cardColors(colorScheme.primaryContainer)
                 ) {
                     BrieflyRow(
-                        meet.organizer?.avatar,
+                        meet.organizer.avatar,
                         "${member.username}, ${member.age}",
                         modifier = Modifier.padding(16.dp)
                     ); if(index < membersList.size - 1)

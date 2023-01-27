@@ -12,23 +12,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.string.meeting_question_comment_or_assess
-import ru.rikmasters.gilty.shared.R.string.respond_to_meet
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.shared.GAlert
+import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
 @Composable
 private fun MeetingBsDetailed() {
     GiltyTheme {
-        val meet = DemoMeetingModel
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet,
+                    (false), DemoFullMeetingModel,
                     detailed = Pair("", true)
                 ), Modifier.padding(16.dp)
             )
@@ -40,7 +38,7 @@ private fun MeetingBsDetailed() {
 @Composable
 private fun MeetingBsObserve() {
     GiltyTheme {
-        val meet = DemoMeetingModel
+        val meet = DemoFullMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
@@ -60,7 +58,7 @@ private fun MeetingBsObserve() {
 @Composable
 private fun MeetingBsShared() {
     GiltyTheme {
-        val meet = DemoMeetingModel
+        val meet = DemoFullMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
@@ -86,7 +84,7 @@ private fun MeetingBsWhenUser() {
                 .fillMaxSize()
                 .background(colorScheme.background)
         ) {
-            val meet = DemoMeetingModel.copy(
+            val meet = DemoFullMeetingModel.copy(
                 type = ANONYMOUS,
                 isPrivate = true,
                 isOnline = true
@@ -103,30 +101,30 @@ private fun MeetingBsWhenUser() {
 
 data class MeetingBsState(
     val menuState: Boolean,
-    val meet: MeetingModel,
+    val meet: FullMeetingModel,
     val membersList: List<MemberModel>? = null,
     val meetDistance: String? = null,
     val userInMeet: Boolean = false,
     val buttonState: Boolean = true,
     val shared: Boolean = false,
     val detailed: Pair<String, Boolean>? = null,
-    val alert: Boolean = false,
+    val backButton: Boolean = false
 )
 
 interface MeetingBsCallback {
     
     fun onKebabClick(state: Boolean) {}
-    fun onMenuItemClick(index: Int) {}
-    fun onMeetPlaceClick(meet: MeetingModel) {}
+    fun onMenuItemClick(index: Int, meetId: String) {}
+    fun onMeetPlaceClick(meetLocation: LocationModel?) {}
     fun onMemberClick(member: MemberModel) {}
-    fun onBottomButtonClick(point: Int) {}
-    fun onAvatarClick() {}
-    fun closeAlert() {}
-    fun onAllMembersClick() {}
+    fun onRespondClick(meetId: String) {}
+    fun onAvatarClick(organizerId: String) {}
+    fun onAllMembersClick(meetId: String) {}
     fun onHiddenPhotoActive(hidden: Boolean) {}
     fun onCommentChange(text: String) {}
     fun onCommentTextClear() {}
     fun onRespondsClick() {}
+    fun onBack(){}
 }
 
 @Composable
@@ -144,7 +142,8 @@ fun MeetingBsContent(
                         ?.let { 28.dp } ?: 0.dp
                 ), MeetingBsTopBarState(
                     state.meet, state.menuState,
-                    description = state.detailed == null
+                    description = state.detailed == null,
+                    backButton = state.backButton
                 ), callback
             )
         }
@@ -153,7 +152,7 @@ fun MeetingBsContent(
             
             item {
                 Text(
-                    stringResource(meeting_question_comment_or_assess),
+                    stringResource(R.string.meeting_question_comment_or_assess),
                     Modifier, style = typography.labelLarge
                 )
             }
@@ -176,7 +175,7 @@ fun MeetingBsContent(
             
             item {
                 MeetingBsConditions(
-                    state.meet, Modifier.padding(top = 32.dp)
+                    state.meet.map(), Modifier.padding(top = 32.dp)
                 )
             }
             
@@ -184,7 +183,7 @@ fun MeetingBsContent(
                 item {
                     MeetingBsParticipants(
                         state.meet, it, Modifier,
-                        { callback?.onAllMembersClick() })
+                        { callback?.onAllMembersClick(state.meet.id) })
                     { callback?.onMemberClick(it) }
                 }
             }
@@ -192,28 +191,38 @@ fun MeetingBsContent(
             state.meetDistance?.let {
                 if(!state.meet.isOnline) item {
                     MeetingBsMap(
-                        state.meet, it, Modifier.padding(top = 28.dp)
-                    ) { callback?.onMeetPlaceClick(state.meet) }
+                        state.meet, it,
+                        Modifier.padding(top = 28.dp)
+                    ) { callback?.onMeetPlaceClick(state.meet.location) }
                 }
             }
         }
+        val memberState = state.meet.memberState
         item {
-            if(state.buttonState) MeetingBsButtons(
-                state.userInMeet, state.meet.isOnline, state.shared
-            ) { callback?.onBottomButtonClick(it) }
-            else TextButton(
-                Modifier.padding(top = 28.dp, bottom = 32.dp),
-                (null), stringResource(respond_to_meet)
-            )
+            when(memberState) {
+                RESPOND_SENT -> TextButton(
+                    Modifier, state.meet.isOnline,
+                    stringResource(R.string.respond_to_meet)
+                )
+                
+                IS_MEMBER, IS_ORGANIZER -> {}
+                
+                else -> GradientButton(
+                    Modifier.padding(top = 20.dp, bottom = 12.dp),
+                    stringResource(R.string.meeting_respond),
+                    online = state.meet.isOnline,
+                    enabled = when(memberState) {
+                        IS_KICKED, NOT_UNDER_REQUIREMENTS,
+                        RESPOND_REJECTED,
+                        -> false
+                        
+                        else -> true
+                    }
+                ) { callback?.onRespondClick(state.meet.id) }
+            }
         }
         item {
             Spacer(Modifier.height(40.dp))
         }
     }
-    GAlert(
-        state.alert, { callback?.closeAlert() },
-        stringResource(R.string.complaints_send_answer),
-        label = stringResource(R.string.complaints_moderate_sen_answer),
-        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
-    )
 }

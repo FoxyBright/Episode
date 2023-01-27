@@ -1,12 +1,11 @@
 package ru.rikmasters.gilty.auth.meetings
 
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.image.ThumbnailModel
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.valueOf
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -36,9 +35,10 @@ data class DetailedMeetResponse(
     val place: String? = null,
     val address: String? = null,
     val memberState: String,
+    val price: Int? = null,
 ) {
     
-    fun map() = FullMeetModel(
+    fun map() = FullMeetingModel(
         id = id,
         userId = userId,
         organizer = organizer.map(),
@@ -48,7 +48,7 @@ data class DetailedMeetResponse(
         isOnline = isOnline,
         tags = tags.map { it.map() },
         description = description ?: "",
-        datetime = datetime,
+        datetime = LocalDateTime.of(datetime).toString(),
         duration = durationToString(duration),
         isPrivate = isPrivate,
         withoutResponds = withoutResponds,
@@ -61,7 +61,8 @@ data class DetailedMeetResponse(
         location = location?.map(),
         place = place,
         address = address,
-        memberState = memberState
+        memberState = MemberStateType.valueOf(memberState),
+        price = price
     )
 }
 
@@ -97,7 +98,7 @@ data class Organizer(
     val id: String,
     val gender: String,
     val username: String,
-    val emojiType: String,
+    val emojiType: String? = null,
     val avatar: Avatar,
     val thumbnail: Thumbnail,
     val age: Int,
@@ -107,8 +108,9 @@ data class Organizer(
     
     fun map() = OrganizerModel(
         id, valueOf(gender),
-        username, getEmoji(emojiType),
-        avatar.map(), age, isAnonymous,
+        username, getEmoji(emojiType.toString()),
+        avatar.map(), thumbnail.map(),
+        age, isAnonymous,
         isOnline
     )
 }
@@ -118,7 +120,7 @@ data class Member(
     val gender: String,
     val username: String,
     val emojiType: String,
-    val avatar: Avatar,
+    val avatar: Avatar? = null,
     val thumbnail: Thumbnail,
     val age: Int,
     val isAnonymous: Boolean,
@@ -128,8 +130,8 @@ data class Member(
     fun map() = MemberModel(
         id, valueOf(gender),
         username, getEmoji(emojiType),
-        avatar.map(), age, isAnonymous,
-        isOnline
+        avatar?.map(), thumbnail.map(),
+        age, isAnonymous, isOnline
     )
 }
 

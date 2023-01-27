@@ -26,27 +26,15 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.R.drawable.*
-import ru.rikmasters.gilty.shared.R.string.*
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-
-@Preview
-@Composable
-private fun MeetingBsButtonsPreview() {
-    GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
-            Column(Modifier.padding(16.dp)) {
-                MeetingBsButtons((false), (true))
-                MeetingBsButtons((true))
-                MeetingBsButtons((false), (false), (true))
-            }
-        }
-    }
-}
 
 @Preview
 @Composable
@@ -55,7 +43,7 @@ private fun MeetingBsMapPreview() {
         val meet = DemoMeetingModel
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsMap(
-                DemoMeetingModel,
+                DemoFullMeetingModel,
                 distanceCalculator(meet),
                 Modifier.padding(16.dp)
             )
@@ -81,7 +69,7 @@ private fun MeetingBsParticipantsPreview() {
     GiltyTheme {
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsParticipants(
-                DemoMeetingModel.copy(isOnline = true),
+                DemoFullMeetingModel.copy(isOnline = true),
                 DemoMemberModelList,
                 Modifier.padding(16.dp)
             )
@@ -115,48 +103,10 @@ private fun MeetingBsHiddenPreview() {
     }
 }
 
-
-@Composable
-fun MeetingBsButtons(
-    userInMeet: Boolean = false,
-    online: Boolean = false,
-    shared: Boolean = false,
-    onClick: ((Int) -> Unit)? = null,
-) {
-    when {
-        shared -> {
-            Column {
-                GradientButton(
-                    Modifier.padding(top = 20.dp, bottom = 12.dp),
-                    stringResource(meeting_shared_button), online = online,
-                    icon = ic_shared
-                ) { onClick?.let { it(2) } }
-                TextButton(
-                    Modifier, (null),
-                    stringResource(cancel_button)
-                ) { onClick?.let { it(3) } }
-            }
-        }
-        
-        userInMeet -> TextButton(
-            Modifier.padding(
-                top = 20.dp,
-                bottom = 12.dp
-            ), online,
-            stringResource(exit_from_meet)
-        ) { onClick?.let { it(1) } }
-        
-        else -> GradientButton(
-            Modifier.padding(top = 20.dp, bottom = 12.dp),
-            stringResource(meeting_respond), online = online
-        ) { onClick?.let { it(0) } }
-    }
-}
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingBsMap(
-    meet: MeetingModel,
+    meet: FullMeetingModel,
     distance: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -164,7 +114,7 @@ fun MeetingBsMap(
     Column(modifier) {
         Row(Modifier.padding(bottom = 18.dp)) {
             Text(
-                stringResource(meeting_distance_from_user),
+                stringResource(R.string.meeting_distance_from_user),
                 Modifier.padding(end = 8.dp),
                 colorScheme.tertiary,
                 style = typography.labelLarge
@@ -186,7 +136,21 @@ fun MeetingBsMap(
                 Modifier.padding(horizontal = 16.dp),
                 SpaceBetween, CenterVertically
             ) {
-                Column(
+                if(meet.type == ANONYMOUS
+                    || (meet.memberState != IS_MEMBER
+                            && meet.memberState != IS_ORGANIZER)
+                    || meet.address == null
+                    || meet.place == null
+                    || meet.hideAddress == true
+                ) {
+                    Text(
+                        stringResource(R.string.meeting_watch_on_mup_button),
+                        Modifier.padding(16.dp),
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium,
+                        fontWeight = SemiBold
+                    )
+                } else Column(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -198,7 +162,7 @@ fun MeetingBsMap(
                         style = typography.headlineSmall
                     )
                     Text(
-                        meet.place, Modifier
+                        meet.address, Modifier
                             .padding(top = 2.dp, bottom = 10.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium
@@ -211,6 +175,16 @@ fun MeetingBsMap(
                 )
             }
         }
+        Text(
+            stringResource(R.string.add_meet_detailed_meet_place_place_holder),
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 14.dp, start = 16.dp,
+                    bottom = 12.dp
+                ), colorScheme.onTertiary,
+            style = typography.headlineSmall
+        )
     }
 }
 
@@ -221,7 +195,7 @@ fun MeetingBsConditions(
 ) {
     Column(modifier) {
         Text(
-            stringResource(meeting_terms),
+            stringResource(R.string.meeting_terms),
             Modifier, colorScheme.tertiary,
             style = typography.labelLarge
         )
@@ -252,7 +226,7 @@ fun MeetingBsConditions(
                 ) {
                     if(meet.condition == MEMBER_PAY)
                         Image(
-                            painterResource(ic_money),
+                            painterResource(R.drawable.ic_money),
                             (null), Modifier
                                 .padding(end = 16.dp)
                                 .size(24.dp)
@@ -277,7 +251,7 @@ fun MeetingBsConditions(
 
 @Composable
 fun MeetingBsParticipants(
-    meet: MeetingModel,
+    meet: FullMeetingModel,
     membersList: List<MemberModel>,
     modifier: Modifier = Modifier,
     onAllViewClick: (() -> Unit)? = null,
@@ -292,13 +266,14 @@ fun MeetingBsParticipants(
         ) {
             Row(Modifier, Start, CenterVertically) {
                 Text(
-                    stringResource(meeting_members),
+                    stringResource(R.string.meeting_members),
                     Modifier, colorScheme.tertiary,
                     style = typography.labelLarge
                 )
                 Text(
-                    "${membersList.size}/" +
-                            "${meet.memberCount}",
+                    "${membersList.size}" +
+                            if(meet.membersMax > 0)
+                                "/" + meet.membersMax else "",
                     Modifier.padding(start = 8.dp),
                     if(meet.isOnline)
                         colorScheme.secondary
@@ -308,15 +283,15 @@ fun MeetingBsParticipants(
                 Image(
                     painterResource(
                         if(meet.isPrivate)
-                            ic_lock_close
-                        else ic_lock_open
+                            R.drawable.ic_lock_close
+                        else R.drawable.ic_lock_open
                     ), (null), Modifier
                         .padding(start = 8.dp),
                     colorFilter = tint(colorScheme.tertiary)
                 )
             }
             Text(
-                stringResource(meeting_watch_all_members_in_meet),
+                stringResource(R.string.meeting_watch_all_members_in_meet),
                 Modifier.clickable(
                     MutableInteractionSource(), (null)
                 ) { onAllViewClick?.let { it() } },
@@ -338,7 +313,10 @@ fun MeetingBsParticipants(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .clickable { onMemberClick?.let { it(member) } },
+                        .clickable {
+                            if(meet.type != ANONYMOUS)
+                                onMemberClick?.let { it(member) }
+                        },
                     SpaceBetween, CenterVertically
                 ) {
                     BrieflyRow(
@@ -355,6 +333,15 @@ fun MeetingBsParticipants(
                 Divider(Modifier.padding(start = 60.dp))
             }
         }
+        if(meet.type == ANONYMOUS) Text(
+            stringResource(R.string.meeting_anonymous_members_label), Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 14.dp, start = 16.dp,
+                    bottom = 12.dp
+                ), colorScheme.onTertiary,
+            style = typography.headlineSmall
+        )
     }
 }
 
@@ -373,10 +360,10 @@ fun MeetingBsComment(
             shape = shapes.medium,
             colors = descriptionColors(online),
             label = if(text.isNotEmpty()) textFieldLabel(
-                (true), stringResource(meeting_comment_text_holder)
+                (true), stringResource(R.string.meeting_comment_text_holder)
             ) else null,
             placeholder = textFieldLabel(
-                (false), stringResource(meeting_comment_text_holder)
+                (false), stringResource(R.string.meeting_comment_text_holder)
             ), textStyle = typography.bodyMedium,
             clear = onTextClear
         )
@@ -397,11 +384,11 @@ fun MeetingBsHidden(
 ) {
     Column(modifier) {
         CheckBoxCard(
-            stringResource(meeting_open_hidden_photos),
+            stringResource(R.string.meeting_open_hidden_photos),
             Modifier, state, online = online
         ) { onChange(it) }
         BoxLabel(
-            stringResource(meeting_only_organizer_label),
+            stringResource(R.string.meeting_only_organizer_label),
             Modifier.padding(top = 4.dp, start = 16.dp)
         )
     }

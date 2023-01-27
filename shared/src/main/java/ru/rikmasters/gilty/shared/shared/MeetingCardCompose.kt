@@ -108,7 +108,7 @@ fun MeetingCard(
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
-                meeting.dateTime,
+                meeting.datetime,
                 green(), today
             )
             if(today) CategoriesListCard(
@@ -173,7 +173,7 @@ fun MeetingCategoryCard(
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
-                meeting.dateTime,
+                meeting.datetime,
                 when {
                     old -> gray()
                     meeting.isOnline -> green()

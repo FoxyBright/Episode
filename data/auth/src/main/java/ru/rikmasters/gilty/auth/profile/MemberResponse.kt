@@ -9,7 +9,7 @@ data class MemberResponse(
     val id: String,
     val gender: String,
     val username: String,
-    val emojiType: String,
+    val emojiType: String? = null,
     val thumbnail: Thumbnail,
     val age: Int,
 ) {
@@ -18,8 +18,9 @@ data class MemberResponse(
         id = id,
         gender = valueOf(gender),
         username = username,
-        emoji = getEmoji(emojiType),
+        emoji = getEmoji(emojiType.toString()),
         thumbnail.map().map(),
+        thumbnail.map(),
         age = age,
         isAnonymous = false,
         isOnline = false

@@ -68,7 +68,7 @@ fun Responds(
             ) {
                 image?.let {
                     AsyncImage(
-                        it.id, (null), Modifier
+                        it.url, (null), Modifier
                             .size(40.dp)
                             .clip(CircleShape),
                         contentScale = Crop

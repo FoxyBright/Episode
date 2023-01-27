@@ -66,6 +66,7 @@ fun <T: ViewModel> Connector(
 }
 
 @Composable
+@Suppress("unused")
 inline fun <reified T: ViewModel> Use(
     vararg traits: TraitWrapperFactory,
     crossinline content: @Composable () -> Unit

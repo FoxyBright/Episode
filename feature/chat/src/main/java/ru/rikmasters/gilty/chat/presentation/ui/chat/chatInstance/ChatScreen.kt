@@ -101,27 +101,27 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             menuState = state
         }
         
-        override fun onAvatarClick() {
+        override fun onAvatarClick(organizerId: String) {
             scope.launch {
                 asm.bottomSheet.expand {
-//                    Organizer(
-//                        DemoProfileModel, meet,
-//                        asm, scope
-//                    )
+                    //                    Organizer(
+                    //                        DemoProfileModel, meet,
+                    //                        asm, scope
+                    //                    )
                 }
             }
         }
         
-        override fun onBottomButtonClick(point: Int) {
+        override fun onRespondClick(meetId: String) {
             scope.launch { asm.bottomSheet.collapse() }
             meetOutAlert = true
         }
         
-        override fun onMenuItemClick(index: Int) {
+        override fun onMenuItemClick(index: Int, meetId: String) {
             scope.launch {
                 asm.bottomSheet.expand {
                     menuState = false
-                    ComplainsContent(meet) {
+                    ComplainsContent(meet.id) {
                         scope.launch {
                             asm.bottomSheet.collapse()
                         }; alert = true
@@ -329,7 +329,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                     asm.bottomSheet.expand {
                         MeetingBsContent(
                             MeetingBsState(
-                                menuState, meet,
+                                menuState, meet.map(),
                                 DemoMemberModelList,
                                 distanceCalculator(meet),
                                 (true),
@@ -349,7 +349,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                     1 -> scope.launch {
                         asm.bottomSheet.expand {
                             menuState = false
-                            ComplainsContent(meet) {
+                            ComplainsContent(meet.id) {
                                 scope.launch {
                                     asm.bottomSheet.collapse()
                                 }; alert = true

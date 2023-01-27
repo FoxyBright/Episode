@@ -22,3 +22,9 @@ val DemoRequirementModel = RequirementModel(
     ageMax = 40,
     orientation = DemoOrientationModel
 )
+
+val DemoRequirementModelList = listOf(
+    DemoRequirementModel,
+    DemoRequirementModel,
+    DemoRequirementModel
+)

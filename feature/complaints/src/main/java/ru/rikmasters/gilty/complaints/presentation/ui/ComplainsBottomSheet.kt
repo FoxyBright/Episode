@@ -8,13 +8,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainType.*
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 
 private enum class ComplainType { LIE, CHEAT, SPAM, OTHER }
 
 @Composable
-fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
+fun ComplainsContent(meetId: String, send: () -> Unit) {
     var tag by remember { mutableStateOf<ComplainType?>(null) }
     if(tag == null) {
         ComplainElements(
@@ -69,7 +68,6 @@ fun ComplainsContent(meet: MeetingModel, send: () -> Unit) {
                 stringResource(R.string.complaints_button),
             ) {
                 tag = null
-                meet.id // TODO жалоба на meet
                 send()
             }
         }

@@ -21,9 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.GTextField
@@ -115,8 +113,8 @@ fun Profile(
     Column(modifier) {
         TopBar(
             (state.profile?.username ?: ""),
-            state.profileType,
-            Modifier, { callback?.onBack() }
+            state.profileType, Modifier,
+            { callback?.onBack() }
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
@@ -163,12 +161,24 @@ fun Profile(
                 ) { callback?.hiddenImages() }
             }
         }
-        Description(
-            (state.profile?.aboutMe ?: ""),
-            state.profileType,
-            Modifier.padding(top = 20.dp)
-        ) { callback?.onDescriptionChange(it) }
+        when(state.profileType) {
+            CREATE, USERPROFILE -> Descript(state, callback)
+            ORGANIZER, ANONYMOUS_ORGANIZER ->
+                if((state.profile?.aboutMe ?: "").isNotBlank())
+                    Descript(state, callback)
+        }
     }
+}
+
+@Composable
+private fun Descript(
+    state: ProfileState,
+    callback: ProfileCallback?,
+) {
+    Description(
+        (state.profile?.aboutMe ?: ""),
+        state.profileType, Modifier.padding(top = 20.dp)
+    ) { callback?.onDescriptionChange(it) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -181,9 +191,11 @@ private fun TopBar(
     onTextChange: (String) -> Unit,
 ) {
     Row(modifier) {
-        if(profileType == ORGANIZER) IconButton(
+        if(profileType == ORGANIZER
+            || profileType == ANONYMOUS_ORGANIZER
+        ) IconButton(
             onBack, Modifier.padding(
-                top = 10.dp, end = 16.dp
+                top = 6.dp, end = 16.dp
             )
         ) {
             Icon(
@@ -193,7 +205,8 @@ private fun TopBar(
             )
         }
         TextField(
-            text, onTextChange, Modifier
+            text, onTextChange,
+            Modifier
                 .offset((-16).dp)
                 .fillMaxWidth(),
             colors = transparentTextFieldColors(),
@@ -212,8 +225,10 @@ private fun TopBar(
                         colorScheme.onTertiary
                     )
                 }
-            }, readOnly = profileType == ORGANIZER,
-            singleLine = true
+            },
+            readOnly = profileType == ORGANIZER
+                    || profileType == ANONYMOUS_ORGANIZER,
+            singleLine = true,
         )
     }
 }
@@ -238,7 +253,8 @@ private fun Description(
             Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            readOnly = (profileType == ORGANIZER),
+            readOnly = (profileType == ORGANIZER
+                    || profileType == ANONYMOUS_ORGANIZER),
             shape = shapes.large, colors = textFieldColors(),
             textStyle = typography.bodyMedium,
             keyboardActions = KeyboardActions {

@@ -266,13 +266,13 @@ private fun Message(
 
 @Composable
 private fun Avatar(
-    avatar: AvatarModel,
+    avatar: AvatarModel?,
     unRead: Int,
     modifier: Modifier = Modifier
 ) {
     Box(modifier) {
         AsyncImage(
-            avatar.id,
+            avatar?.url,
             stringResource(R.string.meeting_avatar),
             Modifier
                 .padding(start = 4.dp)

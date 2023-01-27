@@ -121,8 +121,8 @@ class UserProfileViewModel: ViewModel() {
     }
     
     private suspend fun getUserMeets() {
-        _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
         _meets.emit(profileManager.getUserMeets(ACTUAL))
+        _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
     }
     
     suspend fun setUserDate() {

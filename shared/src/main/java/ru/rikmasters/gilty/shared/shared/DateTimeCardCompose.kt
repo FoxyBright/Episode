@@ -23,13 +23,13 @@ import ru.rikmasters.gilty.shared.theme.Gradients
 @Preview
 @Composable
 fun TimeCardPreview() {
-    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), true)
+    DateTimeCard(DemoMeetingModel.datetime, Gradients.green(), true)
 }
 
 @Preview
 @Composable
 fun DateCardPreview() {
-    DateTimeCard(DemoMeetingModel.dateTime, Gradients.green(), false)
+    DateTimeCard(DemoMeetingModel.datetime, Gradients.green(), false)
 }
 
 @Composable
