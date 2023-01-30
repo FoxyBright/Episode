@@ -19,12 +19,14 @@ class ObserverBsViewModel: ViewModel() {
     private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
-    private val _observers = MutableStateFlow(listOf<MemberModel>())
+    private val _observers = MutableStateFlow(emptyList<MemberModel>())
     val observers = _observers.asStateFlow()
     
-    private val _observables = MutableStateFlow(listOf<MemberModel>())
+    private val _observables = MutableStateFlow(emptyList<MemberModel>())
     val observables = _observables.asStateFlow()
     
+    private val _unsubscribeMembers = MutableStateFlow(emptyList<MemberModel>())
+    val unsubscribeMembers = _unsubscribeMembers.asStateFlow()
     suspend fun changeObserversTab(tab: Int) {
         _observersSelectTab.emit(tab)
     }
@@ -39,16 +41,21 @@ class ObserverBsViewModel: ViewModel() {
     
     enum class SubscribeType { SUB, UNSUB, DELETE }
     
+    suspend fun unsubscribeMembers() {
+        unsubscribeMembers.value.forEach {
+            profileManager.unsubscribeFromUser(it.id)
+        }
+        _unsubscribeMembers.emit(emptyList())
+    }
+    
     suspend fun onSubScribe(member: MemberModel, type: SubscribeType) {
         when(type) {
-            SUB -> {
-                profileManager.subscribeToUser(member.id)
-                _observers.emit(observables.value - member)
-            }
-            
-            UNSUB -> {
-                profileManager.unsubscribeFromUser(member.id)
-                _observables.emit(observables.value - member)
+            SUB, UNSUB -> {
+                val list = unsubscribeMembers.value
+                _unsubscribeMembers.emit(
+                    if(list.contains(member)) list - member
+                    else list + member
+                )
             }
             
             DELETE -> {

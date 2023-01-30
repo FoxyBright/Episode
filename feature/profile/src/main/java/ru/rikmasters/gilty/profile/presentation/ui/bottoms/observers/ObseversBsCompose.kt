@@ -37,7 +37,8 @@ fun ObserversListPreview() {
         ObserversListContent(
             ObserversListState(
                 DemoProfileModel.username ?: "",
-                DemoMemberModelList, DemoMemberModelList, (0)
+                DemoMemberModelList, DemoMemberModelList,
+                emptyList(), (0)
             )
         )
     }
@@ -47,6 +48,7 @@ data class ObserversListState(
     val user: String,
     val observers: List<MemberModel>,
     val observed: List<MemberModel>,
+    val unsubList: List<MemberModel>,
     val selectTab: Int,
 )
 
@@ -106,7 +108,7 @@ fun ObserversListContent(
                 } else itemsIndexed(state.observed) { index, member ->
                 Column {
                     val subType =
-                        if(state.observed.contains(member)) UNSUB else SUB
+                        if(state.unsubList.contains(member)) SUB else UNSUB
                     ObserveItem(
                         Modifier, subType, member,
                         lazyItemsShapes(index, state.observed.size),

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.core.app.ui
 
+import android.content.res.Resources.getSystem
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -37,6 +38,7 @@ class BottomSheetState(
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
     
     suspend fun expand() = animateTo(BottomSheetSwipeState.EXPANDED)
+    @Suppress("unused")
     suspend fun halfExpand() = animateTo(BottomSheetSwipeState.HALF_EXPANDED)
     
     suspend fun collapse() {
@@ -47,13 +49,14 @@ class BottomSheetState(
         animateTo(content, BottomSheetSwipeState.EXPANDED)
     }
     
+    @Suppress("unused")
     suspend fun halfExpand(content: @Composable () -> Unit) {
         animateTo(content, BottomSheetSwipeState.HALF_EXPANDED)
     }
     
     private suspend fun animateTo(
         content: @Composable () -> Unit,
-        swipeState: BottomSheetSwipeState
+        swipeState: BottomSheetSwipeState,
     ) {
         animateTo(BottomSheetSwipeState.COLLAPSED)
         this.content = content
@@ -61,7 +64,7 @@ class BottomSheetState(
     }
     
     private suspend fun animateTo(
-        swipeState: BottomSheetSwipeState
+        swipeState: BottomSheetSwipeState,
     ) {
         if(swipeState != BottomSheetSwipeState.COLLAPSED && content == null)
             throw IllegalStateException("Открытие нижней панели без содержимого")
@@ -69,6 +72,11 @@ class BottomSheetState(
     }
     
     val offset: Float by swipeableState.offset
+    
+    fun ifCollapse(block: () -> Unit) {
+        if(offset > getSystem().displayMetrics.heightPixels * 0.99)
+            block.invoke()
+    }
     
     var gripLightColor: @Composable () -> Color
             by mutableStateOf({ MaterialTheme.colorScheme.outlineVariant })
@@ -150,7 +158,7 @@ fun BottomSheetLayout(
             LaunchedEffect(state.swipeableState.targetValue) {
                 focusManager.clearFocus()
             }
-    
+            
             LaunchedEffect(state.swipeableState.currentValue) {
                 if(state.swipeableState.currentValue == BottomSheetSwipeState.COLLAPSED)
                     state.content = null
@@ -185,7 +193,7 @@ fun BottomSheetLayout(
 @Composable
 private fun Grip(
     modifier: Modifier,
-    color: Color
+    color: Color,
 ) {
     Box(
         modifier
