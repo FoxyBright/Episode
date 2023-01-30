@@ -18,7 +18,8 @@ class TimeBsViewModel(
     private val _hour = MutableStateFlow(LOCAL_TIME.hour().toString())
     val hour = _hour.asStateFlow()
     
-    private val _minute = MutableStateFlow(LOCAL_TIME.minute().toString())
+    private val min = (LOCAL_TIME.minute() - (LOCAL_TIME.minute() % 5) + 5).toString()
+    private val _minute = MutableStateFlow(min)
     val minute = _minute.asStateFlow()
     
     suspend fun changeHour(hour: String) {

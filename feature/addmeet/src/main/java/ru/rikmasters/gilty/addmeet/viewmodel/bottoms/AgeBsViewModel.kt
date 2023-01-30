@@ -23,10 +23,12 @@ class AgeBsViewModel(
     val to = _to.asStateFlow()
     
     suspend fun changeFrom(from: String) {
+        if(to.value < from) _to.emit(from)
         _from.emit(from)
     }
     
     suspend fun changeTo(to: String) {
+        if(from.value > to) _from.emit(to)
         _to.emit(to)
     }
     
