@@ -4,10 +4,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
+import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 
 @Composable
 fun CategoriesScreen(vm: CategoryViewModel) {
@@ -23,7 +23,43 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
     var sleep by remember { mutableStateOf(false) }
     
+    fun clearStates() {
+        SelectCategory = null
+        Online = false
+        Condition = null
+        Price = ""
+        Hidden = false
+        RestrictChat = false
+        MeetingType = null
+        Tags = emptyList()
+        Description = ""
+        HideAddress = false
+        Address = ""
+        Place = ""
+        Date = ""
+        Duration = ""
+        AgeFrom = ""
+        AgeTo = ""
+        Gender = null
+        Orientation = null
+        MemberCount = ""
+        Private = false
+        WithoutRespond = false
+        MemberLimited = false
+        Requirements = arrayListOf(
+            RequirementModel(
+                gender = null,
+                ageMin = 0,
+                ageMax = 0,
+                orientation = null
+            )
+        )
+        RequirementsType = 0
+    }
+    
     LaunchedEffect(Unit) {
+        vm.selectCategory(null)
+        clearStates()
         vm.getCategories()
         sleep = true
     }

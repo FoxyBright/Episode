@@ -26,7 +26,7 @@ class CategoryViewModel: ViewModel() {
         _alert.emit(state)
     }
     
-    suspend fun selectCategory(category: CategoryModel) {
+    suspend fun selectCategory(category: CategoryModel?) {
         _selected.emit(category)
         SelectCategory = selected.value
     }
