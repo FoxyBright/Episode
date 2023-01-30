@@ -15,30 +15,45 @@ class TimeBsViewModel(
     private val _date = MutableStateFlow(TODAY_LABEL)
     val date = _date.asStateFlow()
     
-    private val _hour = MutableStateFlow(TIME_START)
+    private val _hour = MutableStateFlow(LOCAL_TIME.hour().toString())
     val hour = _hour.asStateFlow()
     
-    private val _minute = MutableStateFlow(TIME_START)
+    private val _minute = MutableStateFlow(LOCAL_TIME.minute().toString())
     val minute = _minute.asStateFlow()
     
     suspend fun changeHour(hour: String) {
-        _hour.emit(hour)
+        val isLast = LocalDateTime.of(
+            normalizeDate(date.value, hour, minute.value)
+        ).isBefore(LocalDateTime.now())
+        if(!isLast) _hour.emit(hour)
     }
     
     suspend fun changeMinute(minute: String) {
-        _minute.emit(minute)
+        val isLast = LocalDateTime.of(
+            normalizeDate(date.value, hour.value, minute)
+        ).isBefore(LocalDateTime.now())
+        if(!isLast) _minute.emit(minute)
     }
     
     suspend fun changeDate(date: String) {
-        _date.emit(date)
+        val isLast = LocalDate.of(
+            normalizeDate(date, hour.value, minute.value)
+        ).isBefore(LOCAL_DATE)
+        if(!isLast) _date.emit(date)
     }
     
-    suspend fun onSave() { // TODO год всегда текущий, пересмотреть логику
-        val fullTime = "T${_hour.value}:${_minute.value}:00Z"
-        val fullDate = if(_date.value == "Сегодня")
+    private fun normalizeDate(
+        date: String, hour: String, minute: String,
+    ): String { // FIXME год всегда текущий
+        val fullTime = "T$hour:$minute:00Z"
+        val fullDate = if(date == "Сегодня")
             LOCAL_DATE.format("yyyy-MM-dd")
-        else "${LOCAL_DATE.year()}-" + _date.value.format("dd MMMM", "MM-dd")
-        Date = fullDate + fullTime
+        else "${LOCAL_DATE.year()}-" + date.format("dd MMMM", "MM-dd")
+        return fullDate + fullTime
+    }
+    
+    suspend fun onSave() {
+        Date = normalizeDate(_date.value, _hour.value, _minute.value)
         detailedVm.changeDate("${_date.value}, ${hour.value}:${minute.value}")
     }
 }

@@ -6,14 +6,9 @@ import android.annotation.SuppressLint
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.display
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import kotlin.math.abs
+import java.util.Calendar.*
 import java.util.Date
-import java.util.Calendar.YEAR
-import java.util.Calendar.MONTH
-import java.util.Calendar.DAY_OF_MONTH
-import java.util.Calendar.HOUR
-import java.util.Calendar.MINUTE
-import java.util.Calendar.SECOND
+import kotlin.math.abs
 
 const val DATE_FORMAT = "yyyy-MM-dd"
 const val TIME_HOUR_MINUTE_FORMAT = "HH:mm"
@@ -85,7 +80,7 @@ class LocalDate(private var millis: Long) {
     
     /** Возвращает количество дней в месяце **/
     fun lengthOfMounth(): Int {
-        val cal = Calendar.getInstance()
+        val cal = getInstance()
         cal.time = Date(this.toString().long())
         return cal.getActualMaximum(DAY_OF_MONTH)
     }
@@ -115,18 +110,18 @@ class LocalDate(private var millis: Long) {
         dateCallback.compareTo(millis, comp.millis())
     
     fun dayOfYear(): Int {
-        val cal = Calendar.getInstance()
+        val cal = getInstance()
         cal.clear()
         cal.time = Date(this.millis())
-        return cal.get(Calendar.DAY_OF_YEAR)
+        return cal.get(DAY_OF_YEAR)
     }
     
     fun fistDayOfWeek(): LocalDate {
-        val cal = Calendar.getInstance()
+        val cal = getInstance()
         cal.time = Date(this.millis())
-        val week = cal.get(Calendar.WEEK_OF_MONTH)
+        val week = cal.get(WEEK_OF_MONTH)
         cal.clear()
-        cal.set(Calendar.WEEK_OF_MONTH, week)
+        cal.set(WEEK_OF_MONTH, week)
         return LocalDate(cal.time.time)
     }
     
@@ -253,8 +248,8 @@ class LocalTime(private var millis: Long) {
 /* LOCAL DATE_TIME */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-val c: Calendar = Calendar.getInstance()
-val offset = c.get(Calendar.ZONE_OFFSET)
+val c: Calendar = getInstance()
+val offset = c.get(ZONE_OFFSET)
 
 class LocalDateTime(
     private val millis: Long
@@ -289,6 +284,11 @@ class LocalDateTime(
         fun now() = LocalDateTime(c.time.time)
     }
     
+    fun isBefore(to: LocalDateTime) = Date(millis).before(Date(to.millis()))
+    
+    /** Возвращает true если дата больше, чем указаная для сравнения */
+    fun isAfter(to: LocalDateTime) = Date(millis).after(Date(to.millis()))
+    
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis + offset).format(pattern)
     
@@ -316,6 +316,8 @@ class LocalDateTime(
     fun minusHour(count: Int) = LocalDateTime(timeCallback.minusHour(millis, count))
     fun minusMinute(count: Int) = LocalDateTime(timeCallback.minusMinute(millis, count))
     fun minusSecond(count: Int) = LocalDateTime(timeCallback.minusSecond(millis, count))
+    
+
 }
 
 /* MONTH */
@@ -498,7 +500,7 @@ private fun part(date: Long, pattern: String) = Date(date).format(pattern).toInt
 
 /** Изменяет дату в определенном поле на указанное кол-во единиц **/
 private fun plus(date: Long, field: Int, count: Int): Long {
-    val c = Calendar.getInstance()
+    val c = getInstance()
     c.time = Date(date)
     c.add(field, count)
     return c.time.time
