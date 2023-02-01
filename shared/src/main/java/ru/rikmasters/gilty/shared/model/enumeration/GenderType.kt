@@ -5,11 +5,11 @@ enum class GenderType(val value: String) {
     FEMALE("Женский"),
     MALE("Мужской"),
     OTHER("Другое"),
-    NOT_IMPORTANT("Не важно");
+    NOT_IMPORTANT("Неважно");
     
     companion object {
         
-        private val fullList = values().toList()
+        val fullList = values().toList()
         val shortList = values().toList() - NOT_IMPORTANT
         fun get(index: Int) = fullList[index]
     }
