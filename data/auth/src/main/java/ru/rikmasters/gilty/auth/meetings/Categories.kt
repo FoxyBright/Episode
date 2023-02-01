@@ -16,7 +16,7 @@ data class Category(
     
     val iconType: String,
     
-    val children: List<Category>? = emptyList(),
+    val children: List<Category>? = null,
 ): DomainEntity {
     
     fun map() = CategoryModel(
@@ -27,8 +27,8 @@ data class Category(
         children = children.childMap()
     )
     
-    private fun List<Category>?.childMap(): List<CategoryModel> =
-        this?.map { it.map() } ?: emptyList()
+    private fun List<Category>?.childMap(): List<CategoryModel>? =
+        this?.map { it.map() }
     
     private fun String.getColor() =
         parseColor(this)

@@ -15,6 +15,7 @@ import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
 fun DetailedScreen(vm: DetailedViewModel) {
@@ -75,7 +76,7 @@ fun DetailedScreen(vm: DetailedViewModel) {
                 }
             }
             
-            override fun onTagDelete(tag: String) {
+            override fun onTagDelete(tag: TagModel) {
                 scope.launch { vm.deleteTag(tag) }
             }
             

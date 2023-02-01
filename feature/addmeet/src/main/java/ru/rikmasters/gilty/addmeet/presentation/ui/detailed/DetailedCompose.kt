@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Buttons
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -36,7 +37,7 @@ data class DetailedState(
     val time: String,
     val date: String,
     val description: String,
-    val tagList: List<String>,
+    val tagList: List<TagModel>,
     val meetPlace: Pair<String, String>?,
     val hideMeetPlace: Boolean,
     val alert: Boolean,
@@ -52,7 +53,7 @@ interface DetailedCallback {
     fun onDateClick() {}
     fun onTimeClick() {}
     fun onTagsClick() {}
-    fun onTagDelete(tag: String) {}
+    fun onTagDelete(tag: TagModel) {}
     fun onDescriptionChange(text: String) {}
     fun onDescriptionClear() {}
     fun onMeetPlaceClick() {}

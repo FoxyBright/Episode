@@ -3,10 +3,15 @@ package ru.rikmasters.gilty.mainscreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.singleOf
+import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
+import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 object Main: FeatureDefinition() {
@@ -15,20 +20,22 @@ object Main: FeatureDefinition() {
         
         nested("main", "meetings") {
             
-            screen("meetings") { MainScreen() }
+            screen<MainViewModel>("meetings") { vm, _ ->
+                MainScreen(vm)
+            }
             
             screen(
-                "reaction?avatar={avatar}&meetType={meetType}",
+                "reaction?avatar={avatar}&response={response}",
                 listOf(navArgument("avatar") {
                     type = NavType.StringType
                     defaultValue = ""
-                }, navArgument("meetType") {
-                    type = NavType.IntType
-                    defaultValue = 0
+                }, navArgument("response") {
+                    type = NavType.BoolType
+                    defaultValue = true
                 })
             ) {
                 it.arguments?.getString("avatar")?.let { avatar ->
-                    it.arguments?.getInt("meetType")?.let { meetType ->
+                    it.arguments?.getInt("meetType")?.let { response ->
                         ReactionScreen(avatar, DemoCategoryModel)
                     }
                 }
@@ -36,5 +43,13 @@ object Main: FeatureDefinition() {
         }
     }
     
-    override fun Module.koin() {}
+    
+    override fun Module.koin() {
+        singleOf(::MeetingManager)
+        
+        scope<MainViewModel> {
+            scopedOf(::MainViewModel)
+            scopedOf(::FiltersViewModel)
+        }
+    }
 }

@@ -12,7 +12,6 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import java.util.UUID.randomUUID
 
 class CompleteViewModel: ViewModel() {
@@ -34,11 +33,10 @@ class CompleteViewModel: ViewModel() {
     
     suspend fun setMeet() {
         val meet = MeetingModel(
-            randomUUID().toString(), Tags.first(),
+            randomUUID().toString(), Tags.first().title,
             Condition!!, SelectCategory!!, Duration, MeetingType!!, Date,
             profileManager.getProfile().mapToOrganizerModel(), Online,
-            Tags.map { TagModel(randomUUID().toString(), it) },
-            Description, Private, try {
+            Tags, Description, Private, try {
                 MemberCount.toInt()
             } catch(e: Exception) {
                 1
@@ -64,7 +62,7 @@ class CompleteViewModel: ViewModel() {
             } else null,
             photoAccess = Hidden,
             chatForbidden = RestrictChat,
-            tags = Tags,
+            tags = Tags.map { it.id },
             description = Description.ifBlank { null },
             dateTime = Date,
             duration = durationToMinutes(Duration),

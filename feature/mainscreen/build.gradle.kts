@@ -14,4 +14,5 @@ dependencies {
     implementation(project(":feature:bubbles"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:animated"))
+    implementation(project(":data:auth"))
 }

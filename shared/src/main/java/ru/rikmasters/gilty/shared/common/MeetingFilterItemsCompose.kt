@@ -1,9 +1,12 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -30,8 +33,10 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -44,7 +49,12 @@ fun Country(
     onCountryClick: () -> Unit,
     onCityClick: () -> Unit,
 ) {
-    Column {
+    Column(
+        Modifier.background(
+            colorScheme.primaryContainer,
+            shapes.medium
+        )
+    ) {
         CardRow(
             stringResource(R.string.select_country), country,
             Modifier, ThemeExtra.shapes.mediumTopRoundedShape
@@ -58,61 +68,68 @@ fun Country(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun Category(
     categories: List<CategoryModel>,
-    categoryStatus: List<Boolean>,
-    onCategoryClick: (selected: Int) -> Unit,
+    states: List<Int>,
+    selected: List<CategoryModel>,
+    onCategoryClick: (Int, CategoryModel) -> Unit,
+    onSubClick: (CategoryModel) -> Unit,
     onAllCategoryClick: () -> Unit,
 ) {
     categories.forEachIndexed { index, category ->
         Card(
+            { onCategoryClick(index, category) },
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp)
-                .clickable { onCategoryClick(index) },
-            shapes.large,
-            cardColors(colorScheme.primaryContainer),
+                .padding(bottom = 12.dp),
+            shape = shapes.large,
+            colors = cardColors(colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp),
                 SpaceBetween, CenterVertically
             ) {
-                Row {
+                Row(Modifier, Start, CenterVertically) {
                     GEmojiImage(
                         category.emoji,
                         Modifier.size(20.dp)
                     )
                     Text(
                         category.name,
-                        Modifier.padding(start = 18.dp),
+                        Modifier
+                            .padding(start = 18.dp)
+                            .padding(vertical = 16.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                 }
-                Icon(
-                    Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    tint = colorScheme.onTertiary
+                if(!category.children.isNullOrEmpty()) Icon(
+                    Filled.KeyboardArrowRight, (null),
+                    Modifier, colorScheme.onTertiary
+                )
+                else if(selected.contains(category)) Image(
+                    painterResource(R.drawable.enabled_check_box),
+                    (null), Modifier.size(32.dp)
                 )
             }
-            category.children?.let {
-                if(categoryStatus[index]) {
-                    Divider(); FlowLayout(
-                        Modifier
-                            .background(colorScheme.primaryContainer)
-                            .padding(top = 16.dp)
-                            .padding(horizontal = 8.dp), 8.dp, 8.dp
-                    ) {
-                        it.forEach { category ->
-                            GiltyChip(
-                                Modifier,
-                                category.name,
-                                false
-                            ) { /*TODO: Выбор подкатегорий*/ }
-                        }
+            if(!category.children.isNullOrEmpty()
+                && states.contains(index)
+            ) {
+                Divider(); FlowLayout(
+                    Modifier
+                        .background(colorScheme.primaryContainer)
+                        .padding(top = 16.dp)
+                        .padding(horizontal = 8.dp), 8.dp, 8.dp
+                ) {
+                    category.children.forEach { sub ->
+                        GiltyChip(
+                            Modifier, sub.name,
+                            selected.contains(sub)
+                        ) { onSubClick(sub) }
                     }
                 }
             }
@@ -149,10 +166,10 @@ fun Category(
 
 @Composable
 fun TagSearch(
-    tagList: List<String>,
+    tagList: List<TagModel>,
     onClick: () -> Unit,
     online: Boolean = false,
-    onDeleteTag: (Int) -> Unit,
+    onDeleteTag: (TagModel) -> Unit,
 ) {
     Card(
         Modifier
@@ -187,26 +204,29 @@ fun TagSearch(
                 .padding(top = 8.dp)
                 .padding(horizontal = 8.dp), 8.dp, 8.dp
         ) {
-            tagList.forEachIndexed { index, item ->
+            tagList.forEach {
                 Box(
                     Modifier
                         .clip(shapes.large)
                         .background(linearGradient(if(online) green() else red()))
                 ) {
                     Row(
-                        Modifier.padding(12.dp, 6.dp),
+                        Modifier
+                            .width(Max)
+                            .padding(12.dp, 6.dp),
                         Arrangement.Center, CenterVertically
                     ) {
                         Text(
-                            item,
-                            Modifier.padding(end = 10.dp),
+                            it.title,
+                            Modifier
+                                .weight(1f)
+                                .padding(end = 10.dp),
                             Color.White,
                             style = typography.labelSmall
                         )
                         Icon(
-                            Filled.Close,
-                            stringResource(R.string.meeting_filter_delete_tag_label),
-                            Modifier.clickable { onDeleteTag(index) },
+                            Filled.Close, (null),
+                            Modifier.clickable { onDeleteTag(it) },
                             Color.White
                         )
                     }
@@ -375,23 +395,11 @@ fun ConditionsSelect(
 
 @Composable
 fun GenderAndConditions(
-    selectedGenders: List<Boolean>,
-    selectedMeetingTypes: List<Boolean>,
-    onGenderSelect: (Int, Boolean) -> Unit,
-    onConditionSelect: (Int, Boolean) -> Unit,
+    selectedGenders: List<Int>,
+    selectedConditions: List<Int>,
+    onGenderSelect: (Int) -> Unit,
+    onConditionSelect: (Int) -> Unit,
 ) {
-    val genderList = listOf(
-        stringResource(R.string.female_sex),
-        stringResource(R.string.male_sex),
-        stringResource(R.string.others_sex)
-    )
-    val conditionList = listOf(
-        stringResource(R.string.meeting_filter_select_meeting_type_free),
-        stringResource(R.string.meeting_filter_select_meeting_type_divide_amount),
-        stringResource(R.string.meeting_filter_select_meeting_type_organizer_pays),
-        stringResource(R.string.meeting_filter_select_meeting_type_paid),
-        stringResource(R.string.meeting_filter_select_meeting_type_does_not_matter)
-    )
     Card(
         Modifier
             .fillMaxWidth()
@@ -399,20 +407,18 @@ fun GenderAndConditions(
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedGenders.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier,
-                        genderList[index],
-                        item
-                    ) { onGenderSelect(index, item) }
-                }
+        FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 8.dp)
+                .padding(8.dp), 8.dp, 8.dp
+        ) {
+            repeat(GenderType.shortList.size) {
+                GiltyChip(
+                    Modifier,
+                    GenderType.shortList[it].value,
+                    selectedGenders.contains(it)
+                ) { onGenderSelect(it) }
             }
         }
     }
@@ -421,20 +427,18 @@ fun GenderAndConditions(
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedMeetingTypes.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier,
-                        conditionList[index],
-                        item
-                    ) { onConditionSelect(index, item) }
-                }
+        FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 8.dp)
+                .padding(8.dp), 8.dp, 8.dp
+        ) {
+            repeat(ConditionType.list.size) {
+                GiltyChip(
+                    Modifier,
+                    ConditionType.list[it].display,
+                    selectedConditions.contains(it)
+                ) { onConditionSelect(it) }
             }
         }
     }

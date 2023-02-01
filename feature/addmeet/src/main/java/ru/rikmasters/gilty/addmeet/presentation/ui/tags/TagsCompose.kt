@@ -19,23 +19,24 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
 
 interface TagsCallback {
     
     fun onAddTag(text: String) {}
-    fun onTagClick(tag: String) {}
-    fun onDeleteTag(tag: String) {}
+    fun onTagClick(tag: TagModel) {}
+    fun onDeleteTag(tag: TagModel) {}
     fun onBack() {}
     fun onSave() {}
 }
 
 data class TagsState(
     val newTag: String,
-    val tagList: List<String>,
-    val popularTags: List<String>,
+    val tagList: List<TagModel>,
+    val popularTags: List<TagModel>,
     val online: Boolean,
-    val tagSearch: List<String>,
+    val tagSearch: List<TagModel>,
     val category: CategoryModel?,
 )
 
@@ -109,8 +110,8 @@ fun TagsContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun AllTagItem(
-    item: String, index: Int, size: Int,
-    onClick: (String) -> Unit,
+    item: TagModel, index: Int, size: Int,
+    onClick: (TagModel) -> Unit,
 ) {
     Card(
         { onClick(item) }, Modifier, (true),
@@ -118,7 +119,7 @@ private fun AllTagItem(
         cardColors(colorScheme.primaryContainer)
     ) {
         Text(
-            item,
+            item.title,
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -131,11 +132,11 @@ private fun AllTagItem(
 
 @Composable
 private fun PopularTags(
-    popularTags: List<String>,
-    tagList: List<String>,
+    popularTags: List<TagModel>,
+    tagList: List<TagModel>,
     online: Boolean,
     category: CategoryModel,
-    onClick: (String) -> Unit,
+    onClick: (TagModel) -> Unit,
 ) {
     Card(
         colors = cardColors(
@@ -172,7 +173,7 @@ private fun PopularTags(
         ) {
             popularTags.forEach {
                 GiltyChip(
-                    Modifier, it,
+                    Modifier, it.title,
                     tagList.contains(it),
                     online
                 ) { onClick(it) }

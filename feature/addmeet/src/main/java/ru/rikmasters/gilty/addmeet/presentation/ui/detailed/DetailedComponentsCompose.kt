@@ -29,7 +29,7 @@ fun tags(
             state.tagList,
             { callback?.onTagsClick() },
             state.online
-        ) { callback?.onTagDelete(state.tagList[it]) }
+        ) { callback?.onTagDelete(it) }
         Text(
             stringResource(R.string.add_meet_detailed_tags_description),
             Modifier

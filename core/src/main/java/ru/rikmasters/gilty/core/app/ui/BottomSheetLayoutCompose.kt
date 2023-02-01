@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.core.app.ui
 
-import android.content.res.Resources.getSystem
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -22,6 +21,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.app.ui.fork.*
 import java.lang.Float.max
 import kotlin.math.roundToInt
@@ -73,10 +74,9 @@ class BottomSheetState(
     
     val offset: Float by swipeableState.offset
     
-    fun ifCollapse(block: () -> Unit) {
-        if(offset > getSystem().displayMetrics.heightPixels * 0.99)
-            block.invoke()
-    }
+    @Suppress("PropertyName")
+    internal val _current = MutableStateFlow(BottomSheetSwipeState.COLLAPSED)
+    val current = _current.asStateFlow()
     
     var gripLightColor: @Composable () -> Color
             by mutableStateOf({ MaterialTheme.colorScheme.outlineVariant })
@@ -160,6 +160,7 @@ fun BottomSheetLayout(
             }
             
             LaunchedEffect(state.swipeableState.currentValue) {
+                state._current.emit(state.swipeableState.currentValue)
                 if(state.swipeableState.currentValue == BottomSheetSwipeState.COLLAPSED)
                     state.content = null
             }

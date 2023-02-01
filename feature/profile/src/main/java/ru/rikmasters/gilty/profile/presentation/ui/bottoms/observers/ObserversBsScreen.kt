@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
@@ -28,13 +30,8 @@ fun ObserversBs(
     LaunchedEffect(Unit) {
         vm.getObservables()
         vm.getObservers()
-    }
-    
-    LaunchedEffect(asm.bottomSheet.offset) {
-        asm.bottomSheet.ifCollapse {
-            scope.launch {
-                vm.unsubscribeMembers()
-            }
+        asm.bottomSheet.current.collectLatest {
+            if(it == COLLAPSED) vm.unsubscribeMembers()
         }
     }
     

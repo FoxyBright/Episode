@@ -22,10 +22,10 @@ enum class ConditionType {
     val display
         @Composable get() = stringResource(
             when(this) {
+                FREE -> meeting_filter_select_meeting_type_free
+                DIVIDE -> condition_divide
                 ORGANIZER_PAY -> condition_organizer_pay
                 MEMBER_PAY -> meeting_filter_select_meeting_type_paid
-                DIVIDE -> condition_divide
-                FREE -> meeting_filter_select_meeting_type_free
                 NO_MATTER -> condition_no_matter
             }
         )

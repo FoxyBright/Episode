@@ -12,11 +12,14 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.MeetingFilterContent
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.GCalendarWidget
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBS
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
+import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.organizer.OrganizerProfile
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.organizer.OrganizerProfileState
 import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsList
@@ -37,7 +40,11 @@ import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
 @Composable
-fun MainScreen(nav: NavState = get()) {
+fun MainScreen(vm: MainViewModel) {
+    
+    val today by vm.today.collectAsState()
+    
+    val nav = get<NavState>()
     var hiddenPhoto by remember { mutableStateOf(false) }
     var menuState by remember { mutableStateOf(false) }
     var commentText by remember { mutableStateOf("") }
@@ -55,9 +62,6 @@ fun MainScreen(nav: NavState = get()) {
         )
     }
     
-    var today by remember {
-        mutableStateOf(true)
-    }
     var timeSelect by remember { mutableStateOf("") }
     val meetings = remember {
         mutableStateListOf(
@@ -139,7 +143,7 @@ fun MainScreen(nav: NavState = get()) {
                 nav.navigateAbsolute(
                     "main/reaction?avatar=${
                         it.organizer?.avatar?.id
-                    }&meetType=${it.category.id}"
+                    }&meetType=${false}"
                 ); scope.launch { asm.bottomSheet.collapse() }
             }
         }
@@ -258,7 +262,7 @@ fun MainScreen(nav: NavState = get()) {
             }
             
             override fun onTodayChange() {
-                today = !today
+                scope.launch { vm.changeGroup() }
             }
             
             override fun onRespond(meet: MeetingModel) {
@@ -284,8 +288,8 @@ fun MainScreen(nav: NavState = get()) {
             override fun onOpenFiltersBottomSheet() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        MeetingFilterContent {
-                            scope.launch { asm.bottomSheet.collapse() }
+                        Connector<FiltersViewModel>(vm.scope) {
+                            FiltersBs(it)
                         }
                     }
                 }

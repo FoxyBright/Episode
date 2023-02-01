@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 class TagsViewModel: ViewModel() {
     
@@ -13,10 +14,10 @@ class TagsViewModel: ViewModel() {
     private val _selected = MutableStateFlow(Tags)
     val selected = _selected.asStateFlow()
     
-    private val _popular = MutableStateFlow(emptyList<String>())
+    private val _popular = MutableStateFlow(emptyList<TagModel>())
     val popular = _popular.asStateFlow()
     
-    private val _tags = MutableStateFlow(emptyList<String>())
+    private val _tags = MutableStateFlow(emptyList<TagModel>())
     val tags = _tags.asStateFlow()
     
     private val _search = MutableStateFlow("")
@@ -34,18 +35,12 @@ class TagsViewModel: ViewModel() {
     
     
     suspend fun getPopular() {
-        var categoriesId =
-            meetManager.getPopularTags(
-                listOf(SelectCategory?.id)
-            )
-        categoriesId.forEach {
-            if(Tags.contains(it))
-                categoriesId = categoriesId - it
-        }
-        _popular.emit(Tags + categoriesId)
+        _popular.emit(Tags + meetManager.getPopularTags(
+            listOf(SelectCategory?.id)
+        ).filter { !Tags.contains(it) })
     }
     
-    suspend fun selectTag(tag: String) {
+    suspend fun selectTag(tag: TagModel) {
         val list = selected.value
         _selected.emit(
             if(list.contains(tag))
@@ -56,11 +51,11 @@ class TagsViewModel: ViewModel() {
         )
     }
     
-    suspend fun addToPopular(tag: String) {
+    suspend fun addToPopular(tag: TagModel) {
         _popular.emit(popular.value + tag)
     }
     
-    suspend fun deleteTag(tag: String) {
+    suspend fun deleteTag(tag: TagModel) {
         _selected.emit(selected.value - tag)
     }
     

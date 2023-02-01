@@ -143,7 +143,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Connector<ObserverBsViewModel>(vm.scope) {
-                            ObserversBs(it, profile?.username ?: "")
+                            ObserversBs(it, (profile?.username ?: ""))
                         }
                     }
                 }

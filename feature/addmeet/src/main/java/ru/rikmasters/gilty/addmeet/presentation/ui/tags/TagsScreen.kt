@@ -8,6 +8,7 @@ import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
 fun TagsScreen(vm: TagsViewModel) {
@@ -44,11 +45,11 @@ fun TagsScreen(vm: TagsViewModel) {
             nav.navigationBack()
         }
         
-        override fun onDeleteTag(tag: String) {
+        override fun onDeleteTag(tag: TagModel) {
             scope.launch { vm.deleteTag(tag) }
         }
         
-        override fun onTagClick(tag: String) {
+        override fun onTagClick(tag: TagModel) {
             scope.launch {
                 vm.selectTag(tag)
                 if(!popular.contains(tag))

@@ -5,13 +5,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 var Description: String = ""
 var HideAddress: Boolean = false
 
 var Address: String = ""
 var Place: String = ""
-var Tags: List<String> = emptyList()
+var Tags: List<TagModel> = emptyList()
 var Date: String = ""
 var Duration: String = ""
 
@@ -57,7 +58,7 @@ class DetailedViewModel: ViewModel() {
         Place = place.second
     }
     
-    suspend fun deleteTag(tag: String) {
+    suspend fun deleteTag(tag: TagModel) {
         _tags.emit(tags.value - tag)
         Tags = tags.value
     }

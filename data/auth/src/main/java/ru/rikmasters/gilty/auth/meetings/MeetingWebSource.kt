@@ -12,8 +12,6 @@ import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingWebSource: KtorSource() {
     
-    private data class Tag(val title: String)
-    
     private data class ShortLocation(
         val address: String,
         val place: String,
@@ -24,6 +22,63 @@ class MeetingWebSource: KtorSource() {
         client.patch(
             "http://$HOST$PREFIX_URL/meetings/$meetId/leave"
         ) {}
+    }
+    
+    enum class MeetFilterGroup(val value: String) {
+        TODAY("today"),
+        AFTER("after")
+    }
+    
+    suspend fun getMeetCount(
+        group: MeetFilterGroup,
+        categories: List<String>? = null,
+        tags: List<String>? = null,
+        radius: Int? = null,
+        lat: Int? = null,
+        lng: Int? = null,
+        meetTypes: List<String>? = null,
+        onlyOnline: Int? = null,
+        conditions: List<String>? = null,
+        genders: List<String>? = null,
+    ): Int {
+        data class MeetCount(val total: Int)
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/meetings/count"
+        ) {
+            url {
+                query("group" to group.value)
+                categories?.let { list ->
+                    list.forEach {
+                        query("category_ids[]" to it)
+                    }
+                }
+                tags?.let { list ->
+                    list.forEach {
+                        query("tag_ids[]" to it)
+                    }
+                }
+                radius?.let { query("radius" to "$it") }
+                lat?.let { query("lat" to "$it") }
+                lng?.let { query("lng" to "$it") }
+                meetTypes?.let { list ->
+                    list.forEach {
+                        query("meeting_type[]" to it)
+                    }
+                }
+                onlyOnline?.let { query("online_only" to "$it") }
+                conditions?.let { list ->
+                    list.forEach {
+                        query("condition[]" to it)
+                    }
+                }
+                genders?.let { list ->
+                    list.forEach {
+                        query("gender[]" to it)
+                    }
+                }
+            }
+        }.wrapped<MeetCount>().total
     }
     
     suspend fun cancelMeet(meetId: String) {
@@ -90,7 +145,7 @@ class MeetingWebSource: KtorSource() {
     
     suspend fun getPopularTags(
         categoriesId: List<String?>,
-    ): List<String> {
+    ): List<TagModel> {
         updateClientToken()
         return try {
             client.get(
@@ -101,7 +156,7 @@ class MeetingWebSource: KtorSource() {
                         query("category_ids[]" to "$it")
                     }
                 }
-            }.wrapped<List<Tag>>().map { it.title }
+            }.wrapped<List<TagModel>>()
         } catch(e: Exception) {
             emptyList()
         }
@@ -114,14 +169,14 @@ class MeetingWebSource: KtorSource() {
         ) { setBody(Tag(tag)) }
     }
     
-    suspend fun searchTags(tag: String): List<String> {
+    suspend fun searchTags(tag: String): List<TagModel> {
         updateClientToken()
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/tags/search"
             ) {
                 url { query("query" to tag) }
-            }.wrapped<List<Tag>>().map { it.title }
+            }.wrapped()
         } catch(e: Exception) {
             emptyList()
         }
@@ -131,6 +186,13 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/categories"
+        ).wrapped<List<Category>>().map { it.map() }
+    }
+    
+    suspend fun getUserCategories(): List<CategoryModel> {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/profile/categories"
         ).wrapped<List<Category>>().map { it.map() }
     }
     

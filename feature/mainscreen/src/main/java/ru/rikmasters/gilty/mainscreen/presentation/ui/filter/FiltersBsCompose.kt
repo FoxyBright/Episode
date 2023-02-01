@@ -1,10 +1,13 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,28 +19,72 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 fun MeetingFilterBottomPreview() {
     GiltyTheme {
-        MeetingFilterBottom(
-            Modifier, (26), FilterListState(
-                (false), (25), (false),
-                listOf(0, 2), listOf(false, false, false),
-                listOf(false, false, false, false, false),
-                listOf("kaif", "pain", "fast", "launch"),
-                listOf(DemoCategoryModel),
-                listOf(false, false, false),
-                ("Россия"), ("Москва"),
+        Box(
+            Modifier.background(
+                colorScheme.background
             )
-        )
+        ) {
+            MeetingFilterBottom(
+                Modifier, (26), FilterListState(
+                    (true), (false), (25), (false),
+                    listOf(0, 2), emptyList(), emptyList(),
+                    listOf("kaif", "pain", "fast", "launch")
+                        .map { TagModel(it, it) },
+                    listOf(), listOf(), listOf(),
+                    listOf(1), ("Россия"), ("Москва"),
+                )
+            )
+        }
     }
 }
+
+data class FilterListState(
+    val today: Boolean,
+    val distanceState: Boolean,
+    val distance: Int,
+    val onlyOnline: Boolean,
+    val meetType: List<Int>,
+    val genderList: List<Int>,
+    val conditionList: List<Int>,
+    val tags: List<TagModel>,
+    val interest: List<CategoryModel>,
+    val categories: List<CategoryModel>,
+    val selectedCategories: List<CategoryModel>,
+    val categoriesStates: List<Int>,
+    val country: String,
+    val city: String,
+)
+
+interface MeetingFilterBottomCallback {
+    
+    fun onNext()
+    fun onBack()
+    fun onCategoryClick(index: Int, category: CategoryModel)
+    fun onSubClick(category: CategoryModel)
+    fun onAllCategoryClick()
+    fun onFilterClick()
+    fun onDeleteTag(tag: TagModel)
+    fun onDistanceClick()
+    fun onDistanceValueChange(it: Int)
+    fun onOnlyOnlineClick()
+    fun onMeetingTypeSelect(index: Int)
+    fun onGenderSelect(index: Int)
+    fun onConditionSelect(index: Int)
+    fun onCountryClick()
+    fun onCityClick()
+    fun onClear()
+}
+
 
 @Composable
 fun MeetingFilterBottom(
@@ -49,6 +96,21 @@ fun MeetingFilterBottom(
     val list = filterList(state, callback)
     Box(modifier.fillMaxSize()) {
         LazyColumn(Modifier.fillMaxSize()) {
+            item {
+                LazyRow(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 28.dp, bottom = 18.dp)
+                ) {
+                    items(state.interest) {
+                        GiltyChip(
+                            Modifier.padding(end = 8.dp), it.name,
+                            state.selectedCategories.contains(it)
+                        ) { callback?.onSubClick(it) }
+                    }
+                }
+            }
             items(list) {
                 Column(
                     Modifier
@@ -58,7 +120,7 @@ fun MeetingFilterBottom(
                     Text(
                         it.name,
                         Modifier.padding(top = 28.dp, bottom = 18.dp),
-                        MaterialTheme.colorScheme.tertiary,
+                        colorScheme.tertiary,
                         style = MaterialTheme.typography.labelLarge
                     )
                     it.content.invoke()
@@ -82,7 +144,7 @@ fun MeetingFilterBottom(
                         .fillMaxWidth()
                         .clickable { callback?.onClear() }
                         .padding(top = 12.dp, bottom = 28.dp),
-                    MaterialTheme.colorScheme.tertiary,
+                    colorScheme.tertiary,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -91,71 +153,28 @@ fun MeetingFilterBottom(
     }
 }
 
-data class FilterListState(
-    val distanceState: Boolean,
-    val distance: Int,
-    val onlyOnline: Boolean,
-    val meetType: List<Int>,
-    val genderList: List<Boolean>,
-    val conditionList: List<Boolean>,
-    val tagList: List<String>,
-    val categoryList: List<CategoryModel>,
-    val categoryStateList: List<Boolean>,
-    val country: String,
-    val city: String,
-)
-
-interface MeetingFilterBottomCallback {
-    
-    fun onNext() {}
-    fun onBack() {}
-    fun onCategoryClick(index: Int) {}
-    fun onAllCategoryClick() {}
-    fun onFilterClick() {}
-    fun onDeleteTag(it: Int) {}
-    fun onDistanceClick() {}
-    fun onDistanceValueChange(it: Int) {}
-    fun onOnlyOnlineClick() {}
-    fun onMeetingTypeSelect(it: Int) {}
-    fun onGenderSelect(it: Int, status: Boolean) {}
-    fun onConditionSelect(it: Int, status: Boolean) {}
-    fun onCountryClick() {}
-    fun onCityClick() {}
-    fun onClear() {}
-}
-
 @Composable
 private fun filterList(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null,
 ): List<FilterModel> {
-    return listOf(
-        FilterModel(stringResource(add_meet_detailed_meet_place)) {
-            Country(state.country,
-                state.city,
-                { callback?.onCountryClick() })
-            { callback?.onCityClick() }
-        },
+    val filters = arrayListOf(
         FilterModel(stringResource(R.string.meeting_filter_category)) {
-            Category(state.categoryList,
-                state.categoryStateList,
-                { callback?.onCategoryClick(it) },
+            Category(
+                state.categories,
+                state.categoriesStates,
+                state.selectedCategories,
+                { index, category ->
+                    callback?.onCategoryClick(index, category)
+                }, { callback?.onSubClick(it) },
                 { callback?.onAllCategoryClick() }
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_tag_search)) {
             TagSearch(
-                state.tagList,
+                state.tags,
                 { callback?.onFilterClick() },
             ) { callback?.onDeleteTag(it) }
-        },
-        FilterModel(stringResource(R.string.meeting_filter_distance)) {
-            Distance(
-                state.distance,
-                state.distanceState,
-                { callback?.onDistanceClick() },
-                { callback?.onDistanceValueChange(it) }
-            )
         },
         FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
             MeetingType(
@@ -170,12 +189,26 @@ private fun filterList(
             GenderAndConditions(
                 state.genderList,
                 state.conditionList,
-                { it, status ->
-                    callback?.onGenderSelect(it, status)
-                }, { it, status ->
-                    callback?.onConditionSelect(it, status)
-                }
+                { callback?.onGenderSelect(it) },
+                { callback?.onConditionSelect(it) }
             )
         }
     )
+    if(state.today) filters.add(
+        (2), FilterModel(stringResource(R.string.meeting_filter_distance)) {
+            Distance(
+                state.distance,
+                state.distanceState,
+                { callback?.onDistanceClick() },
+                { callback?.onDistanceValueChange(it) }
+            )
+        })
+    else filters.add(
+        (0), FilterModel(stringResource(add_meet_detailed_meet_place)) {
+            Country(state.country,
+                state.city,
+                { callback?.onCountryClick() })
+            { callback?.onCityClick() }
+        })
+    return filters
 }

@@ -33,3 +33,11 @@ val DemoCategoryModel = CategoryModel(
         DemoChildCategoryModel
     )
 )
+
+@Suppress("unused")
+val DemoCategoryModelList = listOf(
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel
+)
