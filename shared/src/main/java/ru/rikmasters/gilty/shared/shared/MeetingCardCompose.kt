@@ -122,7 +122,7 @@ fun MeetingCard(
                 .width(156.dp)
         ) {
             AsyncImage(
-                meeting.organizer?.avatar?.id,
+                meeting.organizer?.avatar?.thumbnail?.url,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(CircleShape)

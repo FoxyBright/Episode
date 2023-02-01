@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.auth.meetings
 
 import io.ktor.client.request.*
+import io.ktor.client.statement.HttpResponse
 import ru.rikmasters.gilty.auth.profile.MemberResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
@@ -25,12 +26,18 @@ class MeetingWebSource: KtorSource() {
     }
     
     enum class MeetFilterGroup(val value: String) {
-        TODAY("today"),
-        AFTER("after")
+        AFTER("after"),
+        TODAY("today");
+        
+        companion object {
+            
+            fun get(index: Int) = values()[index]
+        }
     }
     
-    suspend fun getMeetCount(
-        group: MeetFilterGroup,
+    suspend fun getMeetsList(
+        count: Boolean,
+        group: String,
         categories: List<String>? = null,
         tags: List<String>? = null,
         radius: Int? = null,
@@ -40,14 +47,13 @@ class MeetingWebSource: KtorSource() {
         onlyOnline: Int? = null,
         conditions: List<String>? = null,
         genders: List<String>? = null,
-    ): Int {
-        data class MeetCount(val total: Int)
+    ): HttpResponse {
         updateClientToken()
         return client.get(
-            "http://$HOST$PREFIX_URL/meetings/count"
+            "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
         ) {
             url {
-                query("group" to group.value)
+                query("group" to group)
                 categories?.let { list ->
                     list.forEach {
                         query("category_ids[]" to it)
@@ -78,7 +84,7 @@ class MeetingWebSource: KtorSource() {
                     }
                 }
             }
-        }.wrapped<MeetCount>().total
+        }
     }
     
     suspend fun cancelMeet(meetId: String) {
@@ -156,7 +162,7 @@ class MeetingWebSource: KtorSource() {
                         query("category_ids[]" to "$it")
                     }
                 }
-            }.wrapped<List<TagModel>>()
+            }.wrapped()
         } catch(e: Exception) {
             emptyList()
         }

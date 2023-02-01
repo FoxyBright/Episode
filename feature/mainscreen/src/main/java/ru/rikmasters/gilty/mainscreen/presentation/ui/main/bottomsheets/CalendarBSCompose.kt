@@ -43,7 +43,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
 @Composable
-private fun CalendarBSPreview() {
+private fun CalendarBsPreview() {
     GiltyTheme {
         val year = LOCAL_DATE.year()
         val month = LOCAL_DATE.month()
@@ -68,7 +68,7 @@ private fun CalendarBSPreview() {
             )
         }
         Box(Modifier.background(colorScheme.background)) {
-            GCalendarWidget(Modifier.padding(10.dp), list,
+            CalendarBs(Modifier.padding(10.dp), list,
                 {
                     if(list.contains(it)) list.remove(it)
                     else list.add(it)
@@ -79,7 +79,7 @@ private fun CalendarBSPreview() {
 }
 
 @Composable
-fun GCalendarWidget(
+fun CalendarBs(
     modifier: Modifier = Modifier,
     dateLIst: List<String>,
     onItemSelect: ((String) -> Unit)? = null,

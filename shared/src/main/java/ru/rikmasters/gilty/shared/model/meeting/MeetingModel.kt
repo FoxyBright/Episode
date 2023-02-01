@@ -27,7 +27,7 @@ data class MeetingModel(
     val price: Int? = null,
 ) {
     
-    fun map() = FullMeetingModel( // TODO - поправить на нормальные данные
+    fun map() = FullMeetingModel(
         id = id,
         userId = id,
         condition = condition,

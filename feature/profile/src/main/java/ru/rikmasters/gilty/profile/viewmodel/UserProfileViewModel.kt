@@ -61,20 +61,16 @@ class UserProfileViewModel: ViewModel() {
     private val _complaintsAlert = MutableStateFlow(false)
     val complaintsAlert = _complaintsAlert.asStateFlow()
     
-    private val _navBar = MutableStateFlow(navBarStateList)
-    val navBar = _navBar.asStateFlow()
-    
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
+    
+    private val _navBar = MutableStateFlow(navBarStateList)
+    val navBar = _navBar.asStateFlow()
     
     private suspend fun navBarSetStates(
         states: List<NavIconState>,
     ) {
         _navBar.emit(states)
-    }
-    
-    suspend fun errorConnection(state: Boolean) {
-        _errorConnection.emit(state)
     }
     
     suspend fun navBarNavigate(point: Int): String {
@@ -96,6 +92,10 @@ class UserProfileViewModel: ViewModel() {
             3 -> "chats/main"
             else -> "profile/main"
         }
+    }
+    
+    suspend fun errorConnection(state: Boolean) {
+        _errorConnection.emit(state)
     }
     
     suspend fun setComplaintAlertState(state: Boolean) {

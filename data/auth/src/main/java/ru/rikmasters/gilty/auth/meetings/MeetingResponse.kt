@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.auth.meetings
 import ru.rikmasters.gilty.auth.profile.ProfileResponse
 import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.DemoRequirementModel
@@ -38,7 +39,7 @@ data class MeetingResponse(
         id, tags?.first()?.title.toString(),
         ConditionType.valueOf(condition.toString()),
         category.map(),
-        duration.toString(),
+        durationToString(duration ?: 0),
         MeetType.valueOf(type.toString()),
         datetime?.let { LocalDateTime.of(it).toString() }.toString(),
         organizer?.map()?.mapToOrganizerModel(),

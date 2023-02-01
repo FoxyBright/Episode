@@ -22,10 +22,22 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private const val START_TIME = "00"
 
+@Preview
 @Composable
-fun TimeBS(
+private fun TimeBsPreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) { TimeBs() }
+    }
+}
+
+@Composable
+fun TimeBs(
     modifier: Modifier = Modifier,
-    onSave: ((String) -> Unit)? = null
+    onSave: ((String) -> Unit)? = null,
 ) {
     var minutes by remember {
         mutableStateOf(START_TIME)
@@ -81,17 +93,5 @@ fun TimeBS(
             resetTime = time
             onSave?.let { it(time) }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun TimeBSPreview() {
-    GiltyTheme {
-        Box(
-            Modifier.background(
-                colorScheme.background
-            )
-        ) { TimeBS() }
     }
 }

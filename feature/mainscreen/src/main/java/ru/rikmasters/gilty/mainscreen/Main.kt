@@ -12,6 +12,9 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
 import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 object Main: FeatureDefinition() {
@@ -49,6 +52,9 @@ object Main: FeatureDefinition() {
         
         scope<MainViewModel> {
             scopedOf(::MainViewModel)
+            scopedOf(::CalendarBsViewModel)
+            scopedOf(::MeetBsViewModel)
+            scopedOf(::TimeBsViewModel)
             scopedOf(::FiltersViewModel)
         }
     }

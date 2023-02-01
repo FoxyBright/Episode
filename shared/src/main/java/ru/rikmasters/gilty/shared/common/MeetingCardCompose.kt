@@ -150,7 +150,7 @@ fun CardButton(
 fun MeetingStates(
     modifier: Modifier,
     meet: MeetingModel,
-    small: Boolean = false
+    small: Boolean = false,
 ) {
     val today = todayControl(meet.datetime)
     Box(modifier) {
@@ -184,7 +184,7 @@ fun MeetingStates(
 private fun Icons(
     modifier: Modifier,
     meet: MeetingModel,
-    imageSize: Dp = 20.dp
+    imageSize: Dp = 20.dp,
 ) {
     CategoriesListCard(
         modifier,
@@ -197,7 +197,7 @@ private fun Icons(
 fun EmptyMeetCard(
     modifier: Modifier = Modifier,
     onMoreClick: (() -> Unit)? = null,
-    onRepeatClick: (() -> Unit)? = null
+    onRepeatClick: (() -> Unit)? = null,
 ) {
     Card(
         modifier, shapes.large,
@@ -292,7 +292,7 @@ fun MeetCard(
     offset: Float = 0f,
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
-    onSelect: ((DirectionType) -> Unit)? = null
+    onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     Box(modifier) {
         if(type == MEET) Image(
@@ -344,7 +344,7 @@ fun MeetCard(
 
 @Composable
 private fun EmptyTop(
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     AnimatedImage(
         if(isSystemInDarkTheme())
@@ -363,11 +363,10 @@ private fun EmptyTop(
 @Composable
 private fun MeetTop(
     avatar: AvatarModel?,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     AsyncImage(
-        avatar?.id, stringResource(R.string.meeting_avatar),
-        modifier
+        avatar?.thumbnail?.url, (null), modifier
             .fillMaxSize()
             .clip(ThemeExtra.shapes.bigTopShapes),
         contentScale = Crop
@@ -378,7 +377,7 @@ private fun MeetTop(
 private fun MeetBottom(
     meet: MeetingModel,
     offset: Float,
-    onSelect: ((DirectionType) -> Unit)? = null
+    onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     val leftSwipe = offset < -(50)
     val rightSwipe = offset > 50
@@ -435,7 +434,7 @@ private fun MeetBottom(
 private fun EmptyBottom(
     modifier: Modifier,
     onRepeatClick: (() -> Unit)? = null,
-    onMoreClick: (() -> Unit)? = null
+    onMoreClick: (() -> Unit)? = null,
 ) {
     Box(modifier.fillMaxWidth()) {
         ShadowBack(Modifier.offset(y = (-30).dp))

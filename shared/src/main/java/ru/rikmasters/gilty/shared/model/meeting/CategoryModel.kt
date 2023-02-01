@@ -19,7 +19,7 @@ data class CategoryModel(
     val children: List<CategoryModel>?,
 )
 
-private val DemoChildCategoryModel = CategoryModel(
+private val demoChildCategoryModel = CategoryModel(
     "0", "Кино",
     Red, DemoCategoryEmoji, (null)
 )
@@ -28,9 +28,9 @@ val DemoCategoryModel = CategoryModel(
     "0", "Развлечения",
     Blue, DemoCategoryEmoji,
     listOf(
-        DemoChildCategoryModel,
-        DemoChildCategoryModel,
-        DemoChildCategoryModel
+        demoChildCategoryModel,
+        demoChildCategoryModel,
+        demoChildCategoryModel
     )
 )
 

@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
@@ -23,11 +21,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCard
 import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -44,8 +46,7 @@ fun MainContentPreview() {
         MainContent(
             MainContentState(
                 (true), (true), (false), (false),
-                DemoMeetingList, listOf(),
-                listOf(
+                DemoMeetingList, listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW, INACTIVE
                 ), (false)
@@ -56,30 +57,24 @@ fun MainContentPreview() {
 
 interface MainContentCallback {
     
-    fun onTodayChange() {}
-    fun onTimeFilterClick() {}
-    fun onStyleChange() {}
-    fun onRespond(meet: MeetingModel) {}
-    fun onMeetClick(meet: MeetingModel) {}
-    fun onNavBarSelect(point: Int) {}
-    fun onOpenFiltersBottomSheet() {}
+    fun onTodayChange()
+    fun onTimeFilterClick()
+    fun onStyleChange()
+    fun onRespond(meet: MeetingModel)
+    fun onMeetClick(meet: MeetingModel)
+    fun onNavBarSelect(point: Int)
+    fun onOpenFiltersBottomSheet()
     fun onCloseAlert()
     
     fun onMeetsRepeatClick()
     
     fun onMeetMoreClick()
     
-    fun onInteresting(
+    fun meetInteraction(
+        direction: DirectionType,
         meet: MeetingModel,
-        state: SwipeableCardState
-    ) {
-    }
-    
-    fun onNotInteresting(
-        meet: MeetingModel,
-        state: SwipeableCardState
-    ) {
-    }
+        state: SwipeableCardState,
+    )
 }
 
 data class MainContentState(
@@ -88,7 +83,6 @@ data class MainContentState(
     val selectDate: Boolean,
     val selectTime: Boolean,
     val meetings: List<MeetingModel>,
-    val cardStates: List<Pair<MeetingModel, SwipeableCardState>>,
     val navBarStates: List<NavIconState>,
     val alert: Boolean,
 )
@@ -122,9 +116,9 @@ fun MainContent(
         },
         content = { padding ->
             Content(
-                state.grid, state.cardStates,
-                state.meetings,
-                Modifier
+                state.grid, state.meetings.map {
+                    it to rememberSwipeableCardState()
+                }, state.meetings, Modifier
                     .padding(top = padding.calculateTopPadding())
                     .padding(bottom = padding.calculateBottomPadding() - 28.dp)
                     .padding(horizontal = 16.dp),
@@ -170,13 +164,26 @@ private fun TopBar(
             )
         }
         IconButton(onTimeFilterClick) {
+            val icons = if(isSystemInDarkTheme())
+                listOf(
+                    R.drawable.ic_clock_day,
+                    R.drawable.ic_clock_indicator_day,
+                    R.drawable.ic_calendar_indicator_day,
+                    R.drawable.ic_calendar_day
+                )
+            else listOf(
+                R.drawable.ic_clock,
+                R.drawable.ic_clock_indicator,
+                R.drawable.ic_calendar_indicator,
+                R.drawable.ic_calendar
+            )
             Image(
                 painterResource(
                     when {
-                        today && !selectTime -> R.drawable.ic_clock
-                        today && selectTime -> R.drawable.ic_clock_indicator
-                        selectDate -> R.drawable.ic_calendar_indicator
-                        else -> R.drawable.ic_calendar
+                        today && !selectTime -> icons[0]
+                        today && selectTime -> icons[1]
+                        selectDate -> icons[2]
+                        else -> icons[3]
                     }
                 ), (null), Modifier.size(30.dp)
             )
@@ -191,7 +198,7 @@ private fun Content(
             SwipeableCardState>>,
     meetings: List<MeetingModel>,
     modifier: Modifier = Modifier,
-    callback: MainContentCallback?
+    callback: MainContentCallback?,
 ) {
     if(meetings.size <= 2) MeetCard(
         modifier.fillMaxHeight(0.9f), EMPTY,
@@ -206,10 +213,10 @@ private fun Content(
     else {
         MeetingsListContent(
             cardStates, modifier.fillMaxHeight(0.9f),
-            { meet, it -> callback?.onNotInteresting(meet, it) },
+            { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
             { meet, it ->
                 callback?.onRespond(meet)
-                callback?.onInteresting(meet, it)
+                callback?.meetInteraction(RIGHT, meet, it)
             }
         ) { callback?.onMeetClick(it) }
     }
@@ -218,7 +225,7 @@ private fun Content(
 @Composable
 private fun Filters(
     modifier: Modifier = Modifier,
-    onOpenFilters: () -> Unit
+    onOpenFilters: () -> Unit,
 ) {
     Box(modifier, BottomCenter) {
         DividerBold(

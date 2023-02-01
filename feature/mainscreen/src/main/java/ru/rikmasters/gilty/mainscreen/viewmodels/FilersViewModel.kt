@@ -4,8 +4,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.AFTER
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.TODAY
+import ru.rikmasters.gilty.auth.meetings.MeetFilters
+import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.Companion.get
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
@@ -168,25 +168,26 @@ class FiltersViewModel(
     }
     
     private suspend fun findMeets() {
-        _results.emit(
-            meetManager.getMeetCount(
-                group = if(mainVm.today.value) TODAY else AFTER,
+        _results.emit(1)
+        meetManager.getMeetCount(
+            MeetFilters(
+                group = get(mainVm.today.value.compareTo(false)),
                 categories = selectedCategories.value.ifEmpty { null },
                 tags = tags.value.ifEmpty { null },
                 radius = if(mainVm.today.value) distance.value else null,
                 lat = if(mainVm.today.value) 0 else null,
                 lng = if(mainVm.today.value) 0 else null,
-                meetType = if(meetTypes.value.isNotEmpty()) {
+                onlyOnline = online.value,
+                meetTypes = if(meetTypes.value.isNotEmpty()) {
                     meetTypes.value.map { MeetType.get(it) }
                 } else null,
-                onlyOnline = online.value,
-                condition = if(selectedCondition.value.isNotEmpty())
+                conditions = if(selectedCondition.value.isNotEmpty())
                     selectedCondition.value.map { ConditionType.get(it) }
                 else null,
-                gender = if(selectedGenders.value.isNotEmpty())
+                genders = if(selectedGenders.value.isNotEmpty())
                     selectedGenders.value.map { GenderType.get(it) }
-                else null,
-            ),
+                else null
+            )
         )
     }
     

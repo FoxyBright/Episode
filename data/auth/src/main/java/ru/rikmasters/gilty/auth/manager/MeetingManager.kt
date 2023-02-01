@@ -1,39 +1,43 @@
 package ru.rikmasters.gilty.auth.manager
 
-import ru.rikmasters.gilty.auth.meetings.Location
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
-import ru.rikmasters.gilty.auth.meetings.Requirement
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType
-import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.auth.meetings.*
+import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
     
     private val web: MeetingWebSource,
 ) {
     
-    suspend fun getMeetCount(
-        group: MeetingWebSource.MeetFilterGroup,
-        categories: List<CategoryModel>? = null,
-        tags: List<TagModel>? = null,
-        radius: Int? = null,
-        lat: Int? = null,
-        lng: Int? = null,
-        meetType: List<MeetType>? = null,
-        onlyOnline: Boolean? = null,
-        condition: List<ConditionType>? = null,
-        gender: List<GenderType>? = null,
-    ) = web.getMeetCount(
-        group, categories?.map { it.id },
-        tags?.map { it.id },
-        radius, lat, lng,
-        meetType?.map { it.name },
-        onlyOnline?.compareTo(false),
-        condition?.map { it.name },
-        gender?.map { it.name }
-    )
+    data class MeetCount(val total: Int)
+    
+    private suspend inline fun <reified Type> getMeetings(
+        filter: MeetFilters,
+        count: Boolean,
+    ): Type {
+        return web.getMeetsList(
+            count = count,
+            group = filter.group.value,
+            categories = filter.categories?.map { it.id },
+            tags = filter.tags?.map { it.id },
+            radius = filter.radius,
+            lat = filter.lat,
+            lng = filter.lng,
+            meetTypes = filter.meetTypes?.map { it.name },
+            onlyOnline = filter.onlyOnline?.compareTo(false),
+            conditions = filter.conditions?.map { it.name },
+            genders = filter.genders?.map { it.name },
+        ).wrapped()
+    }
+    
+    suspend fun getMeetings(filter: MeetFilters): List<MeetingModel> {
+        return getMeetings<List<MainMeetResponse>>(
+            filter, false
+        ).map { it.map() }
+    }
+    
+    suspend fun getMeetCount(filter: MeetFilters): Int =
+        getMeetings<MeetCount>(filter, true).total
     
     suspend fun leaveMeet(meetId: String) {
         web.leaveMeet(meetId)

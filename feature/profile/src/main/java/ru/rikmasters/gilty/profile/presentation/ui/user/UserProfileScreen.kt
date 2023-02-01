@@ -94,7 +94,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun onNavBarSelect(point: Int) {
-                if(point !in 0..3) return
+                if(point == 4) return
                 scope.launch {
                     nav.navigateAbsolute(
                         vm.navBarNavigate(point)
