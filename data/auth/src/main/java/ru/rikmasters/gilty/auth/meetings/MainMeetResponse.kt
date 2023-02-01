@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.auth.meetings
 
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
@@ -27,7 +28,7 @@ data class MainMeetResponse(
         category = category.map(),
         durationToString(duration),
         MeetType.valueOf(type),
-        datetime = datetime,
+        datetime = "${of(datetime)}",
         organizer = organizer.map(),
         isOnline = isOnline,
         tags = tags, "",

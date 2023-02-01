@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,8 +20,6 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ScrollTimePicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-private const val START_TIME = "00"
-
 @Preview
 @Composable
 private fun TimeBsPreview() {
@@ -30,27 +28,34 @@ private fun TimeBsPreview() {
             Modifier.background(
                 colorScheme.background
             )
-        ) { TimeBs() }
+        ) {
+            TimeBsContent(
+                TimeBsState(("10"), ("12"), ("10:12"))
+            )
+        }
     }
 }
 
+data class TimeBsState(
+    val minutes: String,
+    val hours: String,
+    val time: String,
+)
+
+interface TimeBSCallback {
+    
+    fun onSave()
+    fun onHourChange(hour: String)
+    fun onMinuteChange(minute: String)
+    fun onClear()
+}
+
 @Composable
-fun TimeBs(
+fun TimeBsContent(
+    state: TimeBsState,
     modifier: Modifier = Modifier,
-    onSave: ((String) -> Unit)? = null,
+    callback: TimeBSCallback? = null,
 ) {
-    var minutes by remember {
-        mutableStateOf(START_TIME)
-    }
-    var hours by remember {
-        mutableStateOf(START_TIME)
-    }
-    var time by remember {
-        mutableStateOf("")
-    }
-    var resetTime by remember {
-        mutableStateOf("")
-    }
     Column(
         modifier
             .height(350.dp)
@@ -67,31 +72,26 @@ fun TimeBs(
                 Modifier, colorScheme.tertiary,
                 style = typography.labelLarge,
             )
-            if(time.isNotBlank()) Text(
+            if(state.time.isNotBlank()) Text(
                 stringResource(R.string.meeting_filter_clear),
                 Modifier.clickable(
                     MutableInteractionSource(), (null)
-                ) {
-                    minutes = START_TIME
-                    hours = START_TIME
-                    time = resetTime
-                }, colorScheme.primary,
+                ) { callback?.onClear() },
+                colorScheme.primary,
                 style = typography.bodyMedium,
                 fontWeight = Medium
             )
         }
         ScrollTimePicker(
             Modifier.fillMaxWidth(),
-            minutes, hours
-        ) { h, m -> time = "$h:$m" }
+            state.minutes, state.hours,
+            { callback?.onHourChange(it) }
+        ) { callback?.onMinuteChange(it) }
         GradientButton(
             Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 32.dp),
             stringResource(R.string.save_button), (true)
-        ) {
-            resetTime = time
-            onSave?.let { it(time) }
-        }
+        ) { callback?.onSave() }
     }
 }

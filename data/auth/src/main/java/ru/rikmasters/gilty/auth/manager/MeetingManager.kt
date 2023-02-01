@@ -17,7 +17,7 @@ class MeetingManager(
     ): Type {
         return web.getMeetsList(
             count = count,
-            group = filter.group.value,
+            group = filter.group,
             categories = filter.categories?.map { it.id },
             tags = filter.tags?.map { it.id },
             radius = filter.radius,
@@ -27,6 +27,8 @@ class MeetingManager(
             onlyOnline = filter.onlyOnline?.compareTo(false),
             conditions = filter.conditions?.map { it.name },
             genders = filter.genders?.map { it.name },
+            dates = filter.dates,
+            time = filter.time
         ).wrapped()
     }
     

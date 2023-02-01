@@ -167,29 +167,30 @@ class FiltersViewModel(
         findMeets()
     }
     
-    private suspend fun findMeets() {
-        _results.emit(1)
-        meetManager.getMeetCount(
-            MeetFilters(
-                group = get(mainVm.today.value.compareTo(false)),
-                categories = selectedCategories.value.ifEmpty { null },
-                tags = tags.value.ifEmpty { null },
-                radius = if(mainVm.today.value) distance.value else null,
-                lat = if(mainVm.today.value) 0 else null,
-                lng = if(mainVm.today.value) 0 else null,
-                onlyOnline = online.value,
-                meetTypes = if(meetTypes.value.isNotEmpty()) {
-                    meetTypes.value.map { MeetType.get(it) }
-                } else null,
-                conditions = if(selectedCondition.value.isNotEmpty())
-                    selectedCondition.value.map { ConditionType.get(it) }
-                else null,
-                genders = if(selectedGenders.value.isNotEmpty())
-                    selectedGenders.value.map { GenderType.get(it) }
-                else null
-            )
-        )
+    suspend fun findMeets() {
+        _results.emit(meetManager.getMeetCount(filtersBuilder()))
     }
+    
+    private fun filtersBuilder() = MeetFilters(
+        group = get(mainVm.today.value.compareTo(false)),
+        categories = selectedCategories.value.ifEmpty { null },
+        tags = tags.value.ifEmpty { null },
+        radius = if(mainVm.today.value) distance.value else null,
+        lat = if(mainVm.today.value) 0 else null,
+        lng = if(mainVm.today.value) 0 else null,
+        onlyOnline = online.value,
+        meetTypes = if(meetTypes.value.isNotEmpty()) {
+            meetTypes.value.map { MeetType.get(it) }
+        } else null,
+        conditions = if(selectedCondition.value.isNotEmpty())
+            selectedCondition.value.map { ConditionType.get(it) }
+        else null,
+        genders = if(selectedGenders.value.isNotEmpty())
+            selectedGenders.value.map { GenderType.get(it) }
+        else null,
+        time = mainVm.time.value.ifBlank { null },
+        dates = mainVm.days.value.ifEmpty { null }
+    )
     
     suspend fun navigate(page: Int) {
         _screen.emit(page)
@@ -197,13 +198,13 @@ class FiltersViewModel(
     
     suspend fun changeCountry(country: String) {
         _country.emit(country)
-        makeToast("Стран нет. Вопросы к бэку")
+        makeToast("Стран пока нет")
         findMeets()
     }
     
     suspend fun changeCity(city: String) {
         _city.emit(city)
-        makeToast("Городов нет. Вопросы к бэку")
+        makeToast("Городов пока нет")
         findMeets()
     }
     
@@ -218,8 +219,18 @@ class FiltersViewModel(
     }
     
     suspend fun clearFilters() {
-        makeToast("Фильтры сброшены")
+        _country.emit("")
+        _city.emit("")
+        _selectedCategories.emit(emptyList())
+        _tags.emit(emptyList())
+        _distance.emit(15)
+        _meetTypes.emit(emptyList())
+        _online.emit(false)
+        _selectedGenders.emit(emptyList())
+        _selectedCondition.emit(emptyList())
         findMeets()
+        mainVm.setFilters(filtersBuilder())
+        mainVm.getMeets()
     }
     
     suspend fun selectGender(gender: Int) {
@@ -251,7 +262,10 @@ class FiltersViewModel(
         findMeets()
     }
     
-    fun onSave() {}
+    suspend fun onSave() {
+        mainVm.setFilters(filtersBuilder())
+        mainVm.getMeets()
+    }
     
     suspend fun changeDistance(distance: Int) {
         _distance.emit(distance)
@@ -308,5 +322,6 @@ class FiltersViewModel(
     
     suspend fun saveTags() {
         _tags.emit(additionallyTags.value)
+        findMeets()
     }
 }

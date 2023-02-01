@@ -47,13 +47,28 @@ class MainViewModel: ViewModel() {
     private val _meetFilters = MutableStateFlow(MeetFilters())
     private val meetFilters = _meetFilters.asStateFlow()
     
+    suspend fun changeTime(time: String) {
+        _time.emit(time)
+        getMeets()
+    }
+    
+    suspend fun setFilters(filters: MeetFilters) {
+        _meetFilters.emit(
+            filters.copy(
+                group = get(today.value.compareTo(false)),
+                dates = days.value.ifEmpty { null },
+                time = time.value.ifBlank { null }
+            )
+        )
+    }
+    
     suspend fun getMeets() {
         _meetings.emit(
             meetManager.getMeetings(
                 meetFilters.value.copy(
-                    group = get(
-                        today.value.compareTo(false)
-                    )
+                    group = get(today.value.compareTo(false)),
+                    dates = days.value.ifEmpty { null },
+                    time = time.value.ifBlank { null }
                 )
             )
         )

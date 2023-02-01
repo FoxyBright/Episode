@@ -40,6 +40,7 @@ fun FiltersBs(vm: FiltersViewModel) {
     LaunchedEffect(Unit) {
         vm.getAllCategories()
         vm.getUserCategories()
+        vm.findMeets()
     }
     
     when(screen) {

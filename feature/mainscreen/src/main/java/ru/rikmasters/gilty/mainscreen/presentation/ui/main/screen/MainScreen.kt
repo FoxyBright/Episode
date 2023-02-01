@@ -2,9 +2,11 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -13,7 +15,7 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.CalendarBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBs
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBsScreen
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
@@ -37,9 +39,7 @@ fun MainScreen(vm: MainViewModel) {
     val meetings by vm.meetings.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.getMeets()
-    }
+    LaunchedEffect(Unit) { vm.getMeets() }
     
     MainContent(
         MainContentState(
@@ -62,10 +62,11 @@ fun MainScreen(vm: MainViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Text(
-                            "ТУТ КАРТОЧКА ВСТРЕЧИ",
-                            Modifier
+                            meet.id, Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)
+                                .padding(28.dp),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -75,10 +76,11 @@ fun MainScreen(vm: MainViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         Text(
-                            "ТУТ КАРТОЧКА ВСТРЕЧИ",
-                            Modifier
+                            meet.id, Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)
+                                .padding(28.dp),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -93,12 +95,12 @@ fun MainScreen(vm: MainViewModel) {
                     }
                 }
             }
-        
+            
             override fun onTimeFilterClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
                         if(today) Connector<TimeBsViewModel>(vm.scope) {
-                            TimeBs()
+                            TimeBsScreen(it)
                         } else Connector<CalendarBsViewModel>(vm.scope) {
                             CalendarBs(Modifier, days)
                         }

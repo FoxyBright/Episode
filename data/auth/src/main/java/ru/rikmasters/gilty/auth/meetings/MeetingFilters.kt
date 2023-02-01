@@ -17,6 +17,8 @@ data class MeetFilters(
     val lng: Int? = null,
     val meetTypes: List<MeetType>? = null,
     val onlyOnline: Boolean? = null,
-    val conditions: List<ConditionType>? = null,
     val genders: List<GenderType>? = null,
+    val conditions: List<ConditionType>? = null,
+    val dates: List<String>? = null,
+    val time: String? = null
 )

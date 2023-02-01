@@ -2,6 +2,8 @@ package ru.rikmasters.gilty.auth.meetings
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
+import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.AFTER
+import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.TODAY
 import ru.rikmasters.gilty.auth.profile.MemberResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
@@ -37,7 +39,7 @@ class MeetingWebSource: KtorSource() {
     
     suspend fun getMeetsList(
         count: Boolean,
-        group: String,
+        group: MeetFilterGroup,
         categories: List<String>? = null,
         tags: List<String>? = null,
         radius: Int? = null,
@@ -47,13 +49,15 @@ class MeetingWebSource: KtorSource() {
         onlyOnline: Int? = null,
         conditions: List<String>? = null,
         genders: List<String>? = null,
+        dates: List<String>? = null,
+        time: String? = null,
     ): HttpResponse {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
         ) {
             url {
-                query("group" to group)
+                query("group" to group.value)
                 categories?.let { list ->
                     list.forEach {
                         query("category_ids[]" to it)
@@ -81,6 +85,14 @@ class MeetingWebSource: KtorSource() {
                 genders?.let { list ->
                     list.forEach {
                         query("gender[]" to it)
+                    }
+                }
+                when(group) {
+                    TODAY -> time?.let { query("time" to it) }
+                    AFTER -> dates?.let { list ->
+                        list.forEach {
+                            query("dates[]" to it)
+                        }
                     }
                 }
             }
