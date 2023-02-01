@@ -67,35 +67,45 @@ private fun CalendarBsPreview() {
                 }",
             )
         }
-        Box(Modifier.background(colorScheme.background)) {
-            CalendarBs(Modifier.padding(10.dp), list,
-                {
-                    if(list.contains(it)) list.remove(it)
-                    else list.add(it)
-                })
-            { list.clear() }
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            CalendarBsContent(
+                CalendarBSState(list)
+            )
         }
     }
 }
 
+data class CalendarBSState(
+    val days: List<String>,
+)
+
+interface CalendarBSCallback {
+    
+    fun onItemSelect(date: String)
+    fun onSave()
+    fun onClear()
+}
+
 @Composable
-fun CalendarBs(
+fun CalendarBsContent(
+    state: CalendarBSState,
     modifier: Modifier = Modifier,
-    dateLIst: List<String>,
-    onItemSelect: ((String) -> Unit)? = null,
-    onSave: (() -> Unit)? = null,
-    onClear: (() -> Unit)? = null
+    callback: CalendarBSCallback? = null,
 ) {
-    val thisMounth = remember { LOCAL_DATE.atStartOfMounth() }
-    val nextMounth = remember { thisMounth.plusMonths(1) }
-    val listState: LazyListState = rememberLazyListState()
+    val thisMounth = LOCAL_DATE.atStartOfMounth()
+    val nextMounth = thisMounth.plusMonths(1)
+    val listState = rememberLazyListState()
     val mounthState = remember {
         derivedStateOf {
             listState.firstVisibleItemIndex
         }
     }.value
     Column(
-        modifier.padding(top = 12.dp),
+        modifier.padding(top = 28.dp),
         SpaceBetween
     ) {
         Row(
@@ -106,14 +116,15 @@ fun CalendarBs(
                 if(mounthState == 0)
                     thisMounth.monthName()
                 else nextMounth.monthName(),
-                Modifier, colorScheme.tertiary,
+                Modifier.padding(start = 16.dp), colorScheme.tertiary,
                 style = typography.labelLarge,
             )
-            if(dateLIst.isNotEmpty()) Text(
+            if(state.days.isNotEmpty()) Text(
                 stringResource(R.string.meeting_filter_clear),
-                Modifier.clickable {
-                    onClear?.let { it() }
-                }, colorScheme.primary,
+                Modifier
+                    .padding(end = 16.dp)
+                    .clickable { callback?.onClear() },
+                colorScheme.primary,
                 style = typography.bodyMedium,
                 fontWeight = Medium
             )
@@ -130,31 +141,37 @@ fun CalendarBs(
             if(offset > 250) scope.scrollBasic(listState)
             else scope.scrollBasic(listState, (true))
         }
-        LazyRow(Modifier.padding(top = 18.dp), listState) {
+        LazyRow(
+            Modifier.padding(
+                top = 18.dp,
+                start = 10.dp
+            ), listState
+        ) {
             item((0), (0)) {
-                Mounth("$thisMounth", dateLIst)
-                { onItemSelect?.let { c -> c(it) } }
+                Mounth("$thisMounth", state.days)
+                { callback?.onItemSelect(it) }
             }
+            item { Spacer(modifier.width(16.dp)) }
             item((1), (0)) {
-                Mounth("$nextMounth", dateLIst)
-                { onItemSelect?.let { c -> c(it) } }
+                Mounth("$nextMounth", state.days)
+                { callback?.onItemSelect(it) }
             }
         }
         GradientButton(
-            Modifier.padding(vertical = 36.dp),
+            Modifier.padding(16.dp, 36.dp),
             stringResource(R.string.save_button), true
-        ) { onSave?.let { it() } }
+        ) { callback?.onSave() }
     }
 }
 
 private fun CoroutineScope.scrollBasic(
     listState: LazyListState,
-    left: Boolean = false
+    left: Boolean = false,
 ) {
     launch {
         listState.animateScrollToItem(
             if(left) listState.firstVisibleItemIndex
-            else listState.firstVisibleItemIndex + 1
+            else listState.firstVisibleItemIndex + 2
         )
     }
 }
@@ -164,7 +181,7 @@ private fun Mounth(
     date: String,
     dateList: List<String>,
     modifier: Modifier = Modifier,
-    onDayClick: ((String) -> Unit)? = null
+    onDayClick: ((String) -> Unit)? = null,
 ) {
     val locDate = LocalDate.of(date)
     LazyVerticalGrid(
@@ -190,10 +207,9 @@ private fun Mounth(
             }
             Day(
                 "$day", when {
+                    dateList.contains(thisDate) -> CHECKED
                     LocalDate.of(thisDate)
                         .isBefore(LOCAL_DATE) -> INACTIVE
-                    
-                    dateList.contains(thisDate) -> CHECKED
                     
                     else -> NORMAL
                 }
@@ -207,7 +223,7 @@ private fun Mounth(
 private fun Day(
     label: String,
     type: DayType,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },

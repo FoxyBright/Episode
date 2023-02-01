@@ -52,6 +52,11 @@ class MainViewModel: ViewModel() {
         getMeets()
     }
     
+    suspend fun selectDays(days: List<String>) {
+        _days.emit(days)
+        getMeets()
+    }
+    
     suspend fun setFilters(filters: MeetFilters) {
         _meetFilters.emit(
             filters.copy(

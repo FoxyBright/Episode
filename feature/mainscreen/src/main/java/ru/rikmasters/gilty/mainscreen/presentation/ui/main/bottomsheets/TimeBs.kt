@@ -8,7 +8,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 
 @Composable
-fun TimeBsScreen(vm: TimeBsViewModel) {
+fun TimeBs(vm: TimeBsViewModel) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()

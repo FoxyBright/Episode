@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.CalendarBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBsScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
@@ -100,9 +100,9 @@ fun MainScreen(vm: MainViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         if(today) Connector<TimeBsViewModel>(vm.scope) {
-                            TimeBsScreen(it)
+                            TimeBs(it)
                         } else Connector<CalendarBsViewModel>(vm.scope) {
-                            CalendarBs(Modifier, days)
+                            CalendarBs(it)
                         }
                     }
                 }
