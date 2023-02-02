@@ -56,7 +56,7 @@ private fun HiddenPhotoPreview() {
 }
 
 data class HiddenState(
-    val photoList: List<String>
+    val photoList: List<String>,
 )
 
 interface HiddenCallback {
@@ -72,7 +72,7 @@ interface HiddenCallback {
 fun HiddenContent(
     state: HiddenState,
     modifier: Modifier = Modifier,
-    callback: HiddenCallback? = null
+    callback: HiddenCallback? = null,
 ) {
     Column(
         modifier
@@ -80,9 +80,9 @@ fun HiddenContent(
             .fillMaxHeight(0.85f)
     ) {
         ActionBar(
-            "Скрытые фото",
-            "Доступ к фото будет доступен при Вашем\nразрешении",
-            Modifier.padding(bottom = 20.dp)
+            stringResource(R.string.profile_hidden_photo),
+            Modifier.padding(bottom = 20.dp),
+            stringResource(R.string.profile_hidden_photo_label)
         ) { callback?.onBack() }
         LazyVerticalGrid(
             GridCells.Fixed(3),
@@ -147,7 +147,7 @@ private fun LazyItem(
     image: String,
     modifier: Modifier = Modifier,
     onSelect: (String) -> Unit,
-    onDelete: (String) -> Unit
+    onDelete: (String) -> Unit,
 ) {
     Box(
         modifier

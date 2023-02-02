@@ -37,6 +37,7 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
+    <string name="profile_hidden_photo_label">Доступ к фото будет доступен при Вашем/nразрешении</string>
     <string name="profile_observers">Наблюдатели</string>
     <string name="profile_observers_in_profile">Наблюдают</string>
     <string name="profile_observe">Наблюдает</string>
@@ -130,8 +131,10 @@
     <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
     <string name="meeting_only_online_meetings_button">Сделать онлайн</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
-    <string name="meeting_wait_organizer_access">Когда организатор примет ваш\nотклик, вам будет доступен чат\nвстречи</string>
-    <string name="meeting_respond_was_send">Отклик отправлен</string>
+    <string name="meeting_respond_title">Отклик отправлен</string>
+    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат\nвстречи</string>
+    <string name="meeting_without_respond_title">Мгновенное\nучастие!</string>
+    <string name="meeting_without_respond_label">Вы стали участником, теперь вам\nдоступен чат meet</string>
     <string name="meeting_shared_button">Поделиться</string>
     <string name="meeting_close_button">Закрыть</string>
     <string name="meeting_watch_all_members_in_meet">Смотреть всех</string>

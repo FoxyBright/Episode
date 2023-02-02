@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.common
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -42,12 +41,11 @@ private fun ReceivedWithoutPhotosResponds() {
 }
 
 @Composable
-@SuppressLint("ModifierParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 fun Respond(
     respond: RespondModel,
     callback: RespondCallback? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val active = false // TODO Должна быть проверка - участвует пользователь в meet или нет
     Card(
@@ -91,11 +89,12 @@ fun Respond(
 private fun MeetRow(
     user: OrganizerModel,
     text: String,
-    emoji: EmojiModel? = null
+    emoji: EmojiModel? = null,
 ) {
     BrieflyRow(
-        user.avatar, text, emoji,
-        Modifier.padding(start = 16.dp, top = 12.dp)
+        text, Modifier.padding(
+            start = 16.dp, top = 12.dp
+        ), user.avatar, emoji
     )
 }
 
@@ -103,7 +102,7 @@ private fun MeetRow(
 private fun HiddenPhoto(
     respond: RespondModel,
     modifier: Modifier = Modifier,
-    onClick: (AvatarModel) -> Unit
+    onClick: (AvatarModel) -> Unit,
 ) {
     respond.hiddenPhoto?.let {
         LazyRow(modifier) {
@@ -123,7 +122,7 @@ private fun Buttons(
     modifier: Modifier = Modifier,
     active: Boolean = false,
     positive: (() -> Unit)? = null,
-    negative: () -> Unit
+    negative: () -> Unit,
 ) {
     Row(modifier) {
         positive?.let {

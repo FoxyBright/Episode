@@ -11,24 +11,19 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.organizer.OrganizerProfile
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.organizer.OrganizerProfileState
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsList
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants.ParticipantsListCallback
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.MeetingBsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.MeetingBsViewModel.MeetNavigation.*
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsCallback
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsContent
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsState
+import ru.rikmasters.gilty.shared.common.meetBS.*
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.COMPLAINTS
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.MEET
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.PARTICIPANTS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ANONYMOUS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
 @Composable
 fun MeetingBs(
@@ -42,14 +37,11 @@ fun MeetingBs(
     
     val meeting by vm.meet.collectAsState()
     val stack by vm.stack.collectAsState()
-    val profileModel = DemoProfileModel
     
     val menu by vm.menu.collectAsState()
     val memberList by vm.memberList.collectAsState()
     val distance by vm.distance.collectAsState()
     
-    val shared = meeting?.memberState == IS_ORGANIZER
-    val userInMeet = memberList.contains(profileModel.mapToMemberModel())
     val buttonState = meeting?.memberState == IS_ORGANIZER
     
     LaunchedEffect(Unit) {
@@ -59,16 +51,15 @@ fun MeetingBs(
     
     meeting?.let { meet ->
         when(screen) {
-            PROFILE -> Profile(vm, scope, meet.type)
+            MeetNavigation.ORGANIZER-> Profile(vm, scope, meet.type)
             PARTICIPANTS -> Participants(vm, scope, meet)
             COMPLAINTS -> Complaints(vm, scope, meetId)
             MEET -> MeetingBsContent(
                 MeetingBsState(
-                    menu, meet, memberList, distance,
-                    userInMeet, buttonState, shared,
-                    backButton = stack.isNotEmpty()
-                ),
-                Modifier
+                    menu, meet, memberList,
+                    distance, buttonState,
+                    (null), stack.isNotEmpty()
+                ), Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 object: MeetingBsCallback {
@@ -105,7 +96,7 @@ fun MeetingBs(
                         scope.launch {
                             if(meet.type != ANONYMOUS)
                                 vm.getUserActualMeets(organizerId)
-                            vm.navigate(PROFILE, organizerId)
+                            vm.navigate(MeetNavigation.ORGANIZER, organizerId)
                         }
                     }
                     
@@ -117,11 +108,11 @@ fun MeetingBs(
                         scope.launch {
                             if(meet.type != ANONYMOUS)
                                 vm.getUserActualMeets(member.id)
-                            vm.navigate(PROFILE, member.id)
+                            vm.navigate(MeetNavigation.ORGANIZER, member.id)
                         }
                     }
                     
-                    override fun onRespondClick(meetId: String) {
+                    override fun onRespond(meetId: String) {
                         scope.launch { vm.respondForMeet(meetId) }
                     }
                 }
@@ -165,7 +156,7 @@ private fun Participants(
             }
             
             override fun onMemberClick(member: MemberModel) {
-                scope.launch { vm.navigate(PROFILE, member.id) }
+                scope.launch { vm.navigate(MeetNavigation.ORGANIZER, member.id) }
             }
         }
     )

@@ -33,7 +33,8 @@ class CompleteViewModel: ViewModel() {
     
     suspend fun setMeet() {
         val meet = MeetingModel(
-            randomUUID().toString(), Tags.first().title,
+            randomUUID().toString(),
+            Tags.joinToString(separator = ", ") { it.title },
             Condition!!, SelectCategory!!, Duration, MeetingType!!, Date,
             profileManager.getProfile().mapToOrganizerModel(), Online,
             Tags, Description, Private, try {
@@ -62,7 +63,7 @@ class CompleteViewModel: ViewModel() {
             } else null,
             photoAccess = Hidden,
             chatForbidden = RestrictChat,
-            tags = Tags.map { it.id },
+            tags = Tags.map { it.title },
             description = Description.ifBlank { null },
             dateTime = Date,
             duration = durationToMinutes(Duration),

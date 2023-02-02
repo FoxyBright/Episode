@@ -175,7 +175,7 @@ private fun TopBar(
 ) {
     ActionBar(
         stringResource(R.string.login_external_bar),
-        stringResource(
+        Modifier, stringResource(
             R.string.login_external_bar_details,
             (method ?: "")
         )

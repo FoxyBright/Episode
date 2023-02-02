@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.time
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -84,7 +84,7 @@ data class FullMeetingModel(
     
     fun map() = MeetingModel(
         id = id,
-        title = tags.first().title,
+        title = tags.joinToString(separator = ", ") { it.title },
         condition = condition,
         category = category,
         duration = duration,

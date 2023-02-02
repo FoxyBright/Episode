@@ -6,8 +6,9 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.MeetingBsViewModel.MeetNavigation.*
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.*
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 
@@ -16,19 +17,18 @@ class MeetingBsViewModel: ViewModel() {
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
     
-    enum class MeetNavigation { MEET, PROFILE, PARTICIPANTS, COMPLAINTS }
-    
     private val _screen = MutableStateFlow(MEET)
     val screen = _screen.asStateFlow()
     
     // todo добавить в пару адресата
     private val _stack = MutableStateFlow(emptyList<MeetNavigation>())
     val stack = _stack.asStateFlow()
+    
     suspend fun navigate(screen: MeetNavigation, params: String = "") {
         _stack.emit(stack.value + screen)
         when(screen) {
             PARTICIPANTS -> _memberList.emit(meetManager.getMeetMembers(params))
-            PROFILE -> {
+            ORGANIZER -> {
                 _profile.emit(profileManager.getUser(params))
                 _observe.emit(profile.value.isWatching == true)
             }
@@ -45,9 +45,7 @@ class MeetingBsViewModel: ViewModel() {
     
     suspend fun navigateBack() {
         if(stack.value.isNotEmpty()) {
-            _stack.emit(
-                stack.value - stack.value[stack.value.size - 1]
-            )
+            _stack.emit(stack.value - stack.value[stack.value.size - 1])
             _screen.emit(
                 if(stack.value.isEmpty()) MEET
                 else stack.value.last(),

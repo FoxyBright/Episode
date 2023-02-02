@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.shared
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Row
@@ -15,13 +14,11 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.shared.R.string.meeting_avatar
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -33,26 +30,24 @@ private fun BrieflyRowPreview() {
     GiltyTheme {
         val user = DemoProfileModel
         BrieflyRow(
-            user.avatar, (user.username ?: ""), user.rating.emoji,
-            Modifier.background(colorScheme.background)
+            (user.username ?: ""),
+            Modifier.background(colorScheme.background),
+            user.avatar, user.rating.emoji
         )
     }
 }
 
 @Composable
-@SuppressLint("ModifierParameter")
 fun BrieflyRow(
-    avatar: AvatarModel? = null,
     text: String,
+    modifier: Modifier = Modifier,
+    avatar: AvatarModel? = null,
     emoji: EmojiModel? = null,
-    modifier: Modifier = Modifier
 ) {
     Row(modifier, Start, CenterVertically) {
         avatar?.let {
             AsyncImage(
-                it.url,
-                stringResource(meeting_avatar),
-                Modifier
+                it.url, (null), Modifier
                     .padding(end = 12.dp)
                     .size(38.dp)
                     .clip(CircleShape),

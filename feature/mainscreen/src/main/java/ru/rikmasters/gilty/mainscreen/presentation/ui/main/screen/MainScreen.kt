@@ -1,25 +1,21 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.CalendarBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.TimeBs
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar.CalendarBs
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.meet.MeetBs
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.time.TimeBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -61,13 +57,9 @@ fun MainScreen(vm: MainViewModel) {
             override fun onMeetClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Text(
-                            meet.id, Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                                .padding(28.dp),
-                            textAlign = TextAlign.Center
-                        )
+                        Connector<MeetBsViewModel>(vm.scope) {
+                            MeetBs(it, meet.id, (false))
+                        }
                     }
                 }
             }
@@ -75,13 +67,9 @@ fun MainScreen(vm: MainViewModel) {
             override fun onRespond(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Text(
-                            meet.id, Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                                .padding(28.dp),
-                            textAlign = TextAlign.Center
-                        )
+                        Connector<MeetBsViewModel>(vm.scope) {
+                            MeetBs(it, meet.id, (true))
+                        }
                     }
                 }
             }
@@ -125,7 +113,7 @@ fun MainScreen(vm: MainViewModel) {
             }
             
             override fun onCloseAlert() {
-                scope.launch { vm.alertDismiss() }
+                scope.launch { vm.alertDismiss(false) }
             }
             
             override fun onTodayChange() {

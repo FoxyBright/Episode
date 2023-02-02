@@ -23,7 +23,7 @@ data class MainMeetResponse(
     
     fun map() = MeetingModel(
         id = id,
-        title = tags.first().title,
+        title = tags.joinToString(separator = ", ") { it.title },
         condition = ConditionType.valueOf(condition),
         category = category.map(),
         durationToString(duration),

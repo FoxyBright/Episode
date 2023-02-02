@@ -116,8 +116,8 @@ fun MeetingBsTopBarCompose(
                     )
                 }
                 Text(
-                    state.meet.tags.first().title,
-                    Modifier, colorScheme.tertiary,
+                    state.meet.tags.joinToString(separator = ", ")
+                    { it.title }, Modifier, colorScheme.tertiary,
                     style = typography.labelLarge
                 )
             }
@@ -143,8 +143,8 @@ fun MeetingBsTopBarCompose(
             Start, CenterVertically
         ) {
             BrieflyRow(
-                (null), ("${org.username}, ${org.age}"),
-                org.emoji
+                ("${org.username}, ${org.age}"),
+                Modifier, (null), org.emoji
             )
             Text(
                 state.meet.display(),

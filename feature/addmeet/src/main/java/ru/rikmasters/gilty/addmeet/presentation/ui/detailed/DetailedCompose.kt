@@ -71,7 +71,7 @@ fun DetailedContent(
     Scaffold(modifier, {
         ClosableActionBar(
             stringResource(R.string.add_meet_detailed_title),
-            (null), Modifier.padding(bottom = 10.dp),
+            Modifier.padding(bottom = 10.dp), (null),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
     }, {

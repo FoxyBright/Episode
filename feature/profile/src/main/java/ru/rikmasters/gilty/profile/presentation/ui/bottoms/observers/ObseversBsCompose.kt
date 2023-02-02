@@ -70,10 +70,7 @@ fun ObserversListContent(
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        ActionBar(
-            state.user, (null),
-            Modifier.padding(bottom = 22.dp)
-        )
+        ActionBar(state.user, Modifier.padding(bottom = 22.dp))
         GiltyTab(
             listOf(
                 "${stringResource(R.string.profile_observers)} ${
@@ -143,13 +140,9 @@ private fun ObserveItem(
             SpaceBetween, CenterVertically
         ) {
             BrieflyRow(
-                member.avatar,
-                "${
-                    member.username
-                }, ${
-                    member.age
-                }",
-                member.emoji, Modifier.weight(1f)
+                "${member.username}, ${member.age}",
+                Modifier.weight(1f), member.avatar,
+                member.emoji
             )
             SmallButton(
                 stringResource(

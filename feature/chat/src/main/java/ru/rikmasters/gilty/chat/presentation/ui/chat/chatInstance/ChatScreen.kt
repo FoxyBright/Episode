@@ -112,7 +112,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
         }
         
-        override fun onRespondClick(meetId: String) {
+        override fun onRespond(meetId: String) {
             scope.launch { asm.bottomSheet.collapse() }
             meetOutAlert = true
         }

@@ -67,8 +67,7 @@ private fun MeetingBsShared() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoMemberModelList,
-                    distanceCalculator(meet), (false),
-                    shared = true
+                    distanceCalculator(meet), (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -104,9 +103,7 @@ data class MeetingBsState(
     val meet: FullMeetingModel,
     val membersList: List<MemberModel>? = null,
     val meetDistance: String? = null,
-    val userInMeet: Boolean = false,
     val buttonState: Boolean = true,
-    val shared: Boolean = false,
     val detailed: Pair<String, Boolean>? = null,
     val backButton: Boolean = false
 )
@@ -117,7 +114,7 @@ interface MeetingBsCallback {
     fun onMenuItemClick(index: Int, meetId: String) {}
     fun onMeetPlaceClick(meetLocation: LocationModel?) {}
     fun onMemberClick(member: MemberModel) {}
-    fun onRespondClick(meetId: String) {}
+    fun onRespond(meetId: String) {}
     fun onAvatarClick(organizerId: String) {}
     fun onAllMembersClick(meetId: String) {}
     fun onHiddenPhotoActive(hidden: Boolean) {}
@@ -218,7 +215,7 @@ fun MeetingBsContent(
                         
                         else -> true
                     }
-                ) { callback?.onRespondClick(state.meet.id) }
+                ) { callback?.onRespond(state.meet.id) }
             }
         }
         item {

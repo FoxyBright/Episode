@@ -61,7 +61,7 @@ fun PermissionsContent(
     Box(modifier.fillMaxSize()) {
         Column {
             ActionBar(
-                stringResource(R.string.permissions_action_bar),
+                stringResource(R.string.permissions_action_bar), Modifier,
                 stringResource(R.string.permissions_action_bar_details),
             ) { callback?.onBack() }
             MapImage()

@@ -1,24 +1,16 @@
 package ru.rikmasters.gilty.complaints.presentation.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -29,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.RowActionBar
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.textFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -88,10 +80,8 @@ fun ComplainTextBox(
             .background(colorScheme.background)
     ) {
         RowActionBar(
-            title, (null),
-            Modifier.padding(bottom = 12.dp),
-            (null), (null), onBack
-        )
+            title, Modifier.padding(bottom = 12.dp)
+        ) { onBack?.let { it() } }
         GTextField(
             text, { onTextChange(it) },
             Modifier.fillMaxWidth(),
@@ -134,10 +124,9 @@ fun ComplainElements(
             .background(colorScheme.background)
     ) {
         RowActionBar(
-            title, (null),
-            Modifier.padding(bottom = 12.dp),
-            description, (null), onBack
-        )
+            title, Modifier.padding(bottom = 12.dp),
+            description = description
+        ) { onBack?.let { it() } }
         LazyColumn(
             Modifier.background(
                 colorScheme.primaryContainer, shapes.medium

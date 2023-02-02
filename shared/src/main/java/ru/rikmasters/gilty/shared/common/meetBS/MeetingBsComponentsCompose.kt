@@ -145,7 +145,7 @@ fun MeetingBsMap(
                 ) {
                     Text(
                         stringResource(R.string.meeting_watch_on_mup_button),
-                        Modifier.padding(16.dp),
+                        Modifier.weight(1f).padding(16.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
@@ -320,9 +320,9 @@ fun MeetingBsParticipants(
                     SpaceBetween, CenterVertically
                 ) {
                     BrieflyRow(
-                        member.avatar,
                         "${member.username}, ${member.age}",
-                        (null), Modifier.padding(12.dp, 8.dp)
+                        Modifier.padding(12.dp, 8.dp),
+                        member.avatar,
                     )
                     Icon(
                         Filled.KeyboardArrowRight,

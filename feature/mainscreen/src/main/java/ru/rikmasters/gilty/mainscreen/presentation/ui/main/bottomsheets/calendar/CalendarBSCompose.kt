@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets
+package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.DayType.CHECKED
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.DayType.INACTIVE
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.DayType.NORMAL
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar.DayType.CHECKED
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar.DayType.INACTIVE
+import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar.DayType.NORMAL
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayShort

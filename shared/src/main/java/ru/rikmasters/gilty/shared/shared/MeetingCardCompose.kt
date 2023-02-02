@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoriesListCard
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
@@ -41,9 +43,10 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 private fun MeetingCardTodayPreview() {
     GiltyTheme {
         MeetingCard(
-            DemoMeetingModel,
-            Modifier.padding(20.dp),
-            true
+            DemoMeetingModel.copy(
+                datetime = now().toString(),
+                isOnline = true
+            ), Modifier.padding(20.dp)
         )
     }
 }
@@ -76,9 +79,10 @@ private fun MeetingCategoryCardPreview() {
 private fun MeetingCategoryCardTodayPreview() {
     GiltyTheme {
         MeetingCategoryCard(
-            DemoMeetingModel.copy(condition = FREE),
-            Modifier.padding(20.dp),
-            today = true,
+            DemoMeetingModel.copy(
+                condition = FREE,
+                datetime = now().toString()
+            ), Modifier.padding(20.dp),
             old = false
         ) {}
     }
@@ -89,17 +93,16 @@ private fun MeetingCategoryCardTodayPreview() {
 fun MeetingCard(
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    today: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
+    val today = todayControl(meeting.datetime)
     Card(
         { onClick?.let { it() } },
         modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
     ) {
         Text(
-            meeting.title,
-            Modifier
+            meeting.title, Modifier
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
@@ -109,7 +112,11 @@ fun MeetingCard(
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
                 meeting.datetime,
-                green(), today
+                if(meeting.isOnline) green()
+                else listOf(
+                    meeting.category.color,
+                    meeting.category.color
+                ), today
             )
             if(today) CategoriesListCard(
                 Modifier.padding(start = 4.dp),
@@ -150,10 +157,10 @@ fun MeetingCard(
 fun MeetingCategoryCard(
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    today: Boolean = false,
     old: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
+    val today = todayControl(meeting.datetime)
     val color = meeting.category.color
     Card(
         { onClick?.let { it() } },

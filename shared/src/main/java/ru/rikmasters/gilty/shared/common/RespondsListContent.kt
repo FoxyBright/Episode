@@ -87,9 +87,9 @@ private fun GroupList(
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             RowActionBar(
-                meet.title,
-                responds.size.toString(),
-                Modifier.clickable { callback?.onArrowClick(index) }
+                meet.title, Modifier.clickable {
+                    callback?.onArrowClick(index)
+                }, responds.size.toString()
             )
             IconButton({ callback?.onArrowClick(index) }) {
                 Icon(

@@ -47,8 +47,8 @@ fun CategoriesContent(
         Column(Modifier.weight(1f)) {
             ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
-                stringResource(R.string.add_meet_create_description),
-                Modifier, { callback?.onCloseAlert(true) }
+                Modifier, stringResource(R.string.add_meet_create_description),
+                { callback?.onCloseAlert(true) }
             )
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)

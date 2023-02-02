@@ -77,7 +77,7 @@ fun CodeContent(
     Box(modifier.background(colorScheme.background)) {
         Column(Modifier.fillMaxSize(), Top, CenterHorizontally) {
             ActionBar(
-                stringResource(R.string.confirm_number_title),
+                stringResource(R.string.confirm_number_title), Modifier,
                 stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
             DigitCode(Modifier.padding(5.dp), state.code, state.focuses)

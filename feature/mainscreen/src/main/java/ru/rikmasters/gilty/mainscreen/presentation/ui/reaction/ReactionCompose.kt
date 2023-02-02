@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,6 +29,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -41,8 +41,9 @@ fun ReactionPreview() {
     GiltyTheme {
         Box(Modifier.background(colorScheme.background)) {
             ReactionContent(
-                DemoAvatarModel.id,
-                DemoCategoryModel
+                DemoAvatarModel,
+                DemoCategoryModel,
+                false,
             )
         }
     }
@@ -50,34 +51,41 @@ fun ReactionPreview() {
 
 @Composable
 fun ReactionContent(
-    avatar: String,
+    avatar: AvatarModel?,
     categoryModel: CategoryModel,
+    withoutResponse: Boolean,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
 ) {
+    
     Box(modifier.fillMaxSize()) {
         AsyncImage(
-            avatar, stringResource(R.string.meeting_avatar),
+            avatar?.url, (null),
             Modifier.fillMaxSize(),
             contentScale = Crop
         )
         Box(
             Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.22f)
                 .align(BottomCenter)
                 .clip(shapes.largeTopRoundedShape)
                 .background(colorScheme.primaryContainer)
         ) {
             Column {
                 Text(
-                    stringResource(R.string.meeting_respond_was_send),
-                    Modifier.padding(top = 16.dp, start = 16.dp),
+                    stringResource(
+                        if(withoutResponse) R.string.meeting_without_respond_title
+                        else R.string.meeting_respond_title
+                    ), Modifier.padding(top = 16.dp, start = 16.dp),
                     color = colorScheme.tertiary,
                     style = typography.displayLarge
                 )
                 Text(
-                    stringResource(R.string.meeting_wait_organizer_access),
-                    Modifier.padding(top = 8.dp, start = 16.dp),
+                    stringResource(
+                        if(withoutResponse) R.string.meeting_without_respond_label
+                        else R.string.meeting_respond_label
+                    ), Modifier.padding(top = 8.dp, start = 16.dp),
                     color = colorScheme.onTertiary,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
@@ -101,18 +109,16 @@ fun ReactionContent(
     }
 }
 
-@SuppressLint("InvalidColorHexValue")
 @Composable
 private fun CloseButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier
             .clip(CircleShape)
             .clickable(
-                MutableInteractionSource(),
-                (null)
+                MutableInteractionSource(), (null)
             ) { onClick() }, Center
     ) {
         Box(

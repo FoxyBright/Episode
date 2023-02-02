@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.bottoms.participants
+package ru.rikmasters.gilty.shared.common.meetBS
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -46,7 +46,11 @@ fun ParticipantsList(
     Column(modifier) {
         RowActionBar(
             stringResource(R.string.meeting_members),
-            "${membersList.size}/${meet.membersCount}"
+            Modifier, ("${membersList.size}" +
+                    if(meet.membersMax > 0)
+                        "/" + meet.membersMax else ""),
+            if(meet.isOnline) colorScheme.secondary
+            else colorScheme.primary
         ) { callback?.onBack() }
         LazyColumn(
             Modifier
@@ -62,9 +66,9 @@ fun ParticipantsList(
                     colors = cardColors(colorScheme.primaryContainer)
                 ) {
                     BrieflyRow(
-                        meet.organizer.avatar,
                         "${member.username}, ${member.age}",
-                        modifier = Modifier.padding(16.dp)
+                        Modifier.padding(16.dp),
+                        member.avatar
                     ); if(index < membersList.size - 1)
                     Divider(Modifier.padding(start = 60.dp))
                 }

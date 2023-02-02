@@ -111,8 +111,8 @@ private fun Participant(
                 SpaceBetween, CenterVertically
             ) {
                 BrieflyRow(
-                    member.avatar,
                     "${member.username}, ${member.age}",
+                    Modifier, member.avatar,
                     member.emoji,
                 )
                 Icon(
