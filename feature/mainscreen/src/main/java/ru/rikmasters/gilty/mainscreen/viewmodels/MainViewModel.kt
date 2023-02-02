@@ -79,8 +79,8 @@ class MainViewModel: ViewModel() {
         )
     }
     
-    suspend fun alertDismiss() {
-        _alert.emit(!alert.value)
+    suspend fun alertDismiss(state: Boolean) {
+        _alert.emit(state)
     }
     
     suspend fun repeatMeets() {
