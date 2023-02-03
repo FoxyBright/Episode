@@ -19,13 +19,13 @@ fun TimeBs(vm: TimeBsViewModel) {
     val hour by vm.hour.collectAsState()
     val minute by vm.minute.collectAsState()
     
-    fun isActive(): Boolean {
-        return LocalDateTime.of(vm.normalizeDate(date, hour, minute)).isAfter(LocalDateTime.now())
-    }
+    val isActive = LocalDateTime.of(
+        vm.normalizeDate(date, hour, minute)
+    ).isAfter(LocalDateTime.now())
     
     DateTimeBS(
         DateTimeBSState(
-            date, hour, minute, Online, isActive()
+            date, hour, minute, Online, isActive
         ), Modifier, object: DateTimeBSCallback {
             
             override fun dateChange(it: String) {
