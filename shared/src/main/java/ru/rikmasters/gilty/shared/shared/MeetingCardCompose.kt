@@ -21,7 +21,8 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -175,7 +176,7 @@ fun MeetingCategoryCard(
             colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = Bold,
-            overflow = TextOverflow.Ellipsis,
+            overflow = Ellipsis,
             maxLines = 1
         )
         Row(Modifier.padding(start = 14.dp)) {
@@ -213,9 +214,12 @@ fun MeetingCategoryCard(
             ) {
                 Text(
                     meeting.category.name,
-                    Modifier, White,
+                    Modifier.padding(horizontal = 16.dp), White,
                     style = typography.labelSmall,
-                    fontWeight = SemiBold
+                    textAlign = TextAlign.Center,
+                    fontWeight = SemiBold,
+                    overflow = Ellipsis,
+                    maxLines = 3
                 )
             }
             CategoriesListCard(
