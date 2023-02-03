@@ -55,7 +55,7 @@ fun CompleteContent(
     meeting: MeetingModel,
     isOnline: Boolean,
     modifier: Modifier = Modifier,
-    callback: CompleteCallBack? = null
+    callback: CompleteCallBack? = null,
 ) {
     Column(
         modifier
@@ -87,7 +87,7 @@ private fun Buttons(
     modifier: Modifier = Modifier,
     online: Boolean,
     onShare: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
 ) {
     Column(
         modifier,
@@ -115,12 +115,12 @@ private fun Buttons(
 private fun MeetingCard(
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean
+    online: Boolean,
 ) {
     Box(modifier) {
         Box {
             AsyncImage(
-                meeting.organizer?.avatar?.id,
+                meeting.organizer?.thumbnail?.url,
                 stringResource(R.string.meeting_avatar),
                 Modifier
                     .clip(shapes.large)
@@ -140,7 +140,7 @@ private fun MeetingCard(
 @Composable
 private fun PhoneContent(
     modifier: Modifier = Modifier,
-    content: (@Composable () -> Unit)?
+    content: (@Composable () -> Unit)?,
 ) {
     Box(modifier.fillMaxSize(), Center) {
         Image(
@@ -162,7 +162,7 @@ private fun PhoneContent(
 fun MeetBottom(
     modifier: Modifier,
     meet: MeetingModel,
-    online: Boolean
+    online: Boolean,
 ) {
     Box(modifier) {
         Image(
@@ -227,7 +227,7 @@ fun CardButton(
     text: String,
     icon: Int,
     online: Boolean,
-    betweenDistance: Dp = 2.dp
+    betweenDistance: Dp = 2.dp,
 ) {
     val color = if(online) colorScheme.secondary
     else colorScheme.primary

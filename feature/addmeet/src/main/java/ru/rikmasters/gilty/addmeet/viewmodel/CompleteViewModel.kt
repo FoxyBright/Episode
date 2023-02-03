@@ -51,7 +51,7 @@ class CompleteViewModel: ViewModel() {
     }
     
     suspend fun addMeet() {
-        meetManager.addMeet(
+        val id = meetManager.addMeet(
             categoryId = SelectCategory?.id,
             type = MeetingType?.name,
             isOnline = Online,
@@ -80,6 +80,7 @@ class CompleteViewModel: ViewModel() {
             requirements = getRequirements(),
             withoutResponds = WithoutRespond
         )
+        _meet.emit(meet.value?.copy(id = id))
     }
     
     private fun getRequirements(): List<Requirement>? {
@@ -102,19 +103,5 @@ class CompleteViewModel: ViewModel() {
                 )
             }
         }
-    }
-    
-    suspend fun onShared() {
-        makeToast("Тут должна быть кнопка поделиться")
-        //        val extraText = "https://www.google.com"
-        //        val intent = Intent(ACTION_SEND)
-        //        intent.type = "text/plain"
-        //        intent.putExtra(EXTRA_TEXT, extraText)
-        //
-        //        ContextCompat.startActivity(
-        //            context, createChooser(
-        //                intent, ("Поделиться встречей")
-        //            ), (null)
-        //        )
     }
 }

@@ -94,14 +94,12 @@ class MeetingManager(
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ) {
-        web.addMeet(
-            categoryId, type, isOnline,
-            condition, price, photoAccess,
-            chatForbidden, tags, description,
-            dateTime, duration, location,
-            isPrivate, memberCount, requirementsType,
-            requirements, withoutResponds
-        )
-    }
+    ) = web.addMeet(
+        categoryId, type, isOnline,
+        condition, price, photoAccess,
+        chatForbidden, tags, description,
+        dateTime, duration, location,
+        isPrivate, memberCount, requirementsType,
+        requirements, withoutResponds
+    )
 }

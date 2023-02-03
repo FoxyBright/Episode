@@ -256,9 +256,9 @@ class MeetingWebSource: KtorSource() {
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ) {
+    ): String {
         updateClientToken()
-        client.post(
+        return client.post(
             "http://$HOST$PREFIX_URL/meetings"
         ) {
             setBody(
@@ -271,6 +271,6 @@ class MeetingWebSource: KtorSource() {
                     requirements, withoutResponds
                 )
             )
-        }
+        }.wrapped<DetailedMeetResponse>().id
     }
 }
