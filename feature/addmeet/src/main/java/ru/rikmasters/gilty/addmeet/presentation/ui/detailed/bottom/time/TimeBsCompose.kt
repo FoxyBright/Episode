@@ -1,11 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -16,13 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.HOURS_IN_DAY
-import ru.rikmasters.gilty.shared.common.extentions.MINUTES_IN_HOUR
-import ru.rikmasters.gilty.shared.common.extentions.TIME_START
-import ru.rikmasters.gilty.shared.common.extentions.TODAY_LABEL
-import ru.rikmasters.gilty.shared.common.extentions.getDate
-import ru.rikmasters.gilty.shared.common.extentions.getTime
-import ru.rikmasters.gilty.shared.common.extentions.replacer
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ListItemPicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -37,9 +27,8 @@ private fun DateTimeBSPreview() {
         DateTimeBS(
             DateTimeBSState(
                 TODAY_LABEL, TIME_START,
-                TIME_START, false
-            ),
-            Modifier.padding(16.dp)
+                TIME_START, (false), (true)
+            ), Modifier.padding(16.dp)
         )
     }
 }
@@ -49,6 +38,7 @@ data class DateTimeBSState(
     val hour: String,
     val minute: String,
     val online: Boolean,
+    val isActive: Boolean,
 )
 
 interface DateTimeBSCallback {
@@ -84,7 +74,7 @@ fun DateTimeBS(
         GradientButton(
             Modifier.padding(vertical = 28.dp),
             stringResource(R.string.save_button),
-            online = state.online
+            state.isActive, state.online
         ) { callback?.onSave() }
     }
 }

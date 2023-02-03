@@ -23,27 +23,18 @@ class TimeBsViewModel(
     val minute = _minute.asStateFlow()
     
     suspend fun changeHour(hour: String) {
-        val isLast = LocalDateTime.of(
-            normalizeDate(date.value, hour, minute.value)
-        ).isBefore(LocalDateTime.now())
-        if(!isLast) _hour.emit(hour)
+        _hour.emit(hour)
     }
     
     suspend fun changeMinute(minute: String) {
-        val isLast = LocalDateTime.of(
-            normalizeDate(date.value, hour.value, minute)
-        ).isBefore(LocalDateTime.now())
-        if(!isLast) _minute.emit(minute)
+        _minute.emit(minute)
     }
     
     suspend fun changeDate(date: String) {
-        val isLast = LocalDate.of(
-            normalizeDate(date, hour.value, minute.value)
-        ).isBefore(LOCAL_DATE)
-        if(!isLast) _date.emit(date)
+        _date.emit(date)
     }
     
-    private fun normalizeDate(
+    fun normalizeDate(
         date: String, hour: String, minute: String,
     ): String { // FIXME год всегда текущий
         val fullTime = "T$hour:$minute:00Z"
