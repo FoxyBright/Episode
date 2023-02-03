@@ -52,7 +52,9 @@ fun OrganizerBs(
             override fun profileImage() {
                 scope.launch {
                     asm.bottomSheet.collapse()
-                    nav.navigate("avatar?type=2&image=${profile.avatar?.url}")
+                    nav.navigateAbsolute(
+                        ("profile/avatar?type=2&image=${profile.avatar?.url}")
+                    )
                 }
             }
             
