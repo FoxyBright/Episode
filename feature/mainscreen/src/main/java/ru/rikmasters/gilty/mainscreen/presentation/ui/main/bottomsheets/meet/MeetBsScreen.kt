@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
+import ru.rikmasters.gilty.shared.common.extentions.shareMeet
 import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.*
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsContent
@@ -28,6 +30,7 @@ fun MeetBs(
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
     
     val memberList by vm.memberList.collectAsState()
@@ -67,7 +70,7 @@ fun MeetBs(
                         
                         override fun onMenuItemClick(index: Int, meetId: String) {
                             scope.launch {
-                                if(index == 0) vm.sharedMeet(meetId)
+                                if(index == 0) shareMeet(meetId, context)
                                 if(index == 3) vm.navigate(COMPLAINTS)
                             }
                         }

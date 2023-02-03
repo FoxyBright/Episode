@@ -145,7 +145,9 @@ fun MeetingBsMap(
                 ) {
                     Text(
                         stringResource(R.string.meeting_watch_on_mup_button),
-                        Modifier.weight(1f).padding(16.dp),
+                        Modifier
+                            .weight(1f)
+                            .padding(16.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
@@ -290,7 +292,7 @@ fun MeetingBsParticipants(
                     colorFilter = tint(colorScheme.tertiary)
                 )
             }
-            Text(
+            if(membersList.size > 3) Text(
                 stringResource(R.string.meeting_watch_all_members_in_meet),
                 Modifier.clickable(
                     MutableInteractionSource(), (null)

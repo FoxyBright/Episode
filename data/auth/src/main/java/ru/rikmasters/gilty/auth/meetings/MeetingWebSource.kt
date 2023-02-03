@@ -20,12 +20,10 @@ class MeetingWebSource: KtorSource() {
         val place: String,
     )
     
-    suspend fun leaveMeet(meetId: String) {
-        updateClientToken()
-        client.patch(
-            "http://$HOST$PREFIX_URL/meetings/$meetId/leave"
-        ) {}
-    }
+    private data class Respond(
+        val description: String?,
+        val photoAccess: Boolean,
+    )
     
     enum class MeetFilterGroup(val value: String) {
         AFTER("after"),
@@ -35,6 +33,32 @@ class MeetingWebSource: KtorSource() {
             
             fun get(index: Int) = values()[index]
         }
+    }
+    
+    suspend fun notInteresting(meetId: String) {
+        updateClientToken()
+        client.patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")
+    }
+    
+    suspend fun resetMeets() {
+        updateClientToken()
+        client.post("http://$HOST$PREFIX_URL/meetings/reset")
+    }
+    
+    suspend fun respondOfMeet(
+        meetId: String,
+        comment: String?,
+        hidden: Boolean,
+    ) {
+        updateClientToken()
+        client.post(
+            "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
+        ) { setBody(Respond(comment, hidden)) }
+    }
+    
+    suspend fun leaveMeet(meetId: String) {
+        updateClientToken()
+        client.patch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
     }
     
     suspend fun getMeetsList(
@@ -103,7 +127,7 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         client.patch(
             "http://$HOST$PREFIX_URL/meetings/$meetId/cancel"
-        ) {}
+        )
     }
     
     suspend fun getUserActualMeets(
@@ -112,7 +136,7 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/users/$userId/meetings"
-        ) {}.wrapped<List<MeetingResponse>>().map { it.map() }
+        ).wrapped<List<MeetingResponse>>().map { it.map() }
     }
     
     suspend fun getDetailedMeet(
@@ -121,7 +145,7 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/meetings/$meet"
-        ) {}.wrapped<DetailedMeetResponse>().map()
+        ).wrapped<DetailedMeetResponse>().map()
     }
     
     suspend fun getMeetMembers(
@@ -131,7 +155,7 @@ class MeetingWebSource: KtorSource() {
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/meetings/$meet/members"
-            ) {}.wrapped<List<MemberResponse>>().map { it.map() }
+            ).wrapped<List<MemberResponse>>().map { it.map() }
         } catch(e: Exception) {
             emptyList()
         }
@@ -153,7 +177,7 @@ class MeetingWebSource: KtorSource() {
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/meetings/places"
-            ) {}.wrapped<List<ShortLocation>>().map {
+            ).wrapped<List<ShortLocation>>().map {
                 Pair(it.address, it.place)
             }
         } catch(e: Exception) {

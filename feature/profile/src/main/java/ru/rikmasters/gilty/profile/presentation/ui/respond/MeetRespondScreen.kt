@@ -1,12 +1,13 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
+package ru.rikmasters.gilty.profile.presentation.ui.respond
 
 import androidx.compose.runtime.*
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.mainscreen.viewmodels.RespondsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.RespondsViewModel
+import ru.rikmasters.gilty.shared.common.meetBS.MeetRespondContent
 
 @Composable
-fun ReactionScreen(
+fun MeetRespondScreen(
     vm: RespondsViewModel,
     meetId: String,
 ) {
@@ -18,7 +19,7 @@ fun ReactionScreen(
     LaunchedEffect(Unit) { vm.getMeet(meetId) }
     
     meeting?.let { meet ->
-        ReactionContent(
+        MeetRespondContent(
             meet.organizer.avatar,
             meet.category,
             meet.withoutResponds

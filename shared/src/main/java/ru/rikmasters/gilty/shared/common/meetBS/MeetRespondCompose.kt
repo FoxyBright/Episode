@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.reaction
+package ru.rikmasters.gilty.shared.common.meetBS
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,10 +37,10 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 @Preview
 @Composable
-fun ReactionPreview() {
+fun MeetRespondPreview() {
     GiltyTheme {
         Box(Modifier.background(colorScheme.background)) {
-            ReactionContent(
+            MeetRespondContent(
                 DemoAvatarModel,
                 DemoCategoryModel,
                 false,
@@ -50,7 +50,7 @@ fun ReactionPreview() {
 }
 
 @Composable
-fun ReactionContent(
+fun MeetRespondContent(
     avatar: AvatarModel?,
     categoryModel: CategoryModel,
     withoutResponse: Boolean,

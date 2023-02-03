@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.Compan
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
+import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -83,7 +84,8 @@ class MainViewModel: ViewModel() {
         _alert.emit(state)
     }
     
-    suspend fun repeatMeets() {
+    suspend fun resetMeets() {
+        meetManager.resetMeets()
         getMeets()
     }
     
@@ -94,6 +96,8 @@ class MainViewModel: ViewModel() {
     ) {
         state.swipe(direction)
         _meetings.emit(meetings.value - meet)
+        if(direction == LEFT)
+            meetManager.notInteresting(meet.id)
     }
     
     private suspend fun navBarSetStates(

@@ -62,6 +62,20 @@ class MeetingManager(
     
     suspend fun getMeetMembers(meetId: String) = web.getMeetMembers(meetId)
     
+    suspend fun notInteresting(meetId: String) {
+        web.notInteresting(meetId)
+    }
+    
+    suspend fun resetMeets() {
+        web.resetMeets()
+    }
+    
+    suspend fun respondOfMeet(
+        meetId: String, comment: String?, hidden: Boolean,
+    ) {
+        web.respondOfMeet(meetId, comment, hidden)
+    }
+    
     suspend fun addMeet(
         categoryId: String?,
         type: String?,

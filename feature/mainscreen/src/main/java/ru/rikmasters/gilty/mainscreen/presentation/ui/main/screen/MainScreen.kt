@@ -108,8 +108,8 @@ fun MainScreen(vm: MainViewModel) {
                 scope.launch { vm.moreMeet() }
             }
             
-            override fun onMeetsRepeatClick() {
-                scope.launch { vm.repeatMeets() }
+            override fun onResetMeets() {
+                scope.launch { vm.resetMeets() }
             }
             
             override fun onCloseAlert() {

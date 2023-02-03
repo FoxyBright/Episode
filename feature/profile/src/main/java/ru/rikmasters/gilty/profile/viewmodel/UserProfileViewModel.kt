@@ -58,8 +58,8 @@ class UserProfileViewModel: ViewModel() {
     private val _username = MutableStateFlow(profileModel.username)
     private val username = _username.asStateFlow()
     
-    private val _complaintsAlert = MutableStateFlow(false)
-    val complaintsAlert = _complaintsAlert.asStateFlow()
+    private val _alert = MutableStateFlow(false)
+    val alert = _alert.asStateFlow()
     
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
@@ -98,8 +98,8 @@ class UserProfileViewModel: ViewModel() {
         _errorConnection.emit(state)
     }
     
-    suspend fun setComplaintAlertState(state: Boolean) {
-        _complaintsAlert.emit(state)
+    suspend fun alertDismiss(state: Boolean) {
+        _alert.emit(state)
     }
     
     suspend fun changeDescription(text: String) {

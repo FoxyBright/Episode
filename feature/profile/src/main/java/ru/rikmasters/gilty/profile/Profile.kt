@@ -11,6 +11,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.profile.presentation.ui.photo.AvatarScreen
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.profile.presentation.ui.respond.MeetRespondScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
@@ -49,6 +50,18 @@ object Profile: FeatureDefinition() {
                 }
             }
             
+            screen<RespondsViewModel>(
+                "reaction?meetId={meetId}",
+                listOf(navArgument("meetId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                })
+            ) { vm, it ->
+                it.arguments?.getString("meetId")?.let { meetId ->
+                    MeetRespondScreen(vm, meetId)
+                }
+            }
+            
             screen<GalleryViewModel>(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
@@ -69,6 +82,10 @@ object Profile: FeatureDefinition() {
         
         scope<AvatarViewModel> {
             scopedOf(::AvatarViewModel)
+        }
+        
+        scope<RespondsViewModel> {
+            scopedOf(::RespondsViewModel)
         }
         
         scope<GalleryViewModel> {

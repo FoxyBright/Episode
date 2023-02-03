@@ -29,7 +29,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val listState = rememberLazyListState()
     
     val navBar by vm.navBar.collectAsState()
-    val alert by vm.complaintsAlert.collectAsState()
+    val alert by vm.alert.collectAsState()
     
     val menuState by vm.menu.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
@@ -75,7 +75,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun closeAlert() {
-                scope.launch { vm.setComplaintAlertState(false) }
+                scope.launch { vm.alertDismiss(false) }
             }
             
             override fun profileImage() {

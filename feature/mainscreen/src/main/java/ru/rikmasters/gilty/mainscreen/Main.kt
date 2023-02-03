@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.respond.MeetRespondScreen
 import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.RespondsViewModel
@@ -35,7 +35,7 @@ object Main: FeatureDefinition() {
                 })
             ) { vm, it ->
                 it.arguments?.getString("meetId")?.let { meetId ->
-                    ReactionScreen(vm, meetId)
+                    MeetRespondScreen(vm, meetId)
                 }
             }
         }

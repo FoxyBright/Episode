@@ -66,7 +66,7 @@ interface MainContentCallback {
     fun onOpenFiltersBottomSheet()
     fun onCloseAlert()
     
-    fun onMeetsRepeatClick()
+    fun onResetMeets()
     
     fun onMeetMoreClick()
     
@@ -203,7 +203,7 @@ private fun Content(
     if(meetings.size <= 2) MeetCard(
         modifier.fillMaxHeight(0.9f), EMPTY,
         onMoreClick = { callback?.onMeetMoreClick() },
-        onRepeatClick = { callback?.onMeetsRepeatClick() }
+        onRepeatClick = { callback?.onResetMeets() }
     )
     if(state && meetings.isNotEmpty()) MeetingGridContent(
         modifier
