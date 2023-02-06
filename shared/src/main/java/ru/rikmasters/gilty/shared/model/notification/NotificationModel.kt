@@ -1,8 +1,24 @@
 package ru.rikmasters.gilty.shared.model.notification
 
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+
+data class FullNotify(
+    val id: String,
+    val date: String,
+    val type: NotificationType,
+    val status: NotificationStatus,
+    val parent: NotificationParentModel,
+    val respond: RespondModel,
+)
+
+data class ShortNotification(
+    val id: String,
+    val name: String,
+    val description: String,
+)
 
 data class NotificationModel(
     val id: Int,

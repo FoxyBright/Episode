@@ -6,7 +6,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
-import ru.rikmasters.gilty.notifications.viewmodel.RespondsViewModel
+import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 
 object Notifications: FeatureDefinition() {
     
@@ -24,7 +24,7 @@ object Notifications: FeatureDefinition() {
     override fun Module.koin() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
-            scopedOf(::RespondsViewModel)
+            scopedOf(::RespondsBsViewModel)
         }
     }
 }

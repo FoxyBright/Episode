@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.notifications.presentation.ui.item
+package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

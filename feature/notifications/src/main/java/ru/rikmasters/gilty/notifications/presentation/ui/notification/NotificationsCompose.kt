@@ -5,19 +5,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.notifications.presentation.ui.item.Item
-import ru.rikmasters.gilty.notifications.presentation.ui.item.NotificationItemState
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Item
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
@@ -46,10 +44,11 @@ private fun NotificationsContentPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    DemoNotificationModelList,
-                    DemoNotificationModelList,
-                    DemoNotificationModelList,
-                    DemoMeetingModel,
+                    Triple(
+                        DemoNotificationModelList,
+                        DemoNotificationModelList,
+                        DemoNotificationModelList
+                    ), DemoMeetingModel,
                     (3), listOf(), (false),
                     DemoNotificationLeaveEmotionModel,
                     listOf(), listOf()
@@ -70,10 +69,11 @@ private fun NotificationsBlurPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    DemoNotificationModelList,
-                    DemoNotificationModelList,
-                    DemoNotificationModelList,
-                    DemoMeetingModel,
+                    Triple(
+                        DemoNotificationModelList,
+                        DemoNotificationModelList,
+                        DemoNotificationModelList
+                    ), DemoMeetingModel,
                     (3), listOf(), (true),
                     DemoNotificationLeaveEmotionModel,
                     listOf(), listOf()
@@ -84,9 +84,8 @@ private fun NotificationsBlurPreview() {
 }
 
 data class NotificationsState(
-    val todayNotific: List<NotificationModel>,
-    val weekNotific: List<NotificationModel>,
-    val earlyNotific: List<NotificationModel>,
+    val notifications: Triple<List<NotificationModel>,
+            List<NotificationModel>, List<NotificationModel>>,
     val lastRespond: MeetingModel,
     val myResponds: Int,
     val stateList: List<NavIconState>,
@@ -98,46 +97,52 @@ data class NotificationsState(
 
 interface NotificationsCallback {
     
-    fun onClick(notification: NotificationModel) {}
-    fun onSwiped(notification: NotificationModel) {}
-    fun onEmojiClick(emoji: EmojiModel) {}
-    fun onRespondsClick() {}
-    fun onBlurClick() {}
-    fun onParticipantClick(index: Int) {}
-    fun onNavBarSelect(point: Int) {}
+    fun onClick(notification: NotificationModel)
+    fun onSwiped(notification: NotificationModel)
+    fun onEmojiClick(emoji: EmojiModel, notify: NotificationModel)
+    fun onRespondsClick()
+    fun onBlurClick()
+    fun onParticipantClick(index: Int)
+    fun onNavBarSelect(point: Int)
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun NotificationsContent(
     state: NotificationsState,
     modifier: Modifier = Modifier,
     callback: NotificationsCallback? = null,
 ) {
-    Column(
+    Scaffold(
         modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .background(colorScheme.background)
-    ) {
-        Text(
-            stringResource(R.string.notification_screen_name),
-            Modifier.padding(top = 80.dp, bottom = 10.dp),
-            colorScheme.tertiary,
-            style = MaterialTheme.typography.titleLarge
-        )
+            .background(colorScheme.background),
+        topBar = {
+            Text(
+                stringResource(R.string.notification_screen_name),
+                Modifier.padding(
+                    start = 16.dp,
+                    top = 80.dp,
+                    bottom = 10.dp
+                ), colorScheme.tertiary,
+                style = typography.titleLarge
+            )
+        },
+        bottomBar = {
+            NavBar(
+                state.stateList, Modifier
+            ) { callback?.onNavBarSelect(it) }
+        }
+    ) { padding ->
         Notifications(state,
             Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.90f),
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
             { callback?.onClick(it) },
             { callback?.onRespondsClick() },
-            { callback?.onEmojiClick(it) })
+            { e, not -> callback?.onEmojiClick(e, not) })
         { callback?.onSwiped(it) }
-    }
-    Box(Modifier.fillMaxSize()) {
-        NavBar(
-            state.stateList, Modifier.align(Alignment.BottomCenter)
-        ) { callback?.onNavBarSelect(it) }
     }
     state.activeNotification?.let {
         if(state.blur) Box(
@@ -151,9 +156,9 @@ fun NotificationsContent(
                 state.participantsWrap,
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .align(Alignment.Center),
-                { callback?.onParticipantClick(it) }
-            ) { callback?.onEmojiClick(it) }
+                    .align(Center),
+                { part -> callback?.onParticipantClick(part) }
+            ) { e -> callback?.onEmojiClick(e, it) }
         }
     }
 }
@@ -162,41 +167,61 @@ fun NotificationsContent(
 private fun Notifications(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    onClick: ((NotificationModel) -> Unit)? = null,
-    onRespondsClick: (() -> Unit)? = null,
-    onEmojiClick: ((EmojiModel) -> Unit)? = null,
-    onSwiped: ((NotificationModel) -> Unit)? = null,
+    onClick: (NotificationModel) -> Unit,
+    onRespondsClick: () -> Unit,
+    onEmojiClick: (EmojiModel, NotificationModel) -> Unit,
+    onSwiped: (NotificationModel) -> Unit,
 ) {
+    val notify =
+        state.notifications
     val todayList =
-        state.todayNotific.map { it to rememberDragRowState() }
+        notify.first.map { it to rememberDragRowState() }
     val weekList =
-        state.weekNotific.map { it to rememberDragRowState() }
+        notify.second.map { it to rememberDragRowState() }
     val earlierList =
-        state.earlyNotific.map { it to rememberDragRowState() }
+        notify.third.map { it to rememberDragRowState() }
     
     LazyColumn(modifier) {
         if(state.myResponds != 0) item {
+            
             Responds(
                 stringResource(R.string.notification_responds_on_user_meetings),
                 state.myResponds, state.lastRespond.organizer?.avatar,
                 Modifier.padding(vertical = 12.dp)
-            ) { onRespondsClick?.let { it() } }
-        };if(todayList.isNotEmpty()) {; item { Label(R.string.meeting_profile_bottom_today_label) }
-        itemsIndexed(todayList) { i, not ->
-            Item(i, todayList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
+            ) { onRespondsClick() }
         }
-    }; if(weekList.isNotEmpty()) {; item { Label(R.string.notification_on_this_week_label) }
-        itemsIndexed(weekList) { i, not ->
-            Item(i, weekList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
+        
+        if(todayList.isNotEmpty()) {
+            item { Label(R.string.meeting_profile_bottom_today_label) }
+            itemsIndexed(todayList) { i, not ->
+                Item(i, todayList.size, not,
+                    { onClick(it) },
+                    { onEmojiClick(it, not.first) })
+                { onSwiped(it) }
+            }
         }
-    }; if(earlierList.isNotEmpty()) {; item { Label(R.string.notification_earlier_label) }
-        itemsIndexed(earlierList) { i, not ->
-            Item(i, earlierList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
+        
+        if(weekList.isNotEmpty()) {
+            item { Label(R.string.notification_on_this_week_label) }
+            itemsIndexed(weekList) { i, not ->
+                Item(i, weekList.size, not,
+                    { onClick(it) },
+                    { onEmojiClick(it, not.first) })
+                { onSwiped(it) }
+            }
         }
-    }; item { Divider(Modifier, 20.dp, Color.Transparent) }
+        
+        if(earlierList.isNotEmpty()) {
+            item { Label(R.string.notification_earlier_label) }
+            itemsIndexed(earlierList) { i, not ->
+                Item(i, earlierList.size, not,
+                    { onClick(it) },
+                    { onEmojiClick(it, not.first) })
+                { onSwiped(it) }
+            }
+        }
+        
+        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 
@@ -210,18 +235,21 @@ private fun Item(
 ) {
     Item(
         NotificationItemState(
-            item.first, item.second, lazyItemsShapes(index, size),
+            item.first, item.second,
+            lazyItemsShapes(index, size),
             getDifferenceOfTime(item.first.date)
-        ), Modifier, onClick = { onClick(item.first) },
-        onEmojiClick = { onEmojiClick(it) },
-        onSwiped = { onSwiped(item.first) })
+        ), Modifier,
+        { onClick(item.first) },
+        { onEmojiClick(it) },
+        { onSwiped(item.first) })
 }
 
 @Composable
 private fun Label(text: Int) {
     Text(
-        stringResource(text), Modifier.padding(vertical = 20.dp),
+        stringResource(text),
+        Modifier.padding(vertical = 20.dp),
         colorScheme.tertiary,
-        style = MaterialTheme.typography.labelLarge
+        style = typography.labelLarge
     )
 }

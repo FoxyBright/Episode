@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.core.viewmodel
 
 import android.content.Context
 import androidx.annotation.StringRes
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.scope.Scope
@@ -30,12 +31,16 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
     
     protected suspend fun startLoading() = loadingMut.emit(true)
     protected suspend fun stopLoading() = loadingMut.emit(false)
-    protected suspend inline fun <T> loading(block: () -> T): T {
-        startLoading()
-        val res = block()
-        stopLoading()
-        return res
-    }
+    protected suspend inline fun <T> loading(block: () -> T): T = try {
+            startLoading()
+            val res = block()
+            stopLoading()
+            res
+        } catch(e: Exception) {
+            if(e is CancellationException)
+                stopLoading()
+            throw e
+        }
     
     protected suspend inline fun <T> singleLoading(
         strategy: Strategy = DEFAULT_SINGLE_STRATEGY,

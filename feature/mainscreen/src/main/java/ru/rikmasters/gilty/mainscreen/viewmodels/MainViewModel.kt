@@ -69,10 +69,6 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun getMeets() = singleLoading {
-        logD("Start")
-        logD(meetFilters.value.toString())
-        logD(meetFilters.value.isNotNullOrEmpty().toString())
-        logD("end")
         _meetFilters.emit(meetFilters.value.copy(
             group = get(today.value.compareTo(false)),
             dates = days.value.ifEmpty { null },
