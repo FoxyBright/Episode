@@ -30,7 +30,7 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModelList
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -45,7 +45,7 @@ private fun CategoryListPreview() {
         ) {
             CategoryList(
                 CategoryListState(
-                    listOf(DemoCategoryModel),
+                    DemoCategoryModelList,
                     emptyList(), emptyList()
                 ), Modifier.padding(16.dp)
             )

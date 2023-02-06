@@ -28,7 +28,7 @@ data class Category(
     )
     
     private fun List<Category>?.childMap(): List<CategoryModel>? =
-        this?.map { it.map() }
+        this?.map { it.map().copy(parentId = id) }
     
     private fun String.getColor() =
         parseColor(this)

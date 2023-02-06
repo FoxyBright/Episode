@@ -17,6 +17,9 @@ data class CategoryModel(
     val emoji: EmojiModel,
     
     val children: List<CategoryModel>?,
+    
+    val parentId: String? = null,
+    
 )
 
 private val demoChildCategoryModel = CategoryModel(
@@ -34,7 +37,6 @@ val DemoCategoryModel = CategoryModel(
     )
 )
 
-@Suppress("unused")
 val DemoCategoryModelList = listOf(
     DemoCategoryModel,
     DemoCategoryModel,

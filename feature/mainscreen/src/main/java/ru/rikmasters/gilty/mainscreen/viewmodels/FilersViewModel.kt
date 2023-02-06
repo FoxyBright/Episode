@@ -147,13 +147,22 @@ class FiltersViewModel(
     }
     
     suspend fun selectAdditionally(category: CategoryModel) {
-        val list =
-            selectedAdditionally.value
-        _selectedAdditionally.emit(
-            if(list.contains(category))
-                list - category
-            else list + category
-        )
+        val result by lazy {
+            val list = selectedAdditionally.value
+            category.parentId?.let { parentId ->
+                val set = setOf(category,
+                    allCategories.value.first { it.id == parentId })
+                
+                (if(list.contains(category)) list - set
+                else list + set).distinct()
+                
+            } ?: run {
+                if(list.contains(category))
+                    list - category
+                else list + category
+            }
+        }
+        _selectedAdditionally.emit(result)
     }
     
     suspend fun clearAdditionally() {

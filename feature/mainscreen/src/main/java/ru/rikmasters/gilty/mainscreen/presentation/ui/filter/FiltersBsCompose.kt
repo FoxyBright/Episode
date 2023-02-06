@@ -70,7 +70,7 @@ interface MeetingFilterBottomCallback {
     fun onNext()
     fun onBack()
     fun onCategoryClick(index: Int, category: CategoryModel)
-    fun onSubClick(category: CategoryModel)
+    fun onSubClick(parent: CategoryModel)
     fun onAllCategoryClick()
     fun onFilterClick()
     fun onDeleteTag(tag: TagModel)

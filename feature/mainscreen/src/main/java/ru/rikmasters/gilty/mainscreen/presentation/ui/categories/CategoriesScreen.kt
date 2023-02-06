@@ -39,9 +39,7 @@ fun CategoriesScreen(vm: FiltersViewModel) {
             }
             
             override fun onSubClick(category: CategoryModel) {
-                scope.launch {
-                    vm.selectAdditionally(category)
-                }
+                scope.launch { vm.selectAdditionally(category) }
             }
             
             override fun onComplete() {
