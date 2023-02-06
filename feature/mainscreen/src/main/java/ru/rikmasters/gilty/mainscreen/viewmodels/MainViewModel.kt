@@ -46,7 +46,7 @@ class MainViewModel: ViewModel() {
     val navBar = _navBar.asStateFlow()
     
     private val _meetFilters = MutableStateFlow(MeetFilters())
-    private val meetFilters = _meetFilters.asStateFlow()
+    val meetFilters = _meetFilters.asStateFlow()
     
     suspend fun changeTime(time: String) {
         _time.emit(time)
@@ -68,16 +68,23 @@ class MainViewModel: ViewModel() {
         )
     }
     
-    suspend fun getMeets() {
-        _meetings.emit(
-            meetManager.getMeetings(
-                meetFilters.value.copy(
-                    group = get(today.value.compareTo(false)),
-                    dates = days.value.ifEmpty { null },
-                    time = time.value.ifBlank { null }
-                )
-            )
-        )
+    suspend fun getMeets() = singleLoading {
+        logD("Start")
+        logD(meetFilters.value.toString())
+        logD(meetFilters.value.isNotNullOrEmpty().toString())
+        logD("end")
+        _meetFilters.emit(meetFilters.value.copy(
+            group = get(today.value.compareTo(false)),
+            dates = days.value.ifEmpty { null },
+            time = time.value.ifBlank { null },
+            radius = if(today.value)
+                meetFilters.value.radius else null,
+            lat = if(today.value)
+                meetFilters.value.lat else null,
+            lng = if(today.value)
+                meetFilters.value.lng else null
+        ))
+        _meetings.emit(meetManager.getMeetings(meetFilters.value))
     }
     
     suspend fun alertDismiss(state: Boolean) {
@@ -111,7 +118,10 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun moreMeet() {
-        makeToast("Пока не имеет функционала")
+        _meetFilters.emit(
+            MeetFilters(get(today.value.compareTo(false)))
+        )
+        getMeets()
     }
     
     suspend fun navBarNavigate(point: Int): String {

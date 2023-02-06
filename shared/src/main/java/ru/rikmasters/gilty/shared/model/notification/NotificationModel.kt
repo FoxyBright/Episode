@@ -34,3 +34,10 @@ val DemoTodayNotificationMeetingOver = NotificationModel(
     NotificationType.MEETING_OVER,
     "2022-11-09T17:26:00.140Z"
 )
+
+val DemoNotificationModelList = listOf(
+    DemoNotificationLeaveEmotionModel,
+    DemoNotificationMeetingOverModel,
+    DemoTodayNotificationRespondAccept,
+    DemoTodayNotificationMeetingOver,
+)

@@ -20,5 +20,18 @@ data class MeetFilters(
     val genders: List<GenderType>? = null,
     val conditions: List<ConditionType>? = null,
     val dates: List<String>? = null,
-    val time: String? = null
-)
+    val time: String? = null,
+) {
+    
+    fun isNotNullOrEmpty() = (!categories.isNullOrEmpty()
+            || !tags.isNullOrEmpty()
+            || radius != null
+            || (lat != 0 && lat != null)
+            || (lng != 0 && lng != null)
+            || !meetTypes.isNullOrEmpty()
+            || onlyOnline != null
+            || !genders.isNullOrEmpty()
+            || !conditions.isNullOrEmpty()
+            || !dates.isNullOrEmpty()
+            || !time.isNullOrBlank())
+}

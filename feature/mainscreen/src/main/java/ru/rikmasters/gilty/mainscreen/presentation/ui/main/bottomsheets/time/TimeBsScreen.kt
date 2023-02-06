@@ -17,27 +17,39 @@ fun TimeBs(vm: TimeBsViewModel) {
     val minutes by vm.minutes.collectAsState()
     val time by vm.time.collectAsState()
     
+    LaunchedEffect(Unit) { vm.setTime() }
+    
     TimeBsContent(
         TimeBsState(
             minutes, hours, time
         ), Modifier, object: TimeBSCallback {
+            
             override fun onSave() {
                 scope.launch {
-                    vm.onSave()
                     asm.bottomSheet.collapse()
+                    vm.onSave()
+                }
+            }
+            
+            override fun onClear() {
+                scope.launch {
+                    asm.bottomSheet.collapse()
+                    vm.onClear()
                 }
             }
             
             override fun onHourChange(hour: String) {
-                scope.launch { vm.hoursChange(hour) }
+                scope.launch {
+                    vm.hoursChange(hour)
+                    vm.setTime()
+                }
             }
             
             override fun onMinuteChange(minute: String) {
-                scope.launch { vm.minutesChange(minute) }
-            }
-            
-            override fun onClear() {
-                scope.launch { vm.onClear() }
+                scope.launch {
+                    vm.minutesChange(minute)
+                    vm.setTime()
+                }
             }
         }
     )

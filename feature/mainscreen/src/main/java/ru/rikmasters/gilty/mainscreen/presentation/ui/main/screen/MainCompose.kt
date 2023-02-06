@@ -49,7 +49,7 @@ fun MainContentPreview() {
                 DemoMeetingList, listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW, INACTIVE
-                ), (false)
+                ), (false), (false)
             )
         )
     }
@@ -85,6 +85,7 @@ data class MainContentState(
     val meetings: List<MeetingModel>,
     val navBarStates: List<NavIconState>,
     val alert: Boolean,
+    val hasFilters: Boolean,
 )
 
 @Composable
@@ -95,13 +96,6 @@ fun MainContent(
     callback: MainContentCallback? = null,
 ) {
     Scaffold(modifier.background(colorScheme.background),
-        topBar = {
-            TopBar(
-                state.today, state.selectDate,
-                state.selectTime, Modifier,
-                { callback?.onTodayChange() }
-            ) { callback?.onTimeFilterClick() }
-        },
         bottomBar = {
             Column(Modifier, Top, CenterHorizontally) {
                 // TODO - тут должен быть нормальный ботомщит с фильтрами
@@ -115,15 +109,23 @@ fun MainContent(
             { callback?.onStyleChange() }
         },
         content = { padding ->
-            Content(
-                state.grid, state.meetings.map {
-                    it to rememberSwipeableCardState()
-                }, state.meetings, Modifier
-                    .padding(top = padding.calculateTopPadding())
-                    .padding(bottom = padding.calculateBottomPadding() - 28.dp)
-                    .padding(horizontal = 16.dp),
-                callback
-            )
+            Column {
+                TopBar(
+                    state.today, state.selectDate,
+                    state.selectTime, Modifier,
+                    { callback?.onTodayChange() }
+                ) { callback?.onTimeFilterClick() }
+                Content(
+                    state.grid, state.hasFilters,
+                    state.meetings, Modifier
+                        .padding(
+                            bottom = padding
+                                .calculateBottomPadding() - 28.dp
+                        )
+                        .padding(horizontal = 16.dp),
+                    callback
+                )
+            }
         })
     GAlert(
         state.alert, { callback?.onCloseAlert() },
@@ -194,31 +196,37 @@ private fun TopBar(
 @Composable
 private fun Content(
     state: Boolean,
-    cardStates: List<Pair<MeetingModel,
-            SwipeableCardState>>,
+    hasFilters: Boolean,
     meetings: List<MeetingModel>,
     modifier: Modifier = Modifier,
     callback: MainContentCallback?,
 ) {
-    if(meetings.size <= 2) MeetCard(
-        modifier.fillMaxHeight(0.9f), EMPTY,
-        onMoreClick = { callback?.onMeetMoreClick() },
-        onRepeatClick = { callback?.onResetMeets() }
-    )
-    if(state && meetings.isNotEmpty()) MeetingGridContent(
-        modifier
-            .background(colorScheme.background)
-            .fillMaxSize(), meetings
-    ) { callback?.onRespond(it) }
-    else {
-        MeetingsListContent(
-            cardStates, modifier.fillMaxHeight(0.9f),
-            { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
-            { meet, it ->
-                callback?.onRespond(meet)
-                callback?.meetInteraction(RIGHT, meet, it)
-            }
-        ) { callback?.onMeetClick(it) }
+    Box {
+        if(meetings.size <= 2) MeetCard(
+            modifier.fillMaxHeight(0.9f),
+            EMPTY, hasFilters = hasFilters,
+            onMoreClick = { callback?.onMeetMoreClick() },
+            onRepeatClick = { callback?.onResetMeets() }
+        )
+        if(state && meetings.isNotEmpty()) MeetingGridContent(
+            modifier
+                .background(colorScheme.background)
+                .fillMaxSize(), meetings
+        ) { callback?.onRespond(it) }
+        else {
+            //TODO реверс убрать в layout
+            val meets = meetings.map {
+                it to rememberSwipeableCardState()
+            }.reversed()
+            MeetingsListContent(
+                meets, modifier.fillMaxHeight(0.9f),
+                { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
+                { meet, it ->
+                    callback?.onRespond(meet)
+                    callback?.meetInteraction(RIGHT, meet, it)
+                }
+            ) { callback?.onMeetClick(it) }
+        }
     }
 }
 

@@ -66,7 +66,7 @@ private fun MeetingCardPreview() {
         ) {
             MeetCard(
                 Modifier.padding(16.dp),
-                MEET, (true), meeting
+                MEET, (true), meeting, (0f), (true)
             )
         }
     }
@@ -290,6 +290,7 @@ fun MeetCard(
     stack: Boolean = true,
     meet: MeetingModel? = null,
     offset: Float = 0f,
+    hasFilters: Boolean = false,
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
     onSelect: ((DirectionType) -> Unit)? = null,
@@ -321,20 +322,31 @@ fun MeetCard(
                             .weight(1f)
                             .offset(y = 24.dp)
                     )
-                    EmptyBottom(Modifier, {
-                        onRepeatClick?.let { it() }
-                    }) { onMoreClick?.let { it() } }
+                    EmptyBottom(
+                        Modifier.fillMaxHeight(0.28f),
+                        hasFilters, {
+                            onRepeatClick?.let { it() }
+                        }) { onMoreClick?.let { it() } }
                 }
                 
                 MEET -> {
                     meet?.let {
-                        MeetTop(
-                            it.organizer?.avatar, Modifier
-                                .weight(1f)
-                                .offset(y = 24.dp)
-                        )
-                        MeetBottom(it, offset)
-                        { direction -> onSelect?.let { it(direction) } }
+                        Box {
+                            MeetTop(
+                                it.organizer?.avatar,
+                                Modifier
+                                    .fillMaxSize()
+                                    .offset(y = (-24).dp)
+                            )
+                            MeetBottom(
+                                it, offset,
+                                Modifier
+                                    .fillMaxHeight(0.28f)
+                                    .align(BottomCenter)
+                            ) { direction ->
+                                onSelect?.let { it(direction) }
+                            }
+                        }
                     }
                 }
             }
@@ -377,6 +389,7 @@ private fun MeetTop(
 private fun MeetBottom(
     meet: MeetingModel,
     offset: Float,
+    modifier: Modifier = Modifier,
     onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     val leftSwipe = offset < -(50)
@@ -396,13 +409,18 @@ private fun MeetBottom(
         backColor = back
     }
     Box(
-        Modifier
+        modifier
             .background(
                 colorScheme.primaryContainer,
                 ThemeExtra.shapes.bigShapes
             )
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .padding(16.dp),
+            Arrangement.SpaceBetween
+        ) {
             MeetInfo(meet)
             Row(
                 Modifier
@@ -433,6 +451,7 @@ private fun MeetBottom(
 @Composable
 private fun EmptyBottom(
     modifier: Modifier,
+    hasFilters: Boolean,
     onRepeatClick: (() -> Unit)? = null,
     onMoreClick: (() -> Unit)? = null,
 ) {
@@ -444,7 +463,12 @@ private fun EmptyBottom(
                 ThemeExtra.shapes.bigShapes
             )
         ) {
-            Column(Modifier.padding(16.dp)) {
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(16.dp),
+                Arrangement.SpaceBetween
+            ) {
                 Text(
                     stringResource(R.string.meeting_empty_meet_label),
                     Modifier.fillMaxWidth(),
@@ -464,7 +488,7 @@ private fun EmptyBottom(
                         stringResource(R.string.meeting_repeat_button),
                         colorScheme.primary
                     ) { onRepeatClick?.let { it() } }
-                    CardButton(
+                    if(hasFilters) CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_get_more_button),
                         colorScheme.primary

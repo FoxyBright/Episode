@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.notifications.presentation.ui.item.Item
 import ru.rikmasters.gilty.notifications.presentation.ui.item.NotificationItemState
-import ru.rikmasters.gilty.notifications.presentation.ui.item.NotificationsByDateSeparator
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
@@ -28,31 +28,73 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
-import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
+import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
+import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun NotificationsContentPreview() {
     GiltyTheme {
-        val list = listOf(
-            DemoNotificationLeaveEmotionModel,
-            DemoNotificationMeetingOverModel,
-            DemoTodayNotificationRespondAccept,
-            DemoTodayNotificationMeetingOver,
-        )
-        NotificationsContent(
-            NotificationsState(
-                list, DemoMeetingModel,
-                (3), listOf(), true,
-                DemoNotificationLeaveEmotionModel,
-                listOf(), listOf()
+        Box(
+            Modifier.background(
+                colorScheme.background
             )
-        )
+        ) {
+            NotificationsContent(
+                NotificationsState(
+                    DemoNotificationModelList,
+                    DemoNotificationModelList,
+                    DemoNotificationModelList,
+                    DemoMeetingModel,
+                    (3), listOf(), (false),
+                    DemoNotificationLeaveEmotionModel,
+                    listOf(), listOf()
+                )
+            )
+        }
     }
 }
+
+@Preview
+@Composable
+private fun NotificationsBlurPreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            NotificationsContent(
+                NotificationsState(
+                    DemoNotificationModelList,
+                    DemoNotificationModelList,
+                    DemoNotificationModelList,
+                    DemoMeetingModel,
+                    (3), listOf(), (true),
+                    DemoNotificationLeaveEmotionModel,
+                    listOf(), listOf()
+                )
+            )
+        }
+    }
+}
+
+data class NotificationsState(
+    val todayNotific: List<NotificationModel>,
+    val weekNotific: List<NotificationModel>,
+    val earlyNotific: List<NotificationModel>,
+    val lastRespond: MeetingModel,
+    val myResponds: Int,
+    val stateList: List<NavIconState>,
+    val blur: Boolean,
+    val activeNotification: NotificationModel?,
+    val participants: List<MemberModel>,
+    val participantsWrap: List<Boolean>,
+)
 
 interface NotificationsCallback {
     
@@ -65,33 +107,22 @@ interface NotificationsCallback {
     fun onNavBarSelect(point: Int) {}
 }
 
-data class NotificationsState(
-    val notificationsList: List<NotificationModel> = listOf(),
-    val lastRespond: MeetingModel,
-    val myResponds: Int = 0,
-    val stateList: List<NavIconState>,
-    val blur: Boolean = false,
-    val activeNotification: NotificationModel? = null,
-    val participants: List<MemberModel>,
-    val participantsWrap: List<Boolean>
-)
-
 @Composable
 fun NotificationsContent(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback? = null
+    callback: NotificationsCallback? = null,
 ) {
     Column(
         modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .background(MaterialTheme.colorScheme.background)
+            .background(colorScheme.background)
     ) {
         Text(
             stringResource(R.string.notification_screen_name),
             Modifier.padding(top = 80.dp, bottom = 10.dp),
-            MaterialTheme.colorScheme.tertiary,
+            colorScheme.tertiary,
             style = MaterialTheme.typography.titleLarge
         )
         Notifications(state,
@@ -112,7 +143,7 @@ fun NotificationsContent(
         if(state.blur) Box(
             Modifier
                 .fillMaxSize() /*TODO заменить на блюр*/
-                .background(MaterialTheme.colorScheme.background)
+                .background(colorScheme.background)
                 .clickable { callback?.onBlurClick() }
         ) {
             ObserveNotification(
@@ -136,13 +167,13 @@ private fun Notifications(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
     onSwiped: ((NotificationModel) -> Unit)? = null,
 ) {
-    val separator = NotificationsByDateSeparator(state.notificationsList)
-    val todayList = separator
-        .getTodayList().map { it to rememberDragRowState() }
-    val weekList = separator
-        .getWeekList().map { it to rememberDragRowState() }
-    val earlierList = separator
-        .getEarlyList().map { it to rememberDragRowState() }
+    val todayList =
+        state.todayNotific.map { it to rememberDragRowState() }
+    val weekList =
+        state.weekNotific.map { it to rememberDragRowState() }
+    val earlierList =
+        state.earlyNotific.map { it to rememberDragRowState() }
+    
     LazyColumn(modifier) {
         if(state.myResponds != 0) item {
             Responds(
@@ -190,7 +221,7 @@ private fun Item(
 private fun Label(text: Int) {
     Text(
         stringResource(text), Modifier.padding(vertical = 20.dp),
-        MaterialTheme.colorScheme.tertiary,
+        colorScheme.tertiary,
         style = MaterialTheme.typography.labelLarge
     )
 }

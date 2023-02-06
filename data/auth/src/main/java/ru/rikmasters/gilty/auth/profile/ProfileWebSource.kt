@@ -52,7 +52,7 @@ class ProfileWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/users/$id"
-        ) {}.wrapped<ProfileResponse>().map()
+        ).wrapped<ProfileResponse>().map()
     }
     
     suspend fun getUserMeets(
@@ -99,7 +99,7 @@ class ProfileWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile/${type.value}"
-        ) {}.wrapped<List<MemberResponse>>().map { it.map() }
+        ).wrapped<List<MemberResponse>>().map { it.map() }
     }
     
     suspend fun deleteHidden(image: AvatarModel) {
@@ -108,7 +108,7 @@ class ProfileWebSource: KtorSource() {
         val imageId = image.id
         client.delete(
             "http://$HOST$PREFIX_URL/albums/$album/files/$imageId"
-        ) {}
+        )
     }
     
     enum class HiddenType { MY, OTHER }
@@ -124,7 +124,7 @@ class ProfileWebSource: KtorSource() {
         }
         return client.get(
             "http://$HOST$PREFIX_URL/albums/$album/files"
-        ) {}.wrapped()
+        ).wrapped()
     }
     
     suspend fun setHidden(
@@ -231,7 +231,7 @@ class ProfileWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile"
-        ) {}.wrapped<ProfileResponse>().map()
+        ).wrapped<ProfileResponse>().map()
     }
     
     suspend fun isUserRegistered(): Boolean {

@@ -103,12 +103,14 @@ fun MeetingCard(
         colors = cardColors(colors.meetingCardBackBackground)
     ) {
         Text(
-            meeting.title, Modifier
+            meeting.tags.first().title, Modifier
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = Bold
+            overflow = Ellipsis,
+            fontWeight = Bold,
+            maxLines = 1
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(

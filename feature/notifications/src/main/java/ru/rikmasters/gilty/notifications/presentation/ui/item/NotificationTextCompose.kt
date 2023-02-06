@@ -69,40 +69,40 @@ fun NotificationText(
     type: NotificationType,
     meet: MeetingModel,
     duration: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val user = "${organizer?.username}, ${organizer?.age}"
-    val message = when (type) {
+    val message = when(type) {
         MEETING_OVER -> buildAnnotatedString {
-            withStyle(Text(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }
-            withStyle(Text(MEET)) { append(" ${meet.title}") }
-            withStyle(Text(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
-            withStyle(Text(USER)) { append("$user. ") }
-            withStyle(Text(BOLD)) {
+            withStyle(text(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }
+            withStyle(text(MEET)) { append(" ${meet.title}") }
+            withStyle(text(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
+            withStyle(text(USER)) { append("$user. ") }
+            withStyle(text(BOLD)) {
                 append("${stringResource(R.string.notification_leave_impressions)}. ")
-            }; withStyle(Text(TIME)) { append(duration) }
+            }; withStyle(text(TIME)) { append(duration) }
         }
-
+        
         RESPOND_ACCEPT -> buildAnnotatedString {
-            withStyle(Text(USER)) { append("$user ") }
-            withStyle(Text(TEXT)) { append(stringResource(R.string.notification_meet_is_accept)) }
-            withStyle(Text(MEET)) { append(" ${meet.title}") }
-            withStyle(Text(BOLD)) { append(". ") }
-            withStyle(Text(TIME)) { append(duration) }
+            withStyle(text(USER)) { append("$user ") }
+            withStyle(text(TEXT)) { append(stringResource(R.string.notification_meet_is_accept)) }
+            withStyle(text(MEET)) { append(" ${meet.title}") }
+            withStyle(text(BOLD)) { append(". ") }
+            withStyle(text(TIME)) { append(duration) }
         }
-
+        
         LEAVE_EMOTIONS -> buildAnnotatedString {
-            withStyle(Text(TEXT)) { append(stringResource(R.string.notification_leave_emotion)) }
-            withStyle(Text(MEET)) { append(" ${meet.title} ") }
-            withStyle(Text(TEXT)) {
+            withStyle(text(TEXT)) { append(stringResource(R.string.notification_leave_emotion)) }
+            withStyle(text(MEET)) { append(" ${meet.title} ") }
+            withStyle(text(TEXT)) {
                 append(
                     "${
                         meet.datetime.dateCalendar()
                     }. ${stringResource(R.string.notification_organizer_label)} "
                 )
             }
-            withStyle(Text(USER)) { append("$user ") }
-            withStyle(Text(TIME)) { append(duration) }
+            withStyle(text(USER)) { append("$user ") }
+            withStyle(text(TIME)) { append(duration) }
         }
     }
     Text(message, modifier)
@@ -111,21 +111,22 @@ fun NotificationText(
 private enum class CustomText { USER, TEXT, MEET, TIME, BOLD }
 
 @Composable
-private fun Text(text: CustomText): SpanStyle {
+private fun text(text: CustomText): SpanStyle {
     val colors = colorScheme
-    val font: TextStyle = when (text) {
-        USER -> Font(weight = Bold, textStyle = typography.bodyMedium)
-        MEET -> Font(colors.primary, weight = SemiBold)
-        TIME -> Font(colors.onTertiary)
-        BOLD -> Font(weight = SemiBold)
-        TEXT -> Font()
+    val font: TextStyle = when(text) {
+        USER -> font(weight = Bold, textStyle = typography.bodyMedium)
+        MEET -> font(colors.primary, weight = SemiBold)
+        TIME -> font(colors.onTertiary)
+        BOLD -> font(weight = SemiBold)
+        TEXT -> font()
     }; return font.toSpanStyle()
 }
 
 @Composable
-private fun Font(
-    color: Color = colorScheme.tertiary, weight: FontWeight = Medium,
-    textStyle: TextStyle = typography.labelSmall
+private fun font(
+    color: Color = colorScheme.tertiary,
+    weight: FontWeight = Medium,
+    textStyle: TextStyle = typography.labelSmall,
 ): TextStyle {
     return textStyle.copy(color, fontWeight = weight)
 }
