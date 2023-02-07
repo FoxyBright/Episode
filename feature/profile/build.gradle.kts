@@ -10,9 +10,10 @@ dependencies {
     androidBase()
     compose()
     implementation(project(":shared"))
-    implementation(project(":feature:complaints")) // TODO КОСТЫЛЬ
+    implementation(project(":feature:complaints"))
     implementation(project(":feature:bubbles"))
+    implementation(project(":data:profile"))
+    implementation(project(":data:meetings"))
     implementation(project(":data:auth"))
-    
-    implementation("com.vanniktech:android-image-cropper:4.5.0") // TODO сделать свое решение
+    implementation("com.vanniktech:android-image-cropper:4.5.0")
 }

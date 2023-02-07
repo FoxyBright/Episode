@@ -37,15 +37,15 @@ private fun SendResponds() {
 @Preview
 @Composable
 private fun ReceivedWithoutPhotosResponds() {
-    GiltyTheme { Respond(DemoReceivedRespondModelWithoutPhoto) }
+    GiltyTheme { Respond(DemoReceivedShortRespondModelWithoutPhoto) }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun Respond(
-    respond: RespondModel,
-    callback: RespondCallback? = null,
+    respond: ShortRespondModel,
     modifier: Modifier = Modifier,
+    callback: RespondCallback? = null,
 ) {
     val active = false // TODO Должна быть проверка - участвует пользователь в meet или нет
     Card(
@@ -100,7 +100,7 @@ private fun MeetRow(
 
 @Composable
 private fun HiddenPhoto(
-    respond: RespondModel,
+    respond: ShortRespondModel,
     modifier: Modifier = Modifier,
     onClick: (AvatarModel) -> Unit,
 ) {

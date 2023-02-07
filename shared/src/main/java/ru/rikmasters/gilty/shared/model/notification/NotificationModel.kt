@@ -5,19 +5,20 @@ import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
+data class ShortNotification(
+    val id: String,
+    val name: String,
+    val description: String,
+)
+
+@Suppress("unused")
 data class FullNotify(
     val id: String,
     val date: String,
     val type: NotificationType,
     val status: NotificationStatus,
     val parent: NotificationParentModel,
-    val respond: RespondModel,
-)
-
-data class ShortNotification(
-    val id: String,
-    val name: String,
-    val description: String,
+    val respond: RespondsFeedback,
 )
 
 data class NotificationModel(

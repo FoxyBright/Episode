@@ -9,10 +9,10 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.shared.common.RespondCallback
-import ru.rikmasters.gilty.shared.common.extentions.MeetSeparate
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
+import ru.rikmasters.gilty.shared.common.extentions.meetSeparate
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.DemoReceivedShortRespondModelWithoutPhoto
+import ru.rikmasters.gilty.shared.model.notification.ShortRespondModel
 
 @Composable
 fun RespondsBs(vm: RespondsBsViewModel) {
@@ -25,7 +25,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
     val respondsList =
         remember {
             mutableStateListOf(
-                DemoReceivedRespondModelWithoutPhoto,
+                DemoReceivedShortRespondModelWithoutPhoto,
                 DemoReceivedRespondsModel
             )
         }
@@ -38,7 +38,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
     }
     
     val notificationCallback = object: RespondCallback {
-        override fun onCancelClick(respond: RespondModel) {
+        override fun onCancelClick(respond: ShortRespondModel) {
             respondsList.remove(respond)
             Toast.makeText(
                 context, "Втреча отклонена",
@@ -52,7 +52,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
             respondListStates[index] = !respondListStates[index]
         }
         
-        override fun onAcceptClick(respond: RespondModel) {
+        override fun onAcceptClick(respond: ShortRespondModel) {
             respondsList.remove(respond)
             Toast.makeText(
                 context, "Втреча принята",
@@ -65,7 +65,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
     
     RespondsBsContent(
         NotificationRespondsState(
-            MeetSeparate(respondsList),
+            meetSeparate(respondsList),
             respondListStates
         ), Modifier, notificationCallback
     )

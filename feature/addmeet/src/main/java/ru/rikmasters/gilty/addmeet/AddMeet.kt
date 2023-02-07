@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.addmeet
 
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
-import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.addmeet.presentation.ui.category.CategoriesScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.complete.CompleteScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ConditionsScreen
@@ -11,11 +10,10 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.RequirementsScre
 import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.manager.ProfileManager
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.profile.ProfileData
 
 object AddMeet: FeatureDefinition() {
     
@@ -50,10 +48,6 @@ object AddMeet: FeatureDefinition() {
     
     override fun Module.koin() {
         
-        singleOf(::MeetingWebSource)
-        singleOf(::MeetingManager)
-        singleOf(::ProfileManager)
-        
         scope<CategoryViewModel> {
             scopedOf(::CategoryViewModel)
         }
@@ -84,4 +78,6 @@ object AddMeet: FeatureDefinition() {
             scopedOf(::CompleteViewModel)
         }
     }
+    
+    override fun include() = setOf(MeetingsData, ProfileData)
 }

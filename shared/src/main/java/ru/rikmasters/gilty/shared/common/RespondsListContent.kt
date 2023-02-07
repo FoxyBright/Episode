@@ -34,7 +34,7 @@ private fun ReceivedResponds() {
                     DemoMeetingModel,
                     listOf(
                         DemoReceivedRespondsModel,
-                        DemoReceivedRespondModelWithoutPhoto
+                        DemoReceivedShortRespondModelWithoutPhoto
                     )
                 ),
                 Pair(DemoMeetingModel, listOf(DemoSendRespondsModel))
@@ -50,16 +50,16 @@ interface RespondCallback {
     
     fun onTabChange(tab: Int) {}
     fun onBack() {}
-    fun onCancelClick(respond: RespondModel) {}
+    fun onCancelClick(respond: ShortRespondModel) {}
     fun onRespondClick(meet: MeetingModel) {}
-    fun onAcceptClick(respond: RespondModel) {}
+    fun onAcceptClick(respond: ShortRespondModel) {}
     fun onImageClick(image: AvatarModel) {}
     fun onArrowClick(index: Int) {}
 }
 
 @Composable
 fun RespondsListContent(
-    responds: List<Pair<MeetingModel, List<RespondModel>>>,
+    responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
     respondsStates: List<Boolean>,
     modifier: Modifier = Modifier,
     callback: RespondCallback? = null,
@@ -79,7 +79,7 @@ fun RespondsListContent(
 private fun GroupList(
     index: Int,
     meet: MeetingModel,
-    responds: List<RespondModel>,
+    responds: List<ShortRespondModel>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
     callback: RespondCallback?,
@@ -103,8 +103,8 @@ private fun GroupList(
         if(state) Column {
             responds.forEach {
                 Respond(
-                    it, callback,
-                    Modifier.padding(bottom = 6.dp)
+                    it, Modifier.padding(bottom = 6.dp),
+                    callback
                 )
             }
         }

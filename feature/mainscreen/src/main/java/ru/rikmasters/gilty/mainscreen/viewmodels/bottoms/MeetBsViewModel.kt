@@ -3,10 +3,10 @@ package ru.rikmasters.gilty.mainscreen.viewmodels.bottoms
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation
 import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.*

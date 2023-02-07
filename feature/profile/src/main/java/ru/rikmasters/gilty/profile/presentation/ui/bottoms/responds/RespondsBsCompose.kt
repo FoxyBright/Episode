@@ -35,7 +35,7 @@ fun RespondsListPreview() {
                     DemoMeetingModel,
                     listOf(
                         DemoReceivedRespondsModel,
-                        DemoReceivedRespondModelWithoutPhoto,
+                        DemoReceivedShortRespondModelWithoutPhoto,
                         DemoSendRespondsModel,
                         DemoSendRespondsModel
                     )
@@ -47,7 +47,7 @@ fun RespondsListPreview() {
 
 @Composable
 fun RespondsList(
-    responds: List<Pair<MeetingModel, List<RespondModel>>>,
+    responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
     respondsStates: List<Boolean>,
     selectTab: Int,
     modifier: Modifier = Modifier,
@@ -89,11 +89,11 @@ fun RespondsList(
 @Composable
 private fun SentResponds(
     modifier: Modifier = Modifier,
-    responds: List<Pair<MeetingModel, List<RespondModel>>>,
+    responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
     callback: RespondCallback? = null,
 ) {
     val sentResponds =
-        arrayListOf<RespondModel>()
+        arrayListOf<ShortRespondModel>()
     responds.forEach {
         it.second.forEach { respond ->
             if(respond.type == SEND)
@@ -104,8 +104,8 @@ private fun SentResponds(
         LazyColumn(modifier.fillMaxWidth()) {
             items(sentResponds) {
                 Respond(
-                    it, callback,
-                    Modifier.padding(bottom = 12.dp)
+                    it, Modifier.padding(bottom = 12.dp),
+                    callback
                 )
             }
         }
@@ -119,14 +119,14 @@ private fun SentResponds(
 @Composable
 private fun ReceivedResponds(
     modifier: Modifier = Modifier,
-    responds: List<Pair<MeetingModel, List<RespondModel>>>,
+    responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
     respondsStates: List<Boolean>,
     callback: RespondCallback? = null,
 ) {
     val listOfResponds =
-        arrayListOf<RespondModel>()
+        arrayListOf<ShortRespondModel>()
     val list =
-        arrayListOf<Pair<MeetingModel, List<RespondModel>>>()
+        arrayListOf<Pair<MeetingModel, List<ShortRespondModel>>>()
     responds.forEach { pair ->
         listOfResponds.clear()
         pair.second.forEach {

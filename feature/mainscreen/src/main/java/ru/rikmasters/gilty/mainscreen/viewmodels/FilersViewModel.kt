@@ -3,14 +3,12 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.meetings.MeetFilters
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.Companion.get
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.model.enumeration.*
+import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @OptIn(FlowPreview::class)
@@ -180,7 +178,7 @@ class FiltersViewModel(
         _results.emit(meetManager.getMeetCount(filtersBuilder()))
     }
     
-    private fun filtersBuilder() = MeetFilters(
+    private fun filtersBuilder() = MeetFiltersModel(
         group = get(mainVm.today.value.compareTo(false)),
         categories = selectedCategories.value.ifEmpty { null },
         tags = tags.value.ifEmpty { null },

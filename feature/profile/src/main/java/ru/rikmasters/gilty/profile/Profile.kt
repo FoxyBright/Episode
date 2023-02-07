@@ -4,9 +4,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
-import org.koin.core.module.dsl.singleOf
-import ru.rikmasters.gilty.auth.Auth
-import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.profile.presentation.ui.photo.AvatarScreen
@@ -77,9 +74,6 @@ object Profile: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        
-        singleOf(::AuthManager)
-        
         scope<AvatarViewModel> {
             scopedOf(::AvatarViewModel)
         }
@@ -107,5 +101,5 @@ object Profile: FeatureDefinition() {
         }
     }
     
-    override fun include() = setOf(Auth)
+    override fun include() = setOf(ProfileData)
 }

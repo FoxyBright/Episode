@@ -6,8 +6,8 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.addmeet.viewmodel.Address
 import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.Place
-import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 
 class MapBsViewModel(
     

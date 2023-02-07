@@ -4,9 +4,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
-import org.koin.core.module.dsl.singleOf
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
@@ -17,6 +14,8 @@ import ru.rikmasters.gilty.mainscreen.viewmodels.RespondsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
+import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.profile.ProfileData
 
 object Main: FeatureDefinition() {
     
@@ -42,10 +41,6 @@ object Main: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        
-        singleOf(::MeetingManager)
-        singleOf(::ProfileManager)
-        
         scope<RespondsViewModel> {
             scopedOf(::RespondsViewModel)
         }
@@ -58,4 +53,6 @@ object Main: FeatureDefinition() {
             scopedOf(::FiltersViewModel)
         }
     }
+    
+    override fun include() = setOf(MeetingsData, ProfileData)
 }

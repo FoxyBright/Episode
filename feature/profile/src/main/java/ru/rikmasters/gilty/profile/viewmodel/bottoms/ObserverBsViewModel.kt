@@ -3,10 +3,10 @@ package ru.rikmasters.gilty.profile.viewmodel.bottoms
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.ProfileManager
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVABLES
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
+import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB

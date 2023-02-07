@@ -2,6 +2,15 @@
 
 import java.net.URI
 
+include(":data:meetings")
+
+
+include(":data:profile")
+
+
+include(":data:push")
+
+
 include(":data:shared")
 
 

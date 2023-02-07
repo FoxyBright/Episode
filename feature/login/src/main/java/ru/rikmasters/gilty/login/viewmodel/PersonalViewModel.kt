@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.GenderType
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import java.io.File
 
 var UserAge: Int? = null
@@ -23,7 +23,7 @@ class PersonalViewModel: ViewModel() {
     
     suspend fun setGender(index: Int) {
         _gender.emit(index)
-        UserGender = GenderType.valueOf(index)
+        UserGender = GenderType.get(index)
     }
     
     suspend fun setAge(it: Int) {

@@ -33,7 +33,7 @@ private fun RespondsPreview() {
                             DemoMeetingModel,
                             listOf(
                                 DemoReceivedRespondsModel,
-                                DemoReceivedRespondModelWithoutPhoto
+                                DemoReceivedShortRespondModelWithoutPhoto
                             )
                         ),
                         Pair(
@@ -48,7 +48,7 @@ private fun RespondsPreview() {
 }
 
 data class NotificationRespondsState(
-    val responds: List<Pair<MeetingModel, List<RespondModel>>>,
+    val responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
     val respondsStates: List<Boolean>,
 )
 

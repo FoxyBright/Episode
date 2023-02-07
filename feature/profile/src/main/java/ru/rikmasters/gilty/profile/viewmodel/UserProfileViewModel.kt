@@ -3,11 +3,11 @@ package ru.rikmasters.gilty.profile.viewmodel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.ACTUAL
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.HISTORY
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.ACTUAL
+import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.HISTORY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE

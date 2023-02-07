@@ -11,6 +11,8 @@ dependencies {
     androidBase()
     dataBase()
     
+    implementation(project(":data:meetings"))
+    implementation(project(":data:profile"))
     implementation(project(":data:shared"))
     implementation(project(":shared"))
 }

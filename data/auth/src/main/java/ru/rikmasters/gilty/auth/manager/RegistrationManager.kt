@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.auth.manager
 
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.GenderType
+import ru.rikmasters.gilty.meetings.MeetingWebSource
+import ru.rikmasters.gilty.profile.ProfileWebSource
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import java.io.File
 

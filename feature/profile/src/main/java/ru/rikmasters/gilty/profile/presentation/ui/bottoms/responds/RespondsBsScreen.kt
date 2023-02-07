@@ -11,7 +11,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.ShortRespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @Composable
@@ -40,7 +40,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
         listOf(pairRespondsList.value),
         observeGroupStates, tabs,
         Modifier, object: RespondCallback {
-            override fun onCancelClick(respond: RespondModel) {
+            override fun onCancelClick(respond: ShortRespondModel) {
                 respondsList.remove(respond)
                 Toast.makeText(
                     context,
@@ -57,7 +57,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
                 ).show()
             }
             
-            override fun onAcceptClick(respond: RespondModel) {
+            override fun onAcceptClick(respond: ShortRespondModel) {
                 respondsList.remove(respond)
                 Toast.makeText(
                     context,

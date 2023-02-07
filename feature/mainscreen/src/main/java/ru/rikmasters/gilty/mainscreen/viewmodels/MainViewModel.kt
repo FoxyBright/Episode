@@ -3,17 +3,17 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.meetings.MeetFilters
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource.MeetFilterGroup.Companion.get
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
+import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 class MainViewModel: ViewModel() {
@@ -45,7 +45,7 @@ class MainViewModel: ViewModel() {
     private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
-    private val _meetFilters = MutableStateFlow(MeetFilters())
+    private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
     
     suspend fun changeTime(time: String) {
@@ -58,7 +58,7 @@ class MainViewModel: ViewModel() {
         getMeets()
     }
     
-    suspend fun setFilters(filters: MeetFilters) {
+    suspend fun setFilters(filters: MeetFiltersModel) {
         _meetFilters.emit(
             filters.copy(
                 group = get(today.value.compareTo(false)),
@@ -69,17 +69,19 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun getMeets() = singleLoading {
-        _meetFilters.emit(meetFilters.value.copy(
-            group = get(today.value.compareTo(false)),
-            dates = days.value.ifEmpty { null },
-            time = time.value.ifBlank { null },
-            radius = if(today.value)
-                meetFilters.value.radius else null,
-            lat = if(today.value)
-                meetFilters.value.lat else null,
-            lng = if(today.value)
-                meetFilters.value.lng else null
-        ))
+        _meetFilters.emit(
+            meetFilters.value.copy(
+                group = get(today.value.compareTo(false)),
+                dates = days.value.ifEmpty { null },
+                time = time.value.ifBlank { null },
+                radius = if(today.value)
+                    meetFilters.value.radius else null,
+                lat = if(today.value)
+                    meetFilters.value.lat else null,
+                lng = if(today.value)
+                    meetFilters.value.lng else null
+            )
+        )
         _meetings.emit(meetManager.getMeetings(meetFilters.value))
     }
     
@@ -115,7 +117,7 @@ class MainViewModel: ViewModel() {
     
     suspend fun moreMeet() {
         _meetFilters.emit(
-            MeetFilters(get(today.value.compareTo(false)))
+            MeetFiltersModel(get(today.value.compareTo(false)))
         )
         getMeets()
     }

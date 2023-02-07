@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.addmeet.viewmodel.Orientation
 import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
-import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class OrientationBsViewModel(

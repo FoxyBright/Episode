@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
+import ru.rikmasters.gilty.push.Push
 
 object Notifications: FeatureDefinition() {
     
@@ -27,4 +28,6 @@ object Notifications: FeatureDefinition() {
             scopedOf(::RespondsBsViewModel)
         }
     }
+    
+    override fun include() = setOf(Push)
 }

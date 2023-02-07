@@ -4,11 +4,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.addmeet.viewmodel.CompleteViewModel.RequirementType.Companion.get
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.manager.ProfileManager
-import ru.rikmasters.gilty.auth.meetings.Location
-import ru.rikmasters.gilty.auth.meetings.Requirement
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -67,9 +65,11 @@ class CompleteViewModel: ViewModel() {
             description = Description.ifBlank { null },
             dateTime = Date,
             duration = durationToMinutes(Duration),
-            location = if(!Online)
-                Location(HideAddress, (0), (0), Place, Address)
-            else null,
+            hide = HideAddress,
+            lat = (0),
+            lng = (0),
+            place = Place,
+            address = Address,
             isPrivate = Private,
             memberCount = if(Private) 0 else try {
                 MemberCount.toInt()
@@ -77,31 +77,9 @@ class CompleteViewModel: ViewModel() {
                 0
             },
             requirementsType = get(RequirementsType).name,
-            requirements = getRequirements(),
+            requirements = Requirements,
             withoutResponds = WithoutRespond
         )
         _meet.emit(meet.value?.copy(id = id))
-    }
-    
-    private fun getRequirements(): List<Requirement>? {
-        return when {
-            Private -> null
-            RequirementsType == 0 -> {
-                val req = Requirements.first()
-                listOf(
-                    Requirement(
-                        req.gender?.name, req.ageMin,
-                        req.ageMax, (req.orientation!!.id)
-                    )
-                )
-            }
-            
-            else -> Requirements.map {
-                Requirement(
-                    it.gender?.name, it.ageMin,
-                    it.ageMax, (it.orientation!!.id)
-                )
-            }
-        }
     }
 }

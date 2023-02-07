@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.viewmodel.*
+import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
@@ -124,5 +125,5 @@ object Login: FeatureDefinition() {
         }
     }
     
-    override fun include() = setOf(Auth)
+    override fun include() = setOf(Auth, MeetingsData)
 }

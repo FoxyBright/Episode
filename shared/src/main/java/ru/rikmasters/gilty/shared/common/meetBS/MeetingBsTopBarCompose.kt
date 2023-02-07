@@ -39,7 +39,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.ShortRespondModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -85,7 +85,7 @@ data class MeetingBsTopBarState(
     val menuState: Boolean = false,
     val responds: Boolean = false,
     val respondsCount: Int? = null,
-    val lastRespond: RespondModel? = null,
+    val lastRespond: ShortRespondModel? = null,
     val description: Boolean = false,
     val backButton: Boolean = false,
 )

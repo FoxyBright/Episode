@@ -3,13 +3,14 @@ package ru.rikmasters.gilty.login.viewmodel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.MeetingManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 var SelectedCategory: List<CategoryModel> = listOf()
 
 class CategoryViewModel: ViewModel() {
+    
     
     private val meetManager by inject<MeetingManager>()
     
