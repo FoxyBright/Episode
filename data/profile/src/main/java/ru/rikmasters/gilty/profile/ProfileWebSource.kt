@@ -200,19 +200,22 @@ class ProfileWebSource: KtorSource() {
         aboutMe: String? = null,
         age: Int? = null,
         gender: GenderType? = null,
-        orientationId: String? = "HETERO",
-    ) = client.patch(
-        "http://$HOST$PREFIX_URL/profile"
+        orientationId: String? = null,
     ) {
-        setBody(
-            ProfileRequest(
-                username,
-                gender?.name,
-                age,
-                orientationId,
-                aboutMe
+        updateClientToken()
+        client.patch(
+            "http://$HOST$PREFIX_URL/profile"
+        ) {
+            setBody(
+                ProfileRequest(
+                    username,
+                    gender?.name,
+                    age,
+                    orientationId,
+                    aboutMe
+                )
             )
-        )
+        }
     }
     
     private suspend fun getUserAlbumPrivateId(): String {
@@ -239,5 +242,12 @@ class ProfileWebSource: KtorSource() {
         } catch(e: Exception) {
             false
         }
+    }
+    
+    suspend fun deleteAccount() {
+        updateClientToken()
+        client.delete(
+            "http://$HOST$PREFIX_URL/profile/account"
+        )
     }
 }

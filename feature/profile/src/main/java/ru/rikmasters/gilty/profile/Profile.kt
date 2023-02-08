@@ -14,6 +14,8 @@ import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.Categorie
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
+import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 
 object Profile: FeatureDefinition() {
     
@@ -69,7 +71,9 @@ object Profile: FeatureDefinition() {
                     ?.let { multi -> ProfileSelectPhotoScreen(vm, multi) }
             }
             
-            screen("categories") { CategoriesScreen() }
+            screen<CategoryViewModel>("categories") { vm, _ ->
+                CategoriesScreen(vm)
+            }
         }
     }
     
@@ -86,18 +90,27 @@ object Profile: FeatureDefinition() {
             scopedOf(::GalleryViewModel)
         }
         
+        scope<CategoryViewModel> {
+            scopedOf(::CategoryViewModel)
+        }
+        
         scope<SettingsViewModel> {
+            scopedOf(::OrientationBsViewModel)
             scopedOf(::SettingsViewModel)
+            scopedOf(::GenderBsViewModel)
+            scopedOf(::InformationBsViewModel)
+            scopedOf(::IconsBsViewModel)
+            scopedOf(::AgeBsViewModel)
         }
         
         scope<UserProfileViewModel> {
+            scopedOf(::ParticipantsBsViewModel)
             scopedOf(::UserProfileViewModel)
-            scopedOf(::HiddenBsViewModel)
+            scopedOf(::OrganizerBsViewModel)
             scopedOf(::ObserverBsViewModel)
             scopedOf(::RespondsBsViewModel)
             scopedOf(::MeetingBsViewModel)
-            scopedOf(::ParticipantsBsViewModel)
-            scopedOf(::OrganizerBsViewModel)
+            scopedOf(::HiddenBsViewModel)
         }
     }
     

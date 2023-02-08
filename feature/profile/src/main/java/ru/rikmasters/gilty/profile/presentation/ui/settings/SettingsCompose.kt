@@ -1,8 +1,7 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation.Vertical
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -10,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,12 +28,11 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.image_categories_settings
 import ru.rikmasters.gilty.shared.R.string.edit_button
 import ru.rikmasters.gilty.shared.R.string.settings_interest_label
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
-import ru.rikmasters.gilty.shared.shared.CheckBoxCard
-import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.Element
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -41,15 +40,33 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 @Composable
 private fun SettingsPreview() {
     GiltyTheme {
-        SettingsContent(
-            SettingsState(DemoProfileModel, (false))
-        )
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            val user = DemoProfileModel
+            SettingsContent(
+                SettingsState(
+                    user.gender,
+                    user.age.toString(),
+                    user.orientation,
+                    user.phone.toString(),
+                    (true), (false), (false)
+                )
+            )
+        }
     }
 }
 
 data class SettingsState(
-    val profile: ProfileModel,
+    val gender: GenderType?,
+    val age: String,
+    val orientation: OrientationModel?,
+    val phone: String,
     val notification: Boolean,
+    val exitAlert: Boolean,
+    val deleteAlert: Boolean,
 )
 
 interface SettingsCallback {
@@ -65,6 +82,10 @@ interface SettingsCallback {
     fun onPhoneClick()
     fun onExit()
     fun onDelete()
+    fun onExitDismiss()
+    fun onExitSuccess()
+    fun onDeleteSuccess()
+    fun onDeleteDismiss()
 }
 
 @Composable
@@ -77,15 +98,28 @@ fun SettingsContent(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .scrollable(
-                rememberScrollState(), Vertical
-            )
     ) {
         item { Categories(Modifier, callback) }
         item { Information(state, Modifier, callback) }
         item { Additionally(state, Modifier, callback) }
         item { Buttons(Modifier, callback) }
     }
+    GAlert(
+        state.exitAlert, { callback?.onExitDismiss() },
+        stringResource(R.string.settings_exit_alert),
+        success = Pair(stringResource(R.string.exit_button))
+        { callback?.onExitSuccess() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onExitDismiss() },
+    )
+    GAlert(
+        state.deleteAlert, { callback?.onDeleteDismiss() },
+        stringResource(R.string.settings_delete_account_alert),
+        success = Pair(stringResource(R.string.meeting_filter_delete_tag_label))
+        { callback?.onDeleteSuccess() },
+        cancel = Pair(stringResource(R.string.cancel_button))
+        { callback?.onDeleteDismiss() },
+    )
 }
 
 @Composable
@@ -108,7 +142,7 @@ private fun Categories(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp),
-            SpaceBetween
+            SpaceBetween, CenterVertically
         ) {
             Text(
                 stringResource(settings_interest_label),
@@ -117,7 +151,10 @@ private fun Categories(
             )
             Text(
                 stringResource(edit_button),
-                Modifier.clickable { callback?.editCategories() },
+                Modifier.clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { callback?.editCategories() },
                 colorScheme.primary,
                 style = typography.bodyMedium
             )
@@ -128,8 +165,9 @@ private fun Categories(
                 .fillMaxWidth()
                 .height(180.dp)
                 .padding(horizontal = 16.dp)
-                .clip(shapes.large),
-            contentScale = ContentScale.FillWidth
+                .clip(shapes.large)
+                .clickable { callback?.editCategories() },
+            contentScale = FillWidth
         )
     }
 }
@@ -152,25 +190,25 @@ private fun Information(
             Card(
                 stringResource(R.string.sex),
                 ThemeExtra.shapes.mediumTopRoundedShape,
-                Modifier, state.profile.gender.value
+                Modifier, state.gender?.value ?: ""
             ) { callback?.onGenderClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.personal_info_age_placeholder),
                 ThemeExtra.shapes.zero,
-                Modifier, "${state.profile.age} лет"
+                Modifier, ageHolder(state.age)
             ) { callback?.onAgeClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.orientation_title),
                 ThemeExtra.shapes.zero,
-                Modifier, state.profile.orientation?.name
+                Modifier, state.orientation?.name
             ) { callback?.onOrientationClick() }
             Divider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.phone_number),
                 ThemeExtra.shapes.mediumBottomRoundedShape,
-                Modifier, state.profile.phone,
+                Modifier, state.phone,
                 arrow = false
             ) { callback?.onPhoneClick() }
         }
@@ -225,8 +263,9 @@ private fun Card(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick, modifier.fillMaxWidth(), (true), shape,
-        CardDefaults.cardColors(colorScheme.primaryContainer)
+        onClick, modifier.fillMaxWidth(),
+        (true), shape,
+        cardColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
@@ -253,6 +292,16 @@ private fun Card(
     }
 }
 
+private fun ageHolder(age: String): String {
+    if(age.isBlank()) return ""
+    val holder = when(age.last()) {
+        '1' -> "год"
+        '2', '3', '4' -> "года"
+        else -> "лет"
+    }
+    return "$age $holder"
+}
+
 @Composable
 private fun Buttons(
     modifier: Modifier = Modifier,
@@ -266,7 +315,10 @@ private fun Buttons(
             stringResource(R.string.exit_button),
             Modifier
                 .padding(top = 28.dp, bottom = 16.dp)
-                .clickable { callback?.onExit() },
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { callback?.onExit() },
             colorScheme.primary,
             style = typography.bodyLarge
         )
@@ -274,7 +326,10 @@ private fun Buttons(
             stringResource(R.string.settings_delete_account_label),
             Modifier
                 .padding(bottom = 28.dp)
-                .clickable { callback?.onDelete() },
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { callback?.onDelete() },
             colorScheme.tertiary,
             style = typography.bodyLarge
         )

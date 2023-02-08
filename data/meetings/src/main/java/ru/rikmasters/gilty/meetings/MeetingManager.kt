@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.meetings
 
-import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.models.MeetFiltersRequest
 import ru.rikmasters.gilty.shared.models.request.meets.Location
 import ru.rikmasters.gilty.shared.models.request.meets.Requirement
@@ -143,4 +141,8 @@ class MeetingManager(
             }
         }, withoutResponds
     )
+    
+    suspend fun setUserInterest(meets: List<CategoryModel>) {
+        web.setUserInterest(meets.map { it.id })
+    }
 }

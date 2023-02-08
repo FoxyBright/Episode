@@ -4,8 +4,10 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType
 import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType.MY
 import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class ProfileManager(
     
@@ -43,5 +45,22 @@ class ProfileManager(
     
     suspend fun unsubscribeFromUser(member: String) {
         web.unsubscribeFromUser(member)
+    }
+    
+    suspend fun userUpdateData(
+        username: String? = null,
+        aboutMe: String? = null,
+        age: Int? = null,
+        gender: GenderType? = null,
+        orientation: OrientationModel? = null,
+    ) {
+        web.setUserData(
+            username, aboutMe, age,
+            gender, orientation?.id
+        )
+    }
+    
+    suspend fun deleteAccount() {
+        web.deleteAccount()
     }
 }

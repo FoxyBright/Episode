@@ -1,43 +1,54 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings.categories
 
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.profile.viewmodel.CategoryViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 @Composable
-fun CategoriesScreen(nav: NavState = get()) {
-    val context = LocalContext.current
-    var alert by remember { mutableStateOf(false) }
-    CategoriesContent(
-        Modifier,
-        CategoriesState(
-            listOf(DemoCategoryModel),
-            emptyList(), alert
-        ),
-        object : CategoriesCallback {
-
+fun CategoriesScreen(vm: CategoryViewModel) {
+    
+    val scope = rememberCoroutineScope()
+    val nav = get<NavState>()
+    
+    val categories by vm.categories.collectAsState()
+    val selected by vm.selected.collectAsState()
+    val alert by vm.alert.collectAsState()
+    
+    // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
+    var sleep by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        vm.getCategories()
+        vm.getInterest()
+        sleep = true
+    }
+    
+    if(sleep) CategoriesContent(
+        Modifier, CategoriesState(
+            categories, selected, alert
+        ), object: CategoriesCallback {
+            
             override fun onClose() {
-                nav.navigate("settings")
+                nav.navigationBack()
             }
-
+            
             override fun onCloseAlert(it: Boolean) {
-                alert = it
+                scope.launch { vm.alertDismiss(it) }
             }
-
+            
             override fun onCategoryClick(category: CategoryModel) {
-                Toast.makeText(
-                    context, "Выбор категории временно не доступен",
-                    Toast.LENGTH_SHORT
-                ).show()
+                scope.launch { vm.selectCategory(category) }
             }
-
+            
             override fun onNext() {
-                nav.navigate("settings")
+                scope.launch {
+                    vm.setUserInterest()
+                    nav.navigationBack()
+                }
             }
         })
 }

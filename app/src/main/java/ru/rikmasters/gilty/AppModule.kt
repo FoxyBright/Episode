@@ -14,16 +14,13 @@ import ru.rikmasters.gilty.login.Login
 import ru.rikmasters.gilty.mainscreen.Main
 import ru.rikmasters.gilty.notifications.Notifications
 import ru.rikmasters.gilty.profile.Profile
-import ru.rikmasters.gilty.settings.Settings
 
 object AppModule : FeatureDefinition() {
     override fun include(): Set<ModuleDefinition> =
         setOf(
             ExampleModule, Login, Main,
             Profile, AddMeet, Notifications,
-            Chat, Complains, Settings,
-            
-            Realm, Ktor
+            Chat, Complains, Realm, Ktor
         )
     
     override fun DeepNavGraphBuilder.navigation() {}

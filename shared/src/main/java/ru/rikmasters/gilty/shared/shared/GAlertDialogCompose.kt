@@ -159,7 +159,7 @@ fun GAlert(
 @Composable
 private fun List(
     list: List<Pair<String, Boolean>>,
-    select: ((Int) -> Unit)? = null
+    select: ((Int) -> Unit)? = null,
 ) {
     LazyColumn {
         itemsIndexed(list) { index, item ->
@@ -174,10 +174,13 @@ private fun ListItem(
     index: Int,
     item: Pair<String, Boolean>,
     accentColors: Color = colorScheme.primary,
-    select: ((Int) -> Unit)? = null
+    select: ((Int) -> Unit)? = null,
 ) {
-    Row(Modifier.offset((-10).dp),
-        Start, CenterVertically) {
+    Row(
+        Modifier
+            .padding(bottom = 30.dp),
+        Start, CenterVertically
+    ) {
         CheckBox(
             item.second, Modifier.clip(CircleShape),
             listOf(

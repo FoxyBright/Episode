@@ -30,6 +30,13 @@ class MeetingWebSource: KtorSource() {
         val photoAccess: Boolean,
     )
     
+    suspend fun setUserInterest(meets: List<String>) {
+        updateClientToken()
+        client.patch(
+            "http://$HOST$PREFIX_URL/profile/categories"
+        ) { url { meets.forEach { query("category_ids[]" to it) } } }
+    }
+    
     suspend fun notInteresting(meetId: String) {
         updateClientToken()
         client.patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")

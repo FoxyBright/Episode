@@ -38,9 +38,6 @@ include(":dataexample")
 include(":feature:complaints")
 
 
-include(":feature:settings")
-
-
 include(":feature:chat")
 
 
