@@ -4,25 +4,18 @@ import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-
-data class RespondsFeedback(
-    val id: String,
-    val tags: List<TagModel>,
-    val isOnline: Boolean,
-    val organizerModel: OrganizerModel,
-    val respondsCount: Int,
-    val responds: List<RespondModel>,
-)
+import java.util.UUID
 
 data class RespondModel(
     val id: String,
     val author: OrganizerModel,
     val comment: String,
+    val albumId: String,
     val photoAccess: Boolean,
 )
 
 data class ShortRespondModel(
-    val id: Int,
+    val id: String,
     val meet: MeetingModel,
     val comment: String?,
     val sender: OrganizerModel,
@@ -31,7 +24,7 @@ data class ShortRespondModel(
 )
 
 val DemoSendRespondsModel = ShortRespondModel(
-    1,
+    UUID.randomUUID().toString(),
     DemoMeetingModel,
     null,
     DemoOrganizerModel,
@@ -40,7 +33,7 @@ val DemoSendRespondsModel = ShortRespondModel(
 )
 
 val DemoReceivedRespondsModel = ShortRespondModel(
-    1, DemoMeetingModel,
+    UUID.randomUUID().toString(), DemoMeetingModel,
     "Классно выглядишь, пойдем? Я вроде адекватный))",
     DemoOrganizerModel,
     RespondType.RECEIVED,
@@ -53,10 +46,23 @@ val DemoReceivedRespondsModel = ShortRespondModel(
 )
 
 val DemoReceivedShortRespondModelWithoutPhoto = ShortRespondModel(
-    1,
+    UUID.randomUUID().toString(),
     DemoMeetingModel,
     "Покажи свои фото))",
     DemoOrganizerModel,
     RespondType.RECEIVED,
     null
+)
+
+val DemoRespondModelList = listOf(
+    DemoSendRespondsModel,
+    DemoReceivedShortRespondModelWithoutPhoto
+)
+
+val DemoRespondModel = RespondModel(
+    UUID.randomUUID().toString(),
+    DemoOrganizerModel,
+    "comment",
+    "album",
+    true
 )

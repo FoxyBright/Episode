@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.RespondsBsViewModel
-import ru.rikmasters.gilty.shared.common.RespondCallback
+import ru.rikmasters.gilty.shared.common.RespondsListCallback
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
@@ -18,7 +18,7 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 fun RespondsBs(vm: RespondsBsViewModel) {
     
     val tabs by vm.tabs.collectAsState()
-    val observeGroupStates by vm.observeGroupStates.collectAsState()
+    val groupStates by vm.groupStates.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     
@@ -38,8 +38,8 @@ fun RespondsBs(vm: RespondsBsViewModel) {
     
     RespondsList(
         listOf(pairRespondsList.value),
-        observeGroupStates, tabs,
-        Modifier, object: RespondCallback {
+        groupStates, tabs,
+        Modifier, object: RespondsListCallback {
             override fun onCancelClick(respond: ShortRespondModel) {
                 respondsList.remove(respond)
                 Toast.makeText(
@@ -79,7 +79,7 @@ fun RespondsBs(vm: RespondsBsViewModel) {
             }
             
             override fun onArrowClick(index: Int) {
-                scope.launch { vm.expandGroup(index) }
+                scope.launch { vm.selectRespondGroup(index) }
             }
         })
 }

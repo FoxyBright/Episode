@@ -2,8 +2,7 @@ package ru.rikmasters.gilty.shared.model.notification
 
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import java.util.UUID
 
 data class ShortNotification(
     val id: String,
@@ -11,50 +10,40 @@ data class ShortNotification(
     val description: String,
 )
 
-@Suppress("unused")
-data class FullNotify(
+data class NotificationModel(
     val id: String,
     val date: String,
     val type: NotificationType,
     val status: NotificationStatus,
     val parent: NotificationParentModel,
-    val respond: RespondsFeedback,
+    val feedback: FeedBackModel?,
 )
 
-data class NotificationModel(
-    val id: Int,
-    val meeting: MeetingModel,
-    val type: NotificationType,
-    val date: String,
-)
-
-val DemoNotificationLeaveEmotionModel = NotificationModel(
-    1, DemoMeetingModel,
-    NotificationType.LEAVE_EMOTIONS,
-    "2022-11-07T08:35:54.140Z"
+val DemoShortNotification = ShortNotification(
+    UUID.randomUUID().toString(),
+    "NOTIFICATION",
+    "DESCRIPTION"
 )
 
 val DemoNotificationMeetingOverModel = NotificationModel(
-    1, DemoMeetingModel,
+    UUID.randomUUID().toString(),
+    "2022-11-07T08:35:54.140Z",
     NotificationType.MEETING_OVER,
-    "2022-10-17T08:35:54.140Z"
+    NotificationStatus.DELETED,
+    DemoNotificationParentModel,
+    DemoFeedBackModel
 )
 
-val DemoTodayNotificationRespondAccept = NotificationModel(
-    1, DemoMeetingModel,
-    NotificationType.RESPOND_ACCEPT,
-    "2022-10-21T17:40:54.140Z"
-)
-
-val DemoTodayNotificationMeetingOver = NotificationModel(
-    1, DemoMeetingModel,
-    NotificationType.MEETING_OVER,
-    "2022-11-09T17:26:00.140Z"
+val DemoNotificationRespondAccept = NotificationModel(
+    UUID.randomUUID().toString(),
+    "2022-11-07T08:35:54.140Z",
+    NotificationType.RESPOND_ACCEPTED,
+    NotificationStatus.DELETED,
+    DemoNotificationParentModel,
+    DemoFeedBackModel
 )
 
 val DemoNotificationModelList = listOf(
-    DemoNotificationLeaveEmotionModel,
     DemoNotificationMeetingOverModel,
-    DemoTodayNotificationRespondAccept,
-    DemoTodayNotificationMeetingOver,
+    DemoNotificationRespondAccept,
 )

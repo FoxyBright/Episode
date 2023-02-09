@@ -9,17 +9,19 @@ class RespondsBsViewModel: ViewModel() {
     private val _tabs = MutableStateFlow(0)
     val tabs = _tabs.asStateFlow()
     
-    private val _observeGroupStates = MutableStateFlow(listOf(true, false))
-    val observeGroupStates = _observeGroupStates.asStateFlow()
+    private val _groupStates = MutableStateFlow(emptyList<Int>())
+    val groupStates = _groupStates.asStateFlow()
     
-    suspend fun expandGroup(index: Int) {
-        val list = arrayListOf<Boolean>()
-        repeat(observeGroupStates.value.size) { list.add(it == index) }
-        _observeGroupStates.emit(list)
+    suspend fun selectRespondGroup(index: Int) {
+        val list = groupStates.value
+        _groupStates.emit(
+            if(list.contains(index))
+                list - index
+            else list + index
+        )
     }
     
     suspend fun selectTab(tab: Int) {
         _tabs.emit(tab)
     }
-    
 }

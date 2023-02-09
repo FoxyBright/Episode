@@ -24,8 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -34,8 +32,8 @@ private fun RespondCardPreview() {
     GiltyTheme {
         Responds(
             stringResource(R.string.profile_responds_label),
-            3, DemoAvatarModel
-        ) {}
+            3, ""
+        )
     }
 }
 
@@ -44,9 +42,9 @@ private fun RespondCardPreview() {
 fun Responds(
     text: String,
     size: Int?,
-    image: AvatarModel?,
+    image: String?,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -66,14 +64,12 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
-                image?.let {
-                    AsyncImage(
-                        it.url, (null), Modifier
-                            .size(40.dp)
-                            .clip(CircleShape),
-                        contentScale = Crop
-                    )
-                }
+                AsyncImage(
+                    image, (null), Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    contentScale = Crop
+                )
                 Text(
                     text, Modifier.padding(16.dp, 6.dp),
                     colorScheme.tertiary,

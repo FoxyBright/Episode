@@ -5,6 +5,7 @@ import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.DemoRequirementModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
@@ -28,11 +29,12 @@ data class MeetingResponse(
     val tags: List<Tag>? = null,
     val condition: String? = null,
     val category: Category,
-    val datetime: String? = null,
+    val datetime: String,
     val duration: Int? = null,
     val organizer: ProfileResponse? = null,
     val isOnline: Boolean? = null,
     val isAnonymous: Boolean? = null,
+    val withoutResponds: Boolean? = null,
     val memberState: String? = null,
 ) {
     
@@ -42,11 +44,12 @@ data class MeetingResponse(
         category.map(),
         durationToString(duration ?: 0),
         MeetType.valueOf(type.toString()),
-        datetime = "${of(datetime!!)}",
+        datetime = "${of(datetime)}",
         organizer?.map()?.mapToOrganizerModel(),
         anyLog(isOnline) == true,
         tags?.map { it.map() } ?: listOf(),
         "", isAnonymous == true, 0,
-        DemoRequirementModel, "", "", false
+        DemoRequirementModel, "", "", false,
+        memberState = memberState?.let { MemberStateType.valueOf(it) } ?: MemberStateType.IS_MEMBER
     )
 }

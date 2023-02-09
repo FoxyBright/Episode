@@ -25,6 +25,7 @@ data class MeetingModel(
     val address: String,
     val hideAddress: Boolean,
     val price: Int? = null,
+    val memberState: MemberStateType? = null,
 ) {
     
     fun map() = FullMeetingModel(
@@ -51,7 +52,7 @@ data class MeetingModel(
         membersMax = 0,
         members = emptyList(),
         location = null,
-        memberState = IS_MEMBER
+        memberState = memberState
     )
 }
 
@@ -78,7 +79,7 @@ data class FullMeetingModel(
     val location: LocationModel? = null,
     val place: String? = null,
     val address: String? = null,
-    val memberState: MemberStateType,
+    val memberState: MemberStateType?,
     val price: Int? = null,
 ) {
     
@@ -101,6 +102,7 @@ data class FullMeetingModel(
         address = address ?: "",
         hideAddress = hideAddress == true,
         price = price,
+        memberState = memberState
     )
 }
 
@@ -149,6 +151,7 @@ val DemoMeetingModel = MeetingModel(
     address = "Москва, ул. Пушкина 42",
     hideAddress = false,
     price = 600,
+    memberState = IS_MEMBER
 )
 
 val DemoMeetingList = listOf(

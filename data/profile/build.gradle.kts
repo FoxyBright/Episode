@@ -12,5 +12,6 @@ dependencies {
     dataBase()
     
     implementation(project(":data:shared"))
+    implementation(project(":data:push"))
     implementation(project(":shared"))
 }

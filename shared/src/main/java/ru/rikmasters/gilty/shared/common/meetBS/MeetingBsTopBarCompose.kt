@@ -129,7 +129,7 @@ fun MeetingBsTopBarCompose(
         if(state.responds) Responds(
             stringResource(R.string.profile_responds_label),
             state.respondsCount,
-            state.lastRespond?.sender?.avatar,
+            state.lastRespond?.sender?.avatar?.url,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick() }
         Row(Modifier.height(IntrinsicSize.Max)) {

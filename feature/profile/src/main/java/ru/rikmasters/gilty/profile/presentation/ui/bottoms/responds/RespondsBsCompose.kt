@@ -13,9 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.Respond
-import ru.rikmasters.gilty.shared.common.RespondCallback
-import ru.rikmasters.gilty.shared.common.RespondsListContent
+import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SEND
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
@@ -40,7 +38,7 @@ fun RespondsListPreview() {
                         DemoSendRespondsModel
                     )
                 )
-            ), listOf(true, false), (0)
+            ), listOf(0), (0)
         )
     }
 }
@@ -48,10 +46,10 @@ fun RespondsListPreview() {
 @Composable
 fun RespondsList(
     responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
-    respondsStates: List<Boolean>,
+    respondsStates: List<Int>,
     selectTab: Int,
     modifier: Modifier = Modifier,
-    callback: RespondCallback? = null,
+    callback: RespondsListCallback? = null,
 ) {
     Column(
         modifier
@@ -90,7 +88,7 @@ fun RespondsList(
 private fun SentResponds(
     modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
-    callback: RespondCallback? = null,
+    callback: RespondsListCallback? = null,
 ) {
     val sentResponds =
         arrayListOf<ShortRespondModel>()
@@ -120,8 +118,8 @@ private fun SentResponds(
 private fun ReceivedResponds(
     modifier: Modifier = Modifier,
     responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
-    respondsStates: List<Boolean>,
-    callback: RespondCallback? = null,
+    respondsStates: List<Int>,
+    callback: RespondsListCallback? = null,
 ) {
     val listOfResponds =
         arrayListOf<ShortRespondModel>()
@@ -137,7 +135,7 @@ private fun ReceivedResponds(
     }
     if(list.isNotEmpty())
         RespondsListContent(
-            list, respondsStates,
+            RespondsListState(list, respondsStates),
             modifier, callback
         )
     else EmptyScreen(

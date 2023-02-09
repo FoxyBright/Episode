@@ -4,6 +4,7 @@ import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.models.Category
@@ -39,6 +40,7 @@ data class MainMeetResponse(
         place = "",
         address = "",
         hideAddress = false,
-        price = null
+        price = null,
+        memberState = MemberStateType.valueOf(memberState)
     )
 }

@@ -11,4 +11,5 @@ dependencies {
     compose()
     implementation(project(":shared"))
     implementation(project(":data:push"))
+    implementation(project(":data:profile"))
 }

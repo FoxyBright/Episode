@@ -20,6 +20,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Composable
 fun EmojiRow(
+    emojiList: List<EmojiModel>,
     modifier: Modifier = Modifier,
     onClick: (EmojiModel) -> Unit
 ) {
@@ -36,7 +37,7 @@ fun EmojiRow(
                 ), Center
         ) {
             LazyRow(Modifier.clip(CircleShape)) {
-                items(EmojiModel.list) {
+                items(emojiList) {
                     GEmojiImage(it, Modifier
                         .padding(10.dp)
                         .size(30.dp)

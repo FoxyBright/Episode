@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.notification
 import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 
 data class FileModel(
     val id: String,
@@ -28,3 +29,11 @@ data class FileModel(
         hasAccess
     )
 }
+
+private val demo = DemoAvatarModel
+val DemoFileModel = FileModel(
+    demo.id, demo.albumId, demo.ownerId,
+    demo.type, demo.thumbnail, demo.mimetype,
+    demo.filesize, demo.url, demo.width, demo.height,
+    demo.hasAccess, (0), (0), (0)
+)

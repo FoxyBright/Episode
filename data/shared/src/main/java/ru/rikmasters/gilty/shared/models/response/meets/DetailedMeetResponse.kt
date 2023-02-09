@@ -97,11 +97,11 @@ data class Orientation(
 }
 
 data class Organizer(
-    val id: String,
+    val id: String? = null,
     val gender: String,
     val username: String,
     val emojiType: String? = null,
-    val avatar: Avatar,
+    val avatar: Avatar? = null,
     val thumbnail: Thumbnail,
     val age: Int,
     val isAnonymous: Boolean,
@@ -109,9 +109,10 @@ data class Organizer(
 ) {
     
     fun map() = OrganizerModel(
-        id, valueOf(gender),
+        id.toString(),
+        valueOf(gender),
         username, getEmoji(emojiType.toString()),
-        avatar.map(), thumbnail.map(),
+        avatar?.map(), thumbnail.map(),
         age, isAnonymous,
         isOnline
     )

@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
+import ru.rikmasters.gilty.data.ktor.Ktor.logD
+
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -53,21 +55,20 @@ fun replacer(it: String, end: String): String {
     }
 }
 
-fun todayControl(date: String): Boolean {
-    return date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
-}
+fun todayControl(date: String) =
+    date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
+
 
 fun getDifferenceOfTime(date: String): String {
-    val list = arrayListOf<Int>()
-    "${date.time().minusHour((3))}".split((":"))
-        .forEach { list.add(it.toInt()) }
-    return if(todayControl(date))
-        if(LOCAL_TIME.hour() - list.first() > 0)
-            "${LOCAL_TIME.hour() - list.first()} ч"
-        else if(LOCAL_TIME.minute() - list[1] > 0)
-            "${LOCAL_TIME.minute() - list[1]} м"
-        else "${LOCAL_TIME.second() - list.last()} с"
-    else "${LOCAL_DATE.dayOfYear() - date.date().dayOfYear()} д"
+    logD("DATE _>>>>>>>>>>>>>>>>>>>>>>>>    $date")
+    val difference = (LocalDateTime.now().millis() -
+            LocalDateTime.of(date).millis()) / 1000
+    return when {
+        difference < 60 -> "$difference cек"
+        difference in 60..3599 -> "${difference / 60} мин"
+        difference in 3600..86399 -> "${difference / 3600} ч"
+        else -> "${difference / 86400} д"
+    }
 }
 
 fun String.date(): LocalDate {
@@ -76,7 +77,6 @@ fun String.date(): LocalDate {
         dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
     )
 }
-
 
 fun String.timeClock(): String {
     return this.format("HH:mm")

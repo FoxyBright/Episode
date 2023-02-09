@@ -45,7 +45,7 @@ private fun ReceivedWithoutPhotosResponds() {
 fun Respond(
     respond: ShortRespondModel,
     modifier: Modifier = Modifier,
-    callback: RespondCallback? = null,
+    callback: RespondsListCallback? = null,
 ) {
     val active = false // TODO Должна быть проверка - участвует пользователь в meet или нет
     Card(

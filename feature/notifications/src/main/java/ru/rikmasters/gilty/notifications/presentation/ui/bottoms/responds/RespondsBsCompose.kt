@@ -9,8 +9,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.RespondCallback
+import ru.rikmasters.gilty.shared.common.RespondsListCallback
 import ru.rikmasters.gilty.shared.common.RespondsListContent
+import ru.rikmasters.gilty.shared.common.RespondsListState
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.*
@@ -25,7 +26,7 @@ private fun RespondsPreview() {
             Modifier.background(
                 colorScheme.background
             )
-        ){
+        ) {
             RespondsBsContent(
                 NotificationRespondsState(
                     listOf(
@@ -40,7 +41,7 @@ private fun RespondsPreview() {
                             DemoMeetingModel,
                             listOf(DemoSendRespondsModel)
                         )
-                    ), listOf(true, false)
+                    ), listOf(0)
                 )
             )
         }
@@ -49,14 +50,14 @@ private fun RespondsPreview() {
 
 data class NotificationRespondsState(
     val responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
-    val respondsStates: List<Boolean>,
+    val respondsStates: List<Int>,
 )
 
 @Composable
 fun RespondsBsContent(
     state: NotificationRespondsState,
     modifier: Modifier = Modifier,
-    callback: RespondCallback? = null,
+    callback: RespondsListCallback? = null,
 ) {
     Column(modifier.fillMaxSize()) {
         RowActionBar(
@@ -64,8 +65,10 @@ fun RespondsBsContent(
             modifier = Modifier.padding(start = 16.dp, top = 28.dp)
         )
         RespondsListContent(
-            state.responds, state.respondsStates,
-            Modifier.padding(16.dp), callback
+            RespondsListState(
+                state.responds,
+                state.respondsStates
+            ), Modifier.padding(16.dp), callback
         )
     }
 }

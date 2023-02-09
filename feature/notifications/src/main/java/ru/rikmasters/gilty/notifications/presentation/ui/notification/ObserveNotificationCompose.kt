@@ -11,13 +11,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Item
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
@@ -40,7 +41,7 @@ private fun ObserveNotificationPreview() {
         DemoNotificationMeetingOverModel,
         listOf(DemoMemberModel, DemoMemberModel),
         listOf(true, false)
-    ) {}
+    )
 }
 
 @Composable
@@ -49,16 +50,16 @@ fun ObserveNotification(
     participants: List<MemberModel>,
     participantsWrap: List<Boolean>,
     modifier: Modifier = Modifier,
-    onClick: ((Int) -> Unit)? = null,
-    onEmojiClick: ((EmojiModel) -> Unit)? = null,
+    callback: NotificationsCallback? = null,
 ) {
     Column(modifier) {
-        if(model.type != NotificationType.RESPOND_ACCEPT)
-            Item(
+        if(model.type != NotificationType.RESPOND_ACCEPTED)
+            NotificationItem(
                 NotificationItemState(
-                    model, DragRowState(1f), MaterialTheme.shapes.medium,
+                    model, DragRowState(1f),
+                    MaterialTheme.shapes.medium,
                     getDifferenceOfTime(model.date)
-                ), Modifier, (null), { emoji -> onEmojiClick?.let { it(emoji) } }, (null)
+                ), Modifier, callback
             )
         LazyColumn(
             Modifier
@@ -72,15 +73,16 @@ fun ObserveNotification(
             itemsIndexed(participants) { i, item ->
                 Participant(
                     i, item, participants.size,
-                    participantsWrap[i], { index -> onClick?.let { it(index) } }
-                ) { emoji -> onEmojiClick?.let { it(emoji) } }
+                    participantsWrap[i],
+                    { index -> callback?.onParticipantClick(index) }
+                ) { emoji -> callback?.onEmojiClick(emoji, model) }
             }
         }
         Text(
             stringResource(R.string.notification_send_emotion),
             Modifier.padding(top = 6.dp, start = 16.dp),
             colorScheme.onTertiary,
-            style = MaterialTheme.typography.labelSmall
+            style = typography.labelSmall
         )
     }
 }
@@ -111,7 +113,7 @@ private fun Participant(
                 SpaceBetween, CenterVertically
             ) {
                 BrieflyRow(
-                    "${member.username}, ${member.age}",
+                    ("${member.username}, ${member.age}"),
                     Modifier, member.avatar,
                     member.emoji,
                 )
@@ -122,8 +124,11 @@ private fun Participant(
                     colorScheme.onTertiary
                 )
             }
-            if(unwrap) EmojiRow(Modifier.padding(start = 60.dp, end = 20.dp))
-            { emoji -> onEmojiClick?.let { it(emoji) } }
+            if(unwrap) EmojiRow(
+                EmojiModel.list, Modifier.padding(
+                    start = 60.dp, end = 20.dp
+                )
+            ) { emoji -> onEmojiClick?.let { it(emoji) } }
         }
     }; if(index < size - 1)
         Divider(Modifier.padding(start = 60.dp))

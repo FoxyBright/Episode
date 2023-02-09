@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -29,24 +30,33 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun ReceivedResponds() {
     GiltyTheme {
         RespondsListContent(
-            listOf(
-                Pair(
-                    DemoMeetingModel,
-                    listOf(
-                        DemoReceivedRespondsModel,
-                        DemoReceivedShortRespondModelWithoutPhoto
+            RespondsListState(
+                listOf(
+                    Pair(
+                        DemoMeetingModel,
+                        listOf(
+                            DemoReceivedRespondsModel,
+                            DemoReceivedShortRespondModelWithoutPhoto
+                        )
+                    ),
+                    Pair(
+                        DemoMeetingModel,
+                        listOf(DemoSendRespondsModel)
                     )
-                ),
-                Pair(DemoMeetingModel, listOf(DemoSendRespondsModel))
-            ), listOf(true, false),
-            Modifier
+                ), listOf(0, 1)
+            ), Modifier
                 .background(colorScheme.background)
                 .padding(16.dp)
         )
     }
 }
 
-interface RespondCallback {
+data class RespondsListState(
+    val responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
+    val groupStates: List<Int>,
+)
+
+interface RespondsListCallback {
     
     fun onTabChange(tab: Int) {}
     fun onBack() {}
@@ -59,17 +69,15 @@ interface RespondCallback {
 
 @Composable
 fun RespondsListContent(
-    responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
-    respondsStates: List<Boolean>,
+    state: RespondsListState,
     modifier: Modifier = Modifier,
-    callback: RespondCallback? = null,
+    callback: RespondsListCallback? = null,
 ) {
     LazyColumn(modifier) {
-        itemsIndexed(responds) { i, it ->
+        itemsIndexed(state.responds) { i, it ->
             GroupList(
-                i, it.first, it.second,
-                Modifier, respondsStates[i],
-                callback
+                i, it.first, it.second, Modifier,
+                state.groupStates.contains(i), callback
             )
         }
     }
@@ -82,12 +90,14 @@ private fun GroupList(
     responds: List<ShortRespondModel>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
-    callback: RespondCallback?,
+    callback: RespondsListCallback?,
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             RowActionBar(
-                meet.title, Modifier.clickable {
+                meet.title, Modifier.clickable(
+                    MutableInteractionSource(), (null)
+                ) {
                     callback?.onArrowClick(index)
                 }, responds.size.toString()
             )
