@@ -134,7 +134,7 @@ fun MeetingBsTopBarCompose(
         ) { callback?.onRespondsClick() }
         Row(Modifier.height(IntrinsicSize.Max)) {
             Avatar(org.thumbnail?.url, Modifier.weight(1f))
-            { callback?.onAvatarClick(org.id) }
+            { org.id?.let { callback?.onAvatarClick(it) } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
         }
