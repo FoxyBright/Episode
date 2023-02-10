@@ -14,19 +14,19 @@ data class EmojiModel(
     companion object {
         
         val list = listOf(
-            EmojiModel("D", "$ic_love"),
-            EmojiModel("D", "$ic_bad"),
-            EmojiModel("D", "$ic_cry"),
-            EmojiModel("D", "$ic_cuty"),
-            EmojiModel("D", "$ic_admiration"),
-            EmojiModel("D", "$ic_devil"),
-            EmojiModel("D", "$ic_drops"),
-            EmojiModel("D", "$ic_clown"),
-            EmojiModel("D", "$ic_brocken_heart"),
-            EmojiModel("D", "$ic_fire"),
-            EmojiModel("D", "$ic_batterfly"),
-            EmojiModel("D", "$ic_money_love"),
-            EmojiModel("D", "$ic_sarcasm"),
+            EmojiModel("HEART_EYES", "$ic_love"),
+            EmojiModel("EXPRESSIONLESS", "$ic_bad"),
+            EmojiModel("CRYING", "$ic_cry"),
+            EmojiModel("HEART_FACE", "$ic_cuty"),
+            EmojiModel("STAR_EYES", "$ic_admiration"),
+            EmojiModel("DEVIL", "$ic_devil"),
+            EmojiModel("WATER_DROPS", "$ic_drops"),
+            EmojiModel("CLOWN", "$ic_clown"),
+            EmojiModel("BROKEN_HEART", "$ic_brocken_heart"),
+            EmojiModel("FIRE", "$ic_fire"),
+            EmojiModel("BUTTERFLY", "$ic_batterfly"),
+            EmojiModel("MONEY_FACE", "$ic_money_love"),
+            EmojiModel("EYE_ROLL", "$ic_sarcasm"),
         )
         
         val badEmoji = list[1]
@@ -44,19 +44,19 @@ data class EmojiModel(
             "BUTTERFLY" -> list[10]
             "MONEY_FACE" -> list[11]
             "EYE_ROLL" -> list[12]
-            else -> EmojiModel("", "")
+            else -> EmojiModel("URL", "")
         }
         
         fun categoryIcon(icon: String): EmojiModel = when(icon) {
-            "BASKETBALL" -> EmojiModel("D", "$ic_sport")
-            "BRIEFCASE" -> EmojiModel("D", "$ic_business")
-            "EIFFEL_TOWER" -> EmojiModel("D", "$ic_travel")
-            "BRUSH" -> EmojiModel("D", "$ic_master_classes")
-            "POPCORN" -> EmojiModel("D", "$ic_entertainment")
-            "ADULT" -> EmojiModel("D", "$ic_18")
-            "COCKTAIL" -> EmojiModel("D", "$ic_party")
-            "VASE" -> EmojiModel("D", "$ic_art")
-            else -> EmojiModel("", "")
+            "BASKETBALL" -> EmojiModel("BASKETBALL", "$ic_sport")
+            "BRIEFCASE" -> EmojiModel("BRIEFCASE", "$ic_business")
+            "EIFFEL_TOWER" -> EmojiModel("EIFFEL_TOWER", "$ic_travel")
+            "BRUSH" -> EmojiModel("BRUSH", "$ic_master_classes")
+            "POPCORN" -> EmojiModel("POPCORN", "$ic_entertainment")
+            "ADULT" -> EmojiModel("ADULT", "$ic_18")
+            "COCKTAIL" -> EmojiModel("COCKTAIL", "$ic_party")
+            "VASE" -> EmojiModel("VASE", "$ic_art")
+            else -> EmojiModel("URL", "")
         }
     }
 }

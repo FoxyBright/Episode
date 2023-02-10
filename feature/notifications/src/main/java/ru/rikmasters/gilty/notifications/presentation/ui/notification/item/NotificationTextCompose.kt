@@ -46,7 +46,7 @@ private fun MEETING_OVER() {
             )
         ) {
             NotificationText(
-                DemoOrganizerModel, MEETING_OVER,
+                DemoUserModel, MEETING_OVER,
                 DemoMeetingModel,
                 getDifferenceOfTime(NOW_DATE),
                 Modifier.padding(20.dp)
@@ -65,7 +65,7 @@ private fun RESPOND_ACCEPT() {
             )
         ) {
             NotificationText(
-                DemoOrganizerModel, RESPOND_ACCEPTED,
+                DemoUserModel, RESPOND_ACCEPTED,
                 DemoMeetingModel,
                 getDifferenceOfTime(NOW_DATE),
                 Modifier.padding(20.dp)
@@ -76,7 +76,7 @@ private fun RESPOND_ACCEPT() {
 
 @Composable
 fun NotificationText(
-    organizer: OrganizerModel?,
+    organizer: UserModel?,
     type: NotificationType,
     meet: MeetingModel?,
     duration: String,

@@ -6,8 +6,7 @@ import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import java.util.UUID.randomUUID
 
 data class ProfileModel(
@@ -44,17 +43,16 @@ data class ProfileModel(
             age = 0, aboutMe = null,
             rating = RatingModel(average = "0.0", getEmoji(icon = "")),
             avatar = DemoAvatarModel.copy(
-                url = "",
-                thumbnail = DemoThumbnailModel.copy(url = "")
+                url = "", thumbnail = DemoThumbnailModel.copy(url = "")
             ),
             thumbnail = DemoThumbnailModel.copy(url = ""),
-            isCompleted = false,
+            isCompleted = true,
             subscriptionExpiredAt = null,
             respondsCount = null,
             respondsImage = null,
             hidden = null,
-            countWatchers = null,
-            countWatching = null,
+            countWatchers = 0,
+            countWatching = 0,
             isWatching = null,
             unblockAt = null,
             isOnline = null,
@@ -63,20 +61,7 @@ data class ProfileModel(
         )
     }
     
-    fun mapToOrganizerModel() = OrganizerModel(
-        id = id,
-        gender = gender,
-        username = username.toString(),
-        emoji = rating.emoji,
-        avatar = avatar,
-        thumbnail = thumbnail,
-        age = age,
-        isAnonymous = isAnonymous == true,
-        isOnline = isOnline == true
-    )
-    
-    @Suppress("unused")
-    fun mapToMemberModel() = MemberModel(
+    fun map() = UserModel(
         id = id,
         gender = gender,
         username = username.toString(),

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.models.response.meets
+package ru.rikmasters.gilty.shared.models.meets
 
 import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoRequirementModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.models.Category
-import ru.rikmasters.gilty.shared.models.response.profile.ProfileResponse
+import ru.rikmasters.gilty.shared.models.ProfileResponse
 
 data class Tag(
     val id: String? = null,
@@ -45,7 +45,7 @@ data class MeetingResponse(
         durationToString(duration ?: 0),
         MeetType.valueOf(type.toString()),
         datetime = "${of(datetime)}",
-        organizer?.map()?.mapToOrganizerModel(),
+        organizer?.map()?.map(),
         anyLog(isOnline) == true,
         tags?.map { it.map() } ?: listOf(),
         "", isAnonymous == true, 0,

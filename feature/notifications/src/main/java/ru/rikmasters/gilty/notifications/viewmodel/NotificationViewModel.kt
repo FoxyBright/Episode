@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.push.notification.NotificationManager
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
@@ -13,18 +14,25 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
 class NotificationViewModel: ViewModel() {
     
     private val notificationManger by inject<NotificationManager>()
+    private val meetingManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
     
     private val _notifications = MutableStateFlow(emptyList<NotificationModel>())
     val notifications = _notifications.asStateFlow()
     
-    private val _selectedNotify = MutableStateFlow<NotificationModel?>(null)
-    val selectedNotify = _selectedNotify.asStateFlow()
+    private val navBarStateList = listOf(
+        INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE
+    )
+    
+    private val _navBar = MutableStateFlow(navBarStateList)
+    val navBar = _navBar.asStateFlow()
     
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
@@ -50,8 +58,11 @@ class NotificationViewModel: ViewModel() {
         _blur.emit(state)
     }
     
-    suspend fun selectNotification(notification: NotificationModel) {
-        _selectedNotify.emit(notification)
+    suspend fun selectNotification(notification: NotificationModel) = singleLoading {
+        notification.parent.meeting?.let { meet ->
+            _participants.emit(meetingManager.getMeetMembers(meet.id, (true)))
+            _selectedNotification.emit(notification)
+        }
     }
     
     fun sortNotification(list: List<NotificationModel>) = Triple(
@@ -60,17 +71,14 @@ class NotificationViewModel: ViewModel() {
         list.filter { !weekControl(it.date) && !todayControl(it.date) },
     )
     
-    private val navBarStateList = listOf(
-        INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE
-    )
-    
-    private val _navBar = MutableStateFlow(navBarStateList)
-    val navBar = _navBar.asStateFlow()
-    
     private suspend fun navBarSetStates(
         states: List<NavIconState>,
     ) {
         _navBar.emit(states)
+    }
+    
+    suspend fun clearSelectedNotification() {
+        _selectedNotification.emit(null)
     }
     
     suspend fun navBarNavigate(point: Int): String {
@@ -94,18 +102,49 @@ class NotificationViewModel: ViewModel() {
         }
     }
     
-    suspend fun emojiClick(
-        emoji: EmojiModel,
-        notify: NotificationModel,
-    ) = singleLoading {
-        makeToast("Emoji: $emoji, notify: $notify")
-    }
-    
     suspend fun swipeNotification(
         notification: NotificationModel,
     ) = singleLoading {
-        makeToast("тут запрос на удаление уведомления")
-        _notifications.emit(notifications.value - notification)
+        notificationManger.deleteNotifications(
+            listOf(notification.id)
+        )
+        _notifications.emit(
+            notifications.value - notification
+        )
+    }
+    
+    //TODO OBSERVABLE NOTIFICATION
+    
+    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
+    val ratings = _ratings.asStateFlow()
+    
+    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
+    val selectedNotification = _selectedNotification.asStateFlow()
+    
+    private val _participants = MutableStateFlow(emptyList<UserModel>())
+    val participants = _participants.asStateFlow()
+    
+    private val _participantsStates = MutableStateFlow(emptyList<Int>())
+    val participantsStates = _participantsStates.asStateFlow()
+    
+    suspend fun getRatings() = singleLoading {
+        _ratings.emit(notificationManger.getRatings())
+    }
+    
+    suspend fun emojiClick(
+        emoji: EmojiModel, meetId: String, userId: String,
+    ) = singleLoading {
+        makeToast("emoji: $emoji, meetId: $meetId, userId: $userId")
+        //        notificationManger.putRatings(meetId, userId, emoji)
+    }
+    
+    suspend fun selectParticipants(participant: Int) {
+        val list = participantsStates.value
+        _participantsStates.emit(
+            if(list.contains(participant))
+                list - participant
+            else list + participant
+        )
     }
 }
 

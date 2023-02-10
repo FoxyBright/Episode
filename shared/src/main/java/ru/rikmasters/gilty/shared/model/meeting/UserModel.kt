@@ -8,25 +8,19 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import java.util.UUID.randomUUID
 
-data class MemberModel(
-    val id: String,
-    val gender: GenderType,
-    val username: String,
-    val emoji: EmojiModel,
+data class UserModel(
+    val id: String?,
+    val gender: GenderType?,
+    val username: String?,
+    val emoji: EmojiModel?,
     val avatar: AvatarModel?,
     val thumbnail: ThumbnailModel?,
-    val age: Int,
-    val isAnonymous: Boolean,
-    val isOnline: Boolean,
-) {
-    
-    fun mapToOrganizer() = OrganizerModel(
-        id, gender, username, emoji, avatar,
-        thumbnail, age, isAnonymous, isOnline
-    )
-}
+    val age: Int?,
+    val isAnonymous: Boolean?,
+    val isOnline: Boolean?,
+)
 
-val DemoMemberModel = MemberModel(
+val DemoUserModel = UserModel(
     id = randomUUID().toString(),
     gender = FEMALE,
     username = "cristina",
@@ -35,24 +29,24 @@ val DemoMemberModel = MemberModel(
     thumbnail = DemoThumbnailModel,
     age = 23,
     isAnonymous = false,
-    isOnline = false,
+    isOnline = false
 )
 
-val DemoMemberModelTwo = MemberModel(
-    id = "2",
+val DemoUserModelTwo = UserModel(
+    id = randomUUID().toString(),
     gender = MALE,
     username = "gosha",
     emoji = DemoEmojiModel,
     avatar = DemoAvatarModel,
     thumbnail = DemoThumbnailModel,
-    age = 26,
+    age = 40,
     isAnonymous = true,
     isOnline = true,
 )
 
-val DemoMemberModelList = listOf(
-    DemoMemberModel,
-    DemoMemberModelTwo,
-    DemoMemberModel,
-    DemoMemberModelTwo,
+val DemoUserModelList = listOf(
+    DemoUserModel,
+    DemoUserModelTwo,
+    DemoUserModel,
+    DemoUserModelTwo,
 )

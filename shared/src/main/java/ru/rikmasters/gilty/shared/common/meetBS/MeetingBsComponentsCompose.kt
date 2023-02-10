@@ -70,7 +70,7 @@ private fun MeetingBsParticipantsPreview() {
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsParticipants(
                 DemoFullMeetingModel.copy(isOnline = true),
-                DemoMemberModelList,
+                DemoUserModelList,
                 Modifier.padding(16.dp)
             )
         }
@@ -254,10 +254,10 @@ fun MeetingBsConditions(
 @Composable
 fun MeetingBsParticipants(
     meet: FullMeetingModel,
-    membersList: List<MemberModel>,
+    membersList: List<UserModel>,
     modifier: Modifier = Modifier,
     onAllViewClick: (() -> Unit)? = null,
-    onMemberClick: ((MemberModel) -> Unit)? = null,
+    onMemberClick: ((UserModel) -> Unit)? = null,
 ) {
     Column(modifier) {
         Row(

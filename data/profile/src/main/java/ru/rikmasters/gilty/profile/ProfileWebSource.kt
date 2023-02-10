@@ -19,16 +19,13 @@ import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
-import ru.rikmasters.gilty.shared.models.request.profile.ProfileRequest
-import ru.rikmasters.gilty.shared.models.response.meets.Avatar
-import ru.rikmasters.gilty.shared.models.response.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.models.response.notification.MeetWithRespondsResponse
-import ru.rikmasters.gilty.shared.models.response.profile.MemberResponse
-import ru.rikmasters.gilty.shared.models.response.profile.ProfileResponse
+import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.meets.Avatar
+import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
 import ru.rikmasters.gilty.shared.wrapper.Status
 import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
@@ -81,21 +78,21 @@ class ProfileWebSource: KtorSource() {
     }
     
     suspend fun deleteObserver(
-        member: MemberModel,
+        member: UserModel,
     ): HttpResponse {
         updateClientToken()
         return client.delete(
             "http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}"
-        ) { url { query("user_id" to member.id) } }
+        ) { url { query("user_id" to member.id.toString()) } }
     }
     
     suspend fun getObservers(
         type: ObserversType,
-    ): List<MemberModel> {
+    ): List<UserModel> {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile/${type.value}"
-        ).wrapped<List<MemberResponse>>().map { it.map() }
+        ).wrapped<List<User>>().map { it.map() }
     }
     
     suspend fun deleteHidden(image: AvatarModel) {

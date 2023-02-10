@@ -13,7 +13,6 @@ import ru.rikmasters.gilty.notifications.presentation.ui.bottoms.responds.Respon
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.shared.image.EmojiModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
 @Composable
@@ -23,11 +22,12 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val memberList by remember { mutableStateOf(listOf(DemoMemberModel, DemoMemberModel)) }
-    val memberListWrap = remember { mutableStateListOf<Boolean>() }
+    val participants by vm.participants.collectAsState()
+    val participantsStates by vm.participantsStates.collectAsState()
     
     val notifications by vm.notifications.collectAsState()
-    val selected by vm.selectedNotify.collectAsState()
+    val ratings by vm.ratings.collectAsState()
+    val selected by vm.selectedNotification.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val navState by vm.navBar.collectAsState()
     val blur by vm.blur.collectAsState()
@@ -42,29 +42,32 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             NotificationsState(
                 vm.sortNotification(notifications),
                 lastRespond, navState, blur,
-                selected, memberList, memberListWrap
+                selected, participants, participantsStates
             ), Modifier, object: NotificationsCallback {
                 
                 override fun onClick(notification: NotificationModel) {
                     scope.launch {
                         vm.selectNotification(notification)
+//                        vm.getRatings()
                         vm.blur(true)
                     }
                 }
                 
                 override fun onParticipantClick(index: Int) {
-                    memberListWrap[index] = !memberListWrap[index]
+                    scope.launch { vm.selectParticipants(index) }
                 }
                 
                 override fun onBlurClick() {
-                    scope.launch { vm.blur(false) }
+                    scope.launch {
+                        vm.blur(false)
+                        vm.clearSelectedNotification()
+                    }
                 }
                 
                 override fun onEmojiClick(
-                    emoji: EmojiModel,
-                    notification: NotificationModel,
+                    emoji: EmojiModel, meetId: String, userId: String,
                 ) {
-                    scope.launch { vm.emojiClick(emoji, notification) }
+                    scope.launch { vm.emojiClick(emoji, meetId, userId) }
                 }
                 
                 override fun onNavBarSelect(point: Int) {

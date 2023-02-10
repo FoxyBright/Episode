@@ -7,7 +7,7 @@ data class MeetWithRespondsModel(
     val id: String,
     val tags: List<TagModel>,
     val is_online: Boolean,
-    val organizer: OrganizerModel,
+    val organizer: UserModel,
     val responds_count: Int,
     val responds: List<RespondModel>,
 )
@@ -16,7 +16,7 @@ val DemoMeetWithRespondsModel = MeetWithRespondsModel(
     UUID.randomUUID().toString(),
     DemoTagList,
     true,
-    DemoOrganizerModel,
+    DemoUserModel,
     3,
     listOf(
         DemoRespondModel,

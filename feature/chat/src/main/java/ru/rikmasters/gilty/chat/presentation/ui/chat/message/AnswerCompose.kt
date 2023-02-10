@@ -82,7 +82,7 @@ fun AnswerContent(
     message: MessageModel,
     modifier: Modifier = Modifier,
     sender: Boolean = false,
-    textField: Boolean = false
+    textField: Boolean = false,
 ) {
     Row(
         modifier, Start,
@@ -117,7 +117,7 @@ fun AnswerContent(
             Text(
                 if(textField) "${
                     stringResource(R.string.chats_message_answer_recipient)
-                } $user" else user, Modifier,
+                } $user" else user ?: "", Modifier,
                 if(!sender) colorScheme.primary
                 else White,
                 style = typography.bodyMedium,

@@ -26,7 +26,7 @@ data class ChatState(
     val meet: MeetingModel,
     val messageText: String,
     val messageList: List<MessageModel>,
-    val user: MemberModel,
+    val user: UserModel,
     val alert: Boolean,
     val meetAlert: Boolean,
     val kebabMenuState: Boolean,

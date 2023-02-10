@@ -32,7 +32,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
@@ -232,7 +232,7 @@ private fun Timer(
 @Composable
 private fun Message(
     title: String,
-    user: OrganizerModel,
+    user: UserModel,
     message: String,
     modifier: Modifier = Modifier
 ) {

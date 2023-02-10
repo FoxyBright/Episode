@@ -52,7 +52,7 @@ import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.chat.SystemMessageType.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -200,7 +200,7 @@ private fun SystemMessagePreview() {
             SystemMessageType.values().forEach {
                 SystemMessage(
                     ChatNotificationType(
-                        it, DemoMemberModel
+                        it, DemoUserModel
                     ), Modifier.padding(6.dp)
                 )
             }

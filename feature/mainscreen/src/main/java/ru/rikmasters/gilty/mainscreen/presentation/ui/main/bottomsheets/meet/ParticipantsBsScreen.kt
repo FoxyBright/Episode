@@ -12,7 +12,7 @@ import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsList
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsListCallback
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 
 @Composable
@@ -34,9 +34,9 @@ fun ParticipantsBs(
                 scope.launch { vm.navigateBack() }
             }
             
-            override fun onMemberClick(member: MemberModel) {
+            override fun onMemberClick(member: UserModel) {
                 if(meet.type != ANONYMOUS) scope.launch {
-                    vm.navigate(ORGANIZER, member.id)
+                    vm.navigate(ORGANIZER, member.id!!)
                 }
             }
         }

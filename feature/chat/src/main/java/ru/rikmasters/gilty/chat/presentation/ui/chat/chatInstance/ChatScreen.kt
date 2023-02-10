@@ -46,7 +46,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     remember { mutableStateOf("") }
     var answer by
     remember { mutableStateOf<MessageModel?>(null) }
-    val sender = DemoMemberModel
+    val sender = DemoUserModel
     val messageList = remember {
         mutableStateListOf(
             WritingMessageModel,
@@ -58,9 +58,9 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             DemoMessageModel5Minutes,
             DemoHiddenImageMessage,
             DemoMessageModelLeaveChat,
-            getDemoMessageModel(sender = DemoMemberModelTwo),
-            getDemoMessageModel(sender = DemoMemberModelTwo),
-            getDemoMessageModel(sender = DemoMemberModelTwo),
+            getDemoMessageModel(sender = DemoUserModelTwo),
+            getDemoMessageModel(sender = DemoUserModelTwo),
+            getDemoMessageModel(sender = DemoUserModelTwo),
             DemoMessageModelScreenshot,
             DemoMyHiddenImageMessage,
             DemoImageMessage,
@@ -299,7 +299,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                 messageList.add(
                     0, MessageModel(
                         id = "1",
-                        sender = DemoMemberModel,
+                        sender = DemoUserModel,
                         album = "Бэтмен",
                         text = messageText,
                         attachments = null,
@@ -330,7 +330,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                         MeetingBsContent(
                             MeetingBsState(
                                 menuState, meet.map(),
-                                DemoMemberModelList,
+                                DemoUserModelList,
                                 distanceCalculator(meet),
                                 (true),
                             ), Modifier

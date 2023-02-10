@@ -22,7 +22,7 @@ fun GEmojiImage(
 ) {
     emoji?.let {
         Image(
-            if(it.type == "D")
+            if(it.type != "URL")
                 painterResource(it.path.toInt())
             else rememberAsyncImagePainter(it.path),
             (null), modifier, alignment,

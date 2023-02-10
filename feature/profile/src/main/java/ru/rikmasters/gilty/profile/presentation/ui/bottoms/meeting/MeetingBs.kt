@@ -19,7 +19,7 @@ import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsState
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 @Composable
 fun MeetingBs(
@@ -88,11 +88,11 @@ fun MeetingBs(
                             }
                         }
                         
-                        override fun onMemberClick(member: MemberModel) {
+                        override fun onMemberClick(member: UserModel) {
                             scope.launch {
                                 if(meet.type != ANONYMOUS)
-                                    vm.getUserActualMeets(member.id)
-                                vm.navigate(ORGANIZER, member.id)
+                                    vm.getUserActualMeets(member.id!!)
+                                vm.navigate(ORGANIZER, member.id!!)
                             }
                         }
                         

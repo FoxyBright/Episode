@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons.Filled
@@ -23,44 +24,40 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Notif
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
+import ru.rikmasters.gilty.shared.image.DemoEmojiModel
 import ru.rikmasters.gilty.shared.image.EmojiModel
-import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
-import ru.rikmasters.gilty.shared.shared.BrieflyRow
-import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.EmojiRow
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
+import ru.rikmasters.gilty.shared.shared.*
 
 @Preview
 @Composable
 private fun ObserveNotificationPreview() {
     ObserveNotification(
         DemoNotificationMeetingOverModel,
-        listOf(DemoMemberModel, DemoMemberModel),
-        listOf(true, false)
+        listOf(DemoUserModel, DemoUserModel),
+        listOf(0)
     )
 }
 
 @Composable
 fun ObserveNotification(
-    model: NotificationModel,
-    participants: List<MemberModel>,
-    participantsWrap: List<Boolean>,
+    notification: NotificationModel,
+    participants: List<UserModel>,
+    participantsStates: List<Int>,
     modifier: Modifier = Modifier,
     callback: NotificationsCallback? = null,
 ) {
     Column(modifier) {
-        if(model.type != NotificationType.RESPOND_ACCEPTED)
-            NotificationItem(
-                NotificationItemState(
-                    model, DragRowState(1f),
-                    MaterialTheme.shapes.medium,
-                    getDifferenceOfTime(model.date)
-                ), Modifier, callback
-            )
+        NotificationItem(
+            NotificationItemState(
+                notification, DragRowState(1f),
+                MaterialTheme.shapes.medium,
+                getDifferenceOfTime(notification.date), (true)
+            ), Modifier, callback
+        )
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -70,12 +67,19 @@ fun ObserveNotification(
                     MaterialTheme.shapes.large
                 )
         ) {
-            itemsIndexed(participants) { i, item ->
+            itemsIndexed(participants) { index, participant ->
                 Participant(
-                    i, item, participants.size,
-                    participantsWrap[i],
-                    { index -> callback?.onParticipantClick(index) }
-                ) { emoji -> callback?.onEmojiClick(emoji, model) }
+                    index, participant, participants.size,
+                    participantsStates.contains(index),
+                    DemoEmojiModel, EmojiModel.list, // TODO КАКИЕ ЭМОЦИИ
+                    { part -> callback?.onParticipantClick(part) }
+                ) { emoji ->
+                    participant.id?.let {
+                        callback?.onEmojiClick(
+                            emoji, notification.parent.meeting!!.id, it
+                        )
+                    }
+                }
             }
         }
         Text(
@@ -90,19 +94,18 @@ fun ObserveNotification(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Participant(
-    index: Int, member: MemberModel,
+    index: Int, member: UserModel,
     size: Int, unwrap: Boolean,
+    memberEmoji: EmojiModel?,
+    emojiList: List<EmojiModel>,
     onClick: ((Int) -> Unit)? = null,
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it(index) } },
         Modifier.fillMaxWidth(), (true),
-        when(index) {
-            0 -> shapes.largeTopRoundedShape
-            size - 1 -> shapes.largeBottomRoundedShape
-            else -> shapes.zero
-        }, cardColors(colorScheme.primaryContainer)
+        lazyItemsShapes(index, size, 14.dp),
+        cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier.padding(bottom = 12.dp)) {
             Row(
@@ -114,18 +117,25 @@ private fun Participant(
             ) {
                 BrieflyRow(
                     ("${member.username}, ${member.age}"),
-                    Modifier, member.avatar,
-                    member.emoji,
+                    Modifier, member.avatar, member.emoji,
                 )
-                Icon(
-                    if(unwrap) Filled.KeyboardArrowDown
-                    else Filled.KeyboardArrowRight,
-                    (null), Modifier.size(24.dp),
-                    colorScheme.onTertiary
-                )
+                Row(Modifier, Start, CenterVertically) {
+                    memberEmoji?.let {
+                        GEmojiImage(
+                            memberEmoji,
+                            Modifier.size(24.dp)
+                        )
+                    }
+                    Icon(
+                        if(unwrap) Filled.KeyboardArrowDown
+                        else Filled.KeyboardArrowRight,
+                        (null), Modifier.size(24.dp),
+                        colorScheme.onTertiary
+                    )
+                }
             }
             if(unwrap) EmojiRow(
-                EmojiModel.list, Modifier.padding(
+                emojiList, Modifier.padding(
                     start = 60.dp, end = 20.dp
                 )
             ) { emoji -> onEmojiClick?.let { it(emoji) } }

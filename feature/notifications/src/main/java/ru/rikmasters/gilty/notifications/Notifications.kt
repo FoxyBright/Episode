@@ -4,9 +4,11 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
+import ru.rikmasters.gilty.profile.ProfileData
 import ru.rikmasters.gilty.push.Push
 
 object Notifications: FeatureDefinition() {
@@ -21,7 +23,6 @@ object Notifications: FeatureDefinition() {
         }
     }
     
-    
     override fun Module.koin() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
@@ -29,5 +30,7 @@ object Notifications: FeatureDefinition() {
         }
     }
     
-    override fun include() = setOf(Push)
+    override fun include() = setOf(
+        Push, ProfileData, MeetingsData
+    )
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +33,7 @@ import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
 import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.EmojiRow
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 
@@ -40,6 +42,7 @@ data class NotificationItemState(
     val rowState: DragRowState,
     val shape: Shape,
     val duration: String,
+    val putEmoji: Boolean = false,
 )
 
 @Composable
@@ -66,8 +69,11 @@ fun NotificationItem(
             modifier, state.shape, (true),
             { callback?.onSwiped(notification) },
             { callback?.onClick(notification) },
-            (notification.feedback?.ratings?.map { it.emoji } ?: emptyList()),
-            { callback?.onEmojiClick(it, notification) }
+            (notification.feedback?.ratings?.map { it.emoji } ?: emptyList()), {
+                if(state.putEmoji) callback?.onEmojiClick(
+                    it, meet!!.id, meet.organizer?.id!!
+                )
+            }
         ) { NotificationText(organizer, type, meet, state.duration) }
         
         ADMIN_NOTIFICATION, PHOTO_BLOCKED -> InfoNotification(
@@ -186,6 +192,8 @@ private fun TextNotification(
                     emojiList.ifEmpty { EmojiModel.list },
                     Modifier.padding(start = 60.dp, end = 20.dp)
                 ) { emoji -> onEmojiClick?.let { it(emoji) } }
+                if(shape != RoundedCornerShape(bottomEnd = 12.dp, bottomStart = 12.dp))
+                    Divider(Modifier.padding(start = 60.dp))
             }
         }
     }

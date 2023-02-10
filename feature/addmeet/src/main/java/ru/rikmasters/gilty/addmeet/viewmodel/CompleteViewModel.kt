@@ -34,7 +34,7 @@ class CompleteViewModel: ViewModel() {
             randomUUID().toString(),
             Tags.joinToString(separator = ", ") { it.title },
             Condition!!, SelectCategory!!, Duration, MeetingType!!, Date,
-            profileManager.getProfile().mapToOrganizerModel(), Online,
+            profileManager.getProfile().map(), Online,
             Tags, Description, Private, try {
                 MemberCount.toInt()
             } catch(e: Exception) {

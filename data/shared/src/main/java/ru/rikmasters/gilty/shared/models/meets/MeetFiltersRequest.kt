@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.models
+package ru.rikmasters.gilty.shared.models.meets
 
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType

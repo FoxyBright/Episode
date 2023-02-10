@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.models.response.meets
+package ru.rikmasters.gilty.shared.models.meets
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
@@ -8,6 +8,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.models.Category
+import ru.rikmasters.gilty.shared.models.User
 
 data class MainMeetResponse(
     val id: String,
@@ -18,7 +19,7 @@ data class MainMeetResponse(
     val category: Category,
     val datetime: String,
     val duration: Int,
-    val organizer: OrganizerResponse,
+    val organizer: User,
     val isOnline: Boolean,
     val memberState: String,
 ) {

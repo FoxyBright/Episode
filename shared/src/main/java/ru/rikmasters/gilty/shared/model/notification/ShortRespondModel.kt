@@ -1,12 +1,12 @@
 package ru.rikmasters.gilty.shared.model.notification
 
-import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import java.util.UUID
 
 data class RespondModel(
     val id: String,
-    val author: OrganizerModel,
+    val author: UserModel,
     val comment: String,
     val albumId: String,
     val photoAccess: Boolean,
@@ -61,7 +61,7 @@ data class RespondModel(
 
 val DemoRespondModel = RespondModel(
     UUID.randomUUID().toString(),
-    DemoOrganizerModel,
+    DemoUserModel,
     "comment",
     "album",
     true

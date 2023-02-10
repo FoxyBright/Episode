@@ -22,7 +22,7 @@ import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
@@ -85,15 +85,15 @@ data class NotificationsState(
     val navBar: List<NavIconState>,
     val blur: Boolean,
     val activeNotification: NotificationModel?,
-    val participants: List<MemberModel>,
-    val participantsWrap: List<Boolean>,
+    val participants: List<UserModel>,
+    val participantsStates: List<Int>,
 )
 
 interface NotificationsCallback {
     
     fun onClick(notification: NotificationModel)
     fun onSwiped(notification: NotificationModel)
-    fun onEmojiClick(emoji: EmojiModel, notification: NotificationModel)
+    fun onEmojiClick(emoji: EmojiModel, meetId: String, userId: String)
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -145,7 +145,7 @@ fun NotificationsContent(
         ) {
             ObserveNotification(
                 it, state.participants,
-                state.participantsWrap,
+                state.participantsStates,
                 Modifier
                     .padding(horizontal = 16.dp)
                     .align(Center),

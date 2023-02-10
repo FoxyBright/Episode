@@ -8,14 +8,8 @@ import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
-import ru.rikmasters.gilty.shared.models.Category
-import ru.rikmasters.gilty.shared.models.request.meets.Location
-import ru.rikmasters.gilty.shared.models.request.meets.MeetingRequest
-import ru.rikmasters.gilty.shared.models.request.meets.Requirement
-import ru.rikmasters.gilty.shared.models.response.meets.DetailedMeetResponse
-import ru.rikmasters.gilty.shared.models.response.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.models.response.meets.Tag
-import ru.rikmasters.gilty.shared.models.response.profile.MemberResponse
+import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingWebSource: KtorSource() {
@@ -152,12 +146,14 @@ class MeetingWebSource: KtorSource() {
     
     suspend fun getMeetMembers(
         meet: String,
-    ): List<MemberModel> {
+        excludeMe: Int,
+    ): List<UserModel> {
         updateClientToken()
         return try {
             client.get(
                 "http://$HOST$PREFIX_URL/meetings/$meet/members"
-            ).wrapped<List<MemberResponse>>().map { it.map() }
+            ) { url { query("exclude_me" to "$excludeMe") } }
+                .wrapped<List<User>>().map { it.map() }
         } catch(e: Exception) {
             emptyList()
         }

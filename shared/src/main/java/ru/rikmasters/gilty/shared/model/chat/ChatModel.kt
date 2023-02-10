@@ -5,8 +5,8 @@ import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
 import ru.rikmasters.gilty.shared.common.extentions.YESTERDAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoOrganizerModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 enum class ChatStatus { ACTIVE, INACTIVE }
 
@@ -17,7 +17,7 @@ data class ChatModel(
     val meetStatus: MeetStatusType,
     val status: ChatStatus,
     val isOnline: Boolean,
-    val organizer: OrganizerModel,
+    val organizer: UserModel,
     val organizerOnly: Boolean,
     val title: String,
     val lastMessage: MessageModel,
@@ -35,7 +35,7 @@ fun getChatWithData(
     meetStatus: MeetStatusType = MeetStatusType.ACTIVE,
     status: ChatStatus = ChatStatus.ACTIVE,
     isOnline: Boolean = false,
-    organizer: OrganizerModel = DemoOrganizerModel,
+    organizer: UserModel = DemoUserModel,
     organizerOnly: Boolean = false,
     title: String = DemoMeetingModel.title,
     lastMessage: MessageModel = DemoMessageModel,

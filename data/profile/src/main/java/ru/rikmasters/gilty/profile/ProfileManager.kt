@@ -6,7 +6,7 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
@@ -33,7 +33,7 @@ class ProfileManager(
         web.deleteHidden(image)
     }
     
-    suspend fun deleteObserver(member: MemberModel) {
+    suspend fun deleteObserver(member: UserModel) {
         web.deleteObserver(member)
     }
     

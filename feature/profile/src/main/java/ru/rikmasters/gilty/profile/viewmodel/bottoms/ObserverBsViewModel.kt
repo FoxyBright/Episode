@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 class ObserverBsViewModel: ViewModel() {
     
@@ -19,13 +19,13 @@ class ObserverBsViewModel: ViewModel() {
     private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
-    private val _observers = MutableStateFlow(emptyList<MemberModel>())
+    private val _observers = MutableStateFlow(emptyList<UserModel>())
     val observers = _observers.asStateFlow()
     
-    private val _observables = MutableStateFlow(emptyList<MemberModel>())
+    private val _observables = MutableStateFlow(emptyList<UserModel>())
     val observables = _observables.asStateFlow()
     
-    private val _unsubscribeMembers = MutableStateFlow(emptyList<MemberModel>())
+    private val _unsubscribeMembers = MutableStateFlow(emptyList<UserModel>())
     val unsubscribeMembers = _unsubscribeMembers.asStateFlow()
     suspend fun changeObserversTab(tab: Int) {
         _observersSelectTab.emit(tab)
@@ -43,12 +43,12 @@ class ObserverBsViewModel: ViewModel() {
     
     suspend fun unsubscribeMembers() {
         unsubscribeMembers.value.forEach {
-            profileManager.unsubscribeFromUser(it.id)
+            profileManager.unsubscribeFromUser(it.id!!)
         }
         _unsubscribeMembers.emit(emptyList())
     }
     
-    suspend fun onSubScribe(member: MemberModel, type: SubscribeType) {
+    suspend fun onSubScribe(member: UserModel, type: SubscribeType) {
         when(type) {
             SUB, UNSUB -> {
                 val list = unsubscribeMembers.value

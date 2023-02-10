@@ -1,10 +1,10 @@
 package ru.rikmasters.gilty.meetings
 
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.models.MeetFiltersRequest
-import ru.rikmasters.gilty.shared.models.request.meets.Location
-import ru.rikmasters.gilty.shared.models.request.meets.Requirement
-import ru.rikmasters.gilty.shared.models.response.meets.MainMeetResponse
+import ru.rikmasters.gilty.shared.models.Location
+import ru.rikmasters.gilty.shared.models.Requirement
+import ru.rikmasters.gilty.shared.models.meets.MainMeetResponse
+import ru.rikmasters.gilty.shared.models.meets.MeetFiltersRequest
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
@@ -75,7 +75,9 @@ class MeetingManager(
     suspend fun getLastPlaces() = web.getLastPlaces()
     suspend fun getCategoriesList() = web.getCategoriesList()
     
-    suspend fun getMeetMembers(meetId: String) = web.getMeetMembers(meetId)
+    suspend fun getMeetMembers(
+        meetId: String, excludeMe: Boolean = false,
+    ) = web.getMeetMembers(meetId, excludeMe.compareTo(false))
     
     suspend fun notInteresting(meetId: String) {
         web.notInteresting(meetId)

@@ -3,9 +3,9 @@ package ru.rikmasters.gilty.shared.model.chat
 import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelTwo
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelTwo
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 enum class MessageType {
     MESSAGE, NOTIFICATION, WRITING
@@ -13,7 +13,7 @@ enum class MessageType {
 
 data class MessageModel(
     val id: String,
-    val sender: MemberModel,
+    val sender: UserModel,
     val album: String,
     val text: String,
     val attachments: AttachmentModel?,
@@ -27,7 +27,7 @@ data class MessageModel(
 
 fun getDemoMessageModel(
     id: String = "1",
-    sender: MemberModel = DemoMemberModel,
+    sender: UserModel = DemoUserModel,
     album: String = "Бэтмен",
     text: String = "Привет",
     attachments: AttachmentModel? = null,
@@ -46,7 +46,7 @@ fun getDemoMessageModel(
 
 val WritingMessageModel = MessageModel(
     id = "0",
-    sender = DemoMemberModelTwo,
+    sender = DemoUserModelTwo,
     album = "Бэтмен",
     text = "",
     attachments = null,
@@ -60,7 +60,7 @@ val WritingMessageModel = MessageModel(
 
 val DemoMessageModel = MessageModel(
     id = "1",
-    sender = DemoMemberModel,
+    sender = DemoUserModel,
     album = "Бэтмен",
     text = "Привет",
     attachments = null,
@@ -74,7 +74,7 @@ val DemoMessageModel = MessageModel(
 
 val DemoImageMessage = MessageModel(
     id = "1",
-    sender = DemoMemberModel,
+    sender = DemoUserModel,
     album = "Бэтмен",
     text = "",
     attachments = DemoAttachmentModelPhoto,
@@ -88,7 +88,7 @@ val DemoImageMessage = MessageModel(
 
 val DemoHiddenImageMessage = MessageModel(
     id = "1",
-    sender = DemoMemberModelTwo,
+    sender = DemoUserModelTwo,
     album = "Бэтмен",
     text = "",
     attachments = DemoAttachmentModelHiddenAccess,
@@ -102,7 +102,7 @@ val DemoHiddenImageMessage = MessageModel(
 
 val DemoMyHiddenImageMessage = MessageModel(
     id = "1",
-    sender = DemoMemberModel,
+    sender = DemoUserModel,
     album = "Бэтмен",
     text = "",
     attachments = DemoAttachmentModelHidden,
@@ -116,7 +116,7 @@ val DemoMyHiddenImageMessage = MessageModel(
 
 val DemoMessageModelLongMessage = MessageModel(
     id = "1",
-    sender = DemoMemberModelTwo,
+    sender = DemoUserModelTwo,
     album = "Бэтмен",
     text = "Как ты? Давно не виделись",
     attachments = null,
@@ -144,20 +144,20 @@ val DemoMessageModelJoinToChat = getDemoMessageModel(
     type = NOTIFICATION,
     notification = ChatNotificationType(
         SystemMessageType.MEMBER_JOIN,
-        DemoMemberModel
+        DemoUserModel
     )
 )
 val DemoMessageModelLeaveChat = getDemoMessageModel(
     type = NOTIFICATION,
     notification = ChatNotificationType(
         SystemMessageType.MEMBER_LEAVE,
-        DemoMemberModel
+        DemoUserModel
     )
 )
 val DemoMessageModelScreenshot = getDemoMessageModel(
     type = NOTIFICATION,
     notification = ChatNotificationType(
-        SystemMessageType.MEMBER_SCREENSHOT, DemoMemberModel
+        SystemMessageType.MEMBER_SCREENSHOT, DemoUserModel
     )
 )
 val DemoMessageModel5Minutes = getDemoMessageModel(

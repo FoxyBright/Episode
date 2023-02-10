@@ -28,7 +28,7 @@ class MeetingBsViewModel(
     private val _meet = MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
     
-    private val _memberList = MutableStateFlow(listOf<MemberModel>())
+    private val _memberList = MutableStateFlow(listOf<UserModel>())
     val memberList = _memberList.asStateFlow()
     
     private val _navigator = MutableStateFlow<Navigator?>(null)

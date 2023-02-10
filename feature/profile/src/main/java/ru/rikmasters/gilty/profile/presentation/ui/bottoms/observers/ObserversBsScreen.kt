@@ -11,7 +11,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 @Composable
 fun ObserversBs(
@@ -43,12 +43,12 @@ fun ObserversBs(
         object: ObserversListCallback {
             
             override fun onButtonClick(
-                member: MemberModel, type: SubscribeType,
+                member: UserModel, type: SubscribeType,
             ) {
                 scope.launch { vm.onSubScribe(member, type) }
             }
             
-            override fun onClick(member: MemberModel) {
+            override fun onClick(member: UserModel) {
             }
             
             override fun onTabChange(point: Int) {

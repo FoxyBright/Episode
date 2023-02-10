@@ -39,7 +39,7 @@ fun CategoriesListCard(
         ) {
             val emoji = meeting.category.emoji
             Image(
-                if(emoji.type == "D")
+                if(emoji.type != "URL")
                     painterResource(emoji.path.toInt())
                 else rememberAsyncImagePainter(emoji.path),
                 (null),

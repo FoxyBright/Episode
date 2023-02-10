@@ -46,7 +46,7 @@ private fun MeetingBsObserve() {
         ) {
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoMemberModelList,
+                    (false), meet, DemoUserModelList,
                     distanceCalculator(meet), (false)
                 ), Modifier.padding(16.dp)
             )
@@ -66,7 +66,7 @@ private fun MeetingBsShared() {
         ) {
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoMemberModelList,
+                    (false), meet, DemoUserModelList,
                     distanceCalculator(meet), (false)
                 ), Modifier.padding(16.dp)
             )
@@ -90,7 +90,7 @@ private fun MeetingBsWhenUser() {
             )
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoMemberModelList,
+                    (false), meet, DemoUserModelList,
                     distanceCalculator(meet), (true)
                 ), Modifier.padding(16.dp)
             )
@@ -101,7 +101,7 @@ private fun MeetingBsWhenUser() {
 data class MeetingBsState(
     val menuState: Boolean,
     val meet: FullMeetingModel,
-    val membersList: List<MemberModel>? = null,
+    val membersList: List<UserModel>? = null,
     val meetDistance: String? = null,
     val buttonState: Boolean = true,
     val detailed: Pair<String, Boolean>? = null,
@@ -113,7 +113,7 @@ interface MeetingBsCallback {
     fun onKebabClick(state: Boolean) {}
     fun onMenuItemClick(index: Int, meetId: String) {}
     fun onMeetPlaceClick(meetLocation: LocationModel?) {}
-    fun onMemberClick(member: MemberModel) {}
+    fun onMemberClick(member: UserModel) {}
     fun onRespond(meetId: String) {}
     fun onAvatarClick(organizerId: String) {}
     fun onAllMembersClick(meetId: String) {}

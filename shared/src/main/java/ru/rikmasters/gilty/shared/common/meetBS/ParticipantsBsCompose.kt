@@ -24,7 +24,7 @@ private fun ParticipantsListPreview() {
     GiltyTheme {
         ParticipantsList(
             DemoFullMeetingModel,
-            DemoMemberModelList
+            DemoUserModelList
         )
     }
 }
@@ -32,14 +32,14 @@ private fun ParticipantsListPreview() {
 interface ParticipantsListCallback {
     
     fun onBack() {}
-    fun onMemberClick(member: MemberModel) {}
+    fun onMemberClick(member: UserModel) {}
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ParticipantsList(
     meet: FullMeetingModel,
-    membersList: List<MemberModel>,
+    membersList: List<UserModel>,
     modifier: Modifier = Modifier,
     callback: ParticipantsListCallback? = null,
 ) {

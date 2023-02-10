@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.models.response.notification
+package ru.rikmasters.gilty.shared.models
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
@@ -7,9 +7,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
-import ru.rikmasters.gilty.shared.models.response.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.models.response.meets.OrganizerResponse
-import ru.rikmasters.gilty.shared.models.response.meets.Thumbnail
+import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
+import ru.rikmasters.gilty.shared.models.meets.Thumbnail
 
 data class NotificationResponse(
     val id: String,
@@ -35,7 +34,7 @@ data class NotificationResponse(
 
 data class FeedBack(
     val respond: RespondResponse? = null,
-    val ratings: List<RatingResponse>? = null,
+    val ratings: List<Rating>? = null,
 ) {
     
     fun map() = FeedBackModel(
@@ -49,14 +48,9 @@ data class FeedBack(
     )
 }
 
-data class RatingResponse(
-    val emojiType: String,
-    val value: Double,
-)
-
 data class RespondResponse(
     val id: String,
-    val author: OrganizerResponse,
+    val author: User,
     val comment: String,
     val albumId: String? = null,
     val photoAccess: Boolean,

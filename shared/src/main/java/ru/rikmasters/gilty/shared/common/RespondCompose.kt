@@ -106,7 +106,7 @@ fun ReceivedRespond(
                     items(hiddens) { photo ->
                         HiddenImage(
                             photo, Modifier.padding(6.dp), photo.hasAccess
-                        ) { callback?.onImageClick(respond.author.id) }
+                        ) { respond.author.id?.let { callback?.onImageClick(it) } }
                     }
                 }
                 Buttons(

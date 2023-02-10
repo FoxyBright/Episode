@@ -23,8 +23,8 @@ import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.Subscri
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModelList
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -36,7 +36,7 @@ fun ObserversListPreview() {
         ObserversListContent(
             ObserversListState(
                 DemoProfileModel.username ?: "",
-                DemoMemberModelList, DemoMemberModelList,
+                DemoUserModelList, DemoUserModelList,
                 emptyList(), (0)
             )
         )
@@ -45,17 +45,17 @@ fun ObserversListPreview() {
 
 data class ObserversListState(
     val user: String,
-    val observers: List<MemberModel>,
-    val observed: List<MemberModel>,
-    val unsubList: List<MemberModel>,
+    val observers: List<UserModel>,
+    val observed: List<UserModel>,
+    val unsubList: List<UserModel>,
     val selectTab: Int,
 )
 
 interface ObserversListCallback {
     
     fun onTabChange(point: Int) {}
-    fun onButtonClick(member: MemberModel, type: SubscribeType) {}
-    fun onClick(member: MemberModel) {}
+    fun onButtonClick(member: UserModel, type: SubscribeType) {}
+    fun onClick(member: UserModel) {}
 }
 
 @Composable
@@ -123,7 +123,7 @@ fun ObserversListContent(
 private fun ObserveItem(
     modifier: Modifier = Modifier,
     button: SubscribeType,
-    member: MemberModel,
+    member: UserModel,
     shape: Shape, onItemClick: (() -> Unit)? = null,
     onButtonClick: (() -> Unit)? = null,
 ) {
