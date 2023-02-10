@@ -51,19 +51,21 @@ data class Requirement(
 )
 
 data class Location(
-    
     val hide: Boolean? = null,
-    
     val lat: Int? = null,
-    
     val lng: Int? = null,
-    
+    val country: String? = null,
+    val subject: String? = null,
+    val city: String? = null,
     val place: String? = null,
-    
     val address: String? = null,
 ) {
     
     fun map() = LocationModel(
-        hide, lat, lng, place, address
+        hide, lat, lng,
+        country.toString(),
+        subject.toString(),
+        city.toString(),
+        place, address
     )
 }

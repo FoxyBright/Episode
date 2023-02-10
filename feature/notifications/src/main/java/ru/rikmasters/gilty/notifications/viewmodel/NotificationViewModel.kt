@@ -41,7 +41,7 @@ class NotificationViewModel: ViewModel() {
         _lastRespond.emit(
             Pair(
                 user.respondsCount ?: 0,
-                user.respondsImage?.id ?: ""
+                user.respondsImage?.url ?: ""
             )
         )
     }

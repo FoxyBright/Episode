@@ -5,10 +5,10 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.push.model.NotificationResponse
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
+import ru.rikmasters.gilty.shared.models.response.notification.NotificationResponse
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class NotificationWebSource: KtorSource() {

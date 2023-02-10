@@ -5,6 +5,7 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType.MY
 import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
@@ -58,6 +59,21 @@ class ProfileManager(
             username, aboutMe, age,
             gender, orientation?.id
         )
+    }
+    
+    suspend fun getResponds(type: RespondType) =
+        web.getResponds(type)
+    
+    suspend fun deleteRespond(respondId: String) {
+        web.deleteRespond(respondId)
+    }
+    
+    suspend fun acceptRespond(respondId: String) {
+        web.acceptRespond(respondId)
+    }
+    
+    suspend fun cancelRespond(respondId: String) {
+        web.cancelRespond(respondId)
     }
     
     suspend fun deleteAccount() {

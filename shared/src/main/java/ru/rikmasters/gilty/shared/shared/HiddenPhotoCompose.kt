@@ -51,7 +51,7 @@ fun HiddenImage(
     image: AvatarModel,
     modifier: Modifier = Modifier,
     hidden: Boolean = true,
-    onClick: ((AvatarModel) -> Unit)? = null
+    onClick: ((AvatarModel) -> Unit)? = null,
 ) {
     Box(
         modifier
@@ -61,19 +61,19 @@ fun HiddenImage(
                 MutableInteractionSource(), (null)
             ) { onClick?.let { it(image) } }
     ) {
-        if(hidden) Box(
+        if(!hidden) Box(
             Modifier
                 .background(linearGradient(red()))
                 .fillMaxSize()
         ) else AsyncImage(
-            image.url, (null),
+            image.thumbnail.url, (null),
             Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,
         )
         CheckBox(
-            !hidden, Modifier
+            hidden, Modifier
                 .size(24.dp)
                 .align(Center),
             listOf(ic_lock_open, ic_lock_close), White

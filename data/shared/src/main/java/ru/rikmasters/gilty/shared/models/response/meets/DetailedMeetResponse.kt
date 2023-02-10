@@ -16,7 +16,7 @@ import ru.rikmasters.gilty.shared.models.request.meets.Location
 data class DetailedMeetResponse(
     val id: String,
     val userId: String,
-    val organizer: Organizer,
+    val organizer: OrganizerResponse,
     val category: Category,
     val type: String,
     val condition: String,
@@ -96,7 +96,7 @@ data class Orientation(
     fun map() = OrientationModel(id, name)
 }
 
-data class Organizer(
+data class OrganizerResponse(
     val id: String? = null,
     val gender: String,
     val username: String,

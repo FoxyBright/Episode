@@ -12,9 +12,8 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.RespondsListCallback
 import ru.rikmasters.gilty.shared.common.RespondsListContent
 import ru.rikmasters.gilty.shared.common.RespondsListState
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -30,18 +29,9 @@ private fun RespondsPreview() {
             RespondsBsContent(
                 NotificationRespondsState(
                     listOf(
-                        Pair(
-                            DemoMeetingModel,
-                            listOf(
-                                DemoReceivedRespondsModel,
-                                DemoReceivedShortRespondModelWithoutPhoto
-                            )
-                        ),
-                        Pair(
-                            DemoMeetingModel,
-                            listOf(DemoSendRespondsModel)
-                        )
-                    ), listOf(0)
+                        DemoMeetWithRespondsModel,
+                        DemoMeetWithRespondsModel
+                    ), listOf(1)
                 )
             )
         }
@@ -49,7 +39,7 @@ private fun RespondsPreview() {
 }
 
 data class NotificationRespondsState(
-    val responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
+    val responds: List<MeetWithRespondsModel>,
     val respondsStates: List<Int>,
 )
 

@@ -17,10 +17,9 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -32,18 +31,9 @@ private fun ReceivedResponds() {
         RespondsListContent(
             RespondsListState(
                 listOf(
-                    Pair(
-                        DemoMeetingModel,
-                        listOf(
-                            DemoReceivedRespondsModel,
-                            DemoReceivedShortRespondModelWithoutPhoto
-                        )
-                    ),
-                    Pair(
-                        DemoMeetingModel,
-                        listOf(DemoSendRespondsModel)
-                    )
-                ), listOf(0, 1)
+                    DemoMeetWithRespondsModel,
+                    DemoMeetWithRespondsModel
+                ), listOf(1)
             ), Modifier
                 .background(colorScheme.background)
                 .padding(16.dp)
@@ -52,19 +42,18 @@ private fun ReceivedResponds() {
 }
 
 data class RespondsListState(
-    val responds: List<Pair<MeetingModel, List<ShortRespondModel>>>,
+    val responds: List<MeetWithRespondsModel>,
     val groupStates: List<Int>,
 )
 
 interface RespondsListCallback {
     
+    fun onAcceptClick(respondId: String)
+    fun onCancelClick(respondId: String)
+    fun onImageClick(authorId: String)
+    fun onArrowClick(index: Int)
     fun onTabChange(tab: Int) {}
     fun onBack() {}
-    fun onCancelClick(respond: ShortRespondModel) {}
-    fun onRespondClick(meet: MeetingModel) {}
-    fun onAcceptClick(respond: ShortRespondModel) {}
-    fun onImageClick(image: AvatarModel) {}
-    fun onArrowClick(index: Int) {}
 }
 
 @Composable
@@ -74,10 +63,12 @@ fun RespondsListContent(
     callback: RespondsListCallback? = null,
 ) {
     LazyColumn(modifier) {
-        itemsIndexed(state.responds) { i, it ->
+        itemsIndexed(state.responds) { index, respond ->
             GroupList(
-                i, it.first, it.second, Modifier,
-                state.groupStates.contains(i), callback
+                index, respond.tags.first().title,
+                respond.responds, Modifier,
+                !(state.groupStates.contains(index)),
+                callback
             )
         }
     }
@@ -86,8 +77,8 @@ fun RespondsListContent(
 @Composable
 private fun GroupList(
     index: Int,
-    meet: MeetingModel,
-    responds: List<ShortRespondModel>,
+    title: String,
+    responds: List<RespondModel>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
     callback: RespondsListCallback?,
@@ -95,7 +86,7 @@ private fun GroupList(
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             RowActionBar(
-                meet.title, Modifier.clickable(
+                title, Modifier.clickable(
                     MutableInteractionSource(), (null)
                 ) {
                     callback?.onArrowClick(index)
@@ -112,7 +103,7 @@ private fun GroupList(
         }
         if(state) Column {
             responds.forEach {
-                Respond(
+                ReceivedRespond(
                     it, Modifier.padding(bottom = 6.dp),
                     callback
                 )

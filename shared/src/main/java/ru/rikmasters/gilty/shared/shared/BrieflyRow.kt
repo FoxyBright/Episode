@@ -47,7 +47,7 @@ fun BrieflyRow(
     Row(modifier, Start, CenterVertically) {
         avatar?.let {
             AsyncImage(
-                it.url, (null), Modifier
+                it.thumbnail.url, (null), Modifier
                     .padding(end = 12.dp)
                     .size(38.dp)
                     .clip(CircleShape),

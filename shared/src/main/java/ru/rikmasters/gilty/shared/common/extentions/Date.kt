@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import ru.rikmasters.gilty.data.ktor.Ktor.logD
-
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -60,8 +58,7 @@ fun todayControl(date: String) =
 
 
 fun getDifferenceOfTime(date: String): String {
-    logD("DATE _>>>>>>>>>>>>>>>>>>>>>>>>    $date")
-    val difference = (LocalDateTime.now().millis() -
+    val difference = (LocalDateTime.now().plusMinute(1).millis() -
             LocalDateTime.of(date).millis()) / 1000
     return when {
         difference < 60 -> "$difference cек"

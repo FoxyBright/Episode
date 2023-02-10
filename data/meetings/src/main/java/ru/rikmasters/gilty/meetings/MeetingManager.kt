@@ -119,7 +119,11 @@ class MeetingManager(
         chatForbidden, tags, description,
         dateTime, duration,
         if(isOnline != true)
-            Location(hide, lat, lng, place, address)
+            Location(
+                hide, lat, lng, ("RU"),
+                ("Kaluga"), ("Kaluga"),
+                place, address
+            )
         else null, isPrivate, memberCount, requirementsType,
         when {
             isPrivate == true -> null

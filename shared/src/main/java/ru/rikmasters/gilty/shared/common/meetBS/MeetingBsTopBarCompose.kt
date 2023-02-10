@@ -38,8 +38,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.ShortRespondModel
+import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -56,7 +56,7 @@ private fun MeetingBsTopBarPreview() {
                         type = ANONYMOUS,
                         isPrivate = true
                     ), (false), respondsCount = 3,
-                    lastRespond = DemoSendRespondsModel,
+                    lastRespond = DemoMeetWithRespondsModel,
                     responds = true
                 )
             )
@@ -85,7 +85,7 @@ data class MeetingBsTopBarState(
     val menuState: Boolean = false,
     val responds: Boolean = false,
     val respondsCount: Int? = null,
-    val lastRespond: ShortRespondModel? = null,
+    val lastRespond: MeetWithRespondsModel? = null,
     val description: Boolean = false,
     val backButton: Boolean = false,
 )
@@ -129,7 +129,7 @@ fun MeetingBsTopBarCompose(
         if(state.responds) Responds(
             stringResource(R.string.profile_responds_label),
             state.respondsCount,
-            state.lastRespond?.sender?.avatar?.url,
+            state.lastRespond?.organizer?.avatar?.url,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick() }
         Row(Modifier.height(IntrinsicSize.Max)) {

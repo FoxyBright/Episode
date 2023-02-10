@@ -17,13 +17,16 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.request.profile.ProfileRequest
 import ru.rikmasters.gilty.shared.models.response.meets.Avatar
 import ru.rikmasters.gilty.shared.models.response.meets.MeetingResponse
+import ru.rikmasters.gilty.shared.models.response.notification.MeetWithRespondsResponse
 import ru.rikmasters.gilty.shared.models.response.profile.MemberResponse
 import ru.rikmasters.gilty.shared.models.response.profile.ProfileResponse
 import ru.rikmasters.gilty.shared.wrapper.Status
@@ -248,6 +251,38 @@ class ProfileWebSource: KtorSource() {
         updateClientToken()
         client.delete(
             "http://$HOST$PREFIX_URL/profile/account"
+        )
+    }
+    
+    suspend fun getResponds(
+        type: RespondType,
+    ): List<MeetWithRespondsModel> {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/responds"
+        ) {
+            url { query("type" to type.name) }
+        }.wrapped<List<MeetWithRespondsResponse>>().map { it.map() }
+    }
+    
+    suspend fun deleteRespond(respondId: String) {
+        updateClientToken()
+        client.delete(
+            "http://$HOST$PREFIX_URL/responds/$respondId"
+        )
+    }
+    
+    suspend fun acceptRespond(respondId: String) {
+        updateClientToken()
+        client.post(
+            "http://$HOST$PREFIX_URL/responds/$respondId/accept"
+        )
+    }
+    
+    suspend fun cancelRespond(respondId: String) {
+        updateClientToken()
+        client.patch(
+            "http://$HOST$PREFIX_URL/responds/$respondId/cancel"
         )
     }
 }

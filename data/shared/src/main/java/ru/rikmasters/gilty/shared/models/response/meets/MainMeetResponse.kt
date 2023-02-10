@@ -18,7 +18,7 @@ data class MainMeetResponse(
     val category: Category,
     val datetime: String,
     val duration: Int,
-    val organizer: Organizer,
+    val organizer: OrganizerResponse,
     val isOnline: Boolean,
     val memberState: String,
 ) {

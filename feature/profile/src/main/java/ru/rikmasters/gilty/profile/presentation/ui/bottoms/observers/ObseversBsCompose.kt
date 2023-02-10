@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -151,9 +150,9 @@ private fun ObserveItem(
                         UNSUB -> R.string.profile_user_observe
                         DELETE -> R.string.meeting_filter_delete_tag_label
                     }
-                ), if(button == SUB) colorScheme.primary
+                ),
+                color = if(button == SUB) colorScheme.primary
                 else colorScheme.outlineVariant,
-                Color.White, Modifier
             ) { onButtonClick?.let { it() } }
         }
     }

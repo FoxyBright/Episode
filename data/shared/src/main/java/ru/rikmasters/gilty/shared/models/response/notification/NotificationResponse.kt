@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.push.model
+package ru.rikmasters.gilty.shared.models.response.notification
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
@@ -8,7 +8,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 import ru.rikmasters.gilty.shared.models.response.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.models.response.meets.Organizer
+import ru.rikmasters.gilty.shared.models.response.meets.OrganizerResponse
 import ru.rikmasters.gilty.shared.models.response.meets.Thumbnail
 
 data class NotificationResponse(
@@ -56,7 +56,7 @@ data class RatingResponse(
 
 data class RespondResponse(
     val id: String,
-    val author: Organizer,
+    val author: OrganizerResponse,
     val comment: String,
     val albumId: String? = null,
     val photoAccess: Boolean,
