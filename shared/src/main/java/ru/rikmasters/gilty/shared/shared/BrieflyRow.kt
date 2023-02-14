@@ -32,7 +32,7 @@ private fun BrieflyRowPreview() {
         BrieflyRow(
             (user.username ?: ""),
             Modifier.background(colorScheme.background),
-            user.avatar, user.rating.emoji
+            user.thumbnail.map(), user.rating.emoji
         )
     }
 }

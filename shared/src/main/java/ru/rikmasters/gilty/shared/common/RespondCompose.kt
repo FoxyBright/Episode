@@ -54,7 +54,7 @@ fun SentRespond(
                 respond.tags.joinToString(separator = ", ")
                 { it.title }, Modifier.padding(
                     start = 16.dp, top = 12.dp
-                ), respond.organizer.avatar
+                ), respond.organizer.thumbnail?.map()
             )
             Column(Modifier.padding(start = 66.dp)) {
                 Divider(Modifier)
@@ -85,7 +85,7 @@ fun ReceivedRespond(
                 "${user.username}, ${user.age}",
                 Modifier.padding(
                     start = 16.dp, top = 12.dp
-                ), user.avatar, user.emoji
+                ), user.thumbnail?.map(), user.emoji
             )
             Column(Modifier.padding(start = 66.dp)) {
                 Divider(Modifier)
