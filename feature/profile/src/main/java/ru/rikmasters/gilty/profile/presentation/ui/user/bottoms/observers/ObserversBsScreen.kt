@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers
+package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*

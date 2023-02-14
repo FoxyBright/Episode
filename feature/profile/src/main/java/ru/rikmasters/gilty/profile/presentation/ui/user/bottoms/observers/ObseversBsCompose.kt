@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers
+package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

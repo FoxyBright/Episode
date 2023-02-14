@@ -6,9 +6,9 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 
 class AgeBsViewModel(
     
-    private val personalVm: PersonalViewModel
+    private val personalVm: PersonalViewModel,
     
-): ViewModel() {
+    ): ViewModel() {
     
     private val _age = MutableStateFlow(18)
     val age = _age.asStateFlow()
@@ -18,6 +18,9 @@ class AgeBsViewModel(
     }
     
     suspend fun save() {
-        personalVm.setAge(age.value)
+        personalVm.setAge(
+            if(age.value == 17) -1
+            else age.value
+        )
     }
 }

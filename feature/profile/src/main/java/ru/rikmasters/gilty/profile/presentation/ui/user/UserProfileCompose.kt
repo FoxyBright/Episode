@@ -71,10 +71,10 @@ interface UserProfileCallback: ProfileCallback {
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
-private fun UserProfilePreview() {
+private fun ProfilePreview() {
     GiltyTheme {
         val meets = DemoMeetingList
-        UserProfile(
+        ProfileContent(
             UserProfileState(
                 ProfileState(
                     DemoProfileModel,
@@ -95,7 +95,7 @@ private fun UserProfilePreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(
+fun ProfileContent(
     state: UserProfileState,
     modifier: Modifier = Modifier,
     callback: UserProfileCallback? = null,

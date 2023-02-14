@@ -21,6 +21,6 @@ fun BsContainer(
                     content.invoke()
                 }
             }
-        }, modifier.padding(16.dp, 28.dp)
+        }, modifier.padding(top = 28.dp)
     )
 }

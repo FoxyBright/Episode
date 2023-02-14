@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.bottoms.responds
+package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds
 
 //
 //@Preview

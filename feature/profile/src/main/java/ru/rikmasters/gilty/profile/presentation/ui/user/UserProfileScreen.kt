@@ -10,10 +10,10 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.MeetingBs
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.observers.ObserversBs
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting.MeetingBs
+import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers.ObserversBs
+import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
 import ru.rikmasters.gilty.shared.common.ProfileState
@@ -59,7 +59,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         listState, errorState
     )
     
-    UserProfile(state, Modifier,
+    ProfileContent(state, Modifier,
         object: UserProfileCallback {
             
             override fun menu(state: Boolean) {

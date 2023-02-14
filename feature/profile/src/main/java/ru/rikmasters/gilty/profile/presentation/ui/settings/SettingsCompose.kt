@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.image_categories_settings
-import ru.rikmasters.gilty.shared.R.string.edit_button
 import ru.rikmasters.gilty.shared.R.string.settings_interest_label
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
@@ -137,28 +136,12 @@ private fun Categories(
                 (null), Modifier, colorScheme.tertiary
             )
         }
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
-            SpaceBetween, CenterVertically
-        ) {
-            Text(
-                stringResource(settings_interest_label),
-                Modifier, colorScheme.tertiary,
-                style = typography.labelLarge
-            )
-            Text(
-                stringResource(edit_button),
-                Modifier.clickable(
-                    MutableInteractionSource(),
-                    (null)
-                ) { callback?.editCategories() },
-                colorScheme.primary,
-                style = typography.bodyMedium
-            )
-        }
+        Text(
+            stringResource(settings_interest_label),
+            Modifier.padding(start = 16.dp, bottom = 16.dp),
+            colorScheme.tertiary,
+            style = typography.labelLarge
+        )
         Image(
             painterResource(image_categories_settings),
             (null), Modifier
@@ -292,14 +275,17 @@ private fun Card(
     }
 }
 
+@Composable
 private fun ageHolder(age: String): String {
     if(age.isBlank()) return ""
-    val holder = when(age.last()) {
-        '1' -> "год"
-        '2', '3', '4' -> "года"
-        else -> "лет"
-    }
-    return "$age $holder"
+    if(age == "-1") return stringResource(R.string.condition_no_matter)
+    return "$age ${
+        when(age.last()) {
+            '1' -> "год"
+            '2', '3', '4' -> "года"
+            else -> "лет"
+        }
+    }"
 }
 
 @Composable

@@ -8,9 +8,9 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.OrganizerProfile
-import ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting.OrganizerProfileState
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
+import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting.OrganizerProfile
+import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting.OrganizerProfileState
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS

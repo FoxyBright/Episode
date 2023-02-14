@@ -1,9 +1,9 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.age
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.TopCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -29,21 +29,26 @@ fun AgeBsContent(
     modifier: Modifier = Modifier,
     callback: AgeBsCallback? = null,
 ) {
+    val noMatter = stringResource(R.string.condition_no_matter)
     BsContainer(
         stringResource(R.string.personal_info_age_placeholder),
-        modifier.fillMaxHeight(0.6f)
+        modifier.fillMaxHeight(0.5f)
     ) {
-        Box(Modifier.fillMaxSize(), TopCenter) {
+        Column(
+            Modifier.fillMaxSize(),
+            SpaceBetween, CenterHorizontally
+        ) {
+            Spacer(modifier.width(1.dp))
             NumberPicker(
-                Modifier.padding(top = 40.dp),
-                value = state.age, onValueChange = {
+                Modifier, {
+                    if(it == 17) noMatter
+                    else it.toString()
+                }, state.age, {
                     callback?.onAgeChange(it)
                 }, range = state.range
             )
             GradientButton(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 40.dp),
+                Modifier.padding(bottom = 40.dp),
                 stringResource(R.string.save_button)
             ) { callback?.onSave() }
         }

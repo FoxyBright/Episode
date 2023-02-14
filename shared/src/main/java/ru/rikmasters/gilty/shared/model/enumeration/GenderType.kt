@@ -5,7 +5,7 @@ enum class GenderType(val value: String) {
     FEMALE("Женский"),
     MALE("Мужской"),
     OTHER("Другое"),
-    NOT_IMPORTANT("Не важно");
+    NOT_IMPORTANT("Неважно");
     
     companion object {
         

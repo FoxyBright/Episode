@@ -10,7 +10,7 @@ class AgeBsViewModel(
     private val settingVm: SettingsViewModel = SettingsViewModel(),
 ): ViewModel() {
     
-    val ageRange = 18..99
+    val ageRange = 17..99
     
     private val _age = MutableStateFlow(settingVm.age.value.toInt())
     val age = _age.asStateFlow()
@@ -20,6 +20,9 @@ class AgeBsViewModel(
     }
     
     suspend fun onSave() = single {
-        settingVm.changeAge(age.value)
+        settingVm.changeAge(
+            if(age.value == 17) -1
+            else age.value
+        )
     }
 }

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.bottoms.meeting
+package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*

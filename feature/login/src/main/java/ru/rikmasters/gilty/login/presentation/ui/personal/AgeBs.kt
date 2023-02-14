@@ -13,7 +13,7 @@ fun AgeBs(vm: AgeBsViewModel) {
     val scope = rememberCoroutineScope()
     
     val age by vm.age.collectAsState()
-    val range = 18..99
+    val range = 17..99
     
     AgeBottomSheetContent(age, range, {
         scope.launch { vm.changeAge(it) }
