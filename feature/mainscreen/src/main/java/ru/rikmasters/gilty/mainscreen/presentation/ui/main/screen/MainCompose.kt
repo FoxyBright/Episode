@@ -105,8 +105,9 @@ fun MainContent(
             }
         },
         floatingActionButton = {
-            SquareCheckBox(!state.grid, Modifier)
-            { callback?.onStyleChange() }
+            // TODO ФУНКЦИОНАЛЬНОСТЬ ВРЕМЕННО СНЯТА
+            //            SquareCheckBox(!state.grid, Modifier)
+            //            { callback?.onStyleChange() }
         },
         content = { padding ->
             Column {

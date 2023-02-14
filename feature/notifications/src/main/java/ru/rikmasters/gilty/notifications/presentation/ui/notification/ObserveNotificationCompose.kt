@@ -125,7 +125,8 @@ private fun Participant(
             ) {
                 BrieflyRow(
                     ("${member.username}, ${member.age}"),
-                    Modifier, member.avatar, member.emoji,
+                    Modifier, member.thumbnail?.map(),
+                    member.emoji,
                 )
                 memberEmoji?.let {
                     GEmojiImage(
