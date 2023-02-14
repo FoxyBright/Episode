@@ -5,7 +5,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.core.text.isDigitsOnly
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.transform.numberMask
@@ -34,11 +34,12 @@ fun PriceTextField(
         ) else null, placeholder = textFieldLabel(
             false, stringResource(R.string.add_meet_conditions_price_description)
         ), singleLine = true,
+        isError = value.length > 7,
+        errorBottomText = "До 1 000 000 ₽",
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.NumberPassword
+            keyboardType = NumberPassword
         ), visualTransformation =
         transformationOf(numberMask(value.length), if(value.isNotBlank()) " ₽" else "")
-    
     )
 }
 

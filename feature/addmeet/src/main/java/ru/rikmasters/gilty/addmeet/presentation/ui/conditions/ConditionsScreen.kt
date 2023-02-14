@@ -23,10 +23,11 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     
     val isActive = condition.isNotEmpty()
             && meetType.isNotEmpty()
-            && if(condition.contains(3))
+            && if(condition.contains(3)) {
         price.isNotBlank()
-    else true
-   
+        price.length <= 7
+    } else true
+    
     ConditionContent(ConditionState(
         online, hidden, meetType, condition,
         price, alert, restrictChat, isActive

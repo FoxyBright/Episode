@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.data.ktor
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
@@ -13,22 +13,23 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
+import okhttp3.OkHttpClient
 import ru.rikmasters.gilty.core.data.source.WebSource
 import java.io.IOException
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.MINUTES
 
 open class KtorSource: WebSource() {
     
+    private val webSocketPingInterval = 20_000L
+    
     private val baseClient by lazy {
         HttpClient(OkHttp) {
-            engine {
-                config {
-                    writeTimeout(5, TimeUnit.MINUTES)
-                }
-            }
+            engine { config { writeTimeout(5, MINUTES) } }
             install(Logging) {
                 level = LogLevel.BODY
                 logger = LogAdapter
@@ -40,9 +41,9 @@ open class KtorSource: WebSource() {
             }
             install(ContentNegotiation) {
                 jackson {
-                    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
-                    setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                    configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    propertyNamingStrategy = SnakeCaseStrategy()
+                    setSerializationInclusion(NON_NULL)
                 }
             }
             defaultRequest {
@@ -52,22 +53,30 @@ open class KtorSource: WebSource() {
             install(UserAgent) {
                 agent = env[ENV_USER_AGENT] ?: ""
             }
+            install(WebSockets) {
+                pingInterval = webSocketPingInterval
+            }
+            engine {
+                preconfigured = OkHttpClient.Builder()
+                    .pingInterval(
+                        webSocketPingInterval,
+                        MILLISECONDS
+                    ).build()
+            }
         }
     }
     
     val unauthorizedClient by lazy {
-        baseClient.config {
-        
-        }
+        baseClient.config {}
     }
     
-    var client = getTokens()
+    var client = getClientWithTokens()
     
     fun updateClientToken() {
-        client = getTokens()
+        client = getClientWithTokens()
     }
     
-    private fun getTokens(): HttpClient {
+    private fun getClientWithTokens(): HttpClient {
         return baseClient.config {
             install(Auth) {
                 bearer {
