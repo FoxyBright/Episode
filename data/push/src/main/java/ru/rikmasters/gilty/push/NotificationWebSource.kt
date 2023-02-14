@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.push.notification
+package ru.rikmasters.gilty.push
 
 import io.ktor.client.request.*
 import ru.rikmasters.gilty.data.ktor.KtorSource

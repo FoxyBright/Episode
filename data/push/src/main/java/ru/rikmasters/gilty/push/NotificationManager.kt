@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.push.notification
+package ru.rikmasters.gilty.push
 
 import ru.rikmasters.gilty.shared.image.EmojiModel
 

@@ -6,7 +6,7 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.push.notification.NotificationManager
+import ru.rikmasters.gilty.push.NotificationManager
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.common.extentions.weekControl
 import ru.rikmasters.gilty.shared.image.EmojiModel
