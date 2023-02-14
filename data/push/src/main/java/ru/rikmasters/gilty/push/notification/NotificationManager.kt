@@ -29,6 +29,6 @@ class NotificationManager(
         web.markNotifiesAsRead(notifyIds, readAll)
     }
     
-    suspend fun getNotification() =
-        web.getNotifications()
+    suspend fun getNotification(page: Int) =
+        web.getNotifications(page)
 }

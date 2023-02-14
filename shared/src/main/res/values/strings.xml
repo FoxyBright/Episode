@@ -341,5 +341,10 @@
     <string name="text_text">Съешь ещё этих мягких французских булок, да выпей же чаю</string>
     <string name="empty_String" />
 
+    <!-- Notifications Channels -->
+    <string name="meets_push_channel_name">Уведомления от встреч</string>
+    <string name="meets_push_channel_descriptions">Создаваемые встречи и обновление их статусов у пользователя и наблюдаемых</string>
+    <string name="chats_push_channel_name">Уведомления от чатов</string>
+    <string name="chats_push_channel_descriptions">Входящие сообщения и трансляции</string>
 
 </resources>

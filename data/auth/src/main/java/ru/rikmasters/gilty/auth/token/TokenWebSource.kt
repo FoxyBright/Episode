@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.auth.token
 
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -18,15 +19,33 @@ class TokenWebSource: KtorSource() {
         External("external")
     }
     
+    suspend fun savePushToken(
+        token: String, type: PushType,
+    ) {
+        updateClientToken()
+        client.post("http://$HOST$PREFIX_URL/utils/device") {
+            setBody(SavePushTokenRequest(("ANDROID"), type.name, token))
+        }
+    }
+    
+    suspend fun deletePushToken(
+        token: String, type: PushType,
+    ) {
+        updateClientToken()
+        client.delete("http://$HOST$PREFIX_URL/utils/device") {
+            url { query("device_id" to token, "type" to type.name) }
+        }
+    }
+    
     suspend fun logout(): HttpResponse {
         updateClientToken()
         return client.post(
             "http://$HOST/auth/logout"
-        ) {}
+        )
     }
     
     suspend fun linkExternal(
-        token: String
+        token: String,
     ): HttpResponse {
         updateClientToken()
         return client.post(

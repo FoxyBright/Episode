@@ -19,9 +19,18 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer",
-) and accompanist() and accompanistPermissions()
+) and accompanist(
+) and accompanistPermissions(
+) and firebase()
 
 const val accompanistVer = "0.26.5-rc"
+
+fun DependencyHandlerScope.firebase() = implementation(
+    "com.google.firebase:firebase-bom:31.2.0",
+    "com.google.firebase:firebase-messaging:23.1.1",
+    "com.google.firebase:firebase-analytics:21.2.0",
+)
+
 fun DependencyHandlerScope.accompanist() = implementation(
     "com.google.accompanist:accompanist-systemuicontroller:$accompanistVer"
 )

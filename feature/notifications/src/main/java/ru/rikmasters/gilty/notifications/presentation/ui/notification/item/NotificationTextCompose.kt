@@ -1,9 +1,7 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -24,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.CustomText.*
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
-import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
+import ru.rikmasters.gilty.shared.image.DemoEmojiModel
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
@@ -36,20 +34,30 @@ import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Preview
 @Composable
-private fun MEETING_OVER() {
-    GiltyTheme {
-        Box(
-            Modifier.background(
-                colorScheme.background
-            )
-        ) {
+private fun PreviewHelper(
+    type: NotificationType,
+    adminText: String? = null,
+    emoji: List<EmojiModel> = emptyList(),
+    isOrganizer: Boolean = false,
+    isOnline: Boolean = false,
+) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(colorScheme.background)
+    ) {
+        Column {
+            Text(type.name, Modifier.padding(6.dp))
             NotificationText(
-                DemoUserModel, MEETING_OVER,
-                DemoMeetingModel,
-                getDifferenceOfTime(NOW_DATE),
-                Modifier.padding(20.dp)
+                DemoUserModel, type,
+                DemoMeetingModel.copy(
+                    memberState = if(isOrganizer)
+                        IS_ORGANIZER else IS_MEMBER,
+                    isOnline = isOnline
+                ), ("11 мин"),
+                Modifier.padding(16.dp, 4.dp),
+                adminText, emoji
             )
         }
     }
@@ -57,18 +65,66 @@ private fun MEETING_OVER() {
 
 @Preview
 @Composable
-private fun RESPOND_ACCEPT() {
+private fun TextNotificationPreview() {
     GiltyTheme {
-        Box(
-            Modifier.background(
-                colorScheme.background
+        Column {
+            PreviewHelper(WATCH_MEETING_CREATED)
+            PreviewHelper(TRANSLATION_STARTED, isOnline = true)
+            PreviewHelper(TRANSLATION_15MIN, isOnline = true)
+            PreviewHelper(MEETING_CANCELED)
+            PreviewHelper(MEETING_KICKED)
+            PreviewHelper(RESPOND)
+            PreviewHelper(WATCH)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun InfoNotificationPreview() {
+    GiltyTheme {
+        Column {
+            PreviewHelper(
+                ADMIN_NOTIFICATION,
+                ("Внимание! Ведутся технические " +
+                        "работы, возможны сбои в приложении")
             )
-        ) {
-            NotificationText(
-                DemoUserModel, RESPOND_ACCEPTED,
-                DemoMeetingModel,
-                getDifferenceOfTime(NOW_DATE),
-                Modifier.padding(20.dp)
+            PreviewHelper(
+                PHOTO_BLOCKED,
+                stringResource(R.string.notification_meet_PHOTO_BLOCKED)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MEETING_OVER() {
+    GiltyTheme {
+        Column {
+            PreviewHelper(
+                MEETING_OVER,
+                isOrganizer = true,
+                isOnline = true,
+                emoji = emptyList()
+            )
+            PreviewHelper(
+                MEETING_OVER,
+                isOrganizer = true,
+                isOnline = true,
+                emoji = listOf(DemoEmojiModel)
+            )
+            PreviewHelper(
+                MEETING_OVER,
+                isOrganizer = false,
+                isOnline = false,
+                emoji = emptyList()
+            )
+            PreviewHelper(
+                MEETING_OVER,
+                isOrganizer = false,
+                isOnline = false,
+                emoji = listOf(DemoEmojiModel)
             )
         }
     }
@@ -240,18 +296,16 @@ private enum class CustomText { USER, TEXT, MEET, TIME, BOLD }
 private fun text(
     text: CustomText,
     online: Boolean? = false,
-): SpanStyle {
-    val font: TextStyle = when(text) {
-        USER -> font(weight = Bold, textStyle = typography.bodyMedium)
-        BOLD -> font(weight = SemiBold)
-        TEXT -> font()
-        TIME -> font(colorScheme.onTertiary)
-        MEET -> font(
-            if(online == true) colorScheme.secondary
-            else colorScheme.primary, weight = SemiBold
-        )
-    }; return font.toSpanStyle()
-}
+) = when(text) {
+    USER -> font(weight = Bold, textStyle = typography.bodyMedium)
+    BOLD -> font(weight = SemiBold)
+    TEXT -> font()
+    TIME -> font(colorScheme.onTertiary)
+    MEET -> font(
+        if(online == true) colorScheme.secondary
+        else colorScheme.primary, weight = SemiBold
+    )
+}.toSpanStyle()
 
 private fun getGenderEnding(
     genderType: GenderType?,
@@ -264,12 +318,9 @@ private fun getGenderEnding(
     else -> ""
 }
 
-
 @Composable
 private fun font(
     color: Color = colorScheme.tertiary,
     weight: FontWeight = Medium,
     textStyle: TextStyle = typography.labelSmall,
-): TextStyle {
-    return textStyle.copy(color, fontWeight = weight)
-}
+) = textStyle.copy(color, fontWeight = weight)

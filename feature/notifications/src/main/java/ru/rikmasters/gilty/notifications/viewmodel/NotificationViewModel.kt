@@ -40,8 +40,14 @@ class NotificationViewModel: ViewModel() {
     private val _blur = MutableStateFlow(false)
     val blur = _blur.asStateFlow()
     
+    
+    private var page = 0
+    
     suspend fun getNotification() = singleLoading {
-        _notifications.emit(notificationManger.getNotification())
+        val list =
+            notificationManger.getNotification(page)
+        _notifications.emit(notifications.value + list)
+        page++
     }
     
     suspend fun getLastResponse() = singleLoading {

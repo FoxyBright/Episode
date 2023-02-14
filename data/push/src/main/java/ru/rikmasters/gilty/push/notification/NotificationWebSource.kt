@@ -24,10 +24,13 @@ class NotificationWebSource: KtorSource() {
     )
     
     suspend fun putRatings(meetId: String, userId: String, emoji: String) {
+        
+        data class Ratings(val ratings: List<PutRating>)
+        
         updateClientToken()
         client.put(
             "http://$HOST$PREFIX_URL/meetings/$meetId/ratings"
-        ) { setBody(listOf(PutRating(userId, emoji))) }
+        ) { setBody(Ratings(listOf(PutRating(userId, emoji)))) }
     }
     
     suspend fun deleteNotifications(
@@ -60,14 +63,16 @@ class NotificationWebSource: KtorSource() {
     suspend fun getRatings(): List<RatingModel> {
         updateClientToken()
         return client.get(
-            "http://$HOST$PREFIX_URL/profile/notifications"
+            "http://$HOST$PREFIX_URL/ratings"
         ).wrapped<List<Rating>>().map { it.map() }
     }
     
-    suspend fun getNotifications(): List<NotificationModel> {
+    suspend fun getNotifications(page: Int): List<NotificationModel> {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile/notifications"
-        ).wrapped<List<NotificationResponse>>().map { it.map() }
+        ) { url { query("page" to "$page") } }
+            .wrapped<List<NotificationResponse>>()
+            .map { it.map() }
     }
 }

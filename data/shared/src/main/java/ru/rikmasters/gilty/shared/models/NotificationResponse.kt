@@ -51,14 +51,14 @@ data class FeedBack(
 data class RespondResponse(
     val id: String,
     val author: User,
-    val comment: String,
+    val comment: String? = null,
     val albumId: String? = null,
-    val photoAccess: Boolean,
+    val photoAccess: Boolean? = null,
 ) {
     
     fun map() = RespondModel(
-        id, author.map(), comment,
-        albumId ?: "", photoAccess
+        id, author.map() , comment.toString(),
+        albumId ?: "", photoAccess = false
     )
 }
 

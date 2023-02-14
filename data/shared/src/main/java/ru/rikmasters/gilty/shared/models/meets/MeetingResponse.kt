@@ -1,14 +1,11 @@
 package ru.rikmasters.gilty.shared.models.meets
 
-import ru.rikmasters.gilty.data.ktor.Ktor.anyLog
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
-import ru.rikmasters.gilty.shared.model.meeting.DemoRequirementModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.models.Category
 import ru.rikmasters.gilty.shared.models.ProfileResponse
 
@@ -28,7 +25,7 @@ data class MeetingResponse(
     val type: String? = null,
     val tags: List<Tag>? = null,
     val condition: String? = null,
-    val category: Category,
+    val category: Category? = null,
     val datetime: String,
     val duration: Int? = null,
     val organizer: ProfileResponse? = null,
@@ -41,15 +38,17 @@ data class MeetingResponse(
     fun map(): MeetingModel = MeetingModel(
         id, tags?.first()?.title.toString(),
         ConditionType.valueOf(condition.toString()),
-        category.map(),
+        category?.map() ?: DemoCategoryModel,
         durationToString(duration ?: 0),
         MeetType.valueOf(type.toString()),
         datetime = "${of(datetime)}",
         organizer?.map()?.map(),
-        anyLog(isOnline) == true,
-        tags?.map { it.map() } ?: listOf(),
-        "", isAnonymous == true, 0,
-        DemoRequirementModel, "", "", false,
-        memberState = memberState?.let { MemberStateType.valueOf(it) } ?: MemberStateType.IS_MEMBER
+        (isOnline == true),
+        (tags?.map { it.map() } ?: listOf()),
+        (""), (isAnonymous == true), (0),
+        DemoRequirementModel, (""), (""), (false),
+        memberState = memberState?.let {
+            MemberStateType.valueOf(it)
+        } ?: MemberStateType.IS_MEMBER
     )
 }

@@ -2,6 +2,7 @@ package ru.rikmasters.gilty
 
 import org.koin.core.module.Module
 import ru.rikmasters.gilty.addmeet.AddMeet
+import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.chat.Chat
 import ru.rikmasters.gilty.complaints.Complains
 import ru.rikmasters.gilty.core.module.FeatureDefinition
@@ -20,7 +21,7 @@ object AppModule : FeatureDefinition() {
         setOf(
             ExampleModule, Login, Main,
             Profile, AddMeet, Notifications,
-            Chat, Complains, Realm, Ktor
+            Chat, Complains, Realm, Ktor, Auth
         )
     
     override fun DeepNavGraphBuilder.navigation() {}

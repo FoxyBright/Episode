@@ -3,9 +3,8 @@ package ru.rikmasters.gilty.auth.manager
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import ru.rikmasters.gilty.auth.login.SendCode
 import ru.rikmasters.gilty.auth.saga.AuthSaga
-import ru.rikmasters.gilty.auth.token.TokenStore
-import ru.rikmasters.gilty.auth.token.TokenWebSource
-import ru.rikmasters.gilty.auth.token.Tokens
+import ru.rikmasters.gilty.auth.token.*
+import ru.rikmasters.gilty.auth.token.PushType.FIREBASE
 import ru.rikmasters.gilty.core.data.repository.Repository
 import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.core.data.source.deleteAll
@@ -19,14 +18,29 @@ class AuthManager(
     
     private val dbSource: DbSource,
     
-    override val primarySource: TokenStore
-
-): Repository<TokenStore>(primarySource) {
+    override val primarySource: TokenStore,
+    
+    ): Repository<TokenStore>(primarySource) {
     
     suspend fun isAuthorized(): Boolean {
         val token = primarySource.getTokensOrNull()
         logD("YOUR TOKENS: ----->>> $token")
         return token != null
+    }
+    
+    suspend fun savePushToken(
+        token: String,
+        type: PushType = FIREBASE,
+    ) {
+        tokenWebSource.savePushToken(token, type)
+    }
+    
+    @Suppress("unused")
+    suspend fun deletePushToken(
+        token: String,
+        type: PushType = FIREBASE,
+    ) {
+        tokenWebSource.deletePushToken(token, type)
     }
     
     private suspend fun login(tokens: Tokens) {

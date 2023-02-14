@@ -1,6 +1,13 @@
 @file:Suppress("UnstableApiUsage")
 
+buildscript {
+    dependencies {
+        classpath("com.google.gms:google-services:4.3.15")
+    }
+}
+
 plugins {
+    id("com.google.gms.google-services") version "4.3.15"
     id("com.android.application")
     kotlin("android")
 }
@@ -16,6 +23,7 @@ android {
         }
     }
     
+    @Suppress("deprecation")
     packagingOptions {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -27,7 +35,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     androidBase()
@@ -45,6 +52,7 @@ dependencies {
     implementation(project(":feature:chat"))
     
     implementation(project(":data:shared"))
+    implementation(project(":data:auth"))
     implementation(project(":data:realm"))
     implementation(project(":data:ktor"))
     

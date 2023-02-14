@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.data.ktor.Ktor.logD
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
@@ -87,7 +86,7 @@ interface PhotoViewCallback {
 fun PhotoView(
     state: PhotoViewState,
     modifier: Modifier = Modifier,
-    callback: PhotoViewCallback? = null
+    callback: PhotoViewCallback? = null,
 ) {
     Scaffold(
         modifier.background(
@@ -134,7 +133,7 @@ private fun PhotoAppBar(
     text: String,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onMenuClick: (() -> Unit)? = null
+    onMenuClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier
@@ -162,7 +161,7 @@ private fun PhotoAppBar(
 private fun HiddenPhotoAppBar(
     load: Float,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     Column(modifier) {
         Back(Modifier.padding(top = 24.dp), onBack)
@@ -175,7 +174,7 @@ private fun HiddenPhotoAppBar(
 @Composable
 private fun Back(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     IconButton(onClick, modifier) {
         Icon(
@@ -188,7 +187,7 @@ private fun Back(
 @Composable
 private fun Loader(
     load: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier
@@ -211,6 +210,7 @@ private fun Loader(
 }
 
 @Composable
+@Suppress("deprecation")
 @OptIn(ExperimentalFoundationApi::class)
 fun ZoomableAsyncImage(
     model: String,
@@ -223,7 +223,7 @@ fun ZoomableAsyncImage(
     contentScale: ContentScale = Fit,
     isRotation: Boolean = false,
     isZoomable: Boolean = true,
-    scrollState: ScrollableState? = null
+    scrollState: ScrollableState? = null,
 ) {
     val scope =
         rememberCoroutineScope()
@@ -320,7 +320,7 @@ fun ZoomableAsyncImage(
 }
 
 suspend fun ScrollableState.setScrolling(
-    value: Boolean
+    value: Boolean,
 ) {
     scroll(PreventUserInput) {
         if(value) Unit

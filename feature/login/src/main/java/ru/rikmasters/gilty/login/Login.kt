@@ -33,7 +33,8 @@ object Login: FeatureDefinition() {
         if(
             authManager.isAuthorized() &&
             regManager.isUserRegistered()
-        ) "main/meetings" else "login"
+        ) "main/meetings"
+        else "login"
     }
     
     override fun DeepNavGraphBuilder.navigation() {

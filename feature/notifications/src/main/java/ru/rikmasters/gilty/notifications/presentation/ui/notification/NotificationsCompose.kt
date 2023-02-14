@@ -3,8 +3,7 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -26,6 +25,8 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
+import ru.rikmasters.gilty.shared.model.profile.DemoRatingModelList
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
 import ru.rikmasters.gilty.shared.shared.NavBar
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -47,7 +48,8 @@ private fun NotificationsContentPreview() {
                         DemoNotificationModelList
                     ), Pair((3), ""), listOf(), (false),
                     DemoNotificationMeetingOverModel,
-                    listOf(), listOf()
+                    listOf(), listOf(), LazyListState(),
+                    DemoRatingModelList
                 )
             )
         }
@@ -71,7 +73,8 @@ private fun NotificationsBlurPreview() {
                         DemoNotificationModelList
                     ), Pair((3), ""), listOf(), (true),
                     DemoNotificationMeetingOverModel,
-                    listOf(), listOf()
+                    listOf(), listOf(), LazyListState(),
+                    DemoRatingModelList
                 )
             )
         }
@@ -87,6 +90,8 @@ data class NotificationsState(
     val activeNotification: NotificationModel?,
     val participants: List<UserModel>,
     val participantsStates: List<Int>,
+    val listState: LazyListState,
+    val ratings: List<RatingModel>,
 )
 
 interface NotificationsCallback {
@@ -98,6 +103,7 @@ interface NotificationsCallback {
     fun onBlurClick()
     fun onParticipantClick(index: Int)
     fun onNavBarSelect(point: Int)
+    fun onListUpdate()
 }
 
 @Composable
@@ -145,8 +151,7 @@ fun NotificationsContent(
         ) {
             ObserveNotification(
                 it, state.participants,
-                state.participantsStates,
-                Modifier
+                state.participantsStates, Modifier
                     .padding(horizontal = 16.dp)
                     .align(Center),
                 callback
@@ -161,16 +166,16 @@ private fun Notifications(
     modifier: Modifier = Modifier,
     callback: NotificationsCallback?,
 ) {
-    val notify =
+    val notifications =
         state.notifications
     val todayList =
-        notify.first.map { it to rememberDragRowState() }
+        notifications.first.map { it to rememberDragRowState() }
     val weekList =
-        notify.second.map { it to rememberDragRowState() }
+        notifications.second.map { it to rememberDragRowState() }
     val earlierList =
-        notify.third.map { it to rememberDragRowState() }
+        notifications.third.map { it to rememberDragRowState() }
     
-    LazyColumn(modifier) {
+    LazyColumn(modifier, state.listState) {
         if(state.lastRespond.first != 0) item {
             Responds(
                 stringResource(R.string.notification_responds_on_user_meetings),
@@ -182,7 +187,9 @@ private fun Notifications(
         
         if(todayList.isNotEmpty()) {
             item { Label(R.string.meeting_profile_bottom_today_label) }
-            itemsIndexed(todayList) { i, not ->
+            itemsIndexed(todayList,
+                { _, it -> it.first.id },
+                { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(
                         not.first, not.second,
@@ -195,7 +202,9 @@ private fun Notifications(
         
         if(weekList.isNotEmpty()) {
             item { Label(R.string.notification_on_this_week_label) }
-            itemsIndexed(weekList) { i, not ->
+            itemsIndexed(weekList,
+                { _, it -> it.first.id },
+                { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(
                         not.first, not.second,
@@ -208,7 +217,9 @@ private fun Notifications(
         
         if(earlierList.isNotEmpty()) {
             item { Label(R.string.notification_earlier_label) }
-            itemsIndexed(earlierList) { i, not ->
+            itemsIndexed(earlierList,
+                { _, it -> it.first.id },
+                { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(
                         not.first, not.second,
@@ -217,6 +228,14 @@ private fun Notifications(
                     ), Modifier, callback
                 )
             }
+        }
+        
+        item {
+            if(notifications.first.isNotEmpty()
+                || notifications.second.isNotEmpty()
+                || notifications.third.isNotEmpty()
+            ) callback?.onListUpdate()
+            
         }
         
         item { Spacer(Modifier.height(20.dp)) }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 @Composable
 fun NotificationsScreen(vm: NotificationViewModel) {
     
+    val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
@@ -33,8 +35,9 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val blur by vm.blur.collectAsState()
     
     LaunchedEffect(Unit) {
-        vm.getLastResponse()
         vm.getNotification()
+        vm.getLastResponse()
+        vm.getRatings()
     }
     
     Use<NotificationViewModel>(LoadingTrait) {
@@ -42,13 +45,14 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             NotificationsState(
                 vm.sortNotification(notifications),
                 lastRespond, navState, blur,
-                selected, participants, participantsStates
+                selected, participants,
+                participantsStates, listState, ratings
             ), Modifier, object: NotificationsCallback {
                 
                 override fun onClick(notification: NotificationModel) {
                     scope.launch {
                         vm.selectNotification(notification)
-//                        vm.getRatings()
+                        vm.getRatings()
                         vm.blur(true)
                     }
                 }
@@ -86,6 +90,15 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                                 RespondsBs(it)
                             }
                         }
+                    }
+                }
+                
+                override fun onListUpdate() {
+                    scope.launch {
+                        vm.getNotification()
+                        if(notifications.size > 6) listState.scrollToItem(
+                            notifications.size - 6
+                        )
                     }
                 }
                 

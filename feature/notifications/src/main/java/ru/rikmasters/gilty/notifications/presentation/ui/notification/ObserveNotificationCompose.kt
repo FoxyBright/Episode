@@ -58,6 +58,7 @@ fun ObserveNotification(
                 getDifferenceOfTime(notification.date), (true)
             ), Modifier, callback
         )
+        
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -65,7 +66,7 @@ fun ObserveNotification(
                 .background(
                     colorScheme.primaryContainer,
                     MaterialTheme.shapes.large
-                )
+                ),
         ) {
             itemsIndexed(participants) { index, participant ->
                 Participant(

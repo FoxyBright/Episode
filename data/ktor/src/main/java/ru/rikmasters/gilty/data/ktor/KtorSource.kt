@@ -63,7 +63,7 @@ open class KtorSource: WebSource() {
     
     var client = getTokens()
     
-    fun updateClientToken(){
+    fun updateClientToken() {
         client = getTokens()
     }
     
