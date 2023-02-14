@@ -56,7 +56,9 @@ fun NotificationItem(
     val adminMessage = "ADMIN MESSAGE" // TODO для сообщений от администрации приложения
     
     val organizer = when(type) {
-        RESPOND, WATCH -> notification.feedback?.respond?.author
+        ADMIN_NOTIFICATION, PHOTO_BLOCKED -> null
+        RESPOND -> notification.feedback?.respond?.author
+        WATCH -> notification.parent.user
         else -> meet?.organizer
     }
     

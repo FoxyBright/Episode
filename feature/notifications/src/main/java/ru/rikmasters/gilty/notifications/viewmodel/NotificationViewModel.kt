@@ -46,7 +46,7 @@ class NotificationViewModel: ViewModel() {
     suspend fun getNotification() = singleLoading {
         val list =
             notificationManger.getNotification(page)
-        _notifications.emit((notifications.value + list).distinct())
+        _notifications.emit(notifications.value + list)
         page++
     }
     

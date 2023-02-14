@@ -26,7 +26,8 @@ data class NotificationResponse(
         NotificationParentModel(
             parent.meeting?.map(),
             parent.file?.map(),
-            parent.notification
+            parent.notification,
+            parent.user?.map()
         ),
         feedback?.map()
     )
@@ -94,4 +95,5 @@ data class ParentNotificationResponse(
     val meeting: MeetingResponse? = null,
     val file: FileResponse? = null,
     val notification: ShortNotification? = null,
+    val user: User? = null,
 )

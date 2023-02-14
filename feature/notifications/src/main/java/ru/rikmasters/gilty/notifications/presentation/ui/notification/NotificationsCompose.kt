@@ -177,12 +177,17 @@ private fun Notifications(
     val notifications =
         state.notifications
     val todayList =
-        notifications.first.map { it to rememberDragRowState() }
+        notifications.first.distinct().map {
+            it to rememberDragRowState()
+        }
     val weekList =
-        notifications.second.map { it to rememberDragRowState() }
+        notifications.second.distinct().map {
+            it to rememberDragRowState()
+        }
     val earlierList =
-        notifications.third.map { it to rememberDragRowState() }
-    
+        notifications.third.distinct().map {
+            it to rememberDragRowState()
+        }
     LazyColumn(modifier, state.listState) {
         if(state.lastRespond.first != 0) item {
             Responds(
