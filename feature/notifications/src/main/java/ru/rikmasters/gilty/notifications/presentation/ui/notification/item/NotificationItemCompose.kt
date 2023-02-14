@@ -2,13 +2,12 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
@@ -23,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.core.R.*
+import ru.rikmasters.gilty.core.R.drawable
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
@@ -32,7 +31,7 @@ import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
-import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.EmojiRow
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
@@ -109,22 +108,14 @@ private fun InfoNotification(
     shape: Shape,
     onSwiped: () -> Unit,
 ) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .background(colorScheme.primary, shape)
-    ) {
-        SwipeableRowBack(Modifier.align(CenterEnd))
+    SwipeableContainer(shape, modifier) {
         Row(
             Modifier.swipeableRow(
                 rowState, LocalContext.current
             ) { onSwiped() },
             Center, CenterVertically
         ) {
-            Card(
-                Modifier.fillMaxWidth(), shape = shape,
-                colors = cardColors(colorScheme.primaryContainer)
-            ) {
+            Column {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -152,7 +143,6 @@ private fun InfoNotification(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun TextNotification(
     thumbnail: ThumbnailModel?,
     rowState: DragRowState,
@@ -165,22 +155,20 @@ private fun TextNotification(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .background(colorScheme.primary, shape)
-    ) {
-        SwipeableRowBack(Modifier.align(CenterEnd))
+    SwipeableContainer(shape, modifier) {
         Row(
-            Modifier.swipeableRow(
-                rowState, LocalContext.current
-            ) { onSwiped() },
+            Modifier
+                .swipeableRow(
+                    rowState,
+                    LocalContext.current
+                ) { onSwiped() },
             Center, CenterVertically
         ) {
-            Card(
-                { onClick?.let { it() } },
-                Modifier.fillMaxWidth(), (true),
-                shape, cardColors(colorScheme.primaryContainer)
+            Column(
+                Modifier.background(
+                    colorScheme.primaryContainer,
+                    shape
+                )
             ) {
                 Row(
                     Modifier
@@ -199,12 +187,39 @@ private fun TextNotification(
                 }
                 if(emojiRawState) EmojiRow(
                     emojiList.ifEmpty { EmojiModel.list },
-                    Modifier.padding(start = 60.dp, end = 20.dp)
+                    Modifier
+                        .padding(start = 60.dp, end = 20.dp)
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { onClick?.let { it() } }
                 ) { emoji -> onEmojiClick?.let { it(emoji) } }
-                if(shape != shapes.mediumBottomRoundedShape
-                    || shape != MaterialTheme.shapes.medium
-                ) Divider(Modifier.padding(start = 60.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun SwipeableContainer(
+    shape: Shape,
+    modifier: Modifier,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier.background(
+            colorScheme.primaryContainer,
+            shape
+        )
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .background(colorScheme.primary, shape)
+        ) {
+            SwipeableRowBack(Modifier.align(CenterEnd))
+            content.invoke()
+        }
+        if(shape != shapes.mediumBottomRoundedShape
+            && shape != MaterialTheme.shapes.medium
+        ) Divider(Modifier.padding(start = 60.dp))
     }
 }

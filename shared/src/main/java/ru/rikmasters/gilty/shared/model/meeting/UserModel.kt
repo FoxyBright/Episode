@@ -6,6 +6,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
 import java.util.UUID.randomUUID
 
 data class UserModel(
@@ -18,6 +19,7 @@ data class UserModel(
     val age: Int?,
     val isAnonymous: Boolean?,
     val isOnline: Boolean?,
+    val meetRating: RatingModel? = null,
 )
 
 val DemoUserModel = UserModel(

@@ -118,7 +118,7 @@
     <string name="notification_meet_TRANSLATION_15MIN_end">через 15 минут </string>
     <string name="notification_meet_ADMIN_NOTIFICATION_start">Началась трансляция</string>
     <string name="notification_meet_ADMIN_NOTIFICATION_end">Зайдите в чат, чтобы присоединиться</string>
-    <string name="notification_meet_WATCH_MEETING_CREATED">Создал%s meet/nПрисоединяйся к</string>
+    <string name="notification_meet_WATCH_MEETING_CREATED">создал%s meet Присоединяйся к</string>
     <string name="notification_leave_emotion">Вы оставили эмоции от meet</string>
     <string name="notification_earlier_label">Ранее</string>
     <string name="notification_responds_on_user_meetings">Отклики на ваши meet</string>

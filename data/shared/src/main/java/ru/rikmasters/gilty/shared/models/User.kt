@@ -16,6 +16,7 @@ data class User(
     val age: Int? = null,
     val isAnonymous: Boolean? = null,
     val isOnline: Boolean? = null,
+    val meetingRating: Rating? = null,
 ) {
     
     fun map() = UserModel(
@@ -27,6 +28,7 @@ data class User(
         thumbnail = thumbnail?.map(),
         age = age,
         isAnonymous = isAnonymous,
-        isOnline = isOnline
+        isOnline = isOnline,
+        meetRating = meetingRating?.map()
     )
 }

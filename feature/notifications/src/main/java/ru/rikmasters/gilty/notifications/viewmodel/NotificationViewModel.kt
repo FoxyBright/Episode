@@ -14,6 +14,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus.DELETED
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
@@ -46,7 +47,10 @@ class NotificationViewModel: ViewModel() {
     suspend fun getNotification() = singleLoading {
         val list =
             notificationManger.getNotification(page)
-        _notifications.emit(notifications.value + list)
+        _notifications.emit((notifications.value + list)
+            .distinct()
+            .filter { it.status != DELETED }
+        )
         page++
     }
     
@@ -64,9 +68,13 @@ class NotificationViewModel: ViewModel() {
         _blur.emit(state)
     }
     
-    suspend fun selectNotification(notification: NotificationModel) = singleLoading {
+    suspend fun selectNotification(
+        notification: NotificationModel,
+    ) = singleLoading {
         notification.parent.meeting?.let { meet ->
-            _participants.emit(meetingManager.getMeetMembers(meet.id, (true)))
+            _participants.emit(
+                meetingManager.getMeetMembers(meet.id, (true))
+            )
             _selectedNotification.emit(notification)
         }
     }

@@ -187,8 +187,7 @@ private fun Notifications(
         
         if(todayList.isNotEmpty()) {
             item { Label(R.string.meeting_profile_bottom_today_label) }
-            itemsIndexed(todayList,
-                { _, it -> it.first.id },
+            itemsIndexed(todayList, { _, it -> it },
                 { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(
@@ -202,8 +201,7 @@ private fun Notifications(
         
         if(weekList.isNotEmpty()) {
             item { Label(R.string.notification_on_this_week_label) }
-            itemsIndexed(weekList,
-                { _, it -> it.first.id },
+            itemsIndexed(weekList, { _, it -> it },
                 { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(
@@ -217,8 +215,7 @@ private fun Notifications(
         
         if(earlierList.isNotEmpty()) {
             item { Label(R.string.notification_earlier_label) }
-            itemsIndexed(earlierList,
-                { _, it -> it.first.id },
+            itemsIndexed(earlierList, { _, it -> it },
                 { _, it -> it.first.type }) { i, not ->
                 NotificationItem(
                     NotificationItemState(

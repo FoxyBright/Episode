@@ -17,7 +17,35 @@ data class NotificationModel(
     val status: NotificationStatus,
     val parent: NotificationParentModel,
     val feedback: FeedBackModel?,
-)
+) {
+    
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + status.hashCode()
+        result = 31 * result + parent.hashCode()
+        result = 31 * result + (feedback?.hashCode() ?: 0)
+        return result
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        if(this === other) return true
+        if(javaClass != other?.javaClass) return false
+        
+        other as NotificationModel
+        
+        return when {
+            id != other.id -> false
+            date != other.date -> false
+            type != other.type -> false
+            status != other.status -> false
+            parent != other.parent -> false
+            feedback != other.feedback -> false
+            else -> true
+        }
+    }
+}
 
 val DemoShortNotification = ShortNotification(
     UUID.randomUUID().toString(),
