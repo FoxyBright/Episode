@@ -14,7 +14,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus.DELETED
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
@@ -47,10 +46,7 @@ class NotificationViewModel: ViewModel() {
     suspend fun getNotification() = singleLoading {
         val list =
             notificationManger.getNotification(page)
-        _notifications.emit((notifications.value + list)
-            .distinct()
-            .filter { it.status != DELETED }
-        )
+        _notifications.emit((notifications.value + list).distinct())
         page++
     }
     
@@ -72,9 +68,7 @@ class NotificationViewModel: ViewModel() {
         notification: NotificationModel,
     ) = singleLoading {
         notification.parent.meeting?.let { meet ->
-            _participants.emit(
-                meetingManager.getMeetMembers(meet.id, (true))
-            )
+            getParticipants(meet.id)
             _selectedNotification.emit(notification)
         }
     }
@@ -145,11 +139,18 @@ class NotificationViewModel: ViewModel() {
         _ratings.emit(notificationManger.getRatings())
     }
     
+    private suspend fun getParticipants(meetId: String) {
+        _participants.emit(
+            meetingManager.getMeetMembers(meetId, (true))
+        )
+    }
+    
     suspend fun emojiClick(
         emoji: EmojiModel, meetId: String, userId: String,
     ) = singleLoading {
         makeToast("emoji: $emoji, meetId: $meetId, userId: $userId")
-        //        notificationManger.putRatings(meetId, userId, emoji)
+        notificationManger.putRatings(meetId, userId, emoji)
+        getParticipants(meetId)
     }
     
     suspend fun selectParticipants(participant: Int) {
@@ -161,4 +162,3 @@ class NotificationViewModel: ViewModel() {
         )
     }
 }
-

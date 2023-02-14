@@ -24,20 +24,20 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val participants by vm.participants.collectAsState()
     val participantsStates by vm.participantsStates.collectAsState()
+    val participants by vm.participants.collectAsState()
     
     val notifications by vm.notifications.collectAsState()
-    val ratings by vm.ratings.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val navState by vm.navBar.collectAsState()
+    val ratings by vm.ratings.collectAsState()
     val blur by vm.blur.collectAsState()
     
     LaunchedEffect(Unit) {
-        vm.getNotification()
-        vm.getLastResponse()
         vm.getRatings()
+        vm.getLastResponse()
+        vm.getNotification()
     }
     
     Use<NotificationViewModel>(LoadingTrait) {
@@ -48,14 +48,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                 selected, participants,
                 participantsStates, listState, ratings
             ), Modifier, object: NotificationsCallback {
-                
-                override fun onClick(notification: NotificationModel) {
-                    scope.launch {
-                        vm.selectNotification(notification)
-                        vm.getRatings()
-                        vm.blur(true)
-                    }
-                }
                 
                 override fun onParticipantClick(index: Int) {
                     scope.launch { vm.selectParticipants(index) }
@@ -69,9 +61,23 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                 }
                 
                 override fun onEmojiClick(
-                    emoji: EmojiModel, meetId: String, userId: String,
+                    notification: NotificationModel,
+                    emoji: EmojiModel,
+                    userId: String?,
                 ) {
-                    scope.launch { vm.emojiClick(emoji, meetId, userId) }
+                    scope.launch {
+                        selected?.let {
+                            if(notification.feedback?.ratings == null)
+                                vm.emojiClick(
+                                    emoji,
+                                    notification.parent.meeting?.id!!,
+                                    userId!!
+                                )
+                        } ?: run {
+                            vm.selectNotification(notification)
+                            vm.blur(true)
+                        }
+                    }
                 }
                 
                 override fun onNavBarSelect(point: Int) {

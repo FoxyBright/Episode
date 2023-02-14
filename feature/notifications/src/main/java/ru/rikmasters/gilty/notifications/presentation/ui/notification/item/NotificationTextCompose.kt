@@ -138,11 +138,11 @@ fun NotificationText(
     duration: String,
     modifier: Modifier = Modifier,
     NotificationMessage: String? = null,
-    emoji: List<EmojiModel> = emptyList(),
+    emoji: List<EmojiModel>? = null,
 ) {
     val user = "${organizer?.username}, ${organizer?.age}"
     val message = when(type) {
-        MEETING_OVER -> if(meet?.memberState == IS_ORGANIZER) if(emoji.isEmpty())
+        MEETING_OVER -> if(meet?.memberState == IS_ORGANIZER) if(emoji.isNullOrEmpty())
             buildAnnotatedString {
                 withStyle(text(TEXT)) { append(stringResource(R.string.notification_meeting_took_place_for_organizer)) }
                 withStyle(text(MEET, meet.isOnline)) { append(" ${meet.title}") }
@@ -157,7 +157,7 @@ fun NotificationText(
             withStyle(text(MEET, meet.isOnline)) { append(" ${meet.title}") }
             withStyle(text(TIME)) { append(" $duration") }
         }
-        else if(emoji.isEmpty()) buildAnnotatedString {
+        else if(emoji.isNullOrEmpty()) buildAnnotatedString {
             withStyle(text(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }
             withStyle(text(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
             withStyle(text(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
@@ -169,9 +169,9 @@ fun NotificationText(
             withStyle(text(TIME)) { append(" $duration") }
         } else buildAnnotatedString {
             withStyle(text(TEXT)) { append(stringResource(R.string.notification_meeting_emoji_for_meet)) }
-            withStyle(text(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
-            withStyle(text(TEXT)) { append("" + stringResource(R.string.notification_organizer_label)) }
-            withStyle(text(USER)) { append("$user ") }
+            withStyle(text(MEET, meet?.isOnline)) { append(" ${meet?.title} ") }
+            withStyle(text(TEXT)) { append(stringResource(R.string.notification_organizer_label)) }
+            withStyle(text(USER)) { append(" $user ") }
             appendInlineContent("emoji")
             withStyle(text(TIME)) { append(" $duration") }
         }

@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
-import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons.Filled
@@ -24,8 +23,8 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Notif
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
-import ru.rikmasters.gilty.shared.image.DemoEmojiModel
 import ru.rikmasters.gilty.shared.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
@@ -36,29 +35,37 @@ import ru.rikmasters.gilty.shared.shared.*
 @Composable
 private fun ObserveNotificationPreview() {
     ObserveNotification(
-        DemoNotificationMeetingOverModel,
-        listOf(DemoUserModel, DemoUserModel),
-        listOf(0)
+        ObserveNotificationState(
+            DemoNotificationMeetingOverModel,
+            listOf(DemoUserModel, DemoUserModel),
+            listOf(0), EmojiModel.list
+        )
     )
 }
 
+data class ObserveNotificationState(
+    val notification: NotificationModel,
+    val participants: List<UserModel>,
+    val participantsStates: List<Int>,
+    val emojiList: List<EmojiModel>,
+)
+
 @Composable
 fun ObserveNotification(
-    notification: NotificationModel,
-    participants: List<UserModel>,
-    participantsStates: List<Int>,
+    state: ObserveNotificationState,
     modifier: Modifier = Modifier,
     callback: NotificationsCallback? = null,
 ) {
     Column(modifier) {
-        NotificationItem(
-            NotificationItemState(
-                notification, DragRowState(1f),
-                MaterialTheme.shapes.medium,
-                getDifferenceOfTime(notification.date), (true)
-            ), Modifier, callback
-        )
-        
+        if(state.notification.parent.meeting?.memberState != IS_ORGANIZER)
+            NotificationItem(
+                NotificationItemState(
+                    state.notification, DragRowState(1f),
+                    MaterialTheme.shapes.medium,
+                    getDifferenceOfTime(state.notification.date),
+                    state.emojiList
+                ), Modifier, callback
+            )
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -68,16 +75,16 @@ fun ObserveNotification(
                     MaterialTheme.shapes.large
                 ),
         ) {
-            itemsIndexed(participants) { index, participant ->
+            itemsIndexed(state.participants) { index, participant ->
                 Participant(
-                    index, participant, participants.size,
-                    participantsStates.contains(index),
-                    DemoEmojiModel, EmojiModel.list, // TODO КАКИЕ ЭМОЦИИ
+                    index, participant, state.participants.size,
+                    state.participantsStates.contains(index),
+                    participant.meetRating?.emoji, state.emojiList,
                     { part -> callback?.onParticipantClick(part) }
                 ) { emoji ->
                     participant.id?.let {
                         callback?.onEmojiClick(
-                            emoji, notification.parent.meeting!!.id, it
+                            state.notification, emoji, it
                         )
                     }
                 }
@@ -120,13 +127,12 @@ private fun Participant(
                     ("${member.username}, ${member.age}"),
                     Modifier, member.avatar, member.emoji,
                 )
-                Row(Modifier, Start, CenterVertically) {
-                    memberEmoji?.let {
-                        GEmojiImage(
-                            memberEmoji,
-                            Modifier.size(24.dp)
-                        )
-                    }
+                memberEmoji?.let {
+                    GEmojiImage(
+                        memberEmoji,
+                        Modifier.size(24.dp)
+                    )
+                } ?: run {
                     Icon(
                         if(unwrap) Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight,
@@ -135,7 +141,7 @@ private fun Participant(
                     )
                 }
             }
-            if(unwrap) EmojiRow(
+            if(unwrap && memberEmoji == null) EmojiRow(
                 emojiList, Modifier.padding(
                     start = 60.dp, end = 20.dp
                 )

@@ -2,8 +2,6 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -42,7 +40,7 @@ data class NotificationItemState(
     val rowState: DragRowState,
     val shape: Shape,
     val duration: String,
-    val putEmoji: Boolean = false,
+    val emojiList: List<EmojiModel>,
 )
 
 @Composable
@@ -66,14 +64,14 @@ fun NotificationItem(
         
         MEETING_OVER -> {
             val emoji = notification
-                .feedback?.ratings?.map { it.emoji } ?: emptyList()
+                .feedback?.ratings?.map { it.emoji }
             TextNotification(
                 organizer?.thumbnail, state.rowState,
                 modifier, state.shape, (true),
                 { callback?.onSwiped(notification) },
-                { callback?.onClick(notification) }, emoji, {
-                    if(state.putEmoji) callback?.onEmojiClick(
-                        it, meet!!.id, meet.organizer?.id!!
+                (emoji ?: state.emojiList), {
+                    callback?.onEmojiClick(
+                        notification, it, meet?.organizer?.id!!
                     )
                 }
             ) {
@@ -150,7 +148,6 @@ private fun TextNotification(
     shape: Shape,
     emojiRawState: Boolean,
     onSwiped: () -> Unit,
-    onClick: (() -> Unit)? = null,
     emojiList: List<EmojiModel> = emptyList(),
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -159,8 +156,7 @@ private fun TextNotification(
         Row(
             Modifier
                 .swipeableRow(
-                    rowState,
-                    LocalContext.current
+                    rowState, LocalContext.current
                 ) { onSwiped() },
             Center, CenterVertically
         ) {
@@ -186,12 +182,9 @@ private fun TextNotification(
                     content.invoke()
                 }
                 if(emojiRawState) EmojiRow(
-                    emojiList.ifEmpty { EmojiModel.list },
-                    Modifier
-                        .padding(start = 60.dp, end = 20.dp)
-                        .clickable(
-                            MutableInteractionSource(), (null)
-                        ) { onClick?.let { it() } }
+                    emojiList, Modifier.padding(
+                        start = 60.dp, end = 20.dp
+                    )
                 ) { emoji -> onEmojiClick?.let { it(emoji) } }
             }
         }

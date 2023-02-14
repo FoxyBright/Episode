@@ -96,9 +96,13 @@ data class NotificationsState(
 
 interface NotificationsCallback {
     
-    fun onClick(notification: NotificationModel)
     fun onSwiped(notification: NotificationModel)
-    fun onEmojiClick(emoji: EmojiModel, meetId: String, userId: String)
+    fun onEmojiClick(
+        notification: NotificationModel,
+        emoji: EmojiModel,
+        userId: String?,
+    )
+    
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -150,8 +154,12 @@ fun NotificationsContent(
                 .clickable { callback?.onBlurClick() }
         ) {
             ObserveNotification(
-                it, state.participants,
-                state.participantsStates, Modifier
+                ObserveNotificationState(
+                    it, state.participants,
+                    state.participantsStates,
+                    (it.feedback?.ratings?.map { it.emoji }
+                        ?: state.ratings.map { it.emoji })
+                ), Modifier
                     .padding(horizontal = 16.dp)
                     .align(Center),
                 callback
@@ -193,7 +201,9 @@ private fun Notifications(
                     NotificationItemState(
                         not.first, not.second,
                         lazyItemsShapes(i, todayList.size),
-                        getDifferenceOfTime(not.first.date)
+                        getDifferenceOfTime(not.first.date),
+                        (not.first.feedback?.ratings?.map { it.emoji }
+                            ?: state.ratings.map { it.emoji })
                     ), Modifier, callback
                 )
             }
@@ -207,7 +217,9 @@ private fun Notifications(
                     NotificationItemState(
                         not.first, not.second,
                         lazyItemsShapes(i, weekList.size),
-                        getDifferenceOfTime(not.first.date)
+                        getDifferenceOfTime(not.first.date),
+                        (not.first.feedback?.ratings?.map { it.emoji }
+                            ?: state.ratings.map { it.emoji })
                     ), Modifier, callback
                 )
             }
@@ -221,7 +233,9 @@ private fun Notifications(
                     NotificationItemState(
                         not.first, not.second,
                         lazyItemsShapes(i, earlierList.size),
-                        getDifferenceOfTime(not.first.date)
+                        getDifferenceOfTime(not.first.date),
+                        (not.first.feedback?.ratings?.map { it.emoji }
+                            ?: state.ratings.map { it.emoji })
                     ), Modifier, callback
                 )
             }
