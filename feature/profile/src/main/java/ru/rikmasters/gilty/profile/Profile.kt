@@ -26,8 +26,40 @@ object Profile: FeatureDefinition() {
                 UserProfileScreen(vm)
             }
             
-            screen<SettingsViewModel>("settings") { vm, _ ->
-                SettingsScreen(vm)
+            screen<SettingsViewModel>(
+                "settings?gender={gender}&age={age}&orientationId={orientationId}&orientation={orientation}&phone={phone}",
+                listOf(
+                    navArgument("gender") {
+                        type = NavType.StringType; defaultValue = ""
+                    },
+                    navArgument("age") {
+                        type = NavType.StringType; defaultValue = ""
+                    },
+                    navArgument("orientationId") {
+                        type = NavType.StringType; defaultValue = ""
+                    },
+                    navArgument("orientation") {
+                        type = NavType.StringType; defaultValue = ""
+                    },
+                    navArgument("phone") {
+                        type = NavType.StringType; defaultValue = ""
+                    }
+                )
+            ) { vm, it -> // TODO УБРАТЬ С ПОЯВЛЕНИЕМ РЕПОЗИТОРИЯ
+                it.arguments?.getString("gender")?.let { gender ->
+                    it.arguments?.getString("age")?.let { age ->
+                        it.arguments?.getString("orientationId")?.let { orientationId ->
+                            it.arguments?.getString("orientation")?.let { orientation ->
+                                it.arguments?.getString("phone")?.let { phone ->
+                                    SettingsScreen(
+                                        vm, gender, age,
+                                        Pair(orientationId, orientation), phone
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
             
             screen<AvatarViewModel>(

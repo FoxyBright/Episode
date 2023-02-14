@@ -63,7 +63,14 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         object: UserProfileCallback {
             
             override fun menu(state: Boolean) {
-                nav.navigate("settings")
+                nav.navigate(
+                    "settings" +
+                            "?gender=${profile?.gender?.name}" +
+                            "&age=${profile?.age}" +
+                            "&orientationId=${profile?.orientation?.id}" +
+                            "&orientation=${profile?.orientation?.name}" +
+                            "&phone=${profile?.phone}"
+                )
             }
             
             override fun onNameChange(text: String) {

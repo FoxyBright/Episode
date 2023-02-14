@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
@@ -13,6 +14,7 @@ class SettingsViewModel: ViewModel() {
     
     private val authManager by inject<AuthManager>()
     private val profileManager by inject<ProfileManager>()
+    private val meetManager by inject<MeetingManager>()
     
     private val _exitAlert = MutableStateFlow(false)
     val exitAlert = _exitAlert.asStateFlow()
@@ -34,6 +36,10 @@ class SettingsViewModel: ViewModel() {
     
     private val _age = MutableStateFlow("")
     val age = _age.asStateFlow()
+    
+    private val _orientations =
+        MutableStateFlow<List<OrientationModel>?>(null)
+    val orientations = _orientations.asStateFlow()
     
     suspend fun changeOrientation(orientation: OrientationModel) = singleLoading {
         profileManager.userUpdateData(orientation = orientation)
@@ -62,12 +68,25 @@ class SettingsViewModel: ViewModel() {
         _age.emit("$age")
     }
     
-    suspend fun getUserData() = singleLoading {
-        val user = profileManager.getProfile()
-        _gender.emit(user.gender)
-        _age.emit(user.age.toString())
-        _orientation.emit(user.orientation)
-        _phone.emit(user.phone ?: "")
+    suspend fun getUserData(
+        gender: String,
+        age: String,
+        orientation: Pair<String, String>,
+        phone: String,
+    ) = singleLoading {
+        _gender.emit(GenderType.valueOf(gender))
+        _age.emit(age)
+        _orientation.emit(
+            OrientationModel(
+                orientation.first,
+                orientation.second
+            )
+        )
+        _phone.emit(phone)
+    }
+    
+    suspend fun getOrientations() = singleLoading {
+        _orientations.emit(meetManager.getOrientations())
     }
     
     suspend fun deleteAccount() = singleLoading {

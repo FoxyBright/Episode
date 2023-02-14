@@ -18,7 +18,13 @@ import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 
 @Composable
-fun SettingsScreen(vm: SettingsViewModel) {
+fun SettingsScreen(
+    vm: SettingsViewModel,
+    userGender: String,
+    userAge: String,
+    userOrientation: Pair<String, String>,
+    userPhone: String,
+) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -28,13 +34,20 @@ fun SettingsScreen(vm: SettingsViewModel) {
     val exitAlert by vm.exitAlert.collectAsState()
     
     val orientation by vm.orientation.collectAsState()
+    val orientationList by vm.orientations.collectAsState()
     val notification by vm.notifications.collectAsState()
     val gender by vm.gender.collectAsState()
     val phone by vm.phone.collectAsState()
     val age by vm.age.collectAsState()
     
     
-    LaunchedEffect(Unit) { vm.getUserData() }
+    LaunchedEffect(Unit) {
+        vm.getUserData(
+            userGender, userAge,
+            userOrientation, userPhone
+        )
+        vm.getOrientations()
+    }
     
     val state = SettingsState(
         gender, age, orientation,
@@ -60,7 +73,10 @@ fun SettingsScreen(vm: SettingsViewModel) {
                     scope.launch {
                         asm.bottomSheet.expand {
                             Connector<OrientationBsViewModel>(vm.scope) {
-                                OrientationsBs(it)
+                                OrientationsBs(
+                                    it, orientation,
+                                    orientationList
+                                )
                             }
                         }
                     }

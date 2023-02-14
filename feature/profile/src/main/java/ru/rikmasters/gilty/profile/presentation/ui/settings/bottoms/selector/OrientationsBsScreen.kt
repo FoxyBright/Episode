@@ -10,32 +10,38 @@ import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.OrientationBsViewModel
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 @Composable
-fun OrientationsBs(vm: OrientationBsViewModel) {
+fun OrientationsBs(
+    vm: OrientationBsViewModel,
+    orientation: OrientationModel?,
+    orientationList: List<OrientationModel>?,
+) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val orientations by vm.orientations.collectAsState()
     val selected by vm.selected.collectAsState()
     
     LaunchedEffect(Unit) {
-        vm.getOrientations()
+        vm.setSelected(orientation)
     }
     
     Use<OrientationBsViewModel>(LoadingTrait) {
         SelectorBsContent(
             SelectorBsState(
                 stringResource(R.string.orientation_title),
-                (orientations?.map { it.name }
-                    ?: emptyList()), selected
-            ), Modifier,
-            object: SelectorBsCallback {
+                (orientationList?.map { it.name }
+                    ?: emptyList()),
+                orientationList?.indexOf(selected)
+            ), Modifier, object: SelectorBsCallback {
                 override fun onItemSelect(item: Int) {
                     scope.launch {
                         asm.bottomSheet.collapse()
-                        vm.selectOrientation(item)
+                        vm.selectOrientation(
+                            orientationList?.get(item)
+                        )
                     }
                 }
             }
