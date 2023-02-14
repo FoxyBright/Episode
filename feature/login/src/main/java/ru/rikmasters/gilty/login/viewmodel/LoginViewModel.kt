@@ -17,9 +17,7 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 class LoginViewModel(
     
     private val repository: LoginRepository,
-    
-    countryManager: CountryManager
-
+    countryManager: CountryManager,
 ): ViewModel() {
     
     private val authManager by inject<AuthManager>()
@@ -78,7 +76,7 @@ class LoginViewModel(
     }
     
     suspend fun handle(
-        deepLink: Uri
+        deepLink: Uri,
     ): Pair<Boolean, Boolean> {
         
         if(deepLink.host != "external")

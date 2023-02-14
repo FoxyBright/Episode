@@ -1,8 +1,9 @@
-package ru.rikmasters.gilty.login.viewmodel
+package ru.rikmasters.gilty.login.viewmodel.bottoms
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.login.viewmodel.PersonalViewModel
 
 class AgeBsViewModel(
     

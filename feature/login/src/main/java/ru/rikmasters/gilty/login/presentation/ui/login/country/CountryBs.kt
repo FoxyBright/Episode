@@ -7,7 +7,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 import ru.rikmasters.gilty.shared.country.Country
 
 @Composable

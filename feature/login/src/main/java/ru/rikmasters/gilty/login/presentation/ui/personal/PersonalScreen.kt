@@ -7,8 +7,8 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.login.viewmodel.AgeBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.PersonalViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.AgeBsViewModel
 
 @Composable
 fun PersonalScreen(vm: PersonalViewModel) {

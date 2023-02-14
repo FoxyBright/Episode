@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
+import ru.rikmasters.gilty.notifications.viewmodel.bottoms.ObserveBsViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.profile.ProfileData
 import ru.rikmasters.gilty.push.Push
@@ -15,11 +16,9 @@ object Notifications: FeatureDefinition() {
     
     override fun DeepNavGraphBuilder.navigation() {
         nested("notification", "list") {
-            
             screen<NotificationViewModel>("list") { vm, _ ->
                 NotificationsScreen(vm)
             }
-            
         }
     }
     
@@ -27,6 +26,7 @@ object Notifications: FeatureDefinition() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
             scopedOf(::RespondsBsViewModel)
+            scopedOf(::ObserveBsViewModel)
         }
     }
     

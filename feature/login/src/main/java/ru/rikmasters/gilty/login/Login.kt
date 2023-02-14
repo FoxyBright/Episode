@@ -21,6 +21,8 @@ import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
 import ru.rikmasters.gilty.login.presentation.ui.profile.ProfileScreen
 import ru.rikmasters.gilty.login.viewmodel.*
+import ru.rikmasters.gilty.login.viewmodel.bottoms.AgeBsViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.shared.country.CountryManager
 

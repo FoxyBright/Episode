@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
@@ -102,6 +103,9 @@ interface NotificationsCallback {
         emoji: EmojiModel,
         userId: String?,
     )
+    
+    fun onMeetClick(meet: MeetingModel)
+    fun onUserClick(meet: MeetingModel)
     
     fun onRespondsClick()
     fun onBlurClick()

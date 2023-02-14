@@ -10,10 +10,15 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.notifications.presentation.ui.bottoms.meets.ObserveBs
 import ru.rikmasters.gilty.notifications.presentation.ui.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
+import ru.rikmasters.gilty.notifications.viewmodel.bottoms.ObserveBsViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.MEET
+import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.ORGANIZER
 import ru.rikmasters.gilty.shared.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
 @Composable
@@ -105,6 +110,26 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                         if(notifications.size > 6) listState.scrollToItem(
                             notifications.size - 6
                         )
+                    }
+                }
+                
+                override fun onMeetClick(meet: MeetingModel) {
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            Connector<ObserveBsViewModel>(vm.scope) {
+                                ObserveBs(it, MEET, meet)
+                            }
+                        }
+                    }
+                }
+                
+                override fun onUserClick(meet: MeetingModel) {
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            Connector<ObserveBsViewModel>(vm.scope) {
+                                ObserveBs(it, ORGANIZER, meet)
+                            }
+                        }
                     }
                 }
                 

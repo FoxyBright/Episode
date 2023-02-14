@@ -1,8 +1,9 @@
-package ru.rikmasters.gilty.login.viewmodel
+package ru.rikmasters.gilty.login.viewmodel.bottoms
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.CountryManager
 

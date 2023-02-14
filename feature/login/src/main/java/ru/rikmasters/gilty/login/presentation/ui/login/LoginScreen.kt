@@ -14,8 +14,8 @@ import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.login.presentation.ui.login.country.CountryBs
-import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 import ru.rikmasters.gilty.shared.R
 
 
