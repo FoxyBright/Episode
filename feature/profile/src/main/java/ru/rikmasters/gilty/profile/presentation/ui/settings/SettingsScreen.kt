@@ -1,7 +1,19 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings
 
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri.parse
+import android.os.Build
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS
+import android.provider.Settings.EXTRA_APP_PACKAGE
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.messaging.FirebaseMessagingService
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -17,6 +29,7 @@ import ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.selector.Ori
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 
+
 @Composable
 fun SettingsScreen(
     vm: SettingsViewModel,
@@ -28,6 +41,7 @@ fun SettingsScreen(
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
     
     val deleteAlert by vm.deleteAlert.collectAsState()
@@ -40,8 +54,24 @@ fun SettingsScreen(
     val phone by vm.phone.collectAsState()
     val age by vm.age.collectAsState()
     
+    val nm = context.getSystemService(
+        FirebaseMessagingService.NOTIFICATION_SERVICE
+    ) as NotificationManager
+    
+    val launcher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            openNotificationSettings(context)
+            scope.launch {
+                vm.setNotification(
+                    nm.areNotificationsEnabled()
+                )
+            }
+        }
     
     LaunchedEffect(Unit) {
+        vm.setNotification(nm.areNotificationsEnabled())
         vm.getUserData(
             userGender, userAge,
             userOrientation, userPhone
@@ -141,7 +171,7 @@ fun SettingsScreen(
                 }
                 
                 override fun onNotificationChange(it: Boolean) {
-                    scope.launch { vm.setNotification() }
+                    launcher.launch(openNotificationSettings(context))
                 }
                 
                 override fun onDeleteDismiss() {
@@ -162,4 +192,18 @@ fun SettingsScreen(
             }
         )
     }
+}
+
+private fun openNotificationSettings(context: Context): Intent {
+    val intent = Intent()
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        intent.action = ACTION_APP_NOTIFICATION_SETTINGS
+        intent.putExtra(EXTRA_APP_PACKAGE, context.packageName)
+    } else {
+        intent.action = ACTION_APPLICATION_DETAILS_SETTINGS
+        intent.data = parse("package:${context.packageName}")
+    }
+    
+    //        startActivity(context, intent, (null))
+    return intent
 }

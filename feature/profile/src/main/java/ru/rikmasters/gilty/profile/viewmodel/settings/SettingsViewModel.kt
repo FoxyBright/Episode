@@ -59,8 +59,8 @@ class SettingsViewModel: ViewModel() {
         _deleteAlert.emit(state)
     }
     
-    suspend fun setNotification() {
-        _notifications.emit(!notifications.value)
+    suspend fun setNotification(state: Boolean) {
+        _notifications.emit(state)
     }
     
     suspend fun changeAge(age: Int) = singleLoading {
