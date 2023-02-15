@@ -24,7 +24,7 @@ fun CodeScreen(vm: CodeViewModel) {
     val timer by vm.timer.collectAsState()
     
     LaunchedEffect(Unit) {
-        while(true) { // TODO Пока единственный рабочий метод постоянной работы таймера - исправить
+        while(true) { // TODO Пока единственный рабочий метод постоянной работы таймера
             delay(1000L)
             vm.onTimerChange()
         }

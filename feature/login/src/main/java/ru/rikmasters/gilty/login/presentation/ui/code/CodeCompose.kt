@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.code
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
@@ -29,9 +29,7 @@ import ru.rikmasters.gilty.shared.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.BackBlur
 import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
-import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.GEmojiImage
-import ru.rikmasters.gilty.shared.shared.textFieldColors
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
@@ -80,7 +78,21 @@ fun CodeContent(
                 stringResource(R.string.confirm_number_title), Modifier,
                 stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
-            DigitCode(Modifier.padding(5.dp), state.code, state.focuses)
+            
+            Image(
+                painterResource(
+                    if(isSystemInDarkTheme())
+                        R.drawable.send_code_helper_night
+                    else R.drawable.send_code_helper_day
+                ), (null), Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .padding(horizontal = 53.dp)
+                    .padding(top = 58.dp, bottom = 36.dp)
+            )
+            DigitCode(
+                Modifier.padding(5.dp), state.code, state.focuses
+            )
             { index, it -> callback?.onCodeChange(index, it) }
             ButtonTimer(Modifier.padding(top = 20.dp), state.sec)
             { callback?.onCodeSend() }
@@ -150,15 +162,16 @@ private fun ButtonTimer(
             .clickable { if(sec <= 0) onResend() },
         Center
     ) {
-        Text(
-            (if(sec > 0) "${stringResource(R.string.call_again)} \n$sec сек"
-            else stringResource(R.string.call_again)),
+        if(sec > 0) Text(
+            "${stringResource(R.string.call_again_timer)} $sec сек",
             Modifier.padding(6.dp),
-            if(sec > 0) colorScheme.primary
-            else colorScheme.tertiary,
+            colorScheme.primary,
             style = typography.bodyMedium,
             fontWeight = SemiBold,
             textAlign = TextAlign.Center
-        )
+        ) else GradientButton(
+            Modifier.padding(horizontal = 16.dp),
+            stringResource(R.string.call_again),
+        ) { onResend() }
     }
 }
