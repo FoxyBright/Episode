@@ -25,7 +25,6 @@ data class MeetFiltersModel(
             || (lng != 0 && lng != null)
             || !meetTypes.isNullOrEmpty()
             || onlyOnline != null
-            || !genders.isNullOrEmpty()
             || !conditions.isNullOrEmpty()
             || !dates.isNullOrEmpty()
             || !time.isNullOrBlank())

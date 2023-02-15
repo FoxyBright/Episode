@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
@@ -18,6 +19,7 @@ class FiltersViewModel(
 ): ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
+    private val profileManager by inject<ProfileManager>()
     
     private val _screen = MutableStateFlow(0)
     val screen = _screen.asStateFlow()
@@ -36,9 +38,6 @@ class FiltersViewModel(
     
     private val _online = MutableStateFlow(false)
     val online = _online.asStateFlow()
-    
-    private val _selectedGenders = MutableStateFlow(emptyList<Int>())
-    val selectedGenders = _selectedGenders.asStateFlow()
     
     private val _selectedCondition = MutableStateFlow(emptyList<Int>())
     val selectedCondition = _selectedCondition.asStateFlow()
@@ -174,8 +173,16 @@ class FiltersViewModel(
         findMeets()
     }
     
-    suspend fun findMeets() {
-        _results.emit(meetManager.getMeetCount(filtersBuilder()))
+    suspend fun findMeets() = singleLoading {
+        _results.emit(
+            meetManager.getMeetCount(
+                filtersBuilder().copy(
+                    genders = listOf(
+                        profileManager.getProfile().gender
+                    )
+                )
+            )
+        )
     }
     
     private fun filtersBuilder() = MeetFiltersModel(
@@ -191,9 +198,6 @@ class FiltersViewModel(
         } else null,
         conditions = if(selectedCondition.value.isNotEmpty())
             selectedCondition.value.map { ConditionType.get(it) }
-        else null,
-        genders = if(selectedGenders.value.isNotEmpty())
-            selectedGenders.value.map { GenderType.get(it) }
         else null,
         time = mainVm.time.value.ifBlank { null },
         dates = mainVm.days.value.ifEmpty { null }
@@ -233,21 +237,10 @@ class FiltersViewModel(
         _distance.emit(15)
         _meetTypes.emit(emptyList())
         _online.emit(false)
-        _selectedGenders.emit(emptyList())
         _selectedCondition.emit(emptyList())
         findMeets()
         mainVm.setFilters(filtersBuilder())
         mainVm.getMeets()
-    }
-    
-    suspend fun selectGender(gender: Int) {
-        val list = _selectedGenders.value
-        _selectedGenders.emit(
-            if(list.contains(gender))
-                list - gender
-            else list + gender
-        )
-        findMeets()
     }
     
     suspend fun selectCondition(condition: Int) {

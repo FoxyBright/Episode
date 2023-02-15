@@ -37,7 +37,7 @@ fun MeetingFilterBottomPreview() {
             MeetingFilterBottom(
                 Modifier, (26), FilterListState(
                     (true), (false), (25), (false),
-                    listOf(0, 2), emptyList(), emptyList(),
+                    listOf(0, 2), emptyList(),
                     listOf("kaif", "pain", "fast", "launch")
                         .map { TagModel(it, it) },
                     listOf(), listOf(), listOf(),
@@ -54,7 +54,6 @@ data class FilterListState(
     val distance: Int,
     val onlyOnline: Boolean,
     val meetType: List<Int>,
-    val genderList: List<Int>,
     val conditionList: List<Int>,
     val tags: List<TagModel>,
     val interest: List<CategoryModel>,
@@ -78,7 +77,6 @@ interface MeetingFilterBottomCallback {
     fun onDistanceValueChange(it: Int)
     fun onOnlyOnlineClick()
     fun onMeetingTypeSelect(index: Int)
-    fun onGenderSelect(index: Int)
     fun onConditionSelect(index: Int)
     fun onCountryClick()
     fun onCityClick()
@@ -185,13 +183,10 @@ private fun filterList(
                 { callback?.onMeetingTypeSelect(it) }
             )
         },
-        FilterModel(stringResource(R.string.meeting_filter_gender_and_conditions)) {
-            GenderAndConditions(
-                state.genderList,
-                state.conditionList,
-                { callback?.onGenderSelect(it) },
-                { callback?.onConditionSelect(it) }
-            )
+        FilterModel(stringResource(R.string.meeting_filter_conditions)) {
+            Conditions(state.conditionList) {
+                callback?.onConditionSelect(it)
+            }
         }
     )
     if(state.today) filters.add(

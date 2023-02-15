@@ -33,7 +33,6 @@ fun FiltersBs(vm: FiltersViewModel) {
     val distance by vm.distance.collectAsState()
     val online by vm.online.collectAsState()
     val meetTypes by vm.meetTypes.collectAsState()
-    val selectedGenders by vm.selectedGenders.collectAsState()
     val selectedCondition by vm.selectedCondition.collectAsState()
     val results by vm.results.collectAsState()
     
@@ -51,8 +50,7 @@ fun FiltersBs(vm: FiltersViewModel) {
         else -> MeetingFilterBottom(
             Modifier, results, FilterListState(
                 today, distanceState, distance,
-                online, meetTypes, selectedGenders,
-                selectedCondition, tags,
+                online, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
                 categoriesStates, country, city
             ), object: MeetingFilterBottomCallback {
@@ -67,8 +65,8 @@ fun FiltersBs(vm: FiltersViewModel) {
                     }
                 }
                 
-                override fun onSubClick(category: CategoryModel) {
-                    scope.launch { vm.selectCategory(category) }
+                override fun onSubClick(parent: CategoryModel) {
+                    scope.launch { vm.selectCategory(parent) }
                 }
                 
                 override fun onAllCategoryClick() {
@@ -117,10 +115,6 @@ fun FiltersBs(vm: FiltersViewModel) {
                 
                 override fun onMeetingTypeSelect(index: Int) {
                     scope.launch { vm.selectMeetType(index) }
-                }
-                
-                override fun onGenderSelect(index: Int) {
-                    scope.launch { vm.selectGender(index) }
                 }
                 
                 override fun onConditionSelect(index: Int) {

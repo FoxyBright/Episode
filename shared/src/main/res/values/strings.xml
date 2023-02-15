@@ -190,7 +190,7 @@
     <string name="meeting_filter_tag_search">Поиск по тегам</string>
     <string name="meeting_filter_distance">Расстояние</string>
     <string name="meeting_filter_meet_type">Тип meet</string>
-    <string name="meeting_filter_gender_and_conditions">Пол и условия</string>
+    <string name="meeting_filter_conditions">Условия</string>
 
     <!-- Chats -->
     <string name="chats_member_cases">участник%s</string>

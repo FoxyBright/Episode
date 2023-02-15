@@ -33,7 +33,6 @@ import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
@@ -394,34 +393,10 @@ fun ConditionsSelect(
 }
 
 @Composable
-fun GenderAndConditions(
-    selectedGenders: List<Int>,
+fun Conditions(
     selectedConditions: List<Int>,
-    onGenderSelect: (Int) -> Unit,
     onConditionSelect: (Int) -> Unit,
 ) {
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp),
-        shapes.large,
-        cardColors(colorScheme.primaryContainer),
-    ) {
-        FlowLayout(
-            Modifier
-                .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
-        ) {
-            repeat(GenderType.shortList.size) {
-                GiltyChip(
-                    Modifier,
-                    GenderType.shortList[it].value,
-                    selectedGenders.contains(it)
-                ) { onGenderSelect(it) }
-            }
-        }
-    }
     Card(
         Modifier.fillMaxWidth(),
         shapes.large,

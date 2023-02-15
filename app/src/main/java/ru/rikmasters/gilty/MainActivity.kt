@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
@@ -54,9 +55,11 @@ class MainActivity: ComponentActivity() {
                 { GSnackbar(it) },
                 { isLoading, content -> GLoader(isLoading, content) }
             )
+            
             LaunchedEffect(Unit) {
                 
-                authManager.savePushToken(token)
+                val isAuthorized = MutableStateFlow(authManager.isAuthorized())
+                if(isAuthorized.value) authManager.savePushToken(token)
                 
                 env[WebSource.ENV_BASE_URL] = BuildConfig.HOST + BuildConfig.PREFIX_URL
             }
