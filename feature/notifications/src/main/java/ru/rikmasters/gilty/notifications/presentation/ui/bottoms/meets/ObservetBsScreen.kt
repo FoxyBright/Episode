@@ -24,7 +24,8 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 fun ObserveBs(
     vm: ObserveBsViewModel,
     type: MeetNavigation,
-    meet: MeetingModel,
+    meet: MeetingModel? = null,
+    user: UserModel? = null,
 ) {
     
     val scope = rememberCoroutineScope()
@@ -33,20 +34,28 @@ fun ObserveBs(
     val nav = get<NavState>()
     
     val memberList by vm.memberList.collectAsState()
-    val stack by vm.stack.collectAsState()
-    val meeting by vm.meet.collectAsState()
     val navigator by vm.navigator.collectAsState()
+    val meeting by vm.meet.collectAsState()
+    val stack by vm.stack.collectAsState()
     val distance by vm.distance.collectAsState()
     val menu by vm.menu.collectAsState()
-   
+    
+    //TODO для открытия второго BS с комментарием
+    //    val hidden by vm.hidden.collectAsState()
+    //    val comment by vm.comment.collectAsState()
+    //    val details = if(
+    //        meet.memberState != IS_MEMBER
+    //        && meet.memberState != IS_ORGANIZER
+    //    ) Pair(comment, hidden) else null
+    
     val buttonState = meeting?.memberState == IS_ORGANIZER
     val backBut = stack.size > 1
     
     LaunchedEffect(Unit) {
         vm.clearStack()
         vm.navigate(
-            type, if(type == MEET) meet.id
-            else meet.organizer?.id!!
+            type, if(type == MEET) meet?.id!!
+            else user?.id!!
         )
         vm.clearComment()
         vm.changeHidden(false)
@@ -56,7 +65,7 @@ fun ObserveBs(
         navigator?.let { screen ->
             when(screen.navigation) {
                 PARTICIPANTS -> ParticipantsBs(vm, it)
-                COMPLAINTS -> ComplaintsBs(vm, meet.id)
+                COMPLAINTS -> ComplaintsBs(vm, meet?.id!!)
                 ORGANIZER -> OrganizerBs(vm, it)
                 MEET -> MeetingBsContent(
                     MeetingBsState(

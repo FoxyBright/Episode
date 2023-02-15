@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.MEET
 import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.ORGANIZER
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
 @Composable
@@ -113,21 +114,25 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
                 
-                override fun onMeetClick(meet: MeetingModel) {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<ObserveBsViewModel>(vm.scope) {
-                                ObserveBs(it, MEET, meet)
+                override fun onMeetClick(meet: MeetingModel?) {
+                    meet?.let {
+                        scope.launch {
+                            asm.bottomSheet.expand {
+                                Connector<ObserveBsViewModel>(vm.scope) {
+                                    ObserveBs(it, MEET, meet)
+                                }
                             }
                         }
                     }
                 }
                 
-                override fun onUserClick(meet: MeetingModel) {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<ObserveBsViewModel>(vm.scope) {
-                                ObserveBs(it, ORGANIZER, meet)
+                override fun onUserClick(user: UserModel?) {
+                    user?.id?.let {
+                        scope.launch {
+                            asm.bottomSheet.expand {
+                                Connector<ObserveBsViewModel>(vm.scope) {
+                                    ObserveBs(it, ORGANIZER, (null), user)
+                                }
                             }
                         }
                     }

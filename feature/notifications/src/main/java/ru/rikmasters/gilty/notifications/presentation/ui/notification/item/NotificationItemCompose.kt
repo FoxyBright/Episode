@@ -80,8 +80,8 @@ fun NotificationItem(
                 NotificationText(
                     organizer, type, meet,
                     state.duration, emoji = emoji,
-                    onMeetClick = { callback?.onMeetClick(meet!!) },
-                    onUserClick = { callback?.onUserClick(meet!!) }
+                    onMeetClick = { callback?.onMeetClick(meet) },
+                    onUserClick = { callback?.onUserClick(organizer) }
                 )
             }
         }
@@ -100,8 +100,8 @@ fun NotificationItem(
             NotificationText(
                 organizer, type, meet,
                 state.duration,
-                onMeetClick = { callback?.onMeetClick(meet!!) },
-                onUserClick = { callback?.onUserClick(meet!!) }
+                onMeetClick = { callback?.onMeetClick(meet) },
+                onUserClick = { callback?.onUserClick(organizer) }
             )
         }
     }
