@@ -10,13 +10,13 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.notifications.presentation.ui.bottoms.meets.ObserveBs
-import ru.rikmasters.gilty.notifications.presentation.ui.bottoms.responds.RespondsBs
+import ru.rikmasters.gilty.meetbs.presentation.ui.Observe
+import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.MEET
+import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.USER
+import ru.rikmasters.gilty.meetbs.viewmodel.ObserveViewModel
+import ru.rikmasters.gilty.notifications.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
-import ru.rikmasters.gilty.notifications.viewmodel.bottoms.ObserveBsViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
-import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.MEET
-import ru.rikmasters.gilty.shared.common.meetBS.MeetNavigation.ORGANIZER
 import ru.rikmasters.gilty.shared.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -114,24 +114,22 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
                 
-                override fun onMeetClick(meet: MeetingModel?) {
-                    meet?.let {
-                        scope.launch {
-                            asm.bottomSheet.expand {
-                                Connector<ObserveBsViewModel>(vm.scope) {
-                                    ObserveBs(it, MEET, meet)
-                                }
+                override fun onMeetClick(meet: MeetingModel) {
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            Connector<ObserveViewModel>(vm.scope) {
+                                Observe(it, MEET, meet.id, meet.organizer?.id!!)
                             }
                         }
                     }
                 }
                 
-                override fun onUserClick(user: UserModel?) {
-                    user?.id?.let {
+                override fun onUserClick(user: UserModel, meet: MeetingModel) {
+                    user.id?.let { u ->
                         scope.launch {
                             asm.bottomSheet.expand {
-                                Connector<ObserveBsViewModel>(vm.scope) {
-                                    ObserveBs(it, ORGANIZER, (null), user)
+                                Connector<ObserveViewModel>(vm.scope) {
+                                    Observe(it, USER, meet.id, u)
                                 }
                             }
                         }

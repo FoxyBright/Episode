@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting
+package ru.rikmasters.gilty.meetbs.presentation.ui.organizer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,57 +7,52 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileCallback
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
+import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-data class OrganizerProfileState(
-    val profileState: ProfileState,
-    val currentMeetings: List<MeetingModel>,
-)
-
 @Preview
 @Composable
 private fun OrganizerProfilePreview() {
     GiltyTheme {
-        var observeState by remember { mutableStateOf(false) }
-        val currentMeetings = DemoMeetingList
-        val profileState = ProfileState(
-            DemoProfileModel,
-            profileType = ProfileType.ORGANIZER,
-            observeState = observeState
-        )
-        OrganizerProfile(
-            Modifier, OrganizerProfileState(profileState, currentMeetings),
-            object : UserProfileCallback {
-                override fun closeAlert() {}
-
-                override fun onObserveChange(state: Boolean) {
-                    super.onObserveChange(observeState)
-                    observeState = state
-                }
-            }
+        OrganizerContent(
+            Modifier, UserState(
+                ProfileState(
+                    DemoProfileModel,
+                    ORGANIZER, (false)
+                ), DemoMeetingList
+            )
         )
     }
 }
 
+data class UserState(
+    val profileState: ProfileState,
+    val currentMeetings: List<MeetingModel>,
+)
+
+interface OrganizerCallback: ProfileCallback {
+    
+    fun onMeetingClick(meet: MeetingModel)
+}
+
 @Composable
-fun OrganizerProfile(
+fun OrganizerContent(
     modifier: Modifier = Modifier,
-    state: OrganizerProfileState,
-    callback: UserProfileCallback? = null
+    state: UserState,
+    callback: OrganizerCallback? = null,
 ) {
     LazyColumn(
         modifier
@@ -71,7 +66,7 @@ fun OrganizerProfile(
                 callback
             ) { callback?.onObserveChange(it) }
         }
-        if (state.currentMeetings.isNotEmpty()) {
+        if(state.currentMeetings.isNotEmpty()) {
             item {
                 Text(
                     stringResource(R.string.profile_actual_meetings_label),

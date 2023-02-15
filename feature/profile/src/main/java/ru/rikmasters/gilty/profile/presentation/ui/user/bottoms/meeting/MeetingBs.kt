@@ -55,7 +55,7 @@ fun MeetingBs(
     meeting?.let { meet ->
         navigator?.let { screen ->
             when(screen.navigation) {
-                ORGANIZER -> OrganizerBs(vm, meet.type)
+                ORGANIZER -> {}
                 PARTICIPANTS -> ParticipantsBs(vm, meet)
                 COMPLAINTS -> ComplaintsBs(vm, meetId)
                 MEET -> MeetingBsContent(

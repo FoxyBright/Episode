@@ -22,7 +22,6 @@ import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.util.composable.getOrNull
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
@@ -32,17 +31,17 @@ fun AppEntrypoint(
     theme: AppTheme,
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
     snackbar: @Composable (SnackbarData) -> Unit,
-    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null
+    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null,
 ) {
     
     LoadingTrait.loader = loader
-
+    
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetSwipeableState = rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
     val keyboardController = rememberKeyboardController()
-
+    
     val asm = remember {
         AppStateModel(
             isSystemInDarkMode,
@@ -52,27 +51,27 @@ fun AppEntrypoint(
             keyboardController
         )
     }
-
+    
     val navController = rememberNavController()
     val entrypointResolver = getOrNull<EntrypointResolver>()
     val startDestination = remember(entrypointResolver) {
         runBlocking { entrypointResolver?.resolve() ?: "entrypoint" }
     }
-
+    
     val navState = remember(startDestination) {
         NavState(
             navController,
             startDestination
         )
     }
-
+    
     val env: Environment = get()
-
+    
     theme.apply(
         asm.darkMode,
         asm.dynamicColor
     ) {
-    
+        
         val backgroundColor = colorScheme.background
         
         LaunchedEffect(backgroundColor) {
@@ -103,7 +102,7 @@ fun AppEntrypoint(
             )
         }
     }
-
+    
     LaunchedEffect(env, asm) {
         loadAsModule(env, asm)
     }

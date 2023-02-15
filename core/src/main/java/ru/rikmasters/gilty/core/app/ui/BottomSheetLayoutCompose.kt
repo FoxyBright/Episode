@@ -128,6 +128,7 @@ fun BottomSheetLayout(
         )
         
         content()
+        
         if(scrimColor != Color.Transparent)
             Box(
                 Modifier

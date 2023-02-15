@@ -9,13 +9,9 @@ compose()
 dependencies {
     androidBase()
     compose()
-    implementation(project(":feature:complaints"))
-    implementation(project(":feature:profile"))
-    implementation(project(":feature:observebs"))
     
+    implementation(project(":feature:complaints"))
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))
-    implementation(project(":data:push"))
-    
     implementation(project(":shared"))
 }

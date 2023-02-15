@@ -58,7 +58,7 @@ fun MeetBs(
             when(screen.navigation) {
                 PARTICIPANTS -> ParticipantsBs(vm, meet)
                 COMPLAINTS -> ComplaintsBs(vm, meetId)
-                ORGANIZER -> OrganizerBs(vm, meet)
+                ORGANIZER -> {}
                 MEET -> MeetingBsContent(
                     MeetingBsState(
                         menu, meet, memberList, distance,

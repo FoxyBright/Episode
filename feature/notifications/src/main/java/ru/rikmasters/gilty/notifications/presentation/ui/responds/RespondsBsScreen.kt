@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.notifications.presentation.ui.bottoms.responds
+package ru.rikmasters.gilty.notifications.presentation.ui.responds
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

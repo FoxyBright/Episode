@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.notifications.presentation.ui.bottoms.responds
+package ru.rikmasters.gilty.notifications.presentation.ui.responds
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

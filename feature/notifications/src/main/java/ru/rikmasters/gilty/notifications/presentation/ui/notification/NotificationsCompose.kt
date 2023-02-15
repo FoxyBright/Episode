@@ -104,8 +104,8 @@ interface NotificationsCallback {
         userId: String?,
     )
     
-    fun onMeetClick(meet: MeetingModel?)
-    fun onUserClick(user: UserModel?)
+    fun onMeetClick(meet: MeetingModel)
+    fun onUserClick(user: UserModel, meet: MeetingModel)
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
