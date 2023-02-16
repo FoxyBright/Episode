@@ -35,9 +35,9 @@ import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
 import ru.rikmasters.gilty.shared.model.chat.MessageList
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
-import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
-import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
-import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.WRITING
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -86,7 +86,7 @@ interface MessCallBack {
 fun Message(
     state: MessState,
     modifier: Modifier = Modifier,
-    callBack: MessCallBack? = null
+    callBack: MessCallBack? = null,
 ) {
     val message = state.message
     val notification = message.type == NOTIFICATION
@@ -96,9 +96,9 @@ fun Message(
                 if(message.type == MESSAGE)
                     state.dragState
                 else DragRowState(0f),
-                if(message.type == MESSAGE)
+                if(message.type == MESSAGE) {
                     LocalContext.current
-                else null
+                } else null
             ) {
                 callBack?.onSwipe(message)
             },
@@ -134,11 +134,11 @@ fun Message(
 private fun Content(
     state: MessState,
     modifier: Modifier = Modifier,
-    callback: MessCallBack? = null
+    callback: MessCallBack? = null,
 ) {
     val message = state.message
     val sender = state.sender
-    val attach = message.attachments
+    val attach = message.message?.attachments
     Row(
         modifier,
         if(sender) End
@@ -148,7 +148,7 @@ private fun Content(
             message.type != NOTIFICATION
             && state.avatar
         ) AsyncImage(
-            message.sender.avatar?.id, (null),
+            message.message?.author?.avatar?.id, (null),
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
@@ -175,19 +175,16 @@ private fun Content(
             MESSAGE -> {
                 when {
                     (attach != null) -> Image(
-                        attach.type, message,
+                        attach.first().type, message,
                         sender, state.shape,
                         state.isOnline, callback,
                     )
                     
-                    (message.answer != null) -> {
-                        message.answer?.let {
-                            Text(
-                                message, sender, state.shape,
-                                state.isOnline, it,
-                            ) { callback?.onAnswerClick(it) }
-                        }
-                    }
+                    (message.replied != null) -> Text(
+                        message, sender, state.shape,
+                        state.isOnline, message.replied,
+                    ) { callback?.onAnswerClick(message.replied!!) }
+                    
                     
                     else -> Text(
                         message, sender,
@@ -209,7 +206,7 @@ private fun Image(
     sender: Boolean,
     shape: Shape,
     isOnline: Boolean,
-    callback: MessCallBack?
+    callback: MessCallBack?,
 ) {
     when(type) {
         
@@ -223,8 +220,8 @@ private fun Image(
         PRIVATE_PHOTO -> {
             HiddenImageMessage(
                 Modifier, message, sender,
-                message.attachments
-                    ?.file?.hasAccess ?: false, shape
+                message.message?.attachments
+                    ?.first()?.file?.hasAccess ?: false, shape
             ) { callback?.onHiddenClick(message) }
         }
         
@@ -239,7 +236,7 @@ private fun Text(
     shape: Shape,
     isOnline: Boolean,
     answer: MessageModel? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     TextMessage(
         message, sender,

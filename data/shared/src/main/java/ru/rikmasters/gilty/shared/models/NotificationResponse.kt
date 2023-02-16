@@ -1,10 +1,10 @@
 package ru.rikmasters.gilty.shared.models
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 import ru.rikmasters.gilty.shared.models.meets.MeetingResponse

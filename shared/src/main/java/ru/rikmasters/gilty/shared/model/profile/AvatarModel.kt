@@ -1,9 +1,9 @@
 package ru.rikmasters.gilty.shared.model.profile
 
-import ru.rikmasters.gilty.shared.image.DemoThumbnailModel
-import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 
 data class AvatarModel(
     val id: String,

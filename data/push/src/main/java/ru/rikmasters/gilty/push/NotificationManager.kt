@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.push
 
-import ru.rikmasters.gilty.shared.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
 
 class NotificationManager(
     

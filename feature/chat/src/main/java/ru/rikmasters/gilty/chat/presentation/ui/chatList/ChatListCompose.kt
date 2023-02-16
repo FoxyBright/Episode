@@ -32,14 +32,14 @@ import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import ru.rikmasters.gilty.shared.model.chat.DemoChatListModel
+import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.shared.Divider
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.shared.NavBar
+import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -51,7 +51,7 @@ private fun ChatListPreview() {
                 listOf(
                     INACTIVE, NEW, INACTIVE,
                     INACTIVE, ACTIVE
-                ), getSortedChats(DemoChatListModel),
+                ), getSortedChats(DemoChatModelList),
                 (true), (false), LIST, listOf()
             ), Modifier.background(colorScheme.background)
         )

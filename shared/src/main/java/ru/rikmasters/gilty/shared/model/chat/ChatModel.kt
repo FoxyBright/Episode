@@ -3,12 +3,11 @@ package ru.rikmasters.gilty.shared.model.chat
 import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
 import ru.rikmasters.gilty.shared.common.extentions.YESTERDAY
+import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-
-enum class ChatStatus { ACTIVE, INACTIVE }
 
 data class ChatModel(
     val id: String,
@@ -17,46 +16,41 @@ data class ChatModel(
     val meetStatus: MeetStatusType,
     val status: ChatStatus,
     val isOnline: Boolean,
+    val translationStartedAt: String? = null,
     val organizer: UserModel,
     val organizerOnly: Boolean,
     val title: String,
     val lastMessage: MessageModel,
-    val dateTime: String,
-    val hasUnread: Boolean,
+    val datetime: String,
+    val unreadCount: Int,
     val canMessage: Boolean,
     val memberCount: Int,
-    val createdAt: String
+    val createdAt: String,
 )
 
-fun getChatWithData(
-    id: String = "1",
-    meetingId: String = "1",
-    userId: String = "1",
-    meetStatus: MeetStatusType = MeetStatusType.ACTIVE,
-    status: ChatStatus = ChatStatus.ACTIVE,
-    isOnline: Boolean = false,
-    organizer: UserModel = DemoUserModel,
-    organizerOnly: Boolean = false,
-    title: String = DemoMeetingModel.title,
-    lastMessage: MessageModel = DemoMessageModel,
-    dateTime: String = "2022-11-28T20:00:54.140Z",
-    hasUnread: Boolean = false,
-    canMessage: Boolean = false,
-    memberCount: Int = DemoMeetingModel.memberCount,
-    createdAt: String = "2022-11-28T20:00:54.140Z"
-) = ChatModel(
-    id, meetingId, userId, meetStatus,
-    status, isOnline, organizer,
-    organizerOnly, title,
-    lastMessage, dateTime,
-    hasUnread, canMessage,
-    memberCount, createdAt
+val DemoChatModel = ChatModel(
+    "1",
+    "1",
+    "1",
+    MeetStatusType.ACTIVE,
+    ChatStatus.ACTIVE,
+    false,
+    null,
+    DemoUserModel,
+    false,
+    DemoMeetingModel.title,
+    DemoMessageModel,
+    "2022-11-28T20:00:54.140Z",
+    0,
+    true,
+    DemoMeetingModel.memberCount,
+    "2022-11-28T20:00:54.140Z"
 )
 
-val DemoChatListModel = listOf(
-    getChatWithData(id = "1", dateTime = NOW_DATE, isOnline = true, hasUnread = true),
-    getChatWithData(id = "2", dateTime = TOMORROW),
-    getChatWithData(id = "3", dateTime = TOMORROW, hasUnread = true),
-    getChatWithData(id = "4", dateTime = YESTERDAY, isOnline = true),
-    getChatWithData(id = "5", dateTime = YESTERDAY)
+val DemoChatModelList = listOf(
+    DemoChatModel.copy(id = "1", datetime = NOW_DATE, isOnline = true, unreadCount = 10),
+    DemoChatModel.copy(id = "2", datetime = TOMORROW),
+    DemoChatModel.copy(id = "3", datetime = TOMORROW, unreadCount = 4),
+    DemoChatModel.copy(id = "4", datetime = YESTERDAY, isOnline = true),
+    DemoChatModel.copy(id = "5", datetime = YESTERDAY)
 )

@@ -28,14 +28,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.TextFieldType.COMMENT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.TextFieldType.MESSAGE
-import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_answer_arrow
 import ru.rikmasters.gilty.shared.R.drawable.ic_cross
 import ru.rikmasters.gilty.shared.R.string.text_text
-import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelLongMessage
+import ru.rikmasters.gilty.shared.model.chat.DemoLongMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -69,11 +69,11 @@ private fun MessengerBarWithAnswerPreview() {
         Column {
             MessengerBar(
                 smthText, Modifier.padding(6.dp),
-                DemoMessageModelLongMessage
+                DemoLongMessageModel
             )
             MessengerBar(
                 "", Modifier.padding(6.dp),
-                DemoMessageModelLongMessage
+                DemoLongMessageModel
             )
         }
     }

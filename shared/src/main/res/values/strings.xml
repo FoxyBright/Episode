@@ -216,6 +216,11 @@
     <string name="chats_gallery_select_photo">Фото или видео</string>
     <string name="chats_gallery_camera">Камера</string>
 
+    <string name="chats_message_translation_30">Трансляция начнется через 30 минут</string>
+    <string name="chats_message_translation_5">Трансляция начнется через 5 минут</string>
+    <string name="chats_message_translation_started">Трансляция началась</string>
+    <string name="chats_message_translation_completed">Трансляция окончена</string>
+
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
     <string name="action_bar_button_back">Кнопка назад</string>

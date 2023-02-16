@@ -11,7 +11,7 @@ fun getSortedChats(
 ): Pair<List<Pair<String, List<ChatModel>>>, List<ChatModel>> {
     
     val sortChats = chats.sortedBy {
-        LocalDate.of(it.dateTime).millis()
+        LocalDate.of(it.datetime).millis()
     }
     
     val lastChats =
@@ -23,7 +23,7 @@ fun getSortedChats(
         arrayListOf<String>()
     sortChats.forEach {
         
-        val date = it.dateTime
+        val date = it.datetime
             .format(DATE_FORMAT)
         if(!dateList.contains(date) &&
             (LocalDate.of(date).isAfter(LOCAL_DATE)
@@ -40,7 +40,7 @@ fun getSortedChats(
             arrayListOf<ChatModel>()
         sortChats.forEach { chat ->
             val meetDate =
-                LocalDate.of(chat.dateTime)
+                LocalDate.of(chat.datetime)
             
             if(meetDate.toString() == date)
                 chatList.add(chat)

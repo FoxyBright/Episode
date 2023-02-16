@@ -47,7 +47,7 @@ private fun ChatRowLastPreview() {
     GiltyTheme {
         SwipeableChatRow(
             DragRowState(100f),
-            getChatWithData(dateTime = "2022-11-28T20:00:54.140Z"),
+            DemoChatModel.copy(datetime = "2022-11-28T20:00:54.140Z"),
             shapes.medium, (123),
             Modifier.padding(16.dp),
         )
@@ -60,9 +60,9 @@ private fun ChatRowActualPreview() {
     GiltyTheme {
         SwipeableChatRow(
             DragRowState(100f),
-            getChatWithData(
-                dateTime = TOMORROW,
-                hasUnread = true
+            DemoChatModel.copy(
+                datetime = TOMORROW,
+                unreadCount = 10
             ),
             shapes.medium, (15152),
             Modifier.padding(16.dp),
@@ -76,9 +76,9 @@ private fun ChatRowTodayPreview() {
     GiltyTheme {
         SwipeableChatRow(
             DragRowState(100f),
-            getChatWithData(
-                dateTime = NOW_DATE,
-                hasUnread = true
+            DemoChatModel.copy(
+                datetime = NOW_DATE,
+                unreadCount = 10
             ),
             shapes.medium, (13151),
             Modifier.padding(16.dp),
@@ -92,8 +92,8 @@ private fun ChatRowOnlinePreview() {
     GiltyTheme {
         SwipeableChatRow(
             DragRowState(100f),
-            getChatWithData(
-                dateTime = NOW_DATE,
+            DemoChatModel.copy(
+                datetime = NOW_DATE,
                 isOnline = true
             ),
             shapes.medium, (1241521),
@@ -143,7 +143,7 @@ private fun ChatRowContent(
     chat: ChatModel,
     shape: Shape,
     unRead: Int,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -152,17 +152,17 @@ private fun ChatRowContent(
     ) {
         Box(Modifier.fillMaxWidth()) {
             when {
-                todayControl(chat.dateTime) -> Timer(
-                    chat.dateTime, chat.isOnline,
+                todayControl(chat.datetime) -> Timer(
+                    chat.datetime, chat.isOnline,
                     Modifier
                         .align(TopEnd)
                         .padding(12.dp)
                 )
                 
-                LocalDate.of(chat.dateTime)
+                LocalDate.of(chat.datetime)
                     .isBefore(LOCAL_DATE) -> {
                     val date = LocalDate
-                        .of(chat.dateTime)
+                        .of(chat.datetime)
                     Text(
                         "${date.day()} ${
                             Month.of(date.month())
@@ -197,7 +197,7 @@ private fun ChatRowContent(
                 Avatar(chat.organizer.avatar, unRead)
                 Message(
                     chat.title, chat.organizer,
-                    chat.lastMessage.text,
+                    chat.lastMessage.message?.text ?: "",
                     Modifier.padding(start = 8.dp)
                 )
             }
@@ -209,7 +209,7 @@ private fun ChatRowContent(
 private fun Timer(
     time: String,
     isOnline: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier.background(
@@ -234,7 +234,7 @@ private fun Message(
     title: String,
     user: UserModel,
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Text(
@@ -268,7 +268,7 @@ private fun Message(
 private fun Avatar(
     avatar: AvatarModel?,
     unRead: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
         AsyncImage(

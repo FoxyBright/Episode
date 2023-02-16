@@ -3,9 +3,15 @@ package ru.rikmasters.gilty.chat
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.chatInstance.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
 import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
+import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.ChatListViewModel
+import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.ChatViewModel
+import ru.rikmasters.gilty.chats.ChatData
+import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 
@@ -15,7 +21,9 @@ object Chat: FeatureDefinition() {
         
         nested("chats", "main") {
             
-            screen("main") { ChatListScreen() }
+            screen<ChatListViewModel>("main") { vm, _ ->
+                ChatListScreen(vm)
+            }
             
             screen(
                 "chat?type={type}", listOf(
@@ -44,5 +52,17 @@ object Chat: FeatureDefinition() {
         }
     }
     
-    override fun Module.koin() {}
+    override fun Module.koin() {
+        singleOf(::ChatManager)
+        
+        scope<ChatListViewModel> {
+            scopedOf(::ChatListViewModel)
+        }
+        
+        scope<ChatViewModel> {
+            scopedOf(::ChatViewModel)
+        }
+    }
+    
+    override fun include() = setOf(ChatData)
 }

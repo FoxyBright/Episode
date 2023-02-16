@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.BackBlur
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra

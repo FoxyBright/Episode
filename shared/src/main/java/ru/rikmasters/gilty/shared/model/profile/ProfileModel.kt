@@ -1,11 +1,11 @@
 package ru.rikmasters.gilty.shared.model.profile
 
-import ru.rikmasters.gilty.shared.image.DemoThumbnailModel
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
-import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import java.util.UUID.randomUUID
 

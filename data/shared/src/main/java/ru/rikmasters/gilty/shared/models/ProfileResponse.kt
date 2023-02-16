@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.shared.models
 
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
@@ -30,7 +30,7 @@ data class ProfileResponse(
     val subscriptionExpiredAt: String? = null,
     val thumbnail: Thumbnail,
     val responds: Responds? = null,
-    val albumPrivate: AlbumPrivate? = null,
+    val albumPrivate: Album? = null,
     val countWatchers: Int? = null,
     val countWatching: Int? = null,
     val isWatching: Boolean? = null,
@@ -77,9 +77,4 @@ data class ProfileResponse(
 data class Responds(
     val count: Int? = null,
     val thumbnail: Thumbnail? = null,
-)
-
-data class AlbumPrivate(
-    val id: String,
-    val preview: Avatar? = null,
 )

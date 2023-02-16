@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.image
+package ru.rikmasters.gilty.shared.model.image
 
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel

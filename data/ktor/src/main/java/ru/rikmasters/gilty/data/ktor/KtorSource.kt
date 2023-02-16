@@ -16,6 +16,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson
 import okhttp3.OkHttpClient
 import ru.rikmasters.gilty.core.data.source.WebSource
@@ -54,6 +55,7 @@ open class KtorSource: WebSource() {
                 agent = env[ENV_USER_AGENT] ?: ""
             }
             install(WebSockets) {
+                contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
             }
             engine {
@@ -63,6 +65,7 @@ open class KtorSource: WebSource() {
                         MILLISECONDS
                     ).build()
             }
+
         }
     }
     

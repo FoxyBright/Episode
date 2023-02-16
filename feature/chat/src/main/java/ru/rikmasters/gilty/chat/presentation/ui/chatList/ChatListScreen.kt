@@ -1,48 +1,44 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET
 import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET_FINISHED
 import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION_AWAIT
-import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
 import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
-import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.extentions.LOCAL_DATE
+import ru.rikmasters.gilty.shared.common.extentions.LocalDate
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import ru.rikmasters.gilty.shared.model.chat.getChatWithData
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 
 @Composable
-fun ChatListScreen(nav: NavState = get()) {
+fun ChatListScreen(vm: ChatListViewModel) {
+    
+    val nav = get<NavState>()
     
     val stateList = remember {
         mutableStateListOf(INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE)
     }
     
-    val chatsList = remember {
-        mutableStateListOf(
-            getChatWithData(id = "1", dateTime = NOW_DATE, isOnline = true, hasUnread = true),
-            getChatWithData(id = "2", dateTime = TOMORROW),
-            getChatWithData(id = "3", dateTime = NOW_DATE, hasUnread = true),
-            getChatWithData(id = "4", dateTime = YESTERDAY, isOnline = true),
-            getChatWithData(id = "5", dateTime = YESTERDAY, hasUnread = true)
-        )
+    val dialogs by vm.dialogs.collectAsState()
+    
+    LaunchedEffect(Unit) {
+        vm.getDialogs()
     }
     
-    val chats = getSortedChats(chatsList)
+    val chats = getSortedChats(dialogs)
     
     var ended by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     var active by
+    
     remember { mutableStateOf(false) }
     
     val delForMe = stringResource(delete_my_chat_button)
@@ -79,23 +75,23 @@ fun ChatListScreen(nav: NavState = get()) {
             }
             
             override fun onAlertSuccess() {
-                if(state == LIST) state = CONFIRM
-                else {
-                    val select = list.indexOf(list.first { it.second })
-                    chatsList.remove(chatToDelete.value)
-                    Toast.makeText(
-                        context,
-                        "Чат ${chatToDelete.value?.title} был удален ${
-                            when(select) {
-                                0 -> "у вас"
-                                else -> "у всех участников"
-                            }
-                        }",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    state = LIST
-                    active = false
-                }
+                //                if(state == LIST) state = CONFIRM
+                //                else {
+                //                    val select = list.indexOf(list.first { it.second })
+                //                    dialogs.remove(chatToDelete.value)
+                //                    Toast.makeText(
+                //                        context,
+                //                        "Чат ${chatToDelete.value?.title} был удален ${
+                //                            when(select) {
+                //                                0 -> "у вас"
+                //                                else -> "у всех участников"
+                //                            }
+                //                        }",
+                //                        Toast.LENGTH_SHORT
+                //                    ).show()
+                //                    state = LIST
+                //                    active = false
+                //                }
             }
             
             override fun onChatSwipe(chat: ChatModel) {
@@ -118,7 +114,7 @@ fun ChatListScreen(nav: NavState = get()) {
             
             override fun onChatClick(chat: ChatModel) {
                 val type = when {
-                    LocalDate.of(chat.dateTime)
+                    LocalDate.of(chat.datetime)
                         .isBefore(LOCAL_DATE) -> MEET_FINISHED
                     
                     chat.isOnline -> TRANSLATION_AWAIT

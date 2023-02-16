@@ -1,8 +1,8 @@
-package ru.rikmasters.gilty.shared.image
+package ru.rikmasters.gilty.shared.model.image
 
 import ru.rikmasters.gilty.shared.R.drawable.*
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.categoryIcon
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.getEmoji
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.categoryIcon
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 
 data class EmojiModel(
     

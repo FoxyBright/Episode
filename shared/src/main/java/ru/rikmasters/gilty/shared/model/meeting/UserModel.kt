@@ -1,9 +1,9 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
-import ru.rikmasters.gilty.shared.image.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
+import ru.rikmasters.gilty.shared.model.image.*
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel

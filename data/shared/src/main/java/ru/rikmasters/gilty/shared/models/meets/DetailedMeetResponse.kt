@@ -2,10 +2,10 @@ package ru.rikmasters.gilty.shared.models.meets
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
-import ru.rikmasters.gilty.shared.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.valueOf
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel

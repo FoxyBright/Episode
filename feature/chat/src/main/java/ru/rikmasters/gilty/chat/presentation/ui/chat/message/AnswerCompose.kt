@@ -36,7 +36,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun AnswerLongPreview() {
     GiltyTheme {
         AnswerContent(
-            DemoMessageModelLongMessage,
+            DemoLongMessageModel,
             Modifier.padding(16.dp)
         )
     }
@@ -59,7 +59,7 @@ private fun MyAnswer() {
 private fun ImageAnswerTextBox() {
     GiltyTheme {
         AnswerContent(
-            DemoImageMessage,
+            DemoImageMessageModel,
             Modifier.padding(16.dp)
         )
     }
@@ -98,21 +98,19 @@ fun AnswerContent(
                 .width(1.dp)
                 .height(38.dp)
         )
-        message.attachments?.let {
-            it.file?.let { file ->
-                AsyncImage(
-                    file.id, (null), Modifier
-                        .padding(start = 8.dp)
-                        .size(38.dp)
-                        .clip(shapes.small),
-                    contentScale = Crop,
-                    placeholder = painterResource(
-                        ic_image_empty
-                    )
+        message.message?.attachments?.let {
+            AsyncImage(
+                it.first().file.id, (null), Modifier
+                    .padding(start = 8.dp)
+                    .size(38.dp)
+                    .clip(shapes.small),
+                contentScale = Crop,
+                placeholder = painterResource(
+                    ic_image_empty
                 )
-            }
+            )
         }
-        val user = message.sender.username
+        val user = message.message?.author?.username
         Column(Modifier.padding(start = 12.dp)) {
             Text(
                 if(textField) "${
@@ -134,15 +132,15 @@ private fun Label(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = message.attachments?.let {
+        text = message.message?.attachments?.let {
             stringResource(
-                when(it.type) {
+                when(it.first().type) {
                     PHOTO -> chats_message_answer_photo_label
                     PRIVATE_PHOTO -> profile_hidden_photo
                     VIDEO -> chats_message_answer_video_label
                 }
             )
-        } ?: message.text,
+        } ?: message.message?.text ?: "",
         modifier,
         if(!sender) colorScheme.onTertiary
         else White,

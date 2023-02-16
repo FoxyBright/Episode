@@ -20,14 +20,21 @@ import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.extentions.FULL_DATE_FORMAT_WIDTH_ZONE
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsCallback
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsContent
 import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsState
-import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
-import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.chat.DemoMessageModel
+import ru.rikmasters.gilty.shared.model.chat.MemberMessageModel
+import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
+import java.util.UUID
 
 @Composable
 fun ChatScreen(chatType: String, nav: NavState = get()) {
@@ -49,26 +56,12 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     val sender = DemoUserModel
     val messageList = remember {
         mutableStateListOf(
-            WritingMessageModel,
             DemoMessageModel,
             DemoMessageModel,
-            DemoMessageModelVeryLong,
-            DemoMessageModel30Minutes,
-            DemoMessageModelLongMessage,
-            DemoMessageModel5Minutes,
-            DemoHiddenImageMessage,
-            DemoMessageModelLeaveChat,
-            getDemoMessageModel(sender = DemoUserModelTwo),
-            getDemoMessageModel(sender = DemoUserModelTwo),
-            getDemoMessageModel(sender = DemoUserModelTwo),
-            DemoMessageModelScreenshot,
-            DemoMyHiddenImageMessage,
-            DemoImageMessage,
-            DemoMessageModelJoinToChat,
             DemoMessageModel,
-            DemoMessageModelCreated,
         )
     }
+    
     //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
     var unReadCount by remember { mutableStateOf(5) }
     val meet = if(type == TRANSLATION || type == TRANSLATION_AWAIT)
@@ -151,6 +144,8 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
         }
     }
     
+    val user = DemoUserModel
+    
     val participants = 4
     val viewers = if(type == TRANSLATION) 43 else null
     var toTranslation by remember {
@@ -225,7 +220,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             override fun onImageClick(message: MessageModel) {
                 nav.navigate(
                     "photo?image=${
-                        message.attachments!!.file!!.id
+                        message.message?.attachments!!.first().file.id
                     }&type=2"
                 )
             }
@@ -236,7 +231,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
             
             override fun onHiddenClick(message: MessageModel) {
-                if(message.attachments?.file?.hasAccess == true)
+                if(message.message?.attachments?.first()?.file?.hasAccess == true)
                     Toast.makeText(
                         context,
                         "Скрытое фото больше недоступно к просмотру",
@@ -244,7 +239,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                     ).show()
                 else nav.navigate(
                     "photo?image=${
-                        message.attachments!!.file!!.id
+                        message.message?.attachments!!.first().file.id
                     }&type=1"
                 )
             }
@@ -298,17 +293,21 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             override fun onSend() {
                 messageList.add(
                     0, MessageModel(
-                        id = "1",
-                        sender = DemoUserModel,
-                        album = "Бэтмен",
-                        text = messageText,
-                        attachments = null,
-                        notification = null,
+                        id = UUID.randomUUID().toString(),
                         type = MESSAGE,
+                        replied = answer,
+                        notification = null,
+                        message = MemberMessageModel(
+                            author = user,
+                            text = "",
+                            attachments = null,
+                            is_author = true
+                        ),
+                        otherRead = false,
                         isRead = false,
-                        isDelivered = true,
-                        createdAt = "2022-10-17T08:35:54.140Z",
-                        answer = answer
+                        isDelivered = false,
+                        LocalDateTime.now().minusHour(3)
+                            .format(FULL_DATE_FORMAT_WIDTH_ZONE)
                     )
                 )
                 answer = null

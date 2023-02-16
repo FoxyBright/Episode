@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.login.viewmodel.Hidden
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.image.DemoThumbnailModel
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 @Composable

@@ -135,7 +135,7 @@ private fun Content(
         { index, mes ->
             ChatMessage(
                 mes.first, mes.second,
-                (state.user == mes.first.sender),
+                (state.user == mes.first.message?.author),
                 state.meet.isOnline,
                 if(index < list.size - 1)
                     list[index + 1].first

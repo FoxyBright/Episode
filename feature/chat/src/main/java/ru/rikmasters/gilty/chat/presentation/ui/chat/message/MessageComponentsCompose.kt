@@ -41,17 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.animated.AnimatedImage
-import ru.rikmasters.gilty.shared.R.drawable.ic_sms_delivered
-import ru.rikmasters.gilty.shared.R.drawable.ic_sms_read
-import ru.rikmasters.gilty.shared.R.drawable.ic_write
-import ru.rikmasters.gilty.shared.R.raw.typing_dots
-import ru.rikmasters.gilty.shared.R.string.chats_hidden_photo
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.format
-import ru.rikmasters.gilty.shared.image.EmojiModel
-import ru.rikmasters.gilty.shared.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.chat.SystemMessageType.*
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
@@ -68,7 +65,7 @@ private fun TextMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 (true), Modifier.padding(6.dp),
                 isOnline = true
             )
@@ -102,7 +99,7 @@ private fun AnswerMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 (true), Modifier.padding(6.dp),
                 DemoMessageModel,
                 isOnline = true
@@ -110,7 +107,7 @@ private fun AnswerMessagePreview() {
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 isOnline = true
             )
         }
@@ -128,12 +125,12 @@ private fun HiddenPhotoMessagePreview() {
         ) {
             HiddenImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (true), (false), shapes.large
             )
             HiddenImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (false), (true), shapes.large
             )
         }
@@ -150,14 +147,13 @@ private fun AnswerImageMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
-                (true), Modifier.padding(6.dp),
-                DemoImageMessage, isOnline = true
+                DemoLongMessageModel, (true), Modifier.padding(6.dp),
+                DemoImageMessageModel, isOnline = true
             )
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoImageMessage, isOnline = true
+                DemoImageMessageModel, isOnline = true
             )
         }
     }
@@ -166,6 +162,7 @@ private fun AnswerImageMessagePreview() {
 @Preview
 @Composable
 private fun ImageMessagePreview() {
+    
     GiltyTheme {
         Column(
             Modifier.background(
@@ -174,13 +171,13 @@ private fun ImageMessagePreview() {
         ) {
             ImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (true), shapes.large,
                 (true)
             )
             ImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (false), shapes.large,
                 (true)
             )
@@ -197,9 +194,9 @@ private fun SystemMessagePreview() {
                 colorScheme.background
             )
         ) {
-            SystemMessageType.values().forEach {
+            ChatNotificationType.values().forEach {
                 SystemMessage(
-                    ChatNotificationType(
+                    ChatNotificationModel(
                         it, DemoUserModel
                     ), Modifier.padding(6.dp)
                 )
@@ -223,14 +220,14 @@ fun WritingMessage(
             .padding(12.dp, 8.dp)
             .size(24.dp)
         if(LocalInspectionMode.current) Image(
-            painterResource(ic_write), (null), mod
-        ) else AnimatedImage(typing_dots, mod)
+            painterResource(R.drawable.ic_write), (null), mod
+        ) else AnimatedImage(R.raw.typing_dots, mod)
     }
 }
 
 @Composable
 fun SystemMessage(
-    notification: ChatNotificationType?,
+    notification: ChatNotificationModel?,
     modifier: Modifier = Modifier,
 ) {
     val bold = typography.labelSmall
@@ -300,14 +297,28 @@ fun SystemMessage(
                             colorScheme.secondary,
                             fontWeight = SemiBold
                         )
-                    ) { append("Трансляция начнется через 30 минут") }
+                    ) { append(stringResource(R.string.chats_message_translation_30)) }
                     
                     TRANSLATION_START_5 -> withStyle(
                         bold.copy(
                             colorScheme.secondary,
                             fontWeight = SemiBold
                         )
-                    ) { append("Трансляция начнется через 5 минут") }
+                    ) { append(stringResource(R.string.chats_message_translation_5)) }
+                    
+                    TRANSLATION_STARTED -> withStyle(
+                        bold.copy(
+                            colorScheme.secondary,
+                            fontWeight = SemiBold
+                        )
+                    ) { append(stringResource(R.string.chats_message_translation_started)) }
+                    
+                    TRANSLATION_COMPLETED -> withStyle(
+                        bold.copy(
+                            colorScheme.secondary,
+                            fontWeight = SemiBold
+                        )
+                    ) { append(stringResource(R.string.chats_message_translation_completed)) }
                 }
             },
             modifier.fillMaxWidth(),
@@ -342,7 +353,7 @@ fun HiddenImageMessage(
         modifier, (true), shape,
         cardColors(Transparent),
     ) {
-        message.attachments?.let {
+        message.message?.attachments?.let {
             Box(
                 Modifier.background(
                     colorScheme.primaryContainer,
@@ -350,12 +361,10 @@ fun HiddenImageMessage(
                 )
             ) {
                 Row(Modifier.padding(12.dp, 8.dp)) {
-                    it.file?.let { img ->
-                        HiddenImage(img, Modifier, hide)
-                        { onClick?.let { it() } }
-                    }
+                    HiddenImage(it.first().file, Modifier, hide)
+                    { onClick?.let { it() } }
                     Text(
-                        stringResource(chats_hidden_photo),
+                        stringResource(R.string.chats_hidden_photo),
                         Modifier.padding(
                             start = 12.dp,
                             top = 4.dp
@@ -391,20 +400,18 @@ fun ImageMessage(
         cardColors(Transparent),
     ) {
         Box {
-            message.attachments?.let {
-                it.file?.let { file ->
-                    AsyncImage(
-                        file.id, (null),
-                        Modifier
-                            .size(224.dp)
-                            .background(
-                                colorScheme.onTertiary,
-                                shape
-                            )
-                            .clip(shape),
-                        contentScale = Crop,
-                    )
-                }
+            message.message?.attachments?.let {
+                AsyncImage(
+                    it.first().file.id, (null),
+                    Modifier
+                        .size(224.dp)
+                        .background(
+                            colorScheme.onTertiary,
+                            shape
+                        )
+                        .clip(shape),
+                    contentScale = Crop,
+                )
             }
             Box(
                 Modifier
@@ -505,7 +512,7 @@ private fun TextWidget(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        message.text, modifier
+        message.message?.text ?: "", modifier
             .padding(
                 end = if(sender) 50.dp else 36.dp
             ), if(sender) White
@@ -535,8 +542,8 @@ private fun MessageStatus(
         Icon(
             painterResource(
                 if(messageModel.isRead)
-                    ic_sms_read
-                else ic_sms_delivered
+                    R.drawable.ic_sms_read
+                else R.drawable.ic_sms_delivered
             ), (null), Modifier
                 .padding(start = 2.dp)
                 .size(12.dp), color
