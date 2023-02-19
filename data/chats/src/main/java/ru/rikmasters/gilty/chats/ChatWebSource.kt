@@ -69,7 +69,7 @@ class ChatWebSource: KtorSource() {
         )
     }
     
-    suspend fun getChatsStatus():Int {
+    suspend fun getChatsStatus(): Int {
         updateClientToken()
         data class ChatStatus(val unreadCount: Int)
         return client.get(
@@ -147,10 +147,10 @@ class ChatWebSource: KtorSource() {
     ) {
         updateClientToken()
         client.delete(
-            "http://$HOST$PREFIX_URL/chats${
+            "http://$HOST$PREFIX_URL/chats/$chatId${
                 if(forAll) "/all" else ""
             }"
-        ) { url { query("id" to chatId) } }
+        )
     }
 }
 

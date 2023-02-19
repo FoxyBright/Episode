@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
+package ru.rikmasters.gilty.chat.presentation.ui.dialog.bottom
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.shared.R.string.profile_hidden_photo
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 
 @Composable
-fun HiddenPhotoBottomSheet(
+fun HiddenBs(
     modifier: Modifier = Modifier
 ) {
     Box(

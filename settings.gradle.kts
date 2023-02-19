@@ -5,7 +5,7 @@ import java.net.URI
 include(":data:chats")
 
 
-include(":feature:observebs")
+include(":feature:bottomsheet")
 
 
 include(":data:reports")
@@ -17,7 +17,7 @@ include(":data:meetings")
 include(":data:profile")
 
 
-include(":data:push")
+include(":data:notification")
 
 
 include(":data:shared")

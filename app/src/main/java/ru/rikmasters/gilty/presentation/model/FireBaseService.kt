@@ -41,7 +41,6 @@ class FireBaseService: FirebaseMessagingService() {
         token = newToken
     }
     
-    
     @SuppressLint("WrongConstant")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onMessageReceived(message: RemoteMessage) {

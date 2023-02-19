@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.chatInstance
+package ru.rikmasters.gilty.chat.presentation.ui.dialog
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
@@ -11,11 +11,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenPhotoBottomSheet
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION_AWAIT
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION_AWAIT
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.bottom.HiddenBs
+import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.DialogViewModel
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
@@ -37,12 +38,15 @@ import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import java.util.UUID
 
 @Composable
-fun ChatScreen(chatType: String, nav: NavState = get()) {
+fun DialogScreen(
+    vm: DialogViewModel,
+    chatType: String,
+) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
-    var type by remember {
-        mutableStateOf(PinnedBarType.valueOf(chatType))
-    }
+    val nav = get<NavState>()
+    
+    var type = PinnedBarType.MEET
     
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(Nothing)
@@ -64,6 +68,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
     
     //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
     var unReadCount by remember { mutableStateOf(5) }
+    
     val meet = if(type == TRANSLATION || type == TRANSLATION_AWAIT)
         DemoMeetingModel.copy(isOnline = true) else DemoMeetingModel
     var alert by
@@ -159,8 +164,8 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             }
     }
     
-    ChatContent(
-        ChatState(
+    DialogContent(
+        DialogState(
             ChatAppBarState(
                 meet.title, DemoAvatarModel, participants,
                 type, viewers, toTranslation.toTime()
@@ -169,7 +174,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
             meetOutAlert, kebabMenuState,
             messageMenuState, imageMenuState,
             listState, unReadCount
-        ), Modifier, object: ChatCallback {
+        ), Modifier, object: DialogCallback {
             override fun onBack() {
                 nav.navigate("main")
             }
@@ -196,7 +201,7 @@ fun ChatScreen(chatType: String, nav: NavState = get()) {
                     
                     else -> scope.launch {
                         asm.bottomSheet.expand {
-                            HiddenPhotoBottomSheet()
+                            HiddenBs()
                         }
                     }
                 }

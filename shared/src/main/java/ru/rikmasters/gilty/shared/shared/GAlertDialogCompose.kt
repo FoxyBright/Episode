@@ -38,10 +38,13 @@ private const val content = "Любой контент"
 @Composable
 private fun AlertDialogPreview() {
     GiltyTheme {
-        GAlert(true, {}, header,
-            Modifier.padding(10.dp), label,
-            Pair(stringResource(R.string.cancel)) {},
-            Pair(stringResource(R.string.save_button)) {})
+        GAlert(
+            (true), Modifier.padding(10.dp),
+            Pair(stringResource(R.string.save_button)) {},
+            header, label, cancel = Pair(
+                stringResource(R.string.cancel)
+            ) {}
+        )
     }
 }
 
@@ -49,10 +52,12 @@ private fun AlertDialogPreview() {
 @Composable
 private fun AlertDialogWithContentPreview() {
     GiltyTheme {
-        GAlert(true, { }, header,
-            Modifier.padding(10.dp),
+        GAlert(
+            (true), Modifier.padding(10.dp),
             success = Pair(stringResource(R.string.save_button)) {},
-            cancel = Pair(stringResource(R.string.cancel)) {}) {
+            header, cancel = Pair(
+                stringResource(R.string.cancel)
+            ) {}) {
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -75,15 +80,14 @@ private fun AlertDialogWithContentPreview() {
 @Composable
 private fun ListAlertDialogPreview() {
     GiltyTheme {
-        val list = listOf(
-            Pair(stringResource(delete_my_chat_button), true),
-            Pair(stringResource(delete_my_and_other_chat_button), false)
-        )
         Box(Modifier.fillMaxSize()) {
-            GAlert(true, {}, header, Modifier.padding(10.dp),
-                cancel = Pair(stringResource(R.string.cancel_button)) {},
-                success = Pair(stringResource(R.string.confirm_button)) {},
-                list = list, listItemSelect = {})
+            GAlert(true, Modifier.padding(10.dp),
+                Pair(stringResource(R.string.confirm_button)) {},
+                header, cancel = Pair(stringResource(R.string.cancel_button)) {},
+                list = listOf(
+                    stringResource(delete_my_chat_button),
+                    stringResource(delete_my_and_other_chat_button)
+                ), listItemSelect = {})
         }
     }
 }
@@ -91,13 +95,14 @@ private fun ListAlertDialogPreview() {
 @Composable
 fun GAlert(
     show: Boolean,
-    onDismissRequest: (() -> Unit)? = null,
-    title: (String)? = null,
     modifier: Modifier = Modifier,
-    label: String? = null,
     success: Pair<String, () -> Unit>,
+    label: String? = null,
+    title: String? = null,
+    onDismissRequest: (() -> Unit)? = null,
     cancel: Pair<String, () -> Unit>? = null,
-    list: List<Pair<String, Boolean>>? = null,
+    list: List<String>? = null,
+    selected: Int? = null,
     listItemSelect: ((Int) -> Unit)? = null,
     accentColors: Color = colorScheme.primary,
     content: (@Composable () -> Unit)? = null,
@@ -147,57 +152,51 @@ fun GAlert(
                         fontWeight = SemiBold
                     )
                 }; content?.invoke()
-                list?.let {
-                    List(list)
-                    { listItemSelect?.let { s -> s(it) } }
+                list?.let { items ->
+                    selected?.let {
+                        List(items, it, accentColors) {
+                            listItemSelect?.let { s -> s(it) }
+                        }
+                    }
                 }
             }
-        }, containerColor = colorScheme.primaryContainer
+        },
+        containerColor = colorScheme.primaryContainer
     )
 }
 
 @Composable
 private fun List(
-    list: List<Pair<String, Boolean>>,
-    select: ((Int) -> Unit)? = null,
+    list: List<String>,
+    selected: Int,
+    accentColors: Color,
+    onSelect: ((Int) -> Unit),
 ) {
     LazyColumn {
         itemsIndexed(list) { index, item ->
-            ListItem(index, item)
-            { select?.let { select -> select(it) } }
+            Row(
+                Modifier
+                    .padding(bottom = 30.dp),
+                Start, CenterVertically
+            ) {
+                CheckBox(
+                    (selected == index), Modifier
+                        .clip(CircleShape), listOf(
+                        ic_radio_active,
+                        ic_radio_inactive
+                    ), if(selected == index) accentColors
+                    else colorScheme.tertiary
+                ) { onSelect(index) }
+                Text(
+                    item, Modifier
+                        .padding(start = 8.dp)
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { onSelect(index) },
+                    colorScheme.tertiary, fontWeight = SemiBold,
+                    style = typography.labelSmall
+                )
+            }
         }
-    }
-}
-
-@Composable
-private fun ListItem(
-    index: Int,
-    item: Pair<String, Boolean>,
-    accentColors: Color = colorScheme.primary,
-    select: ((Int) -> Unit)? = null,
-) {
-    Row(
-        Modifier
-            .padding(bottom = 30.dp),
-        Start, CenterVertically
-    ) {
-        CheckBox(
-            item.second, Modifier.clip(CircleShape),
-            listOf(
-                ic_radio_active,
-                ic_radio_inactive
-            ), if(item.second) accentColors
-            else colorScheme.tertiary
-        ) { select?.let { it(index) } }
-        Text(
-            item.first,
-            Modifier
-                .padding(start = 8.dp)
-                .clickable(
-                    MutableInteractionSource(), (null)
-                ) { select?.let { it(index) } },
-            colorScheme.tertiary, fontWeight = SemiBold,
-            style = typography.labelSmall
-        )
     }
 }

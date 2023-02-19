@@ -15,11 +15,12 @@ fun CloseAddMeetAlert(
     success: () -> Unit,
 ) {
     GAlert(
-        state, cancel,
+        state,
+        Modifier,
+        Pair(stringResource(R.string.exit_button), success),
+        stringResource(R.string.add_meet_exit_alert_details),
         stringResource(R.string.add_meet_exit_alert_title),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button), success),
-        cancel = Pair(stringResource(R.string.cancel_button), cancel),
+        cancel, Pair(stringResource(R.string.cancel_button), cancel),
         accentColors = if(Online) colorScheme.secondary
         else colorScheme.primary
     )

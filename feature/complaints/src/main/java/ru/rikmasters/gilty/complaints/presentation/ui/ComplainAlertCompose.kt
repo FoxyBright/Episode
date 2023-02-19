@@ -45,7 +45,7 @@ fun ComplainAlert(
     state: Boolean,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     if(state) AlertDialog(
         onDismiss, {}, modifier
@@ -89,19 +89,13 @@ fun ComplainAlert(
 fun MeetOutAlert(
     state: Boolean,
     onSuccess: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     GAlert(
-        state, onDismiss,
-        title = stringResource(exit_from_meet)+ "?",
-        label = stringResource(exit_from_meet_label),
-        success = Pair(
-            stringResource(out_button),
-            onSuccess
-        ),
-        cancel = Pair(
-            stringResource(cancel_button),
-            onDismiss
-        )
+        state, Modifier,
+        Pair(stringResource(out_button), onSuccess),
+        stringResource(exit_from_meet_label),
+        (stringResource(exit_from_meet) + "?"),
+        onDismiss, Pair(stringResource(cancel_button), onDismiss)
     )
 }

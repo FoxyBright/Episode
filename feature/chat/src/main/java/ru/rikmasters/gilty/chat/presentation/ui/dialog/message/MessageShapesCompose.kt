@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.message
+package ru.rikmasters.gilty.chat.presentation.ui.dialog.message
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable

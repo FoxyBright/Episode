@@ -120,8 +120,9 @@ fun ProfileContent(
         }
     ) { Content(state, Modifier.padding(it), callback) }
     GAlert(
-        state.alert, { callback?.closeAlert() },
-        stringResource(R.string.complaints_send_answer),
+        state.alert,
+        title = stringResource(R.string.complaints_send_answer),
+        onDismissRequest = { callback?.closeAlert() },
         label = stringResource(R.string.complaints_moderate_sen_answer),
         success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
     )

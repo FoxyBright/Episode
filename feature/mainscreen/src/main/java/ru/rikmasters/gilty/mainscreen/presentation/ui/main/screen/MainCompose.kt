@@ -129,10 +129,10 @@ fun MainContent(
             }
         })
     GAlert(
-        state.alert, { callback?.onCloseAlert() },
+        state.alert, Modifier, Pair(stringResource(R.string.meeting_close_button))
+        { callback?.onCloseAlert() },
+        stringResource(R.string.complaints_moderate_sen_answer),
         stringResource(R.string.complaints_send_answer),
-        label = stringResource(R.string.complaints_moderate_sen_answer),
-        success = Pair(stringResource(R.string.meeting_close_button))
         { callback?.onCloseAlert() }
     )
 }

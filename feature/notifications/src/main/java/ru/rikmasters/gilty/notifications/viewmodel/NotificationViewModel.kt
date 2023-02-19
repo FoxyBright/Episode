@@ -7,8 +7,6 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.push.NotificationManager
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
-import ru.rikmasters.gilty.shared.common.extentions.weekControl
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -41,7 +39,7 @@ class NotificationViewModel: ViewModel() {
     val blur = _blur.asStateFlow()
     
     
-    private var page = 0
+    private var page = 1
     
     suspend fun getNotification() = singleLoading {
         val list =
@@ -72,12 +70,6 @@ class NotificationViewModel: ViewModel() {
             _selectedNotification.emit(notification)
         }
     }
-    
-    fun sortNotification(list: List<NotificationModel>) = Triple(
-        list.filter { todayControl(it.date) },
-        list.filter { weekControl(it.date) && !todayControl(it.date) },
-        list.filter { !weekControl(it.date) && !todayControl(it.date) },
-    )
     
     private suspend fun navBarSetStates(
         states: List<NavIconState>,

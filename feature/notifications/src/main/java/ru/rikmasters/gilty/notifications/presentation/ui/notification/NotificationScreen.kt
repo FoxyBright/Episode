@@ -49,9 +49,8 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     Use<NotificationViewModel>(LoadingTrait) {
         NotificationsContent(
             NotificationsState(
-                vm.sortNotification(notifications),
-                lastRespond, navState, blur,
-                selected, participants,
+                notifications, lastRespond,
+                navState, blur, selected, participants,
                 participantsStates, listState, ratings
             ), Modifier, object: NotificationsCallback {
                 

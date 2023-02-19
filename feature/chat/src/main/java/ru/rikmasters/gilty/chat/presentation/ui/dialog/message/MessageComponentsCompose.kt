@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.message
+package ru.rikmasters.gilty.chat.presentation.ui.dialog.message
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -241,7 +241,7 @@ fun SystemMessage(
                 
                 when(notification.type) {
                     CHAT_CREATED -> append(
-                        "Чат создан"
+                        stringResource(R.string.chats_message_create_chat, "н")
                     )
                     
                     MEMBER_JOIN ->
@@ -254,10 +254,12 @@ fun SystemMessage(
                             }
                             appendInlineContent("emoji")
                             append(
-                                " присоединил${
-                                    if(it.gender == FEMALE)
-                                        "aсь" else "ся"
-                                } к встрече"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_join_meet, if(it.gender == FEMALE)
+                                            "a" else ""
+                                    )
+                                }"
                             )
                         }
                     
@@ -271,10 +273,12 @@ fun SystemMessage(
                             }
                             appendInlineContent("emoji")
                             append(
-                                " покинул${
-                                    if(it.gender == FEMALE)
-                                        "а" else ""
-                                }  встречу"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_leave_meet, if(it.gender == FEMALE)
+                                            "a" else ""
+                                    )
+                                }"
                             )
                         }
                     
@@ -285,10 +289,13 @@ fun SystemMessage(
                             { append("${it.username}, ${it.age} ") }
                             appendInlineContent("emoji")
                             append(
-                                " сделал${
-                                    if(it.gender == FEMALE)
-                                        "a" else ""
-                                } скриншот!"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_make_screenshot,
+                                        if(it.gender == FEMALE)
+                                            "a" else ""
+                                    )
+                                }"
                             )
                         }
                     

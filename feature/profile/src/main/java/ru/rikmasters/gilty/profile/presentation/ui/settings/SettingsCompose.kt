@@ -104,18 +104,20 @@ fun SettingsContent(
         item { Buttons(Modifier, callback) }
     }
     GAlert(
-        state.exitAlert, { callback?.onExitDismiss() },
-        stringResource(R.string.settings_exit_alert),
-        success = Pair(stringResource(R.string.exit_button))
+        state.exitAlert, Modifier,
+        Pair(stringResource(R.string.exit_button))
         { callback?.onExitSuccess() },
+        onDismissRequest = { callback?.onExitDismiss() },
+        title = stringResource(R.string.settings_exit_alert),
         cancel = Pair(stringResource(R.string.cancel_button))
         { callback?.onExitDismiss() },
     )
     GAlert(
-        state.deleteAlert, { callback?.onDeleteDismiss() },
-        stringResource(R.string.settings_delete_account_alert),
-        success = Pair(stringResource(R.string.meeting_filter_delete_tag_label))
+        state.deleteAlert, Modifier,
+        Pair(stringResource(R.string.meeting_filter_delete_tag_label))
         { callback?.onDeleteSuccess() },
+        onDismissRequest = { callback?.onDeleteDismiss() },
+        title = stringResource(R.string.settings_delete_account_alert),
         cancel = Pair(stringResource(R.string.cancel_button))
         { callback?.onDeleteDismiss() },
     )

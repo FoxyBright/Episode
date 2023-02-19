@@ -56,6 +56,10 @@ fun replacer(it: String, end: String): String {
 fun todayControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
 
+fun tomorrowControl(date: String) =
+    date.format(FORMAT) == LOCAL_DATE
+        .plusDays(1)
+        .format(FORMAT)
 
 fun getDifferenceOfTime(date: String): String {
     val difference = (LocalDateTime.now().plusMinute(1).millis() -

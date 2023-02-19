@@ -17,8 +17,7 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Notif
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Responds
-import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
-import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -43,11 +42,8 @@ private fun NotificationsContentPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    Triple(
-                        DemoNotificationModelList,
-                        DemoNotificationModelList,
-                        DemoNotificationModelList
-                    ), Pair((3), ""), listOf(), (false),
+                    DemoNotificationModelList,
+                    Pair((3), ""), listOf(), (false),
                     DemoNotificationMeetingOverModel,
                     listOf(), listOf(), LazyListState(),
                     DemoRatingModelList
@@ -68,11 +64,8 @@ private fun NotificationsBlurPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    Triple(
-                        DemoNotificationModelList,
-                        DemoNotificationModelList,
-                        DemoNotificationModelList
-                    ), Pair((3), ""), listOf(), (true),
+                    DemoNotificationModelList,
+                    Pair((3), ""), listOf(), (true),
                     DemoNotificationMeetingOverModel,
                     listOf(), listOf(), LazyListState(),
                     DemoRatingModelList
@@ -83,8 +76,7 @@ private fun NotificationsBlurPreview() {
 }
 
 data class NotificationsState(
-    val notifications: Triple<List<NotificationModel>,
-            List<NotificationModel>, List<NotificationModel>>,
+    val notifications: List<NotificationModel>,
     val lastRespond: Pair<Int, String>,
     val navBar: List<NavIconState>,
     val blur: Boolean,
@@ -177,20 +169,21 @@ private fun Notifications(
     modifier: Modifier = Modifier,
     callback: NotificationsCallback?,
 ) {
-    val notifications =
-        state.notifications
-    val todayList =
-        notifications.first.distinct().map {
-            it to rememberDragRowState()
-        }
-    val weekList =
-        notifications.second.distinct().map {
-            it to rememberDragRowState()
-        }
-    val earlierList =
-        notifications.third.distinct().map {
-            it to rememberDragRowState()
-        }
+    
+    val notifications = state.notifications
+    
+    val todayList = notifications.filter {
+        todayControl(it.date)
+    }.map { it to rememberDragRowState() }
+    
+    val weekList = notifications.filter {
+        weekControl(it.date) && !todayControl(it.date)
+    }.map { it to rememberDragRowState() }
+    
+    val earlierList = notifications.filter {
+        !weekControl(it.date) && !todayControl(it.date)
+    }.map { it to rememberDragRowState() }
+    
     LazyColumn(modifier, state.listState) {
         if(state.lastRespond.first != 0) item {
             Responds(
@@ -250,11 +243,8 @@ private fun Notifications(
         }
         
         item {
-            if(notifications.first.isNotEmpty()
-                || notifications.second.isNotEmpty()
-                || notifications.third.isNotEmpty()
-            ) callback?.onListUpdate()
-            
+            if(notifications.isNotEmpty())
+                callback?.onListUpdate()
         }
         
         item { Spacer(Modifier.height(20.dp)) }

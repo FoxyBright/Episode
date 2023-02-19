@@ -5,15 +5,17 @@ import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
-import ru.rikmasters.gilty.chat.presentation.ui.chat.chatInstance.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
+import ru.rikmasters.gilty.chat.presentation.ui.dialog.DialogScreen
 import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
 import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.ChatListViewModel
-import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.ChatViewModel
+import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.DialogViewModel
 import ru.rikmasters.gilty.chats.ChatData
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.profile.ProfileData
+import ru.rikmasters.gilty.profile.ProfileManager
 
 object Chat: FeatureDefinition() {
     
@@ -25,18 +27,13 @@ object Chat: FeatureDefinition() {
                 ChatListScreen(vm)
             }
             
-            screen(
-                "chat?type={type}", listOf(
-                    navArgument("type") {
-                        type = NavType.StringType; defaultValue = ""
-                    })
-            ) {
-                it.arguments?.getString("type")?.let { type ->
-                    ChatScreen(type)
-                }
-            }
+            screen<DialogViewModel>(
+                route = "chat?id={id}",
+                arguments = listOf(navArgument("id")
+                { type = NavType.StringType; defaultValue = "" })
+            ) { vm, it -> DialogScreen(vm, it.arguments?.getString("id")!!) }
             
-            screen("photo?image={image}&type={type}", listOf(  //TODO Убрать лишние аргументы
+            screen("photo?image={image}&type={type}", listOf(
                 navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 }, navArgument("type") {
@@ -54,15 +51,16 @@ object Chat: FeatureDefinition() {
     
     override fun Module.koin() {
         singleOf(::ChatManager)
+        singleOf(::ProfileManager)
         
         scope<ChatListViewModel> {
             scopedOf(::ChatListViewModel)
         }
         
-        scope<ChatViewModel> {
-            scopedOf(::ChatViewModel)
+        scope<DialogViewModel> {
+            scopedOf(::DialogViewModel)
         }
     }
     
-    override fun include() = setOf(ChatData)
+    override fun include() = setOf(ChatData, ProfileData)
 }

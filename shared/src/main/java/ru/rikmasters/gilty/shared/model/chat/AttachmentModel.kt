@@ -6,13 +6,15 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarAccessModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 
-enum class AttachmentType {
-    PHOTO, PRIVATE_PHOTO, VIDEO
+enum class AttachmentType(val value: String) {
+    PHOTO("Фото"),
+    PRIVATE_PHOTO("Скрытое фото"),
+    VIDEO("Видео")
 }
 
 data class AttachmentModel(
     val type: AttachmentType,
-    val file: AvatarModel?
+    val file: AvatarModel?,
 )
 
 val DemoAttachmentModelPhoto = AttachmentModel(

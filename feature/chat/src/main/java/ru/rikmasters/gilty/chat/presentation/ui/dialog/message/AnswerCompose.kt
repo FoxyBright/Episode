@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.chat.message
+package ru.rikmasters.gilty.chat.presentation.ui.dialog.message
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,13 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_image_empty
-import ru.rikmasters.gilty.shared.R.string.chats_message_answer_photo_label
-import ru.rikmasters.gilty.shared.R.string.chats_message_answer_video_label
-import ru.rikmasters.gilty.shared.R.string.profile_hidden_photo
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -132,15 +126,10 @@ private fun Label(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = message.message?.attachments?.let {
-            stringResource(
-                when(it.first().type) {
-                    PHOTO -> chats_message_answer_photo_label
-                    PRIVATE_PHOTO -> profile_hidden_photo
-                    VIDEO -> chats_message_answer_video_label
-                }
-            )
-        } ?: message.message?.text ?: "",
+        text = message.message
+            ?.attachments
+            ?.last()?.type?.value
+            ?: message.message?.text ?: "",
         modifier,
         if(!sender) colorScheme.onTertiary
         else White,

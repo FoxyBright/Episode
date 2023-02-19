@@ -16,4 +16,5 @@ dependencies {
     implementation(project(":feature:animated"))
     
     implementation(project(":data:chats"))
+    implementation(project(":data:profile"))
 }
