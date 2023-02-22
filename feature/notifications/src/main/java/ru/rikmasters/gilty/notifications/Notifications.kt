@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.Notificati
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.profile.ProfileData
-import ru.rikmasters.gilty.push.Push
+import ru.rikmasters.gilty.push.NotificationData
 
 object Notifications: FeatureDefinition() {
     
@@ -39,6 +39,6 @@ object Notifications: FeatureDefinition() {
     }
     
     override fun include() = setOf(
-        Push, ProfileData, MeetingsData, Observe
+        NotificationData, ProfileData, MeetingsData, Observe
     )
 }

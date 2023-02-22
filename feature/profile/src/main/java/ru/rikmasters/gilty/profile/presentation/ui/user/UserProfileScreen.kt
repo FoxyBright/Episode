@@ -61,7 +61,6 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     ProfileContent(state, Modifier,
         object: UserProfileCallback {
-            
             override fun menu(state: Boolean) {
                 nav.navigate(
                     "settings" +

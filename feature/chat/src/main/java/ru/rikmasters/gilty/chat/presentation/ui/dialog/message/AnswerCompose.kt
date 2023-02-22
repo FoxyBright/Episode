@@ -31,7 +31,8 @@ private fun AnswerLongPreview() {
     GiltyTheme {
         AnswerContent(
             DemoLongMessageModel,
-            Modifier.padding(16.dp)
+            Modifier.padding(16.dp),
+            isOnline = false,
         )
     }
 }
@@ -43,6 +44,7 @@ private fun MyAnswer() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
+            isOnline = false,
             (true), (false)
         )
     }
@@ -54,7 +56,8 @@ private fun ImageAnswerTextBox() {
     GiltyTheme {
         AnswerContent(
             DemoImageMessageModel,
-            Modifier.padding(16.dp)
+            Modifier.padding(16.dp),
+            isOnline = true,
         )
     }
 }
@@ -66,7 +69,8 @@ private fun AnswerTextField() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
-            textField = true
+            isOnline = false,
+            textField = true,
         )
     }
 }
@@ -75,6 +79,7 @@ private fun AnswerTextField() {
 fun AnswerContent(
     message: MessageModel,
     modifier: Modifier = Modifier,
+    isOnline: Boolean,
     sender: Boolean = false,
     textField: Boolean = false,
 ) {
@@ -86,15 +91,18 @@ fun AnswerContent(
             Modifier
                 .background(
                     if(!sender)
-                        colorScheme.primary
+                        if(isOnline) colorScheme.secondary
+                        else colorScheme.primary
                     else White
                 )
                 .width(1.dp)
                 .height(38.dp)
         )
-        message.message?.attachments?.let {
+        val attach = message.message?.attachments
+        if(!attach.isNullOrEmpty()) {
             AsyncImage(
-                it.first().file.id, (null), Modifier
+                attach.last().file.thumbnail.url,
+                (null), Modifier
                     .padding(start = 8.dp)
                     .size(38.dp)
                     .clip(shapes.small),
@@ -110,8 +118,8 @@ fun AnswerContent(
                 if(textField) "${
                     stringResource(R.string.chats_message_answer_recipient)
                 } $user" else user ?: "", Modifier,
-                if(!sender) colorScheme.primary
-                else White,
+                if(!sender) if(isOnline) colorScheme.secondary
+                else colorScheme.primary else White,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             ); Label(message, sender)
@@ -125,12 +133,12 @@ private fun Label(
     sender: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val attach = message.message?.attachments
+    val text = if(!attach.isNullOrEmpty())
+        attach.last().type.value
+    else message.message?.text ?: ""
     Text(
-        text = message.message
-            ?.attachments
-            ?.last()?.type?.value
-            ?: message.message?.text ?: "",
-        modifier,
+        text, modifier,
         if(!sender) colorScheme.onTertiary
         else White,
         overflow = Ellipsis,

@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.*
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.*
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarCallback
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
@@ -51,6 +52,7 @@ interface DialogCallback:
     fun onImageMenuItemSelect(point: Int)
     fun onDownButtonClick()
     fun onListDown()
+    fun onSwipeToRefresh()
     fun onMessageMenuItemSelect(
         point: Int,
         message: MessageModel,
@@ -77,7 +79,9 @@ fun DialogContent(
             DialogBottomBar(
                 state.imageMenuState,
                 state.messageText,
-                state.answer, Modifier,
+                state.answer,
+                state.meet.isOnline,
+                Modifier,
                 callback
             )
         },
@@ -85,6 +89,7 @@ fun DialogContent(
             DialogFloatingButton(
                 state.listState,
                 state.unReadCount,
+                state.meet.isOnline,
                 Modifier, {
                     callback?.onListDown()
                 }) {
@@ -132,11 +137,11 @@ private fun Content(
     ) {
         item { Divider(Modifier, 28.dp, Transparent) }
         itemsIndexed(
-            list, { index, _ -> index }) // TODO проверку на сообщения (должны быть уникальны)
-        { index, mes ->
+            list, { _, mes -> mes.first.id })
+        { index, (message, rowState) ->
             DialogMessage(
-                mes.first, mes.second,
-                (state.user == mes.first.message?.author),
+                message, rowState,
+                (message.message?.is_author == true),
                 state.meet.isOnline,
                 if(index < list.size - 1)
                     list[index + 1].first

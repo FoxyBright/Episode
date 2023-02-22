@@ -1,50 +1,64 @@
 package ru.rikmasters.gilty.chats
 
+import ru.rikmasters.gilty.chats.websocket.WebSocketHandler
+import ru.rikmasters.gilty.core.common.CoroutineController
+import ru.rikmasters.gilty.core.viewmodel.Strategy
+import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import java.io.File
+
 class ChatManager(
     
-    private val web: ChatWebSource,
-) {
+    private val webSource: ChatWebSource,
+    private val webSocket: WebSocketHandler,
+): CoroutineController() {
     
     suspend fun getDialogs(
         page: Int? = null, perPage: Int? = null,
-    ) = web.getDialogs(page, perPage)
+    ) = webSource.getDialogs(page, perPage)
     
     suspend fun deleteDialog(
         chatId: String,
         forAll: Boolean,
     ) {
-        web.deleteDialog(chatId, forAll)
+        webSource.deleteDialog(chatId, forAll)
     }
+    
+    suspend fun connect(userId: String) = single(Strategy.JOIN) {
+        webSocket.connect(userId)
+    }
+    
+    val socketAnswer = webSocket.answer
+    
+    suspend fun getChatsStatus() = webSource.getChatsStatus()
     
     suspend fun unmuteChatNotifications(chatId: String) {
-        web.unmuteChatNotifications(chatId)
+        webSource.unmuteChatNotifications(chatId)
     }
-    
-    suspend fun getChatsStatus() = web.getChatsStatus()
     
     suspend fun muteChatNotifications(
         chatId: String, unmuteAt: String,
     ) {
-        web.muteChatNotifications(chatId, unmuteAt)
+        webSource.muteChatNotifications(chatId, unmuteAt)
     }
     
     suspend fun getChatAlbum(chatId: String) =
-        web.getChatAlbum(chatId)
+        webSource.getChatAlbum(chatId)
     
     suspend fun completeChat(chatId: String) {
-        web.completeChat(chatId)
+        webSource.completeChat(chatId)
     }
     
     suspend fun isTyping(chatId: String) {
-        web.isTyping(chatId)
+        webSource.isTyping(chatId)
     }
     
     suspend fun madeScreenshot(chatId: String) {
-        web.madeScreenshot(chatId)
+        webSource.madeScreenshot(chatId)
     }
     
     suspend fun markAsReadMessage(chatId: String) {
-        web.markAsReadMessage(chatId)
+        webSource.markAsReadMessage(chatId)
     }
     
     suspend fun deleteMessage(
@@ -52,22 +66,35 @@ class ChatManager(
         messageIds: List<String>,
         allMembers: Boolean,
     ) {
-        web.deleteMessage(
+        webSource.deleteMessage(
             chatId, messageIds,
             allMembers.compareTo(false)
         )
     }
     
-    suspend fun sendMessage(chatId: String) {
-        web.sendMessage(chatId)
+    suspend fun sendMessage(
+        chatId: String,
+        message: MessageModel,
+        attachment: List<AvatarModel>?,
+        photos: List<File>?,
+        videos: List<File>?,
+    ) {
+        webSource.sendMessage(
+            chatId,
+            message.replied?.id,
+            message.message?.text,
+            photos,
+            attachment,
+            videos
+        )
     }
     
     suspend fun getChat(chatId: String) =
-        web.getChat(chatId)
+        webSource.getChat(chatId)
     
     suspend fun getMessages(
         chatId: String,
         page: Int? = null,
         perPage: Int? = null,
-    ) = web.getMessages(chatId, page, perPage)
+    ) = webSource.getMessages(chatId, page, perPage)
 }

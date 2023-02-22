@@ -23,7 +23,7 @@ data class ChatModel(
     val datetime: String,
     val unreadCount: Int,
     val canMessage: Boolean,
-    val memberCount: Int,
+    val membersCount: Int,
     val createdAt: String,
 ) {
     
@@ -42,7 +42,7 @@ data class ChatModel(
         result = 31 * result + datetime.hashCode()
         result = 31 * result + unreadCount
         result = 31 * result + canMessage.hashCode()
-        result = 31 * result + memberCount
+        result = 31 * result + membersCount
         result = 31 * result + createdAt.hashCode()
         return result
     }
@@ -67,7 +67,7 @@ data class ChatModel(
         if(datetime != other.datetime) return false
         if(unreadCount != other.unreadCount) return false
         if(canMessage != other.canMessage) return false
-        if(memberCount != other.memberCount) return false
+        if(membersCount != other.membersCount) return false
         if(createdAt != other.createdAt) return false
         
         return true

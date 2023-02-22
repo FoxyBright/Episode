@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
+import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
@@ -90,16 +93,27 @@ fun ChatListContent(
     callback: ChatListCallback? = null,
 ) {
     Scaffold(
-        modifier, {
-            TopBar(modifier, state.unRead)
+        modifier = modifier,
+        topBar = {
+            TopBar(Modifier, state.unRead)
             { callback?.onUnreadChange() }
-        }, {
+        },
+        bottomBar = {
             NavBar(state.stateList, Modifier)
             { callback?.onNavBarSelect(it) }
+        },
+        content = {
+            Box(Modifier.padding(it)) {
+                Use<ChatListViewModel>(PullToRefreshTrait) {
+                    Content(
+                        state,
+                        Modifier,
+                        callback
+                    )
+                }
+            }
         }
-    ) {
-        Content(state, Modifier.padding(it), callback)
-    }
+    )
     ChatDeleteAlert(
         state.alertActive,
         state.alertState,
@@ -183,7 +197,7 @@ private fun Content(
                     )
                 )
             }
-            itemsIndexed(unread) { index, (chat, rowState) ->
+            itemsIndexed(unread, { _, c -> c.first.id }) { index, (chat, rowState) ->
                 val shape = lazyItemsShapes(index, current.size)
                 Column(
                     Modifier.background(
@@ -213,7 +227,7 @@ private fun Content(
                     )
                 }
                 
-                itemsIndexed(chats) { index, (chat, rowState) ->
+                itemsIndexed(chats, { _, c -> c.first.id }) { index, (chat, rowState) ->
                     val shape = lazyItemsShapes(index, current.size)
                     Column(
                         Modifier.background(
@@ -246,7 +260,7 @@ private fun Content(
             && state.endedState
             && !state.unRead
         ) {
-            itemsIndexed(completed) { index, (chat, rowState) ->
+            itemsIndexed(completed, { _, c -> c.first.id }) { index, (chat, rowState) ->
                 val shape = lazyItemsShapes(index, current.size)
                 Column(
                     Modifier.background(
@@ -263,11 +277,6 @@ private fun Content(
                     )
                 }
             }
-        }
-        
-        item {
-            if(state.chats.isNotEmpty())
-                callback?.onListUpdate()
         }
         
         item { Spacer(Modifier.height(20.dp)) }

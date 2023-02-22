@@ -8,6 +8,7 @@ apply<DataPlugin>()
 baseConfig()
 
 dependencies {
+    implementation("androidx.paging:paging-common-ktx:3.1.1")
     androidBase()
     dataBase()
     

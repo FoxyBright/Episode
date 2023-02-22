@@ -30,6 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.core.app.ui.ErrorConnection
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.Profile
@@ -118,7 +121,13 @@ fun ProfileContent(
             NavBar(state.stateList)
             { callback?.onNavBarSelect(it) }
         }
-    ) { Content(state, Modifier.padding(it), callback) }
+    ) {
+        Box(Modifier.padding(it)) {
+            Use<UserProfileViewModel>(PullToRefreshTrait) {
+                Content(state, Modifier, callback)
+            }
+        }
+    }
     GAlert(
         state.alert,
         title = stringResource(R.string.complaints_send_answer),

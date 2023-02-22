@@ -10,11 +10,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.data.source.WebSource
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.shared.BuildConfig
+import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GLoader
@@ -27,6 +30,8 @@ class MainActivity: ComponentActivity() {
     
     private val env by inject<Environment>()
     private val authManager by inject<AuthManager>()
+    private val regManager by inject<RegistrationManager>()
+    private val chatManager by inject<ChatManager>()
     
     private var _intent: Intent? by mutableStateOf(null)
     
@@ -53,13 +58,20 @@ class MainActivity: ComponentActivity() {
                 GiltyTheme,
                 { GBottomSheetBackground(it) },
                 { GSnackbar(it) },
-                { isLoading, content -> GLoader(isLoading, content) }
+                { isLoading, content -> GLoader(isLoading, content) },
+                { state, offset, trigger -> LoadingIndicator(state, offset, trigger) }
             )
             
             LaunchedEffect(Unit) {
+                val isAuthorized =
+                    MutableStateFlow(regManager.isUserRegistered())
                 
-                val isAuthorized = MutableStateFlow(authManager.isAuthorized())
-                if(isAuthorized.value) authManager.savePushToken(token)
+                if(isAuthorized.value.first) {
+                    authManager.savePushToken(token)
+                    isAuthorized.value.second?.let { userId ->
+                        chatManager.connect(userId)
+                    }
+                }
                 
                 env[WebSource.ENV_BASE_URL] = BuildConfig.HOST + BuildConfig.PREFIX_URL
             }

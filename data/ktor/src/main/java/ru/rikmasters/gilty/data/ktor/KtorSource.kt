@@ -55,6 +55,7 @@ open class KtorSource: WebSource() {
                 agent = env[ENV_USER_AGENT] ?: ""
             }
             install(WebSockets) {
+                
                 contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
             }

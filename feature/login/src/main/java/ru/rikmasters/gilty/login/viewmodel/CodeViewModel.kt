@@ -100,7 +100,7 @@ class CodeViewModel(
     }
     
     suspend fun isUserRegistered(): Boolean {
-        return regManager.isUserRegistered()
+        return regManager.isUserRegistered().first
     }
     
     suspend fun onBlur(state: Boolean) {

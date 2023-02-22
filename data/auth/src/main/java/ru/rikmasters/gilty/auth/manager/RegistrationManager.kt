@@ -17,7 +17,7 @@ class RegistrationManager(
     suspend fun getCategoriesList(): List<CategoryModel> =
         meetWebSource.getCategoriesList()
     
-    suspend fun isUserRegistered(): Boolean =
+    suspend fun isUserRegistered(): Pair<Boolean, String?> =
         profileWebSource.isUserRegistered()
     
     suspend fun setAvatar(file: File, points: List<Int>) {

@@ -26,8 +26,6 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Avatar
 import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.wrapper.Status
-import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
 
@@ -122,11 +120,10 @@ class ProfileWebSource: KtorSource() {
     
     suspend fun setHidden(
         files: List<File>,
-    ): HttpResponse {
+    ) {
         updateClientToken()
-        val album = getUserAlbumPrivateId()
-        val response = client.post(
-            "http://$HOST$PREFIX_URL/albums/$album/upload"
+        client.post(
+            "http://$HOST$PREFIX_URL/albums/${getUserAlbumPrivateId()}/upload"
         ) {
             setBody(
                 MultiPartFormDataContent(
@@ -145,8 +142,6 @@ class ProfileWebSource: KtorSource() {
                 )
             )
         }
-        
-        return response
     }
     
     suspend fun setUserAvatar(
@@ -230,17 +225,19 @@ class ProfileWebSource: KtorSource() {
         ).wrapped<ProfileResponse>().map()
     }
     
-    suspend fun isUserRegistered(): Boolean {
+    suspend fun isUserRegistered(): Pair<Boolean, String?> {
         updateClientToken()
         val response = client.get(
             "http://$HOST$PREFIX_URL/profile"
-        )
+        ).wrapped<ProfileResponse>()
+        
         return try {
-            response.wrapped<ProfileResponse>().isCompleted == true
-        } catch(e: Exception) {
-            response.errorWrapped().status != Status.ERROR
-        } catch(e: Exception) {
-            false
+            Pair(
+                response.isCompleted == true,
+                response.id
+            )
+        } catch(_: Exception) {
+            Pair(false, null)
         }
     }
     

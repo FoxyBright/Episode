@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.ACTUAL
 import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.HISTORY
@@ -15,7 +16,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
-class UserProfileViewModel: ViewModel() {
+class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
@@ -125,7 +126,11 @@ class UserProfileViewModel: ViewModel() {
         _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
     }
     
-    suspend fun setUserDate() {
+    override suspend fun forceRefresh() {
+        setUserDate()
+    }
+    
+    suspend fun setUserDate() = singleLoading {
         val user = getUserProfile()
         _age.emit(user.age)
         _username.emit("${user.username}, ${user.age}")

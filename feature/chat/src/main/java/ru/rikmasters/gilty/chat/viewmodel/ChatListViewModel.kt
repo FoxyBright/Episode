@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.viewmodel
+package ru.rikmasters.gilty.chat.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
@@ -15,7 +16,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
-class ChatListViewModel: ViewModel() {
+class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val chatsManager by inject<ChatManager>()
     private val profileManager by inject<ProfileManager>()
@@ -56,6 +57,10 @@ class ChatListViewModel: ViewModel() {
     
     private var page = 1
     
+    override suspend fun forceRefresh() = singleLoading {
+        _dialogs.emit(chatsManager.getDialogs(1))
+    }
+    
     suspend fun getDialogs() = singleLoading {
         val list = (chatsManager
             .getDialogs(page) + dialogs.value)
@@ -80,7 +85,6 @@ class ChatListViewModel: ViewModel() {
     ) {
         _navBar.emit(states)
     }
-    
     
     suspend fun getProfile() = singleLoading {
         _profile.emit(profileManager.getProfile())

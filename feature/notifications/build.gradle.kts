@@ -7,6 +7,7 @@ baseConfig()
 compose()
 
 dependencies {
+    implementation("androidx.paging:paging-common-ktx:3.1.1")
     androidBase()
     compose()
     implementation(project(":feature:complaints"))

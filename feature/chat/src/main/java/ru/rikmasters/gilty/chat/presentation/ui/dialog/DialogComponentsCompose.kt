@@ -58,19 +58,21 @@ fun DialogBottomBar(
     menuState: Boolean,
     text: String,
     answer: MessageModel?,
+    isOnline: Boolean,
     modifier: Modifier = Modifier,
     callback: DialogCallback?,
 ) {
     BottomBarMenu(menuState,
         { callback?.onImageMenuDismiss() })
     { callback?.onImageMenuItemSelect(it) }
-    MessengerBar(text, modifier, answer, callback)
+    MessengerBar(text, modifier, answer, isOnline, callback)
 }
 
 @Composable
 fun DialogFloatingButton(
     listState: LazyListState,
     unReadCount: Int,
+    isOnline: Boolean,
     modifier: Modifier = Modifier,
     onListDown: () -> Unit,
     onClick: () -> Unit,
@@ -125,7 +127,8 @@ fun DialogFloatingButton(
             Modifier
                 .offset(offset.x, -offset.y)
                 .background(
-                    colorScheme.primary,
+                    if(isOnline) colorScheme.secondary
+                    else colorScheme.primary,
                     CircleShape
                 )
                 .align(TopEnd)

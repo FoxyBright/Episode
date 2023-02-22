@@ -409,7 +409,8 @@ fun ImageMessage(
         Box {
             message.message?.attachments?.let {
                 AsyncImage(
-                    it.first().file.id, (null),
+                    it.first().file.url,
+                    (null),
                     Modifier
                         .size(224.dp)
                         .background(
@@ -497,7 +498,7 @@ fun TextMessage(
                                 end = 30.dp
                             )
                             .clickable { onClick?.let { it() } },
-                        sender = sender
+                        isOnline, sender
                     )
                 }; TextWidget(message, sender)
             }

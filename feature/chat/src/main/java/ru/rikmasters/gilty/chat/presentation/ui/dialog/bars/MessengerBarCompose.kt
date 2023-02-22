@@ -52,11 +52,13 @@ private fun MessengerBarPreview() {
         Column {
             MessengerBar(
                 smthText,
-                Modifier.padding(6.dp)
+                Modifier.padding(6.dp),
+                isOnline = true
             )
             MessengerBar(
                 "",
-                Modifier.padding(6.dp)
+                Modifier.padding(6.dp),
+                isOnline = true
             )
         }
     }
@@ -69,11 +71,11 @@ private fun MessengerBarWithAnswerPreview() {
         Column {
             MessengerBar(
                 smthText, Modifier.padding(6.dp),
-                DemoLongMessageModel
+                DemoLongMessageModel, false
             )
             MessengerBar(
                 "", Modifier.padding(6.dp),
-                DemoLongMessageModel
+                DemoLongMessageModel, true
             )
         }
     }
@@ -109,7 +111,8 @@ fun MessengerBar(
     text: String,
     modifier: Modifier = Modifier,
     answer: MessageModel? = null,
-    callback: MessengerBarCallback? = null
+    isOnline: Boolean,
+    callback: MessengerBarCallback? = null,
 ) {
     Column(
         modifier
@@ -117,7 +120,9 @@ fun MessengerBar(
             .background(colorScheme.primaryContainer)
     ) {
         answer?.let {
-            Answer(answer) { callback?.onCancelAnswer() }
+            Answer(it, isOnline) {
+                callback?.onCancelAnswer()
+            }
         }
         Row(Modifier.padding(10.dp), Center, Bottom) {
             IconButton(
@@ -139,7 +144,8 @@ fun MessengerBar(
 @Composable
 private fun Answer(
     answer: MessageModel?,
-    onCancel: () -> Unit
+    isOnline: Boolean,
+    onCancel: () -> Unit,
 ) {
     Row(
         Modifier.fillMaxWidth(),
@@ -157,11 +163,12 @@ private fun Answer(
                 null, Modifier
                     .padding(start = 14.dp, end = 22.dp)
                     .size(24.dp),
-                colorScheme.primary
+                if(isOnline) colorScheme.secondary
+                else colorScheme.primary
             )
             answer?.let {
                 AnswerContent(
-                    it, Modifier,
+                    it, Modifier, isOnline,
                     (false), (true)
                 )
             }
@@ -175,7 +182,8 @@ private fun Answer(
             Icon(
                 painterResource(ic_cross),
                 (null), Modifier.size(22.dp),
-                colorScheme.primary
+                if(isOnline) colorScheme.secondary
+                else colorScheme.primary
             )
         }
     }
@@ -186,7 +194,7 @@ fun CommentBar(
     text: String,
     textChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onSend: (() -> Unit)? = null
+    onSend: (() -> Unit)? = null,
 ) {
     MessageField(text, COMMENT, textChange, modifier)
     { onSend?.let { it() } }
@@ -198,7 +206,7 @@ private fun MessageField(
     type: TextFieldType,
     textChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onSend: () -> Unit
+    onSend: () -> Unit,
 ) {
     val message = text.ifBlank {
         stringResource(
@@ -258,7 +266,7 @@ private fun MessageField(
 private fun SendButton(
     color: Color,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier

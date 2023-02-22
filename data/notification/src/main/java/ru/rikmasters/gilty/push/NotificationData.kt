@@ -5,7 +5,7 @@ import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
 
-object Push: DataDefinition() {
+object NotificationData: DataDefinition() {
     
     override fun EntitiesBuilder.entities() {
     }
@@ -13,6 +13,7 @@ object Push: DataDefinition() {
     override fun Module.koin() {
         singleOf(::NotificationWebSource)
         singleOf(::NotificationManager)
+        singleOf(::NotificationPagingSource)
     }
 }
 

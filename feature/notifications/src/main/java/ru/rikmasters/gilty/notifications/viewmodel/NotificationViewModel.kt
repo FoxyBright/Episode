@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.push.NotificationManager
@@ -16,7 +17,7 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
-class NotificationViewModel: ViewModel() {
+class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     private val notificationManger by inject<NotificationManager>()
     private val meetingManager by inject<MeetingManager>()
@@ -38,9 +39,11 @@ class NotificationViewModel: ViewModel() {
     private val _blur = MutableStateFlow(false)
     val blur = _blur.asStateFlow()
     
+    override suspend fun forceRefresh() = singleLoading {
+        _notifications.emit(notificationManger.getNotification(1))
+    }
     
     private var page = 1
-    
     suspend fun getNotification() = singleLoading {
         val list =
             notificationManger.getNotification(page)

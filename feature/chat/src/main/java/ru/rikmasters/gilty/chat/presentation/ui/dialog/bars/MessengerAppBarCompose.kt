@@ -49,7 +49,8 @@ private fun ChatAppBarPreview() {
         ChatAppBarContent(
             ChatAppBarState(
                 ("Бэтмен"), DemoAvatarModel, (4),
-                MEET_FINISHED
+                MEET_FINISHED, isOnline = false,
+                isOrganizer = true
             )
         )
     }
@@ -59,16 +60,12 @@ private fun ChatAppBarPreview() {
 @Composable
 private fun PinnedBarPreview() {
     GiltyTheme {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(colorScheme.background)
-        ) {
-            PinnedBar(MEET_FINISHED)
-            PinnedBar(TRANSLATION, 43)
+        Column(Modifier.background(colorScheme.background)) {
+            PinnedBar(MEET_FINISHED, isOnline = true)
+            PinnedBar(TRANSLATION, 43, true)
             PinnedBar(
                 TRANSLATION_AWAIT, (0),
-                ("04:53")
+                true, ("04:53")
             )
         }
     }
@@ -76,11 +73,13 @@ private fun PinnedBarPreview() {
 
 data class ChatAppBarState(
     val name: String,
-    val avatar: AvatarModel,
+    val avatar: AvatarModel?,
     val memberCount: Int,
     val chatType: PinnedBarType,
     val viewer: Int? = null,
     val toTranslation: String? = null,
+    val isOnline: Boolean,
+    val isOrganizer: Boolean,
 )
 
 interface ChatAppBarCallback {
@@ -95,7 +94,7 @@ interface ChatAppBarCallback {
 fun ChatAppBarContent(
     state: ChatAppBarState,
     modifier: Modifier = Modifier,
-    callback: ChatAppBarCallback? = null
+    callback: ChatAppBarCallback? = null,
 ) {
     Column(modifier.background(colorScheme.background)) {
         Row(
@@ -135,7 +134,7 @@ fun ChatAppBarContent(
         }
         if(state.chatType != MEET) PinnedBar(
             state.chatType, state.viewer,
-            state.toTranslation
+            state.isOnline, state.toTranslation
         ) { callback?.onPinnedBarButtonClick() }
     }
 }
@@ -149,8 +148,9 @@ enum class PinnedBarType {
 private fun PinnedBar(
     type: PinnedBarType,
     viewer: Int? = null,
+    isOnline: Boolean,
     toTranslation: String? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         Modifier, RectangleShape,
@@ -179,7 +179,7 @@ private fun PinnedBar(
                     Modifier.padding()
                 )
             }
-            PinedButton(type, toTranslation)
+            PinedButton(type, isOnline, toTranslation)
             { onClick?.let { it() } }
         }
     }
@@ -189,8 +189,9 @@ private fun PinnedBar(
 @Composable
 private fun PinedButton(
     type: PinnedBarType,
+    isOnline: Boolean,
     toTranslation: String? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     val viewString = stringResource(R.string.chats_view_translation_button)
     val meetType = type == MEET_FINISHED
@@ -228,7 +229,8 @@ private fun PinedButton(
                         
                         else -> ""
                     }, Modifier.padding(), if(meetType)
-                        colorScheme.primary else White,
+                        if(isOnline) colorScheme.secondary
+                        else colorScheme.primary else White,
                     fontWeight = SemiBold,
                     style = typography.labelSmall
                 )
@@ -242,7 +244,7 @@ private fun PinedButton(
 private fun PinedText(
     type: PinnedBarType,
     viewer: Int?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Text(
@@ -281,11 +283,11 @@ private fun PinedText(
 @Composable
 private fun Information(
     modifier: Modifier = Modifier,
-    state: ChatAppBarState
+    state: ChatAppBarState,
 ) {
     Row(modifier, verticalAlignment = CenterVertically) {
         AsyncImage(
-            state.avatar.id,
+            state.avatar?.thumbnail?.url,
             stringResource(R.string.meeting_avatar),
             Modifier
                 .size(32.dp)
@@ -300,7 +302,7 @@ private fun Information(
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             )
-            val count = state.memberCount
+            val count = state.memberCount + 1
             Text(
                 "$count ${
                     stringResource(
@@ -322,14 +324,12 @@ private enum class WordEndingType {
 
 private fun wordEnding(
     type: WordEndingType,
-    count: Int
+    count: Int,
 ): String {
-    val viewer = type == VIEWER
-    val last = count.toString()
-        .last().digitToInt()
-    return when {
-        last == 1 -> if(viewer) "ь" else ""
-        last < 5 -> if(viewer) "я" else "а"
+    val viewer = (type == VIEWER)
+    return when(("$count".last())) {
+        '1' -> if(viewer) "ь" else ""
+        '2', '3', '4' -> if(viewer) "я" else "а"
         else -> if(viewer) "ей" else "ов"
     }
 }

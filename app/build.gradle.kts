@@ -53,6 +53,7 @@ dependencies {
     
     implementation(project(":data:shared"))
     implementation(project(":data:auth"))
+    implementation(project(":data:chats"))
     implementation(project(":data:realm"))
     implementation(project(":data:ktor"))
     

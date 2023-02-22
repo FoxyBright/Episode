@@ -21,9 +21,22 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.compose.ui:ui-tooling:$composeVer",
 ) and accompanist(
 ) and accompanistPermissions(
-) and firebase()
+) and firebase(
+) and swipeRefresher()
 
 const val accompanistVer = "0.26.5-rc"
+
+val pagingVer = "3.1.1"
+
+fun DependencyHandlerScope.paging() = implementation(
+    "androidx.paging:paging-common-ktx:$pagingVer",
+    "androidx.paging:paging-runtime:$pagingVer"
+)
+
+
+fun DependencyHandlerScope.swipeRefresher() = implementation(
+    "com.google.accompanist:accompanist-swiperefresh:0.24.13-rc"
+)
 
 fun DependencyHandlerScope.firebase() = implementation(
     "com.google.firebase:firebase-messaging:23.1.1",
@@ -44,7 +57,7 @@ const val koinVer = "3.2.1"
 fun DependencyHandlerScope.koin() = implementation(
     "io.insert-koin:koin-androidx-compose:$koinVer",
     "io.insert-koin:koin-android:$koinVer",
-    "io.insert-koin:koin-core:$koinVer"
+    "io.insert-koin:koin-core:$koinVer",
 )
 
 fun DependencyHandlerScope.dataBase() =
@@ -72,7 +85,7 @@ fun DependencyHandlerScope.ktor() = implementation(
     "io.ktor:ktor-client-logging:$ktorVer",
     "io.ktor:ktor-client-okhttp:$ktorVer",
     "io.ktor:ktor-client-auth:$ktorVer",
-    "io.ktor:ktor-client-core:$ktorVer"
+    "io.ktor:ktor-client-core:$ktorVer",
 )
 
 @Suppress("UNUSED_PARAMETER")

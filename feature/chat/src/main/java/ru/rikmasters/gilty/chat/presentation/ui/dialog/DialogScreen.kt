@@ -1,76 +1,43 @@
 package ru.rikmasters.gilty.chat.presentation.ui.dialog
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.chat.Chat.logD
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bottom.HiddenBs
-import ru.rikmasters.gilty.chat.presentation.ui.viewmodel.DialogViewModel
-import ru.rikmasters.gilty.complaints.presentation.ui.ComplainsContent
+import ru.rikmasters.gilty.chat.viewmodel.DialogViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.extentions.FULL_DATE_FORMAT_WIDTH_ZONE
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsCallback
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsContent
-import ru.rikmasters.gilty.shared.common.meetBS.MeetingBsState
-import ru.rikmasters.gilty.shared.model.chat.DemoMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MemberMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import java.util.UUID
 
 @Composable
 fun DialogScreen(
     vm: DialogViewModel,
-    chatType: String,
+    chatId: String,
 ) {
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    var type = PinnedBarType.MEET
-    
-    DisposableEffect(Unit) {
-        asm.keyboard.setSoftInputMode(Nothing)
-        onDispose { asm.keyboard.resetSoftInputAdjust() }
-    }
-    
-    var messageText by
-    remember { mutableStateOf("") }
     var answer by
     remember { mutableStateOf<MessageModel?>(null) }
-    val sender = DemoUserModel
-    val messageList = remember {
-        mutableStateListOf(
-            DemoMessageModel,
-            DemoMessageModel,
-            DemoMessageModel,
-        )
-    }
     
-    //TODO - тут на 1 всегда больше т.к. при запуске съедает еденицу
-    var unReadCount by remember { mutableStateOf(5) }
-    
-    val meet = if(type == TRANSLATION || type == TRANSLATION_AWAIT)
-        DemoMeetingModel.copy(isOnline = true) else DemoMeetingModel
     var alert by
     remember { mutableStateOf(false) }
     var meetOutAlert by
@@ -85,53 +52,33 @@ fun DialogScreen(
     remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     
-    LaunchedEffect(Unit) {
+    fun listToDown() {
         scope.launch {
-            listState.scrollToItem(unReadCount)
+            listState.animateScrollToItem(0)
         }
     }
     
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
+    val messageList by vm.messageList.collectAsState()
+    val toTranslation by vm.translationTimer.collectAsState()
+    val meeting by vm.meet.collectAsState()
+    val unreadCount by vm.unreadCount.collectAsState()
+    val type by vm.dialogType.collectAsState()
+    val message by vm.message.collectAsState()
+    val dialog by vm.chat.collectAsState()
+    val viewers by vm.viewers.collectAsState()
+    val user by vm.user.collectAsState()
     
-    val meetBsCallback = object: MeetingBsCallback {
-        override fun onKebabClick(state: Boolean) {
-            menuState = state
-        }
-        
-        override fun onAvatarClick(organizerId: String) {
-            scope.launch {
-                asm.bottomSheet.expand {
-                    //                    Organizer(
-                    //                        DemoProfileModel, meet,
-                    //                        asm, scope
-                    //                    )
-                }
-            }
-        }
-        
-        override fun onRespond(meetId: String) {
-            scope.launch { asm.bottomSheet.collapse() }
-            meetOutAlert = true
-        }
-        
-        override fun onMenuItemClick(index: Int, meetId: String) {
-            scope.launch {
-                asm.bottomSheet.expand {
-                    menuState = false
-                    ComplainsContent(meet.id) {
-                        scope.launch {
-                            asm.bottomSheet.collapse()
-                        }; alert = true
-                    }
-                }
-            }
-        }
-    }
+    val title = meeting
+        ?.tags
+        ?.joinToString((", "))
+        { it.title }
+        ?: ""
     
-    fun Int.toTime(): String? {
-        if(this == 0) {
-            type = TRANSLATION
+    fun Long.toTime(): String? {
+        if(this == 0L) {
+            scope.launch {
+                vm.changeDialogType(TRANSLATION)
+            }
             return null
         }
         val min = this / 60
@@ -143,229 +90,230 @@ fun DialogScreen(
         }$sec"
     }
     
-    fun listToDown() {
-        scope.launch {
-            listState.animateScrollToItem(0)
+    DisposableEffect(Unit) {
+        asm.keyboard.setSoftInputMode(Nothing)
+        onDispose { asm.keyboard.resetSoftInputAdjust() }
+    }
+    
+    LaunchedEffect(Unit) {
+        vm.getChat(chatId)
+        vm.getMeet(dialog?.meetingId)
+        vm.getUser()
+        listState.scrollToItem(unreadCount)
+    }
+    
+    val state = meeting?.let { meet ->
+        dialog?.let { chat ->
+            user?.let { user ->
+                DialogState(
+                    ChatAppBarState(
+                        title,
+                        meet.organizer.avatar,
+                        chat.membersCount,
+                        type, viewers,
+                        toTranslation?.toTime(),
+                        meet.isOnline,
+                        (meet.organizer.id == user.id)
+                    ), answer, meet.map(), message,
+                    messageList, user, alert,
+                    meetOutAlert, kebabMenuState,
+                    messageMenuState, imageMenuState,
+                    listState, unreadCount
+                )
+            }
         }
     }
+    val context = LocalContext.current
+    Use<DialogViewModel>(LoadingTrait) {
+        state?.let { state ->
+            DialogContent(
+                state, Modifier,
+                object: DialogCallback {
+                    override fun onSwipeToRefresh() {
+                        Toast.makeText(context, "SwipeRefresh", Toast.LENGTH_SHORT).show()
+                    }
     
-    val user = DemoUserModel
-    
-    val participants = 4
-    val viewers = if(type == TRANSLATION) 43 else null
-    var toTranslation by remember {
-        mutableStateOf(20) // TODO сюда время в секундах для таймера
-    }
-    LaunchedEffect(Unit) {
-        if(type == TRANSLATION_AWAIT)
-            while(toTranslation > 0) {
-                delay(1000L)
-                toTranslation -= 1
-            }
-    }
-    
-    DialogContent(
-        DialogState(
-            ChatAppBarState(
-                meet.title, DemoAvatarModel, participants,
-                type, viewers, toTranslation.toTime()
-            ), answer, meet, messageText,
-            messageList, sender, alert,
-            meetOutAlert, kebabMenuState,
-            messageMenuState, imageMenuState,
-            listState, unReadCount
-        ), Modifier, object: DialogCallback {
-            override fun onBack() {
-                nav.navigate("main")
-            }
-            
-            override fun onAnswerClick(message: MessageModel) {
-                scope.launch {
-                    listState.animateScrollToItem(
-                        messageList.indexOf(message)
-                    )
-                }
-            }
-            
-            override fun onImageMenuDismiss() {
-                imageMenuState = false
-            }
-            
-            override fun onImageMenuItemSelect(point: Int) {
-                when(point) {
-                    0, 1 -> Toast.makeText(
-                        context,
-                        "Функционал пока не доступен",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    
-                    else -> scope.launch {
-                        asm.bottomSheet.expand {
-                            HiddenBs()
+                    override fun onAnswerClick(message: MessageModel) {
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                messageList.indexOf(message)
+                            )
                         }
                     }
-                }
-            }
-            
-            override fun onPinnedBarButtonClick() {
-                if(type == TRANSLATION) Toast.makeText(
-                    context,
-                    "Трансляции пока что не доступны",
-                    Toast.LENGTH_SHORT
-                ).show() else {
-                    Toast.makeText(
-                        context,
-                        "Чат для встречи ${meet.title} закрыт",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    nav.navigate("main")
-                }
-            }
-            
-            override fun onImageClick(message: MessageModel) {
-                nav.navigate(
-                    "photo?image=${
-                        message.message?.attachments!!.first().file.id
-                    }&type=2"
-                )
-            }
-            
-            override fun onDownButtonClick() {
-                listToDown()
-                unReadCount = 0
-            }
-            
-            override fun onHiddenClick(message: MessageModel) {
-                if(message.message?.attachments?.first()?.file?.hasAccess == true)
-                    Toast.makeText(
-                        context,
-                        "Скрытое фото больше недоступно к просмотру",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                else nav.navigate(
-                    "photo?image=${
-                        message.message?.attachments!!.first().file.id
-                    }&type=1"
-                )
-            }
-            
-            override fun onListDown() {
-                unReadCount -= 1
-            }
-            
-            override fun onSwipe(message: MessageModel) {
-                answer = message
-            }
-            
-            override fun onMessageMenuDismiss() {
-                messageMenuState = false
-            }
-            
-            override fun onMessageMenuItemSelect(point: Int, message: MessageModel) {
-                when(point) {
-                    0 -> answer = message
-                    1 -> {
-                        answer = null
-                        messageList.remove(message)
+                    
+                    override fun onBack() {
+                        nav.navigate("main")
                     }
-                }
-                messageMenuState = false
-            }
-            
-            override fun textChange(text: String) {
-                messageText = text
-            }
-            
-            override fun gallery() {
-                focusManager.clearFocus()
-                imageMenuState = true
-            }
-            
-            override fun onMeetOut() {
-                Toast.makeText(
-                    context,
-                    "Вы покинули встречу ${meet.title}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                meetOutAlert = false
-                nav.navigate("main")
-            }
-            
-            override fun onMeetOutAlertDismiss() {
-                meetOutAlert = false
-            }
-            
-            override fun onSend() {
-                messageList.add(
-                    0, MessageModel(
-                        id = UUID.randomUUID().toString(),
-                        type = MESSAGE,
-                        replied = answer,
-                        notification = null,
-                        message = MemberMessageModel(
-                            author = user,
-                            text = "",
-                            attachments = null,
-                            is_author = true
-                        ),
-                        otherRead = false,
-                        isRead = false,
-                        isDelivered = false,
-                        LocalDateTime.now().minusHour(3)
-                            .format(FULL_DATE_FORMAT_WIDTH_ZONE)
-                    )
-                )
-                answer = null
-                messageText = ""
-                listToDown()
-            }
-            
-            override fun onCancelAnswer() {
-                answer = null
-            }
-            
-            override fun closeAlert() {
-                alert = false
-            }
-            
-            override fun onTopBarClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        MeetingBsContent(
-                            MeetingBsState(
-                                menuState, meet.map(),
-                                DemoUserModelList,
-                                distanceCalculator(meet),
-                                (true),
-                            ), Modifier
-                                .padding(16.dp)
-                                .padding(bottom = 40.dp),
-                            meetBsCallback
-                        )
+                    
+                    override fun onImageMenuDismiss() {
+                        imageMenuState = false
                     }
-                }
-            }
-            
-            override fun onMenuItemClick(point: Int) {
-                kebabMenuState = false
-                when(point) {
-                    0 -> meetOutAlert = true
-                    1 -> scope.launch {
-                        asm.bottomSheet.expand {
-                            menuState = false
-                            ComplainsContent(meet.id) {
-                                scope.launch {
-                                    asm.bottomSheet.collapse()
-                                }; alert = true
+                    
+                    override fun onImageMenuItemSelect(point: Int) {
+                        scope.launch {
+                            vm.onAttachmentMenuSelect(point)
+                            asm.bottomSheet.expand {
+                                when(point) {
+                                    0, 1 -> {}
+                                    2 -> HiddenBs()
+                                }
                             }
                         }
                     }
+                    
+                    override fun onPinnedBarButtonClick() {
+                        scope.launch {
+                            if(type == TRANSLATION)
+                                vm.toTranslation()
+                            else {
+                                vm.finishedChat(title)
+                                nav.navigate("main")
+                            }
+                        }
+                    }
+                    
+                    override fun onImageClick(message: MessageModel) {
+                        logD(message.message?.attachments!!.first().file.url)
+                        nav.navigate(
+                            "photo?type2&image=${
+                                message.message?.attachments!!.first().file.url
+                            }"
+                        )
+                    }
+                    
+                    override fun onDownButtonClick() {
+                        scope.launch {
+                            listToDown()
+                            vm.changeUnreadCount(0)
+                        }
+                    }
+                    
+                    override fun onHiddenClick(message: MessageModel) {
+                        scope.launch {
+                            if(message.message?.attachments
+                                    ?.first()?.file?.hasAccess != true
+                            ) vm.onHiddenClick()
+                            else nav.navigate(
+                                "photo?type=1&image=${
+                                    message.message?.attachments!!.first().file.url
+                                }"
+                            )
+                        }
+                    }
+                    
+                    override fun onListDown() {
+                        scope.launch {
+                            vm.changeUnreadCount(unreadCount - 1)
+                        }
+                    }
+                    
+                    override fun onSwipe(message: MessageModel) {
+                        answer = message
+                    }
+                    
+                    override fun onMessageMenuDismiss() {
+                        messageMenuState = false
+                    }
+                    
+                    override fun onMessageMenuItemSelect(
+                        point: Int,
+                        message: MessageModel,
+                    ) {
+                        scope.launch {
+                            when(point) {
+                                0 -> answer = message
+                                1 -> {
+                                    answer = null
+                                    vm.deleteMessage(
+                                        chatId, listOf(message.id), true
+                                    )
+                                }
+                            }
+                        }
+                        messageMenuState = false
+                    }
+                    
+                    override fun textChange(text: String) {
+                        scope.launch { vm.changeMessage(text) }
+                    }
+                    
+                    override fun gallery() {
+                        focusManager.clearFocus()
+                        imageMenuState = true
+                    }
+                    
+                    override fun onMeetOut() {
+                        meetOutAlert = false
+                        nav.navigate("main")
+                    }
+                    
+                    override fun onMeetOutAlertDismiss() {
+                        meetOutAlert = false
+                    }
+                    
+                    override fun onSend() {
+                        scope.launch {
+                            vm.onSendMessage(
+                                chatId, MessageModel(
+                                    id = UUID.randomUUID().toString(),
+                                    type = MESSAGE,
+                                    replied = answer,
+                                    notification = null,
+                                    message = MemberMessageModel(
+                                        author = state.user,
+                                        text = message,
+                                        attachments = null,
+                                        is_author = true
+                                    ),
+                                    otherRead = false,
+                                    isRead = false,
+                                    isDelivered = true,
+                                    createdAt = LocalDateTime
+                                        .now()
+                                        .minusHour(3)
+                                        .format(FULL_DATE_FORMAT_WIDTH_ZONE)
+                                )
+                            )
+                            answer = null
+                            vm.clearMessage()
+                            vm.getMessages(chatId)
+                            listToDown()
+                        }
+                    }
+                    
+                    override fun onCancelAnswer() {
+                        answer = null
+                    }
+                    
+                    override fun closeAlert() {
+                        alert = false
+                    }
+                    
+                    override fun onTopBarClick() {
+                    }
+                    
+                    override fun onMenuItemClick(point: Int) {
+                        kebabMenuState = false
+                        when(point) {
+                            0 -> meetOutAlert = true
+                            1 -> scope.launch {
+                                asm.bottomSheet.expand {
+                                    menuState = false
+                                    //                            ComplainsContent(meet?.id) {
+                                    //                                scope.launch {
+                                    //                                    asm.bottomSheet.collapse()
+                                    //                                }; alert = true
+                                    //                            }
+                                }
+                            }
+                        }
+                    }
+                    
+                    override fun onKebabClick() {
+                        kebabMenuState = !kebabMenuState
+                    }
                 }
-            }
-            
-            override fun onKebabClick() {
-                kebabMenuState = !kebabMenuState
-            }
+            )
         }
-    )
+    }
 }

@@ -39,6 +39,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.WRITING
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import kotlin.random.Random
 
 @Preview
 @Composable
@@ -48,7 +49,7 @@ fun MessPreview() {
             items(MessageList) {
                 Message(
                     MessState(
-                        it, (false),
+                        it, (Random.nextBoolean()),
                         DragRowState(0f),
                         shapes.large, (true), (false)
                     ),
@@ -148,7 +149,9 @@ private fun Content(
             message.type != NOTIFICATION
             && state.avatar
         ) AsyncImage(
-            message.message?.author?.avatar?.id, (null),
+            message.message?.author
+                ?.avatar?.thumbnail?.url,
+            (null),
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
@@ -174,7 +177,7 @@ private fun Content(
             
             MESSAGE -> {
                 when {
-                    (attach != null) -> Image(
+                    (!attach.isNullOrEmpty()) -> Image(
                         attach.first().type, message,
                         sender, state.shape,
                         state.isOnline, callback,
@@ -218,10 +221,11 @@ private fun Image(
         }
         
         PRIVATE_PHOTO -> {
+            val hide = message.message?.attachments
+            val access = if(hide.isNullOrEmpty()) false
+            else hide.first().file.hasAccess
             HiddenImageMessage(
-                Modifier, message, sender,
-                message.message?.attachments
-                    ?.first()?.file?.hasAccess ?: false, shape
+                Modifier, message, sender, access, shape
             ) { callback?.onHiddenClick(message) }
         }
         

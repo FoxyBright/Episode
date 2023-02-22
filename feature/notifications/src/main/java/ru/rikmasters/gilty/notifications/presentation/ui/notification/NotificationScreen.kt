@@ -8,8 +8,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.core.viewmodel.connector.Use
-import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.meetbs.presentation.ui.Observe
 import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.MEET
 import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.USER
@@ -45,99 +43,91 @@ fun NotificationsScreen(vm: NotificationViewModel) {
         vm.getLastResponse()
         vm.getNotification()
     }
-    
-    Use<NotificationViewModel>(LoadingTrait) {
-        NotificationsContent(
-            NotificationsState(
-                notifications, lastRespond,
-                navState, blur, selected, participants,
-                participantsStates, listState, ratings
-            ), Modifier, object: NotificationsCallback {
-                
-                override fun onParticipantClick(index: Int) {
-                    scope.launch { vm.selectParticipants(index) }
+    NotificationsContent(
+        NotificationsState(
+            notifications, lastRespond,
+            navState, blur, selected, participants,
+            participantsStates, listState, ratings
+        ), Modifier, object: NotificationsCallback {
+            
+            override fun onParticipantClick(index: Int) {
+                scope.launch { vm.selectParticipants(index) }
+            }
+            
+            override fun onBlurClick() {
+                scope.launch {
+                    vm.blur(false)
+                    vm.clearSelectedNotification()
                 }
-                
-                override fun onBlurClick() {
-                    scope.launch {
-                        vm.blur(false)
-                        vm.clearSelectedNotification()
+            }
+            
+            override fun onEmojiClick(
+                notification: NotificationModel,
+                emoji: EmojiModel,
+                userId: String?,
+            ) {
+                scope.launch {
+                    selected?.let {
+                        if(notification.feedback?.ratings == null)
+                            vm.emojiClick(
+                                emoji,
+                                notification.parent.meeting?.id!!,
+                                userId!!
+                            )
+                    } ?: run {
+                        vm.selectNotification(notification)
+                        vm.blur(true)
                     }
                 }
-                
-                override fun onEmojiClick(
-                    notification: NotificationModel,
-                    emoji: EmojiModel,
-                    userId: String?,
-                ) {
-                    scope.launch {
-                        selected?.let {
-                            if(notification.feedback?.ratings == null)
-                                vm.emojiClick(
-                                    emoji,
-                                    notification.parent.meeting?.id!!,
-                                    userId!!
-                                )
-                        } ?: run {
-                            vm.selectNotification(notification)
-                            vm.blur(true)
+            }
+            
+            override fun onNavBarSelect(point: Int) {
+                if(point == 1) return
+                scope.launch {
+                    nav.navigateAbsolute(
+                        vm.navBarNavigate(point)
+                    )
+                }
+            }
+            
+            override fun onRespondsClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<RespondsBsViewModel>(vm.scope) {
+                            RespondsBs(it)
                         }
                     }
                 }
-                
-                override fun onNavBarSelect(point: Int) {
-                    if(point == 1) return
-                    scope.launch {
-                        nav.navigateAbsolute(
-                            vm.navBarNavigate(point)
-                        )
-                    }
-                }
-                
-                override fun onRespondsClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<RespondsBsViewModel>(vm.scope) {
-                                RespondsBs(it)
-                            }
+            }
+            
+            override fun onListUpdate() {
+                scope.launch { vm.getNotification() }
+            }
+            
+            override fun onMeetClick(meet: MeetingModel) {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<ObserveViewModel>(vm.scope) {
+                            Observe(it, MEET, meet.id, meet.organizer?.id!!)
                         }
                     }
                 }
-                
-                override fun onListUpdate() {
-                    scope.launch {
-                        vm.getNotification()
-                        if(notifications.size > 6) listState.scrollToItem(
-                            notifications.size - 6
-                        )
-                    }
-                }
-                
-                override fun onMeetClick(meet: MeetingModel) {
+            }
+            
+            override fun onUserClick(user: UserModel, meet: MeetingModel) {
+                user.id?.let { u ->
                     scope.launch {
                         asm.bottomSheet.expand {
                             Connector<ObserveViewModel>(vm.scope) {
-                                Observe(it, MEET, meet.id, meet.organizer?.id!!)
+                                Observe(it, USER, meet.id, u)
                             }
                         }
                     }
                 }
-                
-                override fun onUserClick(user: UserModel, meet: MeetingModel) {
-                    user.id?.let { u ->
-                        scope.launch {
-                            asm.bottomSheet.expand {
-                                Connector<ObserveViewModel>(vm.scope) {
-                                    Observe(it, USER, meet.id, u)
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                override fun onSwiped(notification: NotificationModel) {
-                    scope.launch { vm.swipeNotification(notification) }
-                }
-            })
-    }
+            }
+            
+            override fun onSwiped(notification: NotificationModel) {
+                scope.launch { vm.swipeNotification(notification) }
+            }
+        })
 }

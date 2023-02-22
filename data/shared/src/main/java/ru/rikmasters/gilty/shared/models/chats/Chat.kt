@@ -20,7 +20,7 @@ data class Chat(
     val datetime: String,
     val unreadCount: Int,
     val canMessage: Boolean,
-    val memberCount: Int,
+    val membersCount: Int,
     val createdAt: String,
 ) {
     
@@ -32,6 +32,6 @@ data class Chat(
         organizer.map(), organizerOnly,
         title, lastMessage.map(),
         datetime, unreadCount, canMessage,
-        memberCount, createdAt,
+        membersCount, createdAt,
     )
 }

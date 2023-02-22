@@ -4,6 +4,7 @@ import org.koin.core.module.Module
 import ru.rikmasters.gilty.addmeet.AddMeet
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.chat.Chat
+import ru.rikmasters.gilty.chats.ChatData
 import ru.rikmasters.gilty.complaints.Complains
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.module.ModuleDefinition
@@ -16,15 +17,17 @@ import ru.rikmasters.gilty.mainscreen.Main
 import ru.rikmasters.gilty.notifications.Notifications
 import ru.rikmasters.gilty.profile.Profile
 
-object AppModule : FeatureDefinition() {
+object AppModule: FeatureDefinition() {
+    
     override fun include(): Set<ModuleDefinition> =
         setOf(
-            ExampleModule, Login, Main,
             Profile, AddMeet, Notifications,
-            Chat, Complains, Realm, Ktor, Auth
+            Chat, Complains, Realm, Ktor,
+            ExampleModule, Login,
+            Main, Auth, ChatData
         )
     
     override fun DeepNavGraphBuilder.navigation() {}
-
+    
     override fun Module.koin() {}
 }

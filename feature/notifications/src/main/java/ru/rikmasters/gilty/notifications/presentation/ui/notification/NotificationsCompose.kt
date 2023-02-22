@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
+import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
@@ -133,13 +136,16 @@ fun NotificationsContent(
             ) { callback?.onNavBarSelect(it) }
         }
     ) { padding ->
-        Notifications(
-            state, Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
-            callback
-        )
+        Box(Modifier.padding(padding)) {
+            Use<NotificationViewModel>(PullToRefreshTrait) {
+                Notifications(
+                    state, Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    callback
+                )
+            }
+        }
     }
     state.activeNotification?.let {
         if(state.blur) Box(
@@ -185,6 +191,7 @@ private fun Notifications(
     }.map { it to rememberDragRowState() }
     
     LazyColumn(modifier, state.listState) {
+        
         if(state.lastRespond.first != 0) item {
             Responds(
                 stringResource(R.string.notification_responds_on_user_meetings),
@@ -240,11 +247,6 @@ private fun Notifications(
                     ), Modifier, callback
                 )
             }
-        }
-        
-        item {
-            if(notifications.isNotEmpty())
-                callback?.onListUpdate()
         }
         
         item { Spacer(Modifier.height(20.dp)) }
