@@ -10,7 +10,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.get
@@ -24,6 +26,7 @@ import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getOrNull
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,9 +35,11 @@ fun AppEntrypoint(
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
     snackbar: @Composable (SnackbarData) -> Unit,
     loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null,
+    indicator: (@Composable (state: SwipeRefreshState, offset:Dp, trigger: Dp) -> Unit)? = null,
 ) {
     
     LoadingTrait.loader = loader
+    PullToRefreshTrait.indicator = indicator
     
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
