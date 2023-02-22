@@ -25,7 +25,7 @@ class ChatWebSource: KtorSource() {
     
     suspend fun getDialogs(
         page: Int?, perPage: Int?,
-    ): List<ChatModel> {
+    ): List<Chat> {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/chats"
@@ -34,7 +34,7 @@ class ChatWebSource: KtorSource() {
                 page?.let { query("page" to "$it") }
                 perPage?.let { query("per_page" to "$it") }
             }
-        }.wrapped<List<Chat>>().map { it.map() }
+        }.wrapped()
     }
     
     suspend fun markAsReadMessage(chatId: String) {

@@ -14,8 +14,7 @@ class ExampleRepository(
     
     override val webSource: KtorSource,
     
-    override val primarySource: DbSource
-    
+    override val primarySource: DbSource,
 ): OfflineFirstRepository<WebSource, DbSource>(webSource, primarySource) {
     
     fun doorsFlow() = primarySource.listenAll(Door::class)

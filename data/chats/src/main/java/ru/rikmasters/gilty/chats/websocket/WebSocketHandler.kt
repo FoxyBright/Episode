@@ -14,8 +14,9 @@ import io.ktor.websocket.send
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType
+import ru.rikmasters.gilty.chats.websocket.enums.AnswerType.*
 import ru.rikmasters.gilty.chats.websocket.enums.SocketEvents
 import ru.rikmasters.gilty.chats.websocket.enums.SocketEvents.*
 import ru.rikmasters.gilty.chats.websocket.model.ChatStatus
@@ -28,7 +29,10 @@ import ru.rikmasters.gilty.shared.models.chats.Chat
 import ru.rikmasters.gilty.shared.models.chats.Message
 import java.io.IOException
 
-class WebSocketHandler: KtorSource() {
+class WebSocketHandler(
+    
+    private val chatRepository: ChatRepository,
+): KtorSource() {
     
     private val socketURL = "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
     
@@ -37,8 +41,7 @@ class WebSocketHandler: KtorSource() {
         addModule(kotlinModule())
     }
     
-    private val _answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
-    val answer = _answer.asStateFlow()
+    private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
     
     private suspend fun handle(
         response: SocketResponse,
@@ -51,8 +54,7 @@ class WebSocketHandler: KtorSource() {
                 data class Res(val auth: String)
                 
                 val body = mapOf(
-                    "socket_id" to mapper
-                        .readValue<SocketData>(response.data).socket_id,
+                    "socket_id" to mapper.readValue<SocketData>(response.data).socket_id,
                     "channel_name" to "private-user.${_userId.value}"
                 )
                 
@@ -75,28 +77,29 @@ class WebSocketHandler: KtorSource() {
             }
             
             SUBSCRIPTION_SUCCEEDED -> {
-                logV("RESPONSE--->>> $response")
+                logV("$response")
             }
             
             PONG -> inPing = false
             
             CHATS_UPDATED, CHATS_DELETED -> {
-                _answer.emit(
+                answer.emit(
                     Pair(
                         if(event == CHATS_DELETED)
-                            AnswerType.CHAT_DELETED
-                        else AnswerType.CHATS_UPDATED,
+                            CHAT_DELETED
+                        else UPDATED_CHATS,
                         mapper.readValue<Chat>(
                             response.data
-                        ).map()
+                        )
                     )
                 )
+                chatRepository.chatUpdate(answer.value)
             }
             
             MESSAGE_UPDATE -> {
-                _answer.emit(
+                answer.emit(
                     Pair(
-                        AnswerType.UPDATE_MESSAGE,
+                        UPDATE_MESSAGE,
                         mapper.readValue<ChatStatus>(
                             response.data
                         ).unreadCount
@@ -105,18 +108,18 @@ class WebSocketHandler: KtorSource() {
             }
             
             CHAT_COMPLETED -> {
-                _answer.emit(
-                    Pair(AnswerType.CHAT_COMPLETED, null)
+                answer.emit(
+                    Pair(COMPLETED_CHAT, null)
                 )
             }
             
             MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED -> {
-                _answer.emit(
+                answer.emit(
                     Pair(
                         when(event) {
-                            MESSAGE_SENT -> AnswerType.NEW_MESSAGE
-                            MESSAGE_READ -> AnswerType.READ_MESSAGE
-                            else -> AnswerType.DELETE_MESSAGE
+                            MESSAGE_SENT -> NEW_MESSAGE
+                            MESSAGE_READ -> READ_MESSAGE
+                            else -> DELETE_MESSAGE
                         }, mapper.readValue<Message>(
                             response.data
                         ).map()
@@ -125,9 +128,9 @@ class WebSocketHandler: KtorSource() {
             }
             
             MESSAGE_TYPING -> {
-                _answer.emit(
+                answer.emit(
                     Pair(
-                        AnswerType.TYPING_MESSAGE,
+                        TYPING_MESSAGE,
                         mapper.readValue<User>(
                             response.data
                         ).map()
@@ -166,11 +169,7 @@ class WebSocketHandler: KtorSource() {
         _userId.emit(userId)
         sessionHandlerJob = launch {
             val session = unauthorizedClient
-                .webSocketSession(
-                    host = HOST,
-                    port = 6001,
-                    path = socketURL
-                )
+                .webSocketSession(host = HOST, port = 6001, path = socketURL)
             
             try {
                 launch {
@@ -181,6 +180,7 @@ class WebSocketHandler: KtorSource() {
                 }
                 mySession.emit(session)
                 while(true) {
+                    
                     val response = session.incoming.receive()
                     logV("Frame: ${String(response.data)}")
                     

@@ -1,11 +1,11 @@
 package ru.rikmasters.gilty.chats.websocket.enums
 
 enum class AnswerType {
-    CHAT_COMPLETED,
+    COMPLETED_CHAT,
     DELETE_MESSAGE,
     TYPING_MESSAGE,
     UPDATE_MESSAGE,
-    CHATS_UPDATED,
+    UPDATED_CHATS,
     CHAT_DELETED,
     READ_MESSAGE,
     NEW_MESSAGE

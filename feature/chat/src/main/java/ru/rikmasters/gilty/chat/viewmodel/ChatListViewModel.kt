@@ -21,8 +21,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     private val chatsManager by inject<ChatManager>()
     private val profileManager by inject<ProfileManager>()
     
-    private val _dialogs = MutableStateFlow(emptyList<ChatModel>())
-    val dialogs = _dialogs.asStateFlow()
+    val dialogs by lazy { chatsManager.chatsFlow.state(emptyList()) }
     
     private val _unreadDialogs = MutableStateFlow(emptyList<ChatModel>())
     val unreadDialogs = _unreadDialogs.asStateFlow()
@@ -55,18 +54,13 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
-    private var page = 1
-    
-    override suspend fun forceRefresh() = singleLoading {
-        _dialogs.emit(chatsManager.getDialogs(1))
+    override suspend fun forceRefresh() {
+        getDialogs(true)
     }
     
-    suspend fun getDialogs() = singleLoading {
-        val list = (chatsManager
-            .getDialogs(page) + dialogs.value)
-        _dialogs.emit(list)
-        page++
-    }
+    suspend fun getDialogs(
+        forceWeb: Boolean = false,
+    ) = singleLoading { chatsManager.getDialogs(forceWeb) }
     
     suspend fun getUnread() = singleLoading {
         _unreadDialogs.emit(dialogs.value)

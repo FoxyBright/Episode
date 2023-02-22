@@ -18,6 +18,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val listState = rememberLazyListState()
     val nav = get<NavState>()
     
+    
     val unreadDialogs by vm.unreadDialogs.collectAsState()
     val chatToDelete by vm.chatToDelete.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chats
 
+import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy
@@ -9,13 +10,18 @@ import java.io.File
 
 class ChatManager(
     
-    private val webSource: ChatWebSource,
+    private val chatRepository: ChatRepository,
+    
     private val webSocket: WebSocketHandler,
+    
+    private val webSource: ChatWebSource,
 ): CoroutineController() {
     
+    val chatsFlow = chatRepository.chatsFlow()
+    
     suspend fun getDialogs(
-        page: Int? = null, perPage: Int? = null,
-    ) = webSource.getDialogs(page, perPage)
+        forceWeb: Boolean,
+    ) = chatRepository.getChats(forceWeb)
     
     suspend fun deleteDialog(
         chatId: String,
@@ -27,8 +33,6 @@ class ChatManager(
     suspend fun connect(userId: String) = single(Strategy.JOIN) {
         webSocket.connect(userId)
     }
-    
-    val socketAnswer = webSocket.answer
     
     suspend fun getChatsStatus() = webSource.getChatsStatus()
     

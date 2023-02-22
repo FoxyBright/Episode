@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.models.chats
 
+import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
@@ -22,7 +23,7 @@ data class Chat(
     val canMessage: Boolean,
     val membersCount: Int,
     val createdAt: String,
-) {
+): DomainEntity {
     
     fun map() = ChatModel(
         id, meetingId, userId,
@@ -34,4 +35,6 @@ data class Chat(
         datetime, unreadCount, canMessage,
         membersCount, createdAt,
     )
+    
+    override fun primaryKey() = id
 }
