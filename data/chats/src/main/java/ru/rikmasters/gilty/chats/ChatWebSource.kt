@@ -5,21 +5,20 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import ru.rikmasters.gilty.chats.models.Chat
+import ru.rikmasters.gilty.chats.models.Message
 import ru.rikmasters.gilty.chats.websocket.model.ChatStatus
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.image.AlbumModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.models.Album
 import ru.rikmasters.gilty.shared.models.Hidden
-import ru.rikmasters.gilty.shared.models.chats.Chat
-import ru.rikmasters.gilty.shared.models.chats.Message
 import ru.rikmasters.gilty.shared.wrapper.wrapped
-import java.io.File
+import java.util.UUID
 
 class ChatWebSource: KtorSource() {
     
@@ -94,9 +93,9 @@ class ChatWebSource: KtorSource() {
         chatId: String,
         replyId: String? = null,
         text: String? = null,
-        photos: List<File>? = null,
+        photos: List<ByteArray>? = null,
         attachments: List<AvatarModel>? = null,
-        videos: List<File>? = null,
+        videos: List<ByteArray>? = null,
     ) {
         updateClientToken()
         client.post(
@@ -130,12 +129,12 @@ class ChatWebSource: KtorSource() {
                         if(!photos.isNullOrEmpty()) {
                             photos.forEach { photo ->
                                 append("upload[type]", "PHOTO")
-                                append("upload[photos][]", photo.readBytes(),
+                                append("upload[photos][]", photo,
                                     Headers.build {
                                         append(HttpHeaders.ContentType, "image/jpg")
                                         append(
                                             HttpHeaders.ContentDisposition,
-                                            "filename=\"${photo.name}\""
+                                            "filename=\"${UUID.randomUUID()}.jpg\""
                                         )
                                     })
                             }
@@ -145,12 +144,12 @@ class ChatWebSource: KtorSource() {
                         if(!videos.isNullOrEmpty()) {
                             videos.forEach { video ->
                                 append("upload[type]", "VIDEO")
-                                append("upload[videos][]", video.readBytes(),
+                                append("upload[videos][]", video,
                                     Headers.build {
                                         append(HttpHeaders.ContentType, "video/mp4")
                                         append(
                                             HttpHeaders.ContentDisposition,
-                                            "filename=\"${video.name}\""
+                                            "filename=\"${UUID.randomUUID()}.mp4\""
                                         )
                                     })
                             }
@@ -165,7 +164,7 @@ class ChatWebSource: KtorSource() {
     suspend fun getMessages(
         chatId: String,
         page: Int?, perPage: Int?,
-    ): List<MessageModel> {
+    ): List<Message> {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
@@ -174,7 +173,7 @@ class ChatWebSource: KtorSource() {
                 page?.let { query("page" to "$it") }
                 perPage?.let { query("per_page" to "$it") }
             }
-        }.wrapped<List<Message>>().map { it.map() }
+        }.wrapped()
     }
     
     suspend fun getChat(chatId: String): ChatModel {

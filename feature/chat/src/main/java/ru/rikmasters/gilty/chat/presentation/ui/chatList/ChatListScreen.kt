@@ -104,6 +104,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
             }
             
             override fun onChatClick(chat: ChatModel) {
+                scope.launch { vm.onChatClick(chat.id) }
                 nav.navigate("chat?id=${chat.id}")
             }
             

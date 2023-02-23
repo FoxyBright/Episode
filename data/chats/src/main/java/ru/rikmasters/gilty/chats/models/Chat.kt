@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.shared.models.chats
+package ru.rikmasters.gilty.chats.models
 
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.chat.ChatModel

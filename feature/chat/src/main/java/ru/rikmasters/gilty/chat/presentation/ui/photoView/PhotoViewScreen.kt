@@ -9,25 +9,30 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.PhotoView
 import ru.rikmasters.gilty.shared.common.PhotoViewCallback
 import ru.rikmasters.gilty.shared.common.PhotoViewState
+import java.net.URLDecoder
 
 @Composable
 fun PhotoViewScreen(
     image: String,
     type: Int,
-    nav: NavState = get()
+    nav: NavState = get(),
 ) {
     var timer by remember {
         mutableStateOf(false)
     }
+    
     LaunchedEffect(Unit) {
-        if(type == 1) timer = true    // TODO Реализовать без LaunchEffect
+        if(type == 1) timer = true
     }
+    
     val animateTimer = animateFloatAsState(
         if(timer) 1f else 0f, tween(6000)
     ) { nav.navigationBack() }.value
+    
     PhotoView(
         PhotoViewState(
-            image, ("1/1"), (false), type, animateTimer
+            URLDecoder.decode(image, "utf-8"),
+            ("1/1"), (false), type, animateTimer
         ), Modifier, object: PhotoViewCallback {
             override fun onBack() {
                 nav.navigationBack()

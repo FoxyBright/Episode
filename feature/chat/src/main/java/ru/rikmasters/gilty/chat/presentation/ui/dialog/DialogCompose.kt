@@ -52,7 +52,6 @@ interface DialogCallback:
     fun onImageMenuItemSelect(point: Int)
     fun onDownButtonClick()
     fun onListDown()
-    fun onSwipeToRefresh()
     fun onMessageMenuItemSelect(
         point: Int,
         message: MessageModel,
@@ -141,7 +140,7 @@ private fun Content(
         { index, (message, rowState) ->
             DialogMessage(
                 message, rowState,
-                (message.message?.is_author == true),
+                (message.message?.author?.id == state.user.id),
                 state.meet.isOnline,
                 if(index < list.size - 1)
                     list[index + 1].first

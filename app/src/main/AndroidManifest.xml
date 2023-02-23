@@ -5,9 +5,13 @@
     <uses-feature
             android:name="android.hardware.telephony"
             android:required="false" />
+    <uses-feature
+            android:name="android.hardware.camera"
+            android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.google.android.c2dm.permissions.RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -39,14 +43,23 @@
             android:theme="@style/Theme.Gilty"
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
+        <provider
+                android:name=".presentation.model.GiltyFileProvider"
+                android:authorities="ru.rikmasters.gilty.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/provider_paths" />
+        </provider>
         <service
                 android:name=".presentation.model.FireBaseService"
                 android:permission="com.google.android.c2dm.permissions.RECEIVE"
                 android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <activity

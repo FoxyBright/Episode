@@ -9,12 +9,17 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.isSuccess
 import io.ktor.websocket.Frame
 import io.ktor.websocket.send
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.rikmasters.gilty.chats.models.Chat
+import ru.rikmasters.gilty.chats.models.MessageWs
+import ru.rikmasters.gilty.chats.models.ShortMessageWs
 import ru.rikmasters.gilty.chats.repository.ChatRepository
+import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType.*
 import ru.rikmasters.gilty.chats.websocket.enums.SocketEvents
@@ -25,13 +30,12 @@ import ru.rikmasters.gilty.chats.websocket.model.SocketResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.models.User
-import ru.rikmasters.gilty.shared.models.chats.Chat
-import ru.rikmasters.gilty.shared.models.chats.Message
 import java.io.IOException
 
 class WebSocketHandler(
     
     private val chatRepository: ChatRepository,
+    private val messageRepository: MessageRepository,
 ): KtorSource() {
     
     private val socketURL = "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
@@ -42,6 +46,52 @@ class WebSocketHandler(
     }
     
     private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
+    private val socketId = MutableStateFlow<String?>(null)
+    private val chatId = MutableStateFlow<String?>(null)
+    
+    private suspend fun subscribe(
+        channel: String,
+        complition: (suspend (Boolean) -> Unit)? = null,
+    ) {
+        data class Res(val auth: String)
+        
+        val body = mapOf(
+            "socket_id" to socketId.value,
+            "channel_name" to channel
+        )
+        
+        updateClientToken()
+        val response = client.post(
+            "http://$HOST/broadcasting/auth"
+        ) { setBody(body) }
+        val auth = response.body<Res>().auth
+        
+        complition?.let { it(response.status.isSuccess()) }
+        
+        send(
+            data = mapOf(
+                "auth" to auth,
+                "channel" to channel
+            ),
+            event = "pusher:subscribe"
+        )
+    }
+    
+    suspend fun connectToChat(id: String) {
+        disconnectToChat()
+        subscribe("private-chats.$id") {
+            if(it) chatId.emit(id)
+        }
+    }
+    
+    private suspend fun disconnectToChat() {
+        chatId.value?.let {
+            send(
+                data = mapOf("channel" to "private=chats.$it"),
+                event = "pusher:unsubscribe"
+            )
+        }
+    }
     
     private suspend fun handle(
         response: SocketResponse,
@@ -51,29 +101,9 @@ class WebSocketHandler(
         when(event) {
             CONNECTION_ESTABLISHED -> {
                 
-                data class Res(val auth: String)
+                socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
                 
-                val body = mapOf(
-                    "socket_id" to mapper.readValue<SocketData>(response.data).socket_id,
-                    "channel_name" to "private-user.${_userId.value}"
-                )
-                
-                updateClientToken()
-                val auth = client.post(
-                    "http://$HOST/broadcasting/auth"
-                ) { setBody(body) }.body<Res>().auth
-                
-                send(
-                    mapper.writeValueAsString(
-                        mapOf(
-                            "data" to mapOf(
-                                "auth" to auth,
-                                "channel" to "private-user.${_userId.value}"
-                            ),
-                            "event" to "pusher:subscribe"
-                        )
-                    )
-                )
+                subscribe("private-user.${_userId.value}")
             }
             
             SUBSCRIPTION_SUCCEEDED -> {
@@ -120,11 +150,15 @@ class WebSocketHandler(
                             MESSAGE_SENT -> NEW_MESSAGE
                             MESSAGE_READ -> READ_MESSAGE
                             else -> DELETE_MESSAGE
-                        }, mapper.readValue<Message>(
-                            response.data
-                        ).map()
+                        },
+                        if(event == MESSAGE_SENT)
+                            mapper.readValue<MessageWs>(response.data).map(chatId.value)
+                        else
+                            mapper.readValue<ShortMessageWs>(response.data).id
                     )
                 )
+                logD("INFO MyMessage $response")
+                messageRepository.messageUpdate(answer.value)
             }
             
             MESSAGE_TYPING -> {
@@ -142,9 +176,15 @@ class WebSocketHandler(
         }
     }
     
-    private suspend fun send(data: String) {
-        logD("data:\t$data")
-        mySession.value?.send(data)
+    private suspend fun send(data: Map<String, String>, event: String) {
+        mySession.value?.send(
+            mapper.writeValueAsString(
+                mapOf(
+                    "data" to data,
+                    "event" to event
+                )
+            )
+        )
     }
     
     private var inPing: Boolean = false

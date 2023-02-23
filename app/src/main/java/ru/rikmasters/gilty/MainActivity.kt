@@ -13,17 +13,16 @@ import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
-import ru.rikmasters.gilty.core.data.source.WebSource
+import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.presentation.model.FireBaseService
-import ru.rikmasters.gilty.shared.BuildConfig
+import ru.rikmasters.gilty.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GLoader
 import ru.rikmasters.gilty.ui.GSnackbar
-
-const val TOPIC_ALL = "all"
 
 @ExperimentalMaterial3Api
 class MainActivity: ComponentActivity() {
@@ -38,7 +37,9 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        FireBaseService.sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        FireBaseService.sharedPref = getSharedPreferences(
+            "sharedPref", MODE_PRIVATE
+        )
         
         var token = ""
         FirebaseMessaging
@@ -51,7 +52,7 @@ class MainActivity: ComponentActivity() {
         
         FirebaseMessaging
             .getInstance()
-            .subscribeToTopic(TOPIC_ALL)
+            .subscribeToTopic("all")
         
         setContent {
             AppEntrypoint(
@@ -63,17 +64,18 @@ class MainActivity: ComponentActivity() {
             )
             
             LaunchedEffect(Unit) {
-                val isAuthorized =
-                    MutableStateFlow(regManager.isUserRegistered())
-                
-                if(isAuthorized.value.first) {
-                    authManager.savePushToken(token)
-                    isAuthorized.value.second?.let { userId ->
-                        chatManager.connect(userId)
+                if(authManager.isAuthorized()) {
+                    val isRegistered =
+                        MutableStateFlow(regManager.isUserRegistered())
+                    
+                    if(isRegistered.value.first) {
+                        authManager.savePushToken(token)
+                        isRegistered.value.second?.let { userId ->
+                            chatManager.connect(userId)
+                        }
                     }
                 }
-                
-                env[WebSource.ENV_BASE_URL] = BuildConfig.HOST + BuildConfig.PREFIX_URL
+                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
         }
     }

@@ -1,16 +1,19 @@
 package ru.rikmasters.gilty.chats
 
 import ru.rikmasters.gilty.chats.repository.ChatRepository
+import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
-import ru.rikmasters.gilty.core.viewmodel.Strategy
+import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
+import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import java.io.File
 
 class ChatManager(
     
     private val chatRepository: ChatRepository,
+    
+    private val messageRepository: MessageRepository,
     
     private val webSocket: WebSocketHandler,
     
@@ -18,6 +21,17 @@ class ChatManager(
 ): CoroutineController() {
     
     val chatsFlow = chatRepository.chatsFlow()
+    val messageFlow = messageRepository.messageFlow()
+    
+    suspend fun getMessages(
+        chatId: String, forceWeb: Boolean,
+    ) {
+        messageRepository.getMessages(chatId, forceWeb)
+    }
+    
+    suspend fun connectToChat(chatId: String) {
+        webSocket.connectToChat(chatId)
+    }
     
     suspend fun getDialogs(
         forceWeb: Boolean,
@@ -30,7 +44,7 @@ class ChatManager(
         webSource.deleteDialog(chatId, forAll)
     }
     
-    suspend fun connect(userId: String) = single(Strategy.JOIN) {
+    suspend fun connect(userId: String) = single(JOIN) {
         webSocket.connect(userId)
     }
     
@@ -78,27 +92,21 @@ class ChatManager(
     
     suspend fun sendMessage(
         chatId: String,
-        message: MessageModel,
+        message: MessageModel?,
         attachment: List<AvatarModel>?,
-        photos: List<File>?,
-        videos: List<File>?,
+        photos: List<FileSource>?,
+        videos: List<FileSource>?,
     ) {
         webSource.sendMessage(
             chatId,
-            message.replied?.id,
-            message.message?.text,
-            photos,
+            message?.replied?.id,
+            message?.message?.text,
+            photos?.map { it.bytes() },
             attachment,
-            videos
+            videos?.map { it.bytes() }
         )
     }
     
     suspend fun getChat(chatId: String) =
         webSource.getChat(chatId)
-    
-    suspend fun getMessages(
-        chatId: String,
-        page: Int? = null,
-        perPage: Int? = null,
-    ) = webSource.getMessages(chatId, page, perPage)
 }

@@ -58,6 +58,10 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         getDialogs(true)
     }
     
+    suspend fun onChatClick(chatId: String) {
+        chatsManager.connectToChat(chatId)
+    }
+    
     suspend fun getDialogs(
         forceWeb: Boolean = false,
     ) = singleLoading { chatsManager.getDialogs(forceWeb) }

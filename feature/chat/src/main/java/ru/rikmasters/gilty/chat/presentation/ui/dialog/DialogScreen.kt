@@ -1,14 +1,19 @@
 package ru.rikmasters.gilty.chat.presentation.ui.dialog
 
-import android.widget.Toast
+import android.Manifest.permission.CAMERA
+import android.annotation.SuppressLint
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.core.content.FileProvider.getUriForFile
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.Chat.logD
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bottom.HiddenBs
@@ -19,24 +24,29 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.extentions.FULL_DATE_FORMAT_WIDTH_ZONE
+import ru.rikmasters.gilty.shared.common.extentions.InputStreamSource
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.chat.MemberMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
+import java.io.File
+import java.net.URLEncoder.encode
 import java.util.UUID
 
 @Composable
+@SuppressLint("Recycle")
+@OptIn(ExperimentalPermissionsApi::class)
 fun DialogScreen(
     vm: DialogViewModel,
     chatId: String,
 ) {
+    val cameraPermissions = rememberPermissionState(CAMERA)
     val focusManager = LocalFocusManager.current
+    val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
-    
-    var answer by
-    remember { mutableStateOf<MessageModel?>(null) }
     
     var alert by
     remember { mutableStateOf(false) }
@@ -50,29 +60,17 @@ fun DialogScreen(
     remember { mutableStateOf(false) }
     var imageMenuState by
     remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
     
-    fun listToDown() {
-        scope.launch {
-            listState.animateScrollToItem(0)
-        }
-    }
-    
-    val messageList by vm.messageList.collectAsState()
     val toTranslation by vm.translationTimer.collectAsState()
-    val meeting by vm.meet.collectAsState()
-    val unreadCount by vm.unreadCount.collectAsState()
+    val messages by vm.messages.collectAsState()
     val type by vm.dialogType.collectAsState()
+    val unreadCount by vm.unreadCount.collectAsState()
+    val meeting by vm.meet.collectAsState()
+    val answer by vm.answer.collectAsState()
     val message by vm.message.collectAsState()
     val dialog by vm.chat.collectAsState()
     val viewers by vm.viewers.collectAsState()
     val user by vm.user.collectAsState()
-    
-    val title = meeting
-        ?.tags
-        ?.joinToString((", "))
-        { it.title }
-        ?: ""
     
     fun Long.toTime(): String? {
         if(this == 0L) {
@@ -102,12 +100,27 @@ fun DialogScreen(
         listState.scrollToItem(unreadCount)
     }
     
+    val uri = getUriForFile(
+        context, ("ru.rikmasters.gilty.provider"),
+        File(context.filesDir, "my_images")
+    )
+    
+    val photographer =
+        rememberLauncherForActivityResult(TakePicture()) { success ->
+            if(success) context.contentResolver.openInputStream(uri)?.let {
+                scope.launch {
+                    vm.onSendMessage(chatId, photos = listOf(InputStreamSource(it)))
+                    listState.animateScrollToItem(0)
+                }
+            }
+        }
+    
     val state = meeting?.let { meet ->
         dialog?.let { chat ->
             user?.let { user ->
                 DialogState(
                     ChatAppBarState(
-                        title,
+                        (dialog?.title ?: ""),
                         meet.organizer.avatar,
                         chat.membersCount,
                         type, viewers,
@@ -115,7 +128,7 @@ fun DialogScreen(
                         meet.isOnline,
                         (meet.organizer.id == user.id)
                     ), answer, meet.map(), message,
-                    messageList, user, alert,
+                    messages, user, alert,
                     meetOutAlert, kebabMenuState,
                     messageMenuState, imageMenuState,
                     listState, unreadCount
@@ -123,20 +136,17 @@ fun DialogScreen(
             }
         }
     }
-    val context = LocalContext.current
+    
     Use<DialogViewModel>(LoadingTrait) {
         state?.let { state ->
             DialogContent(
                 state, Modifier,
                 object: DialogCallback {
-                    override fun onSwipeToRefresh() {
-                        Toast.makeText(context, "SwipeRefresh", Toast.LENGTH_SHORT).show()
-                    }
-    
+                    
                     override fun onAnswerClick(message: MessageModel) {
                         scope.launch {
                             listState.animateScrollToItem(
-                                messageList.indexOf(message)
+                                messages.indexOf(message)
                             )
                         }
                     }
@@ -145,20 +155,9 @@ fun DialogScreen(
                         nav.navigate("main")
                     }
                     
+                    
                     override fun onImageMenuDismiss() {
                         imageMenuState = false
-                    }
-                    
-                    override fun onImageMenuItemSelect(point: Int) {
-                        scope.launch {
-                            vm.onAttachmentMenuSelect(point)
-                            asm.bottomSheet.expand {
-                                when(point) {
-                                    0, 1 -> {}
-                                    2 -> HiddenBs()
-                                }
-                            }
-                        }
                     }
                     
                     override fun onPinnedBarButtonClick() {
@@ -166,39 +165,53 @@ fun DialogScreen(
                             if(type == TRANSLATION)
                                 vm.toTranslation()
                             else {
-                                vm.finishedChat(title)
+                                vm.finishedChat(state.topState.name)
                                 nav.navigate("main")
                             }
                         }
                     }
                     
+                    @SuppressLint("PermissionLaunchedDuringComposition")
+                    override fun onImageMenuItemSelect(point: Int) {
+                        scope.launch {
+                            when(point) {
+                                0 -> {}
+                                1 -> if(cameraPermissions.hasPermission)
+                                    photographer.launch(uri)
+                                else
+                                    cameraPermissions.launchPermissionRequest()
+                                
+                                2 -> asm.bottomSheet.expand { HiddenBs() }
+                            }
+                        }
+                    }
+                    
                     override fun onImageClick(message: MessageModel) {
-                        logD(message.message?.attachments!!.first().file.url)
+                        val attach =
+                            message.message?.attachments!!.first().file
+                        
                         nav.navigate(
-                            "photo?type2&image=${
-                                message.message?.attachments!!.first().file.url
-                            }"
+                            "photo?type2&image=${encode(attach.url, "utf-8")}"
                         )
                     }
                     
                     override fun onDownButtonClick() {
                         scope.launch {
-                            listToDown()
                             vm.changeUnreadCount(0)
+                            listState.animateScrollToItem(0)
                         }
                     }
                     
                     override fun onHiddenClick(message: MessageModel) {
-                        scope.launch {
-                            if(message.message?.attachments
-                                    ?.first()?.file?.hasAccess != true
-                            ) vm.onHiddenClick()
-                            else nav.navigate(
-                                "photo?type=1&image=${
-                                    message.message?.attachments!!.first().file.url
-                                }"
+                        val attach =
+                            message.message?.attachments?.first()?.file
+                        
+                        if(attach?.hasAccess != true)
+                            scope.launch { vm.onHiddenBlock() }
+                        else
+                            nav.navigate(
+                                "photo?type=1&image=${encode(attach.url, "utf-8")}"
                             )
-                        }
                     }
                     
                     override fun onListDown() {
@@ -208,7 +221,7 @@ fun DialogScreen(
                     }
                     
                     override fun onSwipe(message: MessageModel) {
-                        answer = message
+                        scope.launch { vm.changeAnswer(message) }
                     }
                     
                     override fun onMessageMenuDismiss() {
@@ -221,13 +234,8 @@ fun DialogScreen(
                     ) {
                         scope.launch {
                             when(point) {
-                                0 -> answer = message
-                                1 -> {
-                                    answer = null
-                                    vm.deleteMessage(
-                                        chatId, listOf(message.id), true
-                                    )
-                                }
+                                0 -> vm.changeAnswer(message)
+                                1 -> vm.deleteMessage(chatId, message)
                             }
                         }
                         messageMenuState = false
@@ -274,15 +282,12 @@ fun DialogScreen(
                                         .format(FULL_DATE_FORMAT_WIDTH_ZONE)
                                 )
                             )
-                            answer = null
-                            vm.clearMessage()
-                            vm.getMessages(chatId)
-                            listToDown()
+                            listState.animateScrollToItem(0)
                         }
                     }
                     
                     override fun onCancelAnswer() {
-                        answer = null
+                        scope.launch { vm.changeAnswer(null) }
                     }
                     
                     override fun closeAlert() {

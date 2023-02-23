@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
@@ -17,7 +18,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import java.io.File
 
 class DialogViewModel: ViewModel() {
     
@@ -25,8 +25,7 @@ class DialogViewModel: ViewModel() {
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
     
-    private val _messageList = MutableStateFlow(emptyList<MessageModel>())
-    val messageList = _messageList.asStateFlow()
+    val messages by lazy { chatManager.messageFlow.state(emptyList()) }
     
     private val _chat = MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
@@ -43,6 +42,9 @@ class DialogViewModel: ViewModel() {
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
     
+    private val _answer = MutableStateFlow<MessageModel?>(null)
+    val answer = _answer.asStateFlow()
+    
     private val _viewers = MutableStateFlow<Int?>(null)
     val viewers = _viewers.asStateFlow()
     
@@ -51,23 +53,36 @@ class DialogViewModel: ViewModel() {
     
     private val _translationTimer = MutableStateFlow<Long?>(null)
     val translationTimer = _translationTimer.asStateFlow()
-    suspend fun getMessages(chatId: String) = singleLoading {
-        _messageList.emit(chatManager.getMessages(chatId))
+    
+    private suspend fun getMessages(
+        chatId: String,
+        forceWeb: Boolean = false,
+    ) = singleLoading {
+        chatManager.getMessages(chatId, forceWeb)
+    }
+    
+    suspend fun changeAnswer(message: MessageModel?) {
+        _answer.emit(message)
     }
     
     suspend fun deleteMessage(
         chatId: String,
-        messageId: List<String>,
-        all: Boolean,
+        message: MessageModel,
     ) = singleLoading {
-        chatManager.deleteMessage(chatId, messageId, all)
+        if(message == answer.value)
+            _answer.emit(null)
+        
+        chatManager.deleteMessage(
+            chatId, listOf(message.id),
+            (user.value?.id == chat.value?.organizer?.id)
+        )
     }
     
     suspend fun changeUnreadCount(state: Int) {
         _unreadCount.emit(state)
     }
     
-    suspend fun onHiddenClick() {
+    suspend fun onHiddenBlock() {
         makeToast("Скрытое фото больше недоступно к просмотру")
     }
     
@@ -96,7 +111,7 @@ class DialogViewModel: ViewModel() {
             if(dialogType.value == TRANSLATION)
                 43 else null //TODO сюда кол-во смотрящих трансляцию
         )
-        getMessages(chatId)
+        getMessages(chatId, false)
     }
     
     suspend fun finishedChat(title: String) {
@@ -107,7 +122,7 @@ class DialogViewModel: ViewModel() {
         makeToast("Трансляции пока что не доступны")
     }
     
-    
+    @Suppress("unused")
     suspend fun timerTick() {
         translationTimer.value?.let {
             _translationTimer.emit(
@@ -128,17 +143,19 @@ class DialogViewModel: ViewModel() {
         _message.emit(text)
     }
     
-    suspend fun clearMessage() {
+    private suspend fun clearMessage() {
         _message.emit("")
     }
     
     suspend fun onSendMessage(
         chatId: String,
-        message: MessageModel,
+        message: MessageModel? = null,
         attachment: List<AvatarModel>? = null,
-        photos: List<File>? = null,
-        videos: List<File>? = null,
+        photos: List<FileSource>? = null,
+        videos: List<FileSource>? = null,
     ) {
+        changeAnswer(null)
+        clearMessage()
         chatManager.sendMessage(
             chatId, message, attachment,
             photos, videos
@@ -148,14 +165,6 @@ class DialogViewModel: ViewModel() {
     suspend fun getMeet(meetId: String?) = singleLoading {
         meetId?.let {
             _meet.emit(meetManager.getDetailedMeet(it))
-        }
-    }
-    
-    suspend fun onAttachmentMenuSelect(index: Int) {
-        when(index) {
-            0 -> makeToast("Пока нельзя")
-            1 -> makeToast("Пока нельзя")
-            2 -> makeToast("Выбирай")
         }
     }
 }

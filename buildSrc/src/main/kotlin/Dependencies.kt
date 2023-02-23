@@ -24,15 +24,12 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and firebase(
 ) and swipeRefresher()
 
-const val accompanistVer = "0.26.5-rc"
-
 val pagingVer = "3.1.1"
 
 fun DependencyHandlerScope.paging() = implementation(
     "androidx.paging:paging-common-ktx:$pagingVer",
     "androidx.paging:paging-runtime:$pagingVer"
 )
-
 
 fun DependencyHandlerScope.swipeRefresher() = implementation(
     "com.google.accompanist:accompanist-swiperefresh:0.24.13-rc"
@@ -45,7 +42,7 @@ fun DependencyHandlerScope.firebase() = implementation(
 )
 
 fun DependencyHandlerScope.accompanist() = implementation(
-    "com.google.accompanist:accompanist-systemuicontroller:$accompanistVer"
+    "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc"
 )
 
 const val accompanistPermissionsVer = "0.20.3"

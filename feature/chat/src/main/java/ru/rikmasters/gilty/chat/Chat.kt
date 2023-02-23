@@ -34,7 +34,8 @@ object Chat: FeatureDefinition() {
                 arguments = listOf(navArgument("id")
                 { type = NavType.StringType; defaultValue = "" })
             ) { vm, it -> DialogScreen(vm, it.arguments?.getString("id")!!) }
-            screen("photo?type={type}&image={image}&hash={hash}", listOf(
+            
+            screen("photo?type={type}&image={image}", listOf(
                 navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 }, navArgument("type") {
