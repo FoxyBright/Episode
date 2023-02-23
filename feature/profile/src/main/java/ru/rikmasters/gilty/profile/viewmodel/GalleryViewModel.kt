@@ -51,8 +51,10 @@ class GalleryViewModel: ViewModel() {
         )
     }
     
-    suspend fun setPermissions(state: Boolean) {
-        _permissions.emit(state)
+    suspend fun setPermissions(): Boolean {
+        val result = checkStoragePermission()
+        _permissions.emit(result)
+        return result
     }
     
     private fun checkStoragePermission() =

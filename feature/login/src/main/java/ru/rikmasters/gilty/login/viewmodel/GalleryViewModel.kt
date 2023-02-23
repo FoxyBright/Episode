@@ -23,7 +23,7 @@ class GalleryViewModel: ViewModel() {
     private val _selected = MutableStateFlow(listOf<String>())
     val selected = _selected.asStateFlow()
     
-    private val _permissions = MutableStateFlow(checkStoragePermission())
+    private val _permissions = MutableStateFlow(false)
     val permissions = _permissions.asStateFlow()
     
     private val _menuState = MutableStateFlow(false)
@@ -34,6 +34,7 @@ class GalleryViewModel: ViewModel() {
         "Screenshots", "Viber",
         "Telegram", "Camera", "Instagram"
     )
+    
     private val _filters = MutableStateFlow(filterList)
     val filters = _filters.asStateFlow()
     
@@ -47,8 +48,10 @@ class GalleryViewModel: ViewModel() {
         )
     }
     
-    suspend fun setPermissions(state: Boolean) {
-        _permissions.emit(state)
+    suspend fun setPermissions(): Boolean {
+        val result = checkStoragePermission()
+        _permissions.emit(result)
+        return result
     }
     
     private fun checkStoragePermission() =

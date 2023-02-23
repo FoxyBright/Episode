@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.permission.PermissionUtils.requestPermissions
 import ru.rikmasters.gilty.login.viewmodel.GalleryViewModel
 import ru.rikmasters.gilty.shared.common.*
+import ru.rikmasters.gilty.shared.common.extentions.Permissions.Companion.requestPermission
 import java.io.File
 
 @Composable
@@ -53,14 +53,15 @@ fun ProfileSelectPhotoScreen(
                 }
             }
         }
+    
     LaunchedEffect(Unit) {
         if(!permissions)
             asm.bottomSheet.expand {
                 StoragePermissionBs {
-                    requestPermissions(context)
                     launch {
-                        vm.setPermissions(true)
-                        asm.bottomSheet.collapse()
+                        requestPermission(context)
+                        if(vm.setPermissions())
+                            asm.bottomSheet.collapse()
                     }
                 }
             }
