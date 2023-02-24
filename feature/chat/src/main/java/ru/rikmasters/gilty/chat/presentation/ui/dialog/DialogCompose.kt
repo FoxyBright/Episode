@@ -15,7 +15,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
-import ru.rikmasters.gilty.chat.Chat.logD
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.*
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarCallback
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
@@ -154,11 +153,6 @@ private fun Content(
         
         itemsIndexed(list, { _, mes -> mes.first.id })
         { index, (message, rowState) ->
-            
-            
-            logD("AUTHOR --->> ${message.message?.author?.id}")
-            logD("ME --->> ${state.user.id}")
-            
             DialogMessage(
                 message, rowState,
                 (message.message?.author?.id == state.user.id),

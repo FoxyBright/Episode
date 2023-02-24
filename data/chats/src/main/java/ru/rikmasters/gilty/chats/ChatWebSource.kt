@@ -6,6 +6,7 @@ import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import ru.rikmasters.gilty.chats.models.Chat
+import ru.rikmasters.gilty.chats.models.MarkAsReadRequest
 import ru.rikmasters.gilty.chats.models.Message
 import ru.rikmasters.gilty.chats.websocket.model.ChatStatus
 import ru.rikmasters.gilty.data.ktor.KtorSource
@@ -36,11 +37,15 @@ class ChatWebSource: KtorSource() {
         }.wrapped()
     }
     
-    suspend fun markAsReadMessage(chatId: String) {
+    suspend fun markAsReadMessage(
+        chatId: String,
+        messageIds: List<String>,
+        all: Boolean,
+    ) {
         updateClientToken()
         client.patch(
             "http://$HOST$PREFIX_URL/chats/$chatId/markAsRead"
-        )
+        ) { setBody(MarkAsReadRequest(messageIds, all)) }
     }
     
     suspend fun deleteMessage(

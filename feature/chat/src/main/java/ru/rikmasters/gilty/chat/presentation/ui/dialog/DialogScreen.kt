@@ -49,29 +49,37 @@ fun DialogScreen(
     val context = LocalContext.current
     val nav = get<NavState>()
     
-    var alert by
-    remember { mutableStateOf(false) }
-    var meetOutAlert by
-    remember { mutableStateOf(false) }
-    var menuState by
-    remember { mutableStateOf(false) }
-    var kebabMenuState by
-    remember { mutableStateOf(false) }
-    var messageMenuState by
-    remember { mutableStateOf(false) }
-    var imageMenuState by
-    remember { mutableStateOf(false) }
-    
+    // алерт на жалобу
+    val alert by vm.alert.collectAsState()
+    // алерт на выход из встречи
+    val meetOutAlert by vm.meetOutAlert.collectAsState()
+    // состояние меню в шапке
+    val kebabMenuState by vm.kebabMenuState.collectAsState()
+    // состояние меню сообщения
+    val messageMenuState by vm.messageMenuState.collectAsState()
+    // состояние меню выбора картинки
+    val imageMenuState by vm.imageMenuState.collectAsState()
+    // таймер времени до начала трансляции
     val toTranslation by vm.translationTimer.collectAsState()
+    // список сообщений чата
     val messages by vm.messages.collectAsState()
+    // список пользователей в настоящее время пишущих в чат
     val writingUsers by vm.writingUsers.collectAsState()
+    // тип диалога (для определения прикрепленного бара)
     val type by vm.dialogType.collectAsState()
+    // кол-во непрочитанных сообщений
     val unreadCount by vm.unreadCount.collectAsState()
+    // встреча которой принадлежит чат
     val meeting by vm.meet.collectAsState()
+    // сообщение в ответе
     val answer by vm.answer.collectAsState()
+    // выбранное сообщение
     val message by vm.message.collectAsState()
-    val dialog by vm.chat.collectAsState()
+    // информация о текущем чате
+    val chat by vm.chat.collectAsState()
+    // смотрящие текущюю трансляцию
     val viewers by vm.viewers.collectAsState()
+    // текущий пользователь
     val user by vm.user.collectAsState()
     
     fun Long.toTime(): String? {
@@ -97,9 +105,10 @@ fun DialogScreen(
     
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
-        vm.getMeet(dialog?.meetingId)
+        vm.getMeet(chat?.meetingId)
         vm.getUser()
         listState.scrollToItem(unreadCount)
+        vm.markAsReadMessage(chatId, all = true)
     }
     
     val uri = getUriForFile(
@@ -118,11 +127,11 @@ fun DialogScreen(
         }
     
     val state = meeting?.let { meet ->
-        dialog?.let { chat ->
+        chat?.let { chat ->
             user?.let { user ->
                 DialogState(
                     ChatAppBarState(
-                        (dialog?.title ?: ""),
+                        chat.title,
                         meet.organizer.avatar,
                         chat.membersCount,
                         type, viewers,
@@ -154,9 +163,13 @@ fun DialogScreen(
                     
                     override fun onAnswerClick(message: MessageModel) {
                         scope.launch {
-                            listState.animateScrollToItem(
-                                messages.indexOf(message)
-                            )
+                            try {
+                                listState.animateScrollToItem(
+                                    messages.indexOf(message)
+                                )
+                            } catch(e: Exception) {
+                                e.stackTraceToString()
+                            }
                         }
                     }
                     
@@ -166,7 +179,7 @@ fun DialogScreen(
                     
                     
                     override fun onImageMenuDismiss() {
-                        imageMenuState = false
+                        scope.launch { vm.changeImageMenuState(false) }
                     }
                     
                     override fun onPinnedBarButtonClick() {
@@ -234,7 +247,7 @@ fun DialogScreen(
                     }
                     
                     override fun onMessageMenuDismiss() {
-                        messageMenuState = false
+                        scope.launch { vm.changeMessageMenuState(false) }
                     }
                     
                     override fun onMessageMenuItemSelect(
@@ -246,8 +259,8 @@ fun DialogScreen(
                                 0 -> vm.changeAnswer(message)
                                 1 -> vm.deleteMessage(chatId, message)
                             }
+                            vm.changeMessageMenuState(false)
                         }
-                        messageMenuState = false
                     }
                     
                     override fun textChange(text: String) {
@@ -255,17 +268,21 @@ fun DialogScreen(
                     }
                     
                     override fun gallery() {
-                        focusManager.clearFocus()
-                        imageMenuState = true
+                        scope.launch {
+                            focusManager.clearFocus()
+                            vm.changeImageMenuState(true)
+                        }
                     }
                     
                     override fun onMeetOut() {
-                        meetOutAlert = false
-                        nav.navigate("main")
+                        scope.launch {
+                            vm.changeMeetOutAlert(false)
+                            nav.navigate("main")
+                        }
                     }
                     
                     override fun onMeetOutAlertDismiss() {
-                        meetOutAlert = false
+                        scope.launch { vm.changeMeetOutAlert(false) }
                     }
                     
                     override fun onSend() {
@@ -300,31 +317,32 @@ fun DialogScreen(
                     }
                     
                     override fun closeAlert() {
-                        alert = false
+                        scope.launch { vm.alertDismiss(false) }
                     }
                     
                     override fun onTopBarClick() {
                     }
                     
                     override fun onMenuItemClick(point: Int) {
-                        kebabMenuState = false
-                        when(point) {
-                            0 -> meetOutAlert = true
-                            1 -> scope.launch {
-                                asm.bottomSheet.expand {
-                                    menuState = false
-                                    //                            ComplainsContent(meet?.id) {
-                                    //                                scope.launch {
-                                    //                                    asm.bottomSheet.collapse()
-                                    //                                }; alert = true
-                                    //                            }
+                        scope.launch {
+                            vm.changeKebabMenuState(false)
+                            when(point) {
+                                0 -> vm.changeMeetOutAlert(true)
+                                1 -> asm.bottomSheet.expand {
+                                    //  ComplainsContent(meet?.id) {
+                                    //      scope.launch {
+                                    //          asm.bottomSheet.collapse()
+                                    //      }; alert = true
+                                    //  }
                                 }
                             }
                         }
                     }
                     
                     override fun onKebabClick() {
-                        kebabMenuState = !kebabMenuState
+                        scope.launch {
+                            vm.changeKebabMenuState(!kebabMenuState)
+                        }
                     }
                 }
             )

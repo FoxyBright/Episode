@@ -67,8 +67,63 @@ class DialogViewModel: ViewModel() {
     private val _translationTimer = MutableStateFlow<Long?>(null)
     val translationTimer = _translationTimer.asStateFlow()
     
+    private val _alert = MutableStateFlow(false)
+    val alert = _alert.asStateFlow()
+    
+    private val _meetOutAlert = MutableStateFlow(false)
+    val meetOutAlert = _meetOutAlert.asStateFlow()
+    
+    private val _kebabMenuState = MutableStateFlow(false)
+    val kebabMenuState = _kebabMenuState.asStateFlow()
+    
+    private val _messageMenuState = MutableStateFlow(false)
+    val messageMenuState = _messageMenuState.asStateFlow()
+    
+    private val _imageMenuState = MutableStateFlow(false)
+    val imageMenuState = _imageMenuState.asStateFlow()
+    
+    suspend fun changeMeetOutAlert(state: Boolean) {
+        _meetOutAlert.emit(state)
+    }
+    
+    suspend fun changeKebabMenuState(state: Boolean) {
+        _kebabMenuState.emit(state)
+    }
+    
+    suspend fun changeMessageMenuState(state: Boolean) {
+        _messageMenuState.emit(state)
+    }
+    
+    suspend fun changeImageMenuState(state: Boolean) {
+        _imageMenuState.emit(state)
+    }
+    
+    suspend fun alertDismiss(state: Boolean) {
+        _alert.emit(state)
+    }
+    
     suspend fun deleteWriter(id: String) {
         chatManager.deleteWriter(id)
+    }
+    
+    suspend fun markAsReadMessage(
+        chatId: String,
+        messageIds: List<String> = emptyList(),
+        all: Boolean = false,
+    ) {
+        chatManager.markAsReadMessage(
+            chatId, messageIds, all
+        )
+    }
+    
+    @Suppress("unused")
+    suspend fun madeScreenshot(chatId: String) {
+        chatManager.madeScreenshot(chatId)
+    }
+    
+    @Suppress("unused")
+    suspend fun completeChat(chatId: String) {
+        chatManager.completeChat(chatId)
     }
     
     private suspend fun getMessages(
@@ -106,7 +161,7 @@ class DialogViewModel: ViewModel() {
     suspend fun getChat(chatId: String) = singleLoading {
         val chat = chatManager.getChat(chatId)
         _chat.emit(chat)
-        changeUnreadCount(chat.membersCount + 1)
+        changeUnreadCount(chat.unreadCount + 1)
         _dialogType.emit(
             when {
                 chat.isOnline && chat.meetStatus == ACTIVE
@@ -126,7 +181,7 @@ class DialogViewModel: ViewModel() {
         )
         _viewers.emit(
             if(dialogType.value == TRANSLATION)
-                43 else null //TODO сюда кол-во смотрящих трансляцию
+                0 else null //TODO сюда кол-во смотрящих трансляцию
         )
         getMessages(chatId, false)
     }

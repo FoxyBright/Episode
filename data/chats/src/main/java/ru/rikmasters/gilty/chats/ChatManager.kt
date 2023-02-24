@@ -53,18 +53,22 @@ class ChatManager(
         webSocket.connect(userId)
     }
     
+    @Suppress("unused")
     suspend fun getChatsStatus() = webSource.getChatsStatus()
     
+    @Suppress("unused")
     suspend fun unmuteChatNotifications(chatId: String) {
         webSource.unmuteChatNotifications(chatId)
     }
     
+    @Suppress("unused")
     suspend fun muteChatNotifications(
         chatId: String, unmuteAt: String,
     ) {
         webSource.muteChatNotifications(chatId, unmuteAt)
     }
     
+    @Suppress("unused")
     suspend fun getChatAlbum(chatId: String) =
         webSource.getChatAlbum(chatId)
     
@@ -80,8 +84,14 @@ class ChatManager(
         webSource.madeScreenshot(chatId)
     }
     
-    suspend fun markAsReadMessage(chatId: String) {
-        webSource.markAsReadMessage(chatId)
+    suspend fun markAsReadMessage(
+        chatId: String,
+        messageIds: List<String> = emptyList(),
+        all: Boolean = false,
+    ) {
+        webSource.markAsReadMessage(
+            chatId, messageIds, all
+        )
     }
     
     suspend fun deleteMessage(

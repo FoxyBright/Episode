@@ -18,10 +18,10 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
-    private val chatsManager by inject<ChatManager>()
+    private val chatManager by inject<ChatManager>()
     private val profileManager by inject<ProfileManager>()
     
-    val dialogs by lazy { chatsManager.chatsFlow.state(emptyList()) }
+    val dialogs by lazy { chatManager.chatsFlow.state(emptyList()) }
     
     private val _unreadDialogs = MutableStateFlow(emptyList<ChatModel>())
     val unreadDialogs = _unreadDialogs.asStateFlow()
@@ -59,12 +59,12 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun onChatClick(chatId: String) {
-        chatsManager.connectToChat(chatId)
+        chatManager.connectToChat(chatId)
     }
     
     suspend fun getDialogs(
         forceWeb: Boolean = false,
-    ) = singleLoading { chatsManager.getDialogs(forceWeb) }
+    ) = singleLoading { chatManager.getDialogs(forceWeb) }
     
     suspend fun getUnread() = singleLoading {
         _unreadDialogs.emit(dialogs.value)
@@ -92,7 +92,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         chat: ChatModel?, forAll: Boolean,
     ) = singleLoading {
         chatToDelete.value?.let {
-            chatsManager.deleteDialog(it.id, forAll)
+            chatManager.deleteDialog(it.id, forAll)
             _chatToDelete.emit(chat)
         }
         getDialogs()
