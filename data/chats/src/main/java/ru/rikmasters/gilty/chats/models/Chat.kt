@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.chats.models
 
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
@@ -33,7 +34,7 @@ data class Chat(
         organizer.map(), organizerOnly,
         title, lastMessage.map(),
         datetime, unreadCount, canMessage,
-        membersCount, createdAt,
+        membersCount, ("${of(createdAt)}"),
     )
     
     override fun primaryKey() = id

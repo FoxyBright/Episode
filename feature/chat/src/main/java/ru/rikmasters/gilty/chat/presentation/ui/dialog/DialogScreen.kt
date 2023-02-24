@@ -24,9 +24,7 @@ import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.shared.common.extentions.FULL_DATE_FORMAT_WIDTH_ZONE
-import ru.rikmasters.gilty.shared.common.extentions.InputStreamSource
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MemberMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
@@ -82,22 +80,6 @@ fun DialogScreen(
     // текущий пользователь
     val user by vm.user.collectAsState()
     
-    fun Long.toTime(): String? {
-        if(this == 0L) {
-            scope.launch {
-                vm.changeDialogType(TRANSLATION)
-            }
-            return null
-        }
-        val min = this / 60
-        val sec = this - 60 * min
-        return "${
-            if(min < 10) "0" else ""
-        }$min:${
-            if(sec < 10) "0" else ""
-        }$sec"
-    }
-    
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(Nothing)
         onDispose { asm.keyboard.resetSoftInputAdjust() }
@@ -108,7 +90,16 @@ fun DialogScreen(
         vm.getMeet(chat?.meetingId)
         vm.getUser()
         listState.scrollToItem(unreadCount)
+        
+        // TODO реализовать прочтение при просмотре конкретного сообщения
         vm.markAsReadMessage(chatId, all = true)
+    }
+    
+    LaunchedEffect(writingUsers) {
+        writingUsers.forEach {
+            delay(3000)
+            vm.deleteWriter(it.first)
+        }
     }
     
     val uri = getUriForFile(
@@ -135,7 +126,7 @@ fun DialogScreen(
                         meet.organizer.avatar,
                         chat.membersCount,
                         type, viewers,
-                        toTranslation?.toTime(),
+                        vm.timerConverter(toTranslation),
                         meet.isOnline,
                         (meet.organizer.id == user.id)
                     ), answer, meet.map(), message,
@@ -145,13 +136,6 @@ fun DialogScreen(
                     listState, unreadCount, writingUsers
                 )
             }
-        }
-    }
-    
-    LaunchedEffect(writingUsers) {
-        writingUsers.forEach {
-            delay(3000)
-            vm.deleteWriter(it.first)
         }
     }
     
@@ -171,15 +155,6 @@ fun DialogScreen(
                                 e.stackTraceToString()
                             }
                         }
-                    }
-                    
-                    override fun onBack() {
-                        nav.navigate("main")
-                    }
-                    
-                    
-                    override fun onImageMenuDismiss() {
-                        scope.launch { vm.changeImageMenuState(false) }
                     }
                     
                     override fun onPinnedBarButtonClick() {
@@ -217,13 +192,6 @@ fun DialogScreen(
                         )
                     }
                     
-                    override fun onDownButtonClick() {
-                        scope.launch {
-                            vm.changeUnreadCount(0)
-                            listState.animateScrollToItem(0)
-                        }
-                    }
-                    
                     override fun onHiddenClick(message: MessageModel) {
                         val attach =
                             message.message?.attachments?.first()?.file
@@ -231,28 +199,11 @@ fun DialogScreen(
                         if(attach?.hasAccess != true)
                             scope.launch { vm.onHiddenBlock() }
                         else
-                            nav.navigate(
-                                "photo?type=1&image=${encode(attach.url, "utf-8")}"
-                            )
-                    }
-                    
-                    override fun onListDown() {
-                        scope.launch {
-                            vm.changeUnreadCount(unreadCount - 1)
-                        }
-                    }
-                    
-                    override fun onSwipe(message: MessageModel) {
-                        scope.launch { vm.changeAnswer(message) }
-                    }
-                    
-                    override fun onMessageMenuDismiss() {
-                        scope.launch { vm.changeMessageMenuState(false) }
+                            nav.navigate("photo?type=1&image=${encode(attach.url, ("utf-8"))}")
                     }
                     
                     override fun onMessageMenuItemSelect(
-                        point: Int,
-                        message: MessageModel,
+                        point: Int, message: MessageModel,
                     ) {
                         scope.launch {
                             when(point) {
@@ -261,28 +212,6 @@ fun DialogScreen(
                             }
                             vm.changeMessageMenuState(false)
                         }
-                    }
-                    
-                    override fun textChange(text: String) {
-                        scope.launch { vm.changeMessage(text) }
-                    }
-                    
-                    override fun gallery() {
-                        scope.launch {
-                            focusManager.clearFocus()
-                            vm.changeImageMenuState(true)
-                        }
-                    }
-                    
-                    override fun onMeetOut() {
-                        scope.launch {
-                            vm.changeMeetOutAlert(false)
-                            nav.navigate("main")
-                        }
-                    }
-                    
-                    override fun onMeetOutAlertDismiss() {
-                        scope.launch { vm.changeMeetOutAlert(false) }
                     }
                     
                     override fun onSend() {
@@ -304,23 +233,12 @@ fun DialogScreen(
                                     isDelivered = true,
                                     createdAt = LocalDateTime
                                         .now()
-                                        .minusHour(3)
+                                        .minusHour(offset)
                                         .format(FULL_DATE_FORMAT_WIDTH_ZONE)
                                 )
                             )
                             listState.animateScrollToItem(0)
                         }
-                    }
-                    
-                    override fun onCancelAnswer() {
-                        scope.launch { vm.changeAnswer(null) }
-                    }
-                    
-                    override fun closeAlert() {
-                        scope.launch { vm.alertDismiss(false) }
-                    }
-                    
-                    override fun onTopBarClick() {
                     }
                     
                     override fun onMenuItemClick(point: Int) {
@@ -329,20 +247,75 @@ fun DialogScreen(
                             when(point) {
                                 0 -> vm.changeMeetOutAlert(true)
                                 1 -> asm.bottomSheet.expand {
-                                    //  ComplainsContent(meet?.id) {
-                                    //      scope.launch {
-                                    //          asm.bottomSheet.collapse()
-                                    //      }; alert = true
-                                    //  }
+                                    //TODO тут BS жалоб
                                 }
                             }
                         }
                     }
                     
-                    override fun onKebabClick() {
+                    override fun onTopBarClick() {
+                        //TODO тут BS встречи
+                    }
+                    
+                    override fun onDownButtonClick() {
                         scope.launch {
-                            vm.changeKebabMenuState(!kebabMenuState)
+                            vm.changeUnreadCount(0)
+                            listState.animateScrollToItem(0)
                         }
+                    }
+                    
+                    override fun gallery() {
+                        scope.launch {
+                            focusManager.clearFocus()
+                            vm.changeImageMenuState(true)
+                        }
+                    }
+                    
+                    override fun onMeetOut() {
+                        scope.launch {
+                            vm.changeMeetOutAlert(false)
+                            nav.navigate("main")
+                        }
+                    }
+                    
+                    override fun onKebabClick() {
+                        scope.launch { vm.changeKebabMenuState(!kebabMenuState) }
+                    }
+                    
+                    override fun onListDown() {
+                        scope.launch { vm.changeUnreadCount((unreadCount - 1)) }
+                    }
+                    
+                    override fun onMessageMenuDismiss() {
+                        scope.launch { vm.changeMessageMenuState(false) }
+                    }
+                    
+                    override fun onImageMenuDismiss() {
+                        scope.launch { vm.changeImageMenuState(false) }
+                    }
+                    
+                    override fun onMeetOutAlertDismiss() {
+                        scope.launch { vm.changeMeetOutAlert(false) }
+                    }
+                    
+                    override fun closeAlert() {
+                        scope.launch { vm.alertDismiss(false) }
+                    }
+                    
+                    override fun onSwipe(message: MessageModel) {
+                        scope.launch { vm.changeAnswer(message) }
+                    }
+                    
+                    override fun textChange(text: String) {
+                        scope.launch { vm.changeMessage(text) }
+                    }
+                    
+                    override fun onCancelAnswer() {
+                        scope.launch { vm.changeAnswer(null) }
+                    }
+                    
+                    override fun onBack() {
+                        nav.navigate("main")
                     }
                 }
             )

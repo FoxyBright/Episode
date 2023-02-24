@@ -18,8 +18,7 @@ abstract class DbSource: Source {
     
     abstract suspend fun <T: DomainEntity> findAll(domainClass: KClass<T>): List<T>
     
-    
-    abstract suspend fun  <T: DomainEntity> deleteById(id: Any, domainClass: KClass<T>)
+    abstract suspend fun <T: DomainEntity> deleteById(id: Any, domainClass: KClass<T>)
     abstract suspend fun <T: DomainEntity> deleteAll(domainClass: KClass<T>)
     
     abstract fun <T: DomainEntity> listenAll(domainClass: KClass<T>): Flow<List<T>>

@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.map
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.core.data.entity.interfaces.EntityVariant
 import ru.rikmasters.gilty.core.log.log
-import ru.rikmasters.gilty.data.realm.model.RealmRecordContainer
 import ru.rikmasters.gilty.data.realm.RealmManager
 import ru.rikmasters.gilty.data.realm.RealmSourceVariant
 import ru.rikmasters.gilty.data.realm.model.RealmContainer
 import ru.rikmasters.gilty.data.realm.model.RealmIdContainer
+import ru.rikmasters.gilty.data.realm.model.RealmRecordContainer
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 
@@ -67,8 +67,10 @@ internal class RealmContainerSourceImpl(
     private val KClass<*>.javaName get() = java.name
     
     private fun findByIdQuery(id: Any, clazz: KClass<*>) =
-        doQuery<RealmIdContainer>("$ID_FIELD == $0 && $CLASS_FIELD == $1", id, clazz.javaName)
-            .first()
+        doQuery<RealmIdContainer>(
+            "$ID_FIELD == $0 && $CLASS_FIELD == $1",
+            id.hashCode(), clazz.javaName
+        ).first()
     
     private fun findAllQuery(clazz: KClass<*>): RealmQuery<out RealmContainer> {
         val query = "$CLASS_FIELD == $0"

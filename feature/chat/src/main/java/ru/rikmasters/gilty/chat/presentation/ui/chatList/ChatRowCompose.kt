@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -31,8 +32,10 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.*
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType.*
 import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus.COMPLETED
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
@@ -267,31 +270,44 @@ private fun Message(
                 if(!attach.isNullOrEmpty())
                     attach.last().type.value
                 else message.message?.text!!
-            } else {
-                stringResource(
-                    when(message.notification?.type!!) {
-                        TRANSLATION_COMPLETED -> R.string.chats_message_translation_completed
-                        TRANSLATION_START_30 -> R.string.chats_message_translation_30
-                        TRANSLATION_START_5 -> R.string.chats_message_translation_5
-                        TRANSLATION_STARTED -> R.string.chats_message_translation_started
-                        CHAT_CREATED -> R.string.chats_message_create_chat
-                        MEMBER_SCREENSHOT -> R.string.chats_message_make_screenshot
-                        MEMBER_LEAVE -> R.string.chats_message_leave_meet
-                        MEMBER_JOIN -> R.string.chats_message_join_meet
-                    }, when(message.notification?.type!!) {
-                        CHAT_CREATED -> "л"
-                        MEMBER_SCREENSHOT, MEMBER_LEAVE ->
-                            if(user.gender == FEMALE) "a" else ""
-                        
-                        MEMBER_JOIN -> if(user.gender == FEMALE)
-                            "aсь" else "ся"
-                        
-                        else -> ""
-                    }
-                )
-            }, Modifier, colorScheme.onTertiary, style = typography.labelSmall
+            } else notificationText(
+                message.notification?.type!!,
+                user.gender!!
+            ), Modifier.fillMaxWidth(0.8f),
+            maxLines = 1,
+            color = colorScheme.onTertiary,
+            style = typography.labelSmall,
+            overflow = Ellipsis
         )
     }
+}
+
+@Composable
+private fun notificationText(
+    type: ChatNotificationType,
+    userGender: GenderType,
+): String {
+    return stringResource(
+        when(type) {
+            TRANSLATION_COMPLETED -> R.string.chats_message_translation_completed
+            TRANSLATION_START_30 -> R.string.chats_message_translation_30
+            TRANSLATION_START_5 -> R.string.chats_message_translation_5
+            TRANSLATION_STARTED -> R.string.chats_message_translation_started
+            CHAT_CREATED -> R.string.chats_message_create_chat
+            MEMBER_SCREENSHOT -> R.string.chats_message_make_screenshot
+            MEMBER_LEAVE -> R.string.chats_message_leave_meet
+            MEMBER_JOIN -> R.string.chats_message_join_meet
+        }, when(type) {
+            CHAT_CREATED -> "л"
+            MEMBER_SCREENSHOT, MEMBER_LEAVE ->
+                if(userGender == FEMALE) "a" else ""
+            
+            MEMBER_JOIN -> if(userGender == FEMALE)
+                "aсь" else "ся"
+            
+            else -> ""
+        }
+    )
 }
 
 @Composable

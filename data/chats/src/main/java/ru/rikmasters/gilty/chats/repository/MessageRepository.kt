@@ -39,8 +39,7 @@ class MessageRepository(
         }
     
     suspend fun deleteWriter(id: String) {
-        primarySource.deleteAll<UserWs>()
-        // TODO удалять только того чей срок истек
+        primarySource.deleteById<UserWs>(id)
     }
     
     suspend fun writersUpdate(user: UserWs) {
@@ -50,22 +49,12 @@ class MessageRepository(
     suspend fun messageUpdate(answer: Pair<AnswerType, Any?>?) {
         answer?.let { (type, model) ->
             model?.let {
-                
                 when(type) {
                     NEW_MESSAGE -> primarySource.save(it as Message)
-                    DELETE_MESSAGE -> {
-                        // TODO Удаление сообщения из локального хранилища
-                        //primarySource.deleteById<Message>(it as String)
-                    }
-                    
-                    else -> {
-                        // TODO Пометка сообщения как прочитанного
-//                        primarySource.findById<Message>(it.toString())
-//                            ?.let { mes -> primarySource.save(mes.copy(isRead = true)) }
-                    }
+                    DELETE_MESSAGE -> primarySource.deleteById<Message>(it)
+                    else -> primarySource.findById<Message>(it)
+                        ?.let { mes -> primarySource.save(mes.copy(isRead = true)) }
                 }
-                
-                if(type == NEW_MESSAGE) primarySource.save(it as Message)
             }
         }
     }

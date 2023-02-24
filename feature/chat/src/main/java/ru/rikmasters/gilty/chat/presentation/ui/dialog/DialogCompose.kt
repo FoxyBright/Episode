@@ -151,7 +151,7 @@ private fun Content(
             )
         }
         
-        itemsIndexed(list, { _, mes -> mes.first.id })
+        itemsIndexed(list, { i, mes -> mes.first.id + i })
         { index, (message, rowState) ->
             DialogMessage(
                 message, rowState,

@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.chat.viewmodel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.*
@@ -194,6 +195,27 @@ class DialogViewModel: ViewModel() {
         makeToast("Трансляции пока что не доступны")
     }
     
+    fun timerConverter(millis: Long?): String? {
+        millis?.let {
+            val seconds = it / 1000
+            if(seconds > 3599) return "${seconds / 3600} ч"
+            if(seconds > 0L) {
+                val min = seconds / 60
+                val sec = seconds - 60 * min
+                return "${
+                    if(min < 10) "0" else ""
+                }$min:${
+                    if(sec < 10) "0" else ""
+                }$sec"
+            } else {
+                coroutineScope.launch {
+                    changeDialogType(TRANSLATION)
+                }
+                return null
+            }
+        } ?: return null
+    }
+    
     @Suppress("unused")
     suspend fun timerTick() {
         translationTimer.value?.let {
@@ -203,7 +225,9 @@ class DialogViewModel: ViewModel() {
         }
     }
     
-    suspend fun changeDialogType(type: PinnedBarType) {
+    private suspend fun changeDialogType(
+        type: PinnedBarType,
+    ) {
         _dialogType.emit(type)
     }
     
