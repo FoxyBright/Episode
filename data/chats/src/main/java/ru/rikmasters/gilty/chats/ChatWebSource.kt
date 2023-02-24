@@ -209,7 +209,7 @@ class ChatWebSource: KtorSource() {
         )
     }
     
-    suspend fun deleteDialog(
+    suspend fun deleteChat(
         chatId: String,
         forAll: Boolean,
     ) {

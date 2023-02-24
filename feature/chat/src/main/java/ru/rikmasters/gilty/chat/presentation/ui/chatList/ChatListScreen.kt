@@ -18,29 +18,23 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val listState = rememberLazyListState()
     val nav = get<NavState>()
     
-    
-    val unreadDialogs by vm.unreadDialogs.collectAsState()
-    val chatToDelete by vm.chatToDelete.collectAsState()
+    val unreadChats by vm.unreadChats.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()
     val alertState by vm.alertState.collectAsState()
-    val dialogs by vm.dialogs.collectAsState()
+    val chatList by vm.chatList.collectAsState()
     val navBar by vm.navBar.collectAsState()
     val completed by vm.completed.collectAsState()
-    val profile by vm.profile.collectAsState()
     val unRead by vm.unread.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.getDialogs()
-        vm.getProfile()
-    }
+    LaunchedEffect(Unit) { vm.getChatList() }
     
     ChatListContent(
         ChatListState(
-            navBar, dialogs,
+            navBar, chatList,
             completed, alert, alertState,
             alertSelected, unRead,
-            listState, unreadDialogs
+            listState, unreadChats
         ), Modifier, object: ChatListCallback {
             
             override fun onNavBarSelect(point: Int) {
@@ -56,22 +50,15 @@ fun ChatListScreen(vm: ChatListViewModel) {
                 scope.launch {
                     if(alertState == LIST)
                         vm.changeAlertState(CONFIRM)
-                    else {
-                        vm.deleteChat(
-                            chatToDelete,
-                            if(profile?.id != chatToDelete?.id)
-                                (alertSelected != 0) else false
-                        )
-                        vm.changeAlertState(LIST)
-                        vm.dismissAlert(false)
-                    }
+                    else
+                        vm.deleteChat((alertSelected != 0))
                 }
             }
             
             override fun onChatSwipe(chat: ChatModel) {
                 scope.launch {
                     vm.setChatToDelete(chat)
-                    if(profile?.id != chat.userId) {
+                    if(chat.userId != chat.organizer.id) {
                         vm.changeAlertState(CONFIRM)
                         vm.dismissAlert(true)
                     } else {
@@ -96,7 +83,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { vm.getDialogs() }
+                scope.launch { vm.getChatList() }
             }
             
             override fun onListAlertSelect(index: Int) {

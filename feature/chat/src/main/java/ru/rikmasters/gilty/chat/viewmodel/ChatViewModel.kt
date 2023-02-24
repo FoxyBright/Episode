@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -21,7 +21,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
-class DialogViewModel: ViewModel() {
+class ChatViewModel: ViewModel() {
     
     private val chatManager by inject<ChatManager>()
     private val meetManager by inject<MeetingManager>()
@@ -36,8 +36,8 @@ class DialogViewModel: ViewModel() {
     private val _meet = MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
     
-    private val _dialogType = MutableStateFlow(MEET)
-    val dialogType = _dialogType.asStateFlow()
+    private val _chatType = MutableStateFlow(MEET)
+    val chatType = _chatType.asStateFlow()
     
     private val _user = MutableStateFlow<UserModel?>(null)
     val user = _user.asStateFlow()
@@ -163,7 +163,7 @@ class DialogViewModel: ViewModel() {
         val chat = chatManager.getChat(chatId)
         _chat.emit(chat)
         changeUnreadCount(chat.unreadCount + 1)
-        _dialogType.emit(
+        _chatType.emit(
             when {
                 chat.isOnline && chat.meetStatus == ACTIVE
                 -> {
@@ -181,7 +181,7 @@ class DialogViewModel: ViewModel() {
             }
         )
         _viewers.emit(
-            if(dialogType.value == TRANSLATION)
+            if(chatType.value == TRANSLATION)
                 0 else null //TODO сюда кол-во смотрящих трансляцию
         )
         getMessages(chatId, false)
@@ -209,7 +209,7 @@ class DialogViewModel: ViewModel() {
                 }$sec"
             } else {
                 coroutineScope.launch {
-                    changeDialogType(TRANSLATION)
+                    changeChatType(TRANSLATION)
                 }
                 return null
             }
@@ -225,10 +225,10 @@ class DialogViewModel: ViewModel() {
         }
     }
     
-    private suspend fun changeDialogType(
+    private suspend fun changeChatType(
         type: PinnedBarType,
     ) {
-        _dialogType.emit(type)
+        _chatType.emit(type)
     }
     
     suspend fun getUser() = singleLoading {

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
@@ -15,10 +15,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.TRANSLATION
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bottom.HiddenBs
-import ru.rikmasters.gilty.chat.viewmodel.DialogViewModel
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
+import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -35,8 +35,8 @@ import java.util.UUID
 @Composable
 @SuppressLint("Recycle")
 @OptIn(ExperimentalPermissionsApi::class)
-fun DialogScreen(
-    vm: DialogViewModel,
+fun ChatScreen(
+    vm: ChatViewModel,
     chatId: String,
 ) {
     val cameraPermissions = rememberPermissionState(CAMERA)
@@ -64,7 +64,7 @@ fun DialogScreen(
     // список пользователей в настоящее время пишущих в чат
     val writingUsers by vm.writingUsers.collectAsState()
     // тип диалога (для определения прикрепленного бара)
-    val type by vm.dialogType.collectAsState()
+    val type by vm.chatType.collectAsState()
     // кол-во непрочитанных сообщений
     val unreadCount by vm.unreadCount.collectAsState()
     // встреча которой принадлежит чат
@@ -120,7 +120,7 @@ fun DialogScreen(
     val state = meeting?.let { meet ->
         chat?.let { chat ->
             user?.let { user ->
-                DialogState(
+                ChatState(
                     ChatAppBarState(
                         chat.title,
                         meet.organizer.avatar,
@@ -139,11 +139,11 @@ fun DialogScreen(
         }
     }
     
-    Use<DialogViewModel>(LoadingTrait) {
+    Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
-            DialogContent(
+            ChatContent(
                 state, Modifier,
-                object: DialogCallback {
+                object: ChatCallback {
                     
                     override fun onAnswerClick(message: MessageModel) {
                         scope.launch {

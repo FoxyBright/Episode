@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,11 +15,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.*
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarCallback
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.MessengerBarCallback
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.message.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarCallback
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.MessengerBarCallback
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
 import ru.rikmasters.gilty.complaints.presentation.ui.MeetOutAlert
 import ru.rikmasters.gilty.shared.R.string.*
@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
-data class DialogState(
+data class ChatState(
     val topState: ChatAppBarState,
     val answer: MessageModel?,
     val meet: MeetingModel,
@@ -46,7 +46,7 @@ data class DialogState(
     val writingUsers: List<Pair<String, ThumbnailModel>>,
 )
 
-interface DialogCallback:
+interface ChatCallback:
     ChatAppBarCallback,
     MessengerBarCallback,
     MessCallBack {
@@ -68,22 +68,22 @@ interface DialogCallback:
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun DialogContent(
-    state: DialogState,
+fun ChatContent(
+    state: ChatState,
     modifier: Modifier = Modifier,
-    callback: DialogCallback? = null,
+    callback: ChatCallback? = null,
 ) {
     Scaffold(
         modifier,
         topBar = {
-            DialogTopBar(
+            ChatTopBar(
                 state.topState,
                 state.kebabMenuState,
                 Modifier, callback
             )
         },
         bottomBar = {
-            DialogBottomBar(
+            ChatBottomBar(
                 state.imageMenuState,
                 state.messageText,
                 state.answer,
@@ -93,7 +93,7 @@ fun DialogContent(
             )
         },
         floatingActionButton = {
-            DialogFloatingButton(
+            ChatFloatingButton(
                 state.listState,
                 state.unReadCount,
                 state.meet.isOnline,
@@ -126,9 +126,9 @@ fun DialogContent(
 @Composable
 private fun Content(
     padding: PaddingValues,
-    state: DialogState,
+    state: ChatState,
     modifier: Modifier = Modifier,
-    callback: DialogCallback?,
+    callback: ChatCallback?,
 ) {
     val list =
         state.messageList.map { mess ->
@@ -153,7 +153,7 @@ private fun Content(
         
         itemsIndexed(list, { i, mes -> mes.first.id + i })
         { index, (message, rowState) ->
-            DialogMessage(
+            ChatMessage(
                 message, rowState,
                 (message.message?.author?.id == state.user.id),
                 state.meet.isOnline,

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog.bars
+package ru.rikmasters.gilty.chat.presentation.ui.chat.bars
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,9 +31,9 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.*
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.WordEndingType.PARTICIPANT
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.WordEndingType.VIEWER
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.PARTICIPANT
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.VIEWER
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.*
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel

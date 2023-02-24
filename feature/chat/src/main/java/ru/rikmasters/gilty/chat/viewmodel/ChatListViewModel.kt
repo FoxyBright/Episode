@@ -8,29 +8,25 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
-import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val chatManager by inject<ChatManager>()
-    private val profileManager by inject<ProfileManager>()
     
-    val dialogs by lazy { chatManager.chatsFlow.state(emptyList()) }
+    val chatList by lazy { chatManager.chatsFlow.state(emptyList()) }
     
-    private val _unreadDialogs = MutableStateFlow(emptyList<ChatModel>())
-    val unreadDialogs = _unreadDialogs.asStateFlow()
+    private val _unreadChats = MutableStateFlow(emptyList<ChatModel>())
+    val unreadChats = _unreadChats.asStateFlow()
     
     private val _completed = MutableStateFlow(false)
     val completed = _completed.asStateFlow()
     
-    private val _chatToDelete = MutableStateFlow<ChatModel?>(null)
-    val chatToDelete = _chatToDelete.asStateFlow()
+    private val chatToDelete = MutableStateFlow<ChatModel?>(null)
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
@@ -48,26 +44,23 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE
     )
     
-    private val _profile = MutableStateFlow<ProfileModel?>(null)
-    val profile = _profile.asStateFlow()
-    
     private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
     override suspend fun forceRefresh() {
-        getDialogs(true)
+        getChatList(true)
     }
     
     suspend fun onChatClick(chatId: String) {
         chatManager.connectToChat(chatId)
     }
     
-    suspend fun getDialogs(
+    suspend fun getChatList(
         forceWeb: Boolean = false,
-    ) = singleLoading { chatManager.getDialogs(forceWeb) }
+    ) = singleLoading { chatManager.getChatList(forceWeb) }
     
     suspend fun getUnread() = singleLoading {
-        _unreadDialogs.emit(dialogs.value)
+        _unreadChats.emit(chatList.value)
     }
     
     suspend fun alertSelect(index: Int) {
@@ -84,18 +77,15 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         _navBar.emit(states)
     }
     
-    suspend fun getProfile() = singleLoading {
-        _profile.emit(profileManager.getProfile())
-    }
-    
     suspend fun deleteChat(
-        chat: ChatModel?, forAll: Boolean,
+        forAll: Boolean,
     ) = singleLoading {
         chatToDelete.value?.let {
-            chatManager.deleteDialog(it.id, forAll)
-            _chatToDelete.emit(chat)
+            chatManager.deleteChat(it.id, forAll)
         }
-        getDialogs()
+        alertSelect(0)
+        changeAlertState(LIST)
+        dismissAlert(false)
     }
     
     suspend fun navBarNavigate(point: Int): String {
@@ -124,7 +114,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun setChatToDelete(chat: ChatModel) {
-        _chatToDelete.emit(chat)
+        chatToDelete.emit(chat)
     }
     
     suspend fun changeAlertState(state: AlertState) {

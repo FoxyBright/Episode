@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog
+package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -24,15 +24,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarContent
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.MessengerBar
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.message.MessState
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.message.Message
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.message.messageShapes
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.popUp.BottomBarMenu
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.popUp.MessageMenu
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.popUp.TopBarMenu
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarContent
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.MessengerBar
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.MessState
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.messageShapes
+import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.BottomBarMenu
+import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.MessageMenu
+import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.TopBarMenu
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
@@ -41,11 +41,11 @@ import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
 
 @Composable
-fun DialogTopBar(
+fun ChatTopBar(
     state: ChatAppBarState,
     menuState: Boolean,
     modifier: Modifier = Modifier,
-    callback: DialogCallback?,
+    callback: ChatCallback?,
 ) {
     ChatAppBarContent(state, modifier, callback)
     TopBarMenu(menuState,
@@ -54,13 +54,13 @@ fun DialogTopBar(
 }
 
 @Composable
-fun DialogBottomBar(
+fun ChatBottomBar(
     menuState: Boolean,
     text: String,
     answer: MessageModel?,
     isOnline: Boolean,
     modifier: Modifier = Modifier,
-    callback: DialogCallback?,
+    callback: ChatCallback?,
 ) {
     BottomBarMenu(menuState,
         { callback?.onImageMenuDismiss() })
@@ -69,7 +69,7 @@ fun DialogBottomBar(
 }
 
 @Composable
-fun DialogFloatingButton(
+fun ChatFloatingButton(
     listState: LazyListState,
     unReadCount: Int,
     isOnline: Boolean,
@@ -147,14 +147,14 @@ fun DialogFloatingButton(
 }
 
 @Composable
-fun DialogMessage(
+fun ChatMessage(
     message: MessageModel,
     state: DragRowState,
     sender: Boolean,
     isOnline: Boolean,
     last: MessageModel? = null,
     next: MessageModel? = null,
-    callback: DialogCallback?,
+    callback: ChatCallback?,
 ) {
     val context = LocalContext.current
     val type = message.type

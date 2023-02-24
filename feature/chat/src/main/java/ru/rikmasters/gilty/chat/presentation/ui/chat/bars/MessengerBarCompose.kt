@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog.bars
+package ru.rikmasters.gilty.chat.presentation.ui.chat.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,9 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.TextFieldType.COMMENT
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.TextFieldType.MESSAGE
-import ru.rikmasters.gilty.chat.presentation.ui.dialog.message.AnswerContent
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.TextFieldType.COMMENT
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.TextFieldType.MESSAGE
+import ru.rikmasters.gilty.chat.presentation.ui.chat.message.AnswerContent
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_answer_arrow
 import ru.rikmasters.gilty.shared.R.drawable.ic_cross

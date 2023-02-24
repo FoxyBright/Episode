@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chat.presentation.ui.dialog.popUp
+package ru.rikmasters.gilty.chat.presentation.ui.chat.popUp
 
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.MaterialTheme.colorScheme

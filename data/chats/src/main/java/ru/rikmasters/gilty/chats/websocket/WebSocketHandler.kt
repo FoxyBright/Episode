@@ -116,7 +116,11 @@ class WebSocketHandler(
                         if(event == CHATS_DELETED)
                             CHAT_DELETED
                         else UPDATED_CHATS,
-                        mapper.readValue<Chat>(
+                        if(event == CHATS_DELETED)
+                            mapper.readValue<ShortMessageWs>(
+                                response.data
+                            ).id
+                        else mapper.readValue<Chat>(
                             response.data
                         )
                     )

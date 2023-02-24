@@ -25,12 +25,21 @@ class ChatRepository(
         .map { it.map() }
     
     suspend fun chatUpdate(answer: Pair<AnswerType, Any?>?) {
-        answer?.let { (_, model) ->
-            model?.let { primarySource.save(it as Chat) }
+        answer?.let { (type, model) ->
+            model?.let {
+                if(type == AnswerType.UPDATED_CHATS)
+                    primarySource.save(it as Chat)
+                else
+                    primarySource.deleteById<Chat>(it)
+            }
         }
     }
     
-    suspend fun getChats(forceWeb: Boolean): List<ChatModel> {
+    suspend fun deleteChat(id: String) {
+        primarySource.deleteById<Chat>(id)
+    }
+    
+    suspend fun getChatList(forceWeb: Boolean): List<ChatModel> {
         
         if(!forceWeb) primarySource.findAll<Chat>()
             .let { if(it.isNotEmpty()) return it.map() }

@@ -38,15 +38,16 @@ class ChatManager(
         webSocket.connectToChat(chatId)
     }
     
-    suspend fun getDialogs(
+    suspend fun getChatList(
         forceWeb: Boolean,
-    ) = chatRepository.getChats(forceWeb)
+    ) = chatRepository.getChatList(forceWeb)
     
-    suspend fun deleteDialog(
+    suspend fun deleteChat(
         chatId: String,
         forAll: Boolean,
     ) {
-        webSource.deleteDialog(chatId, forAll)
+        webSource.deleteChat(chatId, forAll)
+        if(!forAll) chatRepository.deleteChat(chatId)
     }
     
     suspend fun connect(userId: String) = single(JOIN) {
