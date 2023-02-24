@@ -3,7 +3,9 @@ package ru.rikmasters.gilty.chats.repository
 import kotlinx.coroutines.flow.map
 import ru.rikmasters.gilty.chats.ChatWebSource
 import ru.rikmasters.gilty.chats.models.Message
+import ru.rikmasters.gilty.chats.models.UserWs
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType
+import ru.rikmasters.gilty.chats.websocket.enums.AnswerType.DELETE_MESSAGE
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType.NEW_MESSAGE
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
@@ -28,16 +30,42 @@ class MessageRepository(
         .listenAll(Message::class)
         .map { it.map() }
     
+    fun writersFlow() = primarySource
+        .listenAll(UserWs::class)
+        .map { list ->
+            list.map {
+                Pair(it.id, it.thumbnail.map())
+            }
+        }
+    
+    suspend fun deleteWriter(id: String) {
+        primarySource.deleteAll<UserWs>()
+        // TODO удалять только того чей срок истек
+    }
+    
+    suspend fun writersUpdate(user: UserWs) {
+        primarySource.save(user)
+    }
+    
     suspend fun messageUpdate(answer: Pair<AnswerType, Any?>?) {
         answer?.let { (type, model) ->
             model?.let {
                 
-                if(type == NEW_MESSAGE) primarySource.save(it as Message)
+                when(type) {
+                    NEW_MESSAGE -> primarySource.save(it as Message)
+                    DELETE_MESSAGE -> {
+                        // TODO Удаление сообщения из локального хранилища
+                        //primarySource.deleteById<Message>(it as String)
+                    }
+                    
+                    else -> {
+                        // TODO Пометка сообщения как прочитанного
+//                        primarySource.findById<Message>(it.toString())
+//                            ?.let { mes -> primarySource.save(mes.copy(isRead = true)) }
+                    }
+                }
                 
-//                if(type == DELETE_MESSAGE) logD("DELETE MyMessage $it")
-                //
-                //                if(type == READ_MESSAGE) primarySource.findById<Message>(it.toString())
-                //                    ?.let { mes -> primarySource.save(mes.copy(isRead = true)) }
+                if(type == NEW_MESSAGE) primarySource.save(it as Message)
             }
         }
     }

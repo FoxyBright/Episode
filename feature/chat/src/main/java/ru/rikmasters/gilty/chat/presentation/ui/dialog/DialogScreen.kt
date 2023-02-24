@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.content.FileProvider.getUriForFile
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
@@ -63,6 +64,7 @@ fun DialogScreen(
     
     val toTranslation by vm.translationTimer.collectAsState()
     val messages by vm.messages.collectAsState()
+    val writingUsers by vm.writingUsers.collectAsState()
     val type by vm.dialogType.collectAsState()
     val unreadCount by vm.unreadCount.collectAsState()
     val meeting by vm.meet.collectAsState()
@@ -131,9 +133,16 @@ fun DialogScreen(
                     messages, user, alert,
                     meetOutAlert, kebabMenuState,
                     messageMenuState, imageMenuState,
-                    listState, unreadCount
+                    listState, unreadCount, writingUsers
                 )
             }
+        }
+    }
+    
+    LaunchedEffect(writingUsers) {
+        writingUsers.forEach {
+            delay(3000)
+            vm.deleteWriter(it.first)
         }
     }
     

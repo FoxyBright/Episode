@@ -37,7 +37,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
-import ru.rikmasters.gilty.shared.model.enumeration.MessageType.WRITING
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
@@ -247,7 +246,6 @@ private fun Message(
     val user = when(message.type) {
         MESSAGE -> message.message?.author!!
         NOTIFICATION -> message.notification?.member ?: organizer
-        WRITING -> throw Throwable("")
     }
     
     Column(modifier) {

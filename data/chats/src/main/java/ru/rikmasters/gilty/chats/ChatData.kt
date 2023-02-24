@@ -4,6 +4,7 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chats.models.Chat
 import ru.rikmasters.gilty.chats.models.Message
+import ru.rikmasters.gilty.chats.models.UserWs
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.websocket.WebSocketHandler
@@ -15,6 +16,7 @@ object ChatData: DataDefinition() {
     override fun EntitiesBuilder.entities() {
         entity<Message>()
         entity<Chat>()
+        entity<UserWs>()
     }
     
     override fun Module.koin() {

@@ -2,13 +2,20 @@ package ru.rikmasters.gilty.chat.presentation.ui.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
+import ru.rikmasters.gilty.chat.Chat.logD
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.*
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarCallback
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.ChatAppBarState
@@ -19,6 +26,7 @@ import ru.rikmasters.gilty.complaints.presentation.ui.MeetOutAlert
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
@@ -36,6 +44,7 @@ data class DialogState(
     val imageMenuState: Boolean,
     val listState: LazyListState,
     val unReadCount: Int,
+    val writingUsers: List<Pair<String, ThumbnailModel>>,
 )
 
 interface DialogCallback:
@@ -135,9 +144,21 @@ private fun Content(
         reverseLayout = true
     ) {
         item { Divider(Modifier, 28.dp, Transparent) }
-        itemsIndexed(
-            list, { _, mes -> mes.first.id })
+        
+        if(state.writingUsers.isNotEmpty()) item {
+            Writing(
+                state.writingUsers.map { it.second },
+                Modifier.padding(16.dp, 2.dp)
+            )
+        }
+        
+        itemsIndexed(list, { _, mes -> mes.first.id })
         { index, (message, rowState) ->
+            
+            
+            logD("AUTHOR --->> ${message.message?.author?.id}")
+            logD("ME --->> ${state.user.id}")
+            
             DialogMessage(
                 message, rowState,
                 (message.message?.author?.id == state.user.id),
@@ -147,6 +168,28 @@ private fun Content(
                 else null, if(index in 1..list.size)
                     list[index - 1].first
                 else null, callback
+            )
+        }
+    }
+}
+
+@Composable
+private fun Writing(
+    list: List<ThumbnailModel>,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier, Start, CenterVertically) {
+        WritingMessage()
+        list.forEachIndexed { i, it ->
+            val mod = if(i == 0)
+                Modifier.padding(start = 6.dp)
+            else Modifier.offset((-16).dp)
+            AsyncImage(
+                it.url, (null),
+                mod
+                    .size(24.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
             )
         }
     }

@@ -15,9 +15,7 @@ import io.ktor.websocket.send
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
-import ru.rikmasters.gilty.chats.models.Chat
-import ru.rikmasters.gilty.chats.models.MessageWs
-import ru.rikmasters.gilty.chats.models.ShortMessageWs
+import ru.rikmasters.gilty.chats.models.*
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.websocket.enums.AnswerType
@@ -162,14 +160,11 @@ class WebSocketHandler(
             }
             
             MESSAGE_TYPING -> {
-                answer.emit(
-                    Pair(
-                        TYPING_MESSAGE,
-                        mapper.readValue<User>(
-                            response.data
-                        ).map()
-                    )
+                val user = mapper.readValue<User>(response.data)
+                messageRepository.writersUpdate(
+                    UserWs(user.id!!, user.thumbnail!!)
                 )
+                logD("$response")
             }
             
             else -> {}

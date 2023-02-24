@@ -48,7 +48,7 @@ fun AgeBsContent(
                 }, range = state.range
             )
             GradientButton(
-                Modifier.padding(bottom = 40.dp),
+                Modifier.padding(bottom = 20.dp),
                 stringResource(R.string.save_button)
             ) { callback?.onSave() }
         }

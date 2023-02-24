@@ -22,6 +22,11 @@ class ChatManager(
     
     val chatsFlow = chatRepository.chatsFlow()
     val messageFlow = messageRepository.messageFlow()
+    val writingFlow = messageRepository.writersFlow()
+    
+    suspend fun deleteWriter(id: String) {
+        messageRepository.deleteWriter(id)
+    }
     
     suspend fun getMessages(
         chatId: String, forceWeb: Boolean,

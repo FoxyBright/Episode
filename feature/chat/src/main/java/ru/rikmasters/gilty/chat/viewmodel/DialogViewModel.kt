@@ -1,7 +1,8 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.dialog.bars.PinnedBarType.*
@@ -26,6 +27,7 @@ class DialogViewModel: ViewModel() {
     private val profileManager by inject<ProfileManager>()
     
     val messages by lazy { chatManager.messageFlow.state(emptyList()) }
+    val writingUsers by lazy { chatManager.writingFlow.state(emptyList()) }
     
     private val _chat = MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
@@ -42,6 +44,17 @@ class DialogViewModel: ViewModel() {
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
     
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
+    val messageDebounced = message
+        .debounce(250)
+        .onEach {
+            chat.value?.id?.let {
+                chatManager.isTyping(it)
+            }
+        }
+        .state(_message.value, Eagerly)
+    
     private val _answer = MutableStateFlow<MessageModel?>(null)
     val answer = _answer.asStateFlow()
     
@@ -53,6 +66,10 @@ class DialogViewModel: ViewModel() {
     
     private val _translationTimer = MutableStateFlow<Long?>(null)
     val translationTimer = _translationTimer.asStateFlow()
+    
+    suspend fun deleteWriter(id: String) {
+        chatManager.deleteWriter(id)
+    }
     
     private suspend fun getMessages(
         chatId: String,

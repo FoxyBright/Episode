@@ -37,7 +37,6 @@ import ru.rikmasters.gilty.shared.model.chat.MessageList
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
-import ru.rikmasters.gilty.shared.model.enumeration.MessageType.WRITING
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import kotlin.random.Random
 
@@ -150,9 +149,8 @@ private fun Content(
             && state.avatar
         ) AsyncImage(
             message.message?.author
-                ?.avatar?.thumbnail?.url,
-            (null),
-            Modifier
+                ?.thumbnail?.url,
+            (null), Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
                 .clip(CircleShape),
@@ -196,8 +194,6 @@ private fun Content(
                     )
                 }
             }
-            
-            WRITING -> WritingMessage()
         }
     }
 }

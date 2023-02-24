@@ -16,7 +16,7 @@ data class MessageWs(
         notification = notification,
         message,
         otherRead = false,
-        isRead = true,
+        isRead = false,
         isDelivered = true,
         createdAt = createdAt,
         chatId = chatId
