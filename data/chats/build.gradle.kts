@@ -13,6 +13,7 @@ dependencies {
     
     implementation(project(":data:meetings"))
     implementation(project(":data:shared"))
+    implementation(project(":data:shared"))
     
     implementation(project(":shared"))
 }

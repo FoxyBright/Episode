@@ -8,8 +8,7 @@ import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
 import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
-import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
-import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
+import ru.rikmasters.gilty.chat.viewmodel.*
 import ru.rikmasters.gilty.chats.ChatData
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
@@ -62,6 +61,8 @@ object Chat: FeatureDefinition() {
         
         scope<ChatViewModel> {
             scopedOf(::ChatViewModel)
+            scopedOf(::GalleryViewModel)
+            scopedOf(::HiddenBsViewModel)
         }
     }
     

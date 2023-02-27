@@ -8,7 +8,6 @@ interface FileSource {
     fun bytes(): ByteArray
 }
 
-@Suppress("unused")
 data class JavaFileSource(
     val file: File,
 ): FileSource {

@@ -17,11 +17,15 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.GalleryBs
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
 import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
+import ru.rikmasters.gilty.chat.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.chat.viewmodel.HiddenBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.extentions.*
@@ -89,7 +93,12 @@ fun ChatScreen(
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
         vm.getUser()
-        listState.scrollToItem(unreadCount)
+        
+        try {
+            listState.scrollToItem(unreadCount)
+        } catch(_: Exception) {
+            listState.scrollToItem(messages.size)
+        }
         
         // TODO реализовать прочтение при просмотре конкретного сообщения
         vm.markAsReadMessage(chatId, all = true)
@@ -168,17 +177,24 @@ fun ChatScreen(
                         }
                     }
                     
-                    @SuppressLint("PermissionLaunchedDuringComposition")
                     override fun onImageMenuItemSelect(point: Int) {
                         scope.launch {
-                            when(point) {
-                                0 -> {}
-                                1 -> if(cameraPermissions.hasPermission)
+                            if(point == 1) {
+                                if(cameraPermissions.hasPermission)
                                     photographer.launch(uri)
-                                else
-                                    cameraPermissions.launchPermissionRequest()
-                                
-                                2 -> asm.bottomSheet.expand { HiddenBs() }
+                                else cameraPermissions.launchPermissionRequest()
+                            } else {
+                                asm.bottomSheet.expand {
+                                    when(point) {
+                                        0 -> Connector<GalleryViewModel>(vm.scope) {
+                                            GalleryBs(it, chat!!.isOnline, chat!!.id)
+                                        }
+                                        
+                                        2 -> Connector<HiddenBsViewModel>(vm.scope) {
+                                            HiddenBs(it, chat!!.isOnline, chat!!.id)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

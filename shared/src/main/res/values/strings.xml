@@ -255,6 +255,7 @@
     <string name="complaints_send_answer">Отлично, ваша жалоба отправлена!</string>
     <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
     <string name="complaints_button">Отправить жалобу</string>
+    <string name="send_button">Отправить</string>
 
     <!-- Add Meets -->
     <string name="add_meet_create_title">Создать Meet</string>

@@ -17,7 +17,6 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.image.AlbumModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.models.Album
-import ru.rikmasters.gilty.shared.models.Hidden
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.util.UUID
 
@@ -117,18 +116,12 @@ class ChatWebSource: KtorSource() {
                         text?.let { append("text", it) }
                         
                         // attached hidden photos
-                        if(!attachments.isNullOrEmpty()) {
-                            attachments.forEach {
-                                append(
-                                    "attachments[]",
-                                    Hidden(
-                                        it.type.name,
-                                        it.albumId,
-                                        it.id,
-                                    ).toString()
-                                )
+                        if(!attachments.isNullOrEmpty())
+                            attachments.forEachIndexed { i, it ->
+                                append(("attachments[$i][type]"), ("PRIVATE_PHOTO"))
+                                append(("attachments[$i][album_id]"), it.albumId)
+                                append(("attachments[$i][file_id]"), it.id)
                             }
-                        }
                         
                         // attached photos from camera or gallery
                         if(!photos.isNullOrEmpty()) {

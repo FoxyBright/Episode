@@ -13,8 +13,9 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:complaints"))
-    implementation(project(":feature:profile"))
     implementation(project(":feature:animated"))
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:gallery"))
     
     implementation(project(":data:chats"))
     implementation(project(":data:meetings"))
