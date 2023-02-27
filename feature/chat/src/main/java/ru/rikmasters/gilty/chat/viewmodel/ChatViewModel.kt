@@ -250,12 +250,14 @@ class ChatViewModel: ViewModel() {
         photos: List<FileSource>? = null,
         videos: List<FileSource>? = null,
     ) {
-        changeAnswer(null)
-        clearMessage()
-        chatManager.sendMessage(
-            chatId, message, attachment,
-            photos, videos
-        )
+        coroutineScope.launch {
+            changeAnswer(null)
+            clearMessage()
+            chatManager.sendMessage(
+                chatId, message, attachment,
+                photos, videos
+            )
+        }
     }
     
     suspend fun getMeet(meetId: String?) = singleLoading {
