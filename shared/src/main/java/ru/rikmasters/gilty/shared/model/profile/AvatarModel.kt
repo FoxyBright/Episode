@@ -17,6 +17,7 @@ data class AvatarModel(
     val width: Int,
     val height: Int,
     val hasAccess: Boolean,
+    val blockedAt: String? = null,
 )
 
 val DemoAvatarModel = AvatarModel(

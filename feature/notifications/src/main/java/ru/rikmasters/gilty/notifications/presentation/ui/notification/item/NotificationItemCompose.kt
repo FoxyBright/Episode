@@ -124,7 +124,12 @@ private fun InfoNotification(
             ) { onSwiped() },
             Center, CenterVertically
         ) {
-            Column {
+            Column(
+                Modifier.background(
+                    colorScheme.primaryContainer,
+                    shape
+                )
+            ) {
                 Row(
                     Modifier
                         .fillMaxWidth()

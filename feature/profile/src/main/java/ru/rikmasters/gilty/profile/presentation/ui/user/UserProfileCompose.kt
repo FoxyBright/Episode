@@ -39,12 +39,35 @@ import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+
+@Preview
+@Composable
+private fun ProfilePreview() {
+    GiltyTheme {
+        val meets = DemoMeetingList
+        ProfileContent(
+            UserProfileState(
+                ProfileState(
+                    DemoProfileModel, USERPROFILE
+                ), meets, meets, Pair(4, "image"),
+                (false), listOf(
+                    INACTIVE, NEW, INACTIVE,
+                    INACTIVE, ACTIVE
+                ), alert = false,
+                listState = rememberLazyListState()
+            ), Modifier.background(colorScheme.background)
+        )
+    }
+}
 
 data class UserProfileState(
     val profileState: ProfileState,
@@ -57,6 +80,7 @@ data class UserProfileState(
     val menuState: Boolean = false,
     val listState: LazyListState,
     val errorState: Boolean = false,
+    val photoAlertState: Boolean = false,
 )
 
 interface UserProfileCallback: ProfileCallback {
@@ -68,32 +92,9 @@ interface UserProfileCallback: ProfileCallback {
     fun onRespondsClick() {}
     fun onNavBarSelect(point: Int) {}
     fun closeAlert() {}
+    fun closePhotoAlert() {}
     fun onMenuClick(it: Boolean) {}
     fun onMenuItemClick(point: Int) {}
-}
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-@Composable
-private fun ProfilePreview() {
-    GiltyTheme {
-        val meets = DemoMeetingList
-        ProfileContent(
-            UserProfileState(
-                ProfileState(
-                    DemoProfileModel,
-                    USERPROFILE
-                ), meets, meets, Pair(4, "image"),
-                (false), listOf(
-                    NavIconState.INACTIVE,
-                    NavIconState.NEW,
-                    NavIconState.INACTIVE,
-                    NavIconState.INACTIVE,
-                    NavIconState.ACTIVE
-                ), alert = false,
-                listState = rememberLazyListState()
-            )
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,6 +135,13 @@ fun ProfileContent(
         onDismissRequest = { callback?.closeAlert() },
         label = stringResource(R.string.complaints_moderate_sen_answer),
         success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
+    )
+    GAlert(
+        state.photoAlertState,
+        onDismissRequest = { callback?.closePhotoAlert() },
+        title = stringResource(R.string.profile_blocked_photo_alert),
+        success = Pair(stringResource(R.string.edit_button)) { callback?.onMenuItemClick(1) },
+        cancel = Pair(stringResource(R.string.notification_respond_cancel_button)) { callback?.closePhotoAlert() }
     )
     if(state.errorState) ErrorConnection()
 }

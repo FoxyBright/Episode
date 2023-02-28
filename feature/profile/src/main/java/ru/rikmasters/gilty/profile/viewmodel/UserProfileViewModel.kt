@@ -35,6 +35,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _errorConnection = MutableStateFlow(false)
     val errorConnection = _errorConnection.asStateFlow()
     
+    private val _photoAlertState = MutableStateFlow(false)
+    val photoAlertState = _photoAlertState.asStateFlow()
+    
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
@@ -72,6 +75,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         states: List<NavIconState>,
     ) {
         _navBar.emit(states)
+    }
+    
+    suspend fun photoAlertDismiss(state: Boolean){
+        _photoAlertState.emit(state)
     }
     
     suspend fun navBarNavigate(point: Int): String {

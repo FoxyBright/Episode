@@ -8,7 +8,6 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
-import ru.rikmasters.gilty.shared.models.meets.Thumbnail
 
 data class NotificationResponse(
     val id: String,

@@ -24,7 +24,6 @@ import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
-import ru.rikmasters.gilty.shared.models.meets.Avatar
 import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File

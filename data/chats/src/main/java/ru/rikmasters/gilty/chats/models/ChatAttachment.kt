@@ -2,7 +2,7 @@ package ru.rikmasters.gilty.chats.models
 
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType
 import ru.rikmasters.gilty.shared.model.chat.ChatAttachmentModel
-import ru.rikmasters.gilty.shared.models.meets.Avatar
+import ru.rikmasters.gilty.shared.models.Avatar
 
 data class ChatAttachment(
     val type: String,

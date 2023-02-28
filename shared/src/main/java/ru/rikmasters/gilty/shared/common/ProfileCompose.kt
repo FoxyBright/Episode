@@ -110,9 +110,13 @@ fun Profile(
     callback: ProfileCallback? = null,
     onChange: ((Boolean) -> Unit)? = null,
 ) {
+    val profile = state.profile
+    val rating = profile?.rating?.average.toString()
+    val hidden = profile?.hidden?.thumbnail?.url
+    
     Column(modifier) {
         TopBar(
-            (state.profile?.username ?: ""),
+            (profile?.username ?: ""),
             state.profileType, Modifier,
             { callback?.onBack() }
         ) { callback?.onNameChange(it) }
@@ -127,10 +131,8 @@ fun Profile(
             )
         Row {
             ProfileImageContent(
-                Modifier.weight(1f),
-                (state.profile?.avatar?.thumbnail?.url.toString()),
-                state.profileType,
-                state.observeState,
+                Modifier.weight(1f), profile?.avatar,
+                state.profileType, state.observeState,
                 { bool -> onChange?.let { it(bool) } },
                 { callback?.profileImage() })
             Spacer(
@@ -141,12 +143,11 @@ fun Profile(
             )
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
-                    Modifier,
-                    (state.profile?.rating?.average.toString()),
-                    state.profile?.countWatchers ?: 0,
-                    state.profile?.countWatching ?: 0,
+                    Modifier, rating,
+                    (profile?.countWatchers ?: 0),
+                    (profile?.countWatching ?: 0),
                     state.profileType,
-                    state.profile?.rating?.emoji
+                    profile?.rating?.emoji
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
@@ -155,23 +156,22 @@ fun Profile(
                     )
                 )
                 HiddenContent(
-                    Modifier,
-                    state.profile?.hidden?.thumbnail?.url,
+                    Modifier, hidden,
                     state.profileType
                 ) { callback?.hiddenImages() }
             }
         }
         when(state.profileType) {
-            CREATE, USERPROFILE -> Descript(state, callback)
+            CREATE, USERPROFILE -> AboutMe(state, callback)
             ORGANIZER, ANONYMOUS_ORGANIZER ->
-                if((state.profile?.aboutMe ?: "").isNotBlank())
-                    Descript(state, callback)
+                if((profile?.aboutMe ?: "").isNotBlank())
+                    AboutMe(state, callback)
         }
     }
 }
 
 @Composable
-private fun Descript(
+private fun AboutMe(
     state: ProfileState,
     callback: ProfileCallback?,
 ) {

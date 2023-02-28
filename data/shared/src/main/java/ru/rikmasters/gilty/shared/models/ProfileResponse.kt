@@ -5,8 +5,6 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
-import ru.rikmasters.gilty.shared.models.meets.Avatar
-import ru.rikmasters.gilty.shared.models.meets.Thumbnail
 
 data class ProfileRequest(
     val username: String? = null,

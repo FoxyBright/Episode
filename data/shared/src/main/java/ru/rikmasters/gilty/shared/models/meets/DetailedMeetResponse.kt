@@ -3,16 +3,8 @@ package ru.rikmasters.gilty.shared.models.meets
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
 import ru.rikmasters.gilty.shared.model.enumeration.*
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType.valueOf
-import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
-import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.OrientationModel
-import ru.rikmasters.gilty.shared.models.Category
-import ru.rikmasters.gilty.shared.models.Location
-import ru.rikmasters.gilty.shared.models.User
+import ru.rikmasters.gilty.shared.models.*
 
 data class DetailedMeetResponse(
     val id: String,
@@ -66,70 +58,5 @@ data class DetailedMeetResponse(
         address = address,
         memberState = MemberStateType.valueOf(memberState),
         price = price
-    )
-}
-
-data class DetailedRequirement(
-    val number: Int? = null,
-    val gender: String? = null,
-    val orientation: Orientation? = null,
-    val age: Age? = null,
-) {
-    
-    fun map() = RequirementModel(
-        gender?.let { valueOf(it) },
-        age?.min,
-        age?.max,
-        orientation?.map()
-    )
-}
-
-data class Age(
-    val min: Int,
-    val max: Int,
-)
-
-data class Orientation(
-    val id: String,
-    val name: String,
-) {
-    
-    fun map() = OrientationModel(id, name)
-}
-
-data class Avatar(
-    val id: String,
-    val albumId: String,
-    val ownerId: String,
-    val type: String,
-    val thumbnail: Thumbnail,
-    val mimetype: String,
-    val filesize: Int,
-    val url: String,
-    val width: Int,
-    val height: Int,
-    val hasAccess: Boolean,
-) {
-    
-    fun map() = AvatarModel(
-        id, albumId, ownerId,
-        PHOTO, thumbnail.map(),
-        mimetype, filesize, url,
-        width, height, hasAccess
-    )
-}
-
-data class Thumbnail(
-    val id: String,
-    val url: String,
-    val width: Int,
-    val height: Int,
-    val filesize: Int,
-    val mimetype: String,
-) {
-    
-    fun map() = ThumbnailModel(
-        id, url, width, height,
-        filesize, mimetype
     )
 }

@@ -13,9 +13,9 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
@@ -37,10 +37,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import ru.rikmasters.gilty.core.R.drawable.ic_information
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
@@ -65,7 +68,7 @@ private fun ProfileImageContentPreview() {
     GiltyTheme {
         ProfileImageContent(
             Modifier.width(160.dp),
-            (""), ORGANIZER, (false),
+            DemoAvatarModel, ORGANIZER, (false),
             {}) {}
     }
 }
@@ -123,7 +126,7 @@ fun HiddenContent(
                 .padding(8.dp)
                 .size(26.dp)
                 .clip(CircleShape)
-                .align(TopStart), Center
+                .align(TopStart), Alignment.Center
         ) { if(profileType != USERPROFILE || emptyImage) Lock() }
         CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
@@ -166,8 +169,8 @@ private fun Lock(
 @Composable
 fun ProfileImageContent(
     modifier: Modifier,
-    image: String,
-    profileType: ProfileType,
+    image: AvatarModel?,
+    type: ProfileType,
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
     onClick: () -> Unit,
@@ -175,7 +178,7 @@ fun ProfileImageContent(
     Box(
         modifier
             .height(
-                if(profileType == CREATE)
+                if(type == CREATE)
                     200.dp else 254.dp
             )
             .fillMaxWidth(0.45f)
@@ -183,29 +186,60 @@ fun ProfileImageContent(
             .background(colorScheme.primaryContainer)
             .clickable { onClick() }, BottomCenter
     ) {
-        AsyncImage(
-            image,
-            stringResource(R.string.meeting_avatar),
-            Modifier.fillMaxSize(),
-            contentScale = Crop
-        )
-        when(profileType) {
+        Avatar(image, type)
+        when(type) {
             CREATE -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_user_photo),
-                    profileType
+                    type
                 )
             }
             
             ORGANIZER -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_organizer_observe),
-                    profileType,
+                    type,
                     observeState,
                 ) { onObserveChange(it) }
             }
             
             USERPROFILE, ANONYMOUS_ORGANIZER -> {}
+        }
+    }
+}
+
+@Composable
+private fun Avatar(
+    image: AvatarModel?,
+    type: ProfileType,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier) {
+        AsyncImage(
+            image?.thumbnail?.url,
+            (null), Modifier.fillMaxSize(),
+            contentScale = Crop
+        )
+        image?.blockedAt?.let {
+            if(type == USERPROFILE) Column(
+                Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+                Arrangement.Center,
+                CenterHorizontally
+            ) {
+                Image(
+                    painterResource(ic_information),
+                    (null), Modifier.size(40.dp)
+                )
+                Text(
+                    stringResource(R.string.profile_blocked_photo),
+                    Modifier.padding(top = 16.dp),
+                    style = typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = White
+                )
+            }
         }
     }
 }

@@ -40,6 +40,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val occupied by vm.occupied.collectAsState()
     val errorState by vm.errorConnection.collectAsState()
+    val photoAlertState by vm.photoAlertState.collectAsState()
     
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -47,6 +48,11 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             vm.errorConnection(false)
             vm.setUserDate()
         } else vm.errorConnection(true)
+        
+        // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
+        //        profile?.avatar?.blockedAt?.let{
+        //            vm.photoAlertDismiss(true)
+        //        }
     }
     
     val state = UserProfileState(
@@ -56,7 +62,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         ), meets, meetsHistory,
         lastRespond, history,
         navBar, alert, menuState,
-        listState, errorState
+        listState, errorState,
+        photoAlertState
     )
     
     ProfileContent(state, Modifier,
@@ -70,6 +77,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                             "&orientation=${profile?.orientation?.name}" +
                             "&phone=${profile?.phone}"
                 )
+            }
+            
+            override fun closePhotoAlert() {
+                scope.launch { vm.photoAlertDismiss(false) }
             }
             
             override fun onNameChange(text: String) {
