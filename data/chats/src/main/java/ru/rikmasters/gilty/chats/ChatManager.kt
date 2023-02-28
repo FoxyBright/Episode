@@ -6,7 +6,6 @@ import ru.rikmasters.gilty.chats.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
-import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 class ChatManager(
@@ -108,15 +107,14 @@ class ChatManager(
     
     suspend fun sendMessage(
         chatId: String,
-        message: MessageModel?,
+        repliedId: String?,
+        text: String?,
         attachment: List<AvatarModel>?,
         photos: List<FileSource>?,
         videos: List<FileSource>?,
     ) {
         webSource.sendMessage(
-            chatId,
-            message?.replied?.id,
-            message?.message?.text,
+            chatId, repliedId, text,
             photos?.map { it.bytes() },
             attachment,
             videos?.map { it.bytes() }

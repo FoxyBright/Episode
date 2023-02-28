@@ -10,7 +10,6 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
@@ -18,14 +17,12 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 class ChatViewModel: ViewModel() {
     
     private val chatManager by inject<ChatManager>()
     private val meetManager by inject<MeetingManager>()
-    private val profileManager by inject<ProfileManager>()
     
     val messages by lazy { chatManager.messageFlow.state(emptyList()) }
     val writingUsers by lazy { chatManager.writingFlow.state(emptyList()) }
@@ -38,9 +35,6 @@ class ChatViewModel: ViewModel() {
     
     private val _chatType = MutableStateFlow(MEET)
     val chatType = _chatType.asStateFlow()
-    
-    private val _user = MutableStateFlow<UserModel?>(null)
-    val user = _user.asStateFlow()
     
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
@@ -122,9 +116,11 @@ class ChatViewModel: ViewModel() {
         chatManager.madeScreenshot(chatId)
     }
     
-    @Suppress("unused")
-    suspend fun completeChat(chatId: String) {
-        chatManager.completeChat(chatId)
+    suspend fun completeChat(chat: ChatModel?) {
+        chat?.let {
+            chatManager.completeChat(it.id)
+            makeToast("Чат для встречи ${it.title} был закрыт закрыт")
+        }
     }
     
     private suspend fun getMessages(
@@ -144,11 +140,12 @@ class ChatViewModel: ViewModel() {
     ) = singleLoading {
         if(message == answer.value)
             _answer.emit(null)
-        
-        chatManager.deleteMessage(
-            chatId, listOf(message.id),
-            (user.value?.id == chat.value?.organizer?.id)
-        )
+        chat.value?.let {
+            chatManager.deleteMessage(
+                chatId, listOf(message.id),
+                (it.userId == it.organizer.id)
+            )
+        }
     }
     
     suspend fun changeUnreadCount(state: Int) {
@@ -160,39 +157,50 @@ class ChatViewModel: ViewModel() {
     }
     
     suspend fun getChat(chatId: String) = singleLoading {
-        val chat = chatManager.getChat(chatId)
-        _chat.emit(chat)
-        changeUnreadCount(chat.unreadCount + 1)
-        _chatType.emit(
-            when {
-                chat.isOnline && chat.meetStatus == ACTIVE
-                -> {
-                    val translationStart = of(chat.datetime).millis()
-                    
-                    val now = now().millis()
-                    
-                    if(now < translationStart) TRANSLATION else {
-                        _translationTimer.emit((now - translationStart))
-                        TRANSLATION_AWAIT
-                    }
+        _chat.emit(chatManager.getChat(chatId))
+        
+        chat.value?.let {
+            
+            // кол-во непрочитанных
+            changeUnreadCount(it.unreadCount + 1)
+            
+            // тип прикрепленного топ-бара
+            _chatType.emit(
+                if(it.organizer.id != it.userId)
+                    if(!it.isOnline) MEET
+                    else getTranslationType(it.datetime)
+                else when {
+                    it.meetStatus != ACTIVE -> MEET_FINISHED
+                    it.isOnline -> getTranslationType(it.datetime)
+                    else -> MEET
                 }
-                
-                else -> MEET_FINISHED
-            }
-        )
-        _viewers.emit(
-            if(chatType.value == TRANSLATION)
-                0 else null //TODO сюда кол-во смотрящих трансляцию
-        )
-        getMessages(chatId, false)
+            )
+            // получение списка сообщений
+            getMessages(chatId, false)
+        }
     }
     
-    suspend fun finishedChat(title: String) {
-        makeToast("Чат для встречи $title закрыт")
+    private suspend fun getTranslationType(
+        date: String?,
+    ): PinnedBarType {
+        return date?.let {
+            val start = of(it).millis()
+            val now = now().millis()
+            val difference = start - now
+            if(now > start && difference < 1_800_000) {
+                // получение количества зрителей трансляции
+                _viewers.emit(0)
+                TRANSLATION
+            } else {
+                // таймер отсчета до начала трансляции
+                _translationTimer.emit(difference)
+                TRANSLATION_AWAIT
+            }
+        } ?: MEET
     }
     
     suspend fun toTranslation() {
-        makeToast("Трансляции пока что не доступны")
+        makeToast("Трансляции пока что не доступны на Android-версии Gilty")
     }
     
     fun timerConverter(millis: Long?): String? {
@@ -209,30 +217,19 @@ class ChatViewModel: ViewModel() {
                 }$sec"
             } else {
                 coroutineScope.launch {
-                    changeChatType(TRANSLATION)
+                    _chatType.emit(TRANSLATION)
                 }
                 return null
             }
         } ?: return null
     }
     
-    @Suppress("unused")
     suspend fun timerTick() {
         translationTimer.value?.let {
             _translationTimer.emit(
                 it.minus(1)
             )
         }
-    }
-    
-    private suspend fun changeChatType(
-        type: PinnedBarType,
-    ) {
-        _chatType.emit(type)
-    }
-    
-    suspend fun getUser() = singleLoading {
-        _user.emit(profileManager.getProfile().map())
     }
     
     suspend fun changeMessage(text: String) {
@@ -245,7 +242,8 @@ class ChatViewModel: ViewModel() {
     
     suspend fun onSendMessage(
         chatId: String,
-        message: MessageModel? = null,
+        repliedId: String? = null,
+        text: String? = null,
         attachment: List<AvatarModel>? = null,
         photos: List<FileSource>? = null,
         videos: List<FileSource>? = null,
@@ -254,8 +252,8 @@ class ChatViewModel: ViewModel() {
             changeAnswer(null)
             clearMessage()
             chatManager.sendMessage(
-                chatId, message, attachment,
-                photos, videos
+                chatId, repliedId, text,
+                attachment, photos, videos
             )
         }
     }

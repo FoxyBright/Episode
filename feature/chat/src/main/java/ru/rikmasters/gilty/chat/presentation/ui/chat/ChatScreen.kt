@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.GalleryBs
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
 import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
@@ -29,12 +30,9 @@ import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.extentions.*
-import ru.rikmasters.gilty.shared.model.chat.MemberMessageModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
-import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import java.io.File
 import java.net.URLEncoder.encode
-import java.util.UUID
 
 @Composable
 @SuppressLint("Recycle")
@@ -81,18 +79,16 @@ fun ChatScreen(
     val chat by vm.chat.collectAsState()
     // смотрящие текущюю трансляцию
     val viewers by vm.viewers.collectAsState()
-    // текущий пользователь
-    val user by vm.user.collectAsState()
     
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(Nothing)
         onDispose { asm.keyboard.resetSoftInputAdjust() }
     }
     
+    
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
-        vm.getUser()
         
         try {
             listState.scrollToItem(unreadCount)
@@ -108,6 +104,13 @@ fun ChatScreen(
         writingUsers.forEach {
             delay(3000)
             vm.deleteWriter(it.first)
+        }
+    }
+    
+    LaunchedEffect(toTranslation) {
+        if(type == TRANSLATION_AWAIT) {
+            delay(1000)
+            vm.timerTick()
         }
     }
     
@@ -128,23 +131,21 @@ fun ChatScreen(
     
     val state = meeting?.let { meet ->
         chat?.let { chat ->
-            user?.let { user ->
-                ChatState(
-                    ChatAppBarState(
-                        chat.title,
-                        meet.organizer.avatar,
-                        chat.membersCount,
-                        type, viewers,
-                        vm.timerConverter(toTranslation),
-                        meet.isOnline,
-                        (meet.organizer.id == user.id)
-                    ), answer, meet.map(), message,
-                    messages, user, alert,
-                    meetOutAlert, kebabMenuState,
-                    messageMenuState, imageMenuState,
-                    listState, unreadCount, writingUsers
-                )
-            }
+            ChatState(
+                ChatAppBarState(
+                    chat.title,
+                    meet.organizer.avatar,
+                    chat.membersCount,
+                    type, viewers,
+                    vm.timerConverter(toTranslation),
+                    meet.isOnline,
+                    (meet.organizer.id == chat.userId)
+                ), answer, meet.map(), message,
+                messages, chat.userId, alert,
+                meetOutAlert, kebabMenuState,
+                messageMenuState, imageMenuState,
+                listState, unreadCount, writingUsers
+            )
         }
     }
     
@@ -171,7 +172,7 @@ fun ChatScreen(
                             if(type == TRANSLATION)
                                 vm.toTranslation()
                             else {
-                                vm.finishedChat(state.topState.name)
+                                vm.completeChat(chat)
                                 nav.navigate("main")
                             }
                         }
@@ -232,27 +233,7 @@ fun ChatScreen(
                     
                     override fun onSend() {
                         scope.launch {
-                            vm.onSendMessage(
-                                chatId, MessageModel(
-                                    id = UUID.randomUUID().toString(),
-                                    type = MESSAGE,
-                                    replied = answer,
-                                    notification = null,
-                                    message = MemberMessageModel(
-                                        author = state.user,
-                                        text = message,
-                                        attachments = null,
-                                        is_author = true
-                                    ),
-                                    otherRead = false,
-                                    isRead = false,
-                                    isDelivered = true,
-                                    createdAt = LocalDateTime
-                                        .now()
-                                        .minusHour(offset)
-                                        .format(FULL_DATE_FORMAT_WIDTH_ZONE)
-                                )
-                            )
+                            vm.onSendMessage(chatId, answer?.id, message)
                             listState.animateScrollToItem(0)
                         }
                     }

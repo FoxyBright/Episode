@@ -35,7 +35,7 @@ data class ChatState(
     val meet: MeetingModel,
     val messageText: String,
     val messageList: List<MessageModel>,
-    val user: UserModel,
+    val userId: String,
     val alert: Boolean,
     val meetAlert: Boolean,
     val kebabMenuState: Boolean,
@@ -155,7 +155,7 @@ private fun Content(
         { index, (message, rowState) ->
             ChatMessage(
                 message, rowState,
-                (message.message?.author?.id == state.user.id),
+                (message.message?.author?.id == state.userId),
                 state.meet.isOnline,
                 if(index < list.size - 1)
                     list[index + 1].first
