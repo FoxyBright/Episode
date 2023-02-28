@@ -6,10 +6,10 @@ import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetbs.Observe
-import ru.rikmasters.gilty.meetbs.viewmodel.ObserveViewModel
+import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
 import ru.rikmasters.gilty.meetbs.viewmodel.components.MeetingViewModel
+import ru.rikmasters.gilty.meetbs.viewmodel.components.OrganizerViewModel
 import ru.rikmasters.gilty.meetbs.viewmodel.components.ParticipantsViewModel
-import ru.rikmasters.gilty.meetbs.viewmodel.components.UserViewModel
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
@@ -31,10 +31,10 @@ object Notifications: FeatureDefinition() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
             scopedOf(::RespondsBsViewModel)
-            scopedOf(::ObserveViewModel)
+            scopedOf(::BsViewModel)
             singleOf(::MeetingViewModel)
             scopedOf(::ParticipantsViewModel)
-            scopedOf(::UserViewModel)
+            scopedOf(::OrganizerViewModel)
         }
     }
     

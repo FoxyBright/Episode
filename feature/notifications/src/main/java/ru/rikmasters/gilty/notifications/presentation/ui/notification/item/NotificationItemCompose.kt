@@ -55,7 +55,7 @@ fun NotificationItem(
     
     val adminMessage = "ADMIN MESSAGE" // TODO для сообщений от администрации приложения
     
-    val organizer = when(type) {
+    val user = when(type) {
         ADMIN_NOTIFICATION, PHOTO_BLOCKED -> null
         RESPOND -> notification.feedback?.respond?.author
         WATCH -> notification.parent.user
@@ -68,7 +68,7 @@ fun NotificationItem(
             val emoji = notification
                 .feedback?.ratings?.map { it.emoji }
             TextNotification(
-                organizer?.thumbnail, state.rowState,
+                user?.thumbnail, state.rowState,
                 modifier, state.shape, (true),
                 { callback?.onSwiped(notification) },
                 (emoji ?: state.emojiList), {
@@ -78,10 +78,10 @@ fun NotificationItem(
                 }
             ) {
                 NotificationText(
-                    organizer, type, meet,
+                    user, type, meet,
                     state.duration, emoji = emoji,
                     onMeetClick = { callback?.onMeetClick(meet!!) },
-                    onUserClick = { callback?.onUserClick(organizer!!, meet!!) }
+                    onUserClick = { callback?.onUserClick(user!!, meet!!) }
                 )
             }
         }
@@ -93,15 +93,15 @@ fun NotificationItem(
         ) { callback?.onSwiped(notification) }
         
         else -> TextNotification(
-            organizer?.thumbnail, state.rowState,
+            user?.thumbnail, state.rowState,
             modifier, state.shape, (false),
             { callback?.onSwiped(notification) },
         ) {
             NotificationText(
-                organizer, type, meet,
+                user, type, meet,
                 state.duration,
                 onMeetClick = { callback?.onMeetClick(meet!!) },
-                onUserClick = { callback?.onUserClick(organizer!!, meet!!) }
+                onUserClick = { callback?.onUserClick(user!!, meet!!) }
             )
         }
     }

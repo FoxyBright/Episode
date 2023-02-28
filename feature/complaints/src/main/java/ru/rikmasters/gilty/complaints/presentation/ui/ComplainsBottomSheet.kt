@@ -12,8 +12,10 @@ import ru.rikmasters.gilty.shared.shared.GradientButton
 
 private enum class ComplainType { LIE, CHEAT, SPAM, OTHER }
 
+enum class ReportsType { USER, MEET }
+
 @Composable
-fun ComplainsContent(meetId: String, send: () -> Unit) {
+fun ComplainsContent(id: String, send: () -> Unit) {
     var tag by remember { mutableStateOf<ComplainType?>(null) }
     if(tag == null) {
         ComplainElements(

@@ -7,8 +7,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.MEET
-import ru.rikmasters.gilty.meetbs.viewmodel.components.UserViewModel
+import ru.rikmasters.gilty.meetbs.viewmodel.components.OrganizerViewModel
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ANONYMOUS_ORGANIZER
@@ -16,11 +15,10 @@ import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 @Composable
-fun UserBs(
-    vm: UserViewModel,
-    old: Pair<String, String>,
-    meetId: String,
+fun OrganizerBs(
+    vm: OrganizerViewModel,
     userId: String,
+    meetId: String,
     nav: NavHostController,
 ) {
     
@@ -30,8 +28,8 @@ fun UserBs(
     
     val meets by vm.userActualMeets.collectAsState()
     val observeState by vm.observe.collectAsState()
-    val profile by vm.profile.collectAsState()
     val meetState by vm.meetType.collectAsState()
+    val profile by vm.profile.collectAsState()
     
     LaunchedEffect(Unit) {
         vm.setUser(userId)
@@ -50,13 +48,6 @@ fun UserBs(
         Modifier, UserState(profileState, meets),
         object: OrganizerCallback {
             
-            override fun hiddenImages() {
-            }
-            
-            override fun onMeetingClick(meet: MeetingModel) {
-                scope.launch { vm.navigate(nav, MEET, meet.id) }
-            }
-            
             override fun profileImage() {
                 scope.launch {
                     globalNav.navigateAbsolute(
@@ -66,15 +57,19 @@ fun UserBs(
                 }
             }
             
-            override fun onBack() {
-                scope.launch {
-                    vm.onBack(old)
-                    nav.popBackStack()
-                }
-            }
-            
             override fun onObserveChange(state: Boolean) {
                 scope.launch { vm.observeUser(state, profile.id) }
+            }
+            
+            override fun onMeetingClick(meet: MeetingModel) {
+                nav.navigate("MEET?meet=${meet.id}")
+            }
+            
+            override fun hiddenImages() {
+            }
+            
+            override fun onBack() {
+                nav.popBackStack()
             }
         }
     )

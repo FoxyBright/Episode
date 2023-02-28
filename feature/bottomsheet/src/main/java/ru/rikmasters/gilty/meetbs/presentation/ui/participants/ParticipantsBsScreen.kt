@@ -6,10 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.USER
 import ru.rikmasters.gilty.meetbs.viewmodel.components.ParticipantsViewModel
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsList
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsListCallback
@@ -20,14 +18,11 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 @Composable
 fun ParticipantsBs(
     vm: ParticipantsViewModel,
-    old: Pair<String, String>,
     meetId: String,
     nav: NavHostController,
 ) {
     
-    val scope = rememberCoroutineScope()
     val memberList by vm.participants.collectAsState()
-    
     val meeting by vm.meet.collectAsState()
     
     LaunchedEffect(Unit) {
@@ -44,16 +39,13 @@ fun ParticipantsBs(
                 object: ParticipantsListCallback {
                     
                     override fun onMemberClick(member: UserModel) {
-                        if(meet.type != ANONYMOUS) scope.launch {
-                            vm.navigate(nav, USER, member.id!!)
-                        }
+                        if(meet.type != ANONYMOUS) nav.navigate(
+                            "USER?user=${member.id}&meet=$meet"
+                        )
                     }
                     
                     override fun onBack() {
-                        scope.launch {
-                            vm.onBack(old)
-                            nav.popBackStack()
-                        }
+                        nav.popBackStack()
                     }
                 }
             )

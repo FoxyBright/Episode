@@ -8,10 +8,10 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.meetbs.presentation.ui.Observe
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.MEET
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.USER
-import ru.rikmasters.gilty.meetbs.viewmodel.ObserveViewModel
+import ru.rikmasters.gilty.meetbs.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.meetbs.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.meetbs.presentation.ui.BsType.USER
+import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
 import ru.rikmasters.gilty.notifications.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
@@ -36,6 +36,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val lastRespond by vm.lastRespond.collectAsState()
     val navState by vm.navBar.collectAsState()
     val ratings by vm.ratings.collectAsState()
+    val alert by vm.alert.collectAsState()
     val blur by vm.blur.collectAsState()
     
     LaunchedEffect(Unit) {
@@ -107,19 +108,32 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             override fun onMeetClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<ObserveViewModel>(vm.scope) {
-                            Observe(it, MEET, meet.id, meet.organizer?.id!!)
+                        Connector<BsViewModel>(vm.scope) {
+                            BottomSheet(
+                                vm = it,
+                                type = MEET,
+                                meetId = meet.id
+                            ) {
+                                launch { vm.alertDismiss(it) }
+                            }
                         }
                     }
                 }
             }
             
             override fun onUserClick(user: UserModel, meet: MeetingModel) {
-                user.id?.let { u ->
-                    scope.launch {
+                scope.launch {
+                    user.id?.let { u ->
                         asm.bottomSheet.expand {
-                            Connector<ObserveViewModel>(vm.scope) {
-                                Observe(it, USER, meet.id, u)
+                            Connector<BsViewModel>(vm.scope) {
+                                BottomSheet(
+                                    vm = it,
+                                    type = USER,
+                                    meetId = meet.id,
+                                    userId = u
+                                ) {
+                                    launch { vm.alertDismiss(it) }
+                                }
                             }
                         }
                     }

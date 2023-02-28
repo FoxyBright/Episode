@@ -117,7 +117,7 @@ interface MeetingBsCallback {
     fun onMeetPlaceClick(meetLocation: LocationModel?) {}
     fun onMemberClick(member: UserModel) {}
     fun onRespond(meetId: String) {}
-    fun onAvatarClick(organizerId: String) {}
+    fun onAvatarClick(organizerId: String, meetId: String) {}
     fun onAllMembersClick(meetId: String) {}
     fun onHiddenPhotoActive(hidden: Boolean) {}
     fun onCommentChange(text: String) {}

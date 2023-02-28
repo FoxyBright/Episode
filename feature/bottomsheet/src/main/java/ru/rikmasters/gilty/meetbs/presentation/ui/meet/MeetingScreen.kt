@@ -9,11 +9,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.complaints.presentation.ui.ReportsType.MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType.*
 import ru.rikmasters.gilty.meetbs.viewmodel.components.MeetingViewModel
 import ru.rikmasters.gilty.shared.common.extentions.shareMeet
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
@@ -25,7 +25,6 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 @Composable
 fun MeetingBs(
     vm: MeetingViewModel,
-    old: Pair<String, String>,
     meetId: String,
     nav: NavHostController,
 ) {
@@ -71,7 +70,7 @@ fun MeetingBs(
                                 0 -> shareMeet(meetId, context)
                                 1 -> vm.leaveMeet(meetId)
                                 2 -> vm.canceledMeet(meetId)
-                                3 -> vm.navigate(nav, REPORTS, meetId)
+                                3 -> nav.navigate("REPORTS?id=$meetId&type=${MEET.name}")
                             }
                         }
                     }
@@ -79,21 +78,25 @@ fun MeetingBs(
                     override fun onRespond(meetId: String) {
                         scope.launch {
                             vm.respondForMeet(meetId)
-                            globalNav.navigateAbsolute("main/reaction?meetId=$meetId")
+                            globalNav.navigateAbsolute(
+                                "main/reaction?meetId=$meetId"
+                            )
                             asm.bottomSheet.collapse()
                         }
                     }
                     
-                    override fun onAvatarClick(organizerId: String) {
-                        if(meet.type != MeetType.ANONYMOUS) scope.launch {
-                            vm.navigate(nav, USER, organizerId)
-                        }
+                    override fun onAvatarClick(
+                        organizerId: String, meetId: String,
+                    ) {
+                        if(meet.type != MeetType.ANONYMOUS) nav.navigate(
+                            "USER?user=$organizerId&meet=$meetId"
+                        )
                     }
                     
                     override fun onMemberClick(member: UserModel) {
-                        if(meet.type != MeetType.ANONYMOUS) scope.launch {
-                            vm.navigate(nav, USER, member.id!!)
-                        }
+                        if(meet.type != MeetType.ANONYMOUS) nav.navigate(
+                            "USER?user=${member.id}&meet=${meet.id}"
+                        )
                     }
                     
                     override fun onMeetPlaceClick(meetLocation: LocationModel?) {
@@ -101,11 +104,11 @@ fun MeetingBs(
                     }
                     
                     override fun onRespondsClick(meet: FullMeetingModel) {
-                        scope.launch { vm.navigate(nav, RESPONDS, meet.id) }
+                        nav.navigate("RESPONDS?meet=${meet.id}")
                     }
                     
                     override fun onAllMembersClick(meetId: String) {
-                        scope.launch { vm.navigate(nav, MEET, meetId) }
+                        nav.navigate("MEET?meet=$meetId")
                     }
                     
                     override fun onHiddenPhotoActive(hidden: Boolean) {
@@ -125,10 +128,7 @@ fun MeetingBs(
                     }
                     
                     override fun onBack() {
-                        scope.launch {
-                            vm.onBack(old)
-                            nav.popBackStack()
-                        }
+                        nav.popBackStack()
                     }
                 }
             )

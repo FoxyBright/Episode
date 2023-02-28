@@ -1,22 +1,16 @@
 package ru.rikmasters.gilty.meetbs.viewmodel.components
 
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.meetbs.presentation.ui.ObserveType
-import ru.rikmasters.gilty.meetbs.viewmodel.ObserveViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
-class UserViewModel(
-    
-    private val observeVm: ObserveViewModel = ObserveViewModel(),
-): ViewModel() {
+class OrganizerViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
@@ -55,18 +49,5 @@ class UserViewModel(
     
     suspend fun observeUser(state: Boolean?) {
         _observe.emit(state ?: false)
-    }
-    
-    suspend fun onBack(old: Pair<String, String>) {
-        observeVm.setUser(old.first)
-        observeVm.setMeeting(old.second)
-    }
-    
-    suspend fun navigate(
-        nav: NavHostController,
-        address: ObserveType,
-        link: String,
-    ) {
-        observeVm.navigate(nav, address, link)
     }
 }
