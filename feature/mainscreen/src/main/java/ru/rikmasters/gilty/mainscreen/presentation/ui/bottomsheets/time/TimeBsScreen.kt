@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.time
+package ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

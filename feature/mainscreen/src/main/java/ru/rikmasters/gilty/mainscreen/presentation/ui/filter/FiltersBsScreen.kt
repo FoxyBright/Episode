@@ -6,12 +6,12 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
-import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
-fun FiltersBs(vm: FiltersViewModel) {
+fun FiltersBs(vm: FiltersBsViewModel) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()

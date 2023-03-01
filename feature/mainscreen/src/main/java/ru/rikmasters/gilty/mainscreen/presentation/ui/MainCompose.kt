@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
+package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -20,10 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.rememberSwipeableCardState
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid.MeetingGridContent
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.swipe.MeetingsListContent
+import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
+import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.rememberSwipeableCardState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCard
 import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY

@@ -3,14 +3,14 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchCallback
 import ru.rikmasters.gilty.shared.common.tagSearch.TagSearchContent
 import ru.rikmasters.gilty.shared.common.tagSearch.TagState
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
-fun TagSearchScreen(vm: FiltersViewModel) {
+fun TagSearchScreen(vm: FiltersBsViewModel) {
     
     val scope = rememberCoroutineScope()
     

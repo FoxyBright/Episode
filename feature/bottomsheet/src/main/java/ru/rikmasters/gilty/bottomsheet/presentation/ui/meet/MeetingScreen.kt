@@ -23,6 +23,7 @@ import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 fun MeetingBs(
     vm: MeetingViewModel,
     meetId: String,
+    detailed: Boolean,
     nav: NavHostController,
 ) {
     
@@ -38,8 +39,6 @@ fun MeetingBs(
     val hidden by vm.hidden.collectAsState()
     val menu by vm.menu.collectAsState()
     
-    // TODO Когда будет готова логика открытия второго BS, открывать для отправки комментария
-    val detailed = false
     val details = if(detailed) Pair(comment, hidden) else null
     val buttonState = meeting?.memberState == IS_ORGANIZER
     val backBut = nav.previousBackStackEntry != null

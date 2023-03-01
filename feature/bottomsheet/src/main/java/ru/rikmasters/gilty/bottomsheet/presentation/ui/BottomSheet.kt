@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType.Companion.BoolType
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,11 +30,11 @@ fun BottomSheet(
     
     NavHost(
         nav, when(type) {
-            REPORTS -> "REPORTS?id={id}&type={type}"
+            MEET, SHORT_MEET -> "MEET?meet={meet}&detailed={detailed}"
             PARTICIPANTS -> "PARTICIPANTS?meet={meet}"
+            REPORTS -> "REPORTS?id={id}&type={type}"
             USER -> "USER?user={user}&meet={meet}"
             RESPONDS -> "RESPONDS?meet={meet}"
-            MEET -> "MEET?meet={meet}"
             OBSERVERS -> "OBSERVERS"
         }
     ) {
@@ -46,24 +47,27 @@ fun BottomSheet(
         composable(
             route = "RESPONDS?meet={meet}",
             listOf(
-                setArg("meet", "$meetId")
+                setStringArg("meet", "$meetId")
             )
         ) {
-            it.GetArg("meet") {
+            it.GetStringArg("meet") {
                 //TODO экран откликов
                 nav.popBackStack()
             }
         }
         
         composable(
-            route = "MEET?meet={meet}",
+            route = "MEET?meet={meet}&detailed={detailed}",
             arguments = listOf(
-                setArg("meet", "$meetId")
+                setStringArg("meet", "$meetId"),
+                setBooleanArg("detailed", type == SHORT_MEET)
             )
         ) { stack ->
-            stack.GetArg("meet") { meet ->
-                Connector<MeetingViewModel>(vm.scope) {
-                    MeetingBs(it, meet, nav)
+            stack.GetStringArg("meet") { meet ->
+                stack.GetBooleanArg("detailed") { detailed ->
+                    Connector<MeetingViewModel>(vm.scope) {
+                        MeetingBs(it, meet, detailed, nav)
+                    }
                 }
             }
         }
@@ -71,12 +75,12 @@ fun BottomSheet(
         composable(
             route = "USER?user={user}&meet={meet}",
             arguments = listOf(
-                setArg("user", "$userId"),
-                setArg("meet", "$meetId")
+                setStringArg("user", "$userId"),
+                setStringArg("meet", "$meetId")
             )
         ) { stack ->
-            stack.GetArg("user") { user ->
-                stack.GetArg("meet") { meet ->
+            stack.GetStringArg("user") { user ->
+                stack.GetStringArg("meet") { meet ->
                     Connector<OrganizerViewModel>(vm.scope) {
                         OrganizerBs(it, user, meet, nav)
                     }
@@ -87,10 +91,10 @@ fun BottomSheet(
         composable(
             route = "PARTICIPANTS?meet={meet}",
             arguments = listOf(
-                setArg("meet", "$meetId")
+                setStringArg("meet", "$meetId")
             )
         ) { stack ->
-            stack.GetArg("meet") { meet ->
+            stack.GetStringArg("meet") { meet ->
                 Connector<ParticipantsViewModel>(vm.scope) {
                     ParticipantsBs(it, meet, nav)
                 }
@@ -100,12 +104,12 @@ fun BottomSheet(
         composable(
             route = "REPORTS?id={id}&type={type}",
             arguments = listOf(
-                setArg("id", "$reportObject"),
-                setArg("type", "$reportType")
+                setStringArg("id", "$reportObject"),
+                setStringArg("type", "$reportType")
             )
         ) { stack ->
-            stack.GetArg("id") { id ->
-                stack.GetArg("type") { type ->
+            stack.GetStringArg("id") { id ->
+                stack.GetStringArg("type") { type ->
                     Connector<ReportsViewModel>(vm.scope) {
                         ReportsBs(it, type, id, nav)
                     }
@@ -117,15 +121,29 @@ fun BottomSheet(
 }
 
 @Composable
-private fun NavBackStackEntry.GetArg(
+private fun NavBackStackEntry.GetStringArg(
     arg: String,
     block: @Composable (String) -> Unit,
 ) = arguments?.getString(arg)?.let { block(it) }
 
-private fun setArg(
+@Composable
+private fun NavBackStackEntry.GetBooleanArg(
+    arg: String,
+    block: @Composable (Boolean) -> Unit,
+) = arguments?.getBoolean(arg)?.let { block(it) }
+
+private fun setStringArg(
     arg: String,
     default: String,
 ) = navArgument(arg) {
-    type = StringType
+    this.type = StringType
+    defaultValue = default
+}
+
+private fun setBooleanArg(
+    arg: String,
+    default: Boolean,
+) = navArgument(arg) {
+    this.type = BoolType
     defaultValue = default
 }

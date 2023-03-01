@@ -1,23 +1,25 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen
+package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
+import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
+import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time.TimeBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar.CalendarBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.meet.MeetBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.time.TimeBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.swipeablecard.SwipeableCardState
-import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
-import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -64,8 +66,8 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onMeetClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<MeetBsViewModel>(vm.scope) {
-                                MeetBs(it, meet.id, (false))
+                            Connector<BsViewModel>(vm.scope) {
+                                BottomSheet(it, MEET, meet.id)
                             }
                         }
                     }
@@ -74,8 +76,8 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onRespond(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<MeetBsViewModel>(vm.scope) {
-                                MeetBs(it, meet.id, (true))
+                            Connector<BsViewModel>(vm.scope) {
+                                BottomSheet(it, SHORT_MEET, meet.id)
                             }
                         }
                     }
@@ -84,7 +86,7 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onOpenFiltersBottomSheet() {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<FiltersViewModel>(vm.scope) {
+                            Connector<FiltersBsViewModel>(vm.scope) {
                                 FiltersBs(it)
                             }
                         }

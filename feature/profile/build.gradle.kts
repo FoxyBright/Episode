@@ -12,6 +12,7 @@ dependencies {
     
     implementation("com.vanniktech:android-image-cropper:4.5.0")
     
+    implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:complaints"))
     implementation(project(":feature:bubbles"))
     

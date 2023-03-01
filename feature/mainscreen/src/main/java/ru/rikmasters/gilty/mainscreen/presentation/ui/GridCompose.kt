@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.grid
+package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

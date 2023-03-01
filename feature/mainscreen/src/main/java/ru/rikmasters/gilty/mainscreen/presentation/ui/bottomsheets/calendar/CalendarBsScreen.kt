@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.main.bottomsheets.calendar
+package ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

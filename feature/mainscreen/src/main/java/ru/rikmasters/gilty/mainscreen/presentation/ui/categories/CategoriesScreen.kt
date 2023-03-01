@@ -3,11 +3,11 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 @Composable
-fun CategoriesScreen(vm: FiltersViewModel) {
+fun CategoriesScreen(vm: FiltersBsViewModel) {
     
     val scope = rememberCoroutineScope()
     

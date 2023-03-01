@@ -1,9 +1,10 @@
-package ru.rikmasters.gilty.mainscreen.viewmodels
+package ru.rikmasters.gilty.mainscreen.viewmodels.bottoms
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.*
@@ -13,7 +14,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @OptIn(FlowPreview::class)
-class FiltersViewModel(
+class FiltersBsViewModel(
     
     val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {

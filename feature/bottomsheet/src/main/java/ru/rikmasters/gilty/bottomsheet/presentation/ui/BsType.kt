@@ -6,5 +6,6 @@ enum class BsType {
     RESPONDS,
     REPORTS,
     USER,
-    MEET
+    MEET,
+    SHORT_MEET
 }

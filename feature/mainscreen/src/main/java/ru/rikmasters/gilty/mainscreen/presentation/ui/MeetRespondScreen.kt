@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.mainscreen.presentation.ui.respond
+package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.runtime.*
 import org.koin.androidx.compose.get

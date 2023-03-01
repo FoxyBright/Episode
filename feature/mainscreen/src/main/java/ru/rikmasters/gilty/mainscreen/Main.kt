@@ -6,13 +6,12 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.respond.MeetRespondScreen
-import ru.rikmasters.gilty.mainscreen.viewmodels.FiltersViewModel
+import ru.rikmasters.gilty.mainscreen.presentation.ui.MainScreen
+import ru.rikmasters.gilty.mainscreen.presentation.ui.MeetRespondScreen
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.RespondsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
-import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.MeetBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.profile.ProfileData
@@ -48,9 +47,8 @@ object Main: FeatureDefinition() {
         scope<MainViewModel> {
             scopedOf(::MainViewModel)
             scopedOf(::CalendarBsViewModel)
-            scopedOf(::MeetBsViewModel)
             scopedOf(::TimeBsViewModel)
-            scopedOf(::FiltersViewModel)
+            scopedOf(::FiltersBsViewModel)
         }
     }
     
