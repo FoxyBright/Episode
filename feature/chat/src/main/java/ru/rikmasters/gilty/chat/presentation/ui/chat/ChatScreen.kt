@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.Manifest.permission.CAMERA
-import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -15,6 +14,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.REPORTS
+import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
@@ -31,11 +34,11 @@ import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import java.io.File
 import java.net.URLEncoder.encode
 
 @Composable
-@SuppressLint("Recycle")
 @OptIn(ExperimentalPermissionsApi::class)
 fun ChatScreen(
     vm: ChatViewModel,
@@ -244,14 +247,26 @@ fun ChatScreen(
                             when(point) {
                                 0 -> vm.changeMeetOutAlert(true)
                                 1 -> asm.bottomSheet.expand {
-                                    //TODO тут BS жалоб
+                                    Connector<BsViewModel> {
+                                        BottomSheet(
+                                            it, REPORTS,
+                                            reportObject = state.meet.id,
+                                            reportType = MEETING
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                     
                     override fun onTopBarClick() {
-                        //TODO тут BS встречи
+                        scope.launch {
+                            asm.bottomSheet.expand {
+                                Connector<BsViewModel> {
+                                    BottomSheet(it, MEET, state.meet.id)
+                                }
+                            }
+                        }
                     }
                     
                     override fun onDownButtonClick() {

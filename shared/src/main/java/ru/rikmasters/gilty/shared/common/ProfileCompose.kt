@@ -116,7 +116,7 @@ fun Profile(
     
     Column(modifier) {
         TopBar(
-            ("${profile?.username}, ${profile?.age}"),
+            (profile?.username ?: ""),
             state.profileType, Modifier,
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)

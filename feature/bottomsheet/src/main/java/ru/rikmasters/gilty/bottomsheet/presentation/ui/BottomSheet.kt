@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
 import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.bottomsheet.viewmodel.components.*
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 
 @Composable
 fun BottomSheet(
@@ -23,7 +24,7 @@ fun BottomSheet(
     type: BsType,
     meetId: String? = null,
     userId: String? = null,
-    reportType: String? = null,
+    reportType: ReportObjectType? = null,
     reportObject: String? = null,
 ) {
     val nav = rememberNavController()
@@ -105,13 +106,13 @@ fun BottomSheet(
             route = "REPORTS?id={id}&type={type}",
             arguments = listOf(
                 setStringArg("id", "$reportObject"),
-                setStringArg("type", "$reportType")
+                setStringArg("type", "${reportType?.name}")
             )
         ) { stack ->
             stack.GetStringArg("id") { id ->
                 stack.GetStringArg("type") { type ->
                     Connector<ReportsViewModel>(vm.scope) {
-                        ReportsBs(it, type, id, nav)
+                        ReportsBs(it, ReportObjectType.valueOf(type), id, nav)
                     }
                 }
             }

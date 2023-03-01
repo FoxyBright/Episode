@@ -6,16 +6,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
-import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.meeting.MeetingBs
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers.ObserversBs
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -129,8 +133,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onHistoryClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet.id)
+                        Connector<BsViewModel>(vm.scope) {
+                            BottomSheet(it, MEET, meet.id)
                         }
                     }
                 }
@@ -139,8 +143,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<MeetingBsViewModel>(vm.scope) {
-                            MeetingBs(it, meet.id)
+                        Connector<BsViewModel>(vm.scope) {
+                            BottomSheet(it, MEET, meet.id)
                         }
                     }
                 }

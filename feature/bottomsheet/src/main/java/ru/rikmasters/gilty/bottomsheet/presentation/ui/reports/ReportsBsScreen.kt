@@ -16,7 +16,7 @@ import ru.rikmasters.gilty.shared.model.report.ReportSubtype
 @Composable
 fun ReportsBs(
     vm: ReportsViewModel,
-    type: String,
+    type: ReportObjectType,
     id: String,
     nav: NavHostController,
 ) {
@@ -31,20 +31,19 @@ fun ReportsBs(
     val alert by vm.alert.collectAsState()
     
     val enabled = selected != null || description.isNotBlank()
-    val objectType = ReportObjectType.valueOf(type)
     
-    LaunchedEffect(Unit) { vm.getReports(objectType) }
+    LaunchedEffect(Unit) { vm.getReports(type) }
     
     Use<ReportsViewModel>(LoadingTrait) {
         ReportsBsContent(
             ReportsBsState(
                 reports, screen, selected,
-                description, objectType, enabled
+                description, type, enabled
             ), Modifier, object: ReportsBsCallback {
                 
                 override fun onSendReport() {
                     scope.launch {
-                        vm.sendReport(id, objectType)
+                        vm.sendReport(id, type)
                         vm.alertDismiss(true)
                     }
                 }
