@@ -29,9 +29,9 @@ sealed interface Report {
 
 class FalseInformation(reportObject: ReportObjectType): Report {
     
-    override val name = "FALSE_INFORMATION"
-    
     override fun map() = FALSE_INFORMATION
+    
+    override val name = map().name
     
     @Composable
     override fun display() = stringResource(R.string.complaints_lie_title)
@@ -42,9 +42,9 @@ class FalseInformation(reportObject: ReportObjectType): Report {
 
 class Spam(reportObject: ReportObjectType): Report {
     
-    override val name = "SPAM"
-    
     override fun map() = SPAM
+    
+    override val name = map().name
     
     @Composable
     override fun display() = stringResource(R.string.complaints_spam_title)
@@ -55,9 +55,9 @@ class Spam(reportObject: ReportObjectType): Report {
 
 class Scam(reportObject: ReportObjectType): Report {
     
-    override val name = "SCAM"
-    
     override fun map() = SCAM
+    
+    override val name = map().name
     
     @Composable
     override fun display() = stringResource(R.string.complaints_cheater_title)
@@ -68,9 +68,9 @@ class Scam(reportObject: ReportObjectType): Report {
 
 class Other(reportObject: ReportObjectType): Report {
     
-    override val name = "OTHER"
-    
     override fun map() = OTHER
+    
+    override val name = map().name
     
     @Composable
     override fun display() = stringResource(R.string.complaints_other)

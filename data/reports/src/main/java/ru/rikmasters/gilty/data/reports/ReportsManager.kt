@@ -6,7 +6,6 @@ class ReportsManager(
     
     private val web: ReportsWebSource,
 ) {
-    
     suspend fun sendReport(report: ReportModel) {
         web.sendReport(
             ReportRequest(

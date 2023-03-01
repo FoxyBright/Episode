@@ -3,13 +3,13 @@ package ru.rikmasters.gilty.notifications
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
+import ru.rikmasters.gilty.bottomsheet.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.MeetingViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.OrganizerViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.ParticipantsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.meetbs.BottomSheet
-import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
-import ru.rikmasters.gilty.meetbs.viewmodel.components.MeetingViewModel
-import ru.rikmasters.gilty.meetbs.viewmodel.components.OrganizerViewModel
-import ru.rikmasters.gilty.meetbs.viewmodel.components.ParticipantsViewModel
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
@@ -26,7 +26,7 @@ object Notifications: FeatureDefinition() {
             }
         }
     }
-
+    
     override fun Module.koin() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
@@ -39,6 +39,7 @@ object Notifications: FeatureDefinition() {
     }
     
     override fun include() = setOf(
-        NotificationData, ProfileData, MeetingsData, BottomSheet
+        NotificationData, ProfileData,
+        MeetingsData, BottomSheet
     )
 }

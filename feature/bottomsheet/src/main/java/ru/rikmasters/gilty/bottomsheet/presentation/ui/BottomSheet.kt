@@ -1,20 +1,20 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui
+package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.*
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBs
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer.OrganizerBs
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.participants.ParticipantsBs
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
+import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.*
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.meetbs.presentation.ui.BsType.*
-import ru.rikmasters.gilty.meetbs.presentation.ui.meet.MeetingBs
-import ru.rikmasters.gilty.meetbs.presentation.ui.organizer.OrganizerBs
-import ru.rikmasters.gilty.meetbs.presentation.ui.participants.ParticipantsBs
-import ru.rikmasters.gilty.meetbs.presentation.ui.reports.ReportsBs
-import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
-import ru.rikmasters.gilty.meetbs.viewmodel.components.*
 
 @Composable
 fun BottomSheet(
@@ -24,13 +24,8 @@ fun BottomSheet(
     userId: String? = null,
     reportType: String? = null,
     reportObject: String? = null,
-    openAlert: ((Boolean) -> Unit)? = null,
 ) {
-    
     val nav = rememberNavController()
-    val alertState by vm.alertState.collectAsState()
-    
-    LaunchedEffect(alertState) { openAlert?.let { it(alertState) } }
     
     NavHost(
         nav, when(type) {

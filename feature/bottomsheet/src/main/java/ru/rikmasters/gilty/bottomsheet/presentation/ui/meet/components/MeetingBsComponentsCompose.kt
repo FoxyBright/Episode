@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.meet.components
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

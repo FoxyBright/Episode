@@ -87,18 +87,12 @@ data class NotificationsState(
     val participants: List<UserModel>,
     val participantsStates: List<Int>,
     val listState: LazyListState,
-    val ratings: List<RatingModel>,
+    val ratings: List<RatingModel>
 )
 
 interface NotificationsCallback {
     
     fun onSwiped(notification: NotificationModel)
-    fun onEmojiClick(
-        notification: NotificationModel,
-        emoji: EmojiModel,
-        userId: String?,
-    )
-    
     fun onMeetClick(meet: MeetingModel)
     fun onUserClick(user: UserModel, meet: MeetingModel)
     fun onRespondsClick()
@@ -106,6 +100,11 @@ interface NotificationsCallback {
     fun onParticipantClick(index: Int)
     fun onNavBarSelect(point: Int)
     fun onListUpdate()
+    fun onEmojiClick(
+        notification: NotificationModel,
+        emoji: EmojiModel,
+        userId: String?,
+    )
 }
 
 @Composable

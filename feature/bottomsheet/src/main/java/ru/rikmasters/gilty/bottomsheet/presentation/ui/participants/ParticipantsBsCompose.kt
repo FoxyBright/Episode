@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.participants
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.participants
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

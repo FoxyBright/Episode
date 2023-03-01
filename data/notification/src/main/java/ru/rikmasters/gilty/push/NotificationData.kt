@@ -15,5 +15,7 @@ object NotificationData: DataDefinition() {
         singleOf(::NotificationManager)
         singleOf(::NotificationPagingSource)
     }
+    
+    
 }
 

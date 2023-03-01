@@ -39,13 +39,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val _blur = MutableStateFlow(false)
     val blur = _blur.asStateFlow()
     
-    private val _alert = MutableStateFlow(false)
-    val alert = _alert.asStateFlow()
-    
-    suspend fun alertDismiss(state:Boolean){
-        _alert.emit(state)
-    }
-    
     override suspend fun forceRefresh() = singleLoading {
         _notifications.emit(notificationManger.getNotification(1))
     }

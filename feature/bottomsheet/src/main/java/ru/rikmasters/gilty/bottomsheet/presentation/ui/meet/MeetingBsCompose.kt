@@ -1,23 +1,31 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.meet
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsTopBarCompose
-import ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsTopBarState
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
 import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.shared.GDropMenu
+import ru.rikmasters.gilty.shared.shared.GKebabButton
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -29,8 +37,9 @@ private fun MeetingBsDetailed() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), DemoFullMeetingModel,
-                    detailed = Pair("", true)
-                ), Modifier.padding(16.dp)
+                    detailed = Pair("", true),
+                    backButton = true,
+                )
             )
         }
     }
@@ -70,7 +79,7 @@ private fun MeetingBsShared() {
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
                     distanceCalculator(meet), (false)
-                ), Modifier.padding(16.dp)
+                )
             )
         }
     }
@@ -94,7 +103,7 @@ private fun MeetingBsWhenUser() {
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
                     distanceCalculator(meet), (true)
-                ), Modifier.padding(16.dp)
+                )
             )
         }
     }
@@ -132,7 +141,21 @@ fun MeetingBsContent(
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback? = null,
 ) {
-    LazyColumn(modifier.background(colorScheme.background)) {
+    LazyColumn(
+        modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+            .padding(horizontal = 16.dp)
+    ) {
+        
+        item {
+            TopBar(
+                state.meet, state.backButton,
+                state.menuState,
+                { callback?.onBack() },
+                { callback?.onKebabClick(it) },
+            ) { callback?.onMenuItemClick(it, state.meet.id) }
+        }
         
         item {
             MeetingBsTopBarCompose(
@@ -157,7 +180,7 @@ fun MeetingBsContent(
             }
             
             item {
-                ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsComment(
+                MeetingBsComment(
                     it.first, state.meet.isOnline,
                     { callback?.onCommentChange(it) },
                     Modifier.padding(top = 22.dp)
@@ -165,7 +188,7 @@ fun MeetingBsContent(
             }
             
             item {
-                ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsHidden(
+                MeetingBsHidden(
                     Modifier.padding(top = 8.dp),
                     it.second, state.meet.isOnline
                 ) { callback?.onHiddenPhotoActive(it) }
@@ -173,14 +196,14 @@ fun MeetingBsContent(
         } ?: run {
             
             item {
-                ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsConditions(
+                MeetingBsConditions(
                     state.meet.map(), Modifier.padding(top = 32.dp)
                 )
             }
             
             state.membersList?.let {
                 item {
-                    ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsParticipants(
+                    MeetingBsParticipants(
                         state.meet, it, Modifier,
                         { callback?.onAllMembersClick(state.meet.id) })
                     { callback?.onMemberClick(it) }
@@ -189,7 +212,7 @@ fun MeetingBsContent(
             
             state.meetDistance?.let {
                 if(!state.meet.isOnline) item {
-                    ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.MeetingBsMap(
+                    MeetingBsMap(
                         state.meet, it,
                         Modifier.padding(top = 28.dp)
                     ) { callback?.onMeetPlaceClick(state.meet.location) }
@@ -199,7 +222,7 @@ fun MeetingBsContent(
         val memberState = state.meet.memberState
         item {
             when(memberState) {
-                RESPOND_SENT -> ru.rikmasters.gilty.meetbs.presentation.ui.meet.components.TextButton(
+                RESPOND_SENT -> TextButton(
                     Modifier, state.meet.isOnline,
                     stringResource(R.string.respond_to_meet)
                 )
@@ -220,8 +243,81 @@ fun MeetingBsContent(
                 ) { callback?.onRespond(state.meet.id) }
             }
         }
-        item {
-            Spacer(Modifier.height(40.dp))
-        }
+        item { Spacer(Modifier.height(40.dp)) }
     }
+}
+
+@Composable
+private fun TopBar(
+    meet: FullMeetingModel,
+    backButton: Boolean,
+    menuState: Boolean,
+    onBack: () -> Unit,
+    onKebabClick: (Boolean) -> Unit,
+    onMenuItemSelect: (Int) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 18.dp),
+        SpaceBetween, CenterVertically
+    ) {
+        Row(
+            Modifier.weight(1f),
+            Start, CenterVertically
+        ) {
+            if(backButton) IconButton(
+                { onBack() },
+                Modifier.padding(end = 16.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_back),
+                    stringResource(R.string.action_bar_button_back),
+                    Modifier, colorScheme.tertiary
+                )
+            }
+            Text(
+                meet.tags.joinToString(separator = ", ")
+                { it.title }, Modifier,
+                colorScheme.tertiary,
+                style = typography.labelLarge,
+                overflow = Ellipsis,
+                maxLines = 1
+            )
+        }
+        Menu(
+            menuState, meet,
+            { onKebabClick(false) },
+        ) { onMenuItemSelect(it) }
+        GKebabButton { onKebabClick(true) }
+    }
+}
+
+@Composable
+private fun Menu(
+    menuState: Boolean,
+    meet: FullMeetingModel,
+    onDismiss: (Boolean) -> Unit,
+    onItemSelect: (Int) -> Unit,
+) {
+    val menuItems = arrayListOf(
+        Pair(stringResource(R.string.meeting_shared_button))
+        { onItemSelect(0) }
+    )
+    if(meet.memberState == IS_MEMBER) menuItems.add(
+        Pair(stringResource(R.string.exit_from_meet))
+        { onItemSelect(1) }
+    )
+    menuItems.add(
+        if(meet.memberState == IS_ORGANIZER)
+            Pair(stringResource(R.string.meeting_canceled))
+            { onItemSelect(2) }
+        else Pair(stringResource(R.string.meeting_complain))
+        { onItemSelect(3) }
+    )
+    GDropMenu(
+        menuState,
+        { onDismiss(false) },
+        menuItem = menuItems.toList()
+    )
 }

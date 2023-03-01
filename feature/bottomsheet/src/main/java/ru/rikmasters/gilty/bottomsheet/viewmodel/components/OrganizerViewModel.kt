@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.viewmodel.components
+package ru.rikmasters.gilty.bottomsheet.viewmodel.components
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +24,26 @@ class OrganizerViewModel: ViewModel() {
     private val _observe = MutableStateFlow(false)
     val observe = _observe.asStateFlow()
     
+    private val _menuState = MutableStateFlow(false)
+    val menuState = _menuState.asStateFlow()
+    
+    private val _isMyProfile = MutableStateFlow(false)
+    val isMyProfile = _isMyProfile.asStateFlow()
+    
     private val _userActualMeets = MutableStateFlow(listOf<MeetingModel>())
     val userActualMeets = _userActualMeets.asStateFlow()
+    
+    suspend fun checkMyProfile(userId: String) {
+        _isMyProfile.emit(
+            profileManager
+                .getProfile()
+                .id == userId
+        )
+    }
+    
+    suspend fun menuDismiss(state: Boolean) {
+        _menuState.emit(state)
+    }
     
     suspend fun getUserActualMeets(userId: String) {
         _userActualMeets.emit(

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.reports
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.reports
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,14 +10,14 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
 @Composable
-private fun ComplainAlertPreview() {
+private fun ReportAlertPreview() {
     GiltyTheme {
-        ComplainAlert(true)
+        ReportAlert(true)
     }
 }
 
 @Composable
-fun ComplainAlert(
+fun ReportAlert(
     state: Boolean,
     onDismiss: (() -> Unit)? = null,
 ) {

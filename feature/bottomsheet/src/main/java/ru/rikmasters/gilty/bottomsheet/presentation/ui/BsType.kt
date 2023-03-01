@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui
+package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
 enum class BsType {
     PARTICIPANTS,

@@ -59,7 +59,7 @@ private fun OrganizerProfilePreview() {
                 ProfileState(
                     DemoProfileModel,
                     profileType = ORGANIZER
-                )
+                ), Modifier.padding(16.dp)
             )
         }
     }
@@ -78,7 +78,7 @@ private fun UserProfilePreview() {
                 ProfileState(
                     DemoProfileModel,
                     profileType = USERPROFILE
-                )
+                ), Modifier.padding(16.dp)
             )
         }
     }
@@ -116,9 +116,8 @@ fun Profile(
     
     Column(modifier) {
         TopBar(
-            (profile?.username ?: ""),
+            ("${profile?.username}, ${profile?.age}"),
             state.profileType, Modifier,
-            { callback?.onBack() }
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
@@ -187,50 +186,35 @@ private fun TopBar(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
-    Row(modifier) {
-        if(profileType == ORGANIZER
-            || profileType == ANONYMOUS_ORGANIZER
-        ) IconButton(
-            onBack, Modifier.padding(
-                top = 6.dp, end = 16.dp
-            )
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_back),
-                stringResource(R.string.action_bar_button_back),
-                Modifier, colorScheme.tertiary
-            )
-        }
-        TextField(
-            text, onTextChange,
-            Modifier
-                .offset((-16).dp)
-                .fillMaxWidth(),
-            colors = transparentTextFieldColors(),
-            textStyle = typography.headlineLarge,
-            placeholder = {
-                Row(Modifier, Center, CenterVertically) {
-                    Text(
-                        stringResource(R.string.user_name),
-                        Modifier.padding(end = 8.dp),
-                        colorScheme.onTertiary,
-                        style = typography.headlineLarge
-                    )
-                    Icon(
-                        painterResource(R.drawable.ic_edit),
-                        (null), Modifier.padding(top = 4.dp),
-                        colorScheme.onTertiary
-                    )
-                }
-            },
-            readOnly = profileType == ORGANIZER
-                    || profileType == ANONYMOUS_ORGANIZER,
-            singleLine = true,
-        )
-    }
+    if(
+        profileType != ORGANIZER
+        && profileType != ANONYMOUS_ORGANIZER
+    ) TextField(
+        text, onTextChange,
+        modifier
+            .offset((-16).dp)
+            .fillMaxWidth(),
+        colors = transparentTextFieldColors(),
+        textStyle = typography.headlineLarge,
+        placeholder = {
+            Row(Modifier, Center, CenterVertically) {
+                Text(
+                    stringResource(R.string.user_name),
+                    Modifier.padding(end = 8.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineLarge
+                )
+                Icon(
+                    painterResource(R.drawable.ic_edit),
+                    (null), Modifier.padding(top = 4.dp),
+                    colorScheme.onTertiary
+                )
+            }
+        },
+        singleLine = true,
+    )
 }
 
 @Composable

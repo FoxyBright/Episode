@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.meet.components
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,11 +7,12 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -20,14 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.meetbs.presentation.ui.meet.MeetingBsCallback
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBsCallback
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.Responds
@@ -35,13 +35,12 @@ import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
-import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
-import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
 import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
-import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.shared.BrieflyRow
+import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -74,7 +73,7 @@ private fun MeetingBsTopBarOnlinePreview() {
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
                     DemoFullMeetingModel.copy(isOnline = true),
-                    (false)
+                    (false), backButton = true
                 )
             )
         }
@@ -99,34 +98,6 @@ fun MeetingBsTopBarCompose(
 ) {
     val org = state.meet.organizer
     Column(modifier) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            SpaceBetween, CenterVertically
-        ) {
-            Row(Modifier, Start, CenterVertically) {
-                if(state.backButton) IconButton(
-                    { callback?.onBack() },
-                    Modifier.padding(end = 16.dp)
-                ) {
-                    Icon(
-                        painterResource(R.drawable.ic_back),
-                        stringResource(R.string.action_bar_button_back),
-                        Modifier, colorScheme.tertiary
-                    )
-                }
-                Text(
-                    state.meet.tags.joinToString(separator = ", ")
-                    { it.title }, Modifier, colorScheme.tertiary,
-                    style = typography.labelLarge
-                )
-            }
-            Menu(state.menuState, state.meet, {
-                callback?.onKebabClick(it)
-            }) { callback?.onMenuItemClick(it, state.meet.id) }
-            GKebabButton { callback?.onKebabClick(true) }
-        }
         if(state.responds) Responds(
             stringResource(R.string.profile_responds_label),
             state.respondsCount,
@@ -171,35 +142,6 @@ fun MeetingBsTopBarCompose(
             )
         }
     }
-}
-
-@Composable
-private fun Menu(
-    menuState: Boolean,
-    meet: FullMeetingModel,
-    onDismiss: (Boolean) -> Unit,
-    onItemSelect: (Int) -> Unit,
-) {
-    val menuItems = arrayListOf(
-        Pair(stringResource(R.string.meeting_shared_button))
-        { onItemSelect(0) }
-    )
-    if(meet.memberState == IS_MEMBER) menuItems.add(
-        Pair(stringResource(R.string.exit_from_meet))
-        { onItemSelect(1) }
-    )
-    menuItems.add(
-        if(meet.memberState == IS_ORGANIZER)
-            Pair(stringResource(R.string.meeting_canceled))
-            { onItemSelect(2) }
-        else Pair(stringResource(R.string.meeting_complain))
-        { onItemSelect(3) }
-    )
-    GDropMenu(
-        menuState,
-        { onDismiss(false) },
-        menuItem = menuItems.toList()
-    )
 }
 
 @Composable

@@ -32,7 +32,7 @@ fun GDropMenu(
     ) {
         menuItem.forEach {
             DropdownMenuItem(
-                { menuItem(it.first) },
+                { MenuItem(it.first) },
                 { it.second.invoke() }
             )
         }
@@ -40,7 +40,7 @@ fun GDropMenu(
 }
 
 @Composable
-private fun menuItem(
+private fun MenuItem(
     text: String,
     modifier: Modifier = Modifier
 ) {

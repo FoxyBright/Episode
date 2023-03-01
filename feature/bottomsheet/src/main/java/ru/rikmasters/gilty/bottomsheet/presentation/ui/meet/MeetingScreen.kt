@@ -1,19 +1,16 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.meet
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.MeetingViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.meetbs.viewmodel.components.MeetingViewModel
 import ru.rikmasters.gilty.shared.common.extentions.shareMeet
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
@@ -43,10 +40,9 @@ fun MeetingBs(
     
     // TODO Когда будет готова логика открытия второго BS, открывать для отправки комментария
     val detailed = false
-    
     val details = if(detailed) Pair(comment, hidden) else null
     val buttonState = meeting?.memberState == IS_ORGANIZER
-    val backBut = !nav.backQueue.isEmpty()
+    val backBut = nav.previousBackStackEntry != null
     
     LaunchedEffect(Unit) {
         vm.drawMeet(meetId)
@@ -59,10 +55,7 @@ fun MeetingBs(
                 MeetingBsState(
                     menu, meet, memberList, distance,
                     buttonState, details, backBut
-                ), Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                object: MeetingBsCallback {
+                ), Modifier, object: MeetingBsCallback {
                     
                     override fun onMenuItemClick(index: Int, meetId: String) {
                         scope.launch {

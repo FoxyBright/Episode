@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.meetbs.presentation.ui.participants
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.participants
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -6,9 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import ru.rikmasters.gilty.bottomsheet.viewmodel.components.ParticipantsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.meetbs.viewmodel.components.ParticipantsViewModel
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsList
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsListCallback
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
