@@ -9,7 +9,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.complaints.presentation.ui.ReportsType.MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
@@ -21,6 +20,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 
 @Composable
 fun MeetingBs(
@@ -70,7 +70,9 @@ fun MeetingBs(
                                 0 -> shareMeet(meetId, context)
                                 1 -> vm.leaveMeet(meetId)
                                 2 -> vm.canceledMeet(meetId)
-                                3 -> nav.navigate("REPORTS?id=$meetId&type=${MEET.name}")
+                                3 -> nav.navigate(
+                                    "REPORTS?id=$meetId&type=${MEETING.name}"
+                                )
                             }
                         }
                     }

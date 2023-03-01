@@ -4,12 +4,13 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.data.reports.ReportsData
 import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
 import ru.rikmasters.gilty.meetbs.viewmodel.components.*
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.profile.ProfileData
 
-object Observe: FeatureDefinition() {
+object BottomSheet: FeatureDefinition() {
     
     override fun DeepNavGraphBuilder.navigation() {
     }
@@ -22,5 +23,7 @@ object Observe: FeatureDefinition() {
         singleOf(::ReportsViewModel)
     }
     
-    override fun include() = setOf(ProfileData, MeetingsData)
+    override fun include() = setOf(
+        ProfileData, MeetingsData, ReportsData
+    )
 }

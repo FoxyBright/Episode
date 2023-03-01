@@ -240,6 +240,7 @@
 
     <!-- Complaints -->
     <string name="complaints_title">Пожаловаться</string>
+    <string name="complaints_other">Другое</string>
     <string name="complaints_lie_title">Ложная информация</string>
     <string name="complaints_spam_title">Это спам</string>
     <string name="complaints_cheater_title">Мошенничество или обман</string>

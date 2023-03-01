@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.complaints.presentation.ui
+package ru.rikmasters.gilty.meetbs.presentation.ui.reports
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

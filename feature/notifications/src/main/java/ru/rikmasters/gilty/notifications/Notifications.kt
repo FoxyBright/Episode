@@ -5,7 +5,7 @@ import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.meetbs.Observe
+import ru.rikmasters.gilty.meetbs.BottomSheet
 import ru.rikmasters.gilty.meetbs.viewmodel.BsViewModel
 import ru.rikmasters.gilty.meetbs.viewmodel.components.MeetingViewModel
 import ru.rikmasters.gilty.meetbs.viewmodel.components.OrganizerViewModel
@@ -39,6 +39,6 @@ object Notifications: FeatureDefinition() {
     }
     
     override fun include() = setOf(
-        NotificationData, ProfileData, MeetingsData, Observe
+        NotificationData, ProfileData, MeetingsData, BottomSheet
     )
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
@@ -21,12 +22,12 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.MessengerBarCallback
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
-import ru.rikmasters.gilty.complaints.presentation.ui.MeetOutAlert
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 data class ChatState(
@@ -112,15 +113,20 @@ fun ChatContent(
         }
     )
     
-    ComplainAlert(
-        state.alert,
-        Modifier.padding(16.dp)
-    ) { callback?.closeAlert() }
+    ComplainAlert(state.alert)
+    { callback?.closeAlert() }
     
-    MeetOutAlert(
-        state.meetAlert,
-        { callback?.onMeetOut() })
-    { callback?.onMeetOutAlertDismiss() }
+    GAlert(
+        show = state.meetAlert,
+        modifier = Modifier,
+        onDismissRequest = { callback?.onMeetOutAlertDismiss() },
+        success = Pair(stringResource(out_button))
+        { callback?.onMeetOut() },
+        title = (stringResource(exit_from_meet) + "?"),
+        label = stringResource(exit_from_meet_label),
+        cancel = Pair(stringResource(cancel_button))
+        { callback?.onMeetOutAlertDismiss() }
+    )
 }
 
 @Composable
