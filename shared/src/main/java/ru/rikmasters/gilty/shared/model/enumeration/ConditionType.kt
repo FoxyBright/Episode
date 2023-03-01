@@ -9,8 +9,7 @@ enum class ConditionType {
     FREE,
     DIVIDE,
     ORGANIZER_PAY,
-    MEMBER_PAY,
-    NO_MATTER;
+    MEMBER_PAY;
     
     companion object {
         
@@ -26,7 +25,6 @@ enum class ConditionType {
                 DIVIDE -> condition_divide
                 ORGANIZER_PAY -> condition_organizer_pay
                 MEMBER_PAY -> meeting_filter_select_meeting_type_paid
-                NO_MATTER -> condition_no_matter
             }
         )
 }
