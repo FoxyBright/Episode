@@ -66,7 +66,6 @@ class MeetingManager(
     
     @Suppress("unused")
     suspend fun addNewTag(tag: String) = web.addNewTag(tag)
-    suspend fun getUserCategories() = web.getUserCategories()
     suspend fun getPopularTags(list: List<String?>) = web.getPopularTags(list)
     suspend fun getUserActualMeets(userId: String) = web.getUserActualMeets(userId)
     suspend fun getDetailedMeet(meetId: String) = web.getDetailedMeet(meetId)

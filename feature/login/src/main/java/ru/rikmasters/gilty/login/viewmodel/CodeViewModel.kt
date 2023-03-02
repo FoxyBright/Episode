@@ -99,8 +99,8 @@ class CodeViewModel(
         authManager.onOtpAuthentication(code)
     }
     
-    suspend fun isUserRegistered(): Boolean {
-        return regManager.isUserRegistered().first
+    suspend fun profileCompleted(): Boolean {
+        return regManager.profileCompleted()
     }
     
     suspend fun onBlur(state: Boolean) {

@@ -219,7 +219,7 @@ private fun Image(
         PRIVATE_PHOTO -> {
             val hide = message.message?.attachments
             val access = if(hide.isNullOrEmpty()) false
-            else hide.first().file.hasAccess
+            else hide.first().file?.hasAccess
             HiddenImageMessage(
                 Modifier, message, sender, access, shape
             ) { callback?.onHiddenClick(message) }

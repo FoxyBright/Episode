@@ -52,7 +52,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun getLastResponse() = singleLoading {
-        val user = profileManager.getProfile()
+        val user = profileManager.getProfile(false)
         _lastRespond.emit(
             Pair(
                 user.respondsCount ?: 0,

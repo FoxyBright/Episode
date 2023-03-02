@@ -14,10 +14,12 @@ class HiddenBsViewModel(
     
     private val profileManager by inject<ProfileManager>()
     
-    private val _images = MutableStateFlow(emptyList<AvatarModel>())
-    val images = _images.asStateFlow()
+    val images by lazy {
+        profileManager.hiddenFlow.state(emptyList())
+    }
     
-    private val _selected = MutableStateFlow(emptyList<AvatarModel>())
+    private val _selected =
+        MutableStateFlow(emptyList<AvatarModel>())
     val selected = _selected.asStateFlow()
     
     suspend fun sendImages(chatId: String) {
@@ -45,9 +47,7 @@ class HiddenBsViewModel(
         _selected.emit(emptyList())
     }
     
-    suspend fun getImages() = singleLoading {
-        _images.emit(
-            profileManager.getProfileHiddens()
-        )
+    suspend fun getImages(forceWeb: Boolean) = singleLoading {
+        profileManager.getProfileHiddens(forceWeb)
     }
 }

@@ -24,6 +24,6 @@ object BottomSheet: FeatureDefinition() {
     }
     
     override fun include() = setOf(
-        ProfileData, MeetingsData, ReportsData
+        ProfileData, MeetingsData, ReportsData,
     )
 }

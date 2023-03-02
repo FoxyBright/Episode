@@ -34,14 +34,14 @@ object Login: FeatureDefinition() {
     private val authEntrypointResolver = EntrypointResolver {
         if(
             authManager.isAuthorized() &&
-            regManager.isUserRegistered().first
+            regManager.profileCompleted()
         ) "main/meetings"
         else "login"
     }
     
     override fun DeepNavGraphBuilder.navigation() {
         
-        screen<LoginViewModel>("login") { vm, r ->
+        screen<LoginViewModel>("login") { vm, _ ->
             LoginScreen(vm)
         }
         

@@ -15,11 +15,12 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
     val nav = get<NavState>()
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
-    val photoList by vm.photoList.collectAsState()
+    val photoList by vm.images.collectAsState()
     
     LaunchedEffect(Unit) {
-        vm.uploadPhotoList()
+        vm.uploadPhotoList(false)
     }
+    
     HiddenBsContent(
         photoList, Modifier,
         object: HiddenBsCallback {
@@ -31,15 +32,16 @@ fun HiddenBsScreen(vm: HiddenBsViewModel) {
                 }
             }
             
-            override fun onDeleteImage(image: AvatarModel) {
-                scope.launch { vm.deleteImage(image) }
-            }
-            
             override fun openGallery() {
                 scope.launch {
                     asm.bottomSheet.collapse()
                     nav.navigate("gallery?multi=true")
                 }
             }
-        })
+    
+            override fun onDeleteImage(image: AvatarModel) {
+                scope.launch { vm.deleteImage(image.id) }
+            }
+        }
+    )
 }

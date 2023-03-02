@@ -1,8 +1,7 @@
-package ru.rikmasters.gilty.shared.models
+package ru.rikmasters.gilty.shared.models.meets
 
 import android.graphics.Color.parseColor
 import androidx.compose.ui.graphics.Color
-import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.categoryIcon
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
@@ -17,7 +16,7 @@ data class Category(
     val iconType: String,
     
     val children: List<Category>? = null,
-): DomainEntity {
+) {
     
     fun map() = CategoryModel(
         id = id,

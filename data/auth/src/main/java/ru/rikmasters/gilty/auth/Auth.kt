@@ -14,11 +14,13 @@ import ru.rikmasters.gilty.core.module.DataDefinition
 import ru.rikmasters.gilty.data.ktor.TokenManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.ProfileWebSource
+import ru.rikmasters.gilty.shared.models.Profile
 
 object Auth: DataDefinition() {
     
     override fun EntitiesBuilder.entities() {
         entity<AuthSaga>()
+        entity<Profile>()
         entity(Tokens::class) {
             web(TokensResponse::class)
         }

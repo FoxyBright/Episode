@@ -7,7 +7,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
-import ru.rikmasters.gilty.shared.models.Category
 import ru.rikmasters.gilty.shared.models.User
 
 data class MainMeetResponse(

@@ -68,21 +68,14 @@ class SettingsViewModel: ViewModel() {
         _age.emit("$age")
     }
     
-    suspend fun getUserData(
-        gender: String,
-        age: String,
-        orientation: Pair<String, String>,
-        phone: String,
-    ) = singleLoading {
-        _gender.emit(GenderType.valueOf(gender))
-        _age.emit(age)
-        _orientation.emit(
-            OrientationModel(
-                orientation.first,
-                orientation.second
-            )
-        )
-        _phone.emit(phone)
+    suspend fun getUserData() = singleLoading {
+        val profile = profileManager
+            .getProfile(false)
+        
+        _gender.emit(profile.gender)
+        _age.emit("${profile.age}")
+        _orientation.emit(profile.orientation)
+        _phone.emit("${profile.phone}")
     }
     
     suspend fun getOrientations() = singleLoading {
@@ -95,9 +88,9 @@ class SettingsViewModel: ViewModel() {
         makeToast("Ваш аккаунт был удален!")
     }
     
-    suspend fun changePhone() = singleLoading {}
-    
     suspend fun logout() = singleLoading {
+        profileManager.clearProfile()
         authManager.logout()
+        makeToast("До новых Meet!")
     }
 }

@@ -87,10 +87,8 @@ class GalleryViewModel: ViewModel() {
     }
     
     suspend fun attach() {
-        try {
-            regManager.setHidden(selected.value.map(::File))
-        } catch(e: Exception) {
-            logE(e.toString())
-        }
+        regManager.addHidden(
+            selected.value.map(::File)
+        )
     }
 }

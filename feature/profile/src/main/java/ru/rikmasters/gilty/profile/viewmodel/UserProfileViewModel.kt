@@ -7,8 +7,8 @@ import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.ACTUAL
-import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType.HISTORY
+import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
+import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -20,8 +20,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
-    
-    private suspend fun getUserProfile() = profileManager.getProfile()
     
     private val profileModel = ProfileModel.empty
     
@@ -77,7 +75,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         _navBar.emit(states)
     }
     
-    suspend fun photoAlertDismiss(state: Boolean){
+    suspend fun photoAlertDismiss(state: Boolean) {
         _photoAlertState.emit(state)
     }
     
@@ -128,17 +126,17 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         )
     }
     
-    private suspend fun getUserMeets() {
-        _meets.emit(profileManager.getUserMeets(ACTUAL))
-        _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
+    private suspend fun getUserMeets(forceWeb: Boolean) {
+        _meets.emit(profileManager.getUserMeets(forceWeb, ACTUAL))
+        _meetsHistory.emit(profileManager.getUserMeets(forceWeb, HISTORY))
     }
     
     override suspend fun forceRefresh() {
-        setUserDate()
+        setUserDate(true)
     }
     
-    suspend fun setUserDate() = singleLoading {
-        val user = getUserProfile()
+    suspend fun setUserDate(forceWeb: Boolean) = singleLoading {
+        val user = profileManager.getProfile(forceWeb)
         _age.emit(user.age)
         _username.emit("${user.username}, ${user.age}")
         _description.emit(user.aboutMe ?: "")
@@ -149,7 +147,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
                 aboutMe = description.value
             )
         )
-        getUserMeets()
+        getUserMeets(forceWeb)
     }
     
     suspend fun changeUsername(name: String) {

@@ -29,7 +29,7 @@ fun HiddenBs(
     
     LaunchedEffect(Unit) {
         vm.clearSelect()
-        vm.getImages()
+        vm.getImages(false)
     }
     
     Use<HiddenBsViewModel>(LoadingTrait) {

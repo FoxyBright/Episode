@@ -5,8 +5,7 @@ import ru.rikmasters.gilty.core.data.source.*
 class TokenStore(
     
     private val primarySource: DbSource,
-    
-    ): Source {
+): Source {
     
     suspend fun deleteTokens() {
         primarySource.deleteAll<Tokens>()

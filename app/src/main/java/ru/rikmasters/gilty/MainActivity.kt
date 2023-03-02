@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
@@ -64,16 +63,14 @@ class MainActivity: ComponentActivity() {
             )
             
             LaunchedEffect(Unit) {
-                if(authManager.isAuthorized()) {
-                    val isRegistered =
-                        MutableStateFlow(regManager.isUserRegistered())
-                    
-                    if(isRegistered.value.first) {
-                        authManager.savePushToken(token)
-                        isRegistered.value.second?.let { userId ->
-                            chatManager.connect(userId)
-                        }
-                    }
+                if(
+                    authManager.isAuthorized()
+                    && regManager.profileCompleted()
+                ) {
+                    authManager.savePushToken(token)
+                    chatManager.connect(
+                        regManager.userId()
+                    )
                 }
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }

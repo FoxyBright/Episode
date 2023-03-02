@@ -44,7 +44,7 @@ class PersonalViewModel: ViewModel() {
             logE(e.toString())
         }
         try {
-            regManager.setHidden(ListHidden.map(::File))
+            regManager.addHidden(ListHidden.map(::File))
         } catch(e: Exception) {
             logE(e.toString())
         }

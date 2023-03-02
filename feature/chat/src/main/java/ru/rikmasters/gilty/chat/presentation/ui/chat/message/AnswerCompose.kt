@@ -101,7 +101,7 @@ fun AnswerContent(
         val attach = message.message?.attachments
         if(!attach.isNullOrEmpty()) {
             AsyncImage(
-                attach.last().file.thumbnail.url,
+                attach.last().file?.thumbnail?.url,
                 (null), Modifier
                     .padding(start = 8.dp)
                     .size(38.dp)

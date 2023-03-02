@@ -72,13 +72,19 @@ fun CodeContent(
     modifier: Modifier = Modifier,
     callback: CodeCallback? = null,
 ) {
-    Box(modifier.background(colorScheme.background)) {
-        Column(Modifier.fillMaxSize(), Top, CenterHorizontally) {
+    Box(
+        modifier.background(
+            colorScheme.background
+        )
+    ) {
+        Column(
+            Modifier.fillMaxSize(),
+            Top, CenterHorizontally
+        ) {
             ActionBar(
-                stringResource(R.string.confirm_number_title), Modifier,
-                stringResource(R.string.confirm_number_subtitle)
+                title = stringResource(R.string.confirm_number_title),
+                details = stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
-            
             Image(
                 painterResource(
                     if(isSystemInDarkTheme())
@@ -91,33 +97,50 @@ fun CodeContent(
                     .padding(top = 58.dp, bottom = 36.dp)
             )
             DigitCode(
-                Modifier.padding(5.dp), state.code, state.focuses
-            )
-            { index, it -> callback?.onCodeChange(index, it) }
-            ButtonTimer(Modifier.padding(top = 20.dp), state.sec)
-            { callback?.onCodeSend() }
+                Modifier.padding(5.dp),
+                state.code, state.focuses
+            ) { index, it ->
+                callback?.onCodeChange(index, it)
+            }
+            ButtonTimer(
+                Modifier.padding(top = 20.dp),
+                state.sec
+            ) { callback?.onCodeSend() }
         }
     }
-    if(state.blur)
-        BackBlur(
+    if(state.blur) BadCode {
+        callback?.onBlur()
+    }
+}
+
+@Composable
+private fun BadCode(
+    onClick: () -> Unit,
+) {
+    BackBlur(
+        Modifier.clickable {
+            onClick()
+        }
+    ) {
+        Column(
             Modifier
                 .fillMaxSize()
-                .clickable { callback?.onBlur() }
+                .align(Center),
+            Top, CenterHorizontally
         ) {
-            Column(
-                Modifier.align(Center),
-                horizontalAlignment = CenterHorizontally
-            ) {
-                GEmojiImage(badEmoji, Modifier.size(40.dp))
-                Text(
-                    stringResource(R.string.code_is_bad_code_notification),
-                    Modifier.padding(top = 16.dp),
-                    colorScheme.tertiary,
-                    style = typography.bodyMedium,
-                    fontWeight = SemiBold
-                )
-            }
+            GEmojiImage(
+                badEmoji,
+                Modifier.size(40.dp)
+            )
+            Text(
+                stringResource(R.string.code_is_bad_code_notification),
+                Modifier.padding(top = 16.dp),
+                colorScheme.tertiary,
+                style = typography.bodyMedium,
+                fontWeight = SemiBold
+            )
         }
+    }
 }
 
 @Composable
@@ -163,7 +186,9 @@ private fun ButtonTimer(
         Center
     ) {
         if(sec > 0) Text(
-            "${stringResource(R.string.call_again_timer)} $sec сек",
+            "${
+                stringResource(R.string.call_again_timer)
+            } $sec сек",
             Modifier.padding(6.dp),
             colorScheme.primary,
             style = typography.bodyMedium,

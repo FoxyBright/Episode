@@ -8,7 +8,9 @@ import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
-import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.Location
+import ru.rikmasters.gilty.shared.models.Requirement
+import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -132,7 +134,7 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/users/$userId/meetings"
-        ).wrapped<List<MeetingResponse>>().map { it.map() }
+        ).wrapped<List<Meeting>>().map { it.map() }
     }
     
     suspend fun getDetailedMeet(
@@ -226,13 +228,6 @@ class MeetingWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/categories"
-        ).wrapped<List<Category>>().map { it.map() }
-    }
-    
-    suspend fun getUserCategories(): List<CategoryModel> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/profile/categories"
         ).wrapped<List<Category>>().map { it.map() }
     }
     

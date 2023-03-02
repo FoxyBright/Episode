@@ -19,7 +19,7 @@ data class ProfileModel(
     val aboutMe: String?,
     val rating: RatingModel,
     val avatar: AvatarModel? = null,
-    val thumbnail: ThumbnailModel,
+    val thumbnail: ThumbnailModel? = null,
     val isCompleted: Boolean,
     val subscriptionExpiredAt: String?,
     val respondsCount: Int?,

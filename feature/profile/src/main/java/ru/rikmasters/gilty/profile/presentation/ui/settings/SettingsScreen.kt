@@ -25,25 +25,18 @@ import ru.rikmasters.gilty.shared.common.extentions.Permissions.Companion.openNo
 
 
 @Composable
-fun SettingsScreen(
-    vm: SettingsViewModel,
-    userGender: String,
-    userAge: String,
-    userOrientation: Pair<String, String>,
-    userPhone: String,
-) {
+fun SettingsScreen(vm: SettingsViewModel) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
     
-    val deleteAlert by vm.deleteAlert.collectAsState()
-    val exitAlert by vm.exitAlert.collectAsState()
-    
     val orientation by vm.orientation.collectAsState()
     val orientationList by vm.orientations.collectAsState()
     val notification by vm.notifications.collectAsState()
+    val deleteAlert by vm.deleteAlert.collectAsState()
+    val exitAlert by vm.exitAlert.collectAsState()
     val gender by vm.gender.collectAsState()
     val phone by vm.phone.collectAsState()
     val age by vm.age.collectAsState()
@@ -52,36 +45,31 @@ fun SettingsScreen(
         FirebaseMessagingService.NOTIFICATION_SERVICE
     ) as NotificationManager
     
+    fun checkNotification() {
+        scope.launch { vm.setNotification(nm.areNotificationsEnabled()) }
+    }
+    
     val launcher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
             openNotificationSettings(context)
-            scope.launch {
-                vm.setNotification(
-                    nm.areNotificationsEnabled()
-                )
-            }
+            checkNotification()
         }
     
     LaunchedEffect(Unit) {
-        vm.setNotification(nm.areNotificationsEnabled())
-        vm.getUserData(
-            userGender, userAge,
-            userOrientation, userPhone
-        )
+        checkNotification()
+        vm.getUserData()
         vm.getOrientations()
     }
     
-    val state = SettingsState(
-        gender, age, orientation,
-        phone, notification,
-        exitAlert, deleteAlert
-    )
-    
     Use<SettingsViewModel>(LoadingTrait) {
         SettingsContent(
-            state, Modifier, object: SettingsCallback {
+            SettingsState(
+                gender, age, orientation,
+                phone, notification,
+                exitAlert, deleteAlert
+            ), Modifier, object: SettingsCallback {
                 
                 override fun onGenderClick() {
                     scope.launch {
@@ -136,18 +124,6 @@ fun SettingsScreen(
                     }
                 }
                 
-                override fun onExit() {
-                    scope.launch { vm.exitAlertDismiss(true) }
-                }
-                
-                override fun onDelete() {
-                    scope.launch { vm.deleteAlertDismiss(true) }
-                }
-                
-                override fun onExitDismiss() {
-                    scope.launch { vm.exitAlertDismiss(false) }
-                }
-                
                 override fun onExitSuccess() {
                     scope.launch {
                         vm.exitAlertDismiss(false)
@@ -172,8 +148,20 @@ fun SettingsScreen(
                     scope.launch { vm.deleteAlertDismiss(false) }
                 }
                 
+                override fun onDelete() {
+                    scope.launch { vm.deleteAlertDismiss(true) }
+                }
+                
+                override fun onExitDismiss() {
+                    scope.launch { vm.exitAlertDismiss(false) }
+                }
+                
+                override fun onExit() {
+                    scope.launch { vm.exitAlertDismiss(true) }
+                }
+                
                 override fun onPhoneClick() {
-                    scope.launch { vm.changePhone() }
+                    // TODO функционал пока не существует
                 }
                 
                 override fun editCategories() {

@@ -208,7 +208,7 @@ fun ChatScreen(
                             message.message?.attachments!!.first().file
                         
                         nav.navigate(
-                            "photo?type2&image=${encode(attach.url, "utf-8")}"
+                            "photo?type2&image=${encode(attach?.url, "utf-8")}"
                         )
                     }
                     

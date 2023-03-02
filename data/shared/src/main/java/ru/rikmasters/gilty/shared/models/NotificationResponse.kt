@@ -7,7 +7,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
-import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
+import ru.rikmasters.gilty.shared.models.meets.Meeting
 
 data class NotificationResponse(
     val id: String,
@@ -91,7 +91,7 @@ data class FileResponse(
 }
 
 data class ParentNotificationResponse(
-    val meeting: MeetingResponse? = null,
+    val meeting: Meeting? = null,
     val file: FileResponse? = null,
     val notification: ShortNotification? = null,
     val user: User? = null,

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.models
 
+import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
@@ -14,7 +15,7 @@ data class ProfileRequest(
     val aboutMe: String? = null,
 )
 
-data class ProfileResponse(
+data class Profile(
     val id: String,
     val phone: String? = null,
     val username: String? = null,
@@ -23,10 +24,10 @@ data class ProfileResponse(
     val age: Int? = null,
     val aboutMe: String? = null,
     val emojiType: String? = null,
-    val average: String? = null,
+    val average: Double? = null,
     val avatar: Avatar? = null,
     val subscriptionExpiredAt: String? = null,
-    val thumbnail: Thumbnail,
+    val thumbnail: Thumbnail? = null,
     val responds: Responds? = null,
     val albumPrivate: Album? = null,
     val countWatchers: Int? = null,
@@ -37,7 +38,7 @@ data class ProfileResponse(
     val isOnline: Boolean? = null,
     val isAnonymous: Boolean? = null,
     val status: String? = null,
-) {
+): DomainEntity {
     
     fun map() = ProfileModel(
         id = id,
@@ -52,11 +53,11 @@ data class ProfileResponse(
         age = age ?: 0,
         aboutMe = aboutMe,
         rating = RatingModel(
-            average = average ?: "0.0",
+            average = average?.let { "$it" } ?: "0.0",
             emoji = getEmoji(emojiType.toString())
         ),
         avatar = avatar?.map(),
-        thumbnail = thumbnail.map(),
+        thumbnail = thumbnail?.map(),
         isCompleted = isCompleted == true,
         subscriptionExpiredAt = subscriptionExpiredAt,
         respondsCount = responds?.count,
@@ -70,6 +71,8 @@ data class ProfileResponse(
         isAnonymous = isAnonymous,
         status = status
     )
+    
+    override fun primaryKey() = id
 }
 
 data class Responds(

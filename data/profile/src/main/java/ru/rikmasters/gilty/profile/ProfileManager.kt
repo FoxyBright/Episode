@@ -1,19 +1,26 @@
 package ru.rikmasters.gilty.profile
 
-import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType
-import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType.MY
-import ru.rikmasters.gilty.profile.ProfileWebSource.MeetingsType
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
+import ru.rikmasters.gilty.profile.models.MeetingsType
+import ru.rikmasters.gilty.profile.repository.ProfileStore
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class ProfileManager(
     
     private val web: ProfileWebSource,
+    
+    private val store: ProfileStore,
 ) {
+    
+    suspend fun getUserCategories() =
+        store.getUserCategories(false)
+    
+    suspend fun updateUserCategories() {
+        store.updateUserCategories()
+    }
     
     suspend fun getObservers(type: ObserversType) =
         web.getObservers(type)
@@ -21,16 +28,21 @@ class ProfileManager(
     suspend fun getUser(id: String) =
         web.getUser(id)
     
-    suspend fun getProfile() =
-        web.getUserData()
+    suspend fun clearProfile() {
+        store.deleteProfile()
+    }
     
-    suspend fun getProfileHiddens(
-        type: HiddenType = MY,
-        albumId: String? = null,
-    ) = web.getProfileHiddens(type, albumId).map { it.map() }
+    suspend fun getProfile(forceWeb: Boolean) =
+        store.getProfile(forceWeb)
     
-    suspend fun deleteHidden(image: AvatarModel) {
-        web.deleteHidden(image)
+    val hiddenFlow = store.hiddenFlow()
+    
+    suspend fun getProfileHiddens(forceWeb: Boolean) =
+        store.getUserHidden(forceWeb)
+    
+    suspend fun deleteHidden(imageId: String) {
+        store.deleteHidden(imageId)
+        getProfileHiddens(false)
     }
     
     suspend fun deleteObserver(member: UserModel) {
@@ -41,8 +53,9 @@ class ProfileManager(
         web.subscribeToUser(member)
     }
     
-    suspend fun getUserMeets(type: MeetingsType) =
-        web.getUserMeets(type)
+    suspend fun getUserMeets(
+        forceWeb: Boolean, type: MeetingsType,
+    ) = store.getUserMeets(forceWeb, type)
     
     suspend fun unsubscribeFromUser(member: String) {
         web.unsubscribeFromUser(member)
@@ -55,9 +68,9 @@ class ProfileManager(
         gender: GenderType? = null,
         orientation: OrientationModel? = null,
     ) {
-        web.setUserData(
+        store.updateProfile(
             username, aboutMe, age,
-            gender, orientation?.id
+            gender, orientation
         )
     }
     
@@ -78,5 +91,7 @@ class ProfileManager(
     
     suspend fun deleteAccount() {
         web.deleteAccount()
+        clearProfile()
     }
 }
+

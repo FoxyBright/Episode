@@ -36,7 +36,7 @@ class OrganizerViewModel: ViewModel() {
     suspend fun checkMyProfile(userId: String) {
         _isMyProfile.emit(
             profileManager
-                .getProfile()
+                .getProfile(false)
                 .id == userId
         )
     }

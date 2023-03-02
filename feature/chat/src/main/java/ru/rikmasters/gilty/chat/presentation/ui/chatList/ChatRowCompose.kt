@@ -47,6 +47,7 @@ import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
+import java.util.Locale
 import java.util.Locale.getDefault
 
 @Preview
@@ -350,7 +351,7 @@ private fun Avatar(
                     )
             ) {
                 Text(
-                    counter("$unRead"),
+                    unRead.counter(),
                     Modifier.padding(
                         when("$unRead".length) {
                             1 -> 10.dp
@@ -367,15 +368,26 @@ private fun Avatar(
     }
 }
 
-private fun counter(count: String): String {
-    return when(val size = count.length) {
-        in 0..3 -> count
-        in 4..6 -> count.substring(0, size - 3) +
-                ",${count[4]}" + "k"
-        
-        in 7..9 -> count.substring(0, size - 6) +
-                ",${count[4]}" + "m"
-        
-        else -> ">999m"
+private fun Int.counter() = when {
+    this in 0..999 -> "$this"
+    this > 999_999_999 -> ">999 m"
+    else -> {
+        val str = "%,d".format(
+            Locale("EN"), this
+        )
+        "${
+            when("$this".length) {
+                4, 7 -> if(str[2] == '0') "${str[0]}"
+                else str.substring(0..2)
+                
+                5, 8 -> if(str[3] == '0') "${str[0]}"
+                else str.substring(0..3)
+                
+                6, 9 -> if(str[4] == '0') "${str[0]}"
+                else str.substring(0..4)
+                
+                else -> "0"
+            }
+        } ${if(this in 1000..999_999) "k" else "m"}"
     }
 }

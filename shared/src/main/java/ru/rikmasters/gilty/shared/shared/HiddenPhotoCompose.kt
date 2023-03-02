@@ -48,10 +48,10 @@ private fun HiddenImageUnlockPreview() {
 
 @Composable
 fun HiddenImage(
-    image: AvatarModel,
+    image: AvatarModel?,
     modifier: Modifier = Modifier,
     hidden: Boolean = true,
-    onClick: ((AvatarModel) -> Unit)? = null,
+    onClick: ((AvatarModel?) -> Unit)? = null,
 ) {
     Box(
         modifier
@@ -66,8 +66,8 @@ fun HiddenImage(
                 .background(linearGradient(red()))
                 .fillMaxSize()
         ) else AsyncImage(
-            image.thumbnail.url, (null),
-            Modifier
+            image?.thumbnail?.url,
+            (null), Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,

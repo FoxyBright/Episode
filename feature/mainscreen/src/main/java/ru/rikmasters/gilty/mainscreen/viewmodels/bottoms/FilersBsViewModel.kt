@@ -100,7 +100,11 @@ class FiltersBsViewModel(
     }
     
     suspend fun getUserCategories() {
-        _myInterest.emit(removeChildren(meetManager.getUserCategories()))
+        _myInterest.emit(
+            removeChildren(
+                profileManager.getUserCategories()
+            )
+        )
     }
     
     fun removeChildren(categories: List<CategoryModel>) =
@@ -179,7 +183,7 @@ class FiltersBsViewModel(
             meetManager.getMeetCount(
                 filtersBuilder().copy(
                     genders = listOf(
-                        profileManager.getProfile().gender
+                        profileManager.getProfile(false).gender
                     )
                 )
             )

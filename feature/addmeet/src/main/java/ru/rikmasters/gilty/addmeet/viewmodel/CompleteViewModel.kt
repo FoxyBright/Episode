@@ -3,7 +3,7 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.addmeet.viewmodel.CompleteViewModel.RequirementType.Companion.get
+import ru.rikmasters.gilty.addmeet.viewmodel.RequirementType.Companion.get
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
@@ -20,26 +20,34 @@ class CompleteViewModel: ViewModel() {
     private val _meet = MutableStateFlow<MeetingModel?>(null)
     val meet = _meet.asStateFlow()
     
-    private enum class RequirementType {
-        ALL, EACH;
-        
-        companion object {
-            
-            fun get(index: Int) = values()[index]
-        }
-    }
-    
     suspend fun setMeet() {
         val meet = MeetingModel(
-            randomUUID().toString(),
-            Tags.joinToString(separator = ", ") { it.title },
-            Condition!!, SelectCategory!!, Duration, MeetingType!!, Date,
-            profileManager.getProfile().map(), Online,
-            Tags, Description, Private, try {
+            id = randomUUID().toString(),
+            title = Tags
+                .joinToString(", ")
+                { it.title },
+            condition = Condition!!,
+            category = SelectCategory!!,
+            duration = Duration,
+            type = MeetingType!!,
+            datetime = Date,
+            organizer = profileManager
+                .getProfile(false)
+                .map(),
+            isOnline = Online,
+            tags = Tags,
+            description = Description,
+            isPrivate = Private,
+            memberCount = try {
                 MemberCount.toInt()
             } catch(e: Exception) {
                 1
-            }, (null), Place, Address, HideAddress, try {
+            },
+            requirements = null,
+            place = Place,
+            address = Address,
+            hideAddress = HideAddress,
+            price = try {
                 Price.toInt()
             } catch(e: Exception) {
                 0
@@ -81,5 +89,14 @@ class CompleteViewModel: ViewModel() {
             withoutResponds = WithoutRespond
         )
         _meet.emit(meet.value?.copy(id = id))
+    }
+}
+
+private enum class RequirementType {
+    ALL, EACH;
+    
+    companion object {
+        
+        fun get(index: Int) = values()[index]
     }
 }

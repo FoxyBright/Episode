@@ -10,28 +10,24 @@ import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType.MY
-import ru.rikmasters.gilty.profile.ProfileWebSource.HiddenType.OTHER
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
+import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
-import ru.rikmasters.gilty.shared.models.meets.MeetingResponse
+import ru.rikmasters.gilty.shared.models.meets.Category
+import ru.rikmasters.gilty.shared.models.meets.Meeting
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
 
 
 class ProfileWebSource: KtorSource() {
-    
-    enum class MeetingsType { ACTUAL, HISTORY }
     
     enum class ObserversType(val value: String) {
         OBSERVERS("watchers"),
@@ -42,18 +38,25 @@ class ProfileWebSource: KtorSource() {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/users/$id"
-        ).wrapped<ProfileResponse>().map()
+        ).wrapped<Profile>().map()
     }
     
     suspend fun getUserMeets(
         type: MeetingsType,
-    ): List<MeetingModel> {
+    ): List<Meeting> {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile/meetings"
         ) {
             url { query("is_completed" to type.ordinal.toString()) }
-        }.wrapped<List<MeetingResponse>>().map { it.map() }
+        }.wrapped()
+    }
+    
+    suspend fun getUserCategories(): List<Category> {
+        updateClientToken()
+        return client.get(
+            "http://$HOST$PREFIX_URL/profile/categories"
+        ).wrapped()
     }
     
     suspend fun subscribeToUser(
@@ -92,37 +95,30 @@ class ProfileWebSource: KtorSource() {
         ).wrapped<List<User>>().map { it.map() }
     }
     
-    suspend fun deleteHidden(image: AvatarModel) {
+    suspend fun deleteHidden(
+        albumId: String,
+        imageId: String,
+    ) {
         updateClientToken()
-        val album = getUserAlbumPrivateId()
-        val imageId = image.id
         client.delete(
-            "http://$HOST$PREFIX_URL/albums/$album/files/$imageId"
+            "http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId"
         )
     }
     
-    enum class HiddenType { MY, OTHER }
-    
-    suspend fun getProfileHiddens(
-        type: HiddenType,
-        albumId: String?,
-    ): List<Avatar> {
+    suspend fun getFiles(albumId: String): List<Avatar> {
         updateClientToken()
-        val album = when(type) {
-            MY -> getUserAlbumPrivateId()
-            OTHER -> albumId
-        }
         return client.get(
-            "http://$HOST$PREFIX_URL/albums/$album/files"
+            "http://$HOST$PREFIX_URL/albums/$albumId/files"
         ).wrapped()
     }
     
-    suspend fun setHidden(
+    suspend fun addHidden(
+        albumId: String,
         files: List<File>,
-    ) {
+    ): List<Avatar> {
         updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/albums/${getUserAlbumPrivateId()}/upload"
+        return client.post(
+            "http://$HOST$PREFIX_URL/albums/$albumId/upload"
         ) {
             setBody(
                 MultiPartFormDataContent(
@@ -140,7 +136,7 @@ class ProfileWebSource: KtorSource() {
                     }, "WebAppBoundary"
                 )
             )
-        }
+        }.wrapped()
     }
     
     suspend fun setUserAvatar(
@@ -190,11 +186,11 @@ class ProfileWebSource: KtorSource() {
     }
     
     suspend fun setUserData(
-        username: String? = null,
-        aboutMe: String? = null,
-        age: Int? = null,
-        gender: GenderType? = null,
-        orientationId: String? = null,
+        username: String?,
+        aboutMe: String?,
+        age: Int?,
+        gender: GenderType?,
+        orientationId: String?,
     ) {
         updateClientToken()
         client.patch(
@@ -202,42 +198,18 @@ class ProfileWebSource: KtorSource() {
         ) {
             setBody(
                 ProfileRequest(
-                    username,
-                    gender?.name,
-                    age,
-                    orientationId,
-                    aboutMe
+                    username, gender?.name,
+                    age, orientationId, aboutMe
                 )
             )
         }
     }
     
-    private suspend fun getUserAlbumPrivateId(): String {
-        val profile = getUserData()
-        return profile.hidden?.albumId!!
-    }
-    
-    suspend fun getUserData(): ProfileModel {
+    suspend fun getUserData(): Profile {
         updateClientToken()
         return client.get(
             "http://$HOST$PREFIX_URL/profile"
-        ).wrapped<ProfileResponse>().map()
-    }
-    
-    suspend fun isUserRegistered(): Pair<Boolean, String?> {
-        updateClientToken()
-        val response = client.get(
-            "http://$HOST$PREFIX_URL/profile"
-        ).wrapped<ProfileResponse>()
-        
-        return try {
-            Pair(
-                response.isCompleted == true,
-                response.id
-            )
-        } catch(_: Exception) {
-            Pair(false, null)
-        }
+        ).wrapped()
     }
     
     suspend fun deleteAccount() {

@@ -351,7 +351,7 @@ fun HiddenImageMessage(
     modifier: Modifier = Modifier,
     message: MessageModel,
     sender: Boolean,
-    hide: Boolean,
+    hide: Boolean?,
     shape: Shape = shapes.large,
     onClick: (() -> Unit)? = null,
 ) {
@@ -368,8 +368,10 @@ fun HiddenImageMessage(
                 )
             ) {
                 Row(Modifier.padding(12.dp, 8.dp)) {
-                    HiddenImage(it.first().file, Modifier, hide)
-                    { onClick?.let { it() } }
+                    HiddenImage(
+                        it.first().file,
+                        Modifier, (hide == true)
+                    ) { onClick?.let { it() } }
                     Text(
                         stringResource(R.string.chats_hidden_photo),
                         Modifier.padding(
@@ -409,8 +411,7 @@ fun ImageMessage(
         Box {
             message.message?.attachments?.let {
                 AsyncImage(
-                    it.first().file.url,
-                    (null),
+                    it.first().file?.url, (null),
                     Modifier
                         .size(224.dp)
                         .background(

@@ -6,8 +6,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.models.Category
-import ru.rikmasters.gilty.shared.models.ProfileResponse
+import ru.rikmasters.gilty.shared.models.Profile
 
 data class Tag(
     val id: String? = null,
@@ -19,7 +18,7 @@ data class Tag(
     )
 }
 
-data class MeetingResponse(
+data class Meeting(
     val id: String,
     val status: String? = null,
     val type: String? = null,
@@ -28,7 +27,7 @@ data class MeetingResponse(
     val category: Category? = null,
     val datetime: String,
     val duration: Int? = null,
-    val organizer: ProfileResponse? = null,
+    val organizer: Profile? = null,
     val isOnline: Boolean? = null,
     val isAnonymous: Boolean? = null,
     val withoutResponds: Boolean? = null,

@@ -5,11 +5,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 class CategoryViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
+    private val profileManager by inject<ProfileManager>()
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
@@ -35,10 +37,13 @@ class CategoryViewModel: ViewModel() {
     
     suspend fun setUserInterest() = singleLoading {
         meetManager.setUserInterest(selected.value)
+        profileManager.updateUserCategories()
     }
     
     suspend fun getInterest() = singleLoading {
-        _selected.emit(meetManager.getUserCategories())
+        _selected.emit(
+            profileManager.getUserCategories()
+        )
     }
     
     suspend fun getCategories() = singleLoading {
