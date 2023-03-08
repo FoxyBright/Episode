@@ -213,7 +213,7 @@ private fun Content(
                 .fillMaxSize(), meetings
         ) { callback?.onRespond(it) }
         else {
-            //TODO реверс убрать в layout
+            // TODO реверс убрать в layout
             val meets = meetings.map {
                 it to rememberSwipeableCardState()
             }.reversed()

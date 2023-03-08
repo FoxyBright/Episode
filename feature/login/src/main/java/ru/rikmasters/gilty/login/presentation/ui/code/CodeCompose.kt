@@ -12,17 +12,23 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.*
@@ -67,6 +73,29 @@ interface CodeCallback {
 }
 
 @Composable
+private fun Shadow(modifier: Modifier){
+    Box(
+        modifier
+            .fillMaxWidth()
+            .padding(bottom = 36.dp)
+            .height(50.dp)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        colorScheme.background,
+                        Color(
+                            if(isSystemInDarkTheme())
+                                0xFF111111
+                            else 0xFFD6D6D6
+                        )
+                    )
+                )
+            )
+            .alpha(0.5f)
+    )
+}
+
+@Composable
 fun CodeContent(
     state: CodeState,
     modifier: Modifier = Modifier,
@@ -85,17 +114,20 @@ fun CodeContent(
                 title = stringResource(R.string.confirm_number_title),
                 details = stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
-            Image(
-                painterResource(
-                    if(isSystemInDarkTheme())
-                        R.drawable.send_code_helper_night
-                    else R.drawable.send_code_helper_day
-                ), (null), Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.3f)
-                    .padding(horizontal = 53.dp)
-                    .padding(top = 58.dp, bottom = 36.dp)
-            )
+            Box {
+                Shadow(Modifier.align(BottomCenter))
+                Image(
+                    painterResource(
+                        if(isSystemInDarkTheme())
+                            R.drawable.send_code_helper_night
+                        else R.drawable.send_code_helper_day
+                    ), (null), Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.3f)
+                        .padding(horizontal = 53.dp)
+                        .padding(top = 58.dp, bottom = 36.dp)
+                )
+            }
             DigitCode(
                 Modifier.padding(5.dp),
                 state.code, state.focuses
@@ -157,7 +189,6 @@ private fun DigitCode(
                 if(code.length > index)
                     code[index].toString() else "",
                 { onChange(index, it) }, modifier
-                    .padding(10.dp)
                     .clip(shapes.large)
                     .size(60.dp)
                     .focusRequester(focus),
@@ -185,15 +216,20 @@ private fun ButtonTimer(
             .clickable { if(sec <= 0) onResend() },
         Center
     ) {
-        if(sec > 0) Text(
-            "${
-                stringResource(R.string.call_again_timer)
-            } $sec сек",
-            Modifier.padding(6.dp),
-            colorScheme.primary,
-            style = typography.bodyMedium,
+        val style = typography.bodyMedium.copy(
+            color = colorScheme.onTertiary,
             fontWeight = SemiBold,
             textAlign = TextAlign.Center
+        )
+        if(sec > 0) Text(
+            buildAnnotatedString {
+                append(stringResource(R.string.call_again_timer))
+                withStyle(
+                    style.copy(colorScheme.primary).toSpanStyle()
+                ) { append(" $sec сек") }
+            },
+            Modifier.padding(6.dp),
+            style = style
         ) else GradientButton(
             Modifier.padding(horizontal = 16.dp),
             stringResource(R.string.call_again),
