@@ -187,65 +187,68 @@ private fun Notifications(
     
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
-        
-        if(itemCount > 0) {
-            
-            val list = arrayListOf<Int>()
-            var i = 0
-            
-            while(i < itemCount) {
-                val not = notifications[i]!!
-                if(!todayControl(not.date)) break
-                list.add(i); ++i
-            }
-            if(list.isNotEmpty()) {
-                item { Label(R.string.meeting_profile_bottom_today_label) }
-                list.forEachIndexed { count, item ->
-                    item {
-                        ElementNot(
-                            count, list.size,
-                            notifications[item]!!,
-                            state.ratings, callback
-                        )
+        try {
+            if(itemCount > 0) {
+                
+                val list = arrayListOf<Int>()
+                var i = 0
+                
+                while(i < itemCount) {
+                    val not = notifications[i]!!
+                    if(!todayControl(not.date)) break
+                    list.add(i); ++i
+                }
+                if(list.isNotEmpty()) {
+                    item { Label(R.string.meeting_profile_bottom_today_label) }
+                    list.forEachIndexed { count, item ->
+                        item {
+                            ElementNot(
+                                count, list.size,
+                                notifications[item]!!,
+                                state.ratings, callback
+                            )
+                        }
+                    }
+                    list.clear()
+                }
+                
+                while(i < itemCount) {
+                    val not = notifications[i]!!
+                    if(!weekControl(not.date)) break
+                    list.add(i); ++i
+                }
+                if(list.isNotEmpty()) {
+                    item { Label(R.string.notification_on_this_week_label) }
+                    list.forEachIndexed { count, item ->
+                        item {
+                            ElementNot(
+                                count, list.size,
+                                notifications[item]!!,
+                                state.ratings, callback
+                            )
+                        }
+                    }
+                    list.clear()
+                }
+                
+                (itemCount - i).let {
+                    if(it > 0) {
+                        item { Label(R.string.notification_earlier_label) }
+                        items(it) { count ->
+                            ElementNot(
+                                count, itemCount,
+                                notifications[i + count]!!,
+                                state.ratings, callback
+                            )
+                        }
                     }
                 }
-                list.clear()
             }
-            
-            while(i < itemCount) {
-                val not = notifications[i]!!
-                if(!weekControl(not.date)) break
-                list.add(i); ++i
-            }
-            if(list.isNotEmpty()) {
-                item { Label(R.string.notification_on_this_week_label) }
-                list.forEachIndexed { count, item ->
-                    item {
-                        ElementNot(
-                            count, list.size,
-                            notifications[item]!!,
-                            state.ratings, callback
-                        )
-                    }
-                }
-                list.clear()
-            }
-            
-            (itemCount - i).let {
-                if(it > 0) {
-                    item { Label(R.string.notification_earlier_label) }
-                    items(it) { count ->
-                        ElementNot(
-                            count, itemCount,
-                            notifications[i + count]!!,
-                            state.ratings, callback
-                        )
-                    }
-                }
-            }
+            item { PagingLoader(notifications.loadState) }
+            item { Spacer(Modifier.height(20.dp)) }
+        } catch(e: Exception) {
+            e.stackTraceToString()
         }
-        item { PagingLoader(notifications.loadState) }
-        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 

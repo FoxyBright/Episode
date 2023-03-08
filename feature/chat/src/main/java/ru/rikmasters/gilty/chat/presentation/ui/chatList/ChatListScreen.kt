@@ -21,7 +21,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val nav = get<NavState>()
     
     val alertSelected by vm.alertSelected.collectAsState()
-    val chats = vm.chats().collectAsLazyPagingItems()
+    val chats = vm.chats.collectAsLazyPagingItems()
     val unreadChats by vm.unreadChats.collectAsState()
     val alertState by vm.alertState.collectAsState()
     val completed by vm.completed.collectAsState()

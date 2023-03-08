@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
@@ -7,6 +10,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
+import ru.rikmasters.gilty.notification.NotificationPagingSource
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -39,10 +43,26 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     val isPageRefreshing = MutableStateFlow(false)
     override val pagingPull = isPageRefreshing
     
-    fun notifications() = notificationManger.notifications(coroutineScope)
+    // последний используемый источник пагинации
+    private var source: NotificationPagingSource? = null
+    
+    // создание нового источника пагинации
+    private fun newSource(): NotificationPagingSource {
+        source?.invalidate()
+        source = NotificationPagingSource(
+            notificationManger
+        )
+        return source!!
+    }
+    
+    val notifications =
+        Pager(PagingConfig(15)) {
+            newSource()
+        }.flow.cachedIn(coroutineScope)
     
     override suspend fun forceRefresh() = singleLoading {
-        notificationManger.refresh()
+        source?.invalidate()
+        source = null
     }
     
     suspend fun getLastResponse() = singleLoading {

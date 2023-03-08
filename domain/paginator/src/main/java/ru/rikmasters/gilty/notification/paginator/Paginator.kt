@@ -15,7 +15,7 @@ open class Paginator<T: Any, M: PagingManager<T>>(
             .let { (list, paginator) ->
                 LoadResult.Page(
                     list, (null), if(list.isNotEmpty())
-                        paginator.currentPage + 1 else null
+                        paginator.currentPage.plus(1) else null
                 )
             }
     } catch(e: Exception) {

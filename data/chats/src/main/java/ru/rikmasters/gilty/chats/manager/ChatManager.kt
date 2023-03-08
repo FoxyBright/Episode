@@ -1,26 +1,30 @@
 package ru.rikmasters.gilty.chats.manager
 
-import kotlinx.coroutines.CoroutineScope
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
 import ru.rikmasters.gilty.chats.source.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
+import ru.rikmasters.gilty.notification.paginator.PagingManager
+import ru.rikmasters.gilty.shared.model.chat.ChatModel
 
 class ChatManager(
     
-    private val chatRepository: ChatRepository,
+    private val store: ChatRepository,
     
     private val webSocket: WebSocketHandler,
     
     private val webSource: ChatWebSource,
-): CoroutineController() {
+): CoroutineController(), PagingManager<ChatModel> {
     
-    // список чатов в потоке собраный пагинатором
-    fun chats(scope: CoroutineScope) = chatRepository.pagination(scope)
+    override suspend fun getPage(
+        page: Int, perPage: Int,
+    ) =
+        store.getChats(page, perPage)
     
-    // обновление списка чатов
-    fun refresh() = chatRepository.refresh()
+    fun refresh() = store.refresh()
+    
+    fun newSource() = store.newSource(this)
     
     // получить список чатов с непрочитанными сообщениями
     suspend fun getUnread() =
@@ -38,7 +42,7 @@ class ChatManager(
         forAll: Boolean,
     ) {
         webSource.deleteChat(chatId, forAll)
-        if(!forAll) chatRepository.deleteChat(chatId)
+        if(!forAll) store.deleteChat(chatId)
     }
     
     // подключение к веб сокетам

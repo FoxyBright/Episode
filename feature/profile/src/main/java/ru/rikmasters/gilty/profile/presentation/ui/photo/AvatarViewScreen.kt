@@ -11,11 +11,7 @@ import ru.rikmasters.gilty.shared.common.PhotoViewCallback
 import ru.rikmasters.gilty.shared.common.PhotoViewState
 
 @Composable
-fun AvatarScreen(
-    vm: AvatarViewModel,
-    avatar: String,
-    type: Int,
-) {
+fun AvatarScreen(vm: AvatarViewModel, avatar: String, type: Int) {
     
     val nav = get<NavState>()
     val scope = rememberCoroutineScope()
@@ -41,5 +37,6 @@ fun AvatarScreen(
             override fun onBack() {
                 nav.navigationBack()
             }
-        })
+        }
+    )
 }

@@ -1,18 +1,20 @@
 package ru.rikmasters.gilty.notification
 
-import kotlinx.coroutines.CoroutineScope
+import ru.rikmasters.gilty.core.common.CoroutineController
+import ru.rikmasters.gilty.notification.paginator.PagingManager
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
 class NotificationManager(
     private val store: NotificationRepository,
     private val web: NotificationWebSource,
-) {
+): CoroutineController(), PagingManager<NotificationModel> {
     
-    // список уведомлений в потоке собраный пагинатором
-    fun notifications(scope: CoroutineScope) = store.pagination(scope)
-    
-    // обновление списка уведомлений
-    fun refresh() = store.refresh()
+    // получение новой страницы пагинации
+    override suspend fun getPage(
+        page: Int, perPage: Int,
+    ) =
+        store.getNotifications(page, perPage)
     
     // удаление уведомления
     suspend fun deleteNotifications(

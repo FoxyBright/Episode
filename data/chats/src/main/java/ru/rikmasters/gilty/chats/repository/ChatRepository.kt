@@ -1,16 +1,12 @@
 package ru.rikmasters.gilty.chats.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import kotlinx.coroutines.CoroutineScope
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.chats.models.chat.Chat
 import ru.rikmasters.gilty.chats.models.ws.enums.AnswerType
+import ru.rikmasters.gilty.chats.paging.ChatPagingSource
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
-import ru.rikmasters.gilty.notification.paginator.Paginator
-import ru.rikmasters.gilty.notification.paginator.PagingManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper
 
@@ -27,11 +23,11 @@ open class ChatRepository(
     // чат удалился или обновился
     suspend fun chatUpdate(answer: Pair<AnswerType, Any?>?) {
         answer?.let { (type, model) ->
-                if(type == AnswerType.UPDATED_CHATS)
-                    primarySource.save(model as Chat)
-                else
-                    primarySource.deleteById<Chat>(model!!)
-            }
+            if(type == AnswerType.UPDATED_CHATS)
+                primarySource.save(model as Chat)
+            else
+                primarySource.deleteById<Chat>(model!!)
+        }
         refresh()
     }
     
@@ -40,34 +36,14 @@ open class ChatRepository(
         primarySource.deleteById<Chat>(id)
     }
     
-    // менеджер пагинации для чатов
-    private class ChatPagingManager(
-        private val source: ChatRepository,
-    ): PagingManager<ChatModel> {
-        
-        // метод получения списка чатов
-        override suspend fun getPage(
-            page: Int, perPage: Int,
-        ) = Pair(
-            source.uploadChats(page, perPage),
-            ResponseWrapper.Paginator(page, perPage)
-        )
-    }
-    
-    // источник пагинации для чатов
-    private class ChatPagingSource(
-        manager: ChatPagingManager,
-    ): Paginator<ChatModel, ChatPagingManager>(manager)
-    
     // последний используемый источник пагинации
     private var source: ChatPagingSource? = null
     
     // создание нового источника пагинации
-    private fun newSource(): ChatPagingSource {
+    fun newSource(manager: ChatManager): ChatPagingSource {
         source?.invalidate()
-        source = ChatPagingSource(
-            ChatPagingManager((this))
-        ); return source!!
+        source = ChatPagingSource(manager)
+        return source!!
     }
     
     // обновление списка чатов
@@ -76,18 +52,13 @@ open class ChatRepository(
         source = null
     }
     
-    // пагинация для чатов
-    fun pagination(scope: CoroutineScope) =
-        Pager(PagingConfig(5))
-        { newSource() }.flow.cachedIn(scope)
-    
     // подгрузка чатов по страницам
-    private suspend fun uploadChats(
+    suspend fun getChats(
         page: Int, perPage: Int,
-    ): List<ChatModel> {
-        val list = webSource.getDialogs(page, perPage).first
+    ): Pair<List<ChatModel>, ResponseWrapper.Paginator> {
+        val list = webSource.getDialogs(page, perPage)
         primarySource.deleteAll<Chat>()
-        primarySource.saveAll(list)
-        return list.map()
+        primarySource.saveAll(list.first)
+        return Pair(list.first.map(), list.second)
     }
 }

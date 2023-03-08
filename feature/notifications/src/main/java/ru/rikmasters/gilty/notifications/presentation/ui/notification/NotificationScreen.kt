@@ -30,7 +30,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val notifications = vm.notifications().collectAsLazyPagingItems()
+    val notifications = vm.notifications.collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val participants by vm.participants.collectAsState()

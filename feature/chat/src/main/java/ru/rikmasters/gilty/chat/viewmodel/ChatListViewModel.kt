@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
@@ -41,8 +44,6 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     val isPageRefreshing = MutableStateFlow(false)
     override val pagingPull = isPageRefreshing
     
-    fun chats() = chatManager.chats(coroutineScope)
-    
     private val navBarStateList = listOf(
         INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE
     )
@@ -53,6 +54,10 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun onChatClick(chatId: String) {
         chatManager.connectToChat(chatId)
     }
+    
+    val chats = Pager(PagingConfig(15)) {
+        chatManager.newSource()
+    }.flow.cachedIn(coroutineScope)
     
     override suspend fun forceRefresh() = singleLoading {
         chatManager.refresh()
