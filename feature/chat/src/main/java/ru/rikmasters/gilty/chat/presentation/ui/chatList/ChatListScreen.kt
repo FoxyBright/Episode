@@ -3,6 +3,8 @@ package ru.rikmasters.gilty.chat.presentation.ui.chatList
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
@@ -18,22 +20,27 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val listState = rememberLazyListState()
     val nav = get<NavState>()
     
-    val unreadChats by vm.unreadChats.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()
+    val chats = vm.chats().collectAsLazyPagingItems()
+    val unreadChats by vm.unreadChats.collectAsState()
     val alertState by vm.alertState.collectAsState()
-    val chatList by vm.chatList.collectAsState()
-    val navBar by vm.navBar.collectAsState()
     val completed by vm.completed.collectAsState()
+    val navBar by vm.navBar.collectAsState()
     val unRead by vm.unread.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    LaunchedEffect(Unit) { vm.getChatList() }
+    LaunchedEffect(chats.loadState) {
+        val loadState = chats.loadState
+        vm.isPageRefreshing.emit(
+            loadState.append is LoadState.Loading
+                    || loadState.refresh is LoadState.Loading
+        )
+    }
     
     ChatListContent(
         ChatListState(
-            navBar, chatList,
-            completed, alert, alertState,
-            alertSelected, unRead,
+            navBar, chats, completed, alert,
+            alertState, alertSelected, unRead,
             listState, unreadChats
         ), Modifier, object: ChatListCallback {
             
@@ -83,7 +90,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { vm.getChatList() }
+                scope.launch { vm.forceRefresh() }
             }
             
             override fun onListAlertSelect(index: Int) {

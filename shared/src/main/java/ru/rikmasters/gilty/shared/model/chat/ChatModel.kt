@@ -19,7 +19,7 @@ data class ChatModel(
     val organizer: UserModel,
     val organizerOnly: Boolean,
     val title: String,
-    val lastMessage: MessageModel,
+    val lastMessage: MessageModel? = null,
     val datetime: String,
     val unreadCount: Int,
     val canMessage: Boolean,

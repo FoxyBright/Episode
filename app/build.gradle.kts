@@ -22,13 +22,6 @@ android {
             useSupportLibrary = true
         }
     }
-    
-    @Suppress("deprecation")
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("debug")
@@ -51,10 +44,13 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:chat"))
     
+    implementation(project(":domain:paginator"))
+    implementation(project(":domain"))
+    
     implementation(project(":data:shared"))
-    implementation(project(":data:auth"))
     implementation(project(":data:chats"))
     implementation(project(":data:realm"))
+    implementation(project(":data:auth"))
     implementation(project(":data:ktor"))
     
     implementation(project(":example"))

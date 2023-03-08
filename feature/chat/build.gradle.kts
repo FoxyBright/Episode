@@ -10,6 +10,8 @@ dependencies {
     androidBase()
     compose()
     
+    implementation(project(":domain:paginator"))
+    
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:complaints"))

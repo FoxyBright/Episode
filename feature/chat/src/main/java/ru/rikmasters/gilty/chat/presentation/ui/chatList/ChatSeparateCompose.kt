@@ -4,13 +4,10 @@ import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayRodName
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import java.util.Locale
 
-fun getSortedChats(chats: List<ChatModel>) = Pair(
-    chats.filter { it.meetStatus != COMPLETED }
-        .sortedBy { it.datetime }
-        .groupBy { it.datetime }
+fun getSortedChats(chats: List<ChatModel>) =
+    chats.groupBy { it.datetime }
         .map { chat ->
             Pair(
                 when {
@@ -33,6 +30,4 @@ fun getSortedChats(chats: List<ChatModel>) = Pair(
                     }
                 }, chat.value
             )
-        },
-    chats.filter { it.meetStatus == COMPLETED }
-)
+        }

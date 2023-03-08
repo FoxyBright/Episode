@@ -18,10 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.*
+import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
@@ -31,15 +35,22 @@ import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
+import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+
+@Composable
+private fun previewData() = flowOf(
+    PagingData.from(DemoChatModelList)
+).collectAsLazyPagingItems()
 
 @Preview
 @Composable
@@ -50,7 +61,7 @@ private fun ChatListPreview() {
                 listOf(
                     INACTIVE, NEW, INACTIVE,
                     INACTIVE, ACTIVE
-                ), DemoChatModelList,
+                ), previewData(),
                 (true), (false), LIST, (1),
                 (false), LazyListState(), listOf()
             ),
@@ -61,7 +72,7 @@ private fun ChatListPreview() {
 
 data class ChatListState(
     val stateList: List<NavIconState>,
-    val chats: List<ChatModel>,
+    val chats: LazyPagingItems<ChatModel>,
     val endedState: Boolean,
     val alertActive: Boolean,
     val alertState: AlertState,
@@ -162,124 +173,122 @@ private fun Content(
     modifier: Modifier = Modifier,
     callback: ChatListCallback?,
 ) {
-    val sorted =
-        getSortedChats(state.chats)
+    val chats = state.chats
+    val itemCount = chats.itemCount
     
-    if(sorted.first.isEmpty()
-        && sorted.second.isEmpty()
-    ) EmptyChats()
-    
-    val current =
-        sorted.first.map { all ->
-            Pair(all.first, all.second.map { chat ->
-                chat to rememberDragRowState()
-            })
-        }
-    
-    val completed =
-        sorted.second.map { it to rememberDragRowState() }
-    
-    val unread =
-        state.unreadChats.map { it to rememberDragRowState() }
-    
-    LazyColumn(
+    if(LocalInspectionMode.current) PreviewLazy()
+    else LazyColumn(
         modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         state.listState
     ) {
-        if(state.unRead) {
-            item {
-                Label(
-                    stringResource(R.string.chats_unread),
-                    Modifier.padding(
-                        top = 28.dp, bottom = 18.dp
-                    )
-                )
-            }
-            itemsIndexed(unread, { _, c -> c.first.id }) { index, (chat, rowState) ->
-                val shape = lazyItemsShapes(index, current.size)
-                Column(
-                    Modifier.background(
-                        colorScheme.primaryContainer,
-                        shape
-                    )
-                ) {
-                    SwipeableChatRow(
-                        rowState, chat, shape, Modifier,
-                        { callback?.onChatClick(it) })
-                    { callback?.onChatSwipe(it) }
-                    if(index < unread.size - 1) Divider(
-                        Modifier.padding(start = 78.dp)
-                    )
-                }
-            }
-        }
         
-        if(current.isNotEmpty() && !state.unRead) current
-            .forEach { (label, chats) ->
-                
-                item {
-                    Label(
-                        label, Modifier.padding(
-                            top = 28.dp, bottom = 18.dp
-                        )
-                    )
+        if(itemCount != 0) {
+            
+            val indices = arrayListOf<Int>()
+            var i = 0
+            
+            try {
+                while(i in 0 until itemCount) {
+                    val chat = chats[i]!!
+                    if(chat.meetStatus == MeetStatusType.ACTIVE)
+                        indices.add(i)
+                    ++i
                 }
-                
-                itemsIndexed(chats, { _, c -> c.first.id }) { index, (chat, rowState) ->
-                    val shape = lazyItemsShapes(index, current.size)
-                    Column(
-                        Modifier.background(
-                            colorScheme.primaryContainer,
-                            shape
-                        )
-                    ) {
-                        SwipeableChatRow(
-                            rowState, chat, shape, Modifier,
-                            { callback?.onChatClick(it) })
-                        { callback?.onChatSwipe(it) }
-                        if(index < chats.size - 1) Divider(
-                            Modifier.padding(start = 78.dp)
+            } catch(e: Exception) {
+                e.stackTraceToString()
+            }
+            
+            getSortedChats(indices.map { chats[it]!! }).let {
+                return@let if(it.isNotEmpty() && !state.unRead) it
+                else null
+            }?.let { pairs ->
+                itemsIndexed(pairs) { index, (label, list) ->
+                    Label(label, Modifier.padding(top = 28.dp, bottom = 18.dp))
+                    list.map {
+                        it to rememberDragRowState()
+                    }.forEach { (chat, row) ->
+                        ElementChat(
+                            chat, index, list.size,
+                            row, callback
                         )
                     }
                 }
             }
-        
-        if(!state.unRead) item {
-            ActionRow(
-                Modifier.padding(
-                    top = 28.dp,
-                    bottom = 18.dp,
-                    end = 16.dp
-                ), state.endedState
-            ) { callback?.onEndedClick() }
-        }
-        
-        if(sorted.second.isNotEmpty()
-            && state.endedState
-            && !state.unRead
-        ) {
-            itemsIndexed(completed, { _, c -> c.first.id }) { index, (chat, rowState) ->
-                val shape = lazyItemsShapes(index, current.size)
-                Column(
-                    Modifier.background(
-                        colorScheme.primaryContainer,
-                        shape
-                    )
-                ) {
-                    SwipeableChatRow(
-                        rowState, chat, shape, Modifier,
-                        { callback?.onChatClick(it) })
-                    { callback?.onChatSwipe(it) }
-                    if(index < completed.size - 1) Divider(
-                        Modifier.padding(start = 78.dp)
+            
+            if(!state.unRead) item {
+                ActionRow(
+                    Modifier.padding(
+                        top = 28.dp,
+                        bottom = 18.dp,
+                        end = 16.dp
+                    ), state.endedState
+                ) { callback?.onEndedClick() }
+            }
+            
+            itemsIndexed(chats) { index, item ->
+                if(item?.meetStatus != MeetStatusType.ACTIVE) {
+                    val chat = item!! to rememberDragRowState()
+                    ElementChat(
+                        chat.first, index, itemCount,
+                        chat.second, callback
                     )
                 }
             }
-        }
-        
+            
+            (itemCount).let {
+                if(it > 0 && !state.unRead) items(it) { item ->
+                    (chats[item]!! to rememberDragRowState())
+                        .let { (chat, row) ->
+                            ElementChat(
+                                chat, item, itemCount,
+                                row, callback
+                            )
+                        }
+                }
+            }
+            
+            item { PagingLoader(chats.loadState) }
+        } else item { EmptyChats() }
         item { Spacer(Modifier.height(20.dp)) }
+    }
+}
+
+@Composable
+private fun PreviewLazy() {
+    val list = DemoChatModelList.map {
+        it to rememberDragRowState()
+    }
+    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
+        item { Label(stringResource(R.string.chats_unread)) }
+        itemsIndexed(list) { i, (chat, row) ->
+            ElementChat(chat, i, list.size, row)
+        }
+    }
+}
+
+@Composable
+private fun ElementChat(
+    chat: ChatModel,
+    index: Int, size: Int,
+    rowState: DragRowState,
+    callback: ChatListCallback? = null,
+) {
+    val shape = lazyItemsShapes(index, size)
+    Column(
+        Modifier.background(
+            colorScheme.primaryContainer,
+            shape
+        )
+    ) {
+        SwipeableChatRow(
+            rowState, chat, shape, Modifier,
+            { callback?.onChatClick(it) })
+        { callback?.onChatSwipe(it) }
+        if(index < size - 2) Divider(
+            Modifier.padding(start = 78.dp)
+        )
     }
 }
 

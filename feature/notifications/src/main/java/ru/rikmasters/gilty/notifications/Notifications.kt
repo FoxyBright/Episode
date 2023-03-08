@@ -11,11 +11,11 @@ import ru.rikmasters.gilty.bottomsheet.viewmodel.components.ParticipantsViewMode
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.notification.NotificationData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.profile.ProfileData
-import ru.rikmasters.gilty.push.NotificationData
 
 object Notifications: FeatureDefinition() {
     

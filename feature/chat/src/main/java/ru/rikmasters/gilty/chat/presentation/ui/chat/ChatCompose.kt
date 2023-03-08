@@ -6,36 +6,87 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
+import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.*
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarCallback
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.MessengerBarCallback
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
 import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
-import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.chat.*
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.shared.GAlert
+import ru.rikmasters.gilty.shared.shared.PagingLoader
+import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
+
+@Composable
+private fun previewData() = flowOf(
+    PagingData.from(DemoMessageModelList)
+).collectAsLazyPagingItems()
+
+@Preview
+@Composable
+private fun ChatPreview() {
+    GiltyTheme {
+        ChatContent(
+            state = ChatState(
+                ChatAppBarState(
+                    name = "Название встречи",
+                    avatar = DemoAvatarModel,
+                    memberCount = 10,
+                    chatType = TRANSLATION,
+                    viewer = null,
+                    toTranslation = null,
+                    (true),
+                    (true)
+                ),
+                answer = DemoMessageModel,
+                meet = DemoMeetingModel,
+                messageText = "Вводимое сообщение",
+                messageList = previewData(),
+                userId = "id",
+                alert = false,
+                meetAlert = false,
+                kebabMenuState = false,
+                messageMenuState = false,
+                imageMenuState = false,
+                listState = LazyListState(),
+                unReadCount = 10,
+                listOf(Pair("id", DemoThumbnailModel))
+            ), modifier = Modifier.background(
+                colorScheme.background
+            )
+        )
+    }
+}
 
 data class ChatState(
     val topState: ChatAppBarState,
     val answer: MessageModel?,
     val meet: MeetingModel,
     val messageText: String,
-    val messageList: List<MessageModel>,
+    val messageList: LazyPagingItems<MessageModel>,
     val userId: String,
     val alert: Boolean,
     val meetAlert: Boolean,
@@ -130,17 +181,33 @@ fun ChatContent(
 }
 
 @Composable
+private fun PreviewLazy() {
+    val list = DemoMessageModelList.map { it to rememberDragRowState() }
+    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
+        itemsIndexed(list) { index, (mes, row) ->
+            ChatMessage(
+                mes, row, (index % 2 != 0),
+                (true), if(index < DemoMessageModelList.size.minus(1))
+                    list[index.plus(1)].first
+                else null, if(index in 1..DemoMessageModelList.size)
+                    list[index.minus(1)].first
+                else null
+            )
+        }
+    }
+}
+
+@Composable
 private fun Content(
     padding: PaddingValues,
     state: ChatState,
     modifier: Modifier = Modifier,
     callback: ChatCallback?,
 ) {
-    val list =
-        state.messageList.map { mess ->
-            mess to rememberDragRowState()
-        }
-    LazyColumn(
+    val list = state.messageList
+    
+    if(LocalInspectionMode.current) PreviewLazy()
+    else LazyColumn(
         modifier
             .padding(padding)
             .fillMaxSize()
@@ -148,7 +215,8 @@ private fun Content(
         state.listState,
         reverseLayout = true
     ) {
-        item { Divider(Modifier, 28.dp, Transparent) }
+        item { Spacer(Modifier.height(28.dp)) }
+        item { PagingLoader(list.loadState) }
         
         if(state.writingUsers.isNotEmpty()) item {
             Writing(
@@ -156,19 +224,18 @@ private fun Content(
                 Modifier.padding(16.dp, 2.dp)
             )
         }
-        
-        itemsIndexed(list, { i, mes -> mes.first.id + i })
-        { index, (message, rowState) ->
-            ChatMessage(
-                message, rowState,
-                (message.message?.author?.id == state.userId),
-                state.meet.isOnline,
-                if(index < list.size - 1)
-                    list[index + 1].first
-                else null, if(index in 1..list.size)
-                    list[index - 1].first
-                else null, callback
-            )
+        itemsIndexed(list) { index, item ->
+            (item!! to rememberDragRowState()).let { (mes, row) ->
+                ChatMessage(
+                    mes, row, (mes.message?.author?.id == state.userId),
+                    state.meet.isOnline,
+                    if(index < list.itemCount.minus(1))
+                        list[index.plus(1)]
+                    else null, if(index in 1..list.itemCount)
+                        list[index.minus(1)]
+                    else null, callback
+                )
+            }
         }
     }
 }

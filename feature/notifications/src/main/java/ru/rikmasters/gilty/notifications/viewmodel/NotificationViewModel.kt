@@ -6,8 +6,8 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.push.NotificationManager
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -23,9 +23,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val meetingManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
     
-    private val _notifications = MutableStateFlow(emptyList<NotificationModel>())
-    val notifications = _notifications.asStateFlow()
-    
     private val navBarStateList = listOf(
         INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE
     )
@@ -39,16 +36,13 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val _blur = MutableStateFlow(false)
     val blur = _blur.asStateFlow()
     
-    override suspend fun forceRefresh() = singleLoading {
-        _notifications.emit(notificationManger.getNotification(1))
-    }
+    val isPageRefreshing = MutableStateFlow(false)
+    override val pagingPull = isPageRefreshing
     
-    private var page = 1
-    suspend fun getNotification() = singleLoading {
-        val list =
-            notificationManger.getNotification(page)
-        _notifications.emit(notifications.value + list)
-        page++
+    fun notifications() = notificationManger.notifications(coroutineScope)
+    
+    override suspend fun forceRefresh() = singleLoading {
+        notificationManger.refresh()
     }
     
     suspend fun getLastResponse() = singleLoading {
@@ -111,12 +105,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         notificationManger.deleteNotifications(
             listOf(notification.id)
         )
-        _notifications.emit(
-            notifications.value - notification
-        )
     }
-    
-    //TODO OBSERVABLE NOTIFICATION
     
     private val _ratings = MutableStateFlow(emptyList<RatingModel>())
     val ratings = _ratings.asStateFlow()
@@ -143,7 +132,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun emojiClick(
         emoji: EmojiModel, meetId: String, userId: String,
     ) = singleLoading {
-        makeToast("emoji: $emoji, meetId: $meetId, userId: $userId")
         notificationManger.putRatings(meetId, userId, emoji)
         getParticipants(meetId)
     }

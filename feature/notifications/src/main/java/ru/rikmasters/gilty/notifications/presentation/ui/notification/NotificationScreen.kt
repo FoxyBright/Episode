@@ -3,6 +3,8 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.paging.LoadState.Loading
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -28,7 +30,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val notifications by vm.notifications.collectAsState()
+    val notifications = vm.notifications().collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val participants by vm.participants.collectAsState()
@@ -40,7 +42,19 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     LaunchedEffect(Unit) {
         vm.getRatings()
         vm.getLastResponse()
-        vm.getNotification()
+    }
+    
+    LaunchedEffect(notifications.loadState) {
+        val loadState = notifications.loadState
+        vm.isPageRefreshing.emit(
+            loadState.append is Loading
+                    || loadState.refresh is Loading
+        )
+    }
+    
+    fun refresh() = scope.launch {
+        vm.forceRefresh()
+        notifications.refresh()
     }
     
     NotificationsContent(
@@ -64,6 +78,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                                 notification.parent.meeting?.id!!,
                                 userId!!
                             )
+                        refresh()
                     } ?: run {
                         vm.selectNotification(notification)
                         vm.blur(true)
@@ -128,7 +143,8 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { vm.getNotification() }
+                scope.launch { refresh() }
             }
-        })
+        }
+    )
 }

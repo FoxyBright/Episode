@@ -25,6 +25,8 @@ interface PullToRefreshTrait: LoadingTrait {
             val currentTrigger = remember(trigger) { trigger ?: defaultTrigger }
             
             val isLoading by vm.loading.collectAsState()
+            val pagingPull by vm.pagingPull.collectAsState()
+            
             var isPullTrigger by remember { mutableStateOf(false) }
             
             val isRefreshing = remember(isLoading) {
@@ -32,7 +34,7 @@ interface PullToRefreshTrait: LoadingTrait {
                 isLoading && isPullTrigger
             }
             
-            val state = rememberSwipeRefreshState(isRefreshing)
+            val state = rememberSwipeRefreshState(isRefreshing || pagingPull)
             val offset = with(LocalDensity.current) { state.indicatorOffset.toDp() }
             
             val animatedOffset by animateDpAsState(
@@ -60,9 +62,9 @@ interface PullToRefreshTrait: LoadingTrait {
                 },
                 content = {
                     Box(Modifier.offset(y = animatedOffset)) {
-                        if(isLoading && !isRefreshing) LoadingTrait.Wrapper(vm) {
-                            content(vm)
-                        } else
+                        if(isLoading && !isRefreshing)
+                            LoadingTrait.Wrapper(vm) { content(vm) }
+                        else
                             content(vm)
                     }
                 }
@@ -70,7 +72,7 @@ interface PullToRefreshTrait: LoadingTrait {
         }
         
         private val defaultTrigger = 72.dp
-        var trigger: Dp? = null
+        private var trigger: Dp? = null
         
         private val defaultIndicator = @Composable { state: SwipeRefreshState, _: Dp, trigger: Dp ->
             SwipeRefreshIndicator(state, trigger)

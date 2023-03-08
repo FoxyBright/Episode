@@ -2,6 +2,12 @@
 
 import java.net.URI
 
+include(":domain:paginator")
+
+
+include(":domain")
+
+
 include(":feature:gallery")
 
 

@@ -161,8 +161,7 @@ private fun ChatRowContent(
             when {
                 todayControl(chat.datetime) -> Timer(
                     chat.datetime, chat.isOnline,
-                    Modifier
-                        .align(TopEnd)
+                    Modifier.align(TopEnd)
                         .padding(12.dp)
                 )
                 
@@ -186,15 +185,16 @@ private fun ChatRowContent(
                     )
                 }
             }
-            Text(
-                chat.lastMessage
-                    .createdAt.timeClock(),
-                Modifier
-                    .align(BottomEnd)
-                    .padding(12.dp),
-                colorScheme.onTertiary,
-                style = typography.labelSmall
-            )
+            chat.lastMessage?.let {
+                Text(
+                    it.createdAt.timeClock(),
+                    Modifier
+                        .align(BottomEnd)
+                        .padding(12.dp),
+                    colorScheme.onTertiary,
+                    style = typography.labelSmall
+                )
+            }
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -206,11 +206,13 @@ private fun ChatRowContent(
                     chat.isOnline,
                     (chat.meetStatus == MeetStatusType.COMPLETED)
                 )
-                Message(
-                    chat.title, chat.lastMessage,
-                    chat.organizer,
-                    Modifier.padding(start = 8.dp)
-                )
+                chat.lastMessage?.let {
+                    Message(
+                        chat.title, it,
+                        chat.organizer,
+                        Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
     }

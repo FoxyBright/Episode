@@ -53,7 +53,7 @@ val DemoMessageNotificationModel = DemoMessageModel.copy(
     notification = DemoChatNotificationModel, message = null
 )
 
-val MessageList = listOf(
+val DemoMessageModelList = listOf(
     DemoMessageNotificationModel.copy(
         notification = DemoChatNotificationModel.copy(
             type = ChatNotificationType.CHAT_CREATED

@@ -19,7 +19,7 @@ fun Project.baseConfig(name: String = project.name) =
 fun Project.compose(enable: Boolean = true) = android {
     buildFeatures.compose = enable
     composeOptions {
-        kotlinCompilerExtensionVersion = Config.kotlinCompilerExtensionVersion
+        kotlinCompilerExtensionVersion = Config.composeCompilerVer
     }
 }
 

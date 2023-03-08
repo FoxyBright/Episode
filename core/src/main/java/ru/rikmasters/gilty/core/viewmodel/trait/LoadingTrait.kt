@@ -18,12 +18,14 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
  * Включает загрузку по умолчанию
  */
 interface LoadingTrait: Trait {
+    
     companion object: TraitWrapperFactory() {
+        
         @Composable
         override fun <VM: ViewModel> Wrapper(vm: VM, content: @Composable (VM) -> Unit) {
             
             var showLoader by remember { mutableStateOf(false) }
-    
+            
             val loading by vm.loading.collectAsState()
             
             LaunchedEffect(loading) {
@@ -33,35 +35,38 @@ interface LoadingTrait: Trait {
                 } else
                     false
             }
-    
+            
             if(showLoader)
-                    (loader ?: defaultLoader)(loading) { content(vm) }
+                (loader ?: defaultLoader)(loading) { content(vm) }
             else
                 content(vm)
         }
         
-        private val defaultLoader = @Composable { isLoading: Boolean, content: @Composable () -> Unit ->
-            val alpha by animateFloatAsState(
-                if(isLoading) 1f else 0f
-            )
-            Box {
-                content()
-                if(alpha < 1E-6) Box(
-                    Modifier
-                        .fillMaxSize()
-                        .alpha(alpha)
-                        .background(MaterialTheme.colorScheme.background)
-                ){
-                    CircularProgressIndicator(
-                        Modifier.align(Alignment.Center),
-                        MaterialTheme.colorScheme.primary
-                    )
+        private val defaultLoader =
+            @Composable { isLoading: Boolean, content: @Composable () -> Unit ->
+                val alpha by animateFloatAsState(
+                    if(isLoading) 1f else 0f
+                )
+                Box {
+                    content()
+                    if(alpha < 1E-6) Box(
+                        Modifier
+                            .fillMaxSize()
+                            .alpha(alpha)
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        CircularProgressIndicator(
+                            Modifier.align(Alignment.Center),
+                            MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
-        }
         
-        var loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null
+        var loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? =
+            null
     }
     
     val loading: StateFlow<Boolean>
+    val pagingPull: StateFlow<Boolean>
 }

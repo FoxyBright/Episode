@@ -154,7 +154,7 @@ fun ChatMessage(
     isOnline: Boolean,
     last: MessageModel? = null,
     next: MessageModel? = null,
-    callback: ChatCallback?,
+    callback: ChatCallback? = null,
 ) {
     val context = LocalContext.current
     val type = message.type

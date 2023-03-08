@@ -2,13 +2,18 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.project
 
-fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) = implementation(
-    "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
-    "androidx.core:core-ktx:1.9.0"
-) and koin() and implementationIf(!excludeCore, project(":core"))
+fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
+    implementation(
+        "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
+        "androidx.core:core-ktx:1.9.0"
+    )
+    koin()
+    implementationIf(!excludeCore, project(":core"))
+    paging()
+}
 
-const val composeVer = Config.kotlinCompilerExtensionVersion
+const val composeVer = Config.composeUiVer
 fun DependencyHandlerScope.compose() = implementation(
     "androidx.compose.material3:material3:1.0.0-rc01",
     "androidx.navigation:navigation-compose:2.5.2",
@@ -27,8 +32,7 @@ fun DependencyHandlerScope.compose() = implementation(
 val pagingVer = "3.1.1"
 
 fun DependencyHandlerScope.paging() = implementation(
-    "androidx.paging:paging-common-ktx:$pagingVer",
-    "androidx.paging:paging-runtime:$pagingVer"
+    "androidx.paging:paging-compose:1.0.0-alpha17"
 )
 
 fun DependencyHandlerScope.swipeRefresher() = implementation(

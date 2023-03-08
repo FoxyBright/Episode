@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
 import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
 import ru.rikmasters.gilty.chat.viewmodel.*
 import ru.rikmasters.gilty.chats.ChatData
-import ru.rikmasters.gilty.chats.ChatManager
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingManager

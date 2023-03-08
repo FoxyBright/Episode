@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
-import ru.rikmasters.gilty.chats.ChatManager
+import ru.rikmasters.gilty.chats.manager.MessageManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
@@ -21,11 +21,10 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 class ChatViewModel: ViewModel() {
     
-    private val chatManager by inject<ChatManager>()
     private val meetManager by inject<MeetingManager>()
+    private val messageManager by inject<MessageManager>()
     
-    val messages by lazy { chatManager.messageFlow.state(emptyList()) }
-    val writingUsers by lazy { chatManager.writingFlow.state(emptyList()) }
+    val writingUsers by lazy { messageManager.writingFlow.state(emptyList()) }
     
     private val _chat = MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
@@ -45,7 +44,7 @@ class ChatViewModel: ViewModel() {
         .debounce(250)
         .onEach {
             chat.value?.id?.let {
-                chatManager.isTyping(it)
+                messageManager.isTyping(it)
             }
         }
         .state(_message.value, Eagerly)
@@ -98,7 +97,7 @@ class ChatViewModel: ViewModel() {
     }
     
     suspend fun deleteWriter(id: String) {
-        chatManager.deleteWriter(id)
+        messageManager.deleteWriter(id)
     }
     
     suspend fun markAsReadMessage(
@@ -106,29 +105,25 @@ class ChatViewModel: ViewModel() {
         messageIds: List<String> = emptyList(),
         all: Boolean = false,
     ) {
-        chatManager.markAsReadMessage(
+        messageManager.markAsReadMessage(
             chatId, messageIds, all
         )
     }
     
     @Suppress("unused")
     suspend fun madeScreenshot(chatId: String) {
-        chatManager.madeScreenshot(chatId)
+        messageManager.madeScreenshot(chatId)
     }
     
     suspend fun completeChat(chat: ChatModel?) {
         chat?.let {
-            chatManager.completeChat(it.id)
+            messageManager.completeChat(it.id)
             makeToast("Чат для встречи ${it.title} был закрыт закрыт")
         }
     }
     
-    private suspend fun getMessages(
-        chatId: String,
-        forceWeb: Boolean = false,
-    ) = singleLoading {
-        chatManager.getMessages(chatId, forceWeb)
-    }
+    fun getMessages(chatId: String) =
+        messageManager.messages(chatId, coroutineScope)
     
     suspend fun changeAnswer(message: MessageModel?) {
         _answer.emit(message)
@@ -141,7 +136,7 @@ class ChatViewModel: ViewModel() {
         if(message == answer.value)
             _answer.emit(null)
         chat.value?.let {
-            chatManager.deleteMessage(
+            messageManager.deleteMessage(
                 chatId, listOf(message.id),
                 (it.userId == it.organizer.id)
             )
@@ -157,10 +152,8 @@ class ChatViewModel: ViewModel() {
     }
     
     suspend fun getChat(chatId: String) = singleLoading {
-        _chat.emit(chatManager.getChat(chatId))
-        
+        _chat.emit(messageManager.getChat(chatId))
         chat.value?.let {
-            
             // кол-во непрочитанных
             changeUnreadCount(it.unreadCount + 1)
             
@@ -175,8 +168,6 @@ class ChatViewModel: ViewModel() {
                     else -> MEET
                 }
             )
-            // получение списка сообщений
-            getMessages(chatId, false)
         }
     }
     
@@ -251,7 +242,7 @@ class ChatViewModel: ViewModel() {
         coroutineScope.launch {
             changeAnswer(null)
             clearMessage()
-            chatManager.sendMessage(
+            messageManager.sendMessage(
                 chatId, repliedId, text,
                 attachment, photos, videos
             )

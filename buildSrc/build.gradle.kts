@@ -9,6 +9,7 @@ plugins {
     `kotlin-dsl-precompiled-script-plugins`
 }
 
+@Suppress("GradleDependency")
 dependencies {
     implementation("com.android.tools.build:gradle:8.0.0-beta02")
     implementation("com.android.tools.build:gradle-api:8.0.0-beta02")

@@ -33,7 +33,7 @@ import ru.rikmasters.gilty.shared.model.chat.AttachmentType
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
-import ru.rikmasters.gilty.shared.model.chat.MessageList
+import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelList
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
@@ -45,7 +45,7 @@ import kotlin.random.Random
 fun MessPreview() {
     GiltyTheme {
         LazyColumn {
-            items(MessageList) {
+            items(DemoMessageModelList) {
                 Message(
                     MessState(
                         it, (Random.nextBoolean()),

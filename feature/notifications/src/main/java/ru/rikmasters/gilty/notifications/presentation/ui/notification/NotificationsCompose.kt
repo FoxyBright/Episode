@@ -10,16 +10,20 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -30,9 +34,13 @@ import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.DemoRatingModelList
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
-import ru.rikmasters.gilty.shared.shared.NavBar
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+
+@Composable
+private fun previewData() = flowOf(
+    PagingData.from(DemoNotificationModelList)
+).collectAsLazyPagingItems()
 
 @Preview
 @Composable
@@ -45,7 +53,7 @@ private fun NotificationsContentPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    DemoNotificationModelList,
+                    previewData(),
                     Pair((3), ""), listOf(), (false),
                     DemoNotificationMeetingOverModel,
                     listOf(), listOf(), LazyListState(),
@@ -67,7 +75,7 @@ private fun NotificationsBlurPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    DemoNotificationModelList,
+                    previewData(),
                     Pair((3), ""), listOf(), (true),
                     DemoNotificationMeetingOverModel,
                     listOf(), listOf(), LazyListState(),
@@ -79,7 +87,7 @@ private fun NotificationsBlurPreview() {
 }
 
 data class NotificationsState(
-    val notifications: List<NotificationModel>,
+    val notifications: LazyPagingItems<NotificationModel>,
     val lastRespond: Pair<Int, String>,
     val navBar: List<NavIconState>,
     val blur: Boolean,
@@ -87,7 +95,7 @@ data class NotificationsState(
     val participants: List<UserModel>,
     val participantsStates: List<Int>,
     val listState: LazyListState,
-    val ratings: List<RatingModel>
+    val ratings: List<RatingModel>,
 )
 
 interface NotificationsCallback {
@@ -149,7 +157,7 @@ fun NotificationsContent(
     state.activeNotification?.let {
         if(state.blur) Box(
             Modifier
-                .fillMaxSize() /*TODO заменить на блюр*/
+                .fillMaxSize() /*TODO заменить на блюр, по неизвестным причинам BlurBox() вылетает*/
                 .background(colorScheme.background)
                 .clickable { callback?.onBlurClick() }
         ) {
@@ -174,82 +182,104 @@ private fun Notifications(
     modifier: Modifier = Modifier,
     callback: NotificationsCallback?,
 ) {
-    
     val notifications = state.notifications
+    val itemCount = notifications.itemCount
     
-    val todayList = notifications.filter {
-        todayControl(it.date)
-    }.map { it to rememberDragRowState() }
-    
-    val weekList = notifications.filter {
-        weekControl(it.date) && !todayControl(it.date)
-    }.map { it to rememberDragRowState() }
-    
-    val earlierList = notifications.filter {
-        !weekControl(it.date) && !todayControl(it.date)
-    }.map { it to rememberDragRowState() }
-    
-    LazyColumn(modifier, state.listState) {
+    if(LocalInspectionMode.current) PreviewLazy()
+    else LazyColumn(modifier, state.listState) {
         
-        if(state.lastRespond.first != 0) item {
-            Responds(
-                stringResource(R.string.notification_responds_on_user_meetings),
-                state.lastRespond.first,
-                state.lastRespond.second,
-                Modifier.padding(vertical = 12.dp)
-            ) { callback?.onRespondsClick() }
-        }
-        
-        if(todayList.isNotEmpty()) {
-            item { Label(R.string.meeting_profile_bottom_today_label) }
-            itemsIndexed(todayList, { _, it -> it },
-                { _, it -> it.first.type }) { i, not ->
-                NotificationItem(
-                    NotificationItemState(
-                        not.first, not.second,
-                        lazyItemsShapes(i, todayList.size),
-                        getDifferenceOfTime(not.first.date),
-                        (not.first.feedback?.ratings?.map { it.emoji }
-                            ?: state.ratings.map { it.emoji })
-                    ), Modifier, callback
-                )
+        if(itemCount > 0) {
+            
+            val list = arrayListOf<Int>()
+            var i = 0
+            
+            while(i < itemCount) {
+                val not = notifications[i]!!
+                if(!todayControl(not.date)) break
+                list.add(i); ++i
+            }
+            if(list.isNotEmpty()) {
+                item { Label(R.string.meeting_profile_bottom_today_label) }
+                list.forEachIndexed { count, item ->
+                    item {
+                        ElementNot(
+                            count, list.size,
+                            notifications[item]!!,
+                            state.ratings, callback
+                        )
+                    }
+                }
+                list.clear()
+            }
+            
+            while(i < itemCount) {
+                val not = notifications[i]!!
+                if(!weekControl(not.date)) break
+                list.add(i); ++i
+            }
+            if(list.isNotEmpty()) {
+                item { Label(R.string.notification_on_this_week_label) }
+                list.forEachIndexed { count, item ->
+                    item {
+                        ElementNot(
+                            count, list.size,
+                            notifications[item]!!,
+                            state.ratings, callback
+                        )
+                    }
+                }
+                list.clear()
+            }
+            
+            (itemCount - i).let {
+                if(it > 0) {
+                    item { Label(R.string.notification_earlier_label) }
+                    items(it) { count ->
+                        ElementNot(
+                            count, itemCount,
+                            notifications[i + count]!!,
+                            state.ratings, callback
+                        )
+                    }
+                }
             }
         }
-        
-        if(weekList.isNotEmpty()) {
-            item { Label(R.string.notification_on_this_week_label) }
-            itemsIndexed(weekList, { _, it -> it },
-                { _, it -> it.first.type }) { i, not ->
-                NotificationItem(
-                    NotificationItemState(
-                        not.first, not.second,
-                        lazyItemsShapes(i, weekList.size),
-                        getDifferenceOfTime(not.first.date),
-                        (not.first.feedback?.ratings?.map { it.emoji }
-                            ?: state.ratings.map { it.emoji })
-                    ), Modifier, callback
-                )
-            }
-        }
-        
-        if(earlierList.isNotEmpty()) {
-            item { Label(R.string.notification_earlier_label) }
-            itemsIndexed(earlierList, { _, it -> it },
-                { _, it -> it.first.type }) { i, not ->
-                NotificationItem(
-                    NotificationItemState(
-                        not.first, not.second,
-                        lazyItemsShapes(i, earlierList.size),
-                        getDifferenceOfTime(not.first.date),
-                        (not.first.feedback?.ratings?.map { it.emoji }
-                            ?: state.ratings.map { it.emoji })
-                    ), Modifier, callback
-                )
-            }
-        }
-        
+        item { PagingLoader(notifications.loadState) }
         item { Spacer(Modifier.height(20.dp)) }
     }
+}
+
+@Composable
+private fun PreviewLazy() {
+    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
+        val list = DemoNotificationModelList
+        item { Label(R.string.notification_earlier_label) }
+        itemsIndexed(list) { it, not ->
+            ElementNot(
+                it, list.size, not,
+                DemoRatingModelList
+            )
+        }
+    }
+}
+
+@Composable
+private fun ElementNot(
+    index: Int, size: Int,
+    item: NotificationModel,
+    ratings: List<RatingModel>,
+    callback: NotificationsCallback? = null,
+) {
+    val not = item to rememberDragRowState()
+    NotificationItem(
+        NotificationItemState(
+            not.first, not.second,
+            lazyItemsShapes(index, size),
+            getDifferenceOfTime(not.first.date),
+            (not.first.feedback?.ratings?.map { it.emoji }
+                ?: ratings.map { it.emoji })
+        ), Modifier, callback
+    )
 }
 
 @Composable

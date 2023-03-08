@@ -7,16 +7,12 @@ import ru.rikmasters.gilty.shared.models.meets.MainMeetResponse
 import ru.rikmasters.gilty.shared.models.meets.MeetFiltersRequest
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
-class MeetingManager(
-    
-    private val web: MeetingWebSource,
-) {
+class MeetingManager(private val web: MeetingWebSource) {
     
     private data class MeetCount(val total: Int)
     
     private suspend inline fun <reified Type> getMeetings(
-        filter: MeetFiltersRequest,
-        count: Boolean,
+        filter: MeetFiltersRequest, count: Boolean,
     ): Type {
         return web.getMeetsList(
             count = count,

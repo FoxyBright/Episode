@@ -4,10 +4,10 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
+import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.models.ProfileCategories
 import ru.rikmasters.gilty.profile.models.ProfileMeets
 import ru.rikmasters.gilty.profile.repository.ProfileStore
-import ru.rikmasters.gilty.push.NotificationManager
 import ru.rikmasters.gilty.shared.models.Avatar
 
 object ProfileData: DataDefinition() {

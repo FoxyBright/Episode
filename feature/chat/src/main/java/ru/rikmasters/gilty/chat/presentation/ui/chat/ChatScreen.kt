@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.content.FileProvider.getUriForFile
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
@@ -48,55 +49,54 @@ fun ChatScreen(
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
     val context = LocalContext.current
+    val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    // алерт на жалобу
-    val alert by vm.alert.collectAsState()
-    // алерт на выход из встречи
-    val meetOutAlert by vm.meetOutAlert.collectAsState()
-    // состояние меню в шапке
-    val kebabMenuState by vm.kebabMenuState.collectAsState()
+    // список сообщений чата
+    val messages = vm.getMessages(chatId).collectAsLazyPagingItems()
     // состояние меню сообщения
     val messageMenuState by vm.messageMenuState.collectAsState()
-    // состояние меню выбора картинки
-    val imageMenuState by vm.imageMenuState.collectAsState()
     // таймер времени до начала трансляции
     val toTranslation by vm.translationTimer.collectAsState()
-    // список сообщений чата
-    val messages by vm.messages.collectAsState()
+    // состояние меню выбора картинки
+    val imageMenuState by vm.imageMenuState.collectAsState()
+    // состояние меню в шапке
+    val kebabMenuState by vm.kebabMenuState.collectAsState()
     // список пользователей в настоящее время пишущих в чат
     val writingUsers by vm.writingUsers.collectAsState()
-    // тип диалога (для определения прикрепленного бара)
-    val type by vm.chatType.collectAsState()
+    // алерт на выход из встречи
+    val meetOutAlert by vm.meetOutAlert.collectAsState()
     // кол-во непрочитанных сообщений
     val unreadCount by vm.unreadCount.collectAsState()
-    // встреча которой принадлежит чат
-    val meeting by vm.meet.collectAsState()
-    // сообщение в ответе
-    val answer by vm.answer.collectAsState()
-    // выбранное сообщение
-    val message by vm.message.collectAsState()
-    // информация о текущем чате
-    val chat by vm.chat.collectAsState()
     // смотрящие текущюю трансляцию
     val viewers by vm.viewers.collectAsState()
+    // выбранное сообщение
+    val message by vm.message.collectAsState()
+    // тип диалога
+    val type by vm.chatType.collectAsState()
+    // сообщение в ответе
+    val answer by vm.answer.collectAsState()
+    // встреча которой принадлежит чат
+    val meeting by vm.meet.collectAsState()
+    // алерт на жалобу
+    val alert by vm.alert.collectAsState()
+    // информация о текущем чате
+    val chat by vm.chat.collectAsState()
     
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(Nothing)
         onDispose { asm.keyboard.resetSoftInputAdjust() }
     }
     
-    
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
         
-        try {
+        if(unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
         } catch(_: Exception) {
-            listState.scrollToItem(messages.size)
+            listState.scrollToItem(messages.itemCount)
         }
         
         // TODO реализовать прочтение при просмотре конкретного сообщения
@@ -159,15 +159,7 @@ fun ChatScreen(
                 object: ChatCallback {
                     
                     override fun onAnswerClick(message: MessageModel) {
-                        scope.launch {
-                            try {
-                                listState.animateScrollToItem(
-                                    messages.indexOf(message)
-                                )
-                            } catch(e: Exception) {
-                                e.stackTraceToString()
-                            }
-                        }
+                        // TODO для навигации к сообщению при клике на ответ
                     }
                     
                     override fun onPinnedBarButtonClick() {

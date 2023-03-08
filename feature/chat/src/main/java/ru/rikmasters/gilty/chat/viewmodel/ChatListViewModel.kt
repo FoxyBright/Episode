@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
-import ru.rikmasters.gilty.chats.ChatManager
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
@@ -17,8 +17,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val chatManager by inject<ChatManager>()
-    
-    val chatList by lazy { chatManager.chatsFlow.state(emptyList()) }
     
     private val _unreadChats = MutableStateFlow(emptyList<ChatModel>())
     val unreadChats = _unreadChats.asStateFlow()
@@ -40,6 +38,11 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     private val _unread = MutableStateFlow(false)
     val unread = _unread.asStateFlow()
     
+    val isPageRefreshing = MutableStateFlow(false)
+    override val pagingPull = isPageRefreshing
+    
+    fun chats() = chatManager.chats(coroutineScope)
+    
     private val navBarStateList = listOf(
         INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE
     )
@@ -47,20 +50,16 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
-    override suspend fun forceRefresh() {
-        getChatList(true)
-    }
-    
     suspend fun onChatClick(chatId: String) {
         chatManager.connectToChat(chatId)
     }
     
-    suspend fun getChatList(
-        forceWeb: Boolean = false,
-    ) = singleLoading { chatManager.getChatList(forceWeb) }
+    override suspend fun forceRefresh() = singleLoading {
+        chatManager.refresh()
+    }
     
     suspend fun getUnread() = singleLoading {
-        _unreadChats.emit(chatList.value)
+        _unreadChats.emit(chatManager.getUnread())
     }
     
     suspend fun alertSelect(index: Int) {
