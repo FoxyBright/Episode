@@ -107,9 +107,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                 override fun onAboutAppClick() {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<InformationBsViewModel>(vm.scope) {
-                                InformationBs(it)
-                            }
+                            InformationBs()
                         }
                     }
                 }

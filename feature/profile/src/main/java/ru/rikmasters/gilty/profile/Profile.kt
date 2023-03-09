@@ -98,7 +98,6 @@ object Profile: FeatureDefinition() {
             scopedOf(::OrientationBsViewModel)
             scopedOf(::SettingsViewModel)
             scopedOf(::GenderBsViewModel)
-            scopedOf(::InformationBsViewModel)
             scopedOf(::IconsBsViewModel)
             scopedOf(::AgeBsViewModel)
         }

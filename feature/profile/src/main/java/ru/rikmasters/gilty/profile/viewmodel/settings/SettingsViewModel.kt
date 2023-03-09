@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
@@ -12,9 +13,10 @@ import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class SettingsViewModel: ViewModel() {
     
-    private val authManager by inject<AuthManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    private val chatManager by inject<ChatManager>()
+    private val authManager by inject<AuthManager>()
     
     private val _exitAlert = MutableStateFlow(false)
     val exitAlert = _exitAlert.asStateFlow()
@@ -84,12 +86,14 @@ class SettingsViewModel: ViewModel() {
     
     suspend fun deleteAccount() = singleLoading {
         profileManager.deleteAccount()
+        chatManager.disconnect()
         authManager.logout()
         makeToast("Ваш аккаунт был удален!")
     }
     
     suspend fun logout() = singleLoading {
         profileManager.clearProfile()
+        chatManager.disconnect()
         authManager.logout()
         makeToast("До новых Meet!")
     }

@@ -15,8 +15,11 @@ dependencies {
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:bubbles"))
     
+    implementation(project(":domain:paginator"))
+    
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))
+    implementation(project(":data:chats"))
     implementation(project(":data:auth"))
     
     implementation(project(":shared"))

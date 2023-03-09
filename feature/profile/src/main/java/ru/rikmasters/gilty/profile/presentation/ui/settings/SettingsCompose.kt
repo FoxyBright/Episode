@@ -221,11 +221,14 @@ private fun Additionally(
                 Modifier, (null)
             ) { callback?.onAboutAppClick() }
             Divider(Modifier.padding(start = 16.dp))
-            Card(
-                stringResource(R.string.settings_app_icon_label),
-                ThemeExtra.shapes.zero,
-                Modifier, (null)
-            ) { callback?.onIconAppClick() }
+            
+            // TODO Функциональность смены иконки приложения
+            //            Card(
+            //                stringResource(R.string.settings_app_icon_label),
+            //                ThemeExtra.shapes.zero,
+            //                Modifier, (null)
+            //            ) { callback?.onIconAppClick() }
+            
             Divider(Modifier.padding(start = 16.dp))
             CheckBoxCard(
                 stringResource(R.string.notification_screen_name),

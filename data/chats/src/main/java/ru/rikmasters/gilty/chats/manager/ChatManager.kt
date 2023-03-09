@@ -36,6 +36,11 @@ class ChatManager(
         webSocket.connectToChat(chatId)
     }
     
+    // отключение от веб сокетов
+    fun disconnect() {
+        webSocket.disconnect()
+    }
+    
     // удаление чата
     suspend fun deleteChat(
         chatId: String,

@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,7 +15,6 @@ import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.login.presentation.ui.login.country.CountryBs
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
 import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
-import ru.rikmasters.gilty.shared.R
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -82,13 +80,11 @@ fun LoginScreen(vm: LoginViewModel) {
         }
         
         override fun privatePolicy() {
-            val toast = context.resources.getString(R.string.login_policy_toast)
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            openInWeb(context, "https://www.google.ru")
         }
         
         override fun termsOfApp() {
-            val toast = context.resources.getString(R.string.login_terms_toast)
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            openInWeb(context, "https://www.google.ru")
         }
         
         override fun changeCountry() {

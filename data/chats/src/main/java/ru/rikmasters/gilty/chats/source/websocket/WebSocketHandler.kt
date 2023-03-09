@@ -202,6 +202,10 @@ class WebSocketHandler(
     private val _userId = MutableStateFlow("")
     private var sessionHandlerJob: Job? = null
     
+    fun disconnect() {
+        sessionHandlerJob?.cancel()
+    }
+    
     suspend fun connect(userId: String) = withContext(IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
