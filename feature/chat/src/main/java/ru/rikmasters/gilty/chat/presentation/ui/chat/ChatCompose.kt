@@ -23,11 +23,11 @@ import androidx.paging.compose.itemsIndexed
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
 import kotlinx.coroutines.flow.flowOf
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportAlert
 import ru.rikmasters.gilty.chat.presentation.ui.chat.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
-import ru.rikmasters.gilty.complaints.presentation.ui.ComplainAlert
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -164,7 +164,7 @@ fun ChatContent(
         }
     )
     
-    ComplainAlert(state.alert)
+    ReportAlert(state.alert)
     { callback?.closeAlert() }
     
     GAlert(

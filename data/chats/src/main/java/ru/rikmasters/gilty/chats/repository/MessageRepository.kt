@@ -64,7 +64,7 @@ class MessageRepository(
         override suspend fun getPage(
             page: Int, perPage: Int,
         ) = Pair(
-            source.uploadMessage(chatId, page, perPage),
+            source.getMessages(chatId, page, perPage),
             ResponseWrapper.Paginator(page, perPage)
         )
     }
@@ -96,6 +96,15 @@ class MessageRepository(
         chatId: String, scope: CoroutineScope,
     ) = Pager(PagingConfig(15))
     { newSource(chatId) }.flow.cachedIn(scope)
+    
+    private suspend fun getMessages(
+        chatId: String, page: Int, perPage: Int,
+    ): List<MessageModel> {
+        
+        //
+        
+        return uploadMessage(chatId, page, perPage)
+    }
     
     // подгрузка сообщений по страницам
     private suspend fun uploadMessage(

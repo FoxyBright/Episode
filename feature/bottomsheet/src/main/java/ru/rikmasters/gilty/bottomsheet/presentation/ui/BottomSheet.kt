@@ -8,25 +8,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.*
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer.OrganizerBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.participants.ParticipantsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
-import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.bottomsheet.viewmodel.components.*
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 
 @Composable
 fun BottomSheet(
-    vm: BsViewModel,
+    scope: Scope,
     type: BsType,
     meetId: String? = null,
     userId: String? = null,
     reportType: ReportObjectType? = null,
     reportObject: String? = null,
 ) {
+    
     val nav = rememberNavController()
     
     NavHost(
@@ -66,7 +67,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("meet") { meet ->
                 stack.GetBooleanArg("detailed") { detailed ->
-                    Connector<MeetingViewModel>(vm.scope) {
+                    Connector<MeetingViewModel>(scope) {
                         MeetingBs(it, meet, detailed, nav)
                     }
                 }
@@ -82,7 +83,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("user") { user ->
                 stack.GetStringArg("meet") { meet ->
-                    Connector<OrganizerViewModel>(vm.scope) {
+                    Connector<OrganizerViewModel>(scope) {
                         OrganizerBs(it, user, meet, nav)
                     }
                 }
@@ -96,7 +97,7 @@ fun BottomSheet(
             )
         ) { stack ->
             stack.GetStringArg("meet") { meet ->
-                Connector<ParticipantsViewModel>(vm.scope) {
+                Connector<ParticipantsViewModel>(scope) {
                     ParticipantsBs(it, meet, nav)
                 }
             }
@@ -111,7 +112,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("id") { id ->
                 stack.GetStringArg("type") { type ->
-                    Connector<ReportsViewModel>(vm.scope) {
+                    Connector<ReportsViewModel>(scope) {
                         ReportsBs(it, ReportObjectType.valueOf(type), id, nav)
                     }
                 }
@@ -141,6 +142,7 @@ private fun setStringArg(
     defaultValue = default
 }
 
+@Suppress("SameParameterValue")
 private fun setBooleanArg(
     arg: String,
     default: Boolean,

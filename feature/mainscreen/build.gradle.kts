@@ -11,7 +11,6 @@ dependencies {
     compose()
     
     implementation(project(":feature:bottomsheet"))
-    implementation(project(":feature:complaints"))
     implementation(project(":feature:animated"))
     implementation(project(":feature:bubbles"))
     implementation(project(":feature:profile"))

@@ -18,7 +18,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.REPORTS
-import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
@@ -239,13 +238,11 @@ fun ChatScreen(
                             when(point) {
                                 0 -> vm.changeMeetOutAlert(true)
                                 1 -> asm.bottomSheet.expand {
-                                    Connector<BsViewModel> {
-                                        BottomSheet(
-                                            it, REPORTS,
-                                            reportObject = state.meet.id,
-                                            reportType = MEETING
-                                        )
-                                    }
+                                    BottomSheet(
+                                        vm.scope, REPORTS,
+                                        reportObject = state.meet.id,
+                                        reportType = MEETING
+                                    )
                                 }
                             }
                         }
@@ -254,9 +251,7 @@ fun ChatScreen(
                     override fun onTopBarClick() {
                         scope.launch {
                             asm.bottomSheet.expand {
-                                Connector<BsViewModel> {
-                                    BottomSheet(it, MEET, state.meet.id)
-                                }
+                                BottomSheet(vm.scope, MEET, state.meet.id)
                             }
                         }
                     }

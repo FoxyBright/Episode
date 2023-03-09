@@ -7,7 +7,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
-import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -40,9 +39,7 @@ fun MainScreen(vm: MainViewModel) {
     val alert by vm.alert.collectAsState()
     val hasFilters by vm.meetFilters.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.getMeets()
-    }
+    LaunchedEffect(Unit) { vm.getMeets() }
     
     Use<MainViewModel>(LoadingTrait) {
         MainContent(
@@ -66,9 +63,7 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onMeetClick(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<BsViewModel>(vm.scope) {
-                                BottomSheet(it, MEET, meet.id)
-                            }
+                            BottomSheet(vm.scope, MEET, meet.id)
                         }
                     }
                 }
@@ -76,9 +71,7 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onRespond(meet: MeetingModel) {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            Connector<BsViewModel>(vm.scope) {
-                                BottomSheet(it, SHORT_MEET, meet.id)
-                            }
+                            BottomSheet(vm.scope, SHORT_MEET, meet.id)
                         }
                     }
                 }

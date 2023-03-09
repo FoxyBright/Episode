@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
-import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -68,9 +67,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onHistoryClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<BsViewModel>(vm.scope) {
-                            BottomSheet(it, MEET, meet.id)
-                        }
+                        BottomSheet(vm.scope, MEET, meet.id)
                     }
                 }
             }
@@ -78,9 +75,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<BsViewModel>(vm.scope) {
-                            BottomSheet(it, MEET, meet.id)
-                        }
+                        BottomSheet(vm.scope, MEET, meet.id)
                     }
                 }
             }

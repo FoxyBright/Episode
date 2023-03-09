@@ -10,7 +10,6 @@ dependencies {
     androidBase()
     compose()
     
-    implementation(project(":feature:complaints"))
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))
     implementation(project(":data:reports"))

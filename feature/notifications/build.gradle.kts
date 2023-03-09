@@ -12,10 +12,9 @@ dependencies {
     implementation(project(":domain:paginator"))
     
     implementation(project(":feature:bottomsheet"))
-    implementation(project(":feature:complaints"))
     implementation(project(":feature:profile"))
+    implementation(project(":data:notifications"))
     
-    implementation(project(":data:notification"))
     implementation(project(":data:meetings"))
     implementation(project(":data:reports"))
     implementation(project(":data:profile"))

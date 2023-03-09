@@ -14,7 +14,6 @@ dependencies {
     
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:mainscreen"))
-    implementation(project(":feature:complaints"))
     implementation(project(":feature:animated"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:gallery"))

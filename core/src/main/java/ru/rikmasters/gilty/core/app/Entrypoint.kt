@@ -5,9 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -35,7 +33,7 @@ fun AppEntrypoint(
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
     snackbar: @Composable (SnackbarData) -> Unit,
     loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null,
-    indicator: (@Composable (state: SwipeRefreshState, offset:Dp, trigger: Dp) -> Unit)? = null,
+    indicator: (@Composable (state: SwipeRefreshState, offset: Dp, trigger: Dp) -> Unit)? = null,
 ) {
     
     LoadingTrait.loader = loader

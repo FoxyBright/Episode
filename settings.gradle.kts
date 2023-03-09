@@ -26,7 +26,7 @@ include(":data:meetings")
 include(":data:profile")
 
 
-include(":data:notification")
+include(":data:notifications")
 
 
 include(":data:shared")
@@ -53,7 +53,7 @@ include(":feature:bubbles")
 include(":dataexample")
 
 
-include(":feature:complaints")
+include(":feature:reports")
 
 
 include(":feature:chat")

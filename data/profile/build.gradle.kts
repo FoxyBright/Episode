@@ -12,6 +12,6 @@ dependencies {
     dataBase()
     
     implementation(project(":data:shared"))
-    implementation(project(":data:notification"))
+    implementation(project(":data:notifications"))
     implementation(project(":shared"))
 }

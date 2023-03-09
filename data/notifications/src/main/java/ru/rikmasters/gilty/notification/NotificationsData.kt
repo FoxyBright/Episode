@@ -6,7 +6,7 @@ import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
 import ru.rikmasters.gilty.shared.models.Notification
 
-object NotificationData: DataDefinition() {
+object NotificationsData: DataDefinition() {
     
     override fun EntitiesBuilder.entities() {
         entity<Notification>()

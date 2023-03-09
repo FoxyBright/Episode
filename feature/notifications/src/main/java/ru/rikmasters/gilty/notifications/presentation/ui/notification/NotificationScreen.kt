@@ -10,7 +10,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
-import ru.rikmasters.gilty.bottomsheet.viewmodel.BsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -89,9 +88,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             override fun onMeetClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<BsViewModel>(vm.scope) {
-                            BottomSheet(it, MEET, meet.id)
-                        }
+                        BottomSheet(vm.scope, MEET, meet.id)
                     }
                 }
             }
@@ -100,9 +97,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                 scope.launch {
                     user.id?.let { u ->
                         asm.bottomSheet.expand {
-                            Connector<BsViewModel>(vm.scope) {
-                                BottomSheet(it, USER, meet.id, u)
-                            }
+                            BottomSheet(vm.scope, USER, meet.id, u)
                         }
                     }
                 }

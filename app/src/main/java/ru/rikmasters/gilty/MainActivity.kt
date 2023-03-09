@@ -7,11 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.bottomsheet.DeepLinker.deepLink
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.presentation.model.FireBaseService
@@ -61,7 +64,6 @@ class MainActivity: ComponentActivity() {
                 { isLoading, content -> GLoader(isLoading, content) },
                 { state, offset, trigger -> LoadingIndicator(state, offset, trigger) }
             )
-            
             LaunchedEffect(Unit) {
                 if(
                     authManager.isAuthorized()
@@ -74,11 +76,21 @@ class MainActivity: ComponentActivity() {
                 }
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
+            
+            val asm by inject<AppStateModel>()
+            val scope = getKoin().createScope<MainActivity>()
+            
+            LaunchedEffect(intent) {
+                if(authManager.isAuthorized()
+                    && regManager.profileCompleted()
+                ) deepLink(scope, asm, intent)
+            }
         }
     }
     
-    override fun getIntent(): Intent? =
-        _intent ?: super.getIntent()?.let { _intent = it; _intent!! }
+    override fun getIntent() = _intent ?: super.getIntent()
+        ?.let { _intent = it; _intent!! }
+    
     
     override fun setIntent(newIntent: Intent?) {
         _intent = newIntent
