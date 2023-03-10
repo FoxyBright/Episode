@@ -37,8 +37,8 @@ class BottomSheetState(
 ) {
     
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
-    
     suspend fun expand() = animateTo(BottomSheetSwipeState.EXPANDED)
+    
     @Suppress("unused")
     suspend fun halfExpand() = animateTo(BottomSheetSwipeState.HALF_EXPANDED)
     
@@ -61,6 +61,7 @@ class BottomSheetState(
     ) {
         animateTo(BottomSheetSwipeState.COLLAPSED)
         this.content = content
+        
         animateTo(swipeState)
     }
     
@@ -71,8 +72,6 @@ class BottomSheetState(
             throw IllegalStateException("Открытие нижней панели без содержимого")
         swipeableState.animateTo(swipeState, tween())
     }
-    
-    val offset: Float by swipeableState.offset
     
     @Suppress("PropertyName")
     internal val _current = MutableStateFlow(BottomSheetSwipeState.COLLAPSED)
@@ -124,7 +123,7 @@ fun BottomSheetLayout(
         val scrimColor by animateColorAsState(
             if(state.swipeableState.targetValue == BottomSheetSwipeState.COLLAPSED)
                 Color.Transparent else state.scrim().copy(alpha = 0.5f),
-            tween(500)
+            tween(500), label = ""
         )
         
         content()
@@ -168,11 +167,11 @@ fun BottomSheetLayout(
             
             val gripColor by animateColorAsState(
                 if(state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
-                    state.gripDarkColor() else state.gripLightColor()
+                    state.gripDarkColor() else state.gripLightColor(), label = ""
             )
             val gripOffset by animateDpAsState(
                 if(state.swipeableState.targetValue == BottomSheetSwipeState.EXPANDED)
-                    21.dp else 0.dp
+                    21.dp else 0.dp, label = ""
             )
             Box(
                 Modifier
@@ -193,10 +192,7 @@ fun BottomSheetLayout(
 }
 
 @Composable
-private fun Grip(
-    modifier: Modifier,
-    color: Color,
-) {
+private fun Grip(modifier: Modifier, color: Color) {
     Box(
         modifier
             .size(40.dp, 5.dp)

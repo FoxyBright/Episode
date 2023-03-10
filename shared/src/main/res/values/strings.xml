@@ -167,6 +167,12 @@
     <string name="meeting_repeat_button">Повторить</string>
     <string name="meeting_get_more_button">Хочу еще</string>
     <string name="meeting_anonymous_members_label">Так как meet анонимный, профили участников\nне будут видны на протяжении всего meet</string>
+    <string name="meeting_maps_open_with">Открыть с помощью\nприложения</string>
+    <string name="meeting_maps_alert_title">Открыть приложение</string>
+    <string name="meeting_maps_alert_label">«Gilty» хочет открыть приложение «%s»</string>
+    <string name="meeting_maps_alert_open">Открыть</string>
+    <string name="maps_google">Google\nMaps</string>
+    <string name="maps_yandex">Yandex\nMaps</string>
 
 
     <!--Meeting Filters-->
@@ -233,6 +239,7 @@
     <string name="gilty_logo">Логотип Gilty</string>
     <string name="geolocation_icon">Иконка геолокации</string>
     <string name="map">Карта</string>
+    <string name="map_get_route">Проложить маршрут</string>
     <string name="clear">Очистить</string>
     <string name="check_image">Иконка чекбокса</string>
     <string name="edit_button">Изменить</string>
@@ -284,7 +291,7 @@
     <string name="add_meet_detailed_meet_description">Описание</string>
     <string name="add_meet_detailed_meet_description_place_holder">Краткое описание meet</string>
     <string name="add_meet_detailed_meet_place">Место meet</string>
-    <string name="add_meet_detailed_meet_place_place_holder">Точное место meet будет видно только участникам</string>
+    <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только\nучастникам meet</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место meet</string>
     <string name="requirements_title">Требования к\nучастникам</string>
     <string name="requirements_member_count_label">Количество</string>

@@ -4,9 +4,9 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.bottomsheet.BottomSheet
-import ru.rikmasters.gilty.bottomsheet.viewmodel.components.MeetingViewModel
-import ru.rikmasters.gilty.bottomsheet.viewmodel.components.OrganizerViewModel
-import ru.rikmasters.gilty.bottomsheet.viewmodel.components.ParticipantsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.OrganizerViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingsData

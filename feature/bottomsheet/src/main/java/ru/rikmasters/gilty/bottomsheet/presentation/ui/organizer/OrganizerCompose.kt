@@ -70,7 +70,6 @@ fun OrganizerContent(
     callback: OrganizerCallback? = null,
 ) {
     val user = state.profileState.profile
-    
     LazyColumn(
         modifier
             .fillMaxSize()

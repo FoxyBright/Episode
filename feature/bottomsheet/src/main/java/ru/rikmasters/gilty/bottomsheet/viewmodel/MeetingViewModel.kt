@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.bottomsheet.viewmodel.components
+package ru.rikmasters.gilty.bottomsheet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -7,7 +7,6 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 class MeetingViewModel: ViewModel() {
@@ -59,10 +58,6 @@ class MeetingViewModel: ViewModel() {
         meetManager.respondOfMeet(
             meetId, comment.value.ifBlank { null }, hidden.value
         )
-    }
-    
-    suspend fun meetPlaceClick(location: LocationModel?) {
-        makeToast("API карт пока отсутствует $location")
     }
     
     suspend fun leaveMeet(meetId: String) {

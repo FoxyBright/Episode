@@ -57,5 +57,6 @@ fun CameraPreview(
             }, getMainExecutor(context))
             
             previewView
-        })
+        }
+    )
 }

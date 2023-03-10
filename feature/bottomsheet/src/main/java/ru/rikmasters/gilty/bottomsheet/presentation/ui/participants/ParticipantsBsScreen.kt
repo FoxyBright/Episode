@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import ru.rikmasters.gilty.bottomsheet.viewmodel.components.ParticipantsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsList

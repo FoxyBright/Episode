@@ -2,9 +2,15 @@ package ru.rikmasters.gilty.shared.models.meets
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.durationToString
-import ru.rikmasters.gilty.shared.model.enumeration.*
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.valueOf
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.DetailedRequirement
+import ru.rikmasters.gilty.shared.models.Location
+import ru.rikmasters.gilty.shared.models.User
 
 data class DetailedMeetResponse(
     val id: String,
@@ -53,10 +59,13 @@ data class DetailedMeetResponse(
         members = members.map { it.map() },
         requirements = requirements?.let { req -> req.map { it.map() } },
         hideAddress = hideAddress,
-        location = location?.map(),
-        place = place,
+        location = location?.map()?.copy(
+            hide = valueOf(memberState) != IS_MEMBER,
+            place = place,
+            address = address,
+        ), place = place,
         address = address,
-        memberState = MemberStateType.valueOf(memberState),
+        memberState = valueOf(memberState),
         price = price
     )
 }

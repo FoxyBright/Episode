@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":feature:notifications"))
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:mainscreen"))
+    implementation(project(":feature:yandexmap"))
     implementation(project(":feature:animated"))
     implementation(project(":feature:addmeet"))
     implementation(project(":feature:bubbles"))

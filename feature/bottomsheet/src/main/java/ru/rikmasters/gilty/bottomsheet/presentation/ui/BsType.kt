@@ -7,5 +7,7 @@ enum class BsType {
     REPORTS,
     USER,
     MEET,
+    MAP,
+    APPS,
     SHORT_MEET
 }

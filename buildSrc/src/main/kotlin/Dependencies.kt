@@ -14,7 +14,12 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
     koin()
     implementationIf(!excludeCore, project(":core"))
     paging()
+    yandexmap()
 }
+
+private fun DependencyHandlerScope.yandexmap() = implementation(
+    "com.yandex.android:maps.mobile:4.3.1-full"
+)
 
 const val composeVer = Config.composeUiVer
 fun DependencyHandlerScope.compose() = implementation(

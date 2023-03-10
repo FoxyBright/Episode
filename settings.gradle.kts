@@ -2,6 +2,9 @@
 
 import java.net.URI
 
+include(":feature:yandexmap")
+
+
 include(":domain:paginator")
 
 

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.bottomsheet.viewmodel.components
+package ru.rikmasters.gilty.bottomsheet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

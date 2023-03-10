@@ -6,11 +6,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.bottomsheet.viewmodel.components.MeetingViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.common.extentions.shareMeet
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
@@ -93,8 +94,10 @@ fun MeetingBs(
                         )
                     }
                     
-                    override fun onMeetPlaceClick(meetLocation: LocationModel?) {
-                        scope.launch { vm.meetPlaceClick(meetLocation) }
+                    override fun onMeetPlaceClick(location: LocationModel?) {
+                        nav.navigate(
+                            "MAP?location=${mapper.writeValueAsString(location)}"
+                        )
                     }
                     
                     override fun onRespondsClick(meet: FullMeetingModel) {

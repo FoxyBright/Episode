@@ -1,8 +1,5 @@
 package ru.rikmasters.gilty.chats.source.websocket
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.module.kotlin.jsonMapper
-import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -24,6 +21,7 @@ import ru.rikmasters.gilty.chats.models.ws.enums.SocketEvents.*
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.models.User
 import java.io.IOException
@@ -35,11 +33,6 @@ class WebSocketHandler(
 ): KtorSource() {
     
     private val socketURL = "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
-    
-    private val mapper = jsonMapper {
-        propertyNamingStrategy(PropertyNamingStrategies.SnakeCaseStrategy())
-        addModule(kotlinModule())
-    }
     
     private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
     private val socketId = MutableStateFlow<String?>(null)

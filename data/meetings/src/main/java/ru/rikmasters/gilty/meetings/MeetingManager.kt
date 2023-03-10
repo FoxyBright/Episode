@@ -101,8 +101,8 @@ class MeetingManager(private val web: MeetingWebSource) {
         dateTime: String?,
         duration: Int?,
         hide: Boolean?,
-        lat: Int?,
-        lng: Int?,
+        lat: Double?,
+        lng: Double?,
         place: String?,
         address: String?,
         isPrivate: Boolean?,
@@ -115,14 +115,10 @@ class MeetingManager(private val web: MeetingWebSource) {
         condition, price, photoAccess,
         chatForbidden, tags, description,
         dateTime, duration,
-        if(isOnline != true)
-            Location(
-                hide, lat, lng, ("RU"),
-                ("Kaluga"), ("Kaluga"),
-                place, address
-            )
-        else null, isPrivate, memberCount, requirementsType,
-        when {
+        if(isOnline != true) Location(
+            hide, lat, lng, place, address
+        ) else null, isPrivate, memberCount,
+        requirementsType, when {
             isPrivate == true -> null
             requirementsType == "ALL" -> {
                 val req = requirements!!.first()

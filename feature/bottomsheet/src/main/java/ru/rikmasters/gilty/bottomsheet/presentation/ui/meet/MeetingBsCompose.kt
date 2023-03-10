@@ -123,7 +123,7 @@ interface MeetingBsCallback {
     
     fun onKebabClick(state: Boolean) {}
     fun onMenuItemClick(index: Int, meetId: String) {}
-    fun onMeetPlaceClick(meetLocation: LocationModel?) {}
+    fun onMeetPlaceClick(location: LocationModel?) {}
     fun onMemberClick(member: UserModel) {}
     fun onRespond(meetId: String) {}
     fun onAvatarClick(organizerId: String, meetId: String) {}

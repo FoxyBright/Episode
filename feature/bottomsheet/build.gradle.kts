@@ -9,6 +9,9 @@ compose()
 dependencies {
     androidBase()
     compose()
+    ktor()
+    
+    implementation(project(":feature:yandexmap"))
     
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))
