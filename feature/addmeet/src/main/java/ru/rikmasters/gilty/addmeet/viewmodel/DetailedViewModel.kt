@@ -42,6 +42,7 @@ class DetailedViewModel: ViewModel() {
             Pair(address.value, point.value)
         else null
     )
+    
     val place = _place.asStateFlow()
     
     private val _date = MutableStateFlow(getDate())

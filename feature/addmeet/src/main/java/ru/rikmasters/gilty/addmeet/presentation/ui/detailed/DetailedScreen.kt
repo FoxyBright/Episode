@@ -5,13 +5,14 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.duration.DurationBs
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.map.MapBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time.TimeBs
 import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.Online
+import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.DurationBsViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.MapBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.LOCATION
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -69,9 +70,10 @@ fun DetailedScreen(vm: DetailedViewModel) {
             override fun onMeetPlaceClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<MapBsViewModel>(vm.scope) {
-                            MapBs(it)
-                        }
+                        BottomSheet(
+                            vm.scope, LOCATION,
+                            category = SelectCategory
+                        )
                     }
                 }
             }

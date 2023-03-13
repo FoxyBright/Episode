@@ -1,18 +1,12 @@
-package ru.rikmasters.gilty.addmeet.viewmodel.bottoms
+package ru.rikmasters.gilty.bottomsheet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.addmeet.viewmodel.Address
-import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.Place
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 
-class MapBsViewModel(
-    
-    private val detailedVm: DetailedViewModel = DetailedViewModel(),
-): ViewModel() {
+class MapBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     
@@ -26,17 +20,13 @@ class MapBsViewModel(
         _search.emit(text)
     }
     
-    suspend fun onMapClick() {
-        makeToast("Для карт пока что отсутствует API")
-    }
-    
     suspend fun getLastPlaces() {
         _last.emit(meetManager.getLastPlaces())
     }
     
     suspend fun selectPlace(place: Pair<String, String>) {
-        detailedVm.changePlace(place)
-        Address = place.first
-        Place = place.second
+//        detailedVm.changePlace(place)
+//        Address = place.first
+//        Place = place.second
     }
 }

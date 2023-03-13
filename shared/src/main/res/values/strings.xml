@@ -200,6 +200,7 @@
     <string name="meeting_filter_distance">Расстояние</string>
     <string name="meeting_filter_meet_type">Тип meet</string>
     <string name="meeting_filter_conditions">Условия</string>
+    <string name="select_button">Выбрать</string>
 
     <!-- Chats -->
     <string name="chats_member_cases">участник%s</string>

@@ -26,7 +26,8 @@ fun PhotoViewScreen(
     }
     
     val animateTimer = animateFloatAsState(
-        if(timer) 1f else 0f, tween(6000)
+        if(timer) 1f else 0f, tween(6000),
+        label = ""
     ) { nav.navigationBack() }.value
     
     PhotoView(

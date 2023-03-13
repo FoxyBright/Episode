@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.*
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.map.MapBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer.OrganizerBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.participants.ParticipantsBs
@@ -22,6 +23,7 @@ import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 import ru.rikmasters.gilty.yandexmap.MapApps
@@ -37,6 +39,7 @@ fun BottomSheet(
     reportType: ReportObjectType? = null,
     reportObject: String? = null,
     location: LocationModel? = null,
+    category: CategoryModel? = null,
 ) {
     
     val nav = rememberNavController()
@@ -51,8 +54,9 @@ fun BottomSheet(
             USER -> "USER?user={user}&meet={meet}"
             APPS -> "APPS?lat={lat}&lng={lng}"
             RESPONDS -> "RESPONDS?meet={meet}"
-            MAP -> "MAP?location={location}"
+            MAP -> "MAP?location={location}&category={category}"
             OBSERVERS -> "OBSERVERS"
+            LOCATION -> "LOCATION"
         }
     ) {
         
@@ -91,15 +95,24 @@ fun BottomSheet(
         
         
         composable(
-            route = "MAP?location={location}",
+            route = "MAP?location={location}&category={category}",
             arguments = listOf(
                 setStringArg("location", "$location"),
+                setStringArg("category", ""),
             )
         ) { stack ->
             stack.GetStringArg("location") { location ->
-                Connector<YandexMapViewModel>(scope) {
-                    YandexMapScreen(it, location, nav)
+                stack.GetStringArg("category") { category ->
+                    Connector<YandexMapViewModel>(scope) {
+                        YandexMapScreen(it, location, category, nav)
+                    }
                 }
+            }
+        }
+        
+        composable("LOCATION") {
+            Connector<MapBsViewModel>(scope) {
+                MapBs(it, nav, category!!.name)
             }
         }
         

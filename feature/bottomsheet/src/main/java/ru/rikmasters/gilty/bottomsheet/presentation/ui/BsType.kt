@@ -9,5 +9,6 @@ enum class BsType {
     MEET,
     MAP,
     APPS,
-    SHORT_MEET
+    SHORT_MEET,
+    LOCATION
 }

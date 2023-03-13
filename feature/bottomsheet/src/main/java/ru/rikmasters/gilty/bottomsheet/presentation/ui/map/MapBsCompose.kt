@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.map
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.onNull
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.*
@@ -194,6 +193,12 @@ private fun Search(
         }
     }
 }
+
+fun onNull(text: String): String =
+    if(text.isNotEmpty()
+        && text.first() == '0'
+    ) text.substring(1, text.length)
+    else text
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
