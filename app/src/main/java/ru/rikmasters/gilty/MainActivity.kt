@@ -12,12 +12,13 @@ import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.bottomsheet.DeepLinker.deepLink
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
+import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.bottomsheet.deeplink.DeepLinker.deepLink
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
@@ -81,13 +82,14 @@ class MainActivity: ComponentActivity() {
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
             
-            val asm by inject<AppStateModel>()
             val scope = getKoin().createScope<MainActivity>()
+            val asm by inject<AppStateModel>()
+            val nav by inject<NavState>()
             
             LaunchedEffect(intent) {
                 if(authManager.isAuthorized()
                     && regManager.profileCompleted()
-                ) deepLink(scope, asm, intent)
+                ) deepLink(scope, asm, intent, nav)
             }
         }
     }

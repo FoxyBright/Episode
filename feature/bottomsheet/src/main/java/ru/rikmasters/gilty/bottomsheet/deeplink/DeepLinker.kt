@@ -1,45 +1,43 @@
-package ru.rikmasters.gilty.bottomsheet
+package ru.rikmasters.gilty.bottomsheet.deeplink
 
 import android.content.Intent
 import org.koin.core.scope.Scope
-import ru.rikmasters.gilty.bottomsheet.DeepLinker.LinkType.MEET
-import ru.rikmasters.gilty.bottomsheet.DeepLinker.LinkType.OTHER
+import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.MEET
+import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.MESSAGE
+import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.OTHER
+import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.getChatId
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.core.navigation.NavState
 
 object DeepLinker {
     
     private fun String.cut(c: String) =
         this.substringAfter(c)
     
-    private enum class LinkType(val value: String) {
-        OTHER("OTHER"),
-        MEET("meet/?")
-    }
-    
-    private fun getLink(intent: Intent?): Pair<String, String> {
-        return intent?.data.toString().let {
+    private fun getLink(intent: Intent?) =
+        intent?.data.toString().let {
             when {
-                // Ссылка на встречу
-                it.contains(MEET.value) -> Pair(
-                    MEET.name, it.cut(MEET.value)
-                )
+                it.contains(MEET.value) ->
+                    MEET to it.cut(MEET.value)
                 
-                // Другие интенты
-                else -> Pair(OTHER.name, it)
+                it.contains(MESSAGE.value) ->
+                    MESSAGE to getChatId(it, MESSAGE)
+                
+                else -> OTHER to it
             }
         }
-    }
     
     suspend fun deepLink(
-        scope: Scope, asm: AppStateModel, intent: Intent?,
+        scope: Scope, asm: AppStateModel,
+        intent: Intent?, nav: NavState,
     ) {
         
-        log.d("INTENT ->>> ${intent?.data}")
+        log.d("INTENT ->>>\nData: ${intent?.data}")
         
         val link = getLink(intent)
         val bs = asm.bottomSheet
@@ -48,10 +46,9 @@ object DeepLinker {
         if(bs.current.value != COLLAPSED) bs.collapse()
         
         when(link.first) {
-            // Ссылка на встречу
-            MEET.name -> bottomSheet(bs, link.second, scope)
-            
-            // Add new deepLink actions
+            MEET -> bottomSheet(bs, link.second, scope)
+            MESSAGE -> nav.navigateAbsolute("chats/chat?id=${link.second}")
+            OTHER -> {}
         }
     }
     
