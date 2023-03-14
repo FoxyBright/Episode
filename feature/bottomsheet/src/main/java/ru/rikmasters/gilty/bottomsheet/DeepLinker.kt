@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
+import ru.rikmasters.gilty.core.log.log
 
 object DeepLinker {
     
@@ -37,6 +38,9 @@ object DeepLinker {
     suspend fun deepLink(
         scope: Scope, asm: AppStateModel, intent: Intent?,
     ) {
+        
+        log.d("INTENT ->>> ${intent?.data}")
+        
         val link = getLink(intent)
         val bs = asm.bottomSheet
         

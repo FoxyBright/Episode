@@ -30,8 +30,8 @@ fun ConditionPreview() {
         ConditionContent(
             ConditionState(
                 (true), (true), listOf(2),
-                listOf(3), ("1000"),
-                (false), (true), (true)
+                listOf(3), (true), ("1000"),
+                (false), (true)
             ), Modifier.background(colorScheme.background)
         )
     }
@@ -42,9 +42,9 @@ data class ConditionState(
     val hiddenPhoto: Boolean,
     val meetType: List<Int>,
     val condition: List<Int>,
+    val chatForbidden: Boolean,
     val price: String,
     val alert: Boolean,
-    val restrictChat: Boolean,
     val isActive: Boolean,
 )
 
@@ -55,7 +55,7 @@ interface ConditionsCallback {
     fun onClose() {}
     fun onOnlineClick() {}
     fun onHiddenClick() {}
-    fun onRestrictClick() {}
+    fun onForbiddenClick() {}
     fun onPriceChange(price: String) {}
     fun onClear() {}
     fun onMeetingTypeSelect(type: Int) {}
@@ -203,9 +203,9 @@ private fun additional(
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp),
-                state.restrictChat,
+                state.chatForbidden,
                 online = true
-            ) { callback?.onRestrictClick() }
+            ) { callback?.onForbiddenClick() }
             Text(
                 stringResource(R.string.add_meet_restrict_chat_label),
                 Modifier

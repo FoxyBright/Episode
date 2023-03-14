@@ -7,8 +7,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.duration.DurationBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time.TimeBs
 import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
-import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.DurationBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -21,30 +19,39 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 @Composable
 fun DetailedScreen(vm: DetailedViewModel) {
     
-    val nav = get<NavState>()
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
-    val description by vm.description.collectAsState()
+    val addMeet by vm.addMeet.collectAsState()
     val alert by vm.alert.collectAsState()
-    val hideAddress by vm.hideAddress.collectAsState()
-    val date by vm.date.collectAsState()
-    val duration by vm.duration.collectAsState()
-    val tags by vm.tags.collectAsState()
-    val place by vm.place.collectAsState()
+    
+    val tags = addMeet?.tags ?: emptyList()
+    val description = addMeet?.description ?: ""
+    val duration = addMeet?.duration ?: ""
+    val address = addMeet?.address ?: ""
+    val hide = addMeet?.hide ?: false
+    val date = addMeet?.dateTime ?: ""
+    val place = addMeet?.place ?: ""
+    
+    val placePair = if(
+        address.isNotBlank()
+        && place.isNotBlank()
+    ) (address to place) else null
+    
+    val online = addMeet?.isOnline ?: false
     
     val isActive = date.isNotBlank()
             && duration.isNotBlank()
             && tags.isNotEmpty()
-            && if(!Online)
-        place != null
+            && if(!online)
+        placePair != null
     else true
     
     DetailedContent(
         DetailedState(
-            duration, date, description,
-            tags, place, hideAddress,
-            alert, Online, isActive
+            duration, date, description, tags,
+            placePair, hide, alert, online, isActive
         ), Modifier, object: DetailedCallback {
             
             override fun onDateClick() {
@@ -72,30 +79,34 @@ fun DetailedScreen(vm: DetailedViewModel) {
                     asm.bottomSheet.expand {
                         BottomSheet(
                             vm.scope, LOCATION,
-                            category = SelectCategory
+                            category = addMeet?.category!!
                         )
                     }
                 }
-            }
-            
-            override fun onTagDelete(tag: TagModel) {
-                scope.launch { vm.deleteTag(tag) }
             }
             
             override fun onDescriptionChange(text: String) {
                 scope.launch { vm.changeDescription(text) }
             }
             
-            override fun onHideMeetPlaceClick() {
-                scope.launch { vm.hideMeetPlace() }
-            }
-            
             override fun onDescriptionClear() {
                 scope.launch { vm.clearDescription() }
             }
             
+            override fun onCloseAlert(state: Boolean) {
+                scope.launch { vm.alertDismiss(state) }
+            }
+            
             override fun onClose() {
                 nav.navigateAbsolute("main/meetings")
+            }
+            
+            override fun onTagDelete(tag: TagModel) {
+                scope.launch { vm.deleteTag(tags, tag) }
+            }
+            
+            override fun onHideMeetPlaceClick() {
+                scope.launch { vm.hideMeetPlace(!hide) }
             }
             
             override fun onNext() {
@@ -108,10 +119,6 @@ fun DetailedScreen(vm: DetailedViewModel) {
             
             override fun onBack() {
                 nav.navigationBack()
-            }
-            
-            override fun onCloseAlert(state: Boolean) {
-                scope.launch { vm.alertDismiss(state) }
             }
         }
     )

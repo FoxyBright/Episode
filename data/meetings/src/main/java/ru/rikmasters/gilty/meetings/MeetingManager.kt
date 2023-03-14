@@ -1,15 +1,60 @@
 package ru.rikmasters.gilty.meetings
 
+import ru.rikmasters.gilty.meetings.addmeet.AddMeetStorage
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.models.Location
-import ru.rikmasters.gilty.shared.models.Requirement
-import ru.rikmasters.gilty.shared.models.meets.MainMeetResponse
-import ru.rikmasters.gilty.shared.models.meets.MeetFiltersRequest
+import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
-class MeetingManager(private val web: MeetingWebSource) {
+class MeetingManager(
+    
+    private val storage: AddMeetStorage,
+    
+    private val web: MeetingWebSource,
+) {
     
     private data class MeetCount(val total: Int)
+    
+    val addMeetFlow = storage.addMeetFlow
+    
+    suspend fun clearBase(){
+        storage.clear()
+    }
+    
+    suspend fun update(
+        category: CategoryModel? = null,
+        type: MeetType? = null,
+        isOnline: Boolean? = null,
+        condition: ConditionType? = null,
+        price: String? = null,
+        photoAccess: Boolean? = null,
+        chatForbidden: Boolean? = null,
+        tags: List<TagModel>? = null,
+        description: String? = null,
+        dateTime: String? = null,
+        duration: String? = null,
+        hide: Boolean? = null,
+        lat: Double? = null,
+        lng: Double? = null,
+        place: String? = null,
+        address: String? = null,
+        isPrivate: Boolean? = null,
+        memberCount: Int? = null,
+        requirementsType: String? = null,
+        requirements: List<RequirementModel>? = null,
+        withoutResponds: Boolean? = null,
+    ) {
+        storage.update(
+            category, type, isOnline, condition,
+            price, photoAccess, chatForbidden, tags,
+            description, dateTime, duration, hide,
+            lat, lng, place, address, isPrivate,
+            memberCount, requirementsType,
+            requirements, withoutResponds
+        )
+    }
     
     private suspend inline fun <reified Type> getMeetings(
         filter: MeetFiltersRequest, count: Boolean,

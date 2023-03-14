@@ -46,10 +46,10 @@ import ru.rikmasters.gilty.shared.common.extentions.vibrate
 import ru.rikmasters.gilty.yandexmap.R.layout.map_layout
 
 data class MeetPlace(
-    val lat: Double,
-    val lng: Double,
-    val place: String,
-    val address: String,
+    val lat: Double?,
+    val lng: Double?,
+    val place: String?,
+    val address: String?,
 )
 
 @Composable
@@ -107,11 +107,13 @@ fun MapObjectCollection.addMarkerWithListener(
     meetPlace: MeetPlace,
     context: Context,
     position: CameraPosition,
+    callback: YandexMapCallback?,
 ): PlacemarkMapObject {
-    val point = Point(meetPlace.lat, meetPlace.lng)
+    val point = Point(meetPlace.lat!!, meetPlace.lng!!)
     val marker = addPlacemark(point)
     marker.changeIcon(ic_map_point, context)
     marker.addTapListener { _, _ ->
+        callback?.onMarkerClick(meetPlace)
         map.moveCamera(setCamPosition(point))
         if(distance(point, position.target) <= 150)
             vibrate(context)
@@ -153,7 +155,7 @@ private fun MapProperties.getPoints(
                                     point.longitude,
                                     it.obj?.name!!,
                                     it.obj?.descriptionText!!,
-                                ), context, position
+                                ), context, position, callback
                             )
                             marker
                         }

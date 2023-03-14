@@ -4,86 +4,46 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.viewmodel.*
+import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 
 @Composable
 fun CategoriesScreen(vm: CategoryViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
-    
-    val alert by vm.alert.collectAsState()
+    val nav = get<NavState>()
     
     val categories by vm.categories.collectAsState()
-    val selected by vm.selected.collectAsState()
+    val alert by vm.alert.collectAsState()
     
-    // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
-    var sleep by remember { mutableStateOf(false) }
+    val selected = vm.addMeet
+        .collectAsState().value?.category
     
-    fun clearStates() {
-        SelectCategory = null
-        Online = false
-        Condition = null
-        Price = ""
-        Hidden = false
-        RestrictChat = false
-        MeetingType = null
-        Tags = emptyList()
-        Description = ""
-        HideAddress = false
-        Address = ""
-        Place = ""
-        Date = ""
-        Duration = ""
-        AgeFrom = ""
-        AgeTo = ""
-        Gender = null
-        Orientation = null
-        MemberCount = ""
-        Private = false
-        WithoutRespond = false
-        MemberLimited = false
-        Requirements = arrayListOf(
-            RequirementModel(
-                gender = null,
-                ageMin = 0,
-                ageMax = 0,
-                orientation = null
-            )
-        )
-        RequirementsType = 0
-    }
+    LaunchedEffect(Unit) { vm.getCategories() }
     
-    LaunchedEffect(Unit) {
-        vm.selectCategory(null)
-        clearStates()
-        vm.getCategories()
-        sleep = true
-    }
-    
-    if(sleep) CategoriesContent(
+    CategoriesContent(
         Modifier, CategoriesState(
             categories, selected, alert
         ), object: CategoriesCallback {
             
-            override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
+            override fun onCategoryClick(category: CategoryModel) {
+                scope.launch {
+                    vm.selectCategory(category)
+                    nav.navigate("conditions")
+                }
             }
             
             override fun onCloseAlert(state: Boolean) {
                 scope.launch { vm.alertDismiss(state) }
             }
             
-            override fun onCategoryClick(category: CategoryModel) {
+            override fun onClose() {
                 scope.launch {
-                    vm.selectCategory(category)
-                    SelectCategory?.let {
-                        nav.navigate("conditions")
-                    }
+                    vm.clearBase()
+                    nav.navigateAbsolute("main/meetings")
                 }
             }
-        })
+        }
+    )
 }

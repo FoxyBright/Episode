@@ -19,16 +19,18 @@ class CategoryViewModel: ViewModel() {
     private val _categories = MutableStateFlow(emptyList<CategoryModel>())
     val categories = _categories.asStateFlow()
     
-    private val _selected = MutableStateFlow(SelectCategory)
-    val selected = _selected.asStateFlow()
+    val addMeet by lazy { manager.addMeetFlow.state(null) }
     
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }
     
+    suspend fun clearBase() {
+        manager.clearBase()
+    }
+    
     suspend fun selectCategory(category: CategoryModel?) {
-        _selected.emit(category)
-        SelectCategory = selected.value
+        manager.update(category = category)
     }
     
     suspend fun getCategories() {

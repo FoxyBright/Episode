@@ -2,32 +2,25 @@ package ru.rikmasters.gilty.yandexmap
 
 import com.yandex.mapkit.MapKit
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 
 class YandexMapViewModel: ViewModel() {
     
+    private val manager by inject<MeetingManager>()
+    
+    val addMeet by lazy { manager.addMeetFlow.state(null) }
+    
     val mapKit = MutableStateFlow<MapKit?>(null)
     
-    private val _address = MutableStateFlow("")
-    val address = _address.asStateFlow()
-    
-    private val _meetPlace = MutableStateFlow<MeetPlace?>(null)
-    val meetPlace = _meetPlace.asStateFlow()
-    
-    private val _place = MutableStateFlow("")
-    val place = _place.asStateFlow()
-    
     suspend fun changeMeetPlace(meetPlace: MeetPlace) {
-        _meetPlace.emit(meetPlace)
-    }
-    
-    suspend fun changePlace(text: String) {
-        _place.emit(text)
-    }
-    
-    suspend fun changeAddress(text: String) {
-        _address.emit(text)
+        manager.update(
+            place = meetPlace.place,
+            address = meetPlace.address,
+            lat = meetPlace.lat,
+            lng = meetPlace.lng,
+        )
     }
     
     suspend fun setMapKit(map: MapKit) {

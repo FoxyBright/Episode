@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -85,7 +83,7 @@ fun <T> Bubbles(
     
     val scope = rememberCoroutineScope()
     
-    AndroidView(
+    if(data.isNotEmpty()) AndroidView(
         modifier = modifier
             .fillMaxSize()
             .onGloballyPositioned {
@@ -129,7 +127,7 @@ fun <T> Bubbles(
             
             return@AndroidView layout
         },
-        update = { }
+        update = {}
     )
 }
 
