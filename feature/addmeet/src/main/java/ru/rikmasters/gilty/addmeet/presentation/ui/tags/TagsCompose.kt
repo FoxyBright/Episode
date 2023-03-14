@@ -51,6 +51,13 @@ fun TagsContent(
         modifier
             .fillMaxSize()
             .padding(16.dp), {
+            TagSearch(
+                SearchState(
+                    state.newTag, state.online,
+                    { callback?.onBack() },
+                    { callback?.onAddTag("") }
+                ) { callback?.onAddTag(it) }
+            )
             SearchActionBar(
                 SearchState(
                     (null), (true), state.newTag,
@@ -138,11 +145,7 @@ private fun PopularTags(
     category: CategoryModel,
     onClick: (TagModel) -> Unit,
 ) {
-    Card(
-        colors = cardColors(
-            containerColor = Transparent
-        )
-    ) {
+    Card(colors = cardColors(Transparent)) {
         Column(
             Modifier.background(
                 colorScheme.primaryContainer
@@ -174,8 +177,7 @@ private fun PopularTags(
             popularTags.forEach {
                 GiltyChip(
                     Modifier, it.title,
-                    tagList.contains(it),
-                    online
+                    tagList.contains(it), online
                 ) { onClick(it) }
             }
         }

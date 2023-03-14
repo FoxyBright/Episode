@@ -9,7 +9,9 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 class TagsViewModel: ViewModel() {
     
-    private val meetManager by inject<MeetingManager>()
+    private val manager by inject<MeetingManager>()
+    
+    val addMeet by lazy { manager.addMeetFlow.state(null) }
     
     private val _selected = MutableStateFlow(Tags)
     val selected = _selected.asStateFlow()
@@ -25,17 +27,17 @@ class TagsViewModel: ViewModel() {
     
     suspend fun searchChange(text: String) {
         _search.emit(text)
-        _tags.emit(meetManager.searchTags(text))
+        _tags.emit(manager.searchTags(text))
     }
     
     suspend fun searchClear() {
         _search.emit("")
-        _tags.emit(meetManager.searchTags(""))
+        _tags.emit(manager.searchTags(""))
     }
     
     
     suspend fun getPopular() {
-        _popular.emit(Tags + meetManager.getPopularTags(
+        _popular.emit(Tags + manager.getPopularTags(
             listOf(SelectCategory?.id)
         ).filter { !Tags.contains(it) })
     }
@@ -59,7 +61,7 @@ class TagsViewModel: ViewModel() {
         _selected.emit(selected.value - tag)
     }
     
-    fun onSave() {
-        Tags = selected.value
+    suspend fun onSave(list: List<TagModel>) {
+        manager.update(tags = list)
     }
 }

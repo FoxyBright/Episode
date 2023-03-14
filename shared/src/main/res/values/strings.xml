@@ -328,6 +328,7 @@
     <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
+    <string name="bad_tag_error">Тег содержит недопустимый символ</string>
     <string name="delete_my_chat_button">Удалить у меня</string>
     <string name="delete_my_and_other_chat_button">Удалить у всех участников</string>
     <string name="exit_button">Выйти</string>
