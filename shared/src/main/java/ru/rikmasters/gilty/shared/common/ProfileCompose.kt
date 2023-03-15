@@ -99,6 +99,8 @@ interface ProfileCallback {
     fun hiddenImages() {}
     fun onNameChange(text: String) {}
     fun onDescriptionChange(text: String) {}
+    fun onSaveUserName() {}
+    fun onSaveDescription() {}
     fun onObserveChange(state: Boolean) {}
     fun onObserveClick() {}
 }
@@ -118,6 +120,7 @@ fun Profile(
         TopBar(
             (profile?.username ?: ""),
             state.profileType, Modifier,
+            { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
@@ -176,7 +179,8 @@ private fun AboutMe(
 ) {
     Description(
         (state.profile?.aboutMe ?: ""),
-        state.profileType, Modifier.padding(top = 20.dp)
+        state.profileType, Modifier.padding(top = 20.dp),
+        { callback?.onSaveDescription() }
     ) { callback?.onDescriptionChange(it) }
 }
 
@@ -186,8 +190,11 @@ private fun TopBar(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
+    onSaveUsername: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
+    val focusManager =
+        LocalFocusManager.current
     if(
         profileType != ORGANIZER
         && profileType != ANONYMOUS_ORGANIZER
@@ -213,6 +220,13 @@ private fun TopBar(
                 )
             }
         },
+        keyboardActions = KeyboardActions {
+            focusManager.clearFocus()
+            onSaveUsername()
+        },
+        keyboardOptions = Default.copy(
+            imeAction = Done, keyboardType = Text
+        ),
         singleLine = true,
     )
 }
@@ -222,6 +236,7 @@ private fun Description(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
+    onSaveDescription: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager =
@@ -243,6 +258,7 @@ private fun Description(
             textStyle = typography.bodyMedium,
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
+                onSaveDescription()
             }, keyboardOptions = Default.copy(
                 imeAction = Done, keyboardType = Text
             ), placeholder = {

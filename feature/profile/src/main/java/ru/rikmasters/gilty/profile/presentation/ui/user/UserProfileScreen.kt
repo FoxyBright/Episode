@@ -153,6 +153,14 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 scope.launch { vm.changeUsername(text) }
             }
             
+            override fun onSaveUserName() {
+                scope.launch { vm.updateUsername() }
+            }
+            
+            override fun onSaveDescription() {
+                scope.launch { vm.updateDescription() }
+            }
+            
             override fun onMenuClick(it: Boolean) {
                 scope.launch { vm.menuDispose(it) }
             }

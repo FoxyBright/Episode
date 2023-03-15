@@ -74,8 +74,8 @@ fun BottomSheet(
             
             it.GetStringArg("lat") { lat ->
                 it.GetStringArg("lng") { lng ->
-                    val googleMap = "https://maps.google.com/?daddr=$lng%2C$lat&z=18"
-                    val yandexMap = "https://maps.yandex.ru/?pt=$lat%2C$lng&zoom=18"
+                    val googleMap = "https://maps.google.com/?daddr=$lat%2C$lng&zoom=18"
+                    val yandexMap = "https://maps.yandex.ru/?pt=$lng%2C$lat&z=18"
                     MapApps(
                         alert, appIndex, Modifier, { state ->
                             if(state) {
