@@ -13,7 +13,7 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     val scope = rememberCoroutineScope()
     val nav = get<NavState>()
     
-    val addMeet by vm.addMeet.collectAsState()
+    val addMeet by vm.addMeet.collectAsState(null)
     val alert by vm.alert.collectAsState()
     
     val condition = addMeet?.condition?.let {
@@ -27,13 +27,13 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     val forbidden = addMeet?.chatForbidden ?: false
     val hidden = addMeet?.photoAccess ?: false
     val online = addMeet?.isOnline ?: false
-    val price = addMeet?.price ?: ""
+    
+    val price by vm.price.collectAsState()
     
     val isActive = condition.isNotEmpty()
             && meetType.isNotEmpty()
             && if(condition.contains(3)) {
-        price.isNotBlank()
-        price.length <= 7
+        price.length > 1 && price.toInt() <= 1_000_000
     } else true
     
     ConditionContent(

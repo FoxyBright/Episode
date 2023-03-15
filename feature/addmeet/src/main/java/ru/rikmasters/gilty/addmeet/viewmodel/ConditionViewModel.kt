@@ -2,6 +2,8 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -19,10 +21,31 @@ class ConditionViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
     
-    val addMeet by lazy { manager.addMeetFlow.state(null) }
+    val addMeet by lazy { manager.addMeetFlow }
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
+    
+    private val _price = MutableStateFlow("")
+    val price = _price.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest {
+                _price.emit(it?.price ?: "")
+            }
+        }
+    }
+    
+    suspend fun changePrice(text: String) {
+        _price.emit(text)
+        manager.update(price = text)
+    }
+    
+    suspend fun clearPrice() {
+        _price.emit("")
+        manager.update(price = "")
+    }
     
     suspend fun changeOnline(state: Boolean) {
         manager.update(isOnline = state)
@@ -46,14 +69,6 @@ class ConditionViewModel: ViewModel() {
     
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
-    }
-    
-    suspend fun changePrice(text: String) {
-        manager.update(price = text)
-    }
-    
-    suspend fun clearPrice() {
-        manager.update(price = "")
     }
     
     suspend fun clearBase() {
