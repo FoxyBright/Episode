@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
@@ -23,12 +25,12 @@ import androidx.core.app.ActivityCompat.checkSelfPermission
 import androidx.core.app.ActivityCompat.requestPermissions
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.Animation.Type.SMOOTH
+import com.yandex.mapkit.GeoObjectCollection.Item
 import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.geometry.Circle
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.MapObjectCollection
-import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.map.*
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.VisibleRegionUtils.toPolygon
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -67,10 +69,10 @@ fun MapContent(
                     .findViewById<MapView>(R.id.mapview)
                     .getProperties(state)
                 
-                properties.map.moveCamera(properties.camPosition)
+                properties.map.moveCamera(properties.point)
                 
                 if(!state.categoryName.isNullOrBlank())
-                    properties.getPoints(context, callback!!)
+                    properties.getPoints(context, properties, callback)
                 else
                     (properties.obj to properties.point)
                         .let { (obj, it) ->
@@ -103,86 +105,117 @@ fun MapContent(
 }
 
 fun MapObjectCollection.addMarkerWithListener(
-    map: MapView,
-    meetPlace: MeetPlace,
-    context: Context,
-    position: CameraPosition,
+    map: MapView, point: Point,
+    geoItem: Item, context: Context,
     callback: YandexMapCallback?,
 ): PlacemarkMapObject {
-    val point = Point(meetPlace.lat!!, meetPlace.lng!!)
     val marker = addPlacemark(point)
     marker.changeIcon(ic_map_point, context)
     marker.addTapListener { _, _ ->
-        callback?.onMarkerClick(meetPlace)
-        map.moveCamera(setCamPosition(point))
-        if(distance(point, position.target) <= 150)
-            vibrate(context)
+        callback?.onMarkerClick(
+            (marker to geoItem).getMeetPlace()
+        )
+        marker.changeIcon(ic_select_map_point, context)
+        vibrate(context)
+        map.moveCamera(point)
         true
     }
     return marker
 }
 
-private fun distance(start: Point, end: Point): Float {
+private infix fun Point.near(
+    list: List<Point>,
+) = list.map { it to (it distance this) }
+    .filter { it.second <= 100f }
+    .minByOrNull { it.second }
+    ?.first
+
+private infix fun Point.distance(point: Point): Float {
     val array = FloatArray(2)
     Location.distanceBetween(
-        start.latitude, start.longitude,
-        end.latitude, end.longitude, array
+        latitude, longitude,
+        point.latitude, point.longitude,
+        array
     )
     return array[0]
 }
 
+private infix fun Point.equally(value: Point?) = value?.let {
+    latitude == it.latitude && longitude == it.longitude
+} ?: false
+
+
 private fun MapProperties.getPoints(
-    context: Context, callback: YandexMapCallback,
+    context: Context,
+    properties: MapProperties,
+    callback: YandexMapCallback?,
 ) {
-    val list = mutableListOf<PlacemarkMapObject?>()
-    
-    map.map.addCameraListener { map, position, _, _ ->
-        
-        searchManager.submit(
-            searchText, toPolygon(
-                map.visibleRegion(position)
-            ), SearchOptions(),
+    map.map.addCameraListener { map, position, _, finished ->
+        search(map, position) { points ->
+            val nearest by mutableStateOf(
+                position.target near points.map { it.first }
+            )
             
-            object: SearchListener {
-                override fun onSearchResponse(res: Response) {
-                    obj.clear()
-                    res.collection.children.forEach {
-                        val mark = it.obj?.geometry?.first()?.point?.let { point ->
-                            val marker = obj.addMarkerWithListener(
-                                this@getPoints.map,
-                                MeetPlace(
-                                    point.latitude,
-                                    point.longitude,
-                                    it.obj?.name!!,
-                                    it.obj?.descriptionText!!,
-                                ), context, position, callback
-                            )
-                            marker
-                        }
-                        
-                        if(!list.contains(mark)) list.add(mark)
+            points.forEach { (p, it) ->
+                
+                val marker = obj.addMarkerWithListener(
+                    this.map, p, it, context, callback
+                )
+                
+                if(p equally nearest) {
+                    vibrate(context)
+                    marker.changeIcon(ic_select_map_point, context)
+                    if(finished) properties.map.moveCamera(p)
+                    callback?.onMarkerClick(((marker to it).getMeetPlace()))
+                } else marker.changeIcon(ic_map_point, context)
+                
+            }
+        }
+    }
+}
+
+private fun MapProperties.search(
+    camMap: Map, position: CameraPosition,
+    onUpdate: (List<Pair<Point, Item>>) -> Unit,
+) {
+    val list = mutableListOf<Pair<Point, Item>>()
+    searchManager.submit(
+        searchText, toPolygon(camMap.visibleRegion(position)),
+        SearchOptions(), object: SearchListener {
+            
+            override fun onSearchResponse(res: Response) {
+                obj.clear(); list.clear()
+                
+                res.collection.children.forEach {
+                    it.obj?.geometry?.first()?.point?.let { point ->
+                        list.add(point to it)
                     }
                 }
                 
-                override fun onSearchError(err: Error) {
-                    log.d("Error ---> $err")
-                }
+                onUpdate(list)
             }
-        )
-    }
+            
+            override fun onSearchError(err: Error) {
+                log.d(err.toString())
+            }
+        }
+    )
 }
+
+private fun Pair<PlacemarkMapObject, Item>.getMeetPlace() = MeetPlace(
+    lat = first.geometry.latitude, lng = first.geometry.longitude,
+    place = second.obj?.name!!, address = second.obj?.descriptionText!!,
+)
 
 private fun PlacemarkMapObject.changeIcon(
     icon: Int, context: Context,
 ) = this.setIcon(fromResource(context, icon))
-
 
 private fun MapView.getProperties(
     state: YandexMapState,
 ) = state.location.let {
     val point = Point(it?.lat!!, it.lng!!)
     MapProperties(
-        camPosition = setCamPosition(point),
         searchManager = getInstance().createSearchManager(ONLINE),
         obj = this.map.mapObjects,
         searchText = state.categoryName ?: "",
@@ -195,7 +228,6 @@ private fun setCamPosition(point: Point) =
     CameraPosition(point, (14f), (0f), (0f))
 
 private data class MapProperties(
-    val camPosition: CameraPosition,
     val searchManager: SearchManager,
     val obj: MapObjectCollection,
     val searchText: String,
@@ -204,9 +236,9 @@ private data class MapProperties(
 )
 
 private fun MapView.moveCamera(
-    camPosition: CameraPosition,
+    point: Point,
 ) = this.map.move(
-    camPosition,
+    setCamPosition(point),
     Animation(SMOOTH, (1f)),
     null
 )

@@ -6,6 +6,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.valueOf
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.models.DetailedRequirement
@@ -60,7 +61,8 @@ data class DetailedMeetResponse(
         requirements = requirements?.let { req -> req.map { it.map() } },
         hideAddress = hideAddress,
         location = location?.map()?.copy(
-            hide = valueOf(memberState) != IS_MEMBER,
+            hide = (valueOf(memberState) != IS_MEMBER
+                    && valueOf(memberState) != IS_ORGANIZER),
             place = place,
             address = address,
         ), place = place,
