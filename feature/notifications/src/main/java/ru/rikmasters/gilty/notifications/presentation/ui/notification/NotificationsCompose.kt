@@ -8,7 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -169,7 +169,8 @@ fun NotificationsContent(
                         ?: state.ratings.map { it.emoji })
                 ), Modifier
                     .padding(horizontal = 16.dp)
-                    .align(Center),
+                    .padding(top = 84.dp)
+                    .align(TopCenter),
                 callback
             )
         }
