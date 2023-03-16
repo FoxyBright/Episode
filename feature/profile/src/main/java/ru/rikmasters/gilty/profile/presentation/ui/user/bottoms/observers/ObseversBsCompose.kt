@@ -3,17 +3,23 @@ package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Card
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +43,7 @@ fun ObserversListPreview() {
             ObserversListState(
                 DemoProfileModel.username ?: "",
                 DemoUserModelList, DemoUserModelList,
-                emptyList(), (0)
+                emptyList(), (0), ("")
             )
         )
     }
@@ -49,13 +55,15 @@ data class ObserversListState(
     val observed: List<UserModel>,
     val unsubList: List<UserModel>,
     val selectTab: Int,
+    val search: String,
 )
 
 interface ObserversListCallback {
     
-    fun onTabChange(point: Int) {}
-    fun onButtonClick(member: UserModel, type: SubscribeType) {}
-    fun onClick(member: UserModel) {}
+    fun onTabChange(point: Int)
+    fun onButtonClick(member: UserModel, type: SubscribeType)
+    fun onClick(member: UserModel)
+    fun onSearchTextChange(text: String)
 }
 
 @Composable
@@ -80,10 +88,13 @@ fun ObserversListContent(
             ), state.selectTab,
             Modifier.padding(horizontal = 16.dp)
         ) { callback?.onTabChange(it) }
+        Search(
+            state.search,
+            Modifier.padding(16.dp, 18.dp)
+        ) { callback?.onSearchTextChange(it) }
         LazyColumn(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp)
                 .padding(horizontal = 16.dp)
                 .background(
                     colorScheme.primaryContainer,
@@ -154,6 +165,55 @@ private fun ObserveItem(
                 color = if(button == SUB) colorScheme.primary
                 else colorScheme.outlineVariant,
             ) { onButtonClick?.let { it() } }
+        }
+    }
+}
+
+@Composable
+private fun Search(
+    value: String,
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit,
+) {
+    val style = typography.bodyLarge.copy(
+        colorScheme.tertiary
+    )
+    Box(
+        modifier
+            .fillMaxWidth()
+            .background(
+                colorScheme.primaryContainer,
+                shapes.medium
+            ), Center
+    ) {
+        Row(
+            Modifier.padding(18.dp, 14.dp),
+            Start, CenterVertically
+        ) {
+            Icon(
+                painterResource(
+                    R.drawable.magnifier
+                ), (null),
+                Modifier
+                    .padding(end = 28.dp)
+                    .size(20.dp),
+                colorScheme.onTertiary
+            )
+            BasicTextField(
+                value, { onValueChange(it) },
+                Modifier
+                    .fillMaxWidth()
+                    .background(Transparent),
+                textStyle = style,
+                singleLine = true, maxLines = 1,
+                cursorBrush = SolidColor(colorScheme.primary),
+            ) {
+                if(value.isEmpty()) Text(
+                    stringResource(R.string.search_placeholder),
+                    Modifier, colorScheme.onTertiary,
+                    style = typography.bodyLarge
+                ); it()
+            }
         }
     }
 }

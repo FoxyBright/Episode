@@ -87,11 +87,14 @@ class ProfileWebSource: KtorSource() {
     }
     
     suspend fun getObservers(
+        query: String,
         type: ObserversType,
     ): List<UserModel> {
         updateClientToken()
         return client.get(
-            "http://$HOST$PREFIX_URL/profile/${type.value}"
+            "http://$HOST$PREFIX_URL/profile/${type.value}${
+                if(query.isNotBlank()) "?query=$query" else ""
+            }"
         ).wrapped<List<User>>().map { it.map() }
     }
     

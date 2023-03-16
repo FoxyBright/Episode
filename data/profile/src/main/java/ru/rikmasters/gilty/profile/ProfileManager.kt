@@ -22,8 +22,10 @@ class ProfileManager(
         store.updateUserCategories()
     }
     
-    suspend fun getObservers(type: ObserversType) =
-        web.getObservers(type)
+    suspend fun getObservers(
+        query: String,
+        type: ObserversType,
+    ) = web.getObservers(query, type)
     
     suspend fun getUser(id: String) =
         web.getUser(id)
