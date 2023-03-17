@@ -25,6 +25,12 @@ class TagsViewModel: ViewModel() {
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
     
+    val online = MutableStateFlow(false)
+    
+    init {
+    
+    }
+    
     suspend fun searchChange(text: String) {
         _search.emit(text)
         _tags.emit(manager.searchTags(text))
@@ -34,7 +40,6 @@ class TagsViewModel: ViewModel() {
         _search.emit("")
         _tags.emit(manager.searchTags(""))
     }
-    
     
     suspend fun getPopular() {
         _popular.emit(Tags + manager.getPopularTags(

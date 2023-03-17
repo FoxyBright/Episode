@@ -89,6 +89,8 @@ class ProfileWebSource: KtorSource() {
     suspend fun getObservers(
         query: String,
         type: ObserversType,
+        page: Int = 0,
+        pqrPage: Int = 15,
     ): List<UserModel> {
         updateClientToken()
         return client.get(

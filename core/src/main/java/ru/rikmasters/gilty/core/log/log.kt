@@ -5,8 +5,8 @@ import android.util.Log
 @Suppress("ClassName")
 object log {
 
-    const val DEFAULT_GROUP = "default"
-    const val DEFAULT_LEVEL = Log.VERBOSE
+    private const val DEFAULT_GROUP = "default"
+    private const val DEFAULT_LEVEL = Log.VERBOSE
 
     private val groups = hashMapOf(DEFAULT_GROUP to DEFAULT_LEVEL)
 
@@ -64,4 +64,9 @@ object log {
     fun a(msg: String, group: String = DEFAULT_GROUP, thr: Throwable? = null) {
         log(msg, group, Log.ASSERT, thr)
     }
+}
+
+fun <T: Any?> T.log(): T {
+    log.v("THIS IS $this")
+    return this
 }

@@ -21,7 +21,7 @@ class ConditionViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
     
-    val addMeet by lazy { manager.addMeetFlow }
+    private val addMeet by lazy { manager.addMeetFlow }
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
@@ -29,10 +29,34 @@ class ConditionViewModel: ViewModel() {
     private val _price = MutableStateFlow("")
     val price = _price.asStateFlow()
     
+    private val _online = MutableStateFlow(false)
+    val online = _online.asStateFlow()
+    
+    private val _meetType = MutableStateFlow(emptyList<Int>())
+    val meetType = _meetType.asStateFlow()
+    
+    private val _condition = MutableStateFlow(emptyList<Int>())
+    val condition = _condition.asStateFlow()
+    
+    private val _forbidden = MutableStateFlow(false)
+    val forbidden = _forbidden.asStateFlow()
+    
+    private val _hidden = MutableStateFlow(false)
+    val hidden = _hidden.asStateFlow()
+    
     init {
         coroutineScope.launch {
-            addMeet.collectLatest {
-                _price.emit(it?.price ?: "")
+            addMeet.collectLatest { add ->
+                _price.emit(add?.price ?: "")
+                _online.emit(add?.isOnline ?: false)
+                _forbidden.emit(add?.chatForbidden ?: false)
+                _hidden.emit(add?.photoAccess ?: false)
+                _condition.emit(add?.condition?.ordinal?.let {
+                    listOf(it)
+                } ?: emptyList())
+                _meetType.emit(add?.type?.ordinal?.let {
+                    listOf(it)
+                } ?: emptyList())
             }
         }
     }
@@ -48,22 +72,27 @@ class ConditionViewModel: ViewModel() {
     }
     
     suspend fun changeOnline(state: Boolean) {
+        _online.emit(state)
         manager.update(isOnline = state)
     }
     
     suspend fun changeHidden(state: Boolean) {
+        _hidden.emit(state)
         manager.update(photoAccess = state)
     }
     
     suspend fun changeMeetType(type: Int) {
+        _meetType.emit(listOf(type))
         manager.update(type = MeetType.get(type))
     }
     
     suspend fun changeCondition(condition: Int) {
+        _condition.emit(listOf(condition))
         manager.update(condition = ConditionType.get(condition))
     }
     
     suspend fun changeForbiddenChat(state: Boolean) {
+        _forbidden.emit(state)
         manager.update(chatForbidden = state)
     }
     

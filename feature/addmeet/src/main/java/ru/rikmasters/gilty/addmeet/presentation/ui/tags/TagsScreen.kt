@@ -30,25 +30,6 @@ fun TagsScreen(vm: TagsViewModel) {
             online, tags, addMeet?.category
         ), Modifier, object: TagsCallback {
             
-            override fun onAddTag(text: String) {
-                scope.launch { vm.searchChange(text) }
-            }
-            
-            override fun onSave() {
-                scope.launch {
-                    vm.onSave(selected)
-                    nav.navigationBack()
-                }
-            }
-            
-            override fun onBack() {
-                nav.navigationBack()
-            }
-            
-            override fun onDeleteTag(tag: TagModel) {
-                scope.launch { vm.deleteTag(tag) }
-            }
-            
             override fun onTagClick(tag: TagModel) {
                 scope.launch {
                     vm.selectTag(tag)
@@ -56,6 +37,25 @@ fun TagsScreen(vm: TagsViewModel) {
                         vm.addToPopular(tag)
                     vm.searchClear()
                 }
+            }
+        
+            override fun onSave() {
+                scope.launch {
+                    vm.onSave(selected)
+                    nav.navigationBack()
+                }
+            }
+        
+            override fun onAddTag(text: String) {
+                scope.launch { vm.searchChange(text) }
+            }
+        
+            override fun onDeleteTag(tag: TagModel) {
+                scope.launch { vm.deleteTag(tag) }
+            }
+        
+            override fun onBack() {
+                nav.navigationBack()
             }
         }
     )

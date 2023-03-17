@@ -23,10 +23,11 @@ fun DetailedScreen(vm: DetailedViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val addMeet by vm.addMeet.collectAsState()
+    val tags by vm.tags.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    val tags = addMeet?.tags ?: emptyList()
+    val addMeet by vm.addMeet.collectAsState(null)
+    
     val description = addMeet?.description ?: ""
     val duration = addMeet?.duration ?: ""
     val address = addMeet?.address ?: ""
@@ -102,7 +103,7 @@ fun DetailedScreen(vm: DetailedViewModel) {
             }
             
             override fun onTagDelete(tag: TagModel) {
-                scope.launch { vm.deleteTag(tags, tag) }
+                scope.launch { vm.deleteTag(tag) }
             }
             
             override fun onHideMeetPlaceClick() {

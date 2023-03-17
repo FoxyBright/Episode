@@ -12,13 +12,13 @@ import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.bottomsheet.deeplink.DeepLinker.deepLink
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.bottomsheet.deeplink.DeepLinker.deepLink
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
@@ -41,7 +41,7 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // TODO вынести в BuildConfig
+        // TODO вынести в BuildConfig или MapCompose
         MapKitFactory.setApiKey("6eb87a4e-7668-4cf6-a691-36051b71e2e5")
         MapKitFactory.initialize(this)
         FireBaseService.sharedPref = getSharedPreferences(
@@ -70,16 +70,14 @@ class MainActivity: ComponentActivity() {
                 { state, offset, trigger -> LoadingIndicator(state, offset, trigger) }
             )
             LaunchedEffect(Unit) {
+                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 if(
                     authManager.isAuthorized()
                     && regManager.profileCompleted()
                 ) {
                     authManager.savePushToken(token)
-                    chatManager.connect(
-                        regManager.userId()
-                    )
+                    chatManager.connect(regManager.userId())
                 }
-                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
             
             val scope = getKoin().createScope<MainActivity>()

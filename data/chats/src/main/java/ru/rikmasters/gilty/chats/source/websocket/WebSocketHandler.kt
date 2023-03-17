@@ -25,6 +25,7 @@ import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.models.User
 import java.io.IOException
+import java.net.SocketException
 
 class WebSocketHandler(
     
@@ -199,21 +200,23 @@ class WebSocketHandler(
         sessionHandlerJob?.cancel()
     }
     
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun connect(userId: String) = withContext(IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
             val session = unauthorizedClient
                 .webSocketSession(host = HOST, port = 6001, path = socketURL)
-            
             try {
                 launch {
                     while(true) {
+                        if(session.incoming.isEmpty) disconnect()
                         delay(20_000)
                         doPing(session)
                     }
                 }
                 mySession.emit(session)
                 while(true) {
+                    if(session.incoming.isEmpty) disconnect()
                     
                     val response = session.incoming.receive()
                     logV("Frame: ${String(response.data)}")
@@ -222,6 +225,8 @@ class WebSocketHandler(
                         .readValue<SocketResponse>(response.data)
                     handle(socketResponse)
                 }
+            } catch(e: SocketException) {
+                e.stackTraceToString()
             } finally {
                 logV("Closing session...")
                 client.close()

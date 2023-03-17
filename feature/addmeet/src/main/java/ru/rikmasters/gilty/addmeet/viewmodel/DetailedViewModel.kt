@@ -2,6 +2,8 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -22,7 +24,7 @@ class DetailedViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
     
-    val addMeet by lazy { manager.addMeetFlow.state(null) }
+    val addMeet by lazy { manager.addMeetFlow }
     
     private fun getDate() = try {
         if(todayControl(Date))
@@ -37,11 +39,22 @@ class DetailedViewModel: ViewModel() {
     
     private val _date = MutableStateFlow(getDate())
     val date = _date.asStateFlow()
-
-    suspend fun deleteTag(
-        list: List<TagModel>, tag: TagModel,
-    ) {
-        manager.update(tags = (list - tag))
+    
+    private val _tags = MutableStateFlow(emptyList<TagModel>())
+    val tags = _tags.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest { add ->
+                _tags.emit(add?.tags ?: emptyList())
+            }
+        }
+    }
+    
+    suspend fun deleteTag(tag: TagModel) {
+        val list = tags.value - tag
+        _tags.emit(list)
+        manager.update(tags = list)
     }
     
     suspend fun alertDismiss(state: Boolean) {

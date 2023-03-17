@@ -215,9 +215,9 @@ private fun Avatar(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
-        AsyncImage(
+        GCashedImage(
             image?.thumbnail?.url,
-            (null), Modifier.fillMaxSize(),
+            Modifier.fillMaxSize(),
             contentScale = Crop
         )
         image?.blockedAt?.let {

@@ -13,21 +13,12 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     val scope = rememberCoroutineScope()
     val nav = get<NavState>()
     
-    val addMeet by vm.addMeet.collectAsState(null)
+    val condition by vm.condition.collectAsState()
+    val forbidden by vm.forbidden.collectAsState()
+    val meetType by vm.meetType.collectAsState()
+    val online by vm.online.collectAsState()
+    val hidden by vm.hidden.collectAsState()
     val alert by vm.alert.collectAsState()
-    
-    val condition = addMeet?.condition?.let {
-        listOf(it.ordinal)
-    } ?: emptyList()
-    
-    val meetType = addMeet?.type?.let {
-        listOf(it.ordinal)
-    } ?: emptyList()
-    
-    val forbidden = addMeet?.chatForbidden ?: false
-    val hidden = addMeet?.photoAccess ?: false
-    val online = addMeet?.isOnline ?: false
-    
     val price by vm.price.collectAsState()
     
     val isActive = condition.isNotEmpty()
@@ -41,18 +32,6 @@ fun ConditionsScreen(vm: ConditionViewModel) {
             online, hidden, meetType, condition,
             forbidden, price, alert, isActive
         ), Modifier, object: ConditionsCallback {
-            
-            override fun onForbiddenClick() {
-                scope.launch { vm.changeForbiddenChat(!forbidden) }
-            }
-            
-            override fun onConditionSelect(condition: Int) {
-                scope.launch { vm.changeCondition(condition) }
-            }
-            
-            override fun onOnlineClick() {
-                scope.launch { vm.changeOnline(!online) }
-            }
             
             override fun onClose() {
                 scope.launch {
@@ -71,6 +50,18 @@ fun ConditionsScreen(vm: ConditionViewModel) {
             
             override fun onPriceChange(price: String) {
                 scope.launch { vm.changePrice(price) }
+            }
+        
+            override fun onForbiddenClick() {
+                scope.launch { vm.changeForbiddenChat(!forbidden) }
+            }
+        
+            override fun onConditionSelect(condition: Int) {
+                scope.launch { vm.changeCondition(condition) }
+            }
+        
+            override fun onOnlineClick() {
+                scope.launch { vm.changeOnline(!online) }
             }
             
             override fun onHiddenClick() {
