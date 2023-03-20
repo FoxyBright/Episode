@@ -23,36 +23,27 @@ fun DetailedScreen(vm: DetailedViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
+    val category by vm.category.collectAsState()
+    val description by vm.description.collectAsState()
+    val place by vm.place.collectAsState()
+    val duration by vm.duration.collectAsState()
     val tags by vm.tags.collectAsState()
+    val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
-    
-    val addMeet by vm.addMeet.collectAsState(null)
-    
-    val description = addMeet?.description ?: ""
-    val duration = addMeet?.duration ?: ""
-    val address = addMeet?.address ?: ""
-    val hide = addMeet?.hide ?: false
-    val date = addMeet?.dateTime ?: ""
-    val place = addMeet?.place ?: ""
-    
-    val placePair = if(
-        address.isNotBlank()
-        && place.isNotBlank()
-    ) (address to place) else null
-    
-    val online = addMeet?.isOnline ?: false
+    val hide by vm.hide.collectAsState()
+    val date by vm.date.collectAsState()
     
     val isActive = date.isNotBlank()
             && duration.isNotBlank()
             && tags.isNotEmpty()
             && if(!online)
-        placePair != null
+        place != null
     else true
     
     DetailedContent(
         DetailedState(
-            duration, date, description, tags,
-            placePair, hide, alert, online, isActive
+            duration, vm.getDate(date), description, tags,
+            place, hide, alert, online, isActive
         ), Modifier, object: DetailedCallback {
             
             override fun onDateClick() {
@@ -80,7 +71,7 @@ fun DetailedScreen(vm: DetailedViewModel) {
                     asm.bottomSheet.expand {
                         BottomSheet(
                             vm.scope, LOCATION,
-                            category = addMeet?.category!!
+                            category = category
                         )
                     }
                 }
@@ -107,7 +98,7 @@ fun DetailedScreen(vm: DetailedViewModel) {
             }
             
             override fun onHideMeetPlaceClick() {
-                scope.launch { vm.hideMeetPlace(!hide) }
+                scope.launch { vm.hideMeetPlace() }
             }
             
             override fun onNext() {

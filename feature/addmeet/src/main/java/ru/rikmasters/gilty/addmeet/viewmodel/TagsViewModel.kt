@@ -2,18 +2,21 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 class TagsViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
     
-    val addMeet by lazy { manager.addMeetFlow.state(null) }
+    val addMeet by lazy { manager.addMeetFlow }
     
-    private val _selected = MutableStateFlow(Tags)
+    private val _selected = MutableStateFlow(emptyList<TagModel>())
     val selected = _selected.asStateFlow()
     
     private val _popular = MutableStateFlow(emptyList<TagModel>())
@@ -25,10 +28,20 @@ class TagsViewModel: ViewModel() {
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
     
-    val online = MutableStateFlow(false)
+    private val _category = MutableStateFlow<CategoryModel?>(null)
+    val category = _category.asStateFlow()
+    
+    private val _online = MutableStateFlow(false)
+    val online = _online.asStateFlow()
     
     init {
-    
+        coroutineScope.launch {
+            addMeet.collectLatest {
+                _online.emit(it?.isOnline ?: false)
+                _category.emit(it?.category)
+                _selected.emit(it?.tags ?: emptyList())
+            }
+        }
     }
     
     suspend fun searchChange(text: String) {
@@ -43,7 +56,7 @@ class TagsViewModel: ViewModel() {
     
     suspend fun getPopular() {
         _popular.emit(Tags + manager.getPopularTags(
-            listOf(SelectCategory?.id)
+            listOf(category.value?.id)
         ).filter { !Tags.contains(it) })
     }
     

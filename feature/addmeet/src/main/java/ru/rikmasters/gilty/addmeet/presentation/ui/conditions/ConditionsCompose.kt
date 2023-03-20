@@ -91,7 +91,7 @@ fun ConditionContent(
         )
     }
     CloseAddMeetAlert(
-        state.alert, {
+        state.alert, state.online, {
             callback?.onCloseAlert(false)
         }, {
             callback?.onCloseAlert(false)

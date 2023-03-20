@@ -15,16 +15,15 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val nav = get<NavState>()
     
     val categories by vm.categories.collectAsState()
+    val selected by vm.selected.collectAsState()
+    val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
-    
-    val selected = vm.addMeet
-        .collectAsState().value?.category
     
     LaunchedEffect(Unit) { vm.getCategories() }
     
     CategoriesContent(
         Modifier, CategoriesState(
-            categories, selected, alert
+            categories, selected, online, alert
         ), object: CategoriesCallback {
             
             override fun onCategoryClick(category: CategoryModel) {
@@ -40,7 +39,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             
             override fun onClose() {
                 scope.launch {
-                    vm.clearBase()
+                    vm.clearAddMeet()
                     nav.navigateAbsolute("main/meetings")
                 }
             }

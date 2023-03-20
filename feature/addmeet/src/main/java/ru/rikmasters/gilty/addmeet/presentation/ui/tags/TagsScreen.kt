@@ -15,19 +15,18 @@ fun TagsScreen(vm: TagsViewModel) {
     val nav = get<NavState>()
     
     val selected by vm.selected.collectAsState()
-    val addMeet by vm.addMeet.collectAsState()
+    val category by vm.category.collectAsState()
     val popular by vm.popular.collectAsState()
     val tags by vm.tags.collectAsState()
+    val online by vm.online.collectAsState()
     val search by vm.search.collectAsState()
-    
-    val online = addMeet?.isOnline ?: false
     
     LaunchedEffect(Unit) { vm.getPopular() }
     
     TagsContent(
         TagsState(
             search, selected, popular,
-            online, tags, addMeet?.category
+            online, tags, category
         ), Modifier, object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {
@@ -38,22 +37,22 @@ fun TagsScreen(vm: TagsViewModel) {
                     vm.searchClear()
                 }
             }
-        
+            
             override fun onSave() {
                 scope.launch {
                     vm.onSave(selected)
                     nav.navigationBack()
                 }
             }
-        
+            
             override fun onAddTag(text: String) {
                 scope.launch { vm.searchChange(text) }
             }
-        
+            
             override fun onDeleteTag(tag: TagModel) {
                 scope.launch { vm.deleteTag(tag) }
             }
-        
+            
             override fun onBack() {
                 nav.navigationBack()
             }

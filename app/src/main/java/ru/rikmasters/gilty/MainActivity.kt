@@ -8,6 +8,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
@@ -19,6 +22,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
@@ -89,12 +93,20 @@ class MainActivity: ComponentActivity() {
                     && regManager.profileCompleted()
                 ) deepLink(scope, asm, intent, nav)
             }
+            
         }
+    }
+    
+    override fun onStop() {
+        CoroutineScope(IO).launch {
+            inject<MeetingManager>()
+                .value.clearAddMeet()
+        }
+        super.onStop()
     }
     
     override fun getIntent() = _intent ?: super.getIntent()
         ?.let { _intent = it; _intent!! }
-    
     
     override fun setIntent(newIntent: Intent?) {
         _intent = newIntent

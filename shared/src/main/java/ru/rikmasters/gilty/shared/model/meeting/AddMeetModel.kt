@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.model.meeting
 
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
+import java.util.UUID
 
 data class AddMeetModel(
     val category: CategoryModel? = null,
@@ -21,8 +22,39 @@ data class AddMeetModel(
     val place: String,
     val address: String,
     val isPrivate: Boolean,
-    val memberCount: Int,
+    val memberCount: String,
     val requirementsType: String,
     val requirements: List<RequirementModel>,
     val withoutResponds: Boolean,
-)
+    val memberLimited: Boolean,
+) {
+    
+    fun map(profile: UserModel) = MeetingModel(
+        id = UUID.randomUUID().toString(),
+        title = tags.joinToString(", ")
+        { t -> t.title },
+        condition = condition,
+        category = category!!,
+        duration = duration,
+        type = type,
+        datetime = dateTime,
+        organizer = profile,
+        isOnline = isOnline,
+        tags = tags,
+        description = description,
+        isPrivate = isPrivate,
+        memberCount = try {
+            memberCount.toInt()
+        } catch(e: Exception) {
+            1
+        }, requirements = null,
+        place = place,
+        address = address,
+        hideAddress = hide,
+        price = try {
+            price.toInt()
+        } catch(e: Exception) {
+            0
+        }
+    )
+}

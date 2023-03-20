@@ -163,7 +163,6 @@ private fun MapProperties.getPoints(
                 )
                 
                 if(p equally nearest) {
-                    vibrate(context)
                     marker.changeIcon(ic_select_map_point, context)
                     if(finished) properties.map.moveCamera(p)
                     callback?.onMarkerClick(((marker to it).getMeetPlace()))

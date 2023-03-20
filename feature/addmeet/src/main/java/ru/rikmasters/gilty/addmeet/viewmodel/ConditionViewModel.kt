@@ -10,13 +10,6 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 
-var Price: String = ""
-var Online: Boolean = false
-var Hidden: Boolean = false
-var RestrictChat: Boolean = false
-var MeetingType: MeetType? = null
-var Condition: ConditionType? = null
-
 class ConditionViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
@@ -101,6 +94,6 @@ class ConditionViewModel: ViewModel() {
     }
     
     suspend fun clearBase() {
-        manager.clearBase()
+        manager.clearAddMeet()
     }
 }

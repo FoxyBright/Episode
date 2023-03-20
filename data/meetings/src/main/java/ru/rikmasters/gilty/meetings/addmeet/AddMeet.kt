@@ -27,10 +27,11 @@ data class AddMeet(
     val place: String,
     val address: String,
     val isPrivate: Boolean,
-    val memberCount: Int,
+    val memberCount: String,
     val requirementsType: String,
     val requirements: List<RequirementModel>,
     val withoutResponds: Boolean,
+    val memberLimited: Boolean,
 ): DomainEntity {
     
     constructor(): this(
@@ -51,10 +52,11 @@ data class AddMeet(
         place = "",
         address = "",
         isPrivate = false,
-        memberCount = 0,
+        memberCount = "",
         requirementsType = "",
         requirements = emptyList(),
-        withoutResponds = false
+        withoutResponds = false,
+        memberLimited = false
     )
     
     fun map() = AddMeetModel(
@@ -63,6 +65,7 @@ data class AddMeet(
         dateTime, duration, hide, lat, lng,
         place, address, isPrivate, memberCount,
         requirementsType, requirements, withoutResponds,
+        memberLimited
     )
     
     override fun primaryKey() = id

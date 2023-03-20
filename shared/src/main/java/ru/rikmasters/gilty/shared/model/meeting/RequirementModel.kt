@@ -14,7 +14,9 @@ data class RequirementModel(
     val ageMax: Int?,
     
     val orientation: OrientationModel?,
-)
+) {
+    constructor(): this((null), (0), (0), (null))
+}
 
 val DemoRequirementModel = RequirementModel(
     gender = MALE,

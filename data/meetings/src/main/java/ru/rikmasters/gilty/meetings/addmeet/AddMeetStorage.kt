@@ -21,27 +21,28 @@ class AddMeetStorage(
         .map { it.map() }
     
     suspend fun update(
-        category: CategoryModel? = null,
-        type: MeetType? = null,
-        isOnline: Boolean? = null,
-        condition: ConditionType? = null,
-        price: String? = null,
-        photoAccess: Boolean? = null,
-        chatForbidden: Boolean? = null,
-        tags: List<TagModel>? = null,
-        description: String? = null,
-        dateTime: String? = null,
-        duration: String? = null,
-        hide: Boolean? = null,
-        lat: Double? = null,
-        lng: Double? = null,
-        place: String? = null,
-        address: String? = null,
-        isPrivate: Boolean? = null,
-        memberCount: Int? = null,
-        requirementsType: String? = null,
-        requirements: List<RequirementModel>? = null,
-        withoutResponds: Boolean? = null,
+        category: CategoryModel?,
+        type: MeetType?,
+        isOnline: Boolean?,
+        condition: ConditionType?,
+        price: String?,
+        photoAccess: Boolean?,
+        chatForbidden: Boolean?,
+        tags: List<TagModel>?,
+        description: String?,
+        dateTime: String?,
+        duration: String?,
+        hide: Boolean?,
+        lat: Double?,
+        lng: Double?,
+        place: String?,
+        address: String?,
+        isPrivate: Boolean?,
+        memberCount: String?,
+        requirementsType: String?,
+        requirements: List<RequirementModel>?,
+        withoutResponds: Boolean?,
+        memberLimited: Boolean?,
     ) {
         getAddMeet().let {
             primarySource.save(
@@ -67,6 +68,7 @@ class AddMeetStorage(
                     requirementsType = requirementsType ?: it.requirementsType,
                     requirements = requirements ?: it.requirements,
                     withoutResponds = withoutResponds ?: it.withoutResponds,
+                    memberLimited = memberLimited ?: it.memberLimited
                 )
             )
         }

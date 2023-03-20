@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
@@ -27,6 +26,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategory: CategoryModel?,
+    val online: Boolean,
     val alert: Boolean = false,
 )
 
@@ -68,13 +68,13 @@ fun CategoriesContent(
                 .fillMaxWidth()
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            color = if(Online)
+            color = if(state.online)
                 colorScheme.secondary
             else colorScheme.primary
         )
     }
     CloseAddMeetAlert(
-        state.alert,
+        state.alert, state.online,
         { callback?.onCloseAlert(false) },
         { callback?.onCloseAlert(false); callback?.onClose() })
 }
@@ -121,7 +121,7 @@ private fun CategoriesPreview() {
                 Modifier,
                 CategoriesState(
                     listOf(DemoCategoryModel),
-                    DemoCategoryModel
+                    DemoCategoryModel, (false)
                 )
             )
         }

@@ -2,15 +2,21 @@ package ru.rikmasters.gilty.addmeet.viewmodel.bottoms
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ru.rikmasters.gilty.addmeet.viewmodel.Date
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.*
 
 class TimeBsViewModel(
     
     private val detailedVm: DetailedViewModel = DetailedViewModel(),
 ): ViewModel() {
+    
+    private val manager by inject<MeetingManager>()
+    private val addMeet by lazy { manager.addMeetFlow }
     
     private val _date = MutableStateFlow(TODAY_LABEL)
     val date = _date.asStateFlow()
@@ -21,6 +27,17 @@ class TimeBsViewModel(
     private val min = (LOCAL_TIME.minute() - (LOCAL_TIME.minute() % 5) + 5).toString()
     private val _minute = MutableStateFlow(min)
     val minute = _minute.asStateFlow()
+    
+    private val _online = MutableStateFlow(false)
+    val online = _online.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest {
+                _online.emit(it?.isOnline ?: false)
+            }
+        }
+    }
     
     suspend fun changeHour(hour: String) {
         _hour.emit(hour)
@@ -45,7 +62,13 @@ class TimeBsViewModel(
     }
     
     suspend fun onSave() {
-        Date = normalizeDate(_date.value, _hour.value, _minute.value)
-        detailedVm.changeDate("${_date.value}, ${hour.value}:${minute.value}")
+        detailedVm.changeDate(
+            "${_date.value}, ${hour.value}:${minute.value}"
+        )
+        manager.update(
+            dateTime = normalizeDate(
+                _date.value, _hour.value, _minute.value
+            )
+        )
     }
 }
