@@ -9,5 +9,6 @@ dependencies {
     androidBase()
     
     implementation(project(":data:shared"))
+    
     implementation(project(":shared"))
 }

@@ -10,10 +10,9 @@ dependencies {
     androidBase()
     compose()
     
-    implementation("com.vanniktech:android-image-cropper:4.5.0")
-    
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:bubbles"))
+    implementation(project(":feature:gallery"))
     
     implementation(project(":domain:paginator"))
     

@@ -12,7 +12,9 @@ dependencies {
     androidBase()
     dataBase()
     
-    implementation(project(":data:shared"))
     implementation(project(":domain:paginator"))
+    
+    implementation(project(":data:shared"))
+    
     implementation(project(":shared"))
 }

@@ -93,6 +93,7 @@
     <string name="female_sex_en">woman</string>
     <string name="others_sex_en">other</string>
     <string name="personal_info_age_placeholder">Возраст</string>
+    <string name="add_button">Добавить</string>
 
     <!-- Recommendation -->
     <string name="not_interesting">Неинтересно</string>
@@ -340,6 +341,7 @@
     <string name="exit_from_meet_label">Чат и отображение meet в истории пропадут</string>
     <string name="chat_send_complaint">Жалоба отправлена</string>
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
+    <string name="image_preview_cropper">Отображение</string>
 
     <!-- Toasts -->
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>

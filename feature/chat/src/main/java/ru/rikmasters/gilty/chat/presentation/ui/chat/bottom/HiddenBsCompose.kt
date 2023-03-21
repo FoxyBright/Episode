@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.gallery.GalleryCallback
-import ru.rikmasters.gilty.gallery.GalleryGrid
-import ru.rikmasters.gilty.gallery.GalleryState
+import ru.rikmasters.gilty.gallery.gallery.GalleryCallback
+import ru.rikmasters.gilty.gallery.gallery.GalleryGrid
+import ru.rikmasters.gilty.gallery.gallery.GalleryState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.GradientButton

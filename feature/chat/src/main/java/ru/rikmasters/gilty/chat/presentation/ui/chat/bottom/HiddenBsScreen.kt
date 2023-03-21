@@ -9,9 +9,9 @@ import ru.rikmasters.gilty.chat.viewmodel.HiddenBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.gallery.GalleryCallback
-import ru.rikmasters.gilty.gallery.GalleryImageType.MULTIPLE
-import ru.rikmasters.gilty.gallery.GalleryState
+import ru.rikmasters.gilty.gallery.gallery.GalleryCallback
+import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
+import ru.rikmasters.gilty.gallery.gallery.GalleryState
 import ru.rikmasters.gilty.shared.R
 
 @Composable

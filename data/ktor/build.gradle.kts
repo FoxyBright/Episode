@@ -7,6 +7,6 @@ baseConfig()
 
 dependencies {
     androidBase()
-    ktor()
     jackson()
+    ktor()
 }

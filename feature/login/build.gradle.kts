@@ -9,11 +9,14 @@ compose()
 dependencies {
     androidBase()
     compose()
-    implementation("com.vanniktech:android-image-cropper:4.5.0")
+    
     implementation(project(":feature:mainscreen"))
     implementation(project(":feature:animated"))
     implementation(project(":feature:bubbles"))
-    implementation(project(":data:auth"))
+    implementation(project(":feature:gallery"))
+    
     implementation(project(":data:meetings"))
+    implementation(project(":data:auth"))
+    
     implementation(project(":shared"))
 }

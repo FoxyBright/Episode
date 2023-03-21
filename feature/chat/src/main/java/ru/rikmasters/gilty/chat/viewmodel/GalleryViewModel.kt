@@ -4,7 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.gallery.GalleryAdapter.Companion.getImages
+import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.Companion.getImages
 import ru.rikmasters.gilty.shared.common.extentions.JavaFileSource
 import java.io.File
 

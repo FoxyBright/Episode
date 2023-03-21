@@ -8,11 +8,16 @@ import android.os.Environment.isExternalStorageManager
 import androidx.core.content.ContextCompat.checkSelfPermission
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.common.getImages
+import java.io.File
 
 
 class GalleryViewModel: ViewModel() {
+    
+    private val regManager by inject<RegistrationManager>()
     
     private val context = getKoin().get<Context>()
     
@@ -38,6 +43,12 @@ class GalleryViewModel: ViewModel() {
     private val _filters = MutableStateFlow(filterList)
     val filters = _filters.asStateFlow()
     
+    suspend fun setImage(
+        file: File, list: List<Float>,
+    ) = singleLoading {
+        regManager.setAvatar(file, list)
+    }
+    
     suspend fun selectImage(image: String) {
         val list = selected.value
         _selected.emit(
@@ -46,12 +57,6 @@ class GalleryViewModel: ViewModel() {
             else
                 list + image
         )
-    }
-    
-    suspend fun setPermissions(): Boolean {
-        val result = checkStoragePermission()
-        _permissions.emit(result)
-        return result
     }
     
     private fun checkStoragePermission() =
@@ -79,13 +84,11 @@ class GalleryViewModel: ViewModel() {
         _menuState.emit(false)
     }
     
-    fun imageClick(image: String, points: List<Int>) {
-        Avatar = image
-        ListPoints = points
-    }
-    
-    fun attach() {
-        ListHidden = selected.value
-        Hidden = selected.value.first()
+    suspend fun attach() = singleLoading {
+        regManager.addHidden(
+            selected.value.map {
+                File(it)
+            }
+        )
     }
 }

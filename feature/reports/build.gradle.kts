@@ -9,5 +9,6 @@ compose()
 dependencies {
     androidBase()
     compose()
+    
     implementation(project(":shared"))
 }

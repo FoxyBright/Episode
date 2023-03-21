@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.gallery
+package ru.rikmasters.gilty.gallery.gallery
 
 import android.annotation.SuppressLint
 import android.content.Context

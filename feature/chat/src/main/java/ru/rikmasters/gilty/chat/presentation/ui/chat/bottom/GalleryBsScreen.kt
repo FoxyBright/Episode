@@ -14,7 +14,8 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.viewmodel.GalleryViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.gallery.*
-import ru.rikmasters.gilty.gallery.GalleryImageType.MULTIPLE
+import ru.rikmasters.gilty.gallery.gallery.*
+import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.R
 
 @Composable

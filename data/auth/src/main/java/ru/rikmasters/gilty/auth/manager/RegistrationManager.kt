@@ -1,10 +1,12 @@
 package ru.rikmasters.gilty.auth.manager
 
+import androidx.compose.ui.graphics.ImageBitmap
 import ru.rikmasters.gilty.meetings.MeetingWebSource
 import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.profile.repository.ProfileStore
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import java.io.File
 
 class RegistrationManager(
@@ -25,14 +27,11 @@ class RegistrationManager(
     suspend fun getCategoriesList(): List<CategoryModel> =
         meetWebSource.getCategoriesList()
     
-    suspend fun setAvatar(file: File, points: List<Int>) {
-        profileWebSource.setUserAvatar(
-            file,
-            points[0],
-            points[1],
-            points[3],
-            points[2],
-        )
+    suspend fun getProfile() =
+        profileStore.getProfile(true)
+    
+    suspend fun setAvatar(file: File, points: List<Float>) {
+        profileWebSource.setUserAvatar(file, points)
     }
     
     suspend fun addHidden(files: List<File>) {
@@ -49,7 +48,8 @@ class RegistrationManager(
         gender: GenderType? = null,
     ) {
         profileStore.updateProfile(
-            username, aboutMe, age, gender
+            username, aboutMe, age, gender,
+            OrientationModel("HETERO", "Гетеро")
         )
     }
 }

@@ -83,7 +83,7 @@ class GalleryViewModel: ViewModel() {
     }
     
     suspend fun imageClick(image: String, points: List<Int>) {
-        regManager.setAvatar(File(image), points)
+//        regManager.setAvatar(File(image), points)
     }
     
     suspend fun attach() {

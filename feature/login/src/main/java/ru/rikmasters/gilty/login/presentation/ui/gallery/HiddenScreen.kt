@@ -47,5 +47,6 @@ fun HiddenScreen(
                     }"
                 )
             }
-        })
+        }
+    )
 }

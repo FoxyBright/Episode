@@ -20,5 +20,6 @@ android {
 dependencies {
     androidBase()
     dataBase()
+    
     implementation(project(":shared"))
 }

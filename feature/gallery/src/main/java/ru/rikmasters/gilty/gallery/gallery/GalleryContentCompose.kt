@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.gallery
+package ru.rikmasters.gilty.gallery.gallery
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

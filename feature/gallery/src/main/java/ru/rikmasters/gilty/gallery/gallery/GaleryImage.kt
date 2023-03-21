@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.gallery
+package ru.rikmasters.gilty.gallery.gallery
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import ru.rikmasters.gilty.gallery.GalleryImageType.MULTIPLE
+import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.shared.CheckBox
 import java.io.File
 

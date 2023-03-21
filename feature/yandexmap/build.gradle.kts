@@ -11,6 +11,7 @@ dependencies {
     compose()
     ktor()
     
-    implementation(project(":shared"))
     implementation(project(":data:meetings"))
+    
+    implementation(project(":shared"))
 }
