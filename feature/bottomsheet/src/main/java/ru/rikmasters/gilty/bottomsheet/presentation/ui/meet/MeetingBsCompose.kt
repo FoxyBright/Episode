@@ -58,7 +58,7 @@ private fun MeetingBsObserve() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet), (false)
+                    distanceCalculator(meet.map()), (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -78,7 +78,7 @@ private fun MeetingBsShared() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet), (false)
+                    distanceCalculator(meet.map()), (false)
                 )
             )
         }
@@ -102,7 +102,7 @@ private fun MeetingBsWhenUser() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet), (true)
+                    distanceCalculator(meet.map()), (true)
                 )
             )
         }

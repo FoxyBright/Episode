@@ -45,9 +45,9 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // TODO вынести в BuildConfig или MapCompose
         MapKitFactory.setApiKey("6eb87a4e-7668-4cf6-a691-36051b71e2e5")
         MapKitFactory.initialize(this)
+        
         FireBaseService.sharedPref = getSharedPreferences(
             "sharedPref", MODE_PRIVATE
         )

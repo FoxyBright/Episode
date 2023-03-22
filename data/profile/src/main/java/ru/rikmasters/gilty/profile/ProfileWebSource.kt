@@ -89,7 +89,9 @@ class ProfileWebSource: KtorSource() {
     suspend fun getObservers(
         query: String,
         type: ObserversType,
+        @Suppress("unused_parameter")
         page: Int = 0,
+        @Suppress("unused_parameter")
         pqrPage: Int = 15,
     ): List<UserModel> {
         updateClientToken()

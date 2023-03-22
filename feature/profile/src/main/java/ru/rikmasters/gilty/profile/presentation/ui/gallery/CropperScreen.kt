@@ -1,12 +1,12 @@
-package ru.rikmasters.gilty.login.presentation.ui.gallery
+package ru.rikmasters.gilty.profile.presentation.ui.gallery
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.ExifInterface.TAG_ORIENTATION
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -18,10 +18,11 @@ import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.gallery.cropper.GImageCropperCallback
 import ru.rikmasters.gilty.gallery.cropper.GImageCropperState
 import ru.rikmasters.gilty.gallery.cropper.ImageCropper
-import ru.rikmasters.gilty.login.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
 import java.io.File
 
 @Composable
+@SuppressLint("CoroutineCreationDuringComposition")
 fun CropperScreen(vm: GalleryViewModel, image: String) {
     
     val scope = rememberCoroutineScope()
@@ -63,7 +64,7 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
                 override fun onCrop(img: ImageBitmap, list: List<Float>) {
                     scope.launch {
                         vm.setImage(file, list)
-                        nav.navigate("profile")
+                        nav.navigate("main")
                     }
                 }
                 

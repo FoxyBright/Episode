@@ -4,10 +4,13 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.singleOf
+import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.profile.presentation.ui.photo.AvatarScreen
-import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.AvatarScreen
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.CropperScreen
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.GalleryScreen
 import ru.rikmasters.gilty.profile.presentation.ui.respond.MeetRespondScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
@@ -20,6 +23,7 @@ import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 object Profile: FeatureDefinition() {
     
     override fun DeepNavGraphBuilder.navigation() {
+        
         nested("profile", "main") {
             
             screen<UserProfileViewModel>("main") { vm, _ ->
@@ -28,6 +32,16 @@ object Profile: FeatureDefinition() {
             
             screen<SettingsViewModel>("settings") { vm, _ ->
                 SettingsScreen(vm)
+            }
+    
+            screen<GalleryViewModel>(
+                "cropper?image={image}", listOf(navArgument("image") {
+                    type = NavType.StringType; defaultValue = ""
+                })
+            ) { vm, stack ->
+                stack.arguments?.getString("image")?.let {
+                    CropperScreen(vm, it)
+                }
             }
             
             screen<AvatarViewModel>(
@@ -68,7 +82,7 @@ object Profile: FeatureDefinition() {
                 })
             ) { vm, it ->
                 it.arguments?.getBoolean("multi")
-                    ?.let { multi -> ProfileSelectPhotoScreen(vm, multi) }
+                    ?.let { multi -> GalleryScreen(vm, multi) }
             }
             
             screen<CategoryViewModel>("categories") { vm, _ ->
@@ -78,16 +92,15 @@ object Profile: FeatureDefinition() {
     }
     
     override fun Module.koin() {
+        
+        singleOf(::GalleryViewModel)
+        
         scope<AvatarViewModel> {
             scopedOf(::AvatarViewModel)
         }
         
         scope<RespondsViewModel> {
             scopedOf(::RespondsViewModel)
-        }
-        
-        scope<GalleryViewModel> {
-            scopedOf(::GalleryViewModel)
         }
         
         scope<CategoryViewModel> {
@@ -103,15 +116,12 @@ object Profile: FeatureDefinition() {
         }
         
         scope<UserProfileViewModel> {
-            scopedOf(::ParticipantsBsViewModel)
             scopedOf(::UserProfileViewModel)
-            scopedOf(::OrganizerBsViewModel)
             scopedOf(::ObserverBsViewModel)
             scopedOf(::RespondsBsViewModel)
-            scopedOf(::MeetingBsViewModel)
             scopedOf(::HiddenBsViewModel)
         }
     }
     
-    override fun include() = setOf(ProfileData)
+    override fun include() = setOf(ProfileData, Auth)
 }

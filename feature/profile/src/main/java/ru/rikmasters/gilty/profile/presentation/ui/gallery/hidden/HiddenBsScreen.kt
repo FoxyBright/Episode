@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey
+package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

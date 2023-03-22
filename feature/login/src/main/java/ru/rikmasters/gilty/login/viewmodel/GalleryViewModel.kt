@@ -1,17 +1,13 @@
 package ru.rikmasters.gilty.login.viewmodel
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.os.Build
-import android.os.Environment.isExternalStorageManager
-import androidx.core.content.ContextCompat.checkSelfPermission
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.common.getImages
+import ru.rikmasters.gilty.shared.shared.compress
+import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.Companion.getImages
 import java.io.File
 
 
@@ -28,9 +24,6 @@ class GalleryViewModel: ViewModel() {
     private val _selected = MutableStateFlow(listOf<String>())
     val selected = _selected.asStateFlow()
     
-    private val _permissions = MutableStateFlow(false)
-    val permissions = _permissions.asStateFlow()
-    
     private val _menuState = MutableStateFlow(false)
     val menuState = _menuState.asStateFlow()
     
@@ -46,7 +39,7 @@ class GalleryViewModel: ViewModel() {
     suspend fun setImage(
         file: File, list: List<Float>,
     ) = singleLoading {
-        regManager.setAvatar(file, list)
+        regManager.setAvatar(file.compress(context), list)
     }
     
     suspend fun selectImage(image: String) {
@@ -58,14 +51,6 @@ class GalleryViewModel: ViewModel() {
                 list + image
         )
     }
-    
-    private fun checkStoragePermission() =
-        if(Build.VERSION.SDK_INT >= 30) {
-            isExternalStorageManager()
-        } else checkSelfPermission(
-            context, WRITE_EXTERNAL_STORAGE
-        ) == PERMISSION_GRANTED
-    
     
     suspend fun updateImages() {
         _images.emit(getImages(context))
@@ -87,7 +72,7 @@ class GalleryViewModel: ViewModel() {
     suspend fun attach() = singleLoading {
         regManager.addHidden(
             selected.value.map {
-                File(it)
+                File(it).compress(context)
             }
         )
     }

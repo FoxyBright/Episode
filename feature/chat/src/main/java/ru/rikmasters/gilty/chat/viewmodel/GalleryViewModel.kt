@@ -30,11 +30,11 @@ class GalleryViewModel(
     }
     
     suspend fun sendImages(chatId: String) {
-        selected.value.forEach {
+        selected.value.map {
+            listOf(JavaFileSource(File(it)))
+        }.forEach {
             chatVm.onSendMessage(
-                chatId, photos = listOf(
-                    JavaFileSource(File(it))
-                )
+                chatId, photos = it
             )
         }
     }

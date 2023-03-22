@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey
+package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

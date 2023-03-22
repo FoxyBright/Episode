@@ -46,7 +46,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun hiddenImages() {
-                nav.navigateAbsolute("registration/hidden")
+                nav.navigate("hidden")
             }
             
             override fun onDescriptionChange(text: String) {

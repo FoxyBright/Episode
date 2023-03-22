@@ -12,7 +12,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers.ObserversBs
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel

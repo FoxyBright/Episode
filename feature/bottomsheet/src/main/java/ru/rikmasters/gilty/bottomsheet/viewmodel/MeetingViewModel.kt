@@ -34,7 +34,7 @@ class MeetingViewModel: ViewModel() {
     suspend fun drawMeet(meetId: String) {
         _meet.emit(meetManager.getDetailedMeet(meetId))
         if(meet.value?.isOnline == true)
-            _distance.emit(distanceCalculator(meet.value!!))
+            _distance.emit(distanceCalculator(meet.value!!.map()))
         _memberList.emit(meetManager.getMeetMembers(meetId))
     }
     

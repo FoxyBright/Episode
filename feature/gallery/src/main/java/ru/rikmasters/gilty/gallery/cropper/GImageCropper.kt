@@ -33,8 +33,10 @@ import com.smarttoolfactory.cropper.settings.*
 import ru.rikmasters.gilty.gallery.cropper.settings.CropOutlineProperty
 import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
 import ru.rikmasters.gilty.gallery.cropper.settings.CropStyle
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable
 import ru.rikmasters.gilty.shared.R.string
+import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -43,22 +45,33 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun ImageCropperPreview() {
     GiltyTheme {
         ImageCropper(
-            ImageBitmap.imageResource(
-                LocalContext.current.resources,
-                drawable.image_test
+            GImageCropperState(
+                ImageBitmap.imageResource(
+                    LocalContext.current.resources,
+                    drawable.image_test
+                )
             )
-        ) { _, _ -> }
+        )
     }
+}
+
+data class GImageCropperState(
+    val image: ImageBitmap,
+)
+
+interface GImageCropperCallback {
+    
+    fun onBack()
+    fun onCrop(img: ImageBitmap, list: List<Float>)
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun ImageCropper(
-    image: ImageBitmap,
+    state: GImageCropperState,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null,
-    onCrop: (ImageBitmap, List<Float>) -> Unit,
+    callback: GImageCropperCallback? = null,
 ) {
     
     val handleSize = LocalDensity.current.run { 20.dp.toPx() }
@@ -73,7 +86,7 @@ fun ImageCropper(
     Scaffold(
         modifier, topBar = {
             TopBar(Modifier)
-            { onBack?.let { it() } }
+            { callback?.onBack() }
         }, bottomBar = {
             GradientButton(
                 Modifier
@@ -90,7 +103,7 @@ fun ImageCropper(
         ) {
             ImageCropper(
                 Modifier.fillMaxSize(),
-                image, (null), CropStyle(
+                state.image, (null), CropStyle(
                     drawOverlay = false,
                     drawGrid = false,
                     strokeWidth = 2.dp,
@@ -120,7 +133,7 @@ fun ImageCropper(
                 isCropping = false
                 crop = false
                 croppedImage?.let {
-                    onCrop(
+                    callback?.onCrop(
                         it, listOf(
                             rect.left,
                             rect.top,
@@ -132,7 +145,14 @@ fun ImageCropper(
                 }
             }
             Frame()
-            if(isCropping) CircularProgressIndicator()
+            if(isCropping)
+                Box(Modifier, Center) {
+                    AnimatedImage(
+                        R.raw.loaging,
+                        Modifier.size(24.dp),
+                        isPlaying = isCropping
+                    )
+                }
         }
     }
 }

@@ -95,6 +95,7 @@ object Login: FeatureDefinition() {
     
     override fun Module.koin() {
         this@koin.single { authEntrypointResolver }
+        singleOf(::GalleryViewModel)
         singleOf(::CountryManager)
         
         scope<LoginViewModel> {
@@ -104,10 +105,6 @@ object Login: FeatureDefinition() {
         
         scope<CategoryViewModel> {
             scopedOf(::CategoryViewModel)
-        }
-        
-        scope<GalleryViewModel> {
-            scopedOf(::GalleryViewModel)
         }
         
         scope<HiddenViewModel> {

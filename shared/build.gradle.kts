@@ -1,5 +1,3 @@
-import android.annotation.SuppressLint
-
 plugins {
     id("com.android.library")
     kotlin("android")
@@ -12,6 +10,7 @@ compose()
 
 dependencies {
     androidBase()
+    compressor()
     dataBase()
     compose()
     
