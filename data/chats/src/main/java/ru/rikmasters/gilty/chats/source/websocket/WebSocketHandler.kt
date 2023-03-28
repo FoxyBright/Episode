@@ -19,8 +19,8 @@ import ru.rikmasters.gilty.chats.models.ws.enums.SocketEvents.*
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.meetings.mapper
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.models.User
 import java.io.IOException
 import java.net.SocketException

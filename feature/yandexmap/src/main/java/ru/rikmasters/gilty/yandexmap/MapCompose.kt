@@ -43,9 +43,9 @@ import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider.fromBitmap
 import com.yandex.runtime.image.ImageProvider.fromResource
 import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.feature.yandexmap.R
 import ru.rikmasters.gilty.shared.R.drawable.*
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
-import ru.rikmasters.gilty.yandexmap.R.layout.map_layout
 
 data class MeetPlace(
     val lat: Double?,
@@ -65,7 +65,7 @@ fun MapContent(
             { context ->
                 val properties = LayoutInflater
                     .from(context)
-                    .inflate(map_layout, (null), (false))
+                    .inflate(R.layout.map_layout, (null), (false))
                     .findViewById<MapView>(R.id.mapview)
                     .getProperties(state)
                 

@@ -9,11 +9,11 @@ import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.profile.models.MeetingsType
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -62,9 +62,17 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
-    suspend fun getObservers(type: ObserversType) =
-        get("http://$HOST$PREFIX_URL/profile/${type.value}")!!
-            .wrapped<List<User>>().map { it.map() }
+    suspend fun getObservers(
+        query: String, type: ObserversType,
+        @Suppress("unused_parameter")
+        page: Int = 0,
+        @Suppress("unused_parameter")
+        perPage: Int = 15,
+    ) = get(
+        "http://$HOST$PREFIX_URL/profile/${type.value}${
+            if(query.isNotBlank()) "?query=$query" else ""
+        }"
+    )!!.wrapped<List<User>>().map { it.map() }
     
     suspend fun deleteHidden(albumId: String, imageId: String) {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")

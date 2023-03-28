@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.chats.source.web
 
-import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import ru.rikmasters.gilty.chats.models.chat.Chat
@@ -11,8 +11,8 @@ import ru.rikmasters.gilty.chats.models.message.Message
 import ru.rikmasters.gilty.chats.models.ws.ChatStatus
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.image.AlbumModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel

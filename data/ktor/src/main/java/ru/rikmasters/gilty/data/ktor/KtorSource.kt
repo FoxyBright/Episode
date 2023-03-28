@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.data.ktor
 
+import android.content.res.Resources.getSystem
+import androidx.core.os.ConfigurationCompat.getLocales
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
@@ -14,7 +16,9 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.http.ContentType
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.*
+import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson

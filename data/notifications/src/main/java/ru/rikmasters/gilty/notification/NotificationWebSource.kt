@@ -3,10 +3,10 @@ package ru.rikmasters.gilty.notification
 import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.notification.model.MarkAsReadRequest
 import ru.rikmasters.gilty.notification.model.PutRatingRequest
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.models.Notification
 import ru.rikmasters.gilty.shared.models.Rating
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped

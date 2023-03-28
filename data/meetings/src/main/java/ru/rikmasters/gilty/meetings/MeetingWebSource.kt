@@ -3,8 +3,8 @@ package ru.rikmasters.gilty.meetings
 import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Location

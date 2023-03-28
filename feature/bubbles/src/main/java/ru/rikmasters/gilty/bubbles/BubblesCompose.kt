@@ -26,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
 import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.feature.bubbles.R
 import kotlin.math.*
 import kotlin.random.Random
 

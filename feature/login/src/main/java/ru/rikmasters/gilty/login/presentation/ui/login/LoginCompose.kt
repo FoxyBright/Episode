@@ -30,7 +30,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
-import ru.rikmasters.gilty.login.R
+import ru.rikmasters.gilty.feature.login.R
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.ActionBar

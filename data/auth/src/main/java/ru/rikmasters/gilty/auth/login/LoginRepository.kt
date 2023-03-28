@@ -5,7 +5,8 @@ import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.shared.BuildConfig
+import ru.rikmasters.gilty.data.shared.BuildConfig.CLIENT_ID
+import ru.rikmasters.gilty.data.shared.BuildConfig.CLIENT_SECRET
 import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -21,8 +22,8 @@ class LoginRepository(
         webSource.unauthorizedGet("/auth/externals") {
             url {
                 query(
-                    "client_id" to BuildConfig.CLIENT_ID,
-                    "client_secret" to BuildConfig.CLIENT_SECRET,
+                    "client_id" to CLIENT_ID,
+                    "client_secret" to CLIENT_SECRET,
                     "state" to state
                 )
             }
@@ -37,8 +38,8 @@ class LoginRepository(
                 setBody(
                     SendCodeRequest(
                         phone,
-                        BuildConfig.CLIENT_ID,
-                        BuildConfig.CLIENT_SECRET
+                        CLIENT_ID,
+                        CLIENT_SECRET
                     )
                 )
             }

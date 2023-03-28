@@ -4,7 +4,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.shared.BuildConfig.*
+import ru.rikmasters.gilty.data.shared.BuildConfig.*
 
 class TokenWebSource: KtorSource() {
     

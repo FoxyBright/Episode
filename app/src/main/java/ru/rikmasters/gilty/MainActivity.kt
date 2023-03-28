@@ -10,6 +10,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
@@ -23,11 +27,11 @@ import ru.rikmasters.gilty.core.app.ui.ErrorConnection
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
