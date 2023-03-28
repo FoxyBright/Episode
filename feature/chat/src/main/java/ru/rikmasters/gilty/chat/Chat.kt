@@ -54,13 +54,10 @@ object Chat: FeatureDefinition() {
         singleOf(::ChatManager)
         singleOf(::ProfileManager)
         singleOf(::MeetingManager)
-        
-        scope<ChatListViewModel> {
-            scopedOf(::ChatListViewModel)
-        }
+        singleOf(::ChatViewModel)
+        singleOf(::ChatListViewModel)
         
         scope<ChatViewModel> {
-            scopedOf(::ChatViewModel)
             scopedOf(::GalleryViewModel)
             scopedOf(::HiddenBsViewModel)
         }
