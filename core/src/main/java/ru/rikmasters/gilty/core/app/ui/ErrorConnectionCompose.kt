@@ -37,7 +37,7 @@ private fun ErrorPReview() {
 fun ErrorConnection() {
     Box(
         Modifier
-            .fillMaxHeight(0.9f)
+            .fillMaxHeight(0.8f)
             .fillMaxWidth()
     ) {
         Box(
@@ -49,7 +49,10 @@ fun ErrorConnection() {
                 Modifier
                     .height(54.dp)
                     .fillMaxWidth()
-                    .background(Color(0xE60E0E0E), RoundedCornerShape(14.dp))
+                    .background(
+                        Color(0xE60E0E0E),
+                        RoundedCornerShape(14.dp)
+                    )
             )
             Text(
                 buildAnnotatedString {
@@ -58,7 +61,8 @@ fun ErrorConnection() {
                 }, Modifier
                     .fillMaxWidth()
                     .padding(12.dp, 16.dp), White,
-                style = typography.labelSmall.copy(lineHeight = 48.sp),
+                style = typography.labelSmall
+                    .copy(lineHeight = 48.sp),
                 inlineContent = mapOf(
                     "emoji" to InlineTextContent(
                         Placeholder(28.sp, 28.sp, TextCenter)

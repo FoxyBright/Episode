@@ -30,9 +30,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
     
-    private val _errorConnection = MutableStateFlow(false)
-    val errorConnection = _errorConnection.asStateFlow()
-    
     private val _photoAlertState = MutableStateFlow(false)
     val photoAlertState = _photoAlertState.asStateFlow()
     
@@ -100,10 +97,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         }
     }
     
-    suspend fun errorConnection(state: Boolean) {
-        _errorConnection.emit(state)
-    }
-    
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }
@@ -135,7 +128,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         setUserDate(true)
     }
     
-    suspend fun setUserDate(forceWeb: Boolean) = singleLoading {
+    suspend fun setUserDate(forceWeb: Boolean = false) = singleLoading {
         val user = profileManager.getProfile(forceWeb)
         _age.emit(user.age)
         _username.emit("${user.username}, ${user.age}")

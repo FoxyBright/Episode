@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.auth.login
 
-import io.ktor.client.request.get
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.DbSource
@@ -15,12 +13,12 @@ class LoginRepository(
     
     override val webSource: KtorSource,
     
-    override val primarySource: DbSource
-
-): OfflineFirstRepository<KtorSource, DbSource>(webSource, primarySource) {
+    override val primarySource: DbSource,
+    
+    ): OfflineFirstRepository<KtorSource, DbSource>(webSource, primarySource) {
     
     suspend fun getLoginMethods(state: String): Set<LoginMethod> =
-        webSource.unauthorizedClient.get("/auth/externals") {
+        webSource.unauthorizedGet("/auth/externals") {
             url {
                 query(
                     "client_id" to BuildConfig.CLIENT_ID,
@@ -28,14 +26,14 @@ class LoginRepository(
                     "state" to state
                 )
             }
-        }.wrapped<List<LoginMethodDto>>()
-            .map(LoginMethodDto::map)
-            .toSet()
+        }?.wrapped<List<LoginMethodDto>>()
+            ?.map(LoginMethodDto::map)
+            ?.toSet()
+            ?: emptySet()
     
     suspend fun sendCode(phone: String): Pair<SendCode?, String?> {
         val response = webSource
-            .unauthorizedClient
-            .post("auth/sendCode") {
+            .unauthorizedPost("auth/sendCode") {
                 setBody(
                     SendCodeRequest(
                         phone,
@@ -49,9 +47,10 @@ class LoginRepository(
         var sendCode: SendCode? = null
         
         try {
-            sendCode = response.wrapped<SendCode>()
+            sendCode = response?.wrapped<SendCode>()
         } catch(_: Exception) {
-            message = response.errorWrapped().error.message
+            message = response?.errorWrapped()?.error?.message
+                ?: "Плохое соединение с интернетом"
         }
         
         return Pair(sendCode, message)

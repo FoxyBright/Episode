@@ -6,6 +6,7 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
+import java.util.UUID.randomUUID
 
 data class ProfileRequest(
     val username: String? = null,
@@ -39,6 +40,15 @@ data class Profile(
     val isAnonymous: Boolean? = null,
     val status: String? = null,
 ): DomainEntity {
+    
+    constructor(): this(
+        randomUUID().toString(),
+        (""), (""), (""),
+        OrientationModel(),
+        (-1), (""), (""), (0.0),
+        Avatar(), (null),
+        Thumbnail()
+    )
     
     fun map() = ProfileModel(
         id = id,

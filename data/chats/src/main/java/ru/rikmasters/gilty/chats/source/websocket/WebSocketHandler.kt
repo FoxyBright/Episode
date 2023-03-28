@@ -3,8 +3,6 @@ package ru.rikmasters.gilty.chats.source.websocket
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 import io.ktor.websocket.Frame
@@ -43,27 +41,25 @@ class WebSocketHandler(
         complition: (suspend (Boolean) -> Unit)? = null,
     ) {
         data class Res(val auth: String)
-        
-        val body = mapOf(
-            "socket_id" to socketId.value,
-            "channel_name" to channel
-        )
-        
-        updateClientToken()
-        val response = client.post(
+        post(
             "http://$HOST/broadcasting/auth"
-        ) { setBody(body) }
-        val auth = response.body<Res>().auth
-        
-        complition?.let { it(response.status.isSuccess()) }
-        
-        send(
-            data = mapOf(
-                "auth" to auth,
-                "channel" to channel
-            ),
-            event = "pusher:subscribe"
-        )
+        ) {
+            setBody(
+                mapOf(
+                    "socket_id" to socketId.value,
+                    "channel_name" to channel
+                )
+            )
+        }?.let { response ->
+            complition?.let { it(response.status.isSuccess()) }
+            send(
+                data = mapOf(
+                    "auth" to response.body<Res>().auth,
+                    "channel" to channel
+                ),
+                event = "pusher:subscribe"
+            )
+        }
     }
     
     suspend fun connectToChat(id: String) {
@@ -202,8 +198,7 @@ class WebSocketHandler(
     suspend fun connect(userId: String) = withContext(IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
-            val session = unauthorizedClient
-                .webSocketSession(host = HOST, port = 6001, path = socketURL)
+            val session = wsSession(HOST, 6001, socketURL)
             
             try {
                 launch {
@@ -224,9 +219,8 @@ class WebSocketHandler(
                 }
             } finally {
                 logV("Closing session...")
-                client.close()
+                closeClient()
             }
-            
         }
     }
 }

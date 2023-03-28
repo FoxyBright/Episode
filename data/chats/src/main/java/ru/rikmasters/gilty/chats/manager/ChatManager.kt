@@ -19,8 +19,7 @@ class ChatManager(
     
     override suspend fun getPage(
         page: Int, perPage: Int,
-    ) =
-        store.getChats(page, perPage)
+    ) = store.getChats(page, perPage)
     
     fun refresh() = store.refresh()
     

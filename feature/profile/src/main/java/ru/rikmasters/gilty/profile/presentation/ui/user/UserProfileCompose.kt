@@ -79,7 +79,6 @@ data class UserProfileState(
     val alert: Boolean,
     val menuState: Boolean = false,
     val listState: LazyListState,
-    val errorState: Boolean = false,
     val photoAlertState: Boolean = false,
 )
 
@@ -143,7 +142,6 @@ fun ProfileContent(
         success = Pair(stringResource(R.string.edit_button)) { callback?.onMenuItemClick(1) },
         cancel = Pair(stringResource(R.string.notification_respond_cancel_button)) { callback?.closePhotoAlert() }
     )
-    if(state.errorState) ErrorConnection()
 }
 
 @Composable

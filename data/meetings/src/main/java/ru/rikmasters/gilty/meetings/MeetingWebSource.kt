@@ -1,12 +1,11 @@
 package ru.rikmasters.gilty.meetings
 
-import io.ktor.client.request.*
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.request.setBody
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
-import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Location
 import ru.rikmasters.gilty.shared.models.Requirement
@@ -27,20 +26,17 @@ class MeetingWebSource: KtorSource() {
     )
     
     suspend fun setUserInterest(meets: List<String>) {
-        updateClientToken()
-        client.patch(
-            "http://$HOST$PREFIX_URL/profile/categories"
-        ) { url { meets.forEach { query("category_ids[]" to it) } } }
+        patch("http://$HOST$PREFIX_URL/profile/categories") {
+            url { meets.forEach { query("category_ids[]" to it) } }
+        }
     }
     
     suspend fun notInteresting(meetId: String) {
-        updateClientToken()
-        client.patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")
+        patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")
     }
     
     suspend fun resetMeets() {
-        updateClientToken()
-        client.post("http://$HOST$PREFIX_URL/meetings/reset")
+        post("http://$HOST$PREFIX_URL/meetings/reset")
     }
     
     suspend fun respondOfMeet(
@@ -48,15 +44,13 @@ class MeetingWebSource: KtorSource() {
         comment: String?,
         hidden: Boolean,
     ) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
-        ) { setBody(Respond(comment, hidden)) }
+        post("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
+            setBody(Respond(comment, hidden))
+        }
     }
     
     suspend fun leaveMeet(meetId: String) {
-        updateClientToken()
-        client.patch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
+        patch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
     }
     
     suspend fun getMeetsList(
@@ -73,163 +67,122 @@ class MeetingWebSource: KtorSource() {
         genders: List<String>? = null,
         dates: List<String>? = null,
         time: String? = null,
-    ): HttpResponse {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
-        ) {
-            url {
-                query("group" to group)
-                categories?.let { list ->
-                    list.forEach {
-                        query("category_ids[]" to it)
-                    }
+    ) = get(
+        "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
+    ) {
+        url {
+            query("group" to group)
+            categories?.let { list ->
+                list.forEach {
+                    query("category_ids[]" to it)
                 }
-                tags?.let { list ->
-                    list.forEach {
-                        query("tag_ids[]" to it)
-                    }
+            }
+            tags?.let { list ->
+                list.forEach {
+                    query("tag_ids[]" to it)
                 }
-                radius?.let { query("radius" to "$it") }
-                lat?.let { query("lat" to "$it") }
-                lng?.let { query("lng" to "$it") }
-                meetTypes?.let { list ->
-                    list.forEach {
-                        query("meeting_type[]" to it)
-                    }
+            }
+            radius?.let { query("radius" to "$it") }
+            lat?.let { query("lat" to "$it") }
+            lng?.let { query("lng" to "$it") }
+            meetTypes?.let { list ->
+                list.forEach {
+                    query("meeting_type[]" to it)
                 }
-                onlyOnline?.let { query("online_only" to "$it") }
-                conditions?.let { list ->
-                    list.forEach {
-                        query("condition[]" to it)
-                    }
+            }
+            onlyOnline?.let { query("online_only" to "$it") }
+            conditions?.let { list ->
+                list.forEach {
+                    query("condition[]" to it)
                 }
-                genders?.let { list ->
-                    list.forEach {
-                        query("gender[]" to it)
-                    }
+            }
+            genders?.let { list ->
+                list.forEach {
+                    query("gender[]" to it)
                 }
-                when(group) {
-                    "TODAY" -> time?.let { query("time" to it) }
-                    "AFTER" -> dates?.let { list ->
-                        list.forEach {
-                            query("dates[]" to it)
-                        }
+            }
+            when(group) {
+                "TODAY" -> time?.let { query("time" to it) }
+                "AFTER" -> dates?.let { list ->
+                    list.forEach {
+                        query("dates[]" to it)
                     }
                 }
             }
         }
-    }
+    }!!
     
     suspend fun cancelMeet(meetId: String) {
-        updateClientToken()
-        client.patch(
-            "http://$HOST$PREFIX_URL/meetings/$meetId/cancel"
-        )
+        patch("http://$HOST$PREFIX_URL/meetings/$meetId/cancel")
     }
     
     suspend fun getUserActualMeets(
         userId: String,
-    ): List<MeetingModel> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/users/$userId/meetings"
-        ).wrapped<List<Meeting>>().map { it.map() }
-    }
+    ) = get("http://$HOST$PREFIX_URL/users/$userId/meetings")!!
+        .wrapped<List<Meeting>>().map { it.map() }
     
     suspend fun getDetailedMeet(
         meet: String,
-    ): FullMeetingModel {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/meetings/$meet"
-        ).wrapped<DetailedMeetResponse>().map()
-    }
+    ) = get("http://$HOST$PREFIX_URL/meetings/$meet")!!
+        .wrapped<DetailedMeetResponse>().map()
     
     suspend fun getMeetMembers(
         meet: String,
         excludeMe: Int,
-    ): List<UserModel> {
-        updateClientToken()
-        return try {
-            client.get(
-                "http://$HOST$PREFIX_URL/meetings/$meet/members"
-            ) { url { query("exclude_me" to "$excludeMe") } }
-                .wrapped<List<User>>().map { it.map() }
-        } catch(e: Exception) {
-            emptyList()
-        }
+    ) = try {
+        get("http://$HOST$PREFIX_URL/meetings/$meet/members") {
+            url { query("exclude_me" to "$excludeMe") }
+        }!!.wrapped<List<User>>().map { it.map() }
+    } catch(e: Exception) {
+        emptyList()
     }
     
-    suspend fun getOrientations(): List<OrientationModel> {
-        updateClientToken()
-        return try {
-            client.get(
-                "http://$HOST$PREFIX_URL/orientations"
-            ) {}.wrapped()
-        } catch(e: Exception) {
-            emptyList()
-        }
+    suspend fun getOrientations() = try {
+        get("http://$HOST$PREFIX_URL/orientations")!!
+            .wrapped<List<OrientationModel>>()
+    } catch(e: Exception) {
+        emptyList()
     }
     
-    suspend fun getLastPlaces(): List<Pair<String, String>> {
-        updateClientToken()
-        return try {
-            client.get(
-                "http://$HOST$PREFIX_URL/meetings/places"
-            ).wrapped<List<ShortLocation>>().map {
-                Pair(it.address, it.place)
-            }
-        } catch(e: Exception) {
-            emptyList()
-        }
+    suspend fun getLastPlaces() = try {
+        get("http://$HOST$PREFIX_URL/meetings/places")!!
+            .wrapped<List<ShortLocation>>()
+            .map { Pair(it.address, it.place) }
+    } catch(e: Exception) {
+        emptyList()
     }
     
     suspend fun getPopularTags(
         categoriesId: List<String?>,
-    ): List<TagModel> {
-        updateClientToken()
-        return try {
-            client.get(
-                "http://$HOST$PREFIX_URL/tags/popular"
-            ) {
-                url {
-                    categoriesId.forEach {
-                        query("category_ids[]" to "$it")
-                    }
+    ) = try {
+        get("http://$HOST$PREFIX_URL/tags/popular") {
+            url {
+                categoriesId.forEach {
+                    query("category_ids[]" to "$it")
                 }
-            }.wrapped()
-        } catch(e: Exception) {
-            emptyList()
-        }
+            }
+        }!!.wrapped<List<TagModel>>()
+    } catch(e: Exception) {
+        emptyList()
     }
     
     suspend fun addNewTag(tag: String) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/tags"
-        ) { setBody(Tag(tag)) }
-    }
-    
-    suspend fun searchTags(tag: String): List<TagModel> {
-        updateClientToken()
-        return try {
-            client.get(
-                "http://$HOST$PREFIX_URL/tags/search"
-            ) {
-                url { query("query" to tag) }
-            }.wrapped()
-        } catch(e: Exception) {
-            emptyList()
+        post("http://$HOST$PREFIX_URL/tags") {
+            setBody(Tag(tag))
         }
     }
     
-    suspend fun getCategoriesList(): List<CategoryModel> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/categories"
-        ).wrapped<List<Category>>().map { it.map() }
+    suspend fun searchTags(tag: String) = try {
+        get("http://$HOST$PREFIX_URL/tags/search") {
+            url { query("query" to tag) }
+        }!!.wrapped<List<TagModel>>()
+    } catch(e: Exception) {
+        emptyList()
     }
+    
+    suspend fun getCategoriesList() =
+        get("http://$HOST$PREFIX_URL/categories")!!
+            .wrapped<List<Category>>().map { it.map() }
     
     suspend fun addMeet(
         categoryId: String?,
@@ -249,21 +202,16 @@ class MeetingWebSource: KtorSource() {
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ): String {
-        updateClientToken()
-        return client.post(
-            "http://$HOST$PREFIX_URL/meetings"
-        ) {
-            setBody(
-                MeetingRequest(
-                    categoryId, type, isOnline, condition,
-                    price, photoAccess, chatForbidden,
-                    tags, description, dateTime,
-                    duration, location, isPrivate,
-                    memberCount, requirementsType,
-                    requirements, withoutResponds
-                )
+    ) = post("http://$HOST$PREFIX_URL/meetings") {
+        setBody(
+            MeetingRequest(
+                categoryId, type, isOnline, condition,
+                price, photoAccess, chatForbidden,
+                tags, description, dateTime,
+                duration, location, isPrivate,
+                memberCount, requirementsType,
+                requirements, withoutResponds
             )
-        }.wrapped<DetailedMeetResponse>().id
-    }
+        )
+    }!!.wrapped<DetailedMeetResponse>().id
 }

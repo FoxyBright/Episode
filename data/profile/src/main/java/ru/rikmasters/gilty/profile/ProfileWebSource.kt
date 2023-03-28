@@ -1,10 +1,9 @@
 package ru.rikmasters.gilty.profile
 
 import io.ktor.client.call.body
-import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
@@ -18,8 +17,6 @@ import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
@@ -34,92 +31,51 @@ class ProfileWebSource: KtorSource() {
         OBSERVABLES("watch")
     }
     
-    suspend fun getUser(id: String): ProfileModel {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/users/$id"
-        ).wrapped<Profile>().map()
-    }
+    suspend fun getUser(id: String) =
+        get("http://$HOST$PREFIX_URL/users/$id")!!
+            .wrapped<Profile>().map()
     
-    suspend fun getUserMeets(
-        type: MeetingsType,
-    ): List<Meeting> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/profile/meetings"
-        ) {
+    suspend fun getUserMeets(type: MeetingsType) =
+        get("http://$HOST$PREFIX_URL/profile/meetings") {
             url { query("is_completed" to type.ordinal.toString()) }
-        }.wrapped()
+        }!!.wrapped<List<Meeting>>()
+    
+    suspend fun getUserCategories() = get(
+        "http://$HOST$PREFIX_URL/profile/categories"
+    )!!.wrapped<List<Category>>()
+    
+    suspend fun subscribeToUser(memberId: String) {
+        post("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
+            url { query("user_id" to memberId) }
+        }
     }
     
-    suspend fun getUserCategories(): List<Category> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/profile/categories"
-        ).wrapped()
+    suspend fun unsubscribeFromUser(memberId: String) {
+        delete("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
+            url { query("user_id" to memberId) }
+        }
     }
     
-    suspend fun subscribeToUser(
-        memberId: String,
-    ): HttpResponse {
-        updateClientToken()
-        return client.post(
-            "http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}"
-        ) { url { query("user_id" to memberId) } }
+    suspend fun deleteObserver(member: UserModel) {
+        delete("http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}") {
+            url { query("user_id" to member.id.toString()) }
+        }
     }
     
-    suspend fun unsubscribeFromUser(
-        memberId: String,
-    ): HttpResponse {
-        updateClientToken()
-        return client.delete(
-            "http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}"
-        ) { url { query("user_id" to memberId) } }
+    suspend fun getObservers(type: ObserversType) =
+        get("http://$HOST$PREFIX_URL/profile/${type.value}")!!
+            .wrapped<List<User>>().map { it.map() }
+    
+    suspend fun deleteHidden(albumId: String, imageId: String) {
+        delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
     }
     
-    suspend fun deleteObserver(
-        member: UserModel,
-    ): HttpResponse {
-        updateClientToken()
-        return client.delete(
-            "http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}"
-        ) { url { query("user_id" to member.id.toString()) } }
-    }
+    suspend fun getFiles(albumId: String) =
+        get("http://$HOST$PREFIX_URL/albums/$albumId/files")!!
+            .wrapped<List<Avatar>>()
     
-    suspend fun getObservers(
-        type: ObserversType,
-    ): List<UserModel> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/profile/${type.value}"
-        ).wrapped<List<User>>().map { it.map() }
-    }
-    
-    suspend fun deleteHidden(
-        albumId: String,
-        imageId: String,
-    ) {
-        updateClientToken()
-        client.delete(
-            "http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId"
-        )
-    }
-    
-    suspend fun getFiles(albumId: String): List<Avatar> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/albums/$albumId/files"
-        ).wrapped()
-    }
-    
-    suspend fun addHidden(
-        albumId: String,
-        files: List<File>,
-    ): List<Avatar> {
-        updateClientToken()
-        return client.post(
-            "http://$HOST$PREFIX_URL/albums/$albumId/upload"
-        ) {
+    suspend fun addHidden(albumId: String, files: List<File>) =
+        post("http://$HOST$PREFIX_URL/albums/$albumId/upload") {
             setBody(
                 MultiPartFormDataContent(
                     formData {
@@ -133,23 +89,16 @@ class ProfileWebSource: KtorSource() {
                                 },
                             )
                         }
-                    }, "WebAppBoundary"
+                    },
+                    ("WebAppBoundary")
                 )
             )
-        }.wrapped()
-    }
+        }!!.wrapped<List<Avatar>>()
     
     suspend fun setUserAvatar(
-        avatar: File,
-        cropX: Int,
-        cropY: Int,
-        cropWidth: Int,
-        cropHeight: Int,
-    ): HttpResponse {
-        updateClientToken()
-        return client.post(
-            "http://$HOST$PREFIX_URL/profile/avatar"
-        ) {
+        avatar: File, cropX: Int, cropY: Int, cropWidth: Int, cropHeight: Int,
+    ) {
+        post("http://$HOST$PREFIX_URL/profile/avatar") {
             setBody(
                 MultiPartFormDataContent(
                     formData {
@@ -170,32 +119,22 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
-    suspend fun checkUserName(username: String): Boolean {
-        updateClientToken()
-        val response = client.get(
-            "http://$HOST$PREFIX_URL/profile/checkname"
-        ) { url { query("username" to username) } }
-        
-        data class Status(val status: String)
-        
-        return try {
-            response.body<Status>().status == "error"
-        } catch(e: Exception) {
-            false
-        }
+    private data class Status(val status: String)
+    
+    suspend fun checkUserName(username: String) = try {
+        get("http://$HOST$PREFIX_URL/profile/checkname")
+        { url { query("username" to username) } }
+            ?.let { it.body<Status>().status == "error" }
+            ?: false
+    } catch(e: Exception) {
+        false
     }
     
     suspend fun setUserData(
-        username: String?,
-        aboutMe: String?,
-        age: Int?,
-        gender: GenderType?,
-        orientationId: String?,
+        username: String?, aboutMe: String?, age: Int?,
+        gender: GenderType?, orientationId: String?,
     ) {
-        updateClientToken()
-        client.patch(
-            "http://$HOST$PREFIX_URL/profile"
-        ) {
+        patch("http://$HOST$PREFIX_URL/profile") {
             setBody(
                 ProfileRequest(
                     username, gender?.name,
@@ -205,49 +144,28 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
-    suspend fun getUserData(): Profile {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/profile"
-        ).wrapped()
-    }
+    suspend fun getUserData() =
+        get("http://$HOST$PREFIX_URL/profile")
+            ?.wrapped<Profile>() ?: Profile()
     
     suspend fun deleteAccount() {
-        updateClientToken()
-        client.delete(
-            "http://$HOST$PREFIX_URL/profile/account"
-        )
+        delete("http://$HOST$PREFIX_URL/profile/account")
     }
     
-    suspend fun getResponds(
-        type: RespondType,
-    ): List<MeetWithRespondsModel> {
-        updateClientToken()
-        return client.get(
-            "http://$HOST$PREFIX_URL/responds"
-        ) {
+    suspend fun getResponds(type: RespondType) =
+        get("http://$HOST$PREFIX_URL/responds") {
             url { query("type" to type.name) }
-        }.wrapped<List<MeetWithRespondsResponse>>().map { it.map() }
-    }
+        }!!.wrapped<List<MeetWithRespondsResponse>>().map { it.map() }
     
     suspend fun deleteRespond(respondId: String) {
-        updateClientToken()
-        client.delete(
-            "http://$HOST$PREFIX_URL/responds/$respondId"
-        )
+        delete("http://$HOST$PREFIX_URL/responds/$respondId")
     }
     
     suspend fun acceptRespond(respondId: String) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/responds/$respondId/accept"
-        )
+        post("http://$HOST$PREFIX_URL/responds/$respondId/accept")
     }
     
     suspend fun cancelRespond(respondId: String) {
-        updateClientToken()
-        client.patch(
-            "http://$HOST$PREFIX_URL/responds/$respondId/cancel"
-        )
+        patch("http://$HOST$PREFIX_URL/responds/$respondId/cancel")
     }
 }

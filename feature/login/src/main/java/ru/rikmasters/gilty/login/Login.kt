@@ -29,6 +29,7 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 object Login: FeatureDefinition() {
     
     private val authManager by inject<AuthManager>()
+    
     private val regManager by inject<RegistrationManager>()
     
     private val authEntrypointResolver = EntrypointResolver {

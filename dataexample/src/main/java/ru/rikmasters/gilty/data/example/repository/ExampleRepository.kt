@@ -46,8 +46,7 @@ class ExampleRepository(
     
     // Можно вынести в отдельный класс-наследник KtorSource
     private suspend fun getDoorsWeb() =
-        webSource.unauthorizedClient
-            .get("http://cars.cprogroup.ru/api/rubetek/doors/")
-            .body<ResponseWrapper<List<Door>>>()
-            .data ?: emptyList()
+        webSource.unauthorizedGet("http://cars.cprogroup.ru/api/rubetek/doors/")
+            ?.body<ResponseWrapper<List<Door>>>()
+            ?.data ?: emptyList()
 }

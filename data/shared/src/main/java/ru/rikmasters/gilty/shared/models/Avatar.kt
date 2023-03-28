@@ -3,6 +3,8 @@ package ru.rikmasters.gilty.shared.models
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.enumeration.PhotoType
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import java.util.UUID
+import java.util.UUID.randomUUID
 
 data class Avatar(
     val id: String,
@@ -17,7 +19,15 @@ data class Avatar(
     val height: Int,
     val hasAccess: Boolean,
     val blockedAt: String? = null,
-):DomainEntity {
+): DomainEntity {
+    
+    constructor(): this(
+        randomUUID().toString(),
+        (""), (""), (""),
+        Thumbnail(), (""),
+        (0), (""), (0),
+        (0), (false)
+    )
     
     fun map() = AvatarModel(
         id, albumId, ownerId,

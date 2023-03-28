@@ -29,8 +29,7 @@ class ChatWebSource: KtorSource() {
         perPage: Int? = null,
         unread: Int = 0,
     ): Pair<List<Chat>, Paginator> {
-        updateClientToken()
-        return client.get(
+        return get(
             "http://$HOST$PREFIX_URL/chats"
         ) {
             url {
@@ -38,7 +37,7 @@ class ChatWebSource: KtorSource() {
                 perPage?.let { query("per_page" to "$perPage") }
                 query("unread" to "$unread")
             }
-        }.paginateWrapped()
+        }!!.paginateWrapped()
     }
     
     suspend fun markAsReadMessage(
@@ -46,8 +45,7 @@ class ChatWebSource: KtorSource() {
         messageIds: List<String>,
         all: Boolean,
     ) {
-        updateClientToken()
-        client.patch(
+        patch(
             "http://$HOST$PREFIX_URL/chats/$chatId/markAsRead"
         ) { setBody(MarkAsReadRequest(messageIds, all)) }
     }
@@ -57,8 +55,7 @@ class ChatWebSource: KtorSource() {
         messageIds: List<String>,
         allMembers: Int,
     ) {
-        updateClientToken()
-        client.delete(
+        delete(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
         ) {
             url {
@@ -69,31 +66,27 @@ class ChatWebSource: KtorSource() {
     }
     
     suspend fun getChatAlbum(chatId: String): AlbumModel {
-        updateClientToken()
-        return client.get(
+        return get(
             "http://$HOST$PREFIX_URL/chats/$chatId/album"
-        ).wrapped<Album>().map()
+        )!!.wrapped<Album>().map()
     }
     
     suspend fun unmuteChatNotifications(chatId: String) {
-        updateClientToken()
-        client.post(
+        post(
             "http://$HOST$PREFIX_URL/chats/$chatId/unmute"
         )
     }
     
     suspend fun getChatsStatus(): Int {
-        updateClientToken()
-        return client.get(
+        return get(
             "http://$HOST$PREFIX_URL/chats/status"
-        ).wrapped<ChatStatus>().unreadCount
+        )!!.wrapped<ChatStatus>().unreadCount
     }
     
     suspend fun muteChatNotifications(
         chatId: String, unmuteAt: String,
     ) {
-        updateClientToken()
-        client.get(
+        get(
             "http://$HOST$PREFIX_URL/chats/$chatId/mute"
         ) { url { query("unmute_at" to unmuteAt) } }
     }
@@ -106,8 +99,7 @@ class ChatWebSource: KtorSource() {
         attachments: List<AvatarModel>? = null,
         videos: List<ByteArray>? = null,
     ) {
-        updateClientToken()
-        client.post(
+        post(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
         ) {
             setBody(
@@ -168,51 +160,39 @@ class ChatWebSource: KtorSource() {
         chatId: String,
         page: Int?, perPage: Int?,
     ): Pair<List<Message>, Paginator> {
-        updateClientToken()
-        return client.get(
+        return get(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
         ) {
             url {
                 page?.let { query("page" to "$it") }
                 perPage?.let { query("per_page" to "$it") }
             }
-        }.paginateWrapped()
+        }!!.paginateWrapped()
     }
     
     suspend fun getChat(chatId: String): ChatModel {
-        updateClientToken()
-        return client.get(
+        return get(
             "http://$HOST$PREFIX_URL/chats/$chatId"
-        ).wrapped<Chat>().map()
+        )!!.wrapped<Chat>().map()
     }
     
     suspend fun completeChat(chatId: String) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/chats/$chatId/complete"
-        )
+        post("http://$HOST$PREFIX_URL/chats/$chatId/complete")
     }
     
     suspend fun isTyping(chatId: String) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/chats/$chatId/typing"
-        )
+        post("http://$HOST$PREFIX_URL/chats/$chatId/typing")
     }
     
     suspend fun madeScreenshot(chatId: String) {
-        updateClientToken()
-        client.post(
-            "http://$HOST$PREFIX_URL/chats/$chatId/screenshot"
-        )
+        post("http://$HOST$PREFIX_URL/chats/$chatId/screenshot")
     }
     
     suspend fun deleteChat(
         chatId: String,
         forAll: Boolean,
     ) {
-        updateClientToken()
-        client.delete(
+        delete(
             "http://$HOST$PREFIX_URL/chats/$chatId${
                 if(forAll) "/all" else ""
             }"

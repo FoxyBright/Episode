@@ -50,6 +50,11 @@ class ProfileStore(
         return profile
     }
     
+    suspend fun checkProfileStore() =
+        primarySource
+            .find<Profile>()
+            ?.map() != null
+    
     suspend fun getProfile(forceWeb: Boolean) =
         uploadProfile(forceWeb).map()
     

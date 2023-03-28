@@ -15,6 +15,8 @@ class ProfileManager(
     private val store: ProfileStore,
 ) {
     
+    suspend fun checkProfileStore() = store.checkProfileStore()
+    
     suspend fun getUserCategories() =
         store.getUserCategories(false)
     
@@ -32,7 +34,7 @@ class ProfileManager(
         store.deleteProfile()
     }
     
-    suspend fun getProfile(forceWeb: Boolean) =
+    suspend fun getProfile(forceWeb: Boolean = false) =
         store.getProfile(forceWeb)
     
     val hiddenFlow = store.hiddenFlow()

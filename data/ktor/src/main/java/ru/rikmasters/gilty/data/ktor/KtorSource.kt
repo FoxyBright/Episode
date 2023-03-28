@@ -14,6 +14,8 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
@@ -30,14 +32,24 @@ open class KtorSource: WebSource() {
     
     private val baseClient by lazy {
         HttpClient(OkHttp) {
-            engine { config { writeTimeout(5, MINUTES) } }
+            
+            expectSuccess = true
+            
+            engine {
+                config { writeTimeout(5, MINUTES) }
+                preconfigured = OkHttpClient.Builder()
+                    .pingInterval(
+                        webSocketPingInterval,
+                        MILLISECONDS
+                    ).build()
+            }
             install(Logging) {
                 level = LogLevel.BODY
                 logger = LogAdapter
             }
             install(HttpRequestRetry) {
                 exponentialDelay()
-                maxRetries = 3
+                maxRetries = 2
                 retryOnExceptionIf { _, throwable -> throwable is IOException }
             }
             install(ContentNegotiation) {
@@ -55,29 +67,74 @@ open class KtorSource: WebSource() {
                 agent = env[ENV_USER_AGENT] ?: ""
             }
             install(WebSockets) {
-                
                 contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
             }
-            engine {
-                preconfigured = OkHttpClient.Builder()
-                    .pingInterval(
-                        webSocketPingInterval,
-                        MILLISECONDS
-                    ).build()
-            }
-
         }
     }
-    
-    val unauthorizedClient by lazy {
+    private val unauthorizedClient by lazy {
         baseClient.config {}
     }
     
-    var client = getClientWithTokens()
+    private var client = getClientWithTokens()
     
-    fun updateClientToken() {
+    private fun updateClientToken() {
         client = getClientWithTokens()
+    }
+    
+    suspend fun wsSession(
+        host: String, port: Int, path: String,
+    ) = unauthorizedClient.webSocketSession(
+        host = host, port = port, path = path
+    )
+    
+    suspend fun unauthorizedGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { unauthorizedClient.get(url, block) }
+    
+    suspend fun unauthorizedPost(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { unauthorizedClient.post(url, block) }
+    
+    private suspend fun <T> handler(
+        block: suspend () -> T,
+    ) = try {
+        updateClientToken(); block()
+    } catch(e: Exception) {
+        logE("KTOR RESULT EXCEPTION: $e")
+        null
+    }
+    
+    suspend fun get(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { client.get(url, block) }
+    
+    suspend fun post(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { client.post(url, block) }
+    
+    suspend fun patch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { client.patch(url, block) }
+    
+    suspend fun delete(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { client.delete(url, block) }
+    
+    suspend fun put(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler { client.put(url, block) }
+    
+    fun closeClient() {
+        unauthorizedClient.close()
+        client.close()
     }
     
     private fun getClientWithTokens(): HttpClient {

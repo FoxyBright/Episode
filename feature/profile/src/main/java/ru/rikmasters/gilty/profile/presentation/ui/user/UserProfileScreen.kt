@@ -3,13 +3,11 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
@@ -29,13 +27,11 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
-    val context = LocalContext.current
     val nav = get<NavState>()
     
     val meetsHistory by vm.meetsHistory.collectAsState()
     val photoAlertState by vm.photoAlertState.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
-    val errorState by vm.errorConnection.collectAsState()
     val navBar by vm.navBar.collectAsState()
     val meets by vm.meets.collectAsState()
     val profile by vm.profile.collectAsState()
@@ -45,11 +41,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val alert by vm.alert.collectAsState()
     
     LaunchedEffect(Unit) {
-        if(internetCheck(context)) {
-            vm.errorConnection(false)
-            vm.setUserDate(false)
-        } else vm.errorConnection(true)
-        
+        vm.setUserDate()
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{
         //            vm.photoAlertDismiss(true)
@@ -60,8 +52,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         UserProfileState(
             ProfileState(profile, USERPROFILE, (false), occupied),
             meets, meetsHistory, lastRespond, history,
-            navBar, alert, menuState, listState,
-            errorState, photoAlertState
+            navBar, alert, menuState, listState, photoAlertState
         ), Modifier, object: UserProfileCallback {
             
             override fun onHistoryClick(meet: MeetingModel) {

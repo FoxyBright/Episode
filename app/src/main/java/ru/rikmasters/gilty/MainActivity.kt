@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,6 +10,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
@@ -16,9 +20,12 @@ import ru.rikmasters.gilty.bottomsheet.DeepLinker.deepLink
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.internetCheck
+import ru.rikmasters.gilty.core.app.ui.ErrorConnection
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.presentation.model.FireBaseService
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
@@ -32,11 +39,14 @@ class MainActivity: ComponentActivity() {
     
     private val env by inject<Environment>()
     private val authManager by inject<AuthManager>()
+    private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
     private val chatManager by inject<ChatManager>()
+    private val context by inject<Context>()
     
     private var _intent: Intent? by mutableStateOf(null)
     
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -61,6 +71,9 @@ class MainActivity: ComponentActivity() {
             .subscribeToTopic("all")
         
         setContent {
+            var errorState by remember { mutableStateOf(false) }
+            val corScope = rememberCoroutineScope()
+            
             AppEntrypoint(
                 GiltyTheme,
                 { GBottomSheetBackground(it) },
@@ -68,8 +81,25 @@ class MainActivity: ComponentActivity() {
                 { isLoading, content -> GLoader(isLoading, content) },
                 { state, offset, trigger -> LoadingIndicator(state, offset, trigger) }
             )
+            
+            if(errorState) ErrorConnection()
+            
+            corScope.launch {
+                while(true) {
+                    delay(2000)
+                    errorState = !internetCheck(context)
+                }
+            }
+            
             LaunchedEffect(Unit) {
-                if(
+                val userAuthorized = profileManager.checkProfileStore()
+                
+                if(internetCheck(context)) if(userAuthorized) {
+                    authManager.savePushToken(token)
+                    chatManager.connect(
+                        profileManager.getProfile(false).id
+                    )
+                } else if(
                     authManager.isAuthorized()
                     && regManager.profileCompleted()
                 ) {
@@ -78,6 +108,7 @@ class MainActivity: ComponentActivity() {
                         regManager.userId()
                     )
                 }
+                
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
             
