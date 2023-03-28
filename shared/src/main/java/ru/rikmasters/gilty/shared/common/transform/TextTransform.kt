@@ -4,6 +4,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import ru.rikmasters.gilty.core.log.log
 import kotlin.math.absoluteValue
 
 fun transformationOf(mask: String, endChar: String = "") = object: VisualTransformation {
@@ -26,28 +27,24 @@ fun transformationOf(mask: String, endChar: String = "") = object: VisualTransfo
                         if(it == '#') numberOfHashtags++
                         numberOfHashtags < offsetValue
                     }
-                    return masked.length + 1
+                    return (masked.length + 1).also {
+                        log.v("originalToTransformed($offset) => $it")
+                    }
                 }
                 
                 override fun transformedToOriginal(offset: Int): Int {
-                    return mask.take(offset.absoluteValue).count { it == '#' }
+                    return mask.take(offset.absoluteValue).count { it == '#' }.also {
+                        log.v("transformedToOriginal($offset) => $it")
+                    }
                 }
-            })
+            }
+        )
     }
 }
 
-fun numberMask(size: Int): String {
-    var mask = ""
-    val check = check(size)
-    repeat((size - check.length) / 3)
-    { mask += "### " }; return "$check $mask"
-}
-
-private fun check(size: Int): String {
-    repeat(size) {
-        when(size) {
-            1 + 3 * (it) -> return "#"
-            2 + 3 * (it) -> return "##"
-        }
-    }; return "###"
-}
+fun numberMask(size: Int) =
+    CharArray(size) { '#' }
+        .concatToString()
+        .chunked(3)
+        .joinToString(" ")
+        .reversed()

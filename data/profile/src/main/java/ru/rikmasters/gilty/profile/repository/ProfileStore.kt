@@ -118,10 +118,9 @@ class ProfileStore(
             username, aboutMe, age,
             gender, orientation?.id
         )
-        getProfile(true)
     }
     
-    fun List<Category>.map() = this.map { it.map() }
+    private fun List<Category>.map() = this.map { it.map() }
     
     suspend fun getUserMeets(
         forceWeb: Boolean,

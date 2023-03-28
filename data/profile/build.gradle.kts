@@ -11,7 +11,8 @@ dependencies {
     androidBase()
     dataBase()
     
-    implementation(project(":data:shared"))
     implementation(project(":data:notifications"))
+    implementation(project(":data:shared"))
+    
     implementation(project(":shared"))
 }

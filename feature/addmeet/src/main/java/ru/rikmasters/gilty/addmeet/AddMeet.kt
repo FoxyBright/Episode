@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.RequirementsScre
 import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
+import ru.rikmasters.gilty.bottomsheet.viewmodel.MapBsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingsData

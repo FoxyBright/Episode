@@ -2,8 +2,13 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
@@ -11,10 +16,6 @@ var AgeFrom: String = ""
 var AgeTo: String = ""
 var Gender: Int? = null
 var Orientation: OrientationModel? = null
-var MemberCount: String = ""
-var Private: Boolean = false
-var WithoutRespond: Boolean = false
-var MemberLimited: Boolean = false
 var Requirements = arrayListOf(
     RequirementModel(
         gender = null,
@@ -23,38 +24,38 @@ var Requirements = arrayListOf(
         orientation = null
     )
 )
-var RequirementsType: Int = 0
+var RequirementsType = 0
 
 class RequirementsViewModel: ViewModel() {
+    
+    private val manager by inject<MeetingManager>()
+    private val addMeet by lazy { manager.addMeetFlow }
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
-    private val _withoutRespond = MutableStateFlow(WithoutRespond)
+    private val _withoutRespond = MutableStateFlow(false)
     val withoutRespond = _withoutRespond.asStateFlow()
     
-    private val _memberLimited = MutableStateFlow(MemberLimited)
-    val memberLimited = _memberLimited.asStateFlow()
+    private val _limited = MutableStateFlow(false)
+    val limited = _limited.asStateFlow()
     
-    private val _private = MutableStateFlow(Private)
+    private val _private = MutableStateFlow(false)
     val private = _private.asStateFlow()
     
-    private val _gender = MutableStateFlow(Gender)
+    private val _gender = MutableStateFlow<Int?>(null)
     val gender = _gender.asStateFlow()
     
-    private val _orientation = MutableStateFlow(Orientation)
+    private val _orientation = MutableStateFlow<OrientationModel?>(null)
     val orientation = _orientation.asStateFlow()
     
-    private val _requirements = MutableStateFlow(Requirements)
+    private val _requirements = MutableStateFlow(emptyList<RequirementModel>())
     val requirements = _requirements.asStateFlow()
     
-    private val _age = MutableStateFlow(
-        if(AgeFrom.isBlank() || AgeTo.isBlank())
-            "" else "от $AgeFrom до $AgeTo"
-    )
+    private val _age = MutableStateFlow("")
     val age = _age.asStateFlow()
     
-    private val _memberCount = MutableStateFlow(MemberCount)
+    private val _memberCount = MutableStateFlow("")
     val memberCount = _memberCount.asStateFlow()
     
     private val _tabs = MutableStateFlow(0)
@@ -62,6 +63,49 @@ class RequirementsViewModel: ViewModel() {
     
     private val _selectMember = MutableStateFlow(0)
     val selectMember = _selectMember.asStateFlow()
+    
+    private val _online = MutableStateFlow(false)
+    val online = _online.asStateFlow()
+    
+    private val _meetType = MutableStateFlow(GROUP)
+    val meetType = _meetType.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest { add ->
+                _memberCount.emit(add?.memberCount ?: "")
+                _requirements.emit(
+                    add?.requirements?.let { reqList ->
+                        reqList.firstOrNull()?.let { req ->
+                            _age.emit(
+                                req.ageMin?.let { min ->
+                                    req.ageMax?.let { max ->
+                                        if(min == 0 || max == 0) ""
+                                        else "от $min до $max"
+                                    }
+                                } ?: ""
+                            )
+                            _gender.emit(
+                                try {
+                                    GenderType.valueOf(
+                                        req.gender?.name.toString()
+                                    ).ordinal
+                                } catch(e: Exception) {
+                                    null
+                                }
+                            )
+                        }
+                        reqList
+                    } ?: emptyList()
+                )
+                _private.emit(add?.isPrivate ?: false)
+                _limited.emit(add?.memberLimited ?: false)
+                _withoutRespond.emit(add?.withoutResponds ?: false)
+                _online.emit(add?.isOnline ?: false)
+                _meetType.emit(add?.type ?: GROUP)
+            }
+        }
+    }
     
     suspend fun selectMember(member: Int) {
         _selectMember.emit(member)
@@ -84,13 +128,9 @@ class RequirementsViewModel: ViewModel() {
         _orientation.emit(req.orientation)
     }
     
-    private suspend fun updateRequirements() {
-        _requirements.emit(Requirements)
-    }
-    
     suspend fun limitMembers() {
-        _memberLimited.emit(!memberLimited.value)
-        MemberLimited = memberLimited.value
+        _limited.emit(!limited.value)
+        manager.update(memberLimited = limited.value)
     }
     
     suspend fun changeTab(tab: Int) {
@@ -100,7 +140,7 @@ class RequirementsViewModel: ViewModel() {
     
     suspend fun withoutRespondChange() {
         _withoutRespond.emit(!withoutRespond.value)
-        WithoutRespond = withoutRespond.value
+        manager.update(withoutResponds = withoutRespond.value)
     }
     
     suspend fun selectGender(gender: Int) {
@@ -114,7 +154,7 @@ class RequirementsViewModel: ViewModel() {
                     null
                 }
             )
-        updateRequirements()
+        _requirements.emit(Requirements)
     }
     
     suspend fun selectOrientation(orientation: OrientationModel) {
@@ -124,11 +164,12 @@ class RequirementsViewModel: ViewModel() {
             Requirements[selectMember.value].copy(
                 orientation = Orientation
             )
-        updateRequirements()
+        _requirements.emit(Requirements)
     }
     
     suspend fun selectAge(age: Pair<String, String>) {
         _age.emit("от ${age.first} до ${age.second}")
+        
         AgeFrom = age.first
         AgeTo = age.second
         val ageMin = try {
@@ -141,11 +182,12 @@ class RequirementsViewModel: ViewModel() {
         } catch(e: Exception) {
             0
         }
+        
         Requirements[selectMember.value] =
             Requirements[selectMember.value].copy(
                 ageMin = ageMin, ageMax = ageMax
             )
-        updateRequirements()
+        _requirements.emit(Requirements)
     }
     
     suspend fun alertDismiss(state: Boolean) {
@@ -154,7 +196,7 @@ class RequirementsViewModel: ViewModel() {
     
     suspend fun changePrivate() {
         _private.emit(!private.value)
-        Private = private.value
+        manager.update(isPrivate = private.value)
     }
     
     suspend fun changeMemberCount(text: String) {
@@ -163,7 +205,8 @@ class RequirementsViewModel: ViewModel() {
         ) return
         
         _memberCount.emit(text)
-        MemberCount = text
+        manager.update(memberCount = text)
+        
         if(text.isBlank() || text.toInt() < 2) {
             _tabs.emit(0)
             _selectMember.emit(0)
@@ -175,14 +218,7 @@ class RequirementsViewModel: ViewModel() {
             when {
                 size < count -> {
                     repeat(count.minus(size)) {
-                        Requirements.add(
-                            RequirementModel(
-                                gender = null,
-                                ageMin = 0,
-                                ageMax = 0,
-                                orientation = null
-                            )
-                        )
+                        Requirements.add(RequirementModel())
                     }
                 }
                 
@@ -197,11 +233,19 @@ class RequirementsViewModel: ViewModel() {
             Requirements.clear()
             Requirements.add(req)
         }
-        updateRequirements()
+        _requirements.emit(Requirements)
+    }
+    
+    suspend fun setRequirements() {
+        manager.update(
+            requirementsType = if(RequirementsType == 0)
+                "ALL" else "EACH",
+            requirements = Requirements,
+        )
     }
     
     suspend fun clearCount() {
         _memberCount.emit("")
-        MemberCount = ""
+        manager.update(memberCount = "")
     }
 }

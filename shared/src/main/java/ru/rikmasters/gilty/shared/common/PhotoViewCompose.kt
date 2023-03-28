@@ -1,3 +1,5 @@
+@file:Suppress("UnusedEquals")
+
 package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.*
@@ -33,9 +35,7 @@ import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.shared.GDropMenu
-import ru.rikmasters.gilty.shared.shared.GKebabButton
-import ru.rikmasters.gilty.shared.shared.METRICS
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import kotlin.math.*
@@ -292,30 +292,43 @@ fun ZoomableAsyncImage(
                 }
             }
     ) {
-        AsyncImage(
-            model, (null),
-            modifier
-                .align(imageAlign)
-                .graphicsLayer {
-                    if(isZoomable) {
-                        scaleX = maxOf(
-                            maxScale, minOf(
-                                minScale, scale
+        var placeholder by remember {
+            mutableStateOf(true)
+        }
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(colorScheme.background),
+            Center
+        ) {
+            AsyncImage(
+                model, (null),
+                modifier
+                    .align(imageAlign)
+                    .graphicsLayer {
+                        if(isZoomable) {
+                            scaleX = maxOf(
+                                maxScale, minOf(
+                                    minScale, scale
+                                )
                             )
-                        )
-                        scaleY = maxOf(
-                            maxScale, minOf(
-                                minScale, scale
+                            scaleY = maxOf(
+                                maxScale, minOf(
+                                    minScale, scale
+                                )
                             )
-                        )
-                        if(isRotation)
-                            rotationZ = rotationState
-                        translationX = offsetX
-                        translationY = offsetY
-                    }
-                },
-            contentScale = contentScale,
-        )
+                            if(isRotation)
+                                rotationZ = rotationState
+                            translationX = offsetX
+                            translationY = offsetY
+                        }
+                    },
+                contentScale = contentScale,
+                onLoading = { placeholder = true },
+                onSuccess = { placeholder = false },
+            )
+            if(placeholder) AnimatedImage(R.raw.loaging)
+        }
     }
 }
 

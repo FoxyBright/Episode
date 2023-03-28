@@ -96,7 +96,7 @@ class ProfileWebSource: KtorSource() {
         }!!.wrapped<List<Avatar>>()
     
     suspend fun setUserAvatar(
-        avatar: File, cropX: Int, cropY: Int, cropWidth: Int, cropHeight: Int,
+        avatar: File, list: List<Float>,
     ) {
         post("http://$HOST$PREFIX_URL/profile/avatar") {
             setBody(
@@ -109,10 +109,10 @@ class ProfileWebSource: KtorSource() {
                                 append(ContentDisposition, "filename=\"photo.jpg\"")
                             },
                         )
-                        append("crop_x", cropX)
-                        append("crop_y", cropY)
-                        append("crop_width", cropWidth)
-                        append("crop_height", cropHeight)
+                        append("crop_x", list[0])
+                        append("crop_y", list[1])
+                        append("crop_width", list[2])
+                        append("crop_height", list[3])
                     }, "WebAppBoundary"
                 )
             )

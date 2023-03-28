@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.photo.gallerey.HiddenBsScreen
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers.ObserversBs
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
@@ -142,6 +142,14 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun onNameChange(text: String) {
                 scope.launch { vm.changeUsername(text) }
+            }
+            
+            override fun onSaveUserName() {
+                scope.launch { vm.updateUsername() }
+            }
+            
+            override fun onSaveDescription() {
+                scope.launch { vm.updateDescription() }
             }
             
             override fun onMenuClick(it: Boolean) {

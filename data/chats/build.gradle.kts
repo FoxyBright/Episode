@@ -11,9 +11,10 @@ dependencies {
     androidBase()
     dataBase()
     
+    implementation(project(":domain:paginator"))
+    
     implementation(project(":data:meetings"))
     implementation(project(":data:shared"))
-    implementation(project(":domain:paginator"))
     
     implementation(project(":shared"))
 }

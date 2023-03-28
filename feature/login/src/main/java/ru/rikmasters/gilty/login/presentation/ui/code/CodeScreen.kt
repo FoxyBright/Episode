@@ -14,13 +14,13 @@ import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
 @Composable
 fun CodeScreen(vm: CodeViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
-    val code by vm.code.collectAsState()
-    val blur by vm.blur.collectAsState()
     val focuses by vm.focuses.collectAsState()
+    val blur by vm.blur.collectAsState()
+    val code by vm.code.collectAsState()
     val timer by vm.timer.collectAsState()
     
     LaunchedEffect(Unit) {

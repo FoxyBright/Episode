@@ -14,8 +14,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.ProfileSelectPhotoScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.*
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
@@ -52,14 +51,8 @@ object Login: FeatureDefinition() {
                 CodeScreen(vm)
             }
             
-            screen<ProfileViewModel>(
-                "profile?photo={photo}&hp={hp}&jjj",
-            ) { vm, it ->
-                it.arguments?.getString("photo")?.let { avatar ->
-                    it.arguments?.getString("hp")?.let { hiddenPhoto ->
-                        ProfileScreen(vm, avatar, hiddenPhoto)
-                    }
-                }
+            screen<ProfileViewModel>("profile") { vm, _ ->
+                ProfileScreen(vm)
             }
             
             screen<HiddenViewModel>("hidden") { vm, _ ->
@@ -71,9 +64,20 @@ object Login: FeatureDefinition() {
                 listOf(navArgument("multi") {
                     type = NavType.BoolType; defaultValue = false
                 })
-            ) { vm, it ->
-                it.arguments?.getBoolean("multi")
-                    ?.let { multi -> ProfileSelectPhotoScreen(vm, multi) }
+            ) { vm, stack ->
+                stack.arguments?.getBoolean("multi")?.let {
+                    GalleryScreen(vm, it)
+                }
+            }
+            
+            screen<GalleryViewModel>(
+                "cropper?image={image}", listOf(navArgument("image") {
+                    type = NavType.StringType; defaultValue = ""
+                })
+            ) { vm, stack ->
+                stack.arguments?.getString("image")?.let {
+                    CropperScreen(vm, it)
+                }
             }
             
             screen<PersonalViewModel>("personal") { vm, _ ->
@@ -92,6 +96,7 @@ object Login: FeatureDefinition() {
     
     override fun Module.koin() {
         this@koin.single { authEntrypointResolver }
+        singleOf(::GalleryViewModel)
         singleOf(::CountryManager)
         
         scope<LoginViewModel> {
@@ -101,10 +106,6 @@ object Login: FeatureDefinition() {
         
         scope<CategoryViewModel> {
             scopedOf(::CategoryViewModel)
-        }
-        
-        scope<GalleryViewModel> {
-            scopedOf(::GalleryViewModel)
         }
         
         scope<HiddenViewModel> {

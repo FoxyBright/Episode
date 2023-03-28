@@ -12,16 +12,12 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -73,29 +69,6 @@ interface CodeCallback {
 }
 
 @Composable
-private fun Shadow(modifier: Modifier){
-    Box(
-        modifier
-            .fillMaxWidth()
-            .padding(bottom = 36.dp)
-            .height(50.dp)
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        colorScheme.background,
-                        Color(
-                            if(isSystemInDarkTheme())
-                                0xFF111111
-                            else 0xFFD6D6D6
-                        )
-                    )
-                )
-            )
-            .alpha(0.5f)
-    )
-}
-
-@Composable
 fun CodeContent(
     state: CodeState,
     modifier: Modifier = Modifier,
@@ -115,7 +88,6 @@ fun CodeContent(
                 details = stringResource(R.string.confirm_number_subtitle)
             ) { callback?.onBack() }
             Box {
-                Shadow(Modifier.align(BottomCenter))
                 Image(
                     painterResource(
                         if(isSystemInDarkTheme())
@@ -123,8 +95,6 @@ fun CodeContent(
                         else R.drawable.send_code_helper_day
                     ), (null), Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.3f)
-                        .padding(horizontal = 53.dp)
                         .padding(top = 58.dp, bottom = 36.dp)
                 )
             }

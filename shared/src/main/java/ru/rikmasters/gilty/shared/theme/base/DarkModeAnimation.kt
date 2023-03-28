@@ -43,5 +43,5 @@ fun ColorScheme.switch() = copy(
 fun animateDarkModeColor(targetValue: Color) =
     animateColorAsState(
         targetValue = targetValue,
-        animationSpec = tween(durationMillis = 750)
+        animationSpec = tween(durationMillis = 750), label = ""
     ).value

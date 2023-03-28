@@ -2,80 +2,98 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 
-var Price: String = ""
-var Online: Boolean = false
-var Hidden: Boolean = false
-var RestrictChat: Boolean = false
-var MeetingType: MeetType? = null
-var Condition: ConditionType? = null
-
 class ConditionViewModel: ViewModel() {
     
-    private val _price = MutableStateFlow(Price)
-    val price = _price.asStateFlow()
+    private val manager by inject<MeetingManager>()
+    
+    private val addMeet by lazy { manager.addMeetFlow }
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
-    private val _online = MutableStateFlow(Online)
+    private val _price = MutableStateFlow("")
+    val price = _price.asStateFlow()
+    
+    private val _online = MutableStateFlow(false)
     val online = _online.asStateFlow()
     
-    private val _hidden = MutableStateFlow(Hidden)
-    val hidden = _hidden.asStateFlow()
-    
-    private val _restrictChat = MutableStateFlow(RestrictChat)
-    val restrictChat = _restrictChat.asStateFlow()
-    
-    private val _meetType = MutableStateFlow(
-        MeetingType?.let { listOf(it.ordinal) } ?: emptyList()
-    )
+    private val _meetType = MutableStateFlow(emptyList<Int>())
     val meetType = _meetType.asStateFlow()
     
-    private val _condition = MutableStateFlow(
-        Condition?.let { listOf(it.ordinal) } ?: emptyList()
-    )
+    private val _condition = MutableStateFlow(emptyList<Int>())
     val condition = _condition.asStateFlow()
     
-    suspend fun changeOnline() {
-        _online.emit(!online.value)
-        Online = online.value
+    private val _forbidden = MutableStateFlow(false)
+    val forbidden = _forbidden.asStateFlow()
+    
+    private val _hidden = MutableStateFlow(false)
+    val hidden = _hidden.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest { add ->
+                _price.emit(add?.price ?: "")
+                _online.emit(add?.isOnline ?: false)
+                _forbidden.emit(add?.chatForbidden ?: false)
+                _hidden.emit(add?.photoAccess ?: false)
+                _condition.emit(add?.condition?.ordinal?.let {
+                    listOf(it)
+                } ?: emptyList())
+                _meetType.emit(add?.type?.ordinal?.let {
+                    listOf(it)
+                } ?: emptyList())
+            }
+        }
     }
     
-    suspend fun changeHidden() {
-        _hidden.emit(!hidden.value)
-        Hidden = hidden.value
+    suspend fun changePrice(text: String) {
+        _price.emit(text)
+        manager.update(price = text)
+    }
+    
+    suspend fun clearPrice() {
+        _price.emit("")
+        manager.update(price = "")
+    }
+    
+    suspend fun changeOnline(state: Boolean) {
+        _online.emit(state)
+        manager.update(isOnline = state)
+    }
+    
+    suspend fun changeHidden(state: Boolean) {
+        _hidden.emit(state)
+        manager.update(photoAccess = state)
     }
     
     suspend fun changeMeetType(type: Int) {
         _meetType.emit(listOf(type))
-        MeetingType = MeetType.get(type)
+        manager.update(type = MeetType.get(type))
     }
     
     suspend fun changeCondition(condition: Int) {
         _condition.emit(listOf(condition))
-        Condition = ConditionType.get(condition)
+        manager.update(condition = ConditionType.get(condition))
     }
     
-    suspend fun changeRestrictChat() {
-        _restrictChat.emit(!restrictChat.value)
-        RestrictChat = restrictChat.value
+    suspend fun changeForbiddenChat(state: Boolean) {
+        _forbidden.emit(state)
+        manager.update(chatForbidden = state)
     }
     
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }
     
-    suspend fun changePrice(text: String) {
-        _price.emit(text)
-        Price = text
-    }
-    
-    suspend fun clearPrice() {
-        _price.emit("")
-        Price = ""
+    suspend fun clearBase() {
+        manager.clearAddMeet()
     }
 }

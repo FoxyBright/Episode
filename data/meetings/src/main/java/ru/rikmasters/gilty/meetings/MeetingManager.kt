@@ -1,15 +1,63 @@
 package ru.rikmasters.gilty.meetings
 
+import ru.rikmasters.gilty.meetings.addmeet.AddMeetStorage
+import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.models.Location
-import ru.rikmasters.gilty.shared.models.Requirement
-import ru.rikmasters.gilty.shared.models.meets.MainMeetResponse
-import ru.rikmasters.gilty.shared.models.meets.MeetFiltersRequest
+import ru.rikmasters.gilty.shared.models.*
+import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
-class MeetingManager(private val web: MeetingWebSource) {
+class MeetingManager(
+    
+    private val storage: AddMeetStorage,
+    
+    private val web: MeetingWebSource,
+) {
     
     private data class MeetCount(val total: Int)
+    
+    val addMeetFlow = storage.addMeetFlow
+    
+    suspend fun clearAddMeet() {
+        storage.clear()
+    }
+    
+    suspend fun update(
+        category: CategoryModel? = null,
+        type: MeetType? = null,
+        isOnline: Boolean? = null,
+        condition: ConditionType? = null,
+        price: String? = null,
+        photoAccess: Boolean? = null,
+        chatForbidden: Boolean? = null,
+        tags: List<TagModel>? = null,
+        description: String? = null,
+        dateTime: String? = null,
+        duration: String? = null,
+        hide: Boolean? = null,
+        lat: Double? = null,
+        lng: Double? = null,
+        place: String? = null,
+        address: String? = null,
+        isPrivate: Boolean? = null,
+        memberCount: String? = null,
+        requirementsType: String? = null,
+        requirements: List<RequirementModel>? = null,
+        withoutResponds: Boolean? = null,
+        memberLimited: Boolean? = null,
+    ) {
+        storage.update(
+            category, type, isOnline, condition,
+            price, photoAccess, chatForbidden, tags,
+            description, dateTime, duration, hide,
+            lat, lng, place, address, isPrivate,
+            memberCount, requirementsType,
+            requirements, withoutResponds,
+            memberLimited
+        )
+    }
     
     private suspend inline fun <reified Type> getMeetings(
         filter: MeetFiltersRequest, count: Boolean,
@@ -88,58 +136,38 @@ class MeetingManager(private val web: MeetingWebSource) {
         web.respondOfMeet(meetId, comment, hidden)
     }
     
-    suspend fun addMeet(
-        categoryId: String?,
-        type: String?,
-        isOnline: Boolean?,
-        condition: String?,
-        price: Int?,
-        photoAccess: Boolean?,
-        chatForbidden: Boolean?,
-        tags: List<String>?,
-        description: String?,
-        dateTime: String?,
-        duration: Int?,
-        hide: Boolean?,
-        lat: Double?,
-        lng: Double?,
-        place: String?,
-        address: String?,
-        isPrivate: Boolean?,
-        memberCount: Int?,
-        requirementsType: String?,
-        requirements: List<RequirementModel>?,
-        withoutResponds: Boolean?,
-    ) = web.addMeet(
-        categoryId, type, isOnline,
-        condition, price, photoAccess,
-        chatForbidden, tags, description,
-        dateTime, duration,
-        if(isOnline != true) Location(
-            hide, lat, lng, place, address
-        ) else null, isPrivate, memberCount,
-        requirementsType, when {
-            isPrivate == true -> null
-            requirementsType == "ALL" -> {
-                val req = requirements!!.first()
-                listOf(
-                    Requirement(
-                        req.gender?.name, req.ageMin,
-                        req.ageMax, (req.orientation!!.id)
-                    )
-                )
-            }
+    suspend fun addMeet(meet: AddMeetModel) = web.addMeet(
+        meet.category?.id, meet.type.name,
+        meet.isOnline, meet.condition.name, try {
+            meet.price.toInt()
+        } catch(e: Exception) {
+            null
+        }, meet.photoAccess,
+        meet.chatForbidden, meet.tags.map { it.title },
+        meet.description, meet.dateTime,
+        durationToMinutes(meet.duration),
+        if(!meet.isOnline) Location(
+            meet.hide, meet.lat, meet.lng,
+            meet.place, meet.address
+        ) else null, meet.isPrivate, try {
+            meet.memberCount.toInt()
+        } catch(e: Exception) {
+            1
+        }, meet.requirementsType, when {
+            meet.isPrivate -> null
+            meet.requirementsType == "ALL" ->
+                listOf(meet.requirements.first().reqMap())
             
-            else -> requirements?.map {
-                Requirement(
-                    it.gender?.name, it.ageMin,
-                    it.ageMax, (it.orientation!!.id)
-                )
-            }
-        }, withoutResponds
+            else -> meet.requirements.map { it.reqMap() }
+        }, meet.withoutResponds
     )
     
     suspend fun setUserInterest(meets: List<CategoryModel>) {
         web.setUserInterest(meets.map { it.id })
     }
 }
+
+private fun RequirementModel.reqMap() = Requirement(
+    gender?.name, ageMin,
+    ageMax, orientation!!.id
+)

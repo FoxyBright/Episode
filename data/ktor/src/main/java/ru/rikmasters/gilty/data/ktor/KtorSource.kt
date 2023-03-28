@@ -14,8 +14,6 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
@@ -60,7 +58,12 @@ open class KtorSource: WebSource() {
                 }
             }
             defaultRequest {
-                contentType(ContentType.Application.Json)
+                contentType(Json)
+                getLocales(
+                    getSystem().configuration
+                )[0]?.language?.let {
+                    headers { append("Accept-Language", it) }
+                }
                 host = env[ENV_BASE_URL] ?: ""
             }
             install(UserAgent) {
@@ -70,6 +73,14 @@ open class KtorSource: WebSource() {
                 contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
             }
+            engine {
+                preconfigured = OkHttpClient.Builder()
+                    .pingInterval(
+                        webSocketPingInterval,
+                        MILLISECONDS
+                    ).build()
+            }
+            
         }
     }
     private val unauthorizedClient by lazy {

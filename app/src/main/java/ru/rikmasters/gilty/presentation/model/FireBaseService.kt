@@ -5,11 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_ONE_SHOT
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.net.Uri.parse
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,6 +64,11 @@ class FireBaseService: FirebaseMessagingService() {
         }
         
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.data = parse(
+            if(message.data["type"] == "CHAT_MESSAGE")
+                "${message.data["type"]}${message.data["content"]}"
+            else message.data.toString()
+        )
         notificationManager.notify(
             Random.nextInt(), NotificationCompat
                 .Builder(
@@ -79,7 +84,7 @@ class FireBaseService: FirebaseMessagingService() {
                 .setContentIntent(
                     PendingIntent.getActivity(
                         (this), (0), (intent),
-                        (FLAG_ONE_SHOT or FLAG_IMMUTABLE)
+                        FLAG_UPDATE_CURRENT
                     )
                 ).build()
         )

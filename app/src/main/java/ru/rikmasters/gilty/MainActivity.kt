@@ -10,13 +10,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.bottomsheet.DeepLinker.deepLink
+import ru.rikmasters.gilty.bottomsheet.deeplink.DeepLinker.deepLink
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.app.AppEntrypoint
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -24,6 +22,8 @@ import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.app.ui.ErrorConnection
 import ru.rikmasters.gilty.core.data.source.WebSource.Companion.ENV_BASE_URL
 import ru.rikmasters.gilty.core.env.Environment
+import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.BuildConfig.HOST
@@ -50,9 +50,9 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // TODO вынести в BuildConfig
         MapKitFactory.setApiKey("6eb87a4e-7668-4cf6-a691-36051b71e2e5")
         MapKitFactory.initialize(this)
+        
         FireBaseService.sharedPref = getSharedPreferences(
             "sharedPref", MODE_PRIVATE
         )
@@ -104,28 +104,35 @@ class MainActivity: ComponentActivity() {
                     && regManager.profileCompleted()
                 ) {
                     authManager.savePushToken(token)
-                    chatManager.connect(
-                        regManager.userId()
-                    )
+                    chatManager.connect(regManager.userId())
                 }
                 
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
             
-            val asm by inject<AppStateModel>()
             val scope = getKoin().createScope<MainActivity>()
+            val asm by inject<AppStateModel>()
+            val nav by inject<NavState>()
             
             LaunchedEffect(intent) {
                 if(authManager.isAuthorized()
                     && regManager.profileCompleted()
-                ) deepLink(scope, asm, intent)
+                ) deepLink(scope, asm, intent, nav)
             }
+            
         }
+    }
+    
+    override fun onStop() {
+        CoroutineScope(IO).launch {
+            inject<MeetingManager>()
+                .value.clearAddMeet()
+        }
+        super.onStop()
     }
     
     override fun getIntent() = _intent ?: super.getIntent()
         ?.let { _intent = it; _intent!! }
-    
     
     override fun setIntent(newIntent: Intent?) {
         _intent = newIntent

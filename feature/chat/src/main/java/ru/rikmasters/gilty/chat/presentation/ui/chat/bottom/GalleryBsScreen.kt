@@ -14,7 +14,8 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.viewmodel.GalleryViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.gallery.*
-import ru.rikmasters.gilty.gallery.GalleryImageType.MULTIPLE
+import ru.rikmasters.gilty.gallery.gallery.*
+import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.R
 
 @Composable
@@ -43,20 +44,13 @@ fun GalleryBs(
         if(permission.hasPermission) vm.getImages()
     }
     
-    if(!permission.hasPermission) {
-        StoragePermissionBs {
-            scope.launch {
-                permission.launchPermissionRequest()
-                if(permission.hasPermission)
-                    vm.getImages()
-            }
-        }
+    if(!permission.hasPermission) StoragePermissionBs {
+        scope.launch { permission.launchPermissionRequest() }
     } else {
         GalleryBsContent(
             GalleryState(
-                MULTIPLE, images,
-                selected, (false),
-                (null), isOnline,
+                MULTIPLE, images, selected,
+                (false), (null), isOnline,
                 stringResource(R.string.send_button),
                 selected.isNotEmpty()
             ), Modifier, object: GalleryCallback {

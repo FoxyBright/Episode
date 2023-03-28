@@ -13,6 +13,15 @@ data class ThumbnailModel(
     val mimetype: String,
 ) {
     
+    constructor() : this(
+        id = randomUUID().toString(),
+        url = "",
+        width = 0,
+        height = 0,
+        filesize = 0,
+        mimetype = "image/jpeg",
+    )
+    
     fun map() = AvatarModel(
         id = id,
         albumId = id,

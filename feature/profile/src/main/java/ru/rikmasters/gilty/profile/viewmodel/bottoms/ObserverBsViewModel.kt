@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
@@ -19,6 +19,20 @@ class ObserverBsViewModel: ViewModel() {
     private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
+    private val _search = MutableStateFlow("")
+    val search = _search.asStateFlow()
+    
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
+    val searchDebounced = search
+        .debounce(250)
+        .onEach {
+            if(observersSelectTab.value == 0)
+                getObservers(it)
+            else getObservables(it)
+        }
+        .state(_search.value, SharingStarted.Eagerly)
+    
     private val _observers = MutableStateFlow(emptyList<UserModel>())
     val observers = _observers.asStateFlow()
     
@@ -29,14 +43,19 @@ class ObserverBsViewModel: ViewModel() {
     val unsubscribeMembers = _unsubscribeMembers.asStateFlow()
     suspend fun changeObserversTab(tab: Int) {
         _observersSelectTab.emit(tab)
+        _search.emit("")
     }
     
-    suspend fun getObservers() {
-        _observers.emit(profileManager.getObservers(OBSERVERS))
+    suspend fun searchChange(text: String) {
+        _search.emit(text)
     }
     
-    suspend fun getObservables() {
-        _observables.emit(profileManager.getObservers(OBSERVABLES))
+    suspend fun getObservers(query: String = "") {
+        _observers.emit(profileManager.getObservers(query, OBSERVERS))
+    }
+    
+    suspend fun getObservables(query: String = "") {
+        _observables.emit(profileManager.getObservers(query, OBSERVABLES))
     }
     
     enum class SubscribeType { SUB, UNSUB, DELETE }
@@ -60,7 +79,7 @@ class ObserverBsViewModel: ViewModel() {
             
             DELETE -> {
                 profileManager.deleteObserver(member)
-                getObservers()
+                getObservers(search.value)
             }
         }
     }

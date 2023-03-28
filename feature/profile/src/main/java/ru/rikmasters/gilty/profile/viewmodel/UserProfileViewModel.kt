@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -57,6 +57,36 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _username = MutableStateFlow(profileModel.username)
     private val username = _username.asStateFlow()
     
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
+    val usernameDebounced = username
+        .debounce(250)
+        .onEach {
+            it?.substringBefore(',')?.let { name ->
+                _occupied.emit(
+                    regManager.isNameOccupied(name)
+                            && profileManager
+                        .getProfile(false)
+                        .username != name
+                )
+            }
+        }
+        .state(_username.value, SharingStarted.Eagerly)
+    
+    suspend fun updateUsername() {
+        if(!occupied.value) regManager.userUpdateData(
+            username.value?.substringBefore(','),
+            description.value, age.value
+        )
+    }
+    
+    suspend fun changeUsername(name: String) {
+        if(!name.contains(',')) return
+        val text = name.substringBefore(',')
+        _username.emit("$text, ${age.value}")
+        updateProfile()
+    }
+    
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
@@ -104,6 +134,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun changeDescription(text: String) {
         _description.emit(text)
         updateProfile()
+    }
+    
+    suspend fun updateDescription() {
         regManager.userUpdateData(
             username.value?.substringBefore(','),
             description.value
@@ -141,17 +174,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             )
         )
         getUserMeets(forceWeb)
-    }
-    
-    suspend fun changeUsername(name: String) {
-        if(!name.contains(',')) return
-        val text = name.substringBefore(',')
-        _username.emit("$text, ${age.value}")
-        updateProfile()
-        _occupied.emit(regManager.isNameOccupied(text))
-        if(!occupied.value) regManager.userUpdateData(
-            text, description.value, age.value
-        )
     }
     
     suspend fun showHistory() {

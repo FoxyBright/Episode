@@ -142,7 +142,7 @@ fun NotificationText(
     meet: MeetingModel?,
     duration: String,
     modifier: Modifier = Modifier,
-    NotificationMessage: String? = null,
+    notification: String? = null,
     emoji: List<EmojiModel>? = null,
     onMeetClick: (() -> Unit)? = null,
     onUserClick: (() -> Unit)? = null,
@@ -263,7 +263,7 @@ fun NotificationText(
             }
             
             ADMIN_NOTIFICATION, PHOTO_BLOCKED -> {
-                withStyle(style(TEXT)) { append(NotificationMessage) }
+                withStyle(style(TEXT)) { append(notification) }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             

@@ -35,9 +35,25 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and accompanist(
 ) and accompanistPermissions(
 ) and firebase(
-) and swipeRefresher()
+) and swipeRefresher(
+) and lottie()
 
 val pagingVer = "3.1.1"
+
+fun DependencyHandlerScope.imageCropper() = implementation(
+    "com.github.SmartToolFactory:Compose-Colorful-Sliders:1.1.0",
+    "com.github.SmartToolFactory:Compose-Color-Picker-Bundle:1.0.1",
+    "com.github.SmartToolFactory:Compose-Extended-Gestures:2.1.0",
+    "com.github.SmartToolFactory:Compose-AnimatedList:0.5.1",
+)
+
+fun DependencyHandlerScope.compressor() = implementation(
+    "id.zelory:compressor:3.0.1"
+)
+
+fun DependencyHandlerScope.lottie() = implementation(
+    "com.airbnb.android:lottie-compose:5.2.0"
+)
 
 fun DependencyHandlerScope.paging() = implementation(
     "androidx.paging:paging-compose:1.0.0-alpha17"

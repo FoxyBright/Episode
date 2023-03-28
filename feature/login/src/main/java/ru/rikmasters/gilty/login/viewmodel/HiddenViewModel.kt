@@ -1,25 +1,48 @@
 package ru.rikmasters.gilty.login.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-
-var ListHidden: List<String> = listOf()
+import ru.rikmasters.gilty.shared.shared.compress
+import java.io.File
 
 class HiddenViewModel: ViewModel() {
     
-    private val _photoList = MutableStateFlow(ListHidden)
+    private val regManager by inject<RegistrationManager>()
+    
+    private val context = getKoin().get<Context>()
+    
+    private val _photoList = MutableStateFlow(emptyList<String>())
     val photoList = _photoList.asStateFlow()
+    
+    private val hiddenList = MutableStateFlow(emptyList<String>())
+    
+    suspend fun getHidden() = singleLoading {
+        regManager.getProfile().hidden?.let {
+            val list = regManager
+                .getHidden(it.albumId)
+            _photoList.emit(list)
+            hiddenList.emit(list)
+        }
+    }
     
     suspend fun selectImage(image: String) {
         if(!photoList.value.contains(image))
             _photoList.emit(photoList.value + image)
-        ListHidden = photoList.value
     }
     
-    suspend fun deleteImage(image: String) {
+    suspend fun deleteImage(image: String) = singleLoading {
         if(photoList.value.contains(image))
             _photoList.emit(photoList.value - image)
-        ListHidden = photoList.value
+    }
+    
+    suspend fun onNext() = singleLoading {
+        regManager.deleteHidden(hiddenList.value)
+        regManager.addHidden(photoList.value.map {
+            File(it).compress(context)
+        })
     }
 }

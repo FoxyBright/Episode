@@ -7,8 +7,6 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.AgeBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.GenderBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.OrientationBs
-import ru.rikmasters.gilty.addmeet.viewmodel.MeetingType
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.GenderBsViewModel
@@ -23,25 +21,24 @@ import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 @Composable
 fun RequirementsScreen(vm: RequirementsViewModel) {
     
-    val nav = get<NavState>()
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
-    val memberLimited by vm.memberLimited.collectAsState()
+    val requirements by vm.requirements.collectAsState()
+    val orientation by vm.orientation.collectAsState()
+    val withoutRespond by vm.withoutRespond.collectAsState()
+    val memberLimited by vm.limited.collectAsState()
     val count by vm.memberCount.collectAsState()
-    
+    val member by vm.selectMember.collectAsState()
     val private by vm.private.collectAsState()
-    
-    val tabs by vm.tabs.collectAsState()
+    val alert by vm.alert.collectAsState()
     val gender by vm.gender.collectAsState()
     val age by vm.age.collectAsState()
-    val orientation by vm.orientation.collectAsState()
-    val requirements by vm.requirements.collectAsState()
+    val tabs by vm.tabs.collectAsState()
     
-    val alert by vm.alert.collectAsState()
-    
-    val member by vm.selectMember.collectAsState()
-    val withoutRespond by vm.withoutRespond.collectAsState()
+    val meetType by vm.meetType.collectAsState()
+    val online by vm.online.collectAsState()
     
     fun reqControl(it: RequirementModel) = when {
         it.gender == null -> true
@@ -59,8 +56,15 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
         return true
     }
     
+    fun getGender(index: Int?) =
+        index?.let { GenderType.get(it).value }
+    
+    fun getOrientation(orientation: OrientationModel?) =
+        orientation?.name ?: ""
+    
     val countCheck = (if(memberLimited) count.isNotBlank()
             && count.toInt() > 1 else true)
+    
     val isActive = (private && countCheck)
             || countCheck
             && gender != null
@@ -68,18 +72,11 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             && orientation != null
             && checkRequirements()
     
-    fun getGender(index: Int?) =
-        index?.let { GenderType.get(it).value }
-    
-    fun getOrientation(orientation: OrientationModel?) =
-        orientation?.name ?: ""
-    
     RequirementsContent(
         RequirementsState(
-            private, count,
-            getGender(gender), age,
-            getOrientation(orientation),
-            tabs, member, alert, MeetingType, Online,
+            private, count, getGender(gender), age,
+            getOrientation(orientation), tabs,
+            member, alert, meetType, online,
             isActive, withoutRespond, memberLimited
         ), Modifier, object: RequirementsCallback {
             
@@ -159,7 +156,10 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             }
             
             override fun onNext() {
-                nav.navigate("complete")
+                scope.launch {
+                    vm.setRequirements()
+                    nav.navigate("complete")
+                }
             }
         })
 }

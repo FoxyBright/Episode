@@ -34,7 +34,7 @@ fun PriceTextField(
         ) else null, placeholder = textFieldLabel(
             false, stringResource(R.string.add_meet_conditions_price_description)
         ), singleLine = true,
-        isError = value.length > 7,
+        isError = value.isNotEmpty() && value.toInt() > 1_000_000,
         errorBottomText = "До 1 000 000 ₽",
         keyboardOptions = KeyboardOptions(
             keyboardType = NumberPassword

@@ -22,10 +22,11 @@ fun ObserversBs(
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
+    val unsubList by vm.unsubscribeMembers.collectAsState()
     val observersTab by vm.observersSelectTab.collectAsState()
     val observed by vm.observables.collectAsState()
     val observers by vm.observers.collectAsState()
-    val unsubList by vm.unsubscribeMembers.collectAsState()
+    val search by vm.search.collectAsState()
     
     LaunchedEffect(Unit) {
         vm.getObservables()
@@ -37,10 +38,13 @@ fun ObserversBs(
     
     ObserversListContent(
         ObserversListState(
-            username, observers,
-            observed, unsubList, observersTab,
+            username, observers, observed,
+            unsubList, observersTab, search
         ), Modifier.padding(top = 28.dp),
         object: ObserversListCallback {
+            override fun onSearchTextChange(text: String) {
+                scope.launch { vm.searchChange(text) }
+            }
             
             override fun onButtonClick(
                 member: UserModel, type: SubscribeType,

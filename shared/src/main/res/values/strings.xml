@@ -93,6 +93,7 @@
     <string name="female_sex_en">woman</string>
     <string name="others_sex_en">other</string>
     <string name="personal_info_age_placeholder">Возраст</string>
+    <string name="add_button">Добавить</string>
 
     <!-- Recommendation -->
     <string name="not_interesting">Неинтересно</string>
@@ -200,6 +201,7 @@
     <string name="meeting_filter_distance">Расстояние</string>
     <string name="meeting_filter_meet_type">Тип meet</string>
     <string name="meeting_filter_conditions">Условия</string>
+    <string name="select_button">Выбрать</string>
 
     <!-- Chats -->
     <string name="chats_member_cases">участник%s</string>
@@ -327,6 +329,7 @@
     <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Meet?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
+    <string name="bad_tag_error">Тег содержит недопустимый символ</string>
     <string name="delete_my_chat_button">Удалить у меня</string>
     <string name="delete_my_and_other_chat_button">Удалить у всех участников</string>
     <string name="exit_button">Выйти</string>
@@ -338,6 +341,7 @@
     <string name="exit_from_meet_label">Чат и отображение meet в истории пропадут</string>
     <string name="chat_send_complaint">Жалоба отправлена</string>
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
+    <string name="image_preview_cropper">Отображение</string>
 
     <!-- Toasts -->
     <string name="login_policy_toast">Политика не составлена, все на честном слове</string>
