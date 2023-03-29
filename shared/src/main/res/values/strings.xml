@@ -130,6 +130,7 @@
     <string name="notification_respond_cancel_button">Отменить</string>
     <string name="notification_respond_accept_button">Принять</string>
     <string name="notification_send_emotion">Оставьте эмоции участникам meet</string>
+    <string name="notification_place_holder">Уведомлений пока нет</string>
 
     <!-- Meeting -->
     <string name="meeting_canceled">Отменить meet</string>

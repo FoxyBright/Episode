@@ -1,22 +1,26 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
@@ -145,12 +149,14 @@ fun NotificationsContent(
     ) { padding ->
         Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
-                Notifications(
+                if(state.notifications.itemCount > 0
+                    || state.lastRespond.first > 0
+                ) Notifications(
                     state, Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     callback
-                )
+                ) else EmptyNotification()
             }
         }
     }
@@ -178,6 +184,34 @@ fun NotificationsContent(
 }
 
 @Composable
+private fun EmptyNotification(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(top = 30.dp),
+        Top, CenterHorizontally
+    ) {
+        Image(
+            painterResource(
+                if((isSystemInDarkTheme()))
+                    R.drawable.notify_dog_light
+                else R.drawable.notify_dog_light
+            ), (null), Modifier.fillMaxWidth()
+        )
+        Text(
+            stringResource(R.string.notification_place_holder),
+            Modifier.padding(top = 26.dp),
+            color = colorScheme.scrim,
+            style = typography.bodyMedium.copy(
+                fontWeight = SemiBold
+            )
+        )
+    }
+}
+
+@Composable
 private fun Notifications(
     state: NotificationsState,
     modifier: Modifier = Modifier,
@@ -188,81 +222,76 @@ private fun Notifications(
     
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
-        try {
-            if(itemCount > 0) {
-                
-                val list = arrayListOf<Int>()
-                var i = 0
-                
-                while(i < itemCount) {
-                    val not = notifications[i]!!
-                    if(!todayControl(not.date)) break
-                    list.add(i); ++i
-                }
-                if(list.isNotEmpty()) {
-                    item { Label(R.string.meeting_profile_bottom_today_label) }
-                    list.forEachIndexed { count, item ->
-                        item {
-                            ElementNot(
-                                count, list.size,
-                                notifications[item]!!,
-                                state.ratings, callback
-                            )
-                        }
+        if(itemCount > 0) {
+            
+            val list = arrayListOf<Int>()
+            var i = 0
+            
+            items(state.notifications) {}
+            
+            while(i < itemCount) {
+                val not = notifications[i]!!
+                if(!todayControl(not.date)) break
+                list.add(i); ++i
+            }
+            
+            if(list.isNotEmpty()) {
+                item { Label(R.string.meeting_profile_bottom_today_label) }
+                list.forEachIndexed { count, item ->
+                    item {
+                        ElementNot(
+                            count, list.size,
+                            notifications[item]!!,
+                            state.ratings, callback
+                        )
                     }
-                    list.clear()
                 }
-                
-                while(i < itemCount) {
-                    val not = notifications[i]!!
-                    if(!weekControl(not.date)) break
-                    list.add(i); ++i
-                }
-                if(list.isNotEmpty()) {
-                    item { Label(R.string.notification_on_this_week_label) }
-                    list.forEachIndexed { count, item ->
-                        item {
-                            ElementNot(
-                                count, list.size,
-                                notifications[item]!!,
-                                state.ratings, callback
-                            )
-                        }
+                list.clear()
+            }
+            
+            while(i < itemCount) {
+                val not = notifications[i]!!
+                if(!weekControl(not.date)) break
+                list.add(i); ++i
+            }
+            if(list.isNotEmpty()) {
+                item { Label(R.string.notification_on_this_week_label) }
+                list.forEachIndexed { count, item ->
+                    item {
+                        ElementNot(
+                            count, list.size,
+                            notifications[item]!!,
+                            state.ratings, callback
+                        )
                     }
-                    list.clear()
                 }
-                
-                (itemCount - i).let {
-                    if(it > 0) {
-                        item { Label(R.string.notification_earlier_label) }
-                        items(it) { count ->
-                            ElementNot(
-                                count, itemCount,
-                                notifications[i + count]!!,
-                                state.ratings, callback
-                            )
-                        }
+                list.clear()
+            }
+            
+            (itemCount - i).let {
+                if(it > 0) {
+                    item { Label(R.string.notification_earlier_label) }
+                    items(it) { count ->
+                        ElementNot(
+                            count, itemCount,
+                            notifications[i + count]!!,
+                            state.ratings, callback
+                        )
                     }
                 }
             }
-            item { PagingLoader(notifications.loadState) }
-            item { Spacer(Modifier.height(20.dp)) }
-        } catch(e: Exception) {
-            e.stackTraceToString()
         }
+        item { PagingLoader(notifications.loadState) }
+        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 
 @Composable
 private fun PreviewLazy() {
     LazyColumn(Modifier.padding(horizontal = 16.dp)) {
-        val list = DemoNotificationModelList
         item { Label(R.string.notification_earlier_label) }
-        itemsIndexed(list) { it, not ->
-            ElementNot(
-                it, list.size, not,
-                DemoRatingModelList
-            )
+        itemsIndexed(DemoNotificationModelList) { it, not ->
+            ElementNot(it, (2), not, DemoRatingModelList)
         }
     }
 }
