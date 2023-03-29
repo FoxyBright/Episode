@@ -43,7 +43,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -59,7 +58,7 @@ private fun ChatListPreview() {
         ChatListContent(
             ChatListState(
                 listOf(
-                    INACTIVE, NEW, INACTIVE,
+                    INACTIVE, INACTIVE, INACTIVE,
                     INACTIVE, ACTIVE
                 ), previewData(),
                 (true), (false), LIST, (1),

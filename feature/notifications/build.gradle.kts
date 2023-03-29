@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":data:meetings"))
     implementation(project(":data:reports"))
     implementation(project(":data:profile"))
+    implementation(project(":data:chats"))
     
     implementation(project(":shared"))
 }

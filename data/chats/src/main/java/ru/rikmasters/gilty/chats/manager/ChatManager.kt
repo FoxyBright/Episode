@@ -54,7 +54,6 @@ class ChatManager(
         webSocket.connect(userId)
     }
     
-    @Suppress("unused")
     // получить список непрочитанных во всех чатах
     suspend fun getChatsStatus() = webSource.getChatsStatus()
     

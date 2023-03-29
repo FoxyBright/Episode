@@ -30,25 +30,26 @@ fun MainScreen(vm: MainViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val navBar by vm.navBar.collectAsState()
-    val today by vm.today.collectAsState()
-    val time by vm.time.collectAsState()
-    val days by vm.days.collectAsState()
-    val grid by vm.grid.collectAsState()
-    val meetings by vm.meetings.collectAsState()
-    val alert by vm.alert.collectAsState()
     val hasFilters by vm.meetFilters.collectAsState()
+    val meetings by vm.meetings.collectAsState()
+    val navBar by vm.navBar.collectAsState()
+    val days by vm.days.collectAsState()
+    val alert by vm.alert.collectAsState()
+    val today by vm.today.collectAsState()
+    val grid by vm.grid.collectAsState()
+    val time by vm.time.collectAsState()
     
-    LaunchedEffect(Unit) { vm.getMeets() }
+    LaunchedEffect(Unit) {
+        vm.getChatStatus()
+        vm.getMeets()
+    }
     
     Use<MainViewModel>(LoadingTrait) {
         MainContent(
             MainContentState(
-                grid, today,
-                days.isNotEmpty(),
-                time.isNotBlank(),
-                meetings, navBar, alert,
-                hasFilters.isNotNullOrEmpty()
+                grid, today, days.isNotEmpty(),
+                time.isNotBlank(), meetings,
+                navBar, alert, hasFilters.isNotNullOrEmpty()
             ), Modifier, object: MainContentCallback {
                 
                 override fun onNavBarSelect(point: Int) {
@@ -125,6 +126,7 @@ fun MainScreen(vm: MainViewModel) {
                 override fun onStyleChange() {
                     scope.launch { vm.changeGrid() }
                 }
-            })
+            }
+        )
     }
 }

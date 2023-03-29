@@ -16,18 +16,20 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
     
-    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     val nav = get<NavState>()
     
-    val alertSelected by vm.alertSelected.collectAsState()
     val chats = vm.chats.collectAsLazyPagingItems()
     val unreadChats by vm.unreadChats.collectAsState()
+    val alertSelected by vm.alertSelected.collectAsState()
     val alertState by vm.alertState.collectAsState()
-    val completed by vm.completed.collectAsState()
     val navBar by vm.navBar.collectAsState()
+    val completed by vm.completed.collectAsState()
     val unRead by vm.unread.collectAsState()
     val alert by vm.alert.collectAsState()
+    
+    LaunchedEffect(Unit) { vm.getChatStatus() }
     
     LaunchedEffect(chats.loadState) {
         val loadState = chats.loadState

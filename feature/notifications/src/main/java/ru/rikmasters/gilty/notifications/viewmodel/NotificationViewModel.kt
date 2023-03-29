@@ -6,6 +6,7 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -24,14 +25,13 @@ import ru.rikmasters.gilty.shared.model.profile.RatingModel
 class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     private val notificationManger by inject<NotificationManager>()
-    private val meetingManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
+    private val meetManager by inject<MeetingManager>()
+    private val chatManager by inject<ChatManager>()
     
-    private val navBarStateList = listOf(
-        INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE
+    private val _navBar = MutableStateFlow(
+        listOf(INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE)
     )
-    
-    private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
@@ -59,6 +59,18 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         Pager(PagingConfig(15)) {
             newSource()
         }.flow.cachedIn(coroutineScope)
+    
+    suspend fun getChatStatus() {
+        chatManager.getChatsStatus().let {
+            if(it > 0) _navBar.emit(
+                listOf(
+                    INACTIVE, ACTIVE,
+                    INACTIVE, NEW,
+                    INACTIVE
+                )
+            )
+        }
+    }
     
     override suspend fun forceRefresh() = singleLoading {
         source?.invalidate()
@@ -145,7 +157,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     private suspend fun getParticipants(meetId: String) {
         _participants.emit(
-            meetingManager.getMeetMembers(meetId, (true))
+            meetManager.getMeetMembers(meetId, (true))
         )
     }
     

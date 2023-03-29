@@ -41,6 +41,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val alert by vm.alert.collectAsState()
     
     LaunchedEffect(Unit) {
+        vm.getChatStatus()
         vm.setUserDate()
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{

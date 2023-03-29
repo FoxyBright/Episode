@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -14,8 +13,6 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +42,7 @@ fun NavBarPreview() {
 fun NavBar(
     state: List<NavIconState>,
     modifier: Modifier = Modifier,
-    onClick: (point: Int) -> Unit
+    onClick: (point: Int) -> Unit,
 ) {
     Row(
         modifier
@@ -95,7 +92,7 @@ private fun Item(
     icon: Int,
     state: NavIconState,
     add: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     if(add) AddButton(icon, onClick)
     else Card(
@@ -110,9 +107,7 @@ private fun Item(
             painterResource(icon),
             (null), Modifier
                 .padding(24.dp, 8.dp)
-                .size(24.dp),
-            colorFilter = if(isSystemInDarkTheme())
-                ColorFilter.tint(White) else null
+                .size(24.dp)
         )
     }
 }

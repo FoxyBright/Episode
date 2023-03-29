@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -19,6 +20,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 class MainViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
+    private val chatManager by inject<ChatManager>()
     
     private val _today = MutableStateFlow(true)
     val today = _today.asStateFlow()
@@ -35,18 +37,28 @@ class MainViewModel: ViewModel() {
     private val _time = MutableStateFlow("")
     val time = _time.asStateFlow()
     
-    private val navBarStateList = listOf(
-        ACTIVE, NEW, INACTIVE, NEW, INACTIVE
-    )
-    
     private val _meetings = MutableStateFlow(emptyList<MeetingModel>())
     val meetings = _meetings.asStateFlow()
     
-    private val _navBar = MutableStateFlow(navBarStateList)
+    private val _navBar = MutableStateFlow(
+        listOf(ACTIVE, INACTIVE, INACTIVE, INACTIVE, INACTIVE)
+    )
     val navBar = _navBar.asStateFlow()
     
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
+    
+    suspend fun getChatStatus() {
+        chatManager.getChatsStatus().let {
+            if(it > 0) _navBar.emit(
+                listOf(
+                    ACTIVE, INACTIVE,
+                    INACTIVE, NEW,
+                    INACTIVE
+                )
+            )
+        }
+    }
     
     suspend fun changeTime(time: String) {
         _time.emit(time)

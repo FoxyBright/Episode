@@ -4,6 +4,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.ProfileManager
@@ -18,14 +19,11 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
-    private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
+    private val profileManager by inject<ProfileManager>()
+    private val chatManager by inject<ChatManager>()
     
     private val profileModel = ProfileModel.empty
-    
-    private val navBarStateList = listOf(
-        INACTIVE, NEW, INACTIVE, NEW, ACTIVE
-    )
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -93,8 +91,22 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
     
-    private val _navBar = MutableStateFlow(navBarStateList)
+    private val _navBar = MutableStateFlow(
+        listOf(INACTIVE, INACTIVE, INACTIVE, INACTIVE, ACTIVE)
+    )
     val navBar = _navBar.asStateFlow()
+    
+    suspend fun getChatStatus() {
+        chatManager.getChatsStatus().let {
+            if(it > 0) _navBar.emit(
+                listOf(
+                    INACTIVE, INACTIVE,
+                    INACTIVE, NEW,
+                    ACTIVE
+                )
+            )
+        }
+    }
     
     private suspend fun navBarSetStates(
         states: List<NavIconState>,

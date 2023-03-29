@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
-import ru.rikmasters.gilty.core.app.ui.ErrorConnection
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
@@ -41,7 +40,6 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -60,7 +58,7 @@ private fun ProfilePreview() {
                     DemoProfileModel, USERPROFILE
                 ), meets, meets, Pair(4, "image"),
                 (false), listOf(
-                    INACTIVE, NEW, INACTIVE,
+                    INACTIVE, INACTIVE, INACTIVE,
                     INACTIVE, ACTIVE
                 ), alert = false,
                 listState = rememberLazyListState()

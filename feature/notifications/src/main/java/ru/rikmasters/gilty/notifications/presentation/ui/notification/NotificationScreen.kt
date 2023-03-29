@@ -39,6 +39,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val blur by vm.blur.collectAsState()
     
     LaunchedEffect(Unit) {
+        vm.getChatStatus()
         vm.getRatings()
         vm.getLastResponse()
     }

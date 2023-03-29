@@ -44,15 +44,25 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     val isPageRefreshing = MutableStateFlow(false)
     override val pagingPull = isPageRefreshing
     
-    private val navBarStateList = listOf(
-        INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE
+    private val _navBar = MutableStateFlow(
+        listOf(INACTIVE, INACTIVE, INACTIVE, ACTIVE, INACTIVE)
     )
-    
-    private val _navBar = MutableStateFlow(navBarStateList)
     val navBar = _navBar.asStateFlow()
     
     suspend fun onChatClick(chatId: String) {
         chatManager.connectToChat(chatId)
+    }
+    
+    suspend fun getChatStatus() {
+        chatManager.getChatsStatus().let {
+            if(it > 0) _navBar.emit(
+                listOf(
+                    INACTIVE, INACTIVE,
+                    INACTIVE, NEW,
+                    INACTIVE
+                )
+            )
+        }
     }
     
     val chats = Pager(PagingConfig(15)) {
