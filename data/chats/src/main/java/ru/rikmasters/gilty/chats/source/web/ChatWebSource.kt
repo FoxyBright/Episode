@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chats.source.web
 
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
@@ -102,6 +103,7 @@ class ChatWebSource: KtorSource() {
         post(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
         ) {
+            timeout { socketTimeoutMillis = 10000L }
             setBody(
                 MultiPartFormDataContent(
                     formData {

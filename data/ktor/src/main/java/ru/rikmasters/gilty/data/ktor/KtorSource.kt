@@ -7,12 +7,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.UserAgent
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
@@ -24,7 +22,6 @@ import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson
 import okhttp3.OkHttpClient
 import ru.rikmasters.gilty.core.data.source.WebSource
-import java.io.IOException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -50,9 +47,8 @@ open class KtorSource: WebSource() {
                 logger = LogAdapter
             }
             install(HttpRequestRetry) {
+                maxRetries = 3
                 exponentialDelay()
-                maxRetries = 2
-                retryOnExceptionIf { _, throwable -> throwable is IOException }
             }
             install(ContentNegotiation) {
                 jackson {
@@ -70,9 +66,8 @@ open class KtorSource: WebSource() {
                 }
                 host = env[ENV_BASE_URL] ?: ""
             }
-            install(UserAgent) {
-                agent = env[ENV_USER_AGENT] ?: ""
-            }
+            install(HttpTimeout)
+            install(UserAgent) { agent = env[ENV_USER_AGENT] ?: "" }
             install(WebSockets) {
                 contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
