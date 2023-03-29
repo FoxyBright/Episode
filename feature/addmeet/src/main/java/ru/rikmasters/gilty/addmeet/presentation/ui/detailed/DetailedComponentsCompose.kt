@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -9,6 +10,9 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -64,6 +68,10 @@ fun description(
                     false,
                     stringResource(R.string.add_meet_detailed_meet_description_place_holder)
                 ), textStyle = typography.bodyMedium,
+                keyboardOptions = Default.copy(
+                    imeAction = Done, keyboardType = Text,
+                    capitalization = Sentences
+                ),
                 clear = { callback?.onDescriptionClear() }
             )
             Text(

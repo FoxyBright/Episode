@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -26,6 +27,9 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.TextFieldType.COMMENT
@@ -244,7 +248,11 @@ private fun MessageField(
                     .align(CenterStart),
                 maxLines = 5,
                 textStyle = style.copy(color),
-                cursorBrush = SolidColor(colorScheme.primary)
+                cursorBrush = SolidColor(colorScheme.primary),
+                keyboardOptions = Default.copy(
+                    imeAction = Done, keyboardType = Text,
+                    capitalization = Sentences
+                ),
             ) {
                 if(text.isEmpty()) Text(
                     message, Modifier,

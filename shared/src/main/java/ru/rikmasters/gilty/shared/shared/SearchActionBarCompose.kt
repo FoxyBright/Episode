@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -19,6 +20,9 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -51,7 +55,7 @@ data class SearchState(
 @Composable
 fun SearchActionBar(
     state: SearchState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxWidth()) {
         AnimatedVisibility(
@@ -63,8 +67,8 @@ fun SearchActionBar(
         AnimatedVisibility(
             state.state,
             Modifier.height(60.dp),
-            slideInHorizontally { it/2 } + fadeIn(),
-            slideOutHorizontally { it/2 } + fadeOut()
+            slideInHorizontally { it / 2 } + fadeIn(),
+            slideOutHorizontally { it / 2 } + fadeOut()
         ) { SearchBar(Modifier, state) }
     }
 }
@@ -100,11 +104,11 @@ private fun LabelBar(
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    state: SearchState
+    state: SearchState,
 ) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+        focusRequester.requestFocus()
     }
     Box(
         modifier
@@ -144,6 +148,10 @@ fun SearchBar(
                         fontWeight = Bold
                     )
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
                 textStyle = typography.bodyMedium
                     .copy(fontWeight = Bold),
                 singleLine = true,

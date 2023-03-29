@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -225,7 +226,8 @@ private fun TopBar(
             onSaveUsername()
         },
         keyboardOptions = Default.copy(
-            imeAction = Done, keyboardType = Text
+            imeAction = Done, keyboardType = Text,
+            capitalization = Sentences
         ),
         singleLine = true,
     )
@@ -260,7 +262,8 @@ private fun Description(
                 focusManager.clearFocus()
                 onSaveDescription()
             }, keyboardOptions = Default.copy(
-                imeAction = Done, keyboardType = Text
+                imeAction = Done, keyboardType = Text,
+                capitalization = Sentences
             ), placeholder = {
                 Text(
                     stringResource(R.string.about_me_placeholder),
