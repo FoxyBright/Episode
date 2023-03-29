@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.chat
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
@@ -56,11 +55,8 @@ object Chat: FeatureDefinition() {
         singleOf(::MeetingManager)
         singleOf(::ChatViewModel)
         singleOf(::ChatListViewModel)
-        
-        scope<ChatViewModel> {
-            scopedOf(::GalleryViewModel)
-            scopedOf(::HiddenBsViewModel)
-        }
+        singleOf(::GalleryViewModel)
+        singleOf(::HiddenBsViewModel)
     }
     
     override fun include() = setOf(ChatData, ProfileData, MeetingsData)
