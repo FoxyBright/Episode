@@ -38,7 +38,9 @@ fun GCashedImage(
     val env = get<Environment>()
     
     val baseUrl: String = env["WEB_BASE_URL"]
-        ?: throw IllegalStateException("Не задана переменная среды WEB_BASE_URL")
+        ?: "gilty.rikmasters.ru/api/v1".also {
+            logE("Не задана переменная среды WEB_BASE_URL")
+        }
     
     val host = remember(baseUrl) {
         Uri.parse(baseUrl).let {

@@ -122,6 +122,7 @@ private fun ActualMeetings(
         item { Spacer(Modifier.width(8.dp)) }
         items(meets) {
             MeetingCategoryCard(
+                "",
                 it, Modifier.padding(
                     horizontal = 4.dp
                 )

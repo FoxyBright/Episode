@@ -173,7 +173,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         setUserDate(true)
     }
     
-    suspend fun setUserDate(forceWeb: Boolean = false) = singleLoading {
+    suspend fun setUserDate(forceWeb: Boolean = true) = singleLoading {
         val user = profileManager.getProfile(forceWeb)
         _age.emit(user.age)
         _username.emit("${user.username}, ${user.age}")

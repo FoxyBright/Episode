@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.shared
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,7 +16,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoriesListCard
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
@@ -68,6 +69,7 @@ private fun MeetingCardPreview() {
 private fun MeetingCategoryCardPreview() {
     GiltyTheme {
         MeetingCategoryCard(
+            "",
             DemoMeetingModel,
             Modifier.padding(20.dp),
             old = true
@@ -80,6 +82,7 @@ private fun MeetingCategoryCardPreview() {
 private fun MeetingCategoryCardTodayPreview() {
     GiltyTheme {
         MeetingCategoryCard(
+            "userID",
             DemoMeetingModel.copy(
                 condition = FREE,
                 datetime = now().toString()
@@ -158,6 +161,7 @@ fun MeetingCard(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingCategoryCard(
+    userId: String,
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
     old: Boolean = false,
@@ -200,20 +204,23 @@ fun MeetingCategoryCard(
             Box(
                 Modifier
                     .background(
-                        linearGradient(
-                            when {
-                                old -> gray()
-                                meeting.isOnline -> listOf(
-                                    colorScheme.secondary,
-                                    colorScheme.secondary
-                                )
-                    
-                                else -> listOf(color, color)
-                            }
-                        ), CircleShape
+                        when {
+                            old -> colorScheme.onTertiary
+                            meeting.isOnline -> colorScheme.secondary
+                            else -> color
+                        }, CircleShape
                     )
                     .size(126.dp), Center
             ) {
+                val user = meeting.organizer
+                if(user?.id != null && userId != user.id) Image(
+                    rememberAsyncImagePainter(
+                        user.thumbnail?.url
+                    ), (null), Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    contentScale = Crop
+                )
                 Text(
                     meeting.category.name,
                     Modifier.padding(horizontal = 16.dp), White,

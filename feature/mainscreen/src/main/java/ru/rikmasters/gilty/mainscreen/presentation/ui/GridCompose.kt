@@ -49,7 +49,7 @@ fun MeetingGridContent(
         horizontalArrangement = spacedBy(16.dp)
     ) {
         items(meetings) { meet ->
-            MeetingCard(meet)
+            MeetingCard(meeting = meet)
             { onClick?.let { it(meet) } }
         }
         items(2) {

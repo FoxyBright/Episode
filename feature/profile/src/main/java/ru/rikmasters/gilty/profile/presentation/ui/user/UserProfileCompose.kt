@@ -197,18 +197,22 @@ private fun Content(
                 Modifier.padding(16.dp, 12.dp)
             ) { callback?.onRespondsClick() }
         }
+        val userId = state.profileState.profile?.id ?: ""
         if(state.currentMeetings.isNotEmpty()) item {
             LazyRow {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
                     MeetingCategoryCard(
-                        it, Modifier.padding(horizontal = 4.dp)
+                        userId, it,
+                        Modifier.padding(horizontal = 4.dp)
                     ) { callback?.onMeetingClick(it) }
                 }
             }
         }
         if(state.meetingsHistory.isNotEmpty()) item(5) {
-            MeetHistory(state.historyState, state.meetingsHistory,
+            MeetHistory(
+                userId, state.historyState,
+                state.meetingsHistory,
                 { callback?.onHistoryShow() })
             { callback?.onHistoryClick(it) }
         }
@@ -276,6 +280,7 @@ private fun Responds(
 
 @Composable
 private fun MeetHistory(
+    userId: String,
     historyState: Boolean,
     historyList: List<MeetingModel>,
     openHistory: () -> Unit,
@@ -306,7 +311,8 @@ private fun MeetHistory(
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(
-                it, Modifier.padding(horizontal = 4.dp),
+                userId, it,
+                Modifier.padding(horizontal = 4.dp),
                 old = true
             ) { onSelect(it) }
         }

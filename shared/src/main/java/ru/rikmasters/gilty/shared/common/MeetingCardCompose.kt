@@ -159,7 +159,10 @@ fun MeetingStates(
                 DateTimeCard(
                     meet.datetime,
                     if(meet.isOnline) Gradients.green()
-                    else Gradients.red(), today, Modifier,
+                    else listOf(
+                        meet.category.color,
+                        meet.category.color
+                    ), today, Modifier,
                     if(small) typography.displaySmall
                     else typography.labelSmall
                 )

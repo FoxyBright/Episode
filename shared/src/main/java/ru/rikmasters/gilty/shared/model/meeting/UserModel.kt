@@ -23,7 +23,7 @@ data class UserModel(
 )
 
 val DemoUserModel = UserModel(
-    id = randomUUID().toString(),
+    id = "userID",
     gender = FEMALE,
     username = "cristina",
     emoji = DemoEmojiModel,
