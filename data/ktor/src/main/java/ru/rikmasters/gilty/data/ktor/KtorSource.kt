@@ -79,7 +79,6 @@ open class KtorSource: WebSource() {
                         MILLISECONDS
                     ).build()
             }
-            
         }
     }
     private val unauthorizedClient by lazy {

@@ -143,7 +143,6 @@ fun MeetingBsContent(
 ) {
     LazyColumn(
         modifier
-            .fillMaxSize()
             .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {

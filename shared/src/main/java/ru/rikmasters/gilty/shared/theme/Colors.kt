@@ -100,7 +100,7 @@ object Colors {
     val BlackerWhite = Color(0xFFF0F0F0)
     val DarkShadow = Color(0xFF212122)
     val WhiteShadow = Color(0xFFF7F7F7)
-    val RatGray = Color(0xFF5E5E5E)
+    val RatGray = Color(0xFF49454F)
     // Add new colors
 }
 

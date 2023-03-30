@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
@@ -57,7 +56,6 @@ fun MeetRespondContent(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
 ) {
-    
     Box(modifier.fillMaxSize()) {
         AsyncImage(
             avatar?.url, (null),
@@ -104,8 +102,7 @@ fun MeetRespondContent(
             Modifier
                 .padding(16.dp, 28.dp)
                 .align(TopEnd)
-        )
-        { onBack?.let { it() } }
+        ) { onBack?.let { it() } }
     }
 }
 
@@ -129,9 +126,8 @@ private fun CloseButton(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .alpha(0.3f)
                     .background(
-                        colors.meetTransparencyCircleColor,
+                        colors.meetCloseCircleColor,
                         CircleShape
                     )
             )

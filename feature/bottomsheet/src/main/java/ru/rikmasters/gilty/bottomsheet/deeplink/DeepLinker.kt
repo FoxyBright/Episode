@@ -10,7 +10,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
-import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.navigation.NavState
 
@@ -41,9 +40,6 @@ object DeepLinker {
         
         val link = getLink(intent)
         val bs = asm.bottomSheet
-        
-        // FIXME попытка открытия ссылки при открытом BS не отрабатывает
-        if(bs.current.value != COLLAPSED) bs.collapse()
         
         when(link.first) {
             MEET -> bottomSheet(bs, link.second, scope)

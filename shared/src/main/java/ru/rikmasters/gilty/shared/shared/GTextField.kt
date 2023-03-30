@@ -140,14 +140,16 @@ fun GTextField(
     interactionSource: MutableInteractionSource =
         remember { MutableInteractionSource() },
     shape: Shape = shapes.large,
-    colors: TextFieldColors = textFieldColors(),
+    colors: TextFieldColors =
+        ru.rikmasters.gilty.shared.shared.textFieldColors(),
     clear: (() -> Unit)? = null,
     errorBottomText: String? = null,
 ) {
     Column(modifier) {
-        
         Card(
-            colors = cardColors(Transparent),
+            Modifier.fillMaxWidth(),
+            shapes.large,
+            cardColors(colorScheme.primaryContainer),
             border = if(isError)
                 BorderStroke(1.dp, colorScheme.primary)
             else null
@@ -155,7 +157,11 @@ fun GTextField(
             Box(Modifier, TopEnd) {
                 TextField(
                     value, { onValueChange(it) },
-                    Modifier.fillMaxWidth(), enabled, readOnly,
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            end = clear?.let { 40.dp } ?: 0.dp
+                        ), enabled, readOnly,
                     textStyle, label, placeholder, leadingIcon,
                     trailingIcon, supportingText, isError,
                     visualTransformation, keyboardOptions,
@@ -176,11 +182,11 @@ fun GTextField(
             }
         }
         errorBottomText?.let {
-            if(isError)
-                Text(
-                    it, Modifier.padding(start = 16.dp, top = 4.dp),
-                    colorScheme.primary, style = typography.titleSmall
-                )
+            if(isError) Text(
+                it, Modifier.padding(top = 4.dp),
+                colorScheme.primary,
+                style = typography.titleSmall
+            )
         }
     }
 }
