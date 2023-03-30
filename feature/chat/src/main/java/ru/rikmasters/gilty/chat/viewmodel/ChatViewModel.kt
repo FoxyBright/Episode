@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
@@ -25,6 +26,9 @@ class ChatViewModel: ViewModel() {
     private val messageManager by inject<MessageManager>()
     
     val writingUsers by lazy { messageManager.writingFlow.state(emptyList()) }
+
+    private val _chatId = MutableStateFlow("")
+    val chatId = _chatId.asStateFlow()
     
     private val _chat = MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
@@ -121,9 +125,15 @@ class ChatViewModel: ViewModel() {
             makeToast("Чат для встречи ${it.title} был закрыт закрыт")
         }
     }
-    
-    fun getMessages(chatId: String) =
+
+    fun changeChatId(chatId: String) {
+        _chatId.value = chatId
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val messages = _chatId.flatMapLatest { chatId ->
         messageManager.messages(chatId, coroutineScope)
+    }
     
     suspend fun changeAnswer(message: MessageModel?) {
         _answer.emit(message)

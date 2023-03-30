@@ -51,9 +51,11 @@ fun ChatScreen(
     val context = LocalContext.current
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
+
+    vm.changeChatId(chatId)
     
     // список сообщений чата
-    val messages = vm.getMessages(chatId).collectAsLazyPagingItems()
+    val messages = vm.messages.collectAsLazyPagingItems()
     // состояние меню сообщения
     val messageMenuState by vm.messageMenuState.collectAsState()
     // таймер времени до начала трансляции

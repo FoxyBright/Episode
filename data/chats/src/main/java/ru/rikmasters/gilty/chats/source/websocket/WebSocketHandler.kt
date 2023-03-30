@@ -204,14 +204,12 @@ class WebSocketHandler(
             try {
                 launch {
                     while(true) {
-                        if(session.incoming.isEmpty) disconnect()
                         delay(20_000)
                         doPing(session)
                     }
                 }
                 mySession.emit(session)
                 while(true) {
-                    if(session.incoming.isEmpty) disconnect()
                     
                     val response = session.incoming.receive()
                     logV("Frame: ${String(response.data)}")
