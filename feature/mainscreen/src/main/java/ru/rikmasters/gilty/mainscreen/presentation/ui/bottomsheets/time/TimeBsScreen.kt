@@ -13,11 +13,14 @@ fun TimeBs(vm: TimeBsViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val hours by vm.hours.collectAsState()
     val minutes by vm.minutes.collectAsState()
+    val hours by vm.hours.collectAsState()
     val time by vm.time.collectAsState()
     
-    LaunchedEffect(Unit) { vm.setTime() }
+    LaunchedEffect(Unit) {
+        vm.setTime()
+        vm.setLocTime()
+    }
     
     TimeBsContent(
         TimeBsState(

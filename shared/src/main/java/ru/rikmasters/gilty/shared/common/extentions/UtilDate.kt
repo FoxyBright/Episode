@@ -88,7 +88,7 @@ class LocalDate(private var millis: Long) {
     fun monthName() = Month.of(this.month()).display()
     
     fun atStartOfMounth() = if(this.day() == 1) this
-        else this.minusDays(this.day() - 1)
+    else this.minusDays(this.day() - 1)
     
     fun firstDayOfWeek() = this.atStartOfMounth().dayOfWeek()
     
@@ -248,11 +248,11 @@ class LocalTime(private var millis: Long) {
 /* LOCAL DATE_TIME */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-val c: Calendar = getInstance()
+val c: Calendar get() = getInstance()
 val offset = c.get(ZONE_OFFSET)
 
 class LocalDateTime(
-    private val millis: Long
+    private val millis: Long,
 ) {
     
     /** Возвращает дату в виде строки **/
@@ -276,7 +276,7 @@ class LocalDateTime(
         /** Создает объект с указанными данными **/
         fun of(
             year: Int, month: Int = 1, day: Int = 1,
-            hour: Int = 1, minute: Int = 1, second: Int = 1
+            hour: Int = 1, minute: Int = 1, second: Int = 1,
         ) = of("$year-$month-$day" + "T" + "$hour:$minute:$second")
         
         
@@ -316,8 +316,6 @@ class LocalDateTime(
     fun minusHour(count: Int) = LocalDateTime(timeCallback.minusHour(millis, count))
     fun minusMinute(count: Int) = LocalDateTime(timeCallback.minusMinute(millis, count))
     fun minusSecond(count: Int) = LocalDateTime(timeCallback.minusSecond(millis, count))
-    
-
 }
 
 /* MONTH */

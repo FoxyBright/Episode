@@ -4,11 +4,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
+import ru.rikmasters.gilty.shared.common.extentions.LocalTime
+import java.util.Calendar
 
 class TimeBsViewModel(
     
     private val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
+    
     
     private val _minutes = MutableStateFlow("00")
     val minutes = _minutes.asStateFlow()
@@ -21,6 +24,13 @@ class TimeBsViewModel(
     
     suspend fun setTime() {
         _time.emit("${hours.value}:${minutes.value}")
+    }
+    
+    suspend fun setLocTime() {
+        val c = Calendar.getInstance()
+        val lTime = LocalTime(c.time.time)
+        _hours.emit(lTime.hour().toString())
+        _minutes.emit(lTime.minute().toString())
     }
     
     suspend fun minutesChange(minute: String) {
