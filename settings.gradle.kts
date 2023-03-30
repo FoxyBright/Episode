@@ -56,9 +56,6 @@ include(":feature:bubbles")
 include(":dataexample")
 
 
-include(":feature:reports")
-
-
 include(":feature:chat")
 
 
