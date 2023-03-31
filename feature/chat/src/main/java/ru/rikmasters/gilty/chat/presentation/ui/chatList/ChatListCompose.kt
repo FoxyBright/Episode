@@ -27,6 +27,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.*
 import kotlinx.coroutines.flow.flowOf
+import org.koin.core.definition.indexKey
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
@@ -235,9 +236,15 @@ private fun Content(
                     itemsIndexed(state.chats) { index, item ->
                         if (item?.meetStatus != MeetStatusType.ACTIVE) {
                             val chat = item!! to rememberDragRowState()
+                            val inactiveChatsSize = state.chats.itemSnapshotList.items.filter {
+                                it.meetStatus != MeetStatusType.ACTIVE
+                            }.size
+                            val indexCalc = if (index == (itemCount - inactiveChatsSize)) {
+                                0
+                            } else index
                             ElementChat(
                                 chat.first,
-                                index,
+                                indexCalc,
                                 itemCount,
                                 chat.second,
                                 callback
