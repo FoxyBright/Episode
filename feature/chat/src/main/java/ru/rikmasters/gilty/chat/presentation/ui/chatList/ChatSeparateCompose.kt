@@ -17,17 +17,47 @@ fun getSortedChats(chats: List<ChatModel>) =
                         val it = LocalDate.of(chat.key)
                         val dayOfWeek = it.dayOfWeek()
                         "${
-                            if(dayOfWeek.ordinal == 2)
-                                "Во" else "В"
+                        if (dayOfWeek.ordinal == 2) {
+                            "Во" 
+                        }else "В"
                         } ${
-                            dayOfWeek.displayRodName()
-                                .lowercase(Locale.getDefault())
+                        dayOfWeek.displayRodName()
+                            .lowercase(Locale.getDefault())
                         } ${it.day()} ${
-                            Month.of(it.month())
-                                .displayRodName()
-                                .lowercase(Locale.getDefault())
+                        Month.of(it.month())
+                            .displayRodName()
+                            .lowercase(Locale.getDefault())
                         }"
                     }
-                }, chat.value
+                },
+                chat.value
+            )
+        }
+
+fun List<ChatModel>.getSorted() =
+    this.groupBy { it.datetime }
+        .map { chat ->
+            Pair(
+                when {
+                    todayControl(chat.key) -> "Сегодня"
+                    tomorrowControl(chat.key) -> "Завтра"
+                    else -> {
+                        val it = LocalDate.of(chat.key)
+                        val dayOfWeek = it.dayOfWeek()
+                        "${
+                        if (dayOfWeek.ordinal == 2) {
+                            "Во" 
+                        }else "В"
+                        } ${
+                        dayOfWeek.displayRodName()
+                            .lowercase(Locale.getDefault())
+                        } ${it.day()} ${
+                        Month.of(it.month())
+                            .displayRodName()
+                            .lowercase(Locale.getDefault())
+                        }"
+                    }
+                },
+                chat.value
             )
         }

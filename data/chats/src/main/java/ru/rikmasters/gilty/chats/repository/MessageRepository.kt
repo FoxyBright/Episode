@@ -65,7 +65,7 @@ class MessageRepository(
             page: Int, perPage: Int,
         ) = Pair(
             source.getMessages(chatId, page, perPage),
-            ResponseWrapper.Paginator(page, perPage)
+            ResponseWrapper.Paginator(page, perPage,0,0,0)
         )
     }
     
