@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.profile
 
 import io.ktor.client.call.body
-import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
 import io.ktor.http.Headers
@@ -82,49 +81,41 @@ class ProfileWebSource: KtorSource() {
         get("http://$HOST$PREFIX_URL/albums/$albumId/files")!!
             .wrapped<List<Avatar>>()
     
-    suspend fun addHidden(albumId: String, files: List<File>) =
-        post("http://$HOST$PREFIX_URL/albums/$albumId/upload") {
-            setBody(
-                MultiPartFormDataContent(
-                    formData {
-                        append("type", "PHOTO")
-                        files.forEach {
-                            append(
-                                "photos[]", it.readBytes(),
-                                Headers.build {
-                                    append(ContentType, "image/jpg")
-                                    append(ContentDisposition, "filename=\"${it.name}\"")
-                                },
-                            )
-                        }
+    suspend fun addHidden(albumId: String, files: List<File>) = postFormData(
+        "http://$HOST$PREFIX_URL/albums/$albumId/upload",
+        formData {
+            append("type", "PHOTO")
+            files.forEach {
+                append(
+                    "photos[]", it.readBytes(),
+                    Headers.build {
+                        append(ContentType, "image/jpg")
+                        append(ContentDisposition, "filename=\"${it.name}\"")
                     },
-                    ("WebAppBoundary")
                 )
-            )
-        }!!.wrapped<List<Avatar>>()
+            }
+        }
+    )!!.wrapped<List<Avatar>>()
     
     suspend fun setUserAvatar(
         avatar: File, list: List<Float>,
     ) {
-        post("http://$HOST$PREFIX_URL/profile/avatar") {
-            setBody(
-                MultiPartFormDataContent(
-                    formData {
-                        append(
-                            "photo", avatar.readBytes(),
-                            Headers.build {
-                                append(ContentType, "image/jpg")
-                                append(ContentDisposition, "filename=\"photo.jpg\"")
-                            },
-                        )
-                        append("crop_x", list[0])
-                        append("crop_y", list[1])
-                        append("crop_width", list[2])
-                        append("crop_height", list[3])
-                    }, "WebAppBoundary"
+        postFormData(
+            "http://$HOST$PREFIX_URL/profile/avatar",
+            formData {
+                append(
+                    "photo", avatar.readBytes(),
+                    Headers.build {
+                        append(ContentType, "image/jpg")
+                        append(ContentDisposition, "filename=\"photo.jpg\"")
+                    },
                 )
-            )
-        }
+                append("crop_x", list[0])
+                append("crop_y", list[1])
+                append("crop_width", list[2])
+                append("crop_height", list[3])
+            }
+        )
     }
     
     private data class Status(val status: String)

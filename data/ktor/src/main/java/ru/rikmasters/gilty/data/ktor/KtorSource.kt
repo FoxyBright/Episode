@@ -7,16 +7,20 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.*
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.http.ContentType.Application.Json
+import io.ktor.http.content.PartData
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson
@@ -66,7 +70,6 @@ open class KtorSource: WebSource() {
                 }
                 host = env[ENV_BASE_URL] ?: ""
             }
-            install(HttpTimeout)
             install(UserAgent) { agent = env[ENV_USER_AGENT] ?: "" }
             install(WebSockets) {
                 contentConverter = JacksonWebsocketContentConverter()
@@ -125,6 +128,16 @@ open class KtorSource: WebSource() {
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.post(url, block) }
+    
+    suspend fun postFormData(
+        url: String,
+        formData: List<PartData>,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = handler {
+        client.submitFormWithBinaryData(
+            url, formData, block
+        )
+    }
     
     suspend fun patch(
         url: String,

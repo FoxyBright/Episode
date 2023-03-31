@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.chats.source.web
 
-import io.ktor.client.plugins.timeout
-import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
 import io.ktor.http.Headers
@@ -10,6 +8,7 @@ import ru.rikmasters.gilty.chats.models.chat.Chat
 import ru.rikmasters.gilty.chats.models.message.MarkAsReadRequest
 import ru.rikmasters.gilty.chats.models.message.Message
 import ru.rikmasters.gilty.chats.models.ws.ChatStatus
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -100,62 +99,55 @@ class ChatWebSource: KtorSource() {
         attachments: List<AvatarModel>? = null,
         videos: List<ByteArray>? = null,
     ) {
-        post(
-            "http://$HOST$PREFIX_URL/chats/$chatId/messages"
-        ) {
-            timeout { socketTimeoutMillis = 10000L }
-            setBody(
-                MultiPartFormDataContent(
-                    formData {
-                        
-                        // id of the parent message if message is reply
-                        replyId?.let { append("reply_id", it) }
-                        
-                        // text from message
-                        text?.let { append("text", it) }
-                        
-                        // attached hidden photos
-                        if(!attachments.isNullOrEmpty())
-                            attachments.forEachIndexed { i, it ->
-                                append(("attachments[$i][type]"), ("PRIVATE_PHOTO"))
-                                append(("attachments[$i][album_id]"), it.albumId)
-                                append(("attachments[$i][file_id]"), it.id)
+        postFormData(
+            "http://$HOST$PREFIX_URL/chats/$chatId/messages",
+            formData {
+                
+                // id of the parent message if message is reply
+                replyId?.let { append("reply_id", it) }
+                
+                // text from message
+                text?.let { append("text", it) }
+                
+                // attached hidden photos
+                if(!attachments.isNullOrEmpty())
+                    attachments.forEachIndexed { i, it ->
+                        append(("attachments[$i][type]"), ("PRIVATE_PHOTO"))
+                        append(("attachments[$i][album_id]"), it.albumId)
+                        append(("attachments[$i][file_id]"), it.id)
+                    }
+                
+                if(!photos.isNullOrEmpty())
+                    photos.forEachIndexed { i, it ->
+                        log.d("photo -> $it")
+                        append(("upload[type]"), ("PHOTO"))
+                        append(("upload[photos][$i]"), it, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpg")
+                            append(
+                                HttpHeaders.ContentDisposition,
+                                "filename=\"${it}.jpg\""
+                            )
+                        })
+                    }
+                
+                // attached videos from camera or gallery
+                if(!videos.isNullOrEmpty()) {
+                    videos.forEach { video ->
+                        append("upload[type]", "VIDEO")
+                        append("upload[videos][]", video,
+                            Headers.build {
+                                append(HttpHeaders.ContentType, "video/mp4")
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "filename=\"${UUID.randomUUID()}.mp4\""
+                                )
                             }
-                        
-                        // attached photos from camera or gallery
-                        if(!photos.isNullOrEmpty()) {
-                            photos.forEach { photo ->
-                                append("upload[type]", "PHOTO")
-                                append("upload[photos][]", photo,
-                                    Headers.build {
-                                        append(HttpHeaders.ContentType, "image/jpg")
-                                        append(
-                                            HttpHeaders.ContentDisposition,
-                                            "filename=\"${UUID.randomUUID()}.jpg\""
-                                        )
-                                    })
-                            }
-                        }
-                        
-                        // attached videos from camera or gallery
-                        if(!videos.isNullOrEmpty()) {
-                            videos.forEach { video ->
-                                append("upload[type]", "VIDEO")
-                                append("upload[videos][]", video,
-                                    Headers.build {
-                                        append(HttpHeaders.ContentType, "video/mp4")
-                                        append(
-                                            HttpHeaders.ContentDisposition,
-                                            "filename=\"${UUID.randomUUID()}.mp4\""
-                                        )
-                                    })
-                            }
-                        }
-                        
-                    }, "WebAppBoundary"
-                )
-            )
-        }
+                        )
+                    }
+                }
+                
+            },
+        )
     }
     
     suspend fun getMessages(
