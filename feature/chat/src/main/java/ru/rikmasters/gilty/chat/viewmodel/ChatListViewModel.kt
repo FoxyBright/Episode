@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
 import android.util.Log
+import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -74,13 +75,12 @@ class ChatListViewModel : ViewModel(), PullToRefreshTrait {
         refresh.flatMapLatest {
             Log.d("TEST","flatMap $it")
             chatManager.getChats()
-        }
+        }.cachedIn(coroutineScope)
     }
 
     override suspend fun forceRefresh() = singleLoading {
         Log.d("TESTSS","force refresh")
         refresh.value = !refresh.value
-       // chatManager.refresh()
     }
 
     suspend fun getUnread() = singleLoading {

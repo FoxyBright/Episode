@@ -190,12 +190,12 @@ private fun Content(
         state.listState
     ) {
         when {
-            chats.loadState.refresh is LoadState.Loading -> {
-                item { PagingLoader(state.chats.loadState) }
-            }
             chats.loadState.refresh is LoadState.Error -> {}
             chats.loadState.append is LoadState.Error -> {}
             else -> {
+                if (chats.loadState.refresh is LoadState.Loading) {
+                    item { PagingLoader(state.chats.loadState) }
+                }
                 if (itemCount != 0) {
                     getSortedChats(
                         state.chats.itemSnapshotList.items.filter {
@@ -244,9 +244,13 @@ private fun Content(
                             )
                         }
                     }
-                    item { PagingLoader(state.chats.loadState) }
+                    if (state.chats.loadState.append is LoadState.Loading) {
+                        item { PagingLoader(state.chats.loadState) }
+                    }
                 } else {
-                    item { EmptyChats() }
+                    if (chats.loadState.refresh is LoadState.NotLoading) {
+                        item { EmptyChats() }
+                    }
                 }
             }
         }
