@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -42,7 +41,7 @@ private fun BrieflyRowPreview() {
         BrieflyRow(
             (user.username ?: ""),
             Modifier.background(colorScheme.background),
-            user.thumbnail?.map(), user.rating.emoji
+            user.thumbnail?.url, user.rating.emoji
         )
     }
 }
@@ -51,7 +50,7 @@ private fun BrieflyRowPreview() {
 fun BrieflyRow(
     text: String,
     modifier: Modifier = Modifier,
-    avatar: AvatarModel? = null,
+    image: String? = null,
     emoji: EmojiModel? = null,
     textColor: Color = colorScheme.tertiary,
     textStyle: TextStyle = typography.bodyMedium,
@@ -64,9 +63,9 @@ fun BrieflyRow(
         append("$text "); emoji?.let { appendInlineContent("emoji") }
     }
     Row(modifier, Start, CenterVertically) {
-        avatar?.let {
+        image?.let {
             AsyncImage(
-                it.thumbnail.url, (null), Modifier
+                image, (null), Modifier
                     .padding(end = 12.dp)
                     .size(38.dp)
                     .clip(CircleShape),

@@ -68,7 +68,7 @@ fun ParticipantsList(
                     BrieflyRow(
                         "${member.username}, ${member.age}",
                         Modifier.padding(16.dp),
-                        member.thumbnail?.map()
+                        member.thumbnail?.url
                     ); if(index < membersList.size - 1)
                     Divider(Modifier.padding(start = 60.dp))
                 }
