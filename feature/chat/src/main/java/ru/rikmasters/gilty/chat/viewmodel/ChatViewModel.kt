@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -133,7 +134,7 @@ class ChatViewModel: ViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatId.flatMapLatest { chatId ->
         messageManager.messages(chatId, coroutineScope)
-    }
+    }.cachedIn(coroutineScope)
     
     suspend fun changeAnswer(message: MessageModel?) {
         _answer.emit(message)
@@ -243,7 +244,7 @@ class ChatViewModel: ViewModel() {
     
     suspend fun onSendMessage(
         chatId: String,
-        repliedId: String? = null,
+        replied: String? = null,
         text: String? = null,
         attachment: List<AvatarModel>? = null,
         photos: List<FileSource>? = null,
@@ -253,7 +254,7 @@ class ChatViewModel: ViewModel() {
             changeAnswer(null)
             clearMessage()
             messageManager.sendMessage(
-                chatId, repliedId, text,
+                chatId, replied, text,
                 attachment, photos, videos
             )
         }

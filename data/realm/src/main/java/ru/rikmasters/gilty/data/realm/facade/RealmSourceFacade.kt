@@ -110,7 +110,7 @@ class RealmSourceFacade(
             { containerSource.deleteAll(it) }
         )
     
-    override fun <T: DomainEntity> listenAll(domainClass: KClass<T>): Flow<List<T>> =
+    override fun <T : DomainEntity> listenAll(domainClass: KClass<T>): Flow<List<T>> =
         domainClass.ifRealmOrElse(
             { objectSource.listenAll(it) },
             { containerSource.listenAll(it) }

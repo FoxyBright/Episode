@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chats.source.websocket
 
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -84,6 +85,7 @@ class WebSocketHandler(
     ) {
         val event = SocketEvents from response.event
         logV(event?.name.toString())
+        Log.d("TESTSS","webSocket events $event")
         when(event) {
             CONNECTION_ESTABLISHED -> {
                 

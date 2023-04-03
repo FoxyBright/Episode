@@ -23,6 +23,9 @@ data class ResponseWrapper<T: Any?>(
     class Paginator(
         val perPage: Int,
         val currentPage: Int,
+        val list_page: Int,
+        val limit: Int,
+        val offset: Int
     )
     
     data class Error(

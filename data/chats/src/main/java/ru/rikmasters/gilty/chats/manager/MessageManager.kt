@@ -1,8 +1,12 @@
 package ru.rikmasters.gilty.chats.manager
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
+import ru.rikmasters.gilty.chats.source.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -12,12 +16,19 @@ class MessageManager(
     private val messageRepository: MessageRepository,
     
     private val webSource: ChatWebSource,
+
+    private val socket: WebSocketHandler
 ): CoroutineController() {
+
+
+    private val updateMessageFlow = MutableStateFlow(false)
     
     // список сообщений в потоке собраный пагинатором
-    fun messages(chatId: String, scope: CoroutineScope) =
-        messageRepository.pagination(chatId, scope)
-    
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun messages(chatId: String, scope: CoroutineScope) = updateMessageFlow.flatMapLatest {
+        messageRepository.getMessagesPaging(chatId)
+    }
+
     // список пишущих в данный момент пользователей в потоке
     val writingFlow = messageRepository.writersFlow()
     
