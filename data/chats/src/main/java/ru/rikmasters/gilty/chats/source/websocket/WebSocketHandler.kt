@@ -153,7 +153,7 @@ class WebSocketHandler(
             MESSAGE_TYPING -> {
                 val user = mapper.readValue<User>(response.data)
                 messageRepository.writersUpdate(
-                    UserWs(user.id!!, user.thumbnail!!)
+                    UserWs(user.id!!, user.avatar?.thumbnail!!)
                 )
                 logD("$response")
             }

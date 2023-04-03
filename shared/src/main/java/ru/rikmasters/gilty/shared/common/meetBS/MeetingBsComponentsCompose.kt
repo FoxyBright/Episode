@@ -327,7 +327,7 @@ fun MeetingBsParticipants(
                     BrieflyRow(
                         "${member.username}, ${member.age}",
                         Modifier.padding(12.dp, 8.dp),
-                        member.thumbnail?.url,
+                        member.avatar?.thumbnail?.url,
                     )
                     Icon(
                         Filled.KeyboardArrowRight,

@@ -215,7 +215,7 @@ fun MeetingCategoryCard(
                 val user = meeting.organizer
                 if(user?.id != null && userId != user.id) Image(
                     rememberAsyncImagePainter(
-                        user.thumbnail?.url
+                        user.avatar?.thumbnail?.url
                     ), (null), Modifier
                         .fillMaxSize()
                         .clip(CircleShape),

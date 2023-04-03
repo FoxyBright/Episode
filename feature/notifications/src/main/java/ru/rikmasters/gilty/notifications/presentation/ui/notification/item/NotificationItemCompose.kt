@@ -68,7 +68,7 @@ fun NotificationItem(
             val emoji = notification
                 .feedback?.ratings?.map { it.emoji }
             TextNotification(
-                user?.thumbnail, state.rowState,
+                user?.avatar?.thumbnail, state.rowState,
                 modifier, state.shape, (true),
                 { callback?.onSwiped(notification) },
                 (emoji ?: state.emojiList), {
@@ -93,7 +93,7 @@ fun NotificationItem(
         ) { callback?.onSwiped(notification) }
         
         else -> TextNotification(
-            user?.thumbnail, state.rowState,
+            user?.avatar?.thumbnail, state.rowState,
             modifier, state.shape, (false),
             { callback?.onSwiped(notification) },
         ) {

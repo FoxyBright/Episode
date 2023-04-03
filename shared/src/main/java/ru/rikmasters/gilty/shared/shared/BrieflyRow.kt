@@ -41,7 +41,7 @@ private fun BrieflyRowPreview() {
         BrieflyRow(
             (user.username ?: ""),
             Modifier.background(colorScheme.background),
-            user.thumbnail?.url, user.rating.emoji
+            user.avatar?.thumbnail?.url, user.rating.emoji
         )
     }
 }

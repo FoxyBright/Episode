@@ -155,7 +155,7 @@ private fun ObserveItem(
         ) {
             BrieflyRow(
                 "${member.username}, ${member.age}",
-                Modifier.weight(1f), member.thumbnail?.url,
+                Modifier.weight(1f), member.avatar?.thumbnail?.url,
                 member.emoji
             )
             SmallButton(

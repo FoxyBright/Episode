@@ -148,7 +148,7 @@ private fun Content(
             message.type != NOTIFICATION
             && state.avatar
         ) AsyncImage(
-            message.message?.author
+            message.message?.author?.avatar
                 ?.thumbnail?.url,
             (null), Modifier
                 .padding(end = 6.dp)

@@ -43,7 +43,7 @@ class MeetingViewModel: ViewModel() {
             profileManager.getMeetResponds(meetId).let {
                 if(it.isNotEmpty()) _lastResponse.emit(
                     it.size to it.last()
-                        .author.thumbnail?.url
+                        .author.avatar?.thumbnail?.url
                 )
             }
         }

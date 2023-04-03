@@ -106,7 +106,7 @@ fun MeetingBsTopBarCompose(
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick(state.meet) }
         Row(Modifier.height(IntrinsicSize.Max)) {
-            Avatar(org.thumbnail?.url, Modifier.weight(1f))
+            Avatar(org.avatar?.thumbnail?.url, Modifier.weight(1f))
             { org.id?.let { callback?.onAvatarClick(it, state.meet.id) } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
