@@ -28,47 +28,51 @@ fun RespondsBs(
     
     LaunchedEffect(Unit) { vm.getResponds(meetId) }
     
-    val callback = object: RespondsListCallback {
-        
-        override fun onImageClick(authorId: String) {
-        }
-        
-        override fun onArrowClick(index: Int) {
-            scope.launch { vm.selectRespondsGroup(index) }
-        }
-        
-        override fun onCancelClick(respondId: String) {
-            scope.launch {
-                vm.cancelRespond(respondId)
-                vm.getResponds(meetId)
-            }
-        }
-        
-        override fun onAcceptClick(respondId: String) {
-            scope.launch {
-                vm.acceptRespond(respondId)
-                vm.getResponds(meetId)
-            }
-        }
-        
-        override fun onTabChange(tab: Int) {
-            scope.launch {
-                vm.selectTab(tab)
-                vm.getResponds(meetId)
-            }
-        }
-        
-        override fun onBack() {
-            nav.popBackStack()
-        }
-    }
-    
     Use<RespondsBsViewModel>(LoadingTrait) {
         RespondsList(
-            meetId?.let { MEET }
+            type = meetId?.let { MEET }
                 ?: if(full) FULL else SHORT,
-            respondsList, groupsStates,
-            tabs, Modifier, callback
+            responds = respondsList,
+            respondsStates = groupsStates,
+            selectTab = tabs, Modifier,
+            object: RespondsListCallback {
+                
+                override fun onRespondClick(authorId: String) {
+                    nav.navigate("USER?user=$authorId&meet=$meetId")
+                }
+                
+                override fun onImageClick(image: String) {
+                }
+                
+                override fun onArrowClick(index: Int) {
+                    scope.launch { vm.selectRespondsGroup(index) }
+                }
+                
+                override fun onCancelClick(respondId: String) {
+                    scope.launch {
+                        if(tabs == 0)
+                            vm.cancelRespond(respondId)
+                        else
+                            vm.deleteRespond(respondId)
+                        vm.getResponds(meetId)
+                    }
+                }
+                
+                override fun onAcceptClick(respondId: String) {
+                    scope.launch {
+                        vm.acceptRespond(respondId)
+                        vm.getResponds(meetId)
+                    }
+                }
+                
+                override fun onTabChange(tab: Int) {
+                    scope.launch { vm.selectTab(tab) }
+                }
+                
+                override fun onBack() {
+                    nav.popBackStack()
+                }
+            }
         )
     }
 }

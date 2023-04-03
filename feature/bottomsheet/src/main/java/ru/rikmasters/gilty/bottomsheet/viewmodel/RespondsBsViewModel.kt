@@ -24,10 +24,14 @@ class RespondsBsViewModel: ViewModel() {
     val groupsStates = _groupsStates.asStateFlow()
     
     suspend fun selectTab(tab: Int) {
+        _responds.emit(emptyList())
         _tabs.emit(tab)
+        getResponds()
     }
     
-    suspend fun getResponds(meetId: String?) = singleLoading {
+    suspend fun getResponds(
+        meetId: String? = null,
+    ) = singleLoading {
         meetId?.let {
             val resList = profileManager.getMeetResponds(it)
             _responds.emit(listOf(MeetWithRespondsModel(resList)))
@@ -50,16 +54,21 @@ class RespondsBsViewModel: ViewModel() {
         )
     }
     
-    suspend fun cancelRespond(respondId: String) = singleLoading {
+    suspend fun cancelRespond(
+        respondId: String,
+    ) = singleLoading {
         profileManager.cancelRespond(respondId)
     }
     
-    @Suppress("unused")
-    suspend fun deleteRespond(respondId: String) = singleLoading {
+    suspend fun deleteRespond(
+        respondId: String,
+    ) = singleLoading {
         profileManager.deleteRespond(respondId)
     }
     
-    suspend fun acceptRespond(respondId: String) = singleLoading {
+    suspend fun acceptRespond(
+        respondId: String,
+    ) = singleLoading {
         profileManager.acceptRespond(respondId)
     }
 }

@@ -40,11 +40,12 @@ class MeetingViewModel: ViewModel() {
     suspend fun getMeet(meetId: String) {
         _meet.emit(meetManager.getDetailedMeet(meetId))
         if(meet.value?.memberState == IS_ORGANIZER) {
-            val responds = profileManager.getMeetResponds(meetId)
-            _lastResponse.emit(
-                responds.size to responds.last()
-                    .author.thumbnail?.url
-            )
+            profileManager.getMeetResponds(meetId).let {
+                if(it.isNotEmpty()) _lastResponse.emit(
+                    it.size to it.last()
+                        .author.thumbnail?.url
+                )
+            }
         }
         if(meet.value?.isOnline == true)
             _distance.emit(distanceCalculator(meet.value!!.map()))

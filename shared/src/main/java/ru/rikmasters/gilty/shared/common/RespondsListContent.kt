@@ -50,7 +50,8 @@ interface RespondsListCallback {
     
     fun onAcceptClick(respondId: String)
     fun onCancelClick(respondId: String)
-    fun onImageClick(authorId: String)
+    fun onRespondClick(authorId: String)
+    fun onImageClick(image: String)
     fun onArrowClick(index: Int)
     fun onTabChange(tab: Int) {}
     fun onBack() {}
@@ -111,5 +112,3 @@ private fun GroupList(
         }
     }
 }
-
-

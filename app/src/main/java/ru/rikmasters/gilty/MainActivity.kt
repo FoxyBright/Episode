@@ -9,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
-import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -53,9 +52,11 @@ class MainActivity: ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        MapKitFactory.setApiKey("6eb87a4e-7668-4cf6-a691-36051b71e2e5")
-        MapKitFactory.initialize(this)
+    
+        CoroutineScope(IO).launch {
+            inject<MeetingManager>()
+                .value.clearAddMeet()
+        }
         
         FireBaseService.sharedPref = getSharedPreferences(
             "sharedPref", MODE_PRIVATE
@@ -125,14 +126,6 @@ class MainActivity: ComponentActivity() {
             }
             
         }
-    }
-    
-    override fun onStop() {
-        CoroutineScope(IO).launch {
-            inject<MeetingManager>()
-                .value.clearAddMeet()
-        }
-        super.onStop()
     }
     
     override fun getIntent() = _intent ?: super.getIntent()

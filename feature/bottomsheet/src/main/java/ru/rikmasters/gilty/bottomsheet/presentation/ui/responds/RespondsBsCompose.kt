@@ -52,10 +52,11 @@ fun RespondsList(
             )
         ) { callback?.onBack() }
         when(type) {
-            MEET -> SentResponds(
+            MEET -> MeetResponds(
                 Modifier.padding(vertical = 8.dp),
                 responds, callback
             )
+            
             FULL -> {
                 GiltyTab(
                     listOf(
@@ -66,15 +67,18 @@ fun RespondsList(
                             8.dp else 0.dp
                     )
                 ) { callback?.onTabChange(it) }
-                if(selectTab == 0) SentResponds(
-                    Modifier.padding(vertical = 8.dp),
-                    responds, callback
-                )
+                
+                if(selectTab == 0)
+                    SentResponds(
+                        Modifier.padding(vertical = 8.dp),
+                        responds, callback
+                    )
                 else ReceivedResponds(
                     Modifier.padding(vertical = 8.dp),
                     responds, respondsStates, callback
                 )
             }
+            
             SHORT -> ReceivedResponds(
                 Modifier.padding(vertical = 8.dp),
                 responds, respondsStates, callback
@@ -91,9 +95,34 @@ private fun SentResponds(
 ) {
     if(responds.isNotEmpty())
         LazyColumn(modifier.fillMaxWidth()) {
-            items(responds) {
-                SentRespond(
-                    it, Modifier.padding(bottom = 12.dp),
+            responds.forEach {
+                sentRespond(
+                    it.tags.joinToString(separator = ", ")
+                    { t -> t.title }, it.responds,
+                    Modifier.padding(bottom = 12.dp),
+                    callback
+                )
+            }
+        }
+    else EmptyScreen(
+        stringResource(
+            R.string.profile_hasnt_received_responds
+        ), R.drawable.broken_heart
+    )
+}
+
+@Composable
+private fun MeetResponds(
+    modifier: Modifier = Modifier,
+    responds: List<MeetWithRespondsModel>,
+    callback: RespondsListCallback? = null,
+) {
+    if(responds.isNotEmpty())
+        LazyColumn(modifier.fillMaxWidth()) {
+            items(responds.flatMap { it.responds }) {
+                ReceivedRespond(
+                    it, Modifier
+                        .padding(bottom = 6.dp),
                     callback
                 )
             }

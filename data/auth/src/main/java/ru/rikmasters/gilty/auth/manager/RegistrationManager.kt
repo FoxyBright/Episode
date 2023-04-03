@@ -24,7 +24,7 @@ class RegistrationManager(
     
     suspend fun getHidden(albumId: String) =
         profileWebSource.getFiles(albumId)
-            .map { it.id }
+            .map { it.id ?: "" }
     
     suspend fun setAvatar(file: File, points: List<Float>) {
         profileWebSource.setUserAvatar(file, points)

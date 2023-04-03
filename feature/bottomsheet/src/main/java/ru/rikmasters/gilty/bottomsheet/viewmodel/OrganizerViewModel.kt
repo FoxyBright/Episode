@@ -51,8 +51,16 @@ class OrganizerViewModel: ViewModel() {
         )
     }
     
-    suspend fun setMeetType(meetId: String) = singleLoading {
-        meetManager.getDetailedMeet(meetId).type
+    suspend fun setMeetType(
+        meetId: String,
+    ) = singleLoading {
+        _meetType.emit(
+            if(meetId != "null")
+                meetManager.getDetailedMeet(
+                    meetId
+                ).type
+            else GROUP
+        )
     }
     
     suspend fun setUser(userId: String) = singleLoading {

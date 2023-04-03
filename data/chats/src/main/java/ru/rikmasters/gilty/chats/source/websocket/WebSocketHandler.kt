@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chats.source.websocket
 
-import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -27,7 +26,6 @@ import java.io.IOException
 import java.net.SocketException
 
 class WebSocketHandler(
-    
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
 ): KtorSource() {
@@ -85,7 +83,6 @@ class WebSocketHandler(
     ) {
         val event = SocketEvents from response.event
         logV(event?.name.toString())
-        Log.d("TESTSS","webSocket events $event")
         when(event) {
             CONNECTION_ESTABLISHED -> {
                 
@@ -198,8 +195,23 @@ class WebSocketHandler(
         sessionHandlerJob?.cancel()
     }
     
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun connect(userId: String) = withContext(IO) {
+    suspend fun connect(userId: String) {
+        try {
+            connection(userId)
+        } catch(e: Exception) {
+            logV("WebSocket Exception: $e")
+            logV("Reconnect...")
+            disconnect()
+            try {
+                connection(userId)
+            } catch(e: Exception) {
+                logE("BAD RECONNECTION!!!")
+                logE("$e")
+            }
+        }
+    }
+    
+    private suspend fun connection(userId: String) = withContext(IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
             val session = wsSession(HOST, 6001, socketURL)

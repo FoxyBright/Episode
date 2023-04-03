@@ -2,12 +2,12 @@ package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,7 +23,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun ReceivedResponds() {
     GiltyTheme {
-        ReceivedRespond(DemoRespondModel)
+        ReceivedRespond(
+            DemoRespondModel
+        )
     }
 }
 
@@ -31,65 +33,75 @@ private fun ReceivedResponds() {
 @Composable
 private fun SentResponds() {
     GiltyTheme {
-        SentRespond(DemoMeetWithRespondsModel)
+        LazyColumn {
+            sentRespond(
+                "",
+                listOf(
+                    DemoRespondModel
+                )
+            )
+        }
     }
 }
 
-@Composable
-fun SentRespond(
-    respond: MeetWithRespondsModel,
+fun LazyListScope.sentRespond(
+    name: String,
+    responds: List<RespondModel>,
     modifier: Modifier = Modifier,
     callback: RespondsListCallback? = null,
 ) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .background(
-                colorScheme.primaryContainer,
-                shapes.medium
-            )
-    ) {
-        Column {
-            BrieflyRow(
-                respond.tags.joinToString(separator = ", ")
-                { it.title }, Modifier.padding(
-                    start = 16.dp, top = 12.dp
-                ), respond.organizer.thumbnail?.url
-            )
-            Column(Modifier.padding(start = 66.dp)) {
-                Divider(Modifier)
-                Buttons(Modifier.padding(vertical = 8.dp), (true))
-                { callback?.onCancelClick(respond.id) }
+    items(responds) { respond ->
+        Box(
+            modifier
+                .fillMaxWidth()
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.medium
+                )
+        ) {
+            Column {
+                BrieflyRow(
+                    name, Modifier.padding(
+                        start = 16.dp, top = 12.dp
+                    ), respond.author.avatar?.thumbnail?.url
+                )
+                Column(Modifier.padding(start = 66.dp)) {
+                    Divider(Modifier)
+                    Buttons(Modifier.padding(vertical = 8.dp), (true))
+                    { callback?.onCancelClick(respond.id) }
+                }
             }
         }
     }
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun ReceivedRespond(
     respond: RespondModel,
     modifier: Modifier = Modifier,
     callback: RespondsListCallback? = null,
 ) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .background(
-                colorScheme.primaryContainer,
-                shapes.medium
-            )
+    Card(
+        { callback?.onRespondClick(respond.author.id!!) },
+        modifier, (true), shapes.medium,
+        cardColors(colorScheme.primaryContainer)
     ) {
         val user = respond.author
         Column {
             BrieflyRow(
-                "${user.username}, ${user.age}",
-                Modifier.padding(
+                "${user.username}${
+                    if(user.age in 18..99) {
+                        ", ${user.age}"
+                    } else ""
+                }", Modifier.padding(
                     start = 16.dp, top = 12.dp
-                ), user.thumbnail?.url, user.emoji
+                ), user.avatar?.thumbnail?.url,
+                user.emoji
             )
             Column(Modifier.padding(start = 66.dp)) {
                 Divider(Modifier)
-                Text(
+                if(respond.comment.isNotBlank()) Text(
                     respond.comment, Modifier
                         .padding(end = 20.dp)
                         .padding(top = 12.dp, bottom = 8.dp),
