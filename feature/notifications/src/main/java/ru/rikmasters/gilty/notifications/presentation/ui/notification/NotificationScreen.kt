@@ -9,13 +9,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.notifications.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
-import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -123,9 +121,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             override fun onRespondsClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<RespondsBsViewModel>(vm.scope) {
-                            RespondsBs(it)
-                        }
+                        BottomSheet(vm.scope, RESPONDS)
                     }
                 }
             }

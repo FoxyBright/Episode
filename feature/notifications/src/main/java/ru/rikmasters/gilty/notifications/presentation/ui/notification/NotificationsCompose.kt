@@ -28,6 +28,7 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Notif
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -222,6 +223,15 @@ private fun Notifications(
     
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
+        val last = state.lastRespond
+        if(last.first > 0) item {
+            Box(Modifier.padding(vertical = 22.dp)) {
+                Responds(
+                    last.second, last.first,
+                ) { callback?.onRespondsClick() }
+            }
+        }
+        
         if(itemCount > 0) {
             
             val list = arrayListOf<Int>()

@@ -41,7 +41,7 @@ data class AddMeetModel(
         organizer = profile,
         isOnline = isOnline,
         tags = tags,
-        description = description,
+        description = description.ifEmpty { null },
         isPrivate = isPrivate,
         memberCount = try {
             memberCount.toInt()

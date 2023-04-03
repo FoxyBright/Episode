@@ -60,8 +60,10 @@ data class RespondResponse(
 ) {
     
     fun map() = RespondModel(
-        id, author.map(), comment.toString(),
-        albumId ?: "", photoAccess = false
+        id, author.map(),
+        comment.toString(),
+        (albumId ?: ""),
+        (photoAccess ?: false)
     )
 }
 

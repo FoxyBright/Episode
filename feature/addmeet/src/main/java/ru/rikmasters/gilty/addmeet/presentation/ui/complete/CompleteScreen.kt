@@ -16,10 +16,11 @@ fun CompleteScreen(vm: CompleteViewModel) {
     val context = LocalContext.current
     val nav = get<NavState>()
     
+    val addMeet by vm.addMeet.collectAsState(null)
     val meet by vm.meet.collectAsState()
     val online by vm.online.collectAsState()
     
-    LaunchedEffect(Unit) { vm.addMeet() }
+    LaunchedEffect(addMeet) { addMeet?.let { vm.addMeet(it) } }
     
     meet?.let {
         CompleteContent(it, online, Modifier,

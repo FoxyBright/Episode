@@ -17,6 +17,7 @@ object BottomSheet: FeatureDefinition() {
     
     override fun Module.koin() {
         singleOf(::ParticipantsViewModel)
+        singleOf(::RespondsBsViewModel)
         singleOf(::YandexMapViewModel)
         singleOf(::OrganizerViewModel)
         singleOf(::MeetingViewModel)

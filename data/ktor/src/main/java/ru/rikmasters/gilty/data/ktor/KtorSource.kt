@@ -44,7 +44,9 @@ open class KtorSource: WebSource() {
                     .pingInterval(
                         webSocketPingInterval,
                         MILLISECONDS
-                    ).build()
+                    )
+                    .retryOnConnectionFailure(true)
+                    .build()
             }
             install(Logging) {
                 level = LogLevel.BODY
@@ -74,13 +76,6 @@ open class KtorSource: WebSource() {
             install(WebSockets) {
                 contentConverter = JacksonWebsocketContentConverter()
                 pingInterval = webSocketPingInterval
-            }
-            engine {
-                preconfigured = OkHttpClient.Builder()
-                    .pingInterval(
-                        webSocketPingInterval,
-                        MILLISECONDS
-                    ).build()
             }
         }
     }

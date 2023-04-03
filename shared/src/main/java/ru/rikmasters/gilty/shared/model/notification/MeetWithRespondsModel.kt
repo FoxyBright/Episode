@@ -10,7 +10,14 @@ data class MeetWithRespondsModel(
     val organizer: UserModel,
     val responds_count: Int,
     val responds: List<RespondModel>,
-)
+) {
+    
+    constructor(list: List<RespondModel>): this(
+        UUID.randomUUID().toString(),
+        listOf(TagModel()), (false),
+        UserModel(), list.size, list
+    )
+}
 
 val DemoMeetWithRespondsModel = MeetWithRespondsModel(
     UUID.randomUUID().toString(),

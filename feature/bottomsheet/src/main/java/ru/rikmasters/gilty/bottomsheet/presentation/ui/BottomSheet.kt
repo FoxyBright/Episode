@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer.OrganizerBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.participants.ParticipantsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -40,6 +41,7 @@ fun BottomSheet(
     reportObject: String? = null,
     location: LocationModel? = null,
     category: CategoryModel? = null,
+    fullResponds: Boolean = false
 ) {
     
     val nav = rememberNavController()
@@ -49,16 +51,40 @@ fun BottomSheet(
     NavHost(
         nav, when(type) {
             MEET, SHORT_MEET -> "MEET?meet={meet}&detailed={detailed}"
+            MAP -> "MAP?location={location}&category={category}"
+            RESPONDS -> "RESPONDS?meet={meet}&full={full}"
             PARTICIPANTS -> "PARTICIPANTS?meet={meet}"
             REPORTS -> "REPORTS?id={id}&type={type}"
             USER -> "USER?user={user}&meet={meet}"
             APPS -> "APPS?lat={lat}&lng={lng}"
-            RESPONDS -> "RESPONDS?meet={meet}"
-            MAP -> "MAP?location={location}&category={category}"
             OBSERVERS -> "OBSERVERS"
             LOCATION -> "LOCATION"
         }
     ) {
+        
+        composable("OBSERVERS") {
+            //TODO экран наблюдателей
+            nav.popBackStack()
+        }
+        
+        composable(
+            route = "RESPONDS?meet={meet}&full={full}",
+            arguments = listOf(
+                setStringArg("meet", "$meetId"),
+                setBooleanArg("full", fullResponds)
+            )
+        ) { stack ->
+            stack.GetStringArg("meet") { meet ->
+                stack.GetBooleanArg("full") { full ->
+                    Connector<RespondsBsViewModel>(scope) {
+                        RespondsBs(
+                            full, if(meet != "null")
+                                meet else null, it, nav
+                        )
+                    }
+                }
+            }
+        }
         
         composable(
             route = "APPS?lat={lat}&lng={lng}",
@@ -67,6 +93,7 @@ fun BottomSheet(
                 setStringArg("lng", "${location?.lng}"),
             )
         ) {
+            
             var alert by remember { mutableStateOf(false) }
             var appIndex by remember { mutableStateOf(0) }
             
@@ -107,29 +134,6 @@ fun BottomSheet(
                         YandexMapScreen(it, location, category, nav)
                     }
                 }
-            }
-        }
-        
-        composable("LOCATION") {
-            Connector<MapBsViewModel>(scope) {
-                MapBs(it, nav, category!!.name)
-            }
-        }
-        
-        composable("OBSERVERS") {
-            //TODO экран наблюдателей
-            nav.popBackStack()
-        }
-        
-        composable(
-            route = "RESPONDS?meet={meet}",
-            arguments = listOf(
-                setStringArg("meet", "$meetId")
-            )
-        ) {
-            it.GetStringArg("meet") {
-                //TODO экран откликов
-                nav.popBackStack()
             }
         }
         
@@ -194,6 +198,11 @@ fun BottomSheet(
             }
         }
         
+        composable("LOCATION") {
+            Connector<MapBsViewModel>(scope) {
+                MapBs(it, nav, category!!.name)
+            }
+        }
     }
 }
 

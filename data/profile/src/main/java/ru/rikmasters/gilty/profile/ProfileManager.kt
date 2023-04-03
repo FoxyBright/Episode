@@ -81,6 +81,9 @@ class ProfileManager(
     suspend fun getResponds(type: RespondType) =
         web.getResponds(type)
     
+    suspend fun getMeetResponds(meetId: String) =
+        web.getMeetResponds(meetId, null, null)
+    
     suspend fun deleteRespond(respondId: String) {
         web.deleteRespond(respondId)
     }

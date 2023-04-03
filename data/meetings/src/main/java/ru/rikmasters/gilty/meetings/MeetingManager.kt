@@ -144,7 +144,8 @@ class MeetingManager(
             null
         }, meet.photoAccess,
         meet.chatForbidden, meet.tags.map { it.title },
-        meet.description, meet.dateTime,
+        meet.description.ifEmpty { null },
+        meet.dateTime,
         durationToMinutes(meet.duration),
         if(!meet.isOnline) Location(
             meet.hide, meet.lat, meet.lng,

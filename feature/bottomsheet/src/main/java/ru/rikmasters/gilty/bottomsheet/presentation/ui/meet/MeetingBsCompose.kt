@@ -37,6 +37,7 @@ private fun MeetingBsDetailed() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), DemoFullMeetingModel,
+                    Pair(0, null),
                     detailed = Pair("", true),
                     backButton = true,
                 )
@@ -57,7 +58,8 @@ private fun MeetingBsObserve() {
         ) {
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoUserModelList,
+                    (false), meet, Pair(0, null),
+                    DemoUserModelList,
                     distanceCalculator(meet.map()), (false)
                 ), Modifier.padding(16.dp)
             )
@@ -77,7 +79,8 @@ private fun MeetingBsShared() {
         ) {
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoUserModelList,
+                    (false), meet, Pair(0, null),
+                    DemoUserModelList,
                     distanceCalculator(meet.map()), (false)
                 )
             )
@@ -101,7 +104,8 @@ private fun MeetingBsWhenUser() {
             )
             MeetingBsContent(
                 MeetingBsState(
-                    (false), meet, DemoUserModelList,
+                    (false), meet, Pair(0, null),
+                    DemoUserModelList,
                     distanceCalculator(meet.map()), (true)
                 )
             )
@@ -112,6 +116,7 @@ private fun MeetingBsWhenUser() {
 data class MeetingBsState(
     val menuState: Boolean,
     val meet: FullMeetingModel,
+    val lastRespond: Pair<Int, String?>?,
     val membersList: List<UserModel>? = null,
     val meetDistance: String? = null,
     val buttonState: Boolean = true,
@@ -163,6 +168,7 @@ fun MeetingBsContent(
                         ?.let { 28.dp } ?: 0.dp
                 ), MeetingBsTopBarState(
                     state.meet, state.menuState,
+                    state.lastRespond,
                     description = state.detailed == null,
                     backButton = state.backButton
                 ), callback

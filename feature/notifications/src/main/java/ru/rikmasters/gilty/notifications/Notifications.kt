@@ -13,7 +13,6 @@ import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.notification.NotificationsData
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsScreen
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
-import ru.rikmasters.gilty.notifications.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.profile.ProfileData
 
 object Notifications: FeatureDefinition() {
@@ -29,7 +28,6 @@ object Notifications: FeatureDefinition() {
     override fun Module.koin() {
         scope<NotificationViewModel> {
             scopedOf(::NotificationViewModel)
-            scopedOf(::RespondsBsViewModel)
             singleOf(::MeetingViewModel)
             scopedOf(::ParticipantsViewModel)
             scopedOf(::OrganizerViewModel)

@@ -35,10 +35,9 @@ import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
@@ -55,9 +54,9 @@ private fun MeetingBsTopBarPreview() {
                     DemoFullMeetingModel.copy(
                         type = ANONYMOUS,
                         isPrivate = true
-                    ), (false), respondsCount = 3,
-                    lastRespond = DemoMeetWithRespondsModel,
-                    responds = true
+                    ),
+                    (false),
+                    lastRespond = 4 to "",
                 )
             )
         }
@@ -73,7 +72,8 @@ private fun MeetingBsTopBarOnlinePreview() {
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
                     DemoFullMeetingModel.copy(isOnline = true),
-                    (false), backButton = true
+                    (false), backButton = true,
+                    lastRespond = 4 to ""
                 )
             )
         }
@@ -83,9 +83,7 @@ private fun MeetingBsTopBarOnlinePreview() {
 data class MeetingBsTopBarState(
     val meet: FullMeetingModel,
     val menuState: Boolean = false,
-    val responds: Boolean = false,
-    val respondsCount: Int? = null,
-    val lastRespond: MeetWithRespondsModel? = null,
+    val lastRespond: Pair<Int, String?>?,
     val description: Boolean = false,
     val backButton: Boolean = false,
 )
@@ -98,10 +96,13 @@ fun MeetingBsTopBarCompose(
 ) {
     val org = state.meet.organizer
     Column(modifier) {
-        if(state.responds) Responds(
-            stringResource(R.string.profile_responds_label),
-            state.respondsCount,
-            state.lastRespond?.organizer?.avatar?.url,
+        val last = state.lastRespond
+        if(
+            state.lastRespond != null &&
+            state.meet.memberState == IS_ORGANIZER
+            && last?.first!! > 0
+        ) Responds(
+            last.second, last.first,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick(state.meet) }
         Row(Modifier.height(IntrinsicSize.Max)) {

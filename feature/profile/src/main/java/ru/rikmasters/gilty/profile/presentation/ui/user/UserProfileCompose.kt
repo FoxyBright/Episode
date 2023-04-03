@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,9 +10,7 @@ import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,22 +18,16 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
-import ru.rikmasters.gilty.shared.common.Profile
-import ru.rikmasters.gilty.shared.common.ProfileCallback
-import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -71,7 +62,7 @@ data class UserProfileState(
     val profileState: ProfileState,
     val currentMeetings: List<MeetingModel>,
     val meetingsHistory: List<MeetingModel>,
-    val lastRespond: Pair<Int, String>,
+    val lastRespond: Pair<Int, String?>,
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
     val alert: Boolean,
@@ -192,10 +183,12 @@ private fun Content(
             )
         }
         item {
-            Responds(
-                state.lastRespond,
-                Modifier.padding(16.dp, 12.dp)
-            ) { callback?.onRespondsClick() }
+            Box(Modifier.padding(16.dp, 12.dp)) {
+                Responds(
+                    state.lastRespond.second,
+                    state.lastRespond.first,
+                ) { callback?.onRespondsClick() }
+            }
         }
         val userId = state.profileState.profile?.id ?: ""
         if(state.currentMeetings.isNotEmpty()) item {
@@ -217,64 +210,6 @@ private fun Content(
             { callback?.onHistoryClick(it) }
         }
         item { Divider(Modifier.fillMaxWidth(), 20.dp, Transparent) }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Responds(
-    last: Pair<Int, String>,
-    modifier: Modifier,
-    onClick: () -> Unit,
-) {
-    val style = typography.labelSmall
-        .copy(fontWeight = SemiBold)
-    Card(
-        onClick, modifier.fillMaxWidth(),
-        colors = cardColors(colorScheme.primaryContainer)
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 12.dp, end = 20.dp)
-                .padding(vertical = 8.dp),
-            SpaceBetween,
-            CenterVertically,
-        ) {
-            Row(verticalAlignment = CenterVertically) {
-                if(last.second.isNotBlank()) AsyncImage(
-                    last.second, (null), Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .padding(end = 16.dp),
-                    contentScale = Crop
-                )
-                Text(
-                    stringResource(R.string.profile_responds_label),
-                    Modifier.padding(vertical = 12.dp),
-                    colorScheme.tertiary,
-                    style = style
-                )
-            }
-            Row(verticalAlignment = CenterVertically) {
-                if(last.first > 0) Box(
-                    Modifier
-                        .clip(shapes.extraSmall)
-                        .background(colorScheme.primary)
-                ) {
-                    Text(
-                        last.first.toString(),
-                        Modifier.padding(10.dp, 4.dp),
-                        White, style = style
-                    )
-                }
-                Icon(
-                    Filled.KeyboardArrowRight,
-                    stringResource(R.string.profile_responds_label),
-                    Modifier, colorScheme.onTertiary
-                )
-            }
-        }
     }
 }
 

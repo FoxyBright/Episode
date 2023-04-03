@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.profile
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.core.module.FeatureDefinition
@@ -16,7 +15,8 @@ import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.*
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 
@@ -33,7 +33,7 @@ object Profile: FeatureDefinition() {
             screen<SettingsViewModel>("settings") { vm, _ ->
                 SettingsScreen(vm)
             }
-    
+            
             screen<GalleryViewModel>(
                 "cropper?image={image}", listOf(navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
@@ -92,35 +92,18 @@ object Profile: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        
+        singleOf(::OrientationBsViewModel)
+        singleOf(::UserProfileViewModel)
+        singleOf(::ObserverBsViewModel)
+        singleOf(::CategoryViewModel)
+        singleOf(::SettingsViewModel)
+        singleOf(::GenderBsViewModel)
+        singleOf(::RespondsViewModel)
+        singleOf(::HiddenBsViewModel)
+        singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
-        
-        scope<AvatarViewModel> {
-            scopedOf(::AvatarViewModel)
-        }
-        
-        scope<RespondsViewModel> {
-            scopedOf(::RespondsViewModel)
-        }
-        
-        scope<CategoryViewModel> {
-            scopedOf(::CategoryViewModel)
-        }
-        
-        scope<SettingsViewModel> {
-            scopedOf(::OrientationBsViewModel)
-            scopedOf(::SettingsViewModel)
-            scopedOf(::GenderBsViewModel)
-            scopedOf(::IconsBsViewModel)
-            scopedOf(::AgeBsViewModel)
-        }
-        
-        scope<UserProfileViewModel> {
-            scopedOf(::UserProfileViewModel)
-            scopedOf(::ObserverBsViewModel)
-            scopedOf(::RespondsBsViewModel)
-            scopedOf(::HiddenBsViewModel)
-        }
+        singleOf(::AvatarViewModel)
+        singleOf(::AgeBsViewModel)
     }
     
     override fun include() = setOf(ProfileData, Auth)

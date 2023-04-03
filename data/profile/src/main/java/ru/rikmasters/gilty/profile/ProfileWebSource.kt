@@ -156,6 +156,17 @@ class ProfileWebSource: KtorSource() {
             url { query("type" to type.name) }
         }!!.wrapped<List<MeetWithRespondsResponse>>().map { it.map() }
     
+    suspend fun getMeetResponds(
+        meetId: String, page: Int?, perPage: Int?,
+    ) = get(
+        "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
+    ) {
+        url {
+            page?.let { query("page" to "$it") }
+            perPage?.let { query("per_page" to "$it") }
+        }
+    }!!.wrapped<List<RespondResponse>>().map { it.map() }
+    
     suspend fun deleteRespond(respondId: String) {
         delete("http://$HOST$PREFIX_URL/responds/$respondId")
     }

@@ -29,21 +29,21 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview
 @Composable
 private fun RespondCardPreview() {
-    GiltyTheme {
-        Responds(
-            stringResource(R.string.profile_responds_label),
-            3, ""
-        )
-    }
+    GiltyTheme { Responds("", 3) }
+}
+
+@Preview
+@Composable
+private fun RespondCardEmptyPreview() {
+    GiltyTheme { Responds(null, 0) }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun Responds(
-    text: String,
-    size: Int?,
-    image: String?,
+    image: String?, size: Int?,
     modifier: Modifier = Modifier,
+    text: String = stringResource(R.string.profile_responds_label),
     onClick: (() -> Unit)? = null,
 ) {
     Card(
@@ -56,7 +56,8 @@ fun Responds(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(start = 12.dp, end = 20.dp)
+                .padding(vertical = 8.dp),
             SpaceBetween,
             CenterVertically,
         ) {
@@ -64,14 +65,21 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
-                AsyncImage(
-                    image, (null), Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    contentScale = Crop
-                )
+                image?.let {
+                    AsyncImage(
+                        it, (null), Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        contentScale = Crop
+                    )
+                }
                 Text(
-                    text, Modifier.padding(16.dp, 6.dp),
+                    text,
+                    Modifier
+                        .padding(16.dp, 6.dp)
+                        .padding(vertical = image?.let {
+                            0.dp
+                        } ?: 8.dp),
                     colorScheme.tertiary,
                     style = typography.labelSmall
                 )
@@ -81,13 +89,13 @@ fun Responds(
                 CenterVertically
             ) {
                 size?.let {
-                    Box(
+                    if(it > 0) Box(
                         Modifier
                             .clip(shapes.extraSmall)
                             .background(colorScheme.primary)
                     ) {
                         Text(
-                            "$size", Modifier.padding(12.dp, 6.dp),
+                            "$it", Modifier.padding(12.dp, 6.dp),
                             White, fontWeight = SemiBold,
                             style = typography.labelSmall
                         )

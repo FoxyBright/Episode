@@ -2,9 +2,7 @@ package ru.rikmasters.gilty.bottomsheet.deeplink
 
 import android.content.Intent
 import org.koin.core.scope.Scope
-import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.MEET
-import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.MESSAGE
-import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.OTHER
+import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.LinkType.*
 import ru.rikmasters.gilty.bottomsheet.deeplink.PushMessageWrapper.getChatId
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
@@ -44,6 +42,7 @@ object DeepLinker {
         when(link.first) {
             MEET -> bottomSheet(bs, link.second, scope)
             MESSAGE -> nav.navigateAbsolute("chats/chat?id=${link.second}")
+            MEETING_CREATED -> {}
             OTHER -> {}
         }
     }

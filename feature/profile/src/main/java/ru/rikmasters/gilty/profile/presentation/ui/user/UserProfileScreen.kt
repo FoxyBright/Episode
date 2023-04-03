@@ -7,16 +7,15 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers.ObserversBs
-import ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.responds.RespondsBs
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.RespondsBsViewModel
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -95,9 +94,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onRespondsClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<RespondsBsViewModel>(vm.scope) {
-                            RespondsBs(it)
-                        }
+                        BottomSheet(
+                            vm.scope, RESPONDS,
+                            fullResponds = true
+                        )
                     }
                 }
             }

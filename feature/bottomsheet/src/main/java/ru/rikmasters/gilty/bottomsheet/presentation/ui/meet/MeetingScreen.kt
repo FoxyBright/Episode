@@ -33,6 +33,7 @@ fun MeetingBs(
     val context = LocalContext.current
     val globalNav = get<NavState>()
     
+    val lastResponse by vm.lastResponse.collectAsState()
     val memberList by vm.memberList.collectAsState()
     val meeting by vm.meet.collectAsState()
     val distance by vm.distance.collectAsState()
@@ -45,15 +46,17 @@ fun MeetingBs(
     val backBut = nav.previousBackStackEntry != null
     
     LaunchedEffect(Unit) {
-        vm.drawMeet(meetId)
+        vm.getMeet(meetId)
         vm.clearComment()
         vm.changeHidden(false)
     }
+    
     Use<MeetingViewModel>(LoadingTrait) {
         meeting?.let { meet ->
             MeetingBsContent(
                 MeetingBsState(
-                    menu, meet, memberList, distance,
+                    menu, meet, lastResponse,
+                    memberList, distance,
                     buttonState, details, backBut
                 ), Modifier, object: MeetingBsCallback {
                     
@@ -105,7 +108,7 @@ fun MeetingBs(
                     }
                     
                     override fun onAllMembersClick(meetId: String) {
-                        nav.navigate("MEET?meet=$meetId")
+                        nav.navigate("PARTICIPANTS?meet=$meetId")
                     }
                     
                     override fun onHiddenPhotoActive(hidden: Boolean) {

@@ -20,7 +20,15 @@ data class UserModel(
     val isAnonymous: Boolean?,
     val isOnline: Boolean?,
     val meetRating: RatingModel? = null,
-)
+) {
+    
+    constructor(): this(
+        (null), (null), (null),
+        (null), (null), (null),
+        (null), (null), (null),
+        (null),
+    )
+}
 
 val DemoUserModel = UserModel(
     id = "userID",

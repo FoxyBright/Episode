@@ -127,9 +127,8 @@ fun MeetingBsTopBarCompose(
             GKebabButton { callback?.onKebabClick(true) }
         }
         if(state.responds) Responds(
-            stringResource(R.string.profile_responds_label),
-            state.respondsCount,
             state.lastRespond?.organizer?.avatar?.url,
+            state.respondsCount,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick() }
         Row(Modifier.height(IntrinsicSize.Max)) {

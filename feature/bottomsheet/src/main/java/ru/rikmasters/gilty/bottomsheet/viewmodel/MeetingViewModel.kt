@@ -5,19 +5,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 class MeetingViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
+    private val profileManager by inject<ProfileManager>()
     
     private val _meet = MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
     
     private val _memberList = MutableStateFlow(listOf<UserModel>())
     val memberList = _memberList.asStateFlow()
+    
+    private val _lastResponse = MutableStateFlow<Pair<Int, String?>?>(null)
+    val lastResponse = _lastResponse.asStateFlow()
     
     private val _hidden = MutableStateFlow(false)
     val hidden = _hidden.asStateFlow()
@@ -31,8 +37,15 @@ class MeetingViewModel: ViewModel() {
     private val _distance = MutableStateFlow("")
     val distance = _distance.asStateFlow()
     
-    suspend fun drawMeet(meetId: String) {
+    suspend fun getMeet(meetId: String) {
         _meet.emit(meetManager.getDetailedMeet(meetId))
+        if(meet.value?.memberState == IS_ORGANIZER) {
+            val responds = profileManager.getMeetResponds(meetId)
+            _lastResponse.emit(
+                responds.size to responds.last()
+                    .author.thumbnail?.url
+            )
+        }
         if(meet.value?.isOnline == true)
             _distance.emit(distanceCalculator(meet.value!!.map()))
         _memberList.emit(meetManager.getMeetMembers(meetId))
