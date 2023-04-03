@@ -8,13 +8,10 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 class NotificationManager(
     private val store: NotificationRepository,
     private val web: NotificationWebSource,
-): CoroutineController(), PagingManager<NotificationModel> {
+): CoroutineController() {
     
     // получение новой страницы пагинации
-    override suspend fun getPage(
-        page: Int, perPage: Int,
-    ) =
-        store.getNotifications(page, perPage)
+    fun getNotifications() = store.getNotifications()
     
     // удаление уведомления
     suspend fun deleteNotifications(
