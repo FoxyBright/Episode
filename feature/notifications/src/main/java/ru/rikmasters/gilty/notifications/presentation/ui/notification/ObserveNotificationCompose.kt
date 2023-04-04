@@ -90,7 +90,7 @@ fun ObserveNotification(
                 }
             }
         }
-        Text(
+        if(state.participants.isNotEmpty()) Text(
             stringResource(R.string.notification_send_emotion),
             Modifier.padding(top = 6.dp, start = 16.dp),
             colorScheme.onTertiary,
