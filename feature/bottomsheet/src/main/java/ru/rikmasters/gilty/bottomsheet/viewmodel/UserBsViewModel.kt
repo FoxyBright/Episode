@@ -6,6 +6,7 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
@@ -46,9 +47,13 @@ class UserBsViewModel: ViewModel() {
     }
     
     suspend fun getUserActualMeets(userId: String) {
-        _userActualMeets.emit(
-            meetManager.getUserActualMeets(userId)
-        )
+        try {
+            _userActualMeets.emit(
+                meetManager.getUserActualMeets(userId)
+            )
+        } catch(e: Exception) {
+            _meetType.emit(ANONYMOUS)
+        }
     }
     
     suspend fun setMeetType(

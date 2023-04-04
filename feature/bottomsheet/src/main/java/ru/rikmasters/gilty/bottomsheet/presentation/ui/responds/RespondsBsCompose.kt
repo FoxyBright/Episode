@@ -98,7 +98,7 @@ private fun SentResponds(
             responds.forEach {
                 sentRespond(
                     it.tags.joinToString(separator = ", ")
-                    { t -> t.title }, it.organizer.avatar,
+                    { t -> t.title }, it.organizer,
                     it.responds, Modifier.padding(bottom = 12.dp),
                     callback
                 )

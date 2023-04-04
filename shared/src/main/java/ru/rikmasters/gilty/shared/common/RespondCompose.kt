@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
@@ -14,9 +13,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -36,7 +35,7 @@ private fun SentResponds() {
     GiltyTheme {
         LazyColumn {
             sentRespond(
-                (""), DemoAvatarModel, listOf(
+                (""), DemoUserModel, listOf(
                     DemoRespondModelWithPhoto
                 )
             )
@@ -44,27 +43,25 @@ private fun SentResponds() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 fun LazyListScope.sentRespond(
     name: String,
-    avatar: AvatarModel?,
+    organizer: UserModel,
     responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
     callback: RespondsListCallback? = null,
 ) {
     items(responds) { respond ->
-        Box(
-            modifier
-                .fillMaxWidth()
-                .background(
-                    colorScheme.primaryContainer,
-                    shapes.medium
-                )
+        Card(
+            { callback?.onRespondClick(organizer.id!!) },
+            modifier.fillMaxWidth(), (true), shapes.medium,
+            cardColors(colorScheme.primaryContainer)
         ) {
             Column {
                 BrieflyRow(
                     name, Modifier.padding(
                         start = 16.dp, top = 12.dp
-                    ), avatar?.thumbnail?.url
+                    ), organizer.avatar?.thumbnail?.url
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     Divider(Modifier)
