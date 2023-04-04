@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
+import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
 
@@ -34,13 +35,16 @@ class ProfileWebSource : KtorSource() {
             .wrapped<Profile>().map()
 
     suspend fun getUserMeets(
-        page: Int,
-        perPage: Int,
+        page: Int? = null,
+        perPage: Int? = null,
         type: MeetingsType
     ) =
         get("http://$HOST$PREFIX_URL/profile/meetings") {
-            url { query("is_completed" to type.ordinal.toString()) }
-        }!!.wrapped<List<Meeting>>()
+            url {
+                page?.let { query("page" to "$page") }
+                query("is_completed" to type.ordinal.toString())
+            }
+        }!!.paginateWrapped<List<Meeting>>()
 
     suspend fun getUserCategories() = get(
         "http://$HOST$PREFIX_URL/profile/categories"

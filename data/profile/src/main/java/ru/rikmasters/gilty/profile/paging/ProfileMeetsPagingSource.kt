@@ -29,10 +29,9 @@ class ProfileMeetsPagingSource(
                 perPage = loadSize,
                 type = type
             )
-            val nextKey = if (meets.size < loadSize) null else page + 1
-            Log.d("TEST", "RESPONSE -> $meets")
+            val nextKey = if (meets.first.size < loadSize) null else page + 1
             val prevKey = if (page == 1) null else page - 1
-            LoadResult.Page(meets.map { it.map() }, prevKey, nextKey)
+            LoadResult.Page(meets.first.map { it.map() }, prevKey, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }

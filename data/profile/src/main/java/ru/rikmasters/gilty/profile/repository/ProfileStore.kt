@@ -21,7 +21,6 @@ import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Avatar
 import ru.rikmasters.gilty.shared.models.Profile
 import ru.rikmasters.gilty.shared.models.meets.Category
-import ru.rikmasters.gilty.shared.models.meets.Meeting
 import java.io.File
 
 class ProfileStore(
@@ -128,9 +127,8 @@ class ProfileStore(
     private fun List<Category>.map() = this.map { it.map() }
 
     fun getUserMeets(
-        type: MeetingsType,
+        type: MeetingsType
     ): Flow<PagingData<MeetingModel>> {
-
         return Pager(
             config = PagingConfig(
                 pageSize = 15,
