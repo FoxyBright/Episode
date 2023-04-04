@@ -305,7 +305,9 @@ private fun Notifications(
                         item { PagingLoader(notifications.loadState) }
                     }
                 } else {
-                    item { EmptyNotification() }
+                    if (notifications.loadState.refresh is LoadState.NotLoading) {
+                        item { EmptyNotification() }
+                    }
                 }
             }
         }
