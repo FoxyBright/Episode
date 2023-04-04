@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.bottomsheet.viewmodel.ReportsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.ReportsBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.shared.model.report.ReportSubtype
 
 @Composable
 fun ReportsBs(
-    vm: ReportsViewModel,
+    vm: ReportsBsViewModel,
     type: ReportObjectType,
     id: String,
     nav: NavHostController,
@@ -34,7 +34,7 @@ fun ReportsBs(
     
     LaunchedEffect(Unit) { vm.getReports(type) }
     
-    Use<ReportsViewModel>(LoadingTrait) {
+    Use<ReportsBsViewModel>(LoadingTrait) {
         ReportsBsContent(
             ReportsBsState(
                 reports, screen, selected,

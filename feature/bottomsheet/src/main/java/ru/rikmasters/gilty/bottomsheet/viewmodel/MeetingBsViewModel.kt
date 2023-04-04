@@ -11,7 +11,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
-class MeetingViewModel: ViewModel() {
+class MeetingBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()

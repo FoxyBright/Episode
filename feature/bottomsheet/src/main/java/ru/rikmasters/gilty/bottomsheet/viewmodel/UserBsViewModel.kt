@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
-class OrganizerViewModel: ViewModel() {
+class UserBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()

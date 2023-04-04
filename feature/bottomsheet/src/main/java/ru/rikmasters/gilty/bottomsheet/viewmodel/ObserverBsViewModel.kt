@@ -1,15 +1,16 @@
-package ru.rikmasters.gilty.profile.viewmodel.bottoms
+package ru.rikmasters.gilty.bottomsheet.viewmodel
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.DELETE
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.SUB
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.UNSUB
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 class ObserverBsViewModel: ViewModel() {
@@ -57,8 +58,6 @@ class ObserverBsViewModel: ViewModel() {
     suspend fun getObservables(query: String = "") {
         _observables.emit(profileManager.getObservers(query, OBSERVABLES))
     }
-    
-    enum class SubscribeType { SUB, UNSUB, DELETE }
     
     suspend fun unsubscribeMembers() {
         unsubscribeMembers.value.forEach {

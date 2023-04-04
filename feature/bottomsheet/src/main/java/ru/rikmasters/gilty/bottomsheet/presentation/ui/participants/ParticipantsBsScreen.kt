@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsBsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.meetBS.ParticipantsList
@@ -17,7 +17,7 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 @Composable
 fun ParticipantsBs(
-    vm: ParticipantsViewModel,
+    vm: ParticipantsBsViewModel,
     meetId: String,
     nav: NavHostController,
 ) {
@@ -30,7 +30,7 @@ fun ParticipantsBs(
         vm.getParticipants(meetId)
     }
     
-    Use<ParticipantsViewModel>(LoadingTrait) {
+    Use<ParticipantsBsViewModel>(LoadingTrait) {
         meeting?.let { meet ->
             ParticipantsList(
                 meet, memberList, Modifier

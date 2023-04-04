@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingViewModel
+import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
@@ -22,7 +22,7 @@ import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 
 @Composable
 fun MeetingBs(
-    vm: MeetingViewModel,
+    vm: MeetingBsViewModel,
     meetId: String,
     detailed: Boolean,
     nav: NavHostController,
@@ -51,7 +51,7 @@ fun MeetingBs(
         vm.changeHidden(false)
     }
     
-    Use<MeetingViewModel>(LoadingTrait) {
+    Use<MeetingBsViewModel>(LoadingTrait) {
         meeting?.let { meet ->
             MeetingBsContent(
                 MeetingBsState(

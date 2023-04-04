@@ -5,6 +5,7 @@ import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
+import ru.rikmasters.gilty.bottomsheet.viewmodel.ObserverBsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.AvatarScreen
@@ -16,7 +17,6 @@ import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.Categorie
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
 import ru.rikmasters.gilty.profile.viewmodel.*
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
 

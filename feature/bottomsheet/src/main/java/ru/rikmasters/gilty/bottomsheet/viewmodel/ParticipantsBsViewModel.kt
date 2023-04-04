@@ -8,7 +8,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
-class ParticipantsViewModel: ViewModel() {
+class ParticipantsBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     

@@ -8,7 +8,7 @@ import ru.rikmasters.gilty.data.reports.ReportsManager
 import ru.rikmasters.gilty.shared.model.report.*
 import ru.rikmasters.gilty.shared.model.report.Report.Companion.all
 
-class ReportsViewModel: ViewModel() {
+class ReportsBsViewModel: ViewModel() {
     
     private val reportsManager by inject<ReportsManager>()
     

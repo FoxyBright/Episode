@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.profile.presentation.ui.user.bottoms.observers
+package ru.rikmasters.gilty.bottomsheet.presentation.ui.observers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,10 +27,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.DELETE
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.SUB
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.ObserverBsViewModel.SubscribeType.UNSUB
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.DELETE
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.SUB
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList

@@ -16,6 +16,7 @@ import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.*
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.map.MapBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBs
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.ObserversBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer.OrganizerBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.participants.ParticipantsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
@@ -41,7 +42,8 @@ fun BottomSheet(
     reportObject: String? = null,
     location: LocationModel? = null,
     category: CategoryModel? = null,
-    fullResponds: Boolean = false
+    fullResponds: Boolean = false,
+    username: String? = "",
 ) {
     
     val nav = rememberNavController()
@@ -56,15 +58,23 @@ fun BottomSheet(
             PARTICIPANTS -> "PARTICIPANTS?meet={meet}"
             REPORTS -> "REPORTS?id={id}&type={type}"
             USER -> "USER?user={user}&meet={meet}"
+            OBSERVERS -> "OBSERVERS?user={user}"
             APPS -> "APPS?lat={lat}&lng={lng}"
-            OBSERVERS -> "OBSERVERS"
             LOCATION -> "LOCATION"
         }
     ) {
         
-        composable("OBSERVERS") {
-            //TODO экран наблюдателей
-            nav.popBackStack()
+        composable(
+            route = "OBSERVERS?user={user}",
+            arguments = listOf(
+                setStringArg("user", (username ?: ""))
+            )
+        ) { stack ->
+            stack.GetStringArg("user") { user ->
+                Connector<ObserverBsViewModel>(scope) {
+                    ObserversBs(it, user, nav)
+                }
+            }
         }
         
         composable(
@@ -146,7 +156,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("meet") { meet ->
                 stack.GetBooleanArg("detailed") { detailed ->
-                    Connector<MeetingViewModel>(scope) {
+                    Connector<MeetingBsViewModel>(scope) {
                         MeetingBs(it, meet, detailed, nav)
                     }
                 }
@@ -162,7 +172,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("user") { user ->
                 stack.GetStringArg("meet") { meet ->
-                    Connector<OrganizerViewModel>(scope) {
+                    Connector<UserBsViewModel>(scope) {
                         OrganizerBs(it, user, meet, nav)
                     }
                 }
@@ -176,7 +186,7 @@ fun BottomSheet(
             )
         ) { stack ->
             stack.GetStringArg("meet") { meet ->
-                Connector<ParticipantsViewModel>(scope) {
+                Connector<ParticipantsBsViewModel>(scope) {
                     ParticipantsBs(it, meet, nav)
                 }
             }
@@ -191,7 +201,7 @@ fun BottomSheet(
         ) { stack ->
             stack.GetStringArg("id") { id ->
                 stack.GetStringArg("type") { type ->
-                    Connector<ReportsViewModel>(scope) {
+                    Connector<ReportsBsViewModel>(scope) {
                         ReportsBs(it, ReportObjectType.valueOf(type), id, nav)
                     }
                 }
