@@ -1,10 +1,10 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -21,9 +22,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 class ChatListViewModel : ViewModel(), PullToRefreshTrait {
 
     private val chatManager by inject<ChatManager>()
-
-    private val _unreadChats = MutableStateFlow(emptyList<ChatModel>())
-    val unreadChats = _unreadChats.asStateFlow()
 
     private val _completed = MutableStateFlow(false)
     val completed = _completed.asStateFlow()
@@ -39,13 +37,13 @@ class ChatListViewModel : ViewModel(), PullToRefreshTrait {
     private val _alertSelected = MutableStateFlow(0)
     val alertSelected = _alertSelected.asStateFlow()
 
-    private val _unread = MutableStateFlow(false)
-    val unread = _unread.asStateFlow()
-
     val isPageRefreshing = MutableStateFlow(false)
     override val pagingPull = isPageRefreshing
 
     private val refresh = MutableStateFlow(false)
+
+    private val _sortType = MutableStateFlow(SortTypeModel.MEETING_DATE)
+    val sortType = _sortType.asStateFlow()
 
     private val _navBar = MutableStateFlow(
         listOf(INACTIVE, INACTIVE, INACTIVE, ACTIVE, INACTIVE)
@@ -72,27 +70,26 @@ class ChatListViewModel : ViewModel(), PullToRefreshTrait {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val chats by lazy {
-        refresh.flatMapLatest {
-            Log.d("TEST","flatMap $it")
-            chatManager.getChats()
+        combine(
+            refresh,
+            _sortType
+        ) { refresh, sort ->
+            Pair(refresh, sort)
+        }.flatMapLatest {
+            chatManager.getChats(it.second)
         }.cachedIn(coroutineScope)
     }
 
     override suspend fun forceRefresh() = singleLoading {
-        Log.d("TESTSS","force refresh")
         refresh.value = !refresh.value
-    }
-
-    suspend fun getUnread() = singleLoading {
-        _unreadChats.emit(chatManager.getUnread())
     }
 
     suspend fun alertSelect(index: Int) {
         _alertSelected.emit(index)
     }
 
-    suspend fun changeUnRead() {
-        _unread.emit(!unread.value)
+    suspend fun changeSortType(sortType: SortTypeModel) {
+        _sortType.emit(sortType)
     }
 
     private suspend fun navBarSetStates(

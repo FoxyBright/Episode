@@ -1,10 +1,8 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import android.util.Log
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -13,6 +11,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
@@ -21,46 +20,20 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val nav = get<NavState>()
 
     val chats = vm.chats.collectAsLazyPagingItems()
-    val unreadChats by vm.unreadChats.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()
     val alertState by vm.alertState.collectAsState()
     val navBar by vm.navBar.collectAsState()
     val completed by vm.completed.collectAsState()
-    val unRead by vm.unread.collectAsState()
+    val sortType by vm.sortType.collectAsState()
     val alert by vm.alert.collectAsState()
 
-    LaunchedEffect(key1 = chats.loadState) {
-        Log.d("TEST", "enter chatState ${chats.loadState}")
-
-        /*
-        vm.isPageRefreshing.emit(
-            chats.loadState.refresh is LoadState.Loading
-        )
-         */
-    }
-
     LaunchedEffect(Unit) { vm.getChatStatus() }
-
-    /*
-    LaunchedEffect(chats.loadState) {
-        Log.d("TEST","chatState ${chats.loadState}")
-        val loadState = chats.loadState
-        /*
-        vm.isPageRefreshing.emit(
-            loadState.append is LoadState.Loading
-                    || loadState.refresh is LoadState.Loading
-        )
-
-         */
-    }
-
-     */
 
     ChatListContent(
         ChatListState(
             navBar, chats, completed, alert,
-            alertState, alertSelected, unRead,
-            listState, unreadChats
+            alertState, alertSelected, sortType,
+            listState
         ),
         Modifier,
         object : ChatListCallback {
@@ -104,10 +77,9 @@ fun ChatListScreen(vm: ChatListViewModel) {
                 }
             }
 
-            override fun onUnreadChange() {
+            override fun onSortTypeChanged(sortType: SortTypeModel) {
                 scope.launch {
-                    vm.getUnread()
-                    vm.changeUnRead()
+                    vm.changeSortType(sortType)
                 }
             }
 

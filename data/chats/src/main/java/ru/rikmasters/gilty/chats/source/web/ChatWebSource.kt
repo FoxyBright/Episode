@@ -5,6 +5,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import ru.rikmasters.gilty.chats.models.chat.Chat
+import ru.rikmasters.gilty.chats.models.chat.SortType
 import ru.rikmasters.gilty.chats.models.message.MarkAsReadRequest
 import ru.rikmasters.gilty.chats.models.message.Message
 import ru.rikmasters.gilty.chats.models.ws.ChatStatus
@@ -22,12 +23,12 @@ import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.util.UUID
 
-class ChatWebSource: KtorSource() {
-    
+class ChatWebSource : KtorSource() {
+
     suspend fun getDialogs(
         page: Int? = null,
         perPage: Int? = null,
-        unread: Int = 0,
+        sortType: SortType = SortType.MEETING_DATE
     ): Pair<List<Chat>, Paginator> {
         return get(
             "http://$HOST$PREFIX_URL/chats"
@@ -35,25 +36,25 @@ class ChatWebSource: KtorSource() {
             url {
                 page?.let { query("page" to "$page") }
                 perPage?.let { query("per_page" to "$perPage") }
-                query("unread" to "$unread")
+                query("sort_type" to sortType.stringName)
             }
         }!!.paginateWrapped()
     }
-    
+
     suspend fun markAsReadMessage(
         chatId: String,
         messageIds: List<String>,
-        all: Boolean,
+        all: Boolean
     ) {
         patch(
             "http://$HOST$PREFIX_URL/chats/$chatId/markAsRead"
         ) { setBody(MarkAsReadRequest(messageIds, all)) }
     }
-    
+
     suspend fun deleteMessage(
         chatId: String,
         messageIds: List<String>,
-        allMembers: Int,
+        allMembers: Int
     ) {
         delete(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
@@ -64,77 +65,85 @@ class ChatWebSource: KtorSource() {
             }
         }
     }
-    
+
     suspend fun getChatAlbum(chatId: String): AlbumModel {
         return get(
             "http://$HOST$PREFIX_URL/chats/$chatId/album"
         )!!.wrapped<Album>().map()
     }
-    
+
     suspend fun unmuteChatNotifications(chatId: String) {
         post(
             "http://$HOST$PREFIX_URL/chats/$chatId/unmute"
         )
     }
-    
+
     suspend fun getChatsStatus(): Int {
         return get(
             "http://$HOST$PREFIX_URL/chats/status"
         )!!.wrapped<ChatStatus>().unreadCount
     }
-    
+
     suspend fun muteChatNotifications(
-        chatId: String, unmuteAt: String,
+        chatId: String,
+        unmuteAt: String
     ) {
         get(
             "http://$HOST$PREFIX_URL/chats/$chatId/mute"
         ) { url { query("unmute_at" to unmuteAt) } }
     }
-    
+
     suspend fun sendMessage(
         chatId: String,
         replyId: String? = null,
         text: String? = null,
         photos: List<ByteArray>? = null,
         attachments: List<AvatarModel>? = null,
-        videos: List<ByteArray>? = null,
+        videos: List<ByteArray>? = null
     ) {
         postFormData(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages",
             formData {
-                
                 // id of the parent message if message is reply
                 replyId?.let { append("reply_id", it) }
-                
+
                 // text from message
                 text?.let { append("text", it) }
-                
+
                 // attached hidden photos
-                if(!attachments.isNullOrEmpty())
+                if (!attachments.isNullOrEmpty()) {
                     attachments.forEachIndexed { i, it ->
                         append(("attachments[$i][type]"), ("PRIVATE_PHOTO"))
                         append(("attachments[$i][album_id]"), it.albumId)
                         append(("attachments[$i][file_id]"), it.id)
                     }
-                
-                if(!photos.isNullOrEmpty())
+                }
+
+                if (!photos.isNullOrEmpty()) {
                     photos.forEachIndexed { i, it ->
                         log.d("photo -> $it")
                         append(("upload[type]"), ("PHOTO"))
-                        append(("upload[photos][$i]"), it, Headers.build {
-                            append(HttpHeaders.ContentType, "image/jpg")
-                            append(
-                                HttpHeaders.ContentDisposition,
-                                "filename=\"${it}.jpg\""
-                            )
-                        })
+                        append(
+                            ("upload[photos][$i]"),
+                            it,
+                            Headers.build {
+                                append(HttpHeaders.ContentType, "image/jpg")
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "filename=\"$it.jpg\""
+                                )
+                            }
+                        )
                     }
-                
+                }
+
                 // attached videos from camera or gallery
-                if(!videos.isNullOrEmpty()) {
+                if (!videos.isNullOrEmpty()) {
                     videos.forEach { video ->
                         append("upload[type]", "VIDEO")
-                        append("upload[videos][]", video,
+                        append(
+                            "upload[videos][]",
+                            video,
                             Headers.build {
                                 append(HttpHeaders.ContentType, "video/mp4")
                                 append(
@@ -145,14 +154,14 @@ class ChatWebSource: KtorSource() {
                         )
                     }
                 }
-                
-            },
+            }
         )
     }
-    
+
     suspend fun getMessages(
         chatId: String,
-        page: Int?, perPage: Int?,
+        page: Int?,
+        perPage: Int?
     ): Pair<List<Message>, Paginator> {
         return get(
             "http://$HOST$PREFIX_URL/chats/$chatId/messages"
@@ -163,32 +172,32 @@ class ChatWebSource: KtorSource() {
             }
         }!!.paginateWrapped()
     }
-    
+
     suspend fun getChat(chatId: String): ChatModel {
         return get(
             "http://$HOST$PREFIX_URL/chats/$chatId"
         )!!.wrapped<Chat>().map()
     }
-    
+
     suspend fun completeChat(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/complete")
     }
-    
+
     suspend fun isTyping(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/typing")
     }
-    
+
     suspend fun madeScreenshot(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/screenshot")
     }
-    
+
     suspend fun deleteChat(
         chatId: String,
-        forAll: Boolean,
+        forAll: Boolean
     ) {
         delete(
             "http://$HOST$PREFIX_URL/chats/$chatId${
-                if(forAll) "/all" else ""
+            if (forAll) "/all" else ""
             }"
         )
     }

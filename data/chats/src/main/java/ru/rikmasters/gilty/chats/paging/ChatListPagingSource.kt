@@ -3,12 +3,14 @@ package ru.rikmasters.gilty.chats.paging
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import ru.rikmasters.gilty.chats.models.chat.SortType
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import java.lang.Exception
 
 class ChatListPagingSource(
-    private val webSource: ChatWebSource
+    private val webSource: ChatWebSource,
+    private val sortType: SortType
 ) : PagingSource<Int, ChatModel>() {
     override fun getRefreshKey(state: PagingState<Int, ChatModel>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
@@ -27,7 +29,8 @@ class ChatListPagingSource(
         return try {
             val chats = webSource.getDialogs(
                 page = page,
-                perPage = loadSize
+                perPage = loadSize,
+                sortType = sortType
             )
             Log.d("GEWGG","chats ${chats.first.map { it.title }}")
             Log.d("TESSST", "chats paginator curPAge${chats.second.currentPage} listPAge${chats.second.list_page} perPGE${chats.second.perPage} offset${chats.second.offset} limit${chats.second.limit} size ${chats.first.size}")
