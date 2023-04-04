@@ -17,9 +17,9 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
+import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModelWithPhotos
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
+import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -31,8 +31,8 @@ private fun ReceivedResponds() {
         RespondsListContent(
             RespondsListState(
                 listOf(
-                    DemoMeetWithRespondsModel,
-                    DemoMeetWithRespondsModel
+                    DemoMeetWithRespondsModelWithPhotos,
+                    DemoMeetWithRespondsModelWithPhotos
                 ), listOf(1)
             ), Modifier
                 .background(colorScheme.background)
@@ -42,7 +42,7 @@ private fun ReceivedResponds() {
 }
 
 data class RespondsListState(
-    val responds: List<MeetWithRespondsModel>,
+    val responds: List<MeetWithRespondsModelWithPhotos>,
     val groupStates: List<Int>,
 )
 
@@ -79,7 +79,7 @@ fun RespondsListContent(
 private fun GroupList(
     index: Int,
     title: String,
-    responds: List<RespondModel>,
+    responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
     callback: RespondsListCallback?,

@@ -7,14 +7,14 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SENT
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
 
 class RespondsBsViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
     
     private val _responds =
-        MutableStateFlow(emptyList<MeetWithRespondsModel>())
+        MutableStateFlow(emptyList<MeetWithRespondsModelWithPhotos>())
     val responds = _responds.asStateFlow()
     
     private val _tabs = MutableStateFlow(0)
@@ -33,14 +33,23 @@ class RespondsBsViewModel: ViewModel() {
         meetId: String? = null,
     ) = singleLoading {
         meetId?.let {
-            val resList = profileManager.getMeetResponds(it)
-            _responds.emit(listOf(MeetWithRespondsModel(resList)))
+            _responds.emit(
+                listOf(
+                    MeetWithRespondsModelWithPhotos(
+                        profileManager.getMeetResponds(it)
+                    )
+                )
+            )
         } ?: run {
             _responds.emit(
                 profileManager.getResponds(
                     if(tabs.value == 0) SENT
                     else RECEIVED
-                )
+                ).map {
+                    it.map { album ->
+                        profileManager.getPhotos(album)
+                    }
+                }
             )
         }
     }

@@ -36,6 +36,10 @@ class ProfileManager(
         store.deleteProfile()
     }
     
+    suspend fun getPhotos(albumId: String) =
+        if(albumId.isNotBlank()) web.getFiles(albumId)
+            .map { it.map() } else emptyList()
+    
     suspend fun getProfile(forceWeb: Boolean = false) =
         store.getProfile(forceWeb)
     

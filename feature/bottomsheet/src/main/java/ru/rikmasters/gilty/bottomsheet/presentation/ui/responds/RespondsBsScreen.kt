@@ -4,10 +4,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.FULL
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.SHORT
 import ru.rikmasters.gilty.bottomsheet.viewmodel.RespondsBsViewModel
+import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.RespondsListCallback
@@ -21,6 +24,8 @@ fun RespondsBs(
 ) {
     
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val globalNav = get<NavState>()
     
     val respondsList by vm.responds.collectAsState()
     val groupsStates by vm.groupsStates.collectAsState()
@@ -42,10 +47,12 @@ fun RespondsBs(
                 }
                 
                 override fun onImageClick(image: String) {
-                }
-                
-                override fun onArrowClick(index: Int) {
-                    scope.launch { vm.selectRespondsGroup(index) }
+                    scope.launch {
+                        globalNav.navigateAbsolute(
+                            ("profile/avatar?type=2&image=${image}")
+                        )
+                        asm.bottomSheet.collapse()
+                    }
                 }
                 
                 override fun onCancelClick(respondId: String) {
@@ -63,6 +70,10 @@ fun RespondsBs(
                         vm.acceptRespond(respondId)
                         vm.getResponds(meetId)
                     }
+                }
+                
+                override fun onArrowClick(index: Int) {
+                    scope.launch { vm.selectRespondsGroup(index) }
                 }
                 
                 override fun onTabChange(tab: Int) {

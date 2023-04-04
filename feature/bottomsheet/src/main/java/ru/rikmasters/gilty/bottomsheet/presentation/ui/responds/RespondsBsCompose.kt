@@ -23,7 +23,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.M
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.SHORT
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.*
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.GiltyTab
 
@@ -32,7 +32,7 @@ enum class RespondsBsType { MEET, FULL, SHORT }
 @Composable
 fun RespondsList(
     type: RespondsBsType,
-    responds: List<MeetWithRespondsModel>,
+    responds: List<MeetWithRespondsModelWithPhotos>,
     respondsStates: List<Int>,
     selectTab: Int,
     modifier: Modifier = Modifier,
@@ -90,7 +90,7 @@ fun RespondsList(
 @Composable
 private fun SentResponds(
     modifier: Modifier = Modifier,
-    responds: List<MeetWithRespondsModel>,
+    responds: List<MeetWithRespondsModelWithPhotos>,
     callback: RespondsListCallback? = null,
 ) {
     if(responds.isNotEmpty())
@@ -98,8 +98,8 @@ private fun SentResponds(
             responds.forEach {
                 sentRespond(
                     it.tags.joinToString(separator = ", ")
-                    { t -> t.title }, it.responds,
-                    Modifier.padding(bottom = 12.dp),
+                    { t -> t.title }, it.organizer.avatar,
+                    it.responds, Modifier.padding(bottom = 12.dp),
                     callback
                 )
             }
@@ -114,7 +114,7 @@ private fun SentResponds(
 @Composable
 private fun MeetResponds(
     modifier: Modifier = Modifier,
-    responds: List<MeetWithRespondsModel>,
+    responds: List<MeetWithRespondsModelWithPhotos>,
     callback: RespondsListCallback? = null,
 ) {
     if(responds.isNotEmpty())
@@ -137,7 +137,7 @@ private fun MeetResponds(
 @Composable
 private fun ReceivedResponds(
     modifier: Modifier = Modifier,
-    responds: List<MeetWithRespondsModel>,
+    responds: List<MeetWithRespondsModelWithPhotos>,
     respondsStates: List<Int>,
     callback: RespondsListCallback? = null,
 ) {

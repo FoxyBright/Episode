@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -24,7 +25,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun ReceivedResponds() {
     GiltyTheme {
         ReceivedRespond(
-            DemoRespondModel
+            DemoRespondModelWithPhoto
         )
     }
 }
@@ -35,9 +36,8 @@ private fun SentResponds() {
     GiltyTheme {
         LazyColumn {
             sentRespond(
-                "",
-                listOf(
-                    DemoRespondModel
+                (""), DemoAvatarModel, listOf(
+                    DemoRespondModelWithPhoto
                 )
             )
         }
@@ -46,7 +46,8 @@ private fun SentResponds() {
 
 fun LazyListScope.sentRespond(
     name: String,
-    responds: List<RespondModel>,
+    avatar: AvatarModel?,
+    responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
     callback: RespondsListCallback? = null,
 ) {
@@ -63,7 +64,7 @@ fun LazyListScope.sentRespond(
                 BrieflyRow(
                     name, Modifier.padding(
                         start = 16.dp, top = 12.dp
-                    ), respond.author.avatar?.thumbnail?.url
+                    ), avatar?.thumbnail?.url
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     Divider(Modifier)
@@ -78,7 +79,7 @@ fun LazyListScope.sentRespond(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ReceivedRespond(
-    respond: RespondModel,
+    respond: RespondWithPhotos,
     modifier: Modifier = Modifier,
     callback: RespondsListCallback? = null,
 ) {
@@ -108,19 +109,18 @@ fun ReceivedRespond(
                     colorScheme.tertiary,
                     style = typography.bodyMedium
                 )
-                if(respond.photoAccess) LazyRow(modifier) {
-                    val hiddens =
-                        listOf(
-                            //TODO ОТКУДА СКРЫТЫЕ ФОТО?
-                            DemoAvatarModel, DemoAvatarModel,
-                            DemoAvatarModel, DemoAvatarModel,
-                        )
-                    items(hiddens) { photo ->
-                        HiddenImage(
-                            photo, Modifier.padding(6.dp), photo.hasAccess
-                        ) { respond.author.id?.let { callback?.onImageClick(it) } }
+                if(respond.photos.isNotEmpty() && respond.photoAccess)
+                    LazyRow(modifier) {
+                        items(respond.photos) { photo ->
+                            HiddenImage(
+                                photo, Modifier.padding(6.dp),
+                                !photo.hasAccess
+                            ) {
+                                if(!photo.hasAccess)
+                                    callback?.onImageClick(photo.url)
+                            }
+                        }
                     }
-                }
                 Buttons(
                     Modifier.padding(vertical = 8.dp), (false),
                     { callback?.onAcceptClick(respond.id) })
