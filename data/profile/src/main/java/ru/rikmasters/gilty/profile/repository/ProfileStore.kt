@@ -1,5 +1,9 @@
 package ru.rikmasters.gilty.profile.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
@@ -8,6 +12,7 @@ import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.profile.models.ProfileCategories
 import ru.rikmasters.gilty.profile.models.ProfileMeets
+import ru.rikmasters.gilty.profile.paging.ProfileMeetsPagingSource
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -121,23 +126,23 @@ class ProfileStore(
     }
     
     private fun List<Category>.map() = this.map { it.map() }
-    
-    suspend fun getUserMeets(
-        forceWeb: Boolean,
+
+    fun getUserMeets(
         type: MeetingsType,
-    ): List<MeetingModel> {
-        
-        fun List<Meeting>.map() = this.map { it.map() }
-        
-        if(!forceWeb) primarySource
-            .find<ProfileMeets>()
-            ?.let { return it.list.map() }
-        
-        primarySource.deleteAll<ProfileCategories>()
-        val list = webSource.getUserMeets(type)
-        primarySource.save(ProfileMeets(type, list))
-        
-        return list.map()
+    ): Flow<PagingData<MeetingModel>> {
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                ProfileMeetsPagingSource(
+                    webSource = webSource,
+                    type = type
+                )
+            }
+        ).flow
     }
     
     suspend fun updateUserCategories(): List<CategoryModel> {
