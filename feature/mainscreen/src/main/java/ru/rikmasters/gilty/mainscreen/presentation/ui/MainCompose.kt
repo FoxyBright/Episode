@@ -55,7 +55,7 @@ fun MainContentPreview() {
 
 interface MainContentCallback {
     
-    fun onTodayChange()
+    fun onTodayChange(today: Boolean)
     fun onTimeFilterClick()
     fun onStyleChange()
     fun onRespond(meet: MeetingModel)
@@ -112,7 +112,7 @@ fun MainContent(
                 TopBar(
                     state.today, state.selectDate,
                     state.selectTime, Modifier,
-                    { callback?.onTodayChange() }
+                    { callback?.onTodayChange(it) }
                 ) { callback?.onTimeFilterClick() }
                 Content(
                     state.grid, state.hasFilters,
@@ -141,7 +141,7 @@ private fun TopBar(
     selectDate: Boolean,
     selectTime: Boolean,
     modifier: Modifier = Modifier,
-    onTodayChange: () -> Unit,
+    onTodayChange: (Boolean) -> Unit,
     onTimeFilterClick: () -> Unit,
 ) {
     Row(
@@ -155,14 +155,14 @@ private fun TopBar(
             Start, Bottom
         ) {
             GiltyString(
-                Modifier.padding(end = 12.dp),
+                Modifier,
                 stringResource(R.string.meeting_profile_bottom_today_label),
-                today, onTodayChange
-            )
+                today
+            ) { onTodayChange(true) }
             GiltyString(
                 Modifier, stringResource(R.string.meeting_profile_bottom_latest_label),
-                !today, onTodayChange
-            )
+                !today,
+            ) { onTodayChange(false) }
         }
         IconButton(onTimeFilterClick) {
             val icons = if(isSystemInDarkTheme())

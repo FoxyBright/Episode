@@ -119,8 +119,8 @@ fun MainScreen(vm: MainViewModel) {
                     scope.launch { vm.alertDismiss(false) }
                 }
                 
-                override fun onTodayChange() {
-                    scope.launch { vm.changeGroup() }
+                override fun onTodayChange(today: Boolean) {
+                    scope.launch { vm.changeGroup(today) }
                 }
                 
                 override fun onStyleChange() {

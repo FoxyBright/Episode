@@ -155,8 +155,8 @@ class MainViewModel: ViewModel() {
         }
     }
     
-    suspend fun changeGroup() {
-        _today.emit(!today.value)
+    suspend fun changeGroup(today: Boolean) {
+        _today.emit(today)
         getMeets()
     }
 }

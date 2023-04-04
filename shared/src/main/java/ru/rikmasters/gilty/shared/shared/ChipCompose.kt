@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,12 +11,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -73,7 +74,7 @@ private fun StringPreview() {
         ) {
             list.forEachIndexed { i, it ->
                 GiltyString(
-                    Modifier.padding(end = 12.dp),
+                    Modifier,
                     textList[i], it
                 ) {
                     for(i1 in 0..list.lastIndex) {
@@ -165,17 +166,20 @@ fun GiltyString(
 ) {
     Box(
         modifier
-            .clip(CircleShape)
-            .clickable { onClick() }) {
+            .clickable(
+                MutableInteractionSource(),
+                (null)
+            ) { onClick() }) {
         Text(
-            text,
-            Modifier.padding(4.dp),
-            animateColorAsState(
+            text, Modifier.padding(
+                end = 10.dp, bottom = if(isSelected)
+                    0.dp else 2.dp
+            ), animateColorAsState(
                 if(isSelected) colorScheme.tertiary
                 else colorScheme.onTertiary, tween(600)
             ).value, style = typography.titleLarge.copy(
-                fontSize = animateIntAsState(
-                    if(isSelected) 28 else 18, tween(200)
+                fontSize = animateFloatAsState(
+                    if(isSelected) 28f else 18f, tween(200)
                 ).value.sp
             )
         )
