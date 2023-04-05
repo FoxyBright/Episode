@@ -20,8 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
@@ -29,15 +30,10 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
+/*
 @Preview
 @Composable
 private fun ProfilePreview() {
@@ -46,33 +42,45 @@ private fun ProfilePreview() {
         ProfileContent(
             UserProfileState(
                 ProfileState(
-                    DemoProfileModel, USERPROFILE
-                ), meets, meets, Pair(4, "image"),
-                (false), listOf(
-                    INACTIVE, INACTIVE, INACTIVE,
-                    INACTIVE, ACTIVE
-                ), alert = false,
+                    DemoProfileModel,
+                    USERPROFILE
+                ),
+                meets,
+                meets,
+                Pair(4, "image"),
+                (false),
+                listOf(
+                    INACTIVE,
+                    INACTIVE,
+                    INACTIVE,
+                    INACTIVE,
+                    ACTIVE
+                ),
+                alert = false,
                 listState = rememberLazyListState()
-            ), Modifier.background(colorScheme.background)
+            ),
+            Modifier.background(colorScheme.background)
         )
     }
 }
 
+ */
+
 data class UserProfileState(
     val profileState: ProfileState,
-    val currentMeetings: List<MeetingModel>,
-    val meetingsHistory: List<MeetingModel>,
+    val currentMeetings: LazyPagingItems<MeetingModel>,
+    val meetingsHistory: LazyPagingItems<MeetingModel>,
     val lastRespond: Pair<Int, String?>,
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
     val alert: Boolean,
     val menuState: Boolean = false,
     val listState: LazyListState,
-    val photoAlertState: Boolean = false,
+    val photoAlertState: Boolean = false
 )
 
-interface UserProfileCallback: ProfileCallback {
-    
+interface UserProfileCallback : ProfileCallback {
+
     fun menu(state: Boolean) {}
     fun onHistoryShow() {}
     fun onMeetingClick(meet: MeetingModel) {}
@@ -90,7 +98,7 @@ interface UserProfileCallback: ProfileCallback {
 fun ProfileContent(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null,
+    callback: UserProfileCallback? = null
 ) {
     Box {
         GDropMenu(
@@ -98,17 +106,15 @@ fun ProfileContent(
             { callback?.onMenuClick(false) },
             DpOffset(180.dp, 300.dp),
             listOf(
-                Pair(stringResource(R.string.profile_menu_watch_photo_button))
-                { callback?.onMenuItemClick(0) },
-                Pair(stringResource(R.string.edit_button))
-                { callback?.onMenuItemClick(1) },
+                Pair(stringResource(R.string.profile_menu_watch_photo_button)) { callback?.onMenuItemClick(0) },
+                Pair(stringResource(R.string.edit_button)) { callback?.onMenuItemClick(1) }
             )
         )
     }
     Scaffold(
-        modifier, bottomBar = {
-            NavBar(state.stateList)
-            { callback?.onNavBarSelect(it) }
+        modifier,
+        bottomBar = {
+            NavBar(state.stateList) { callback?.onNavBarSelect(it) }
         }
     ) {
         Box(Modifier.padding(it)) {
@@ -137,7 +143,7 @@ fun ProfileContent(
 private fun Content(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null,
+    callback: UserProfileCallback? = null
 ) {
     LazyColumn(
         modifier
@@ -153,7 +159,8 @@ private fun Content(
             ) {
                 Profile(
                     state.profileState,
-                    Modifier, callback
+                    Modifier,
+                    callback
                 )
                 Box(
                     Modifier.fillMaxWidth(),
@@ -165,7 +172,8 @@ private fun Content(
                     ) {
                         Icon(
                             painterResource(ic_kebab),
-                            null, Modifier,
+                            null,
+                            Modifier,
                             colorScheme.tertiary
                         )
                     }
@@ -186,28 +194,30 @@ private fun Content(
             Box(Modifier.padding(16.dp, 12.dp)) {
                 Responds(
                     state.lastRespond.second,
-                    state.lastRespond.first,
+                    state.lastRespond.first
                 ) { callback?.onRespondsClick() }
             }
         }
         val userId = state.profileState.profile?.id ?: ""
-        if(state.currentMeetings.isNotEmpty()) item {
+        if (state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item {
             LazyRow {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
                     MeetingCategoryCard(
-                        userId, it,
+                        userId,
+                        it!!,
                         Modifier.padding(horizontal = 4.dp)
                     ) { callback?.onMeetingClick(it) }
                 }
             }
         }
-        if(state.meetingsHistory.isNotEmpty()) item(5) {
+        if (state.meetingsHistory.itemSnapshotList.items.isNotEmpty()) item(5) {
             MeetHistory(
-                userId, state.historyState,
+                userId,
+                state.historyState,
                 state.meetingsHistory,
-                { callback?.onHistoryShow() })
-            { callback?.onHistoryClick(it) }
+                { callback?.onHistoryShow() }
+            ) { callback?.onHistoryClick(it) }
         }
         item { Divider(Modifier.fillMaxWidth(), 20.dp, Transparent) }
     }
@@ -217,9 +227,9 @@ private fun Content(
 private fun MeetHistory(
     userId: String,
     historyState: Boolean,
-    historyList: List<MeetingModel>,
+    historyList: LazyPagingItems<MeetingModel>,
     openHistory: () -> Unit,
-    onSelect: (MeetingModel) -> Unit,
+    onSelect: (MeetingModel) -> Unit
 ) {
     Row(
         Modifier
@@ -228,7 +238,8 @@ private fun MeetHistory(
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
             .clickable { openHistory() },
-        Start, CenterVertically
+        Start,
+        CenterVertically
     ) {
         Text(
             stringResource(R.string.profile_meeting_history_label),
@@ -237,16 +248,19 @@ private fun MeetHistory(
             style = typography.labelLarge
         )
         Icon(
-            if(!historyState) Filled.KeyboardArrowRight
-            else Filled.KeyboardArrowDown, (null),
-            Modifier.size(24.dp), colorScheme.tertiary
+            if (!historyState) Filled.KeyboardArrowRight
+            else Filled.KeyboardArrowDown,
+            (null),
+            Modifier.size(24.dp),
+            colorScheme.tertiary
         )
     }
-    if(historyState) LazyRow {
+    if (historyState) LazyRow {
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(
-                userId, it,
+                userId,
+                it!!,
                 Modifier.padding(horizontal = 4.dp),
                 old = true
             ) { onSelect(it) }

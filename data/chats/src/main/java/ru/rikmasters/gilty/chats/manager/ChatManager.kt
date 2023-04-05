@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
+import ru.rikmasters.gilty.chats.models.chat.mapDTO
 import ru.rikmasters.gilty.chats.paging.ChatListPagingSource
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
@@ -11,6 +12,7 @@ import ru.rikmasters.gilty.chats.source.websocket.WebSocketHandler
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 
 class ChatManager(
 
@@ -21,7 +23,9 @@ class ChatManager(
     private val webSource: ChatWebSource
 ) : CoroutineController() {
 
-    fun getChats(): Flow<PagingData<ChatModel>> {
+    fun getChats(
+        sortTypeModel: SortTypeModel
+    ): Flow<PagingData<ChatModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 15,
@@ -30,16 +34,12 @@ class ChatManager(
             ),
             pagingSourceFactory = {
                 ChatListPagingSource(
-                    webSource = webSource
+                    webSource = webSource,
+                    sortType = sortTypeModel.mapDTO()
                 )
             }
         ).flow
     }
-
-    // получить список чатов с непрочитанными сообщениями
-    suspend fun getUnread() =
-        webSource.getDialogs(unread = 1)
-            .first.map { it.map() }
 
     // подписка на получение сообщений из выбранного чата
     suspend fun connectToChat(chatId: String) {

@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
@@ -14,7 +16,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
@@ -35,12 +36,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _age = MutableStateFlow(0)
     private val age = _age.asStateFlow()
     
-    private val _meets = MutableStateFlow(listOf<MeetingModel>())
-    val meets = _meets.asStateFlow()
-    
-    private val _meetsHistory = MutableStateFlow(listOf<MeetingModel>())
-    val meetsHistory = _meetsHistory.asStateFlow()
-    
     private val _history = MutableStateFlow(false)
     val history = _history.asStateFlow()
     
@@ -52,6 +47,22 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _username = MutableStateFlow<String?>(null)
     private val username = _username.asStateFlow()
+    
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val meetsTest by lazy {
+        refresh.flatMapLatest {
+            profileManager.getUserMeets(ACTUAL).cachedIn(coroutineScope)
+        }
+    }
+    
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val historyMeetsTest by lazy {
+        refresh.flatMapLatest {
+            profileManager.getUserMeets(HISTORY).cachedIn(coroutineScope)
+        }
+    }
+    
+    private val refresh = MutableStateFlow(false)
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
@@ -162,13 +173,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         )
     }
     
-    private suspend fun getUserMeets(forceWeb: Boolean) {
-        _meets.emit(profileManager.getUserMeets(forceWeb, ACTUAL))
-        _meetsHistory.emit(profileManager.getUserMeets(forceWeb, HISTORY))
-    }
-    
     override suspend fun forceRefresh() {
         setUserDate(true)
+        refresh.value = !refresh.value
     }
     
     suspend fun setUserDate(forceWeb: Boolean = true) = singleLoading {
@@ -183,7 +190,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
                 aboutMe = description.value
             )
         )
-        getUserMeets(forceWeb)
     }
     
     suspend fun showHistory() {

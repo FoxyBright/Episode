@@ -87,7 +87,7 @@ data class ChatListState(
     val alertState: AlertState,
     val alertSelect: Int,
     val sortType: SortTypeModel,
-    val listState: LazyListState
+    val listState: LazyListState,
 )
 
 interface ChatListCallback {
@@ -170,7 +170,7 @@ private fun TopBar(
                     (null)
                 ) {
                     onSortTypeChanged(
-                        if (sortType == SortTypeModel.MEETING_DATE) SortTypeModel.MESSAGE_DATE
+                        if(sortType == SortTypeModel.MEETING_DATE) SortTypeModel.MESSAGE_DATE
                         else SortTypeModel.MEETING_DATE
                     )
                 },
@@ -261,7 +261,7 @@ private fun Content(
                             )
                         }
                     }
-
+                    
                     if(state.chats.loadState.append is LoadState.Loading) {
                         item { PagingLoader(state.chats.loadState) }
                     }
