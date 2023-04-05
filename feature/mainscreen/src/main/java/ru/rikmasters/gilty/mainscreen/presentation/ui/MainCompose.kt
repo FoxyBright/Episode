@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
@@ -148,7 +149,7 @@ private fun TopBar(
         modifier
             .fillMaxWidth()
             .padding(top = 80.dp, bottom = 10.dp),
-        SpaceBetween
+        SpaceBetween, CenterVertically
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp),
