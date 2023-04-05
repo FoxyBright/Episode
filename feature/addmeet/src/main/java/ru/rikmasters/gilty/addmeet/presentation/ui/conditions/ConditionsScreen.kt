@@ -24,7 +24,11 @@ fun ConditionsScreen(vm: ConditionViewModel) {
     val isActive = condition.isNotEmpty()
             && meetType.isNotEmpty()
             && if(condition.contains(3)) {
-        price.length > 1 && price.toInt() <= 1_000_000
+        price.length > 1 && try {
+            price.toInt() <= 1_000_000
+        } catch(e: Exception) {
+            false
+        }
     } else true
     
     ConditionContent(
@@ -51,15 +55,15 @@ fun ConditionsScreen(vm: ConditionViewModel) {
             override fun onPriceChange(price: String) {
                 scope.launch { vm.changePrice(price) }
             }
-        
+            
             override fun onForbiddenClick() {
                 scope.launch { vm.changeForbiddenChat(!forbidden) }
             }
-        
+            
             override fun onConditionSelect(condition: Int) {
                 scope.launch { vm.changeCondition(condition) }
             }
-        
+            
             override fun onOnlineClick() {
                 scope.launch { vm.changeOnline(!online) }
             }

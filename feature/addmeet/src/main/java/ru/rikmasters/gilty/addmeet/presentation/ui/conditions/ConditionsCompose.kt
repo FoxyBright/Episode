@@ -172,8 +172,7 @@ private fun price(
     callback: ConditionsCallback? = null,
 ) = FilterModel(stringResource(R.string.add_meet_conditions_price)) {
     PriceTextField(
-        state.price,
-        { callback?.onPriceChange(it) },
+        state.price, { callback?.onPriceChange(it) },
         { callback?.onClear() }, state.online,
     )
 }
