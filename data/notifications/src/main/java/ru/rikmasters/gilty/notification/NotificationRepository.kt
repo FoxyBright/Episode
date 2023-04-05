@@ -21,8 +21,7 @@ class NotificationRepository(
             config = PagingConfig(
                 pageSize = 15,
                 enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
+            ), pagingSourceFactory = {
                 NotificationListPagingSource(
                     webSource = webSource
                 )
