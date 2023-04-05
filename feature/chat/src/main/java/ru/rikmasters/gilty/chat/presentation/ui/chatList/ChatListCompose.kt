@@ -40,6 +40,7 @@ import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -66,8 +67,12 @@ private fun ChatListPreview() {
                     ACTIVE
                 ),
                 previewData(),
-                (true), (false), LIST, (1),
-                (false), LazyListState(), listOf()
+                (true),
+                (false),
+                LIST,
+                (1),
+                (SortTypeModel.MEETING_DATE),
+                LazyListState()
             ),
             Modifier.background(colorScheme.background)
         )
@@ -81,9 +86,8 @@ data class ChatListState(
     val alertActive: Boolean,
     val alertState: AlertState,
     val alertSelect: Int,
-    val unRead: Boolean,
-    val listState: LazyListState,
-    val unreadChats: List<ChatModel>,
+    val sortType: SortTypeModel,
+    val listState: LazyListState
 )
 
 interface ChatListCallback {
@@ -94,7 +98,7 @@ interface ChatListCallback {
     fun onEndedClick()
     fun onAlertSuccess()
     fun onAlertDismiss()
-    fun onUnreadChange()
+    fun onSortTypeChanged(sortType: SortTypeModel)
     fun onListUpdate()
     fun onListAlertSelect(index: Int)
 }
@@ -109,7 +113,7 @@ fun ChatListContent(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopBar(Modifier, state.unRead) { callback?.onUnreadChange() }
+            TopBar(Modifier, state.sortType) { callback?.onSortTypeChanged(it) }
         },
         bottomBar = {
             NavBar(state.stateList, Modifier) { callback?.onNavBarSelect(it) }
@@ -139,8 +143,8 @@ fun ChatListContent(
 @Composable
 private fun TopBar(
     modifier: Modifier,
-    unRead: Boolean,
-    onUnReadChange: () -> Unit,
+    sortType: SortTypeModel,
+    onSortTypeChanged: (SortTypeModel) -> Unit,
 ) {
     Row(
         modifier
@@ -164,9 +168,14 @@ private fun TopBar(
                 .clickable(
                     MutableInteractionSource(),
                     (null)
-                ) { onUnReadChange() },
+                ) {
+                    onSortTypeChanged(
+                        if (sortType == SortTypeModel.MEETING_DATE) SortTypeModel.MESSAGE_DATE
+                        else SortTypeModel.MEETING_DATE
+                    )
+                },
             colorFilter = ColorFilter.tint(
-                if(unRead) colorScheme.primary
+                if(sortType == SortTypeModel.MESSAGE_DATE) colorScheme.primary
                 else colorScheme.onTertiary
             )
         )
@@ -202,7 +211,7 @@ private fun Content(
                             it.meetStatus == MeetStatusType.ACTIVE
                         }
                     ).let {
-                        return@let if(it.isNotEmpty() && !state.unRead) it
+                        return@let if(it.isNotEmpty() && state.sortType == SortTypeModel.MEETING_DATE) it
                         else null
                     }?.let { pairs ->
                         itemsIndexed(pairs) { index, (label, list) ->
@@ -220,8 +229,10 @@ private fun Content(
                             }
                         }
                     }
-                    
-                    if(!state.unRead) item {
+                    val inactiveItems = state.chats.itemSnapshotList.items.filter {
+                        it.meetStatus != MeetStatusType.ACTIVE
+                    }
+                    if(state.sortType == SortTypeModel.MEETING_DATE && inactiveItems.isNotEmpty()) item {
                         ActionRow(
                             Modifier.padding(
                                 top = 28.dp,
@@ -233,7 +244,7 @@ private fun Content(
                     }
                     
                     itemsIndexed(state.chats) { index, item ->
-                        if(item?.meetStatus != MeetStatusType.ACTIVE) {
+                        if(item?.meetStatus != MeetStatusType.ACTIVE && (state.endedState || state.sortType == SortTypeModel.MESSAGE_DATE)) {
                             val chat = (item ?: ChatModel()) to rememberDragRowState()
                             val inactiveChatsSize = state.chats.itemSnapshotList.items.filter {
                                 it.meetStatus != MeetStatusType.ACTIVE
@@ -250,6 +261,7 @@ private fun Content(
                             )
                         }
                     }
+
                     if(state.chats.loadState.append is LoadState.Loading) {
                         item { PagingLoader(state.chats.loadState) }
                     }

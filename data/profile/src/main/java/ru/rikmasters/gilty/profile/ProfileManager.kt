@@ -9,29 +9,29 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class ProfileManager(
-    
+
     private val web: ProfileWebSource,
-    
-    private val store: ProfileStore,
+
+    private val store: ProfileStore
 ) {
-    
+
     suspend fun checkProfileStore() = store.checkProfileStore()
-    
+
     suspend fun getUserCategories() =
         store.getUserCategories(false)
-    
+
     suspend fun updateUserCategories() {
         store.updateUserCategories()
     }
-    
+
     suspend fun getObservers(
         query: String,
-        type: ObserversType,
+        type: ObserversType
     ) = web.getObservers(query, type)
-    
+
     suspend fun getUser(id: String) =
         web.getUser(id)
-    
+
     suspend fun clearProfile() {
         store.deleteProfile()
     }
@@ -42,67 +42,69 @@ class ProfileManager(
     
     suspend fun getProfile(forceWeb: Boolean = false) =
         store.getProfile(forceWeb)
-    
+
     val hiddenFlow = store.hiddenFlow()
-    
+
     suspend fun getProfileHiddens(forceWeb: Boolean) =
         store.getUserHidden(forceWeb)
-    
+
     suspend fun deleteHidden(imageId: String) {
         store.deleteHidden(imageId)
         getProfileHiddens(false)
     }
-    
+
     suspend fun deleteObserver(member: UserModel) {
         web.deleteObserver(member)
     }
-    
+
     suspend fun subscribeToUser(member: String) {
         web.subscribeToUser(member)
     }
-    
-    suspend fun getUserMeets(
-        forceWeb: Boolean, type: MeetingsType,
-    ) = store.getUserMeets(forceWeb, type)
-    
+
+    fun getUserMeets(
+        type: MeetingsType
+    ) = store.getUserMeets(type)
+
     suspend fun unsubscribeFromUser(member: String) {
         web.unsubscribeFromUser(member)
     }
-    
+
     suspend fun userUpdateData(
         username: String? = null,
         aboutMe: String? = null,
         age: Int? = null,
         gender: GenderType? = null,
-        orientation: OrientationModel? = null,
+        orientation: OrientationModel? = null
     ) {
         store.updateProfile(
-            username, aboutMe, age,
-            gender, orientation
+            username,
+            aboutMe,
+            age,
+            gender,
+            orientation
         )
     }
-    
+
     suspend fun getResponds(type: RespondType) =
         web.getResponds(type)
-    
+
     suspend fun getMeetResponds(meetId: String) =
         web.getMeetResponds(meetId, null, null)
-    
+
     suspend fun deleteRespond(respondId: String) {
         web.deleteRespond(respondId)
     }
-    
+
     suspend fun acceptRespond(respondId: String) {
         web.acceptRespond(respondId)
     }
-    
+
     suspend fun cancelRespond(respondId: String) {
         web.cancelRespond(respondId)
     }
-    
+
     suspend fun deleteAccount() {
         web.deleteAccount()
         clearProfile()
     }
 }
-

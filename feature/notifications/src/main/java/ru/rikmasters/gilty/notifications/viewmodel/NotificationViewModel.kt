@@ -1,17 +1,15 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
-import ru.rikmasters.gilty.notification.NotificationPagingSource
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -42,25 +40,15 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     val isPageRefreshing = MutableStateFlow(false)
     override val pagingPull = isPageRefreshing
-    
-    // последний используемый источник пагинации
-    private var source: NotificationPagingSource? = null
-    
-    // создание нового источника пагинации
-    private fun newSource(): NotificationPagingSource {
-        source?.invalidate()
-        source = NotificationPagingSource(
-            notificationManger
-        )
-        return source ?: NotificationPagingSource(
-            notificationManger
-        )
+
+    private val refresh = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val notifications by lazy {
+        refresh.flatMapLatest {
+            notificationManger.getNotifications()
+        }
     }
-    
-    val notifications =
-        Pager(PagingConfig(15)) {
-            newSource()
-        }.flow.cachedIn(coroutineScope)
     
     suspend fun getChatStatus() {
         chatManager.getChatsStatus().let {
@@ -75,8 +63,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     override suspend fun forceRefresh() = singleLoading {
-        source?.invalidate()
-        source = null
+        refresh.value = !refresh.value
     }
     
     suspend fun getLastResponse() = singleLoading {
