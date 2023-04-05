@@ -22,6 +22,7 @@ data class ResponseWrapper<T: Any?>(
     
     @Suppress("unused")
     class Paginator(
+        val total: Int,
         val perPage: Int,
         val currentPage: Int,
         val list_page: Int,

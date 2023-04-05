@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
@@ -25,19 +24,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.DELETE
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.SUB
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.UNSUB
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
-import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
+/*
 @Preview
 @Composable
 fun ObserversListPreview() {
@@ -52,17 +50,19 @@ fun ObserversListPreview() {
     }
 }
 
+ */
+
 data class ObserversListState(
     val user: String,
-    val observers: List<UserModel>,
-    val observed: List<UserModel>,
+    val observers: LazyPagingItems<UserModel>,
+    val observed: LazyPagingItems<UserModel>,
     val unsubList: List<UserModel>,
     val selectTab: Int,
-    val search: String,
+    val search: String
 )
 
 interface ObserversListCallback {
-    
+
     fun onTabChange(point: Int)
     fun onButtonClick(member: UserModel, type: SubscribeType)
     fun onClick(member: UserModel)
@@ -73,7 +73,7 @@ interface ObserversListCallback {
 fun ObserversListContent(
     state: ObserversListState,
     modifier: Modifier = Modifier,
-    callback: ObserversListCallback? = null,
+    callback: ObserversListCallback? = null
 ) {
     Column(
         modifier
@@ -81,14 +81,17 @@ fun ObserversListContent(
             .background(colorScheme.background)
     ) {
         ActionBar(state.user, Modifier.padding(bottom = 22.dp))
+        // TODO: найти способ передать total
         GiltyTab(
             listOf(
                 "${stringResource(R.string.profile_observers)} ${
-                    digitalConverter(state.observers.size)
-                }", "${stringResource(R.string.profile_observe)} ${
-                    digitalConverter(state.observed.size)
+                digitalConverter(0)
+                }",
+                "${stringResource(R.string.profile_observe)} ${
+                digitalConverter(0)
                 }"
-            ), state.selectTab,
+            ),
+            state.selectTab,
             Modifier.padding(horizontal = 16.dp)
         ) { callback?.onTabChange(it) }
         Search(
@@ -104,28 +107,35 @@ fun ObserversListContent(
                     shapes.medium
                 )
         ) {
-            if(state.selectTab == 0)
+            if (state.selectTab == 0) {
                 itemsIndexed(state.observers) { index, member ->
                     Column {
                         ObserveItem(
-                            Modifier, DELETE, member,
-                            lazyItemsShapes(index, state.observers.size),
+                            Modifier,
+                            DELETE,
+                            member!!,
+                            lazyItemsShapes(index, state.observers.itemCount),
                             { callback?.onClick(member) }
                         ) { callback?.onButtonClick(member, DELETE) }
-                        if(index < state.observers.size - 1)
+                        if (index < state.observers.itemCount - 1) {
                             Divider(Modifier.padding(start = 16.dp))
+                        }
                     }
-                } else itemsIndexed(state.observed) { index, member ->
+                } 
+            }else itemsIndexed(state.observed) { index, member ->
                 Column {
                     val subType =
-                        if(state.unsubList.contains(member)) SUB else UNSUB
+                        if (state.unsubList.contains(member)) SUB else UNSUB
                     ObserveItem(
-                        Modifier, subType, member,
-                        lazyItemsShapes(index, state.observed.size),
+                        Modifier,
+                        subType,
+                        member!!,
+                        lazyItemsShapes(index, state.observed.itemCount),
                         { callback?.onClick(member) }
                     ) { callback?.onButtonClick(member, subType) }
-                    if(index < state.observed.size - 1)
+                    if (index < state.observed.itemCount - 1) {
                         Divider(Modifier.padding(start = 16.dp))
+                    }
                 }
             }
         }
@@ -138,35 +148,40 @@ private fun ObserveItem(
     modifier: Modifier = Modifier,
     button: SubscribeType,
     member: UserModel,
-    shape: Shape, onItemClick: (() -> Unit)? = null,
-    onButtonClick: (() -> Unit)? = null,
+    shape: Shape,
+    onItemClick: (() -> Unit)? = null,
+    onButtonClick: (() -> Unit)? = null
 ) {
     Card(
         { onItemClick?.let { it() } },
-        modifier.fillMaxWidth(), (true), shape,
+        modifier.fillMaxWidth(),
+        (true),
+        shape,
         cardColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp, 12.dp),
-            SpaceBetween, CenterVertically
+            SpaceBetween,
+            CenterVertically
         ) {
             BrieflyRow(
                 "${member.username}, ${member.age}",
-                Modifier.weight(1f), member.avatar?.thumbnail?.url,
+                Modifier.weight(1f),
+                member.avatar?.thumbnail?.url,
                 member.emoji
             )
             SmallButton(
                 stringResource(
-                    when(button) {
+                    when (button) {
                         SUB -> R.string.profile_organizer_observe
                         UNSUB -> R.string.profile_user_observe
                         DELETE -> R.string.meeting_filter_delete_tag_label
                     }
                 ),
-                color = if(button == SUB) colorScheme.primary
-                else colorScheme.outlineVariant,
+                color = if (button == SUB) colorScheme.primary
+                else colorScheme.outlineVariant
             ) { onButtonClick?.let { it() } }
         }
     }
@@ -176,7 +191,7 @@ private fun ObserveItem(
 private fun Search(
     value: String,
     modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit
 ) {
     val style = typography.bodyLarge.copy(
         colorScheme.tertiary
@@ -187,37 +202,44 @@ private fun Search(
             .background(
                 colorScheme.primaryContainer,
                 shapes.medium
-            ), Center
+            ),
+        Center
     ) {
         Row(
             Modifier.padding(18.dp, 14.dp),
-            Start, CenterVertically
+            Start,
+            CenterVertically
         ) {
             Icon(
                 painterResource(
                     R.drawable.magnifier
-                ), (null),
+                ),
+                (null),
                 Modifier
                     .padding(end = 28.dp)
                     .size(20.dp),
                 colorScheme.onTertiary
             )
             BasicTextField(
-                value, { onValueChange(it) },
+                value,
+                { onValueChange(it) },
                 Modifier
                     .fillMaxWidth()
                     .background(Transparent),
                 textStyle = style,
-                singleLine = true, maxLines = 1,
+                singleLine = true,
+                maxLines = 1,
                 cursorBrush = SolidColor(colorScheme.primary),
                 keyboardOptions = Default.copy(
-                    imeAction = Done, keyboardType = Text,
+                    imeAction = Done,
+                    keyboardType = Text,
                     capitalization = Sentences
-                ),
+                )
             ) {
-                if(value.isEmpty()) Text(
+                if (value.isEmpty()) Text(
                     stringResource(R.string.search_placeholder),
-                    Modifier, colorScheme.onTertiary,
+                    Modifier,
+                    colorScheme.onTertiary,
                     style = typography.bodyLarge
                 ); it()
             }
