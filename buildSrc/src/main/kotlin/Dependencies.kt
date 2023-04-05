@@ -21,9 +21,11 @@ private fun DependencyHandlerScope.yandexmap() = implementation(
     "com.yandex.android:maps.mobile:4.3.1-full"
 )
 
-const val composeVer = Config.composeUiVer
+private const val composeVer = Config.composeUiVer
+private const val materialVer = "1.0.1"
 fun DependencyHandlerScope.compose() = implementation(
-    "androidx.compose.material3:material3:1.0.0-rc01",
+    "androidx.compose.material3:material3:$materialVer",
+    "androidx.compose.material3:material3-window-size-class:$materialVer",
     "androidx.navigation:navigation-compose:2.5.2",
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.ui:ui:$composeVer",

@@ -138,7 +138,7 @@ private fun Item(
 @Composable
 private fun AddButton(icon: Int, onClick: () -> Unit) {
     Card(
-        onClick, shape = shapes.extraSmall,
+        onClick, shape = shapes.medium,
         colors = cardColors(colors.navBarAddButton),
     ) {
         Icon(
