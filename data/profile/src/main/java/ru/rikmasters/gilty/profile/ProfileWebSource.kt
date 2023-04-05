@@ -42,8 +42,9 @@ class ProfileWebSource : KtorSource() {
     ) =
         get("http://$HOST$PREFIX_URL/profile/meetings") {
             url {
-                page?.let { query("page" to "$page") }
+                page?.let { query("page" to "$it") }
                 query("is_completed" to type.ordinal.toString())
+                perPage?.let { query("per_page" to "$it") }
             }
         }!!.paginateWrapped<List<Meeting>>()
 

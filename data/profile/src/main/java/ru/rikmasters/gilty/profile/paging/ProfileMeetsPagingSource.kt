@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.profile.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.profile.ProfileWebSource
@@ -27,8 +28,9 @@ class ProfileMeetsPagingSource(
                 perPage = loadSize,
                 type = type
             )
-            val nextKey = if (meets.first.size < loadSize) null else page + 1
-            val prevKey = if (page == 1) null else page - 1
+            Log.d("TEST","meets ${meets.second.currentPage} ${meets.second.perPage} ${meets.second.list_page}")
+            val nextKey = if (meets.first.size < loadSize) null else meets.second.currentPage + 1
+            val prevKey = if (page == 1) null else meets.second.currentPage - 1
             LoadResult.Page(meets.first.map { it.map() }, prevKey, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
