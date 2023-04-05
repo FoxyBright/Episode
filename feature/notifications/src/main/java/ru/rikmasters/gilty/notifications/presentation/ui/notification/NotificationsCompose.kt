@@ -100,11 +100,11 @@ data class NotificationsState(
     val participants: List<UserModel>,
     val participantsStates: List<Int>,
     val listState: LazyListState,
-    val ratings: List<RatingModel>
+    val ratings: List<RatingModel>,
 )
 
 interface NotificationsCallback {
-
+    
     fun onSwiped(notification: NotificationModel)
     fun onMeetClick(meet: MeetingModel)
     fun onUserClick(user: UserModel, meet: MeetingModel)
@@ -116,7 +116,7 @@ interface NotificationsCallback {
     fun onEmojiClick(
         notification: NotificationModel,
         emoji: EmojiModel,
-        userId: String?
+        userId: String?,
     )
 }
 
@@ -125,7 +125,7 @@ interface NotificationsCallback {
 fun NotificationsContent(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback? = null
+    callback: NotificationsCallback? = null,
 ) {
     Scaffold(
         modifier
@@ -152,7 +152,7 @@ fun NotificationsContent(
     ) { padding ->
         Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
-                 Notifications(
+                Notifications(
                     state,
                     Modifier
                         .fillMaxSize()
@@ -163,7 +163,7 @@ fun NotificationsContent(
         }
     }
     state.activeNotification?.let {
-        if (state.blur) Box(
+        if(state.blur) Box(
             Modifier
                 .fillMaxSize() /*TODO заменить на блюр, по неизвестным причинам BlurBox() вылетает*/
                 .background(colorScheme.background)
@@ -175,9 +175,9 @@ fun NotificationsContent(
                     state.participants,
                     state.participantsStates,
                     (
-                        it.feedback?.ratings?.map { it.emoji }
-                            ?: state.ratings.map { it.emoji }
-                        )
+                            it.feedback?.ratings?.map { it.emoji }
+                                ?: state.ratings.map { it.emoji }
+                            )
                 ),
                 Modifier
                     .padding(horizontal = 16.dp)
@@ -191,7 +191,7 @@ fun NotificationsContent(
 
 @Composable
 private fun EmptyNotification(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier
@@ -202,8 +202,8 @@ private fun EmptyNotification(
     ) {
         Image(
             painterResource(
-                if ((isSystemInDarkTheme())) {
-                    R.drawable.notify_dog_light
+                if((isSystemInDarkTheme())) {
+                    R.drawable.notify_dog_dark
                 } else R.drawable.notify_dog_light
             ),
             (null),
@@ -224,24 +224,24 @@ private fun EmptyNotification(
 private fun Notifications(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback?
+    callback: NotificationsCallback?,
 ) {
     val notifications = state.notifications
     val itemCount = notifications.itemCount
-
-    if (LocalInspectionMode.current) PreviewLazy()
+    
+    if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
-
+        
         when {
             notifications.loadState.refresh is LoadState.Error -> {}
             notifications.loadState.append is LoadState.Error -> {}
             else -> {
-                if (notifications.loadState.refresh is LoadState.Loading) {
+                if(notifications.loadState.refresh is LoadState.Loading) {
                     item { PagingLoader(notifications.loadState) }
                 }
-
+                
                 val last = state.lastRespond
-                if (last.first > 0) item {
+                if(last.first > 0) item {
                     Box(Modifier.padding(vertical = 22.dp)) {
                         Responds(
                             last.second,
@@ -249,13 +249,13 @@ private fun Notifications(
                         ) { callback?.onRespondsClick() }
                     }
                 }
-
-                if (itemCount > 0) {
+                
+                if(itemCount > 0) {
                     val todayItems = notifications.itemSnapshotList.filter {
                         todayControl(it!!.date)
                     }
-
-                    if (todayItems.isNotEmpty()) {
+                    
+                    if(todayItems.isNotEmpty()) {
                         item { Label(R.string.meeting_profile_bottom_today_label) }
                         itemsIndexed(todayItems) { count, item ->
                             ElementNot(
@@ -267,12 +267,12 @@ private fun Notifications(
                             )
                         }
                     }
-
+                    
                     val weekItems = notifications.itemSnapshotList.filter {
                         weekControl(it!!.date)
                     }
-
-                    if (weekItems.isNotEmpty()) {
+                    
+                    if(weekItems.isNotEmpty()) {
                         item { Label(R.string.notification_on_this_week_label) }
                         itemsIndexed(weekItems) { count, item ->
                             ElementNot(
@@ -284,12 +284,12 @@ private fun Notifications(
                             )
                         }
                     }
-
+                    
                     val restItems = notifications.itemSnapshotList.filter {
                         !weekControl(it!!.date) && !todayControl(it.date)
                     }
-
-                    if (restItems.isNotEmpty()) {
+                    
+                    if(restItems.isNotEmpty()) {
                         item { Label(R.string.notification_earlier_label) }
                         itemsIndexed(restItems) { count, item ->
                             ElementNot(
@@ -301,11 +301,11 @@ private fun Notifications(
                             )
                         }
                     }
-                    if (notifications.loadState.append is LoadState.Loading) {
+                    if(notifications.loadState.append is LoadState.Loading) {
                         item { PagingLoader(notifications.loadState) }
                     }
                 } else {
-                    if (notifications.loadState.refresh is LoadState.NotLoading) {
+                    if(notifications.loadState.refresh is LoadState.NotLoading) {
                         item { EmptyNotification() }
                     }
                 }
@@ -331,7 +331,7 @@ private fun ElementNot(
     size: Int,
     item: NotificationModel,
     ratings: List<RatingModel>,
-    callback: NotificationsCallback? = null
+    callback: NotificationsCallback? = null,
 ) {
     val not = item to rememberDragRowState()
     NotificationItem(
@@ -341,9 +341,9 @@ private fun ElementNot(
             lazyItemsShapes(index, size),
             getDifferenceOfTime(not.first.date),
             (
-                not.first.feedback?.ratings?.map { it.emoji }
-                    ?: ratings.map { it.emoji }
-                )
+                    not.first.feedback?.ratings?.map { it.emoji }
+                        ?: ratings.map { it.emoji }
+                    )
         ),
         Modifier,
         callback
