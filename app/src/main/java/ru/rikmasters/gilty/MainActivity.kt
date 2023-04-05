@@ -52,7 +52,7 @@ class MainActivity: ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    
+        
         CoroutineScope(IO).launch {
             inject<MeetingManager>()
                 .value.clearAddMeet()
@@ -124,7 +124,6 @@ class MainActivity: ComponentActivity() {
                     && regManager.profileCompleted()
                 ) deepLink(scope, asm, intent, nav)
             }
-            
         }
     }
     

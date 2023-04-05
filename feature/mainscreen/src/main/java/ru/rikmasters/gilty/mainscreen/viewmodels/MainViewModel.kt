@@ -13,7 +13,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companio
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
@@ -53,7 +53,7 @@ class MainViewModel: ViewModel() {
             if(it > 0) _navBar.emit(
                 listOf(
                     ACTIVE, INACTIVE,
-                    INACTIVE, NEW,
+                    INACTIVE, NEW_INACTIVE,
                     INACTIVE
                 )
             )
@@ -139,7 +139,7 @@ class MainViewModel: ViewModel() {
         repeat(navBar.value.size) {
             list.add(
                 when {
-                    navBar.value[it] == NEW -> NEW
+                    navBar.value[it] == NEW_INACTIVE -> NEW_INACTIVE
                     it == point -> ACTIVE
                     else -> INACTIVE
                 }

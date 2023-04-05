@@ -32,7 +32,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.*
@@ -47,7 +47,7 @@ fun MainContentPreview() {
                 (true), (true), (false), (false),
                 DemoMeetingList, listOf(
                     INACTIVE, ACTIVE,
-                    INACTIVE, NEW, INACTIVE
+                    INACTIVE, NEW_INACTIVE, INACTIVE
                 ), (false), (false)
             )
         )

@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
@@ -110,7 +110,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             if(it > 0) _navBar.emit(
                 listOf(
                     INACTIVE, INACTIVE,
-                    INACTIVE, NEW,
+                    INACTIVE, NEW_INACTIVE,
                     ACTIVE
                 )
             )
@@ -132,7 +132,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         repeat(navBar.value.size) {
             list.add(
                 when {
-                    navBar.value[it] == NEW -> NEW
+                    navBar.value[it] == NEW_INACTIVE -> NEW_INACTIVE
                     it == point -> ACTIVE
                     else -> INACTIVE
                 }

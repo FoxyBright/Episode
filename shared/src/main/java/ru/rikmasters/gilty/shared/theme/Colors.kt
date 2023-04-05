@@ -36,6 +36,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.Zircon
 
 @Suppress("unused")
 object Colors {
+    
     /*     UNIVERSAL COLORS    */
     val White = Color(0xFFFFFFFF) // ContainerDay && TextNight
     val Black = Color(0xFF000000) // ContainerDay && TextNight
@@ -48,14 +49,14 @@ object Colors {
     val OrangeRed = Color(0xFFFF6645) // RedGradient1
     val FireRed = Color(0xFFDF2B4B) // RedGradient2
     val DimRed = Color(0xFFFD7C7A) // RedInactive
-
+    
     /*     DAY COLORS    */
     val LightGray = Color(0xFFF6F6F6) // BackgroundDay
     val PreDark = Color(0xFF1C1B1F) // TextDay
     val Silver = Color(0xFFAEAAAE) // TextSecondaryDay
     val Anthracite = Color(0xFFDFDFDF) // SeparatorDay
     val Ash = Color(0xFFC9C5CA) // ArrowDay
-
+    
     /*     NIGHT COLORS    */
     val AlmostDark = Color(0xFF1C1C1D) // ContainerNight
     val Zircon = Color(0xFF98989F) // TextSecondaryNight
@@ -64,7 +65,7 @@ object Colors {
     val Asphalt = Color(0xFF767373) // GrayNight
     val SuperDark = Color(0xFF1B1B1B) // GradientButtonNight
     val Twilight = Color(0xFF353535) // TextFieldNight
-
+    
     /*     CATEGORY COLORS    */
     //                                       Day
     val Orange = Color(0xFFFF9500)
@@ -73,7 +74,7 @@ object Colors {
     val Blue = Color(0xFF33A9FE)
     val Cyan = Color(0xFF00B8F2)
     val Purple = Color(0xFF6061B8)
-
+    
     //                                       Night
     val DarkOrange = Color(0xFFFF9F0A)
     val DarkYellow = Color(0xFFFFC42C)
@@ -81,7 +82,7 @@ object Colors {
     val DarkBlue = Color(0xFF2DC2FF)
     val DarkCyan = Color(0xFF29B2FF)
     val DarkPurple = Color(0xFF5E5CE6)
-
+    
     /*     ANOTHER COLORS    */
     val Gray = Color(0xFFE9E9EA)
     val Border = Color(0xFFB0B0B0)
@@ -89,7 +90,7 @@ object Colors {
     val lockColorsBackgroundDay = Color(0xFFB3B3B3)
     val meetingCardBackBackgroundNight = Color(0xFF303030)
     val lockColorsBackgroundNight = Color(0xFF222222)
-    val LightPink = Color(0xFFFFDADA)
+    val LightPink = Color(0x32FF4745)
     val RottenPlum = Color(0xFF49454F)
     val Pinky = Color(0xFFF6EDEC)
     val GentlePinky = Color(0xFFF8D3D3)

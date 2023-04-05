@@ -2,7 +2,9 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -11,18 +13,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
@@ -32,7 +31,7 @@ fun NavBarPreview() {
         NavBar(
             listOf(
                 INACTIVE, ACTIVE,
-                INACTIVE, NEW, INACTIVE
+                INACTIVE, NEW_INACTIVE, INACTIVE
             )
         ) {}
     }
@@ -48,35 +47,55 @@ fun NavBar(
         modifier
             .fillMaxWidth()
             .height(65.dp)
-            .background(
-                colorScheme.primaryContainer,
-                ThemeExtra.shapes.ultraTopRoundedShape
-            ),
-        Arrangement.SpaceEvenly,
-        Alignment.CenterVertically
+            .background(colorScheme.primaryContainer),
+        SpaceEvenly, CenterVertically
     ) {
         state.forEachIndexed { i, state ->
             Item(
                 when(i) {
-                    0 -> if(state == ACTIVE)
-                        R.drawable.ic_home_active
-                    else R.drawable.ic_home
+                    0 -> if(isSystemInDarkTheme()) {
+                        if(state == ACTIVE)
+                            R.drawable.ic_home_active_dark
+                        else R.drawable.ic_home_dark
+                    } else {
+                        if(state == ACTIVE)
+                            R.drawable.ic_home_active
+                        else R.drawable.ic_home
+                    }
                     
-                    1 -> when(state) {
+                    1 -> if(isSystemInDarkTheme()) when(state) {
+                        ACTIVE -> R.drawable.ic_notification_active_dark
+                        INACTIVE -> R.drawable.ic_notification_dark
+                        NEW_INACTIVE -> R.drawable.ic_notification_indicator_dark
+                        NEW_ACTIVE -> R.drawable.ic_notification_indicator_active_dark
+                    } else when(state) {
                         ACTIVE -> R.drawable.ic_notification_active
                         INACTIVE -> R.drawable.ic_notification
-                        NEW -> R.drawable.ic_notification_indicator
+                        NEW_INACTIVE -> R.drawable.ic_notification_indicator
+                        NEW_ACTIVE -> R.drawable.ic_notification_indicator_active
                     }
                     
-                    3 -> when(state) {
+                    3 -> if(isSystemInDarkTheme()) when(state) {
+                        ACTIVE -> R.drawable.ic_chat_active_dark
+                        INACTIVE -> R.drawable.ic_chat_dark
+                        NEW_INACTIVE -> R.drawable.ic_chat_indicator_dark
+                        NEW_ACTIVE -> R.drawable.ic_chat_indicator_active_dark
+                    } else when(state) {
                         ACTIVE -> R.drawable.ic_chat_active
                         INACTIVE -> R.drawable.ic_chat
-                        NEW -> R.drawable.ic_chat_indicator
+                        NEW_INACTIVE -> R.drawable.ic_chat_indicator
+                        NEW_ACTIVE -> R.drawable.ic_chat_indicator_active
                     }
                     
-                    4 -> if(state == ACTIVE)
-                        R.drawable.ic_profile_active
-                    else R.drawable.ic_profile
+                    4 -> if(isSystemInDarkTheme()) {
+                        if(state == ACTIVE)
+                            R.drawable.ic_profile_active_dark
+                        else R.drawable.ic_profile_dark
+                    } else {
+                        if(state == ACTIVE)
+                            R.drawable.ic_profile_active
+                        else R.drawable.ic_profile
+                    }
                     
                     else -> R.drawable.ic_add
                 }, state, (i == 2)
@@ -98,16 +117,19 @@ private fun Item(
     else Card(
         onClick, shape = CircleShape,
         colors = cardColors(
-            if(state == ACTIVE)
-                colors.navBarActiveBackground
-            else colorScheme.primaryContainer
+            when(state) {
+                ACTIVE, NEW_ACTIVE ->
+                    colors.navBarActiveBackground
+                else -> colorScheme.primaryContainer
+            }
         )
     ) {
         Image(
             painterResource(icon),
-            (null), Modifier
-                .padding(24.dp, 8.dp)
-                .size(24.dp)
+            (null),
+            Modifier
+                .padding(20.dp, 4.dp)
+                .size(24.dp),
         )
     }
 }
@@ -122,7 +144,7 @@ private fun AddButton(icon: Int, onClick: () -> Unit) {
         Icon(
             painterResource(icon),
             (null), Modifier
-                .padding(14.dp, 8.dp)
+                .padding(15.dp, 8.dp)
                 .size(10.dp),
             colorScheme.primaryContainer
         )
