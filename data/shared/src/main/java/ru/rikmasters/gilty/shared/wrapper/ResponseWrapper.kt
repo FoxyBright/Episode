@@ -19,13 +19,14 @@ data class ResponseWrapper<T: Any?>(
     val error: Error? = null,
     val paginator: Paginator? = null,
 ) {
+    
     @Suppress("unused")
     class Paginator(
         val perPage: Int,
         val currentPage: Int,
         val list_page: Int,
         val limit: Int,
-        val offset: Int
+        val offset: Int,
     )
     
     data class Error(

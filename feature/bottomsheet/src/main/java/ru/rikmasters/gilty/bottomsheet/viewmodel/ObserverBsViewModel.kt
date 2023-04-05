@@ -61,7 +61,9 @@ class ObserverBsViewModel: ViewModel() {
     
     suspend fun unsubscribeMembers() {
         unsubscribeMembers.value.forEach {
-            profileManager.unsubscribeFromUser(it.id!!)
+            it.id?.let { id ->
+                profileManager.unsubscribeFromUser(id)
+            }
         }
         _unsubscribeMembers.emit(emptyList())
     }

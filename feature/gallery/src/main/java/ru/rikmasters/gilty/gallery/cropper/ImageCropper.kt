@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
-import com.smarttoolfactory.cropper.crop.CropAgent
 import com.smarttoolfactory.cropper.draw.DrawingOverlay
 import com.smarttoolfactory.cropper.draw.ImageDrawCanvas
 import com.smarttoolfactory.cropper.handlesTouched
@@ -33,6 +32,7 @@ import com.smarttoolfactory.cropper.state.rememberCropState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import ru.rikmasters.gilty.gallery.cropper.crop.CropAgent
 import ru.rikmasters.gilty.gallery.cropper.settings.CropDefaults
 import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
 import ru.rikmasters.gilty.gallery.cropper.settings.CropStyle

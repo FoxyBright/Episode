@@ -49,11 +49,14 @@ class NotificationWebSource: KtorSource() {
     
     // получение списка возможных реакций на встречу или участника
     suspend fun getRatings() =
-        get("http://$HOST$PREFIX_URL/ratings")!!
-            .wrapped<List<Rating>>().map { it.map() }
+        get("http://$HOST$PREFIX_URL/ratings")
+            ?.wrapped<List<Rating>>()?.map { it.map() }
+            ?: emptyList()
     
     // получение списка уведомлений
-    suspend fun getNotifications(
+    suspend
+    
+    fun getNotifications(
         page: Int, perPage: Int,
     ) = get("http://$HOST$PREFIX_URL/profile/notifications") {
         url {

@@ -150,7 +150,8 @@ private fun Content(
         ) AsyncImage(
             message.message?.author?.avatar
                 ?.thumbnail?.url,
-            (null), Modifier
+            (null),
+            Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
                 .clip(CircleShape),
@@ -184,7 +185,7 @@ private fun Content(
                     (message.replied != null) -> Text(
                         message, sender, state.shape,
                         state.isOnline, message.replied,
-                    ) { callback?.onAnswerClick(message.replied!!) }
+                    ) { callback?.onAnswerClick(message.replied ?: MessageModel()) }
                     
                     
                     else -> Text(

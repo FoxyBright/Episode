@@ -1,8 +1,11 @@
 package ru.rikmasters.gilty.shared.model.notification
 
+import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus.DELETED
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
-import java.util.UUID
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.ADMIN_NOTIFICATION
+import java.util.UUID.randomUUID
 
 data class ShortNotification(
     val id: String,
@@ -18,6 +21,12 @@ data class NotificationModel(
     val parent: NotificationParentModel,
     val feedback: FeedBackModel?,
 ) {
+    
+    constructor(): this(
+        randomUUID().toString(),
+        NOW_DATE, ADMIN_NOTIFICATION, DELETED,
+        NotificationParentModel(), (null)
+    )
     
     override fun hashCode(): Int {
         var result = id.hashCode()
@@ -48,25 +57,25 @@ data class NotificationModel(
 }
 
 val DemoShortNotification = ShortNotification(
-    UUID.randomUUID().toString(),
+    randomUUID().toString(),
     "NOTIFICATION",
     "DESCRIPTION"
 )
 
 val DemoNotificationMeetingOverModel = NotificationModel(
-    UUID.randomUUID().toString(),
+    randomUUID().toString(),
     "2022-11-07T08:35:54.140Z",
     NotificationType.MEETING_OVER,
-    NotificationStatus.DELETED,
+    DELETED,
     DemoNotificationParentModel,
     DemoFeedBackModel
 )
 
 val DemoNotificationRespondAccept = NotificationModel(
-    UUID.randomUUID().toString(),
+    randomUUID().toString(),
     "2022-11-07T08:35:54.140Z",
     NotificationType.RESPOND_ACCEPTED,
-    NotificationStatus.DELETED,
+    DELETED,
     DemoNotificationParentModel,
     DemoFeedBackModel
 )

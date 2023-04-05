@@ -3,10 +3,13 @@ package ru.rikmasters.gilty.shared.model.chat
 import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
 import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus
+import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import java.util.UUID.randomUUID
 
 data class ChatModel(
     val id: String,
@@ -26,6 +29,25 @@ data class ChatModel(
     val membersCount: Int,
     val createdAt: String,
 ) {
+    
+    constructor(): this(
+        id = randomUUID().toString(),
+        meetingId = "",
+        userId = "",
+        meetStatus = CANCELED,
+        status = COMPLETED,
+        isOnline = false,
+        translationStartedAt = null,
+        organizer = UserModel(),
+        organizerOnly = false,
+        title = "",
+        lastMessage = MessageModel(),
+        datetime = NOW_DATE,
+        unreadCount = 0,
+        canMessage = true,
+        membersCount = 0,
+        createdAt = NOW_DATE
+    )
     
     override fun hashCode(): Int {
         var result = id.hashCode()
@@ -99,9 +121,9 @@ val DemoChatModelList = listOf(
     DemoChatModel.copy(id = "3", datetime = TOMORROW, unreadCount = 4),
     DemoChatModel.copy(
         id = "4",
-        status = ChatStatus.COMPLETED,
+        status = COMPLETED,
         isOnline = true,
         unreadCount = 1412
     ),
-    DemoChatModel.copy(id = "5", status = ChatStatus.COMPLETED)
+    DemoChatModel.copy(id = "5", status = COMPLETED)
 )

@@ -34,7 +34,7 @@ data class AddMeetModel(
         title = tags.joinToString(", ")
         { t -> t.title },
         condition = condition,
-        category = category!!,
+        category = category ?: CategoryModel(),
         duration = duration,
         type = type,
         datetime = dateTime,

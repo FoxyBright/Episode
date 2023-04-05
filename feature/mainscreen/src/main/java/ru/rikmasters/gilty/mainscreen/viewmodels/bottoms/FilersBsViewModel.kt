@@ -111,7 +111,7 @@ class FiltersBsViewModel(
         categories.filter { my ->
             !allCategories.value
                 .filter { it.children != null }
-                .flatMap { it.children!! }.contains(my)
+                .flatMap { it.children ?: emptyList() }.contains(my)
         }
     
     suspend fun changeCategoryState(category: Int) {

@@ -100,9 +100,9 @@ fun MeetingBsTopBarCompose(
         if(
             state.lastRespond != null &&
             state.meet.memberState == IS_ORGANIZER
-            && last?.first!! > 0
+            && (last?.first ?: 0) > 0
         ) Responds(
-            last.second, last.first,
+            last?.second, last?.first,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick(state.meet) }
         Row(Modifier.height(IntrinsicSize.Max)) {

@@ -51,7 +51,7 @@ class CategoryViewModel: ViewModel() {
         meetManager.getCategoriesList().forEach { parent ->
             categories.add(parent)
             if(!parent.children.isNullOrEmpty())
-                parent.children!!.forEach { child ->
+                parent.children?.forEach { child ->
                     categories.add(child)
                 }
         }

@@ -53,7 +53,7 @@ fun LazyListScope.sentRespond(
 ) {
     items(responds) { respond ->
         Card(
-            { callback?.onRespondClick(organizer.id!!) },
+            { callback?.onRespondClick(organizer.id ?: "") },
             modifier.fillMaxWidth(), (true), shapes.medium,
             cardColors(colorScheme.primaryContainer)
         ) {
@@ -81,7 +81,7 @@ fun ReceivedRespond(
     callback: RespondsListCallback? = null,
 ) {
     Card(
-        { callback?.onRespondClick(respond.author.id!!) },
+        { callback?.onRespondClick(respond.author.id ?: "") },
         modifier, (true), shapes.medium,
         cardColors(colorScheme.primaryContainer)
     ) {

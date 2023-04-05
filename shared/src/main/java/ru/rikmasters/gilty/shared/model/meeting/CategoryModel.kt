@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import ru.rikmasters.gilty.shared.model.image.DemoCategoryEmoji
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -25,7 +25,7 @@ data class CategoryModel(
     
     constructor(): this(
         id = randomUUID().toString(),
-        name = "", color = Black,
+        name = "", color = Gray,
         emoji = EmojiModel(type = "", path = ""),
         children = null
     )

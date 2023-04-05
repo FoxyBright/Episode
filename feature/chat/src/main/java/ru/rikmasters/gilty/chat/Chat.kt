@@ -31,7 +31,11 @@ object Chat: FeatureDefinition() {
                 route = "chat?id={id}",
                 arguments = listOf(navArgument("id")
                 { type = NavType.StringType; defaultValue = "" })
-            ) { vm, it -> ChatScreen(vm, it.arguments?.getString("id")!!) }
+            ) { vm, it ->
+                it.arguments?.getString("id")?.let { id ->
+                    ChatScreen(vm, id)
+                }
+            }
             
             screen("photo?type={type}&image={image}", listOf(
                 navArgument("image") {

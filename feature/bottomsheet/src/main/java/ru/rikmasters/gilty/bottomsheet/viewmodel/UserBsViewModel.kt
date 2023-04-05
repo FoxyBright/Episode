@@ -19,7 +19,7 @@ class UserBsViewModel: ViewModel() {
     private val _meetType = MutableStateFlow(GROUP)
     val meetType = _meetType.asStateFlow()
     
-    private val _profile = MutableStateFlow(ProfileModel.empty)
+    private val _profile = MutableStateFlow(ProfileModel())
     val profile = _profile.asStateFlow()
     
     private val _observe = MutableStateFlow(false)
@@ -63,7 +63,7 @@ class UserBsViewModel: ViewModel() {
             if(meetId != "null")
                 meetManager.getDetailedMeet(
                     meetId
-                ).type
+                )?.type ?: GROUP
             else GROUP
         )
     }

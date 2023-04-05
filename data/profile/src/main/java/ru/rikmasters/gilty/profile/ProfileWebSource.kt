@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
@@ -31,17 +32,17 @@ class ProfileWebSource: KtorSource() {
     }
     
     suspend fun getUser(id: String) =
-        get("http://$HOST$PREFIX_URL/users/$id")!!
-            .wrapped<Profile>().map()
+        get("http://$HOST$PREFIX_URL/users/$id")
+            ?.wrapped<Profile>()?.map() ?: ProfileModel()
     
     suspend fun getUserMeets(type: MeetingsType) =
         get("http://$HOST$PREFIX_URL/profile/meetings") {
             url { query("is_completed" to type.ordinal.toString()) }
-        }!!.wrapped<List<Meeting>>()
+        }?.wrapped<List<Meeting>>() ?: emptyList()
     
     suspend fun getUserCategories() = get(
         "http://$HOST$PREFIX_URL/profile/categories"
-    )!!.wrapped<List<Category>>()
+    )?.wrapped<List<Category>>() ?: emptyList()
     
     suspend fun subscribeToUser(memberId: String) {
         post("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
@@ -71,15 +72,18 @@ class ProfileWebSource: KtorSource() {
         "http://$HOST$PREFIX_URL/profile/${type.value}${
             if(query.isNotBlank()) "?query=$query" else ""
         }"
-    )!!.wrapped<List<User>>().map { it.map() }
+    )?.wrapped<List<User>>()
+        ?.map { it.map() }
+        ?: emptyList()
     
     suspend fun deleteHidden(albumId: String, imageId: String) {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
     }
     
     suspend fun getFiles(albumId: String) =
-        get("http://$HOST$PREFIX_URL/albums/$albumId/files")!!
-            .wrapped<List<Avatar>>()
+        get("http://$HOST$PREFIX_URL/albums/$albumId/files")
+            ?.wrapped<List<Avatar>>()
+            ?: emptyList()
     
     suspend fun addHidden(albumId: String, files: List<File>) = postFormData(
         "http://$HOST$PREFIX_URL/albums/$albumId/upload",
@@ -95,7 +99,8 @@ class ProfileWebSource: KtorSource() {
                 )
             }
         }
-    )!!.wrapped<List<Avatar>>()
+    )?.wrapped<List<Avatar>>()
+        ?: emptyList()
     
     suspend fun setUserAvatar(
         avatar: File, list: List<Float>,
@@ -154,7 +159,8 @@ class ProfileWebSource: KtorSource() {
     suspend fun getResponds(type: RespondType) =
         get("http://$HOST$PREFIX_URL/responds") {
             url { query("type" to type.name) }
-        }!!.wrapped<List<MeetWithRespondsResponse>>().map { it.map() }
+        }?.wrapped<List<MeetWithRespondsResponse>>()
+            ?.map { it.map() } ?: emptyList()
     
     suspend fun getMeetResponds(
         meetId: String, page: Int?, perPage: Int?,
@@ -165,7 +171,8 @@ class ProfileWebSource: KtorSource() {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }!!.wrapped<List<RespondResponse>>().map { it.map() }
+    }?.wrapped<List<RespondResponse>>()
+        ?.map { it.map() } ?: emptyList()
     
     suspend fun deleteRespond(respondId: String) {
         delete("http://$HOST$PREFIX_URL/responds/$respondId")

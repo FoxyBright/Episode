@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.crop
+package ru.rikmasters.gilty.gallery.cropper.crop
 
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
@@ -6,10 +6,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import com.smarttoolfactory.cropper.model.CropImageMask
-import com.smarttoolfactory.cropper.model.CropOutline
-import com.smarttoolfactory.cropper.model.CropPath
-import com.smarttoolfactory.cropper.model.CropShape
+import com.smarttoolfactory.cropper.model.*
 
 
 /**
@@ -42,7 +39,7 @@ class CropAgent {
         )
 
         val imageToCrop = croppedBitmap
-            .copy(Bitmap.Config.ARGB_8888, true)!!
+            .copy(Bitmap.Config.ARGB_8888, true)
             .asImageBitmap()
 
         drawCroppedImage(cropOutline, cropRect, layoutDirection, density, imageToCrop)

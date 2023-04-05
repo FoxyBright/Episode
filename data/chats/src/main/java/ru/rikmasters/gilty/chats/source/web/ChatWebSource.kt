@@ -29,9 +29,7 @@ class ChatWebSource: KtorSource() {
         perPage: Int? = null,
         unread: Int = 0,
     ): Pair<List<Chat>, Paginator> {
-        return get(
-            "http://$HOST$PREFIX_URL/chats"
-        ) {
+        return get("http://$HOST$PREFIX_URL/chats") {
             url {
                 page?.let { query("page" to "$page") }
                 perPage?.let { query("per_page" to "$perPage") }
@@ -45,9 +43,9 @@ class ChatWebSource: KtorSource() {
         messageIds: List<String>,
         all: Boolean,
     ) {
-        patch(
-            "http://$HOST$PREFIX_URL/chats/$chatId/markAsRead"
-        ) { setBody(MarkAsReadRequest(messageIds, all)) }
+        patch("http://$HOST$PREFIX_URL/chats/$chatId/markAsRead") {
+            setBody(MarkAsReadRequest(messageIds, all))
+        }
     }
     
     suspend fun deleteMessage(
@@ -55,9 +53,7 @@ class ChatWebSource: KtorSource() {
         messageIds: List<String>,
         allMembers: Int,
     ) {
-        delete(
-            "http://$HOST$PREFIX_URL/chats/$chatId/messages"
-        ) {
+        delete("http://$HOST$PREFIX_URL/chats/$chatId/messages") {
             url {
                 messageIds.forEach { query("ids[]" to it) }
                 query("all_members" to "$allMembers")
@@ -66,29 +62,29 @@ class ChatWebSource: KtorSource() {
     }
     
     suspend fun getChatAlbum(chatId: String): AlbumModel {
-        return get(
-            "http://$HOST$PREFIX_URL/chats/$chatId/album"
-        )!!.wrapped<Album>().map()
+        return get("http://$HOST$PREFIX_URL/chats/$chatId/album")
+            ?.wrapped<Album>()
+            ?.map()
+            ?: AlbumModel()
     }
     
     suspend fun unmuteChatNotifications(chatId: String) {
-        post(
-            "http://$HOST$PREFIX_URL/chats/$chatId/unmute"
-        )
+        post("http://$HOST$PREFIX_URL/chats/$chatId/unmute")
     }
     
     suspend fun getChatsStatus(): Int {
-        return get(
-            "http://$HOST$PREFIX_URL/chats/status"
-        )!!.wrapped<ChatStatus>().unreadCount
+        return get("http://$HOST$PREFIX_URL/chats/status")
+            ?.wrapped<ChatStatus>()
+            ?.unreadCount
+            ?: 0
     }
     
     suspend fun muteChatNotifications(
         chatId: String, unmuteAt: String,
     ) {
-        get(
-            "http://$HOST$PREFIX_URL/chats/$chatId/mute"
-        ) { url { query("unmute_at" to unmuteAt) } }
+        get("http://$HOST$PREFIX_URL/chats/$chatId/mute") {
+            url { query("unmute_at" to unmuteAt) }
+        }
     }
     
     suspend fun sendMessage(
@@ -167,7 +163,7 @@ class ChatWebSource: KtorSource() {
     suspend fun getChat(chatId: String): ChatModel {
         return get(
             "http://$HOST$PREFIX_URL/chats/$chatId"
-        )!!.wrapped<Chat>().map()
+        )?.wrapped<Chat>()?.map() ?: ChatModel()
     }
     
     suspend fun completeChat(chatId: String) {

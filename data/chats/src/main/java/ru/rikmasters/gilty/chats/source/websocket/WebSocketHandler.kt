@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.meetings.mapper
+import ru.rikmasters.gilty.shared.models.Thumbnail
 import ru.rikmasters.gilty.shared.models.User
 import java.io.IOException
 import java.net.SocketException
@@ -153,7 +154,10 @@ class WebSocketHandler(
             MESSAGE_TYPING -> {
                 val user = mapper.readValue<User>(response.data)
                 messageRepository.writersUpdate(
-                    UserWs(user.id!!, user.avatar?.thumbnail!!)
+                    UserWs(
+                        (user.id ?: ""),
+                        (user.avatar?.thumbnail ?: Thumbnail())
+                    )
                 )
                 logD("$response")
             }
@@ -205,7 +209,7 @@ class WebSocketHandler(
             try {
                 connection(userId)
             } catch(e: Exception) {
-                logE("BAD RECONNECTION!!!")
+                logE("Bad reconnection")
                 logE("$e")
             }
         }

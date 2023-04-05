@@ -4,7 +4,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
 import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
-import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import java.util.UUID.randomUUID
@@ -34,32 +33,29 @@ data class ProfileModel(
     val status: String?,
 ) {
     
-    companion object {
-        
-        val empty = ProfileModel(
-            id = "", phone = null, username = null,
-            gender = MALE,
-            orientation = null,
-            age = 0, aboutMe = null,
-            rating = RatingModel(average = "0.0", getEmoji(icon = "")),
-            avatar = DemoAvatarModel.copy(
-                url = "", thumbnail = DemoThumbnailModel.copy(url = "")
-            ),
-            thumbnail = DemoThumbnailModel.copy(url = ""),
-            isCompleted = true,
-            subscriptionExpiredAt = null,
-            respondsCount = null,
-            respondsImage = null,
-            hidden = null,
-            countWatchers = 0,
-            countWatching = 0,
-            isWatching = null,
-            unblockAt = null,
-            isOnline = null,
-            isAnonymous = null,
-            status = null
-        )
-    }
+    constructor(): this(
+        id = randomUUID().toString(),
+        phone = null,
+        username = null,
+        gender = MALE,
+        orientation = null,
+        age = 0, aboutMe = null,
+        rating = RatingModel(),
+        avatar = AvatarModel(),
+        thumbnail = ThumbnailModel(),
+        isCompleted = true,
+        subscriptionExpiredAt = null,
+        respondsCount = null,
+        respondsImage = null,
+        hidden = null,
+        countWatchers = null,
+        countWatching = null,
+        isWatching = null,
+        unblockAt = null,
+        isOnline = null,
+        isAnonymous = null,
+        status = null
+    )
     
     fun map() = UserModel(
         id = id,

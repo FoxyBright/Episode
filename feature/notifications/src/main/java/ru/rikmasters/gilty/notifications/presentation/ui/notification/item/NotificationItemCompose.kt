@@ -29,6 +29,8 @@ import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.EmojiRow
@@ -73,15 +75,25 @@ fun NotificationItem(
                 { callback?.onSwiped(notification) },
                 (emoji ?: state.emojiList), {
                     callback?.onEmojiClick(
-                        notification, it, meet?.organizer?.id!!
+                        notification, it,
+                        meet?.organizer?.id ?: ""
                     )
                 }
             ) {
                 NotificationText(
                     user, type, meet,
                     state.duration, emoji = emoji,
-                    onMeetClick = { callback?.onMeetClick(meet!!) },
-                    onUserClick = { callback?.onUserClick(user!!, meet!!) }
+                    onMeetClick = {
+                        callback?.onMeetClick(
+                            meet ?: MeetingModel()
+                        )
+                    },
+                    onUserClick = {
+                        callback?.onUserClick(
+                            user ?: UserModel(),
+                            meet ?: MeetingModel()
+                        )
+                    }
                 )
             }
         }
@@ -100,8 +112,17 @@ fun NotificationItem(
             NotificationText(
                 user, type, meet,
                 state.duration,
-                onMeetClick = { callback?.onMeetClick(meet!!) },
-                onUserClick = { callback?.onUserClick(user!!, meet!!) }
+                onMeetClick = {
+                    callback?.onMeetClick(
+                        meet ?: MeetingModel()
+                    )
+                },
+                onUserClick = {
+                    callback?.onUserClick(
+                        user ?: UserModel(),
+                        meet ?: MeetingModel()
+                    )
+                }
             )
         }
     }

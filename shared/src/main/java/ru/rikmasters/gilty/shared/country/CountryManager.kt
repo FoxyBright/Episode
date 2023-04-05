@@ -19,19 +19,28 @@ data class Country(
     val name: String,
     val code: String,
     val phoneDial: String,
-    val phoneMask: String
+    val phoneMask: String,
 ) {
-    val flag: ImageBitmap @Composable get() {
-        val manager = get<CountryManager>()
-        return manager.flagForCountry(code)
-    }
+    
+    constructor(): this(
+        "Россия",
+        "RU",
+        "+7",
+        "+7 (###) ###-##-##"
+    )
+    
+    val flag: ImageBitmap
+        @Composable get() {
+            val manager = get<CountryManager>()
+            return manager.flagForCountry(code)
+        }
     val clearPhoneDial by lazy {
         phoneDial.replace(Regex("\\D"), "")
     }
 }
 
 val DemoCountry = Country(
-    "Россия", "GU", "+7", "+7 (###) ###-##-##"
+    "Россия", "RU", "+7", "+7 (###) ###-##-##"
 )
 
 class CountryManager: Component {
@@ -43,14 +52,14 @@ class CountryManager: Component {
     }
     
     private fun countryFrom(locale: Locale) =
-        masks[locale.country]!!.let {
+        masks[locale.country]?.let {
             Country(
                 Locale("", locale.country).displayName,
                 locale.country,
                 it.dial,
                 it
             )
-        }
+        } ?: Country()
     
     private fun countryFrom(code: String, mask: String) =
         Country(
@@ -73,25 +82,27 @@ class CountryManager: Component {
             }
         }
     }
-
+    
     fun getCountries(): List<Country> {
         return masks.map {
             countryFrom(it.key, it.value)
         }
     }
     
-    private val String.dial: String get() {
-        val index = replace(" ", "")
-            .indexOfAny(listOf("#", "-#", ")#", "(#"))
-        return substring(0, index).let {
-            if(it.contains("(") && !it.contains(")"))
-                "$it)"
-            else
-                it
+    private val String.dial: String
+        get() {
+            val index = replace(" ", "")
+                .indexOfAny(listOf("#", "-#", ")#", "(#"))
+            return substring(0, index).let {
+                if(it.contains("(") && !it.contains(")"))
+                    "$it)"
+                else
+                    it
+            }
         }
-    }
     
     companion object {
+        
         const val FLAG_WIDTH = 32
         const val FLAG_HEIGHT = 22
     }

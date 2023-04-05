@@ -73,8 +73,8 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                         if(notification.feedback?.ratings == null)
                             vm.emojiClick(
                                 emoji,
-                                notification.parent.meeting?.id!!,
-                                userId!!
+                                notification.parent.meeting?.id ?: "",
+                                userId ?: ""
                             )
                         refresh()
                     } ?: run {

@@ -24,13 +24,12 @@ fun ProfileScreen(vm: ProfileViewModel) {
     LaunchedEffect(Unit) { vm.getProfile() }
     
     val profileState = ProfileState(
-        ProfileModel.empty.copy(
+        ProfileModel().copy(
             username = username,
             hidden = profile?.hidden,
             avatar = profile?.avatar,
             aboutMe = description,
-        ),
-        occupiedName = occupied
+        ), occupiedName = occupied
     )
     
     val isActive = username.isNotBlank()

@@ -65,9 +65,9 @@ fun ChatDeleteAlert(
         active, Modifier
             .wrapContentHeight()
             .fillMaxWidth(),
-        Pair(button, onSuccess!!),
-        label, title, onDismiss!!,
-        Pair(stringResource(notification_respond_cancel_button), onDismiss),
+        Pair(button) { onSuccess?.let { it() } },
+        label, title, { onDismiss?.let { it() } },
+        Pair(stringResource(notification_respond_cancel_button)) { onDismiss?.let { it() } },
         items, selected, listItemSelect
     )
 }

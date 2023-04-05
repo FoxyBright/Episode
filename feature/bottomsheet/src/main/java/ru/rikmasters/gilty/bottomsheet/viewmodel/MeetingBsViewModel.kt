@@ -47,8 +47,9 @@ class MeetingBsViewModel: ViewModel() {
                 )
             }
         }
-        if(meet.value?.isOnline == true)
-            _distance.emit(distanceCalculator(meet.value!!.map()))
+        if(meet.value?.isOnline == true) meet.value?.let {
+            _distance.emit(distanceCalculator(it.map()))
+        }
         _memberList.emit(meetManager.getMeetMembers(meetId))
     }
     

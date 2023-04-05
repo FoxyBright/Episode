@@ -1,8 +1,11 @@
 package ru.rikmasters.gilty.shared.model.meeting
 
+import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.*
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import java.util.UUID.randomUUID
 
@@ -27,6 +30,28 @@ data class MeetingModel(
     val price: Int? = null,
     val memberState: MemberStateType? = null,
 ) {
+    
+    constructor(): this(
+        id = randomUUID().toString(),
+        title = "",
+        condition = FREE,
+        category = CategoryModel(),
+        duration = "",
+        type = GROUP,
+        datetime = NOW_DATE,
+        organizer = null,
+        isOnline = false,
+        tags = emptyList<TagModel>(),
+        description = null,
+        isPrivate = true,
+        memberCount = 0,
+        requirements = null,
+        place = "",
+        address = "",
+        hideAddress = true,
+        price = null,
+        memberState = null
+    )
     
     fun map() = FullMeetingModel(
         id = id,
@@ -112,7 +137,7 @@ val DemoFullMeetingModel = FullMeetingModel(
     condition = MEMBER_PAY,
     category = DemoCategoryModel,
     duration = "2 часа",
-    type = MeetType.GROUP,
+    type = GROUP,
     organizer = DemoUserModel,
     isOnline = true,
     tags = DemoTagList,
@@ -138,7 +163,7 @@ val DemoMeetingModel = MeetingModel(
     condition = MEMBER_PAY,
     category = DemoCategoryModel,
     duration = "2 часа",
-    type = MeetType.GROUP,
+    type = GROUP,
     datetime = "2022-11-28T20:00:54.140Z",
     organizer = DemoUserModel,
     isOnline = false,

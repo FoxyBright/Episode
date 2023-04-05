@@ -23,8 +23,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val profileManager by inject<ProfileManager>()
     private val chatManager by inject<ChatManager>()
     
-    private val profileModel = ProfileModel.empty
-    
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
     
@@ -49,10 +47,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
     
-    private val _description = MutableStateFlow(profileModel.aboutMe)
+    private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
     
-    private val _username = MutableStateFlow(profileModel.username)
+    private val _username = MutableStateFlow<String?>(null)
     private val username = _username.asStateFlow()
     
     @Suppress("unused")

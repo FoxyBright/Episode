@@ -129,7 +129,7 @@ fun MeetingFilterBottom(
                     Modifier
                         .padding(horizontal = 16.dp)
                         .padding(top = 28.dp),
-                    stringResource(R.string.save_button),
+                    stringResource(R.string.confirm_button),
                     smallText = find?.let {
                         stringResource(R.string.meeting_filter_meeting_find, it)
                     }

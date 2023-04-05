@@ -152,7 +152,7 @@ fun <T> ListItemPicker(
                                         halfNumbersColumnHeightPx
                                     )
                                 val coercedPoint =
-                                    coercedAnchors.minByOrNull { abs(it - coercedTarget) }!!
+                                    coercedAnchors.minByOrNull { abs(it - coercedTarget) } ?: 0f
                                 val base =
                                     halfNumbersColumnHeightPx * (target / halfNumbersColumnHeightPx).toInt()
                                 coercedPoint + base

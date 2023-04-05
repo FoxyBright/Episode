@@ -67,7 +67,7 @@ class ProfileStore(
     suspend fun deleteHidden(imageId: String) {
         webSource.deleteHidden(
             uploadProfile(false)
-                .albumPrivate?.id!!, imageId
+                .albumPrivate?.id ?: "", imageId
         )
         primarySource.deleteById<Avatar>(imageId)
     }
@@ -76,7 +76,7 @@ class ProfileStore(
         primarySource.saveAll(
             webSource.addHidden(
                 uploadProfile(false)
-                    .albumPrivate?.id!!, files
+                    .albumPrivate?.id ?: "", files
             )
         )
     }
@@ -100,7 +100,7 @@ class ProfileStore(
         
         primarySource.deleteAll<Avatar>()
         val list = webSource.getFiles(
-            profile.albumPrivate?.id!!
+            profile.albumPrivate?.id ?: ""
         )
         primarySource.saveAll(list)
         

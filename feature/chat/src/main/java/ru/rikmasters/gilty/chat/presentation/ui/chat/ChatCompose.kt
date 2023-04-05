@@ -235,7 +235,7 @@ private fun Content(
                     )
                 }
                 itemsIndexed(list) { index, item ->
-                    (item!! to rememberDragRowState()).let { (mes, row) ->
+                    ((item ?: MessageModel()) to rememberDragRowState()).let { (mes, row) ->
                         ChatMessage(
                             mes,
                             row,

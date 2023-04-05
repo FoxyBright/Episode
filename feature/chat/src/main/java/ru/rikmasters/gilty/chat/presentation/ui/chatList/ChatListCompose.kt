@@ -27,7 +27,6 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.*
 import kotlinx.coroutines.flow.flowOf
-import org.koin.core.definition.indexKey
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
@@ -84,11 +83,11 @@ data class ChatListState(
     val alertSelect: Int,
     val unRead: Boolean,
     val listState: LazyListState,
-    val unreadChats: List<ChatModel>
+    val unreadChats: List<ChatModel>,
 )
 
 interface ChatListCallback {
-
+    
     fun onNavBarSelect(point: Int)
     fun onChatClick(chat: ChatModel)
     fun onChatSwipe(chat: ChatModel)
@@ -105,7 +104,7 @@ interface ChatListCallback {
 fun ChatListContent(
     state: ChatListState,
     modifier: Modifier = Modifier,
-    callback: ChatListCallback? = null
+    callback: ChatListCallback? = null,
 ) {
     Scaffold(
         modifier = modifier,
@@ -141,7 +140,7 @@ fun ChatListContent(
 private fun TopBar(
     modifier: Modifier,
     unRead: Boolean,
-    onUnReadChange: () -> Unit
+    onUnReadChange: () -> Unit,
 ) {
     Row(
         modifier
@@ -167,7 +166,7 @@ private fun TopBar(
                     (null)
                 ) { onUnReadChange() },
             colorFilter = ColorFilter.tint(
-                if (unRead) colorScheme.primary
+                if(unRead) colorScheme.primary
                 else colorScheme.onTertiary
             )
         )
@@ -178,12 +177,12 @@ private fun TopBar(
 private fun Content(
     state: ChatListState,
     modifier: Modifier = Modifier,
-    callback: ChatListCallback?
+    callback: ChatListCallback?,
 ) {
     val chats = state.chats
     val itemCount = chats.itemCount
-
-    if (LocalInspectionMode.current) PreviewLazy()
+    
+    if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(
         modifier
             .fillMaxWidth()
@@ -194,16 +193,16 @@ private fun Content(
             chats.loadState.refresh is LoadState.Error -> {}
             chats.loadState.append is LoadState.Error -> {}
             else -> {
-                if (chats.loadState.refresh is LoadState.Loading) {
+                if(chats.loadState.refresh is LoadState.Loading) {
                     item { PagingLoader(state.chats.loadState) }
                 }
-                if (itemCount != 0) {
+                if(itemCount != 0) {
                     getSortedChats(
                         state.chats.itemSnapshotList.items.filter {
                             it.meetStatus == MeetStatusType.ACTIVE
                         }
                     ).let {
-                        return@let if (it.isNotEmpty() && !state.unRead) it
+                        return@let if(it.isNotEmpty() && !state.unRead) it
                         else null
                     }?.let { pairs ->
                         itemsIndexed(pairs) { index, (label, list) ->
@@ -221,8 +220,8 @@ private fun Content(
                             }
                         }
                     }
-
-                    if (!state.unRead) item {
+                    
+                    if(!state.unRead) item {
                         ActionRow(
                             Modifier.padding(
                                 top = 28.dp,
@@ -232,14 +231,14 @@ private fun Content(
                             state.endedState
                         ) { callback?.onEndedClick() }
                     }
-
+                    
                     itemsIndexed(state.chats) { index, item ->
-                        if (item?.meetStatus != MeetStatusType.ACTIVE) {
-                            val chat = item!! to rememberDragRowState()
+                        if(item?.meetStatus != MeetStatusType.ACTIVE) {
+                            val chat = (item ?: ChatModel()) to rememberDragRowState()
                             val inactiveChatsSize = state.chats.itemSnapshotList.items.filter {
                                 it.meetStatus != MeetStatusType.ACTIVE
                             }.size
-                            val indexCalc = if (index == (itemCount - inactiveChatsSize)) {
+                            val indexCalc = if(index == (itemCount - inactiveChatsSize)) {
                                 0
                             } else index
                             ElementChat(
@@ -251,11 +250,11 @@ private fun Content(
                             )
                         }
                     }
-                    if (state.chats.loadState.append is LoadState.Loading) {
+                    if(state.chats.loadState.append is LoadState.Loading) {
                         item { PagingLoader(state.chats.loadState) }
                     }
                 } else {
-                    if (chats.loadState.refresh is LoadState.NotLoading) {
+                    if(chats.loadState.refresh is LoadState.NotLoading) {
                         item { EmptyChats() }
                     }
                 }
@@ -284,7 +283,7 @@ private fun ElementChat(
     index: Int,
     size: Int,
     rowState: DragRowState,
-    callback: ChatListCallback? = null
+    callback: ChatListCallback? = null,
 ) {
     val shape = lazyItemsShapes(index, size)
     Column(
@@ -300,7 +299,7 @@ private fun ElementChat(
             Modifier,
             { callback?.onChatClick(it) }
         ) { callback?.onChatSwipe(it) }
-        if (index < size - 2) Divider(
+        if(index < size - 2) Divider(
             Modifier.padding(start = 78.dp)
         )
     }
@@ -310,7 +309,7 @@ private fun ElementChat(
 private fun ActionRow(
     modifier: Modifier = Modifier,
     state: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
         modifier.clickable(
@@ -322,7 +321,7 @@ private fun ActionRow(
     ) {
         Label(stringResource(chats_ended_chats_label))
         Icon(
-            if (state) Filled.KeyboardArrowDown
+            if(state) Filled.KeyboardArrowDown
             else Filled.KeyboardArrowRight,
             (null),
             Modifier.size(24.dp),
@@ -334,7 +333,7 @@ private fun ActionRow(
 @Composable
 private fun Label(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) = Text(
     text,
     modifier,
@@ -345,7 +344,7 @@ private fun Label(
 @Composable
 private fun EmptyChats(
     // TODO Сделать скрин с плавающим баблом
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Image(
         painterResource(

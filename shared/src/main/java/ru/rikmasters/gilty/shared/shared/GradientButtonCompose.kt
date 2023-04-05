@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -21,6 +20,7 @@ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -28,20 +28,34 @@ import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
-private fun GradientButtonPreview() {
+private fun GButtonPreview() {
     GiltyTheme {
-        GradientButton(
-            text = "Далее",
-            smallText = "Подробности",
-            icon = R.drawable.ic_shared
-        ) {}
+        Column {
+            GradientButton(
+                text = stringResource(R.string.meeting_shared_button),
+                icon = R.drawable.ic_shared,
+                online = true
+            ) {}
+            GradientButton(
+                Modifier.padding(top = 16.dp),
+                text = stringResource(R.string.next_button),
+                enabled = false
+            ) {}
+            GradientButton(
+                Modifier.padding(top = 16.dp),
+                text = stringResource(R.string.confirm_button),
+                smallText = stringResource(
+                    R.string.meeting_filter_meeting_find, (26)
+                ),
+            ) {}
+        }
     }
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun GradientButton(
     modifier: Modifier = Modifier,
     text: String,
@@ -59,14 +73,12 @@ fun GradientButton(
         colorScheme.inversePrimary,
         colorScheme.inversePrimary
     )
-    Button(
+    Card(
         onClick, modifier.fillMaxWidth(),
-        enabled, shape,
-        buttonColors(
+        enabled, shape, cardColors(
             containerColor = Transparent,
-            disabledContainerColor = Transparent
-        ),
-        contentPadding = PaddingValues(),
+            disabledContainerColor = Transparent,
+        )
     ) {
         Box(
             Modifier
@@ -81,7 +93,7 @@ fun GradientButton(
                         else inverse
                     ), shape
                 )
-                .padding(16.dp, 16.dp), Center
+                .padding(vertical = smallText?.let { 8.dp } ?: 16.dp), Center
         ) {
             Row(Modifier, Start, CenterVertically) {
                 icon?.let {
@@ -92,8 +104,10 @@ fun GradientButton(
                     )
                 }
                 Column(Modifier, Top, CenterHorizontally) {
-                    Text(text, color = White, style = typography.bodyLarge)
-                    smallText?.let { Text(it, style = typography.headlineSmall) }
+                    Text(text, style = typography.bodyLarge.copy(White))
+                    smallText?.let {
+                        Text(it, style = typography.headlineSmall.copy(White))
+                    }
                 }
             }
         }

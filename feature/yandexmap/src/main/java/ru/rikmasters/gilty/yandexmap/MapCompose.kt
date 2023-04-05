@@ -202,8 +202,10 @@ private fun MapProperties.search(
 }
 
 private fun Pair<PlacemarkMapObject, Item>.getMeetPlace() = MeetPlace(
-    lat = first.geometry.latitude, lng = first.geometry.longitude,
-    place = second.obj?.name!!, address = second.obj?.descriptionText!!,
+    lat = first.geometry.latitude,
+    lng = first.geometry.longitude,
+    place = second.obj?.name ?: "",
+    address = second.obj?.descriptionText ?: "",
 )
 
 private fun PlacemarkMapObject.changeIcon(
@@ -213,7 +215,10 @@ private fun PlacemarkMapObject.changeIcon(
 private fun MapView.getProperties(
     state: YandexMapState,
 ) = state.location.let {
-    val point = Point(it?.lat!!, it.lng!!)
+    val point = Point(
+        it?.lat ?: 0.0,
+        it?.lng ?: 0.0
+    )
     MapProperties(
         searchManager = getInstance().createSearchManager(ONLINE),
         obj = this.map.mapObjects,

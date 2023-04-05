@@ -209,8 +209,10 @@ fun BottomSheet(
         }
         
         composable("LOCATION") {
-            Connector<MapBsViewModel>(scope) {
-                MapBs(it, nav, category!!.name)
+            category?.name?.let { name ->
+                Connector<MapBsViewModel>(scope) {
+                    MapBs(it, nav, name)
+                }
             }
         }
     }

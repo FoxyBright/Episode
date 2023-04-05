@@ -1,10 +1,11 @@
 package ru.rikmasters.gilty.shared.model.chat
 
+import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import java.util.UUID
+import java.util.UUID.randomUUID
 
 data class MessageModel(
     val id: String,
@@ -16,10 +17,18 @@ data class MessageModel(
     val isRead: Boolean,
     val isDelivered: Boolean,
     val createdAt: String,
-)
+) {
+    
+    constructor(): this(
+        randomUUID().toString(),
+        MESSAGE, (null), (null),
+        (null), (true), (true), (true),
+        NOW_DATE
+    )
+}
 
 val DemoMessageModel = MessageModel(
-    UUID.randomUUID().toString(),
+    randomUUID().toString(),
     MESSAGE, (null), (null),
     DemoMemberMessageModel,
     (true), (true), (true),

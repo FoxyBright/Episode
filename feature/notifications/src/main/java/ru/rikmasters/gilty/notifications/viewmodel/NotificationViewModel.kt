@@ -52,7 +52,9 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         source = NotificationPagingSource(
             notificationManger
         )
-        return source!!
+        return source ?: NotificationPagingSource(
+            notificationManger
+        )
     }
     
     val notifications =

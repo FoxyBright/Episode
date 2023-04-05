@@ -240,7 +240,8 @@ private fun Notifications(
             items(state.notifications) {}
             
             while(i < itemCount) {
-                val not = notifications[i]!!
+                val not = notifications[i]
+                    ?: NotificationModel()
                 if(!todayControl(not.date)) break
                 list.add(i); ++i
             }
@@ -251,7 +252,8 @@ private fun Notifications(
                     item {
                         ElementNot(
                             count, list.size,
-                            notifications[item]!!,
+                            notifications[item]
+                                ?: NotificationModel(),
                             state.ratings, callback
                         )
                     }
@@ -260,7 +262,8 @@ private fun Notifications(
             }
             
             while(i < itemCount) {
-                val not = notifications[i]!!
+                val not = notifications[i]
+                    ?: NotificationModel()
                 if(!weekControl(not.date)) break
                 list.add(i); ++i
             }
@@ -270,7 +273,8 @@ private fun Notifications(
                     item {
                         ElementNot(
                             count, list.size,
-                            notifications[item]!!,
+                            notifications[item]
+                                ?: NotificationModel(),
                             state.ratings, callback
                         )
                     }
@@ -284,7 +288,8 @@ private fun Notifications(
                     items(it) { count ->
                         ElementNot(
                             count, itemCount,
-                            notifications[i + count]!!,
+                            notifications[i + count]
+                                ?: NotificationModel(),
                             state.ratings, callback
                         )
                     }

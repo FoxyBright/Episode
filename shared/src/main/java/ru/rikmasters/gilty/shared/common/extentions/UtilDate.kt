@@ -573,11 +573,12 @@ private fun String.timeZone(symbol: Char) =
     this.substring(this.lastIndexOf(symbol), this.length)
 
 @SuppressLint("SimpleDateFormat")
-fun String.format(from: String, to: String): String {
-    val date = SimpleDateFormat(from).parse(this)!!
-    return date.format(to)
-}
+fun String.format(from: String, to: String) =
+    SimpleDateFormat(from)
+        .parse(this)
+        ?.format(to)
+        ?: ""
 
 @SuppressLint("SimpleDateFormat")
 fun String.pattern(pattern: String): Long =
-    SimpleDateFormat(pattern).parse(this)!!.time
+    SimpleDateFormat(pattern).parse(this)?.time ?: 0L

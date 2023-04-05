@@ -7,7 +7,13 @@ data class NotificationParentModel(
     val file: FileModel?,
     val notification: ShortNotification?,
     val user: UserModel?,
-)
+) {
+    
+    constructor(): this(
+        (null), (null),
+        (null), (null)
+    )
+}
 
 val DemoNotificationParentModel = NotificationParentModel(
     DemoMeetingModel,

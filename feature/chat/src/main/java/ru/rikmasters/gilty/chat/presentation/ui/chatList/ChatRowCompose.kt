@@ -37,6 +37,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType.*
 import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
@@ -161,7 +162,8 @@ private fun ChatRowContent(
             when {
                 todayControl(chat.datetime) -> Timer(
                     chat.datetime, chat.isOnline,
-                    Modifier.align(TopEnd)
+                    Modifier
+                        .align(TopEnd)
                         .padding(12.dp)
                 )
                 
@@ -250,7 +252,7 @@ private fun Message(
     modifier: Modifier = Modifier,
 ) {
     val user = when(message.type) {
-        MESSAGE -> message.message?.author!!
+        MESSAGE -> message.message?.author ?: UserModel()
         NOTIFICATION -> message.notification?.member ?: organizer
     }
     
@@ -272,10 +274,11 @@ private fun Message(
             if(message.type == MESSAGE) {
                 if(!attach.isNullOrEmpty())
                     attach.last().type.value
-                else message.message?.text!!
+                else message.message?.text ?: ""
             } else notificationText(
-                message.notification?.type!!,
-                user.gender!!
+                message.notification?.type
+                    ?: TRANSLATION_COMPLETED,
+                user.gender ?: MALE
             ), Modifier.fillMaxWidth(0.8f),
             maxLines = 1,
             color = colorScheme.onTertiary,

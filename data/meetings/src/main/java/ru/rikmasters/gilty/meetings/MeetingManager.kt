@@ -61,7 +61,7 @@ class MeetingManager(
     
     private suspend inline fun <reified Type> getMeetings(
         filter: MeetFiltersRequest, count: Boolean,
-    ): Type {
+    ): Type? {
         return web.getMeetsList(
             count = count,
             group = filter.group,
@@ -76,7 +76,7 @@ class MeetingManager(
             genders = filter.genders?.map { it.name },
             dates = filter.dates,
             time = filter.time
-        ).wrapped()
+        )?.wrapped()
     }
     
     suspend fun getMeetings(filter: MeetFiltersModel): List<MeetingModel> {
@@ -87,7 +87,7 @@ class MeetingManager(
                 filter.meetTypes, filter.onlyOnline, filter.genders,
                 filter.conditions, filter.dates, filter.time
             ), false
-        ).map { it.map() }
+        )?.map { it.map() } ?: emptyList()
     }
     
     suspend fun getMeetCount(filter: MeetFiltersModel): Int =
@@ -98,7 +98,7 @@ class MeetingManager(
                 filter.meetTypes, filter.onlyOnline, filter.genders,
                 filter.conditions, filter.dates, filter.time
             ), true
-        ).total
+        )?.total ?: 0
     
     suspend fun leaveMeet(meetId: String) {
         web.leaveMeet(meetId)
@@ -170,5 +170,5 @@ class MeetingManager(
 
 private fun RequirementModel.reqMap() = Requirement(
     gender?.name, ageMin,
-    ageMax, orientation!!.id
+    ageMax, orientation?.id ?: "HETERO"
 )
