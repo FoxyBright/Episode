@@ -20,10 +20,10 @@ class DetailedViewModel: ViewModel() {
     
     private val addMeet by lazy { manager.addMeetFlow }
     
-    private val _date = MutableStateFlow<String>("")
+    private val _date = MutableStateFlow("")
     val date = _date.asStateFlow()
     
-    fun getDate(date:String) = try {
+    fun getDate(date: String) = try {
         if(todayControl(date))
             "Сегодня, ${date.format("HH:mm")}"
         else date.format("dd MMMM, HH:mm")

@@ -44,11 +44,13 @@ class ConditionViewModel: ViewModel() {
                 _online.emit(add?.isOnline ?: false)
                 _forbidden.emit(add?.chatForbidden ?: false)
                 _hidden.emit(add?.photoAccess ?: false)
-                _condition.emit(add?.condition?.ordinal?.let {
-                    listOf(it)
+                _condition.emit(add?.condition?.let {
+                    if(it == ConditionType.NON_SELECT) emptyList()
+                    else listOf(it.ordinal)
                 } ?: emptyList())
-                _meetType.emit(add?.type?.ordinal?.let {
-                    listOf(it)
+                _meetType.emit(add?.type?.let {
+                    if(it == MeetType.NON_SELECT) emptyList()
+                    else listOf(it.ordinal)
                 } ?: emptyList())
             }
         }

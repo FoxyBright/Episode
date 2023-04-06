@@ -2,9 +2,7 @@ package ru.rikmasters.gilty.meetings.addmeet
 
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
 import ru.rikmasters.gilty.shared.model.meeting.*
 import java.util.UUID.randomUUID
 
@@ -36,9 +34,9 @@ data class AddMeet(
     
     constructor(): this(
         category = CategoryModel(),
-        type = PERSONAL,
+        type = MeetType.NON_SELECT,
         isOnline = false,
-        condition = FREE,
+        condition = ConditionType.NON_SELECT,
         price = "",
         photoAccess = false,
         chatForbidden = false,

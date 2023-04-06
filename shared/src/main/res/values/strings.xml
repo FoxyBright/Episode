@@ -292,9 +292,9 @@
     <string name="add_meet_detailed_tags_maximum">(максимум %s)</string>
     <string name="add_meet_detailed_tags_description">Первый тег будет отображаться в названии Episode</string>
     <string name="add_meet_detailed_meet_description">Описание</string>
-    <string name="add_meet_detailed_meet_description_place_holder">Краткое описание Episode</string>
+    <string name="add_meet_detailed_meet_description_place_holder">Краткое описание</string>
     <string name="add_meet_detailed_meet_place">Место Episode</string>
-    <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только\nучастникам Episode</string>
+    <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только участникам</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место Episode</string>
     <string name="requirements_title">Требования к\nучастникам</string>
     <string name="requirements_member_count_label">Количество</string>
@@ -313,7 +313,7 @@
     <string name="orientation_pansexual">Пансексуал(ка)</string>
     <string name="orientation_queer">Квир</string>
     <string name="add_meet_publish_button">Опубликовать</string>
-    <string name="add_meet_meet_duration_label">Длительность Episode</string>
+    <string name="add_meet_meet_duration_label">Длительность</string>
     <string name="age_from">от</string>
     <string name="age_to">до</string>
     <string name="add_meet_without_respond_title">Участие без отклика</string>

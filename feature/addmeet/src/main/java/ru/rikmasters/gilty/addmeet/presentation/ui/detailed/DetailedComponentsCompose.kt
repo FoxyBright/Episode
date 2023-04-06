@@ -34,14 +34,6 @@ fun tags(
             { callback?.onTagsClick() },
             state.online
         ) { callback?.onTagDelete(it) }
-        Text(
-            stringResource(R.string.add_meet_detailed_tags_description),
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
-            colorScheme.onTertiary,
-            style = typography.headlineSmall
-        )
     }
 }
 
@@ -151,7 +143,7 @@ fun MeetPlace(
             stringResource(R.string.add_meet_detailed_meet_place_place_holder),
             Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
+                .padding(top = 4.dp, start = 32.dp),
             colorScheme.onTertiary,
             style = typography.headlineSmall
         )
