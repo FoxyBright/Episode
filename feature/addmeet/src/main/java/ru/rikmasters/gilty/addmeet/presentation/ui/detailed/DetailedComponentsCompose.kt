@@ -54,7 +54,11 @@ fun description(
             shape = shapes.medium,
             label = if(state.description.isNotEmpty())
                 textFieldLabel(
-                    (true), stringResource(R.string.add_meet_detailed_meet_description_place_holder)
+                    (true),
+                    stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                    labelFont = typography.headlineSmall.copy(
+                        colorScheme.onTertiary
+                    ),
                 ) else null,
             placeholder = textFieldLabel(
                 (false), stringResource(R.string.add_meet_detailed_meet_description_place_holder),

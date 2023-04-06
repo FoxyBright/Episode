@@ -62,7 +62,7 @@ fun DateTimeBS(
             .padding(top = 10.dp)
     ) {
         Text(
-            "Дата и время встречи",
+            stringResource(R.string.add_meet_detailed_meet_date_episode),
             Modifier.padding(bottom = 16.dp),
             colorScheme.tertiary,
             style = typography.labelLarge

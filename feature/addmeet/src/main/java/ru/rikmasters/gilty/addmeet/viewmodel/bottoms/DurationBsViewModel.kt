@@ -33,11 +33,13 @@ class DurationBsViewModel(
         }
     }
     
-    suspend fun changeDuration(duration: String) {
-        _duration.emit(duration)
+    suspend fun onSave() {
+        detailedVm.changeDuration(
+            duration.value.ifBlank { "20 минут" }
+        )
     }
     
-    suspend fun onSave() {
-        detailedVm.changeDuration(duration.value)
+    suspend fun changeDuration(duration: String) {
+        _duration.emit(duration)
     }
 }

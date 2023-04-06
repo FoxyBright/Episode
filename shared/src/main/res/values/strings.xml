@@ -286,6 +286,7 @@
     <string name="add_meet_detailed_meet_duration">Длительность</string>
     <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
     <string name="add_meet_detailed_meet_date">Дата и время</string>
+    <string name="add_meet_detailed_meet_date_episode">Дата и время episode</string>
     <string name="add_meet_detailed_meet_date_place_holder">Когда</string>
     <string name="add_meet_detailed_title">Подробнее</string>
     <string name="add_meet_detailed_tags">Теги</string>
