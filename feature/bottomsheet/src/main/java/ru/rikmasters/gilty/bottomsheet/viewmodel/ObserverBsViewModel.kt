@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
@@ -9,6 +10,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.S
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.UNSUB
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
@@ -22,6 +24,9 @@ class ObserverBsViewModel : ViewModel() {
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
 
+    private val _counters = MutableStateFlow(Pair(0, 0))
+    val counters = _counters.asStateFlow()
+
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val searchDebounced = search
@@ -31,20 +36,12 @@ class ObserverBsViewModel : ViewModel() {
             if(observersSelectTab.value == 0)
                 getObservers(it)
             else getObservables(it)
-
              */
         }
         .state(_search.value, SharingStarted.Eagerly)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val observers by lazy {
-        _search.flatMapLatest { query -> profileManager.getObservers(
-            query = query,
-            type = OBSERVERS
-        )
-        }
-    }
-
-    val observables by lazy {
         _search.flatMapLatest { query ->
             profileManager.getObservers(
                 query = query,
@@ -53,8 +50,26 @@ class ObserverBsViewModel : ViewModel() {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val observables by lazy {
+        _search.flatMapLatest { query ->
+            profileManager.getObservers(
+                query = query,
+                type = OBSERVABLES
+            )
+        }
+    }
+
     private val _unsubscribeMembers = MutableStateFlow(emptyList<UserModel>())
     val unsubscribeMembers = _unsubscribeMembers.asStateFlow()
+
+    suspend fun getCounters() {
+        _counters.value = Pair(
+            profileManager.getProfile().countWatchers ?: 0,
+            profileManager.getProfile().countWatching ?: 0
+        )
+    }
+
     suspend fun changeObserversTab(tab: Int) {
         _observersSelectTab.emit(tab)
         _search.emit("")
@@ -85,10 +100,6 @@ class ObserverBsViewModel : ViewModel() {
 
             DELETE -> {
                 profileManager.deleteObserver(member)
-                /*
-                getObservers(search.value)
-
-                 */
             }
         }
     }

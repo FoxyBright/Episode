@@ -28,8 +28,10 @@ fun ObserversBs(
     val observed = vm.observables.collectAsLazyPagingItems()
     val observers = vm.observers.collectAsLazyPagingItems()
     val search by vm.search.collectAsState()
+    val counters by vm.counters.collectAsState()
 
     LaunchedEffect(Unit) {
+        vm.getCounters()
         asm.bottomSheet.current.collectLatest {
             if (it == COLLAPSED) vm.unsubscribeMembers()
         }
@@ -42,7 +44,8 @@ fun ObserversBs(
             observed,
             unsubList,
             observersTab,
-            search
+            search,
+            counters
         ),
         Modifier.padding(top = 28.dp),
         object : ObserversListCallback {

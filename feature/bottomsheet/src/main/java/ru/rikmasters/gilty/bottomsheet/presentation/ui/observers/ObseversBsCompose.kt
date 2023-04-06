@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.DELETE
@@ -58,7 +59,8 @@ data class ObserversListState(
     val observed: LazyPagingItems<UserModel>,
     val unsubList: List<UserModel>,
     val selectTab: Int,
-    val search: String
+    val search: String,
+    val counters: Pair<Int, Int>
 )
 
 interface ObserversListCallback {
@@ -81,14 +83,13 @@ fun ObserversListContent(
             .background(colorScheme.background)
     ) {
         ActionBar(state.user, Modifier.padding(bottom = 22.dp))
-        // TODO: найти способ передать total
         GiltyTab(
             listOf(
                 "${stringResource(R.string.profile_observers)} ${
-                digitalConverter(0)
+                digitalConverter(state.counters.first)
                 }",
                 "${stringResource(R.string.profile_observe)} ${
-                digitalConverter(0)
+                digitalConverter(state.counters.second)
                 }"
             ),
             state.selectTab,
@@ -108,33 +109,63 @@ fun ObserversListContent(
                 )
         ) {
             if (state.selectTab == 0) {
-                itemsIndexed(state.observers) { index, member ->
-                    Column {
-                        ObserveItem(
-                            Modifier,
-                            DELETE,
-                            member!!,
-                            lazyItemsShapes(index, state.observers.itemCount),
-                            { callback?.onClick(member) }
-                        ) { callback?.onButtonClick(member, DELETE) }
-                        if (index < state.observers.itemCount - 1) {
-                            Divider(Modifier.padding(start = 16.dp))
+                when {
+                    state.observers.loadState.refresh is LoadState.Error -> {}
+                    state.observers.loadState.append is LoadState.Error -> {}
+                    else -> {
+                        if (state.observers.loadState.refresh is LoadState.Loading) {
+                            item {
+                                PagingLoader(state.observers.loadState)
+                            }
+                        }
+                        itemsIndexed(state.observers) { index, member ->
+                            Column {
+                                ObserveItem(
+                                    Modifier,
+                                    DELETE,
+                                    member!!,
+                                    lazyItemsShapes(index, state.observers.itemCount),
+                                    { callback?.onClick(member) }
+                                ) { callback?.onButtonClick(member, DELETE) }
+                                if (index < state.observers.itemCount - 1) {
+                                    Divider(Modifier.padding(start = 16.dp))
+                                }
+                            }
+                        }
+                        if (state.observers.loadState.append is LoadState.Loading) {
+                            item { PagingLoader(state.observers.loadState) }
                         }
                     }
-                } 
-            }else itemsIndexed(state.observed) { index, member ->
-                Column {
-                    val subType =
-                        if (state.unsubList.contains(member)) SUB else UNSUB
-                    ObserveItem(
-                        Modifier,
-                        subType,
-                        member!!,
-                        lazyItemsShapes(index, state.observed.itemCount),
-                        { callback?.onClick(member) }
-                    ) { callback?.onButtonClick(member, subType) }
-                    if (index < state.observed.itemCount - 1) {
-                        Divider(Modifier.padding(start = 16.dp))
+                }
+            } else {
+                when {
+                    state.observed.loadState.refresh is LoadState.Error -> {}
+                    state.observed.loadState.append is LoadState.Error -> {}
+                    else -> {
+                        if (state.observed.loadState.refresh is LoadState.Loading) {
+                            item {
+                                PagingLoader(state.observed.loadState)
+                            }
+                        }
+                        itemsIndexed(state.observed) { index, member ->
+                            Column {
+                                val subType =
+                                    if (state.unsubList.contains(member)) SUB else UNSUB
+                                ObserveItem(
+                                    Modifier,
+                                    subType,
+                                    member!!,
+                                    lazyItemsShapes(index, state.observed.itemCount),
+                                    { callback?.onClick(member) }
+                                ) { callback?.onButtonClick(member, subType) }
+                                if (index < state.observed.itemCount - 1) {
+                                    Divider(Modifier.padding(start = 16.dp))
+                                }
+                            }
+                        }
+                        if (state.observed.loadState.append is LoadState.Loading) {
+                            item { PagingLoader(state.observed.loadState) }
+                        }
                     }
                 }
             }
