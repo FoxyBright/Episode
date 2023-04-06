@@ -102,6 +102,8 @@ object Colors {
     val DarkShadow = Color(0xFF212122)
     val WhiteShadow = Color(0xFFF7F7F7)
     val RatGray = Color(0xFF49454F)
+    val NickelGray = Color(0xFFE0E0E0)
+    val NickelDarkGray = Color(0xFF484649)
     // Add new colors
 }
 

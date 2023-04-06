@@ -11,7 +11,7 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.graphics.FilterQuality.Companion.High
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.res.painterResource
@@ -32,7 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter.State.Loading
+import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
@@ -380,11 +382,22 @@ private fun MeetTop(
     avatar: AvatarModel?,
     modifier: Modifier,
 ) {
-    AsyncImage(
-        avatar?.thumbnail?.url, (null), modifier
+    val painter = rememberAsyncImagePainter(
+        avatar?.thumbnail?.url,
+        filterQuality = High
+    )
+    Image(
+        painter, (null),
+        modifier
+            .background(
+                if(painter.state is Loading)
+                    colors.meetCardPlaceHolder
+                else Transparent
+            )
             .fillMaxSize()
+            .padding(horizontal = 1.dp)
             .clip(ThemeExtra.shapes.bigTopShapes),
-        contentScale = Crop
+        contentScale = Crop,
     )
 }
 

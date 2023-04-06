@@ -44,6 +44,22 @@ fun MainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
+                (false), (false), (false), (false),
+                DemoMeetingList, listOf(
+                    INACTIVE, ACTIVE,
+                    INACTIVE, NEW_INACTIVE, INACTIVE
+                ), (false), (false)
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun GridMainContentPreview() {
+    GiltyTheme {
+        MainContent(
+            MainContentState(
                 (true), (true), (false), (false),
                 DemoMeetingList, listOf(
                     INACTIVE, ACTIVE,
@@ -102,11 +118,6 @@ fun MainContent(
                 NavBar(state.navBarStates)
                 { callback?.onNavBarSelect(it) }
             }
-        },
-        floatingActionButton = {
-            // TODO ФУНКЦИОНАЛЬНОСТЬ ВРЕМЕННО СНЯТА
-            //            SquareCheckBox(!state.grid, Modifier)
-            //            { callback?.onStyleChange() }
         },
         content = { padding ->
             Column {
@@ -226,6 +237,16 @@ private fun Content(
             ) { callback?.onMeetClick(it) }
         }
     }
+}
+
+@Composable
+@Suppress("unused")
+private fun Floating(
+    state: MainContentState,
+    callback: MainContentCallback?,
+) {
+    SquareCheckBox(!state.grid, Modifier)
+    { callback?.onStyleChange() }
 }
 
 @Composable
