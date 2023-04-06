@@ -39,6 +39,9 @@ class ProfileManager(
     suspend fun getPhotos(albumId: String) =
         if(albumId.isNotBlank()) web.getFiles(albumId)
             .map { it.map() } else emptyList()
+
+    fun getPhotosPaging(albumId: String) =
+        store.getFiles(albumId)
     
     suspend fun getProfile(forceWeb: Boolean = false) =
         store.getProfile(forceWeb)
@@ -85,11 +88,11 @@ class ProfileManager(
         )
     }
 
-    suspend fun getResponds(type: RespondType) =
-        web.getResponds(type)
+    fun getResponds(type: RespondType) =
+        store.getResponds(type)
 
-    suspend fun getMeetResponds(meetId: String) =
-        web.getMeetResponds(meetId, null, null)
+    fun getMeetResponds(meetId: String) =
+        store.getMeetResponds(meetId)
 
     suspend fun deleteRespond(respondId: String) {
         web.deleteRespond(respondId)

@@ -1,9 +1,10 @@
 package ru.rikmasters.gilty.shared.model.notification
 
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import java.util.UUID
 
 data class RespondModel(
@@ -11,14 +12,18 @@ data class RespondModel(
     val author: UserModel,
     val comment: String,
     val albumId: String,
-    val photoAccess: Boolean,
+    val photoAccess: Boolean
 ) {
-    
+
     fun map(
-        photoList: List<AvatarModel>,
+        photos: (String) -> Flow<PagingData<AvatarModel>>
     ) = RespondWithPhotos(
-        id, author,
-        comment, photoList,
+        id,
+        author,
+        comment,
+        if (photoAccess) {
+            photos(albumId)
+        } else null,
         photoAccess
     )
 }
@@ -27,8 +32,8 @@ data class RespondWithPhotos(
     val id: String,
     val author: UserModel,
     val comment: String,
-    val photos: List<AvatarModel>,
-    val photoAccess: Boolean,
+    val photos: Flow<PagingData<AvatarModel>>?,
+    val photoAccess: Boolean
 )
 
 val DemoRespondModel = RespondModel(
@@ -39,12 +44,17 @@ val DemoRespondModel = RespondModel(
     true
 )
 
+/*
 val DemoRespondModelWithPhoto = RespondWithPhotos(
     UUID.randomUUID().toString(),
-    DemoUserModel, "comment",
+    DemoUserModel,
+    "comment",
     listOf(
         DemoAvatarModel,
         DemoAvatarModel,
-        DemoAvatarModel,
-    ), true
+        DemoAvatarModel
+    ),
+    true
 )
+
+ */

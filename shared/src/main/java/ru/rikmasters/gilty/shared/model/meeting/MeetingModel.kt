@@ -7,7 +7,14 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import java.util.UUID.randomUUID
+
+data class RespondsInfoModel(
+    val count: Int,
+    val thumbnail: ThumbnailModel
+)
 
 data class MeetingModel(
     val id: String,
@@ -77,7 +84,11 @@ data class MeetingModel(
         membersMax = 0,
         members = emptyList(),
         location = null,
-        memberState = memberState
+        memberState = memberState,
+        responds = RespondsInfoModel(
+            count = 0,
+            thumbnail = DemoThumbnailModel
+        )
     )
 }
 
@@ -105,7 +116,8 @@ data class FullMeetingModel(
     val place: String? = null,
     val address: String? = null,
     val memberState: MemberStateType?,
-    val price: Int? = null,
+    val responds: RespondsInfoModel,
+    val price: Int? = null
 ) {
     
     fun map() = MeetingModel(
@@ -154,7 +166,11 @@ val DemoFullMeetingModel = FullMeetingModel(
     membersMax = 10,
     members = DemoUserModelList,
     location = DemoLocationModel,
-    memberState = IS_MEMBER
+    memberState = IS_MEMBER,
+    responds = RespondsInfoModel(
+        count = 0,
+        thumbnail = DemoThumbnailModel
+    )
 )
 
 val DemoMeetingModel = MeetingModel(

@@ -176,11 +176,30 @@ class ProfileWebSource : KtorSource() {
         delete("http://$HOST$PREFIX_URL/profile/account")
     }
 
-    suspend fun getResponds(type: RespondType) =
+    suspend fun getResponds(
+        type: RespondType,
+        page: Int?,
+        perPage: Int?
+    ) =
         get("http://$HOST$PREFIX_URL/responds") {
-            url { query("type" to type.name) }
-        }?.wrapped<List<MeetWithRespondsResponse>>()
-            ?.map { it.map() } ?: emptyList()
+            url {
+                query("type" to type.name)
+                page?.let { query("page" to "$it") }
+                perPage?.let { query("per_page" to "$it") }
+            }
+        }?.paginateWrapped<List<MeetWithRespondsResponse>>()
+
+    suspend fun getFilesPaging(
+        albumId: String,
+        page: Int,
+        perPage: Int
+    ) =
+        get("http://$HOST$PREFIX_URL/albums/$albumId/files") {
+            url {
+                query("page" to "$page")
+                query("per_page" to "$perPage")
+            }
+        }?.paginateWrapped<List<Avatar>>()
 
     suspend fun getMeetResponds(
         meetId: String,
@@ -193,8 +212,7 @@ class ProfileWebSource : KtorSource() {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.wrapped<List<RespondResponse>>()
-        ?.map { it.map() } ?: emptyList()
+    }?.paginateWrapped<List<RespondResponse>>()
 
     suspend fun deleteRespond(respondId: String) {
         delete("http://$HOST$PREFIX_URL/responds/$respondId")

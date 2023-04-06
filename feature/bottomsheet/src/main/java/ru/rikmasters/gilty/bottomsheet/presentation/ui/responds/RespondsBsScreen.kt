@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.bottomsheet.presentation.ui.responds
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.FULL
@@ -20,66 +21,72 @@ fun RespondsBs(
     full: Boolean,
     meetId: String? = null,
     vm: RespondsBsViewModel,
-    nav: NavHostController,
+    nav: NavHostController
 ) {
-    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val globalNav = get<NavState>()
-    
-    val respondsList by vm.responds.collectAsState()
+
+    // Список встреч с пагинацией
+    val respondsList = vm.responds.collectAsLazyPagingItems()
+    // Список откликов с пагинацией
+    val meetRespondsList = vm.meetResponds.collectAsLazyPagingItems()
+
     val groupsStates by vm.groupsStates.collectAsState()
     val tabs by vm.tabs.collectAsState()
-    
-    LaunchedEffect(Unit) { vm.getResponds(meetId) }
-    
+
+    LaunchedEffect(Unit) { vm.updateMeetId(meetId) }
+
     Use<RespondsBsViewModel>(LoadingTrait) {
         RespondsList(
             type = meetId?.let { MEET }
-                ?: if(full) FULL else SHORT,
+                ?: if (full) FULL else SHORT,
             responds = respondsList,
+            meetResponds = meetRespondsList,
             respondsStates = groupsStates,
-            selectTab = tabs, Modifier,
-            object: RespondsListCallback {
-                
+            selectTab = tabs,
+            Modifier,
+            object : RespondsListCallback {
+
                 override fun onRespondClick(authorId: String) {
                     nav.navigate("USER?user=$authorId&meet=$meetId")
                 }
-                
+
                 override fun onImageClick(image: String) {
                     scope.launch {
                         globalNav.navigateAbsolute(
-                            ("profile/avatar?type=2&image=${image}")
+                            ("profile/avatar?type=2&image=$image")
                         )
                         asm.bottomSheet.collapse()
                     }
                 }
-                
+
                 override fun onCancelClick(respondId: String) {
                     scope.launch {
-                        if(tabs == 0)
+                        if (tabs == 0) {
                             vm.cancelRespond(respondId)
-                        else
+                        } else {
                             vm.deleteRespond(respondId)
-                        vm.getResponds(meetId)
+                        }
+                        vm.updateMeetId(meetId)
                     }
                 }
-                
+
                 override fun onAcceptClick(respondId: String) {
                     scope.launch {
                         vm.acceptRespond(respondId)
-                        vm.getResponds(meetId)
+                        vm.updateMeetId(meetId)
                     }
                 }
-                
+
                 override fun onArrowClick(index: Int) {
                     scope.launch { vm.selectRespondsGroup(index) }
                 }
-                
+
                 override fun onTabChange(tab: Int) {
                     scope.launch { vm.selectTab(tab) }
                 }
-                
+
                 override fun onBack() {
                     nav.popBackStack()
                 }

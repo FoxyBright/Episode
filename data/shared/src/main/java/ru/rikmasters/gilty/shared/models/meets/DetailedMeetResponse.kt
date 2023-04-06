@@ -9,9 +9,16 @@ import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.valueOf
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.RespondsInfoModel
 import ru.rikmasters.gilty.shared.models.DetailedRequirement
 import ru.rikmasters.gilty.shared.models.Location
+import ru.rikmasters.gilty.shared.models.Thumbnail
 import ru.rikmasters.gilty.shared.models.User
+
+data class RespondsInfo(
+    val count: Int,
+    val thumbnail: Thumbnail
+)
 
 data class DetailedMeetResponse(
     val id: String,
@@ -35,11 +42,12 @@ data class DetailedMeetResponse(
     val hideAddress: Boolean? = null,
     val location: Location? = null,
     val place: String? = null,
+    val responds: RespondsInfo,
     val address: String? = null,
     val memberState: String,
-    val price: Int? = null,
+    val price: Int? = null
 ) {
-    
+
     fun map() = FullMeetingModel(
         id = id,
         userId = userId,
@@ -61,13 +69,20 @@ data class DetailedMeetResponse(
         requirements = requirements?.let { req -> req.map { it.map() } },
         hideAddress = hideAddress,
         location = location?.map()?.copy(
-            hide = (valueOf(memberState) != IS_MEMBER
-                    && valueOf(memberState) != IS_ORGANIZER),
+            hide = (
+                valueOf(memberState) != IS_MEMBER &&
+                    valueOf(memberState) != IS_ORGANIZER
+                ),
             place = place,
-            address = address,
-        ), place = place,
+            address = address
+        ),
+        place = place,
         address = address,
         memberState = valueOf(memberState),
-        price = price
+        price = price,
+        responds = RespondsInfoModel(
+            count = responds.count,
+            thumbnail = responds.thumbnail.map()
+        )
     )
 }

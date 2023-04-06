@@ -13,12 +13,14 @@ import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
 import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.profile.models.ProfileCategories
 import ru.rikmasters.gilty.profile.models.ProfileMeets
-import ru.rikmasters.gilty.profile.paging.ProfileMeetsPagingSource
-import ru.rikmasters.gilty.profile.paging.ProfileObserversPagingSource
+import ru.rikmasters.gilty.profile.paging.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Avatar
@@ -150,6 +152,57 @@ class ProfileStore(
                     webSource = webSource,
                     type = type,
                     query = query
+                )
+            }
+        ).flow
+    }
+
+    fun getFiles(
+        albumId: String
+    ): Flow<PagingData<AvatarModel>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                AlbumPagingSource(
+                    webSource = webSource,
+                    albumId = albumId
+                )
+            }
+        ).flow
+    }
+
+    fun getMeetResponds(
+        meetId: String
+    ): Flow<PagingData<RespondModel>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                ProfileRespondsPagingSource(
+                    webSource = webSource,
+                    meetId = meetId
+                )
+            }
+        ).flow
+    }
+
+    fun getResponds(
+        type: RespondType
+    ): Flow<PagingData<MeetWithRespondsModel>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                ProfileMeetRespondsPagingSource(
+                    webSource = webSource,
+                    type = type
                 )
             }
         ).flow
