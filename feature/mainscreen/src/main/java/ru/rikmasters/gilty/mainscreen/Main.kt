@@ -20,7 +20,6 @@ object Main: FeatureDefinition() {
     
     override fun DeepNavGraphBuilder.navigation() {
         nested("main", "meetings") {
-            
             screen<MainViewModel>("meetings") { vm, _ ->
                 MainScreen(vm)
             }
