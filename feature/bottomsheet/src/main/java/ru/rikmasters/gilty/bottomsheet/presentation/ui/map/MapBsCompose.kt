@@ -186,6 +186,7 @@ private fun Search(
                     imeAction = Done, keyboardType = Text,
                     capitalization = Sentences
                 ),
+                singleLine = true,
                 placeholder = textFieldLabel(
                     (false), stringResource(R.string.search_placeholder)
                 ),

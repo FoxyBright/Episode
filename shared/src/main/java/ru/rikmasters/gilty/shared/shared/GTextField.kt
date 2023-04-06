@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -101,13 +100,15 @@ private fun Placeholder() {
 fun textFieldLabel(
     label: Boolean = false,
     text: String? = null,
+    labelFont: TextStyle = typography.headlineSmall,
+    holderFont: TextStyle = typography.bodyMedium,
 ): @Composable (() -> Unit) {
     return {
         text?.let {
             Text(
-                it, Modifier, style = if(label)
-                    typography.headlineSmall
-                else typography.bodyMedium
+                it, Modifier,
+                style = if(label) labelFont
+                else holderFont
             )
         }
     }
@@ -125,8 +126,7 @@ fun GTextField(
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null, // TODO Иконка Error пока не применима
-    /*{ Icon(painterResource(R.drawable.ic_trailing), (null)) },*/
+    trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -169,7 +169,7 @@ fun GTextField(
                     interactionSource, shape, colors
                 )
                 if(value.isNotEmpty()) clear?.let {
-                    IconButton({ it() }, Modifier.align(CenterEnd)) {
+                    IconButton({ it() }, Modifier.align(TopEnd)) {
                         if(value.isNotEmpty()) {
                             Icon(
                                 painterResource(R.drawable.ic_close),

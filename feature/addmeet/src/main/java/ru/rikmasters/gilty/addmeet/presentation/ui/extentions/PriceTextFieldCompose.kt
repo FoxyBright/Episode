@@ -37,7 +37,7 @@ fun PriceTextField(
         isError = value.isNotEmpty() && try {
             value.toInt() > 1_000_000
         } catch(e: Exception) {
-            false
+            true
         },
         errorBottomText = "До 1 000 000 ₽",
         keyboardOptions = KeyboardOptions(

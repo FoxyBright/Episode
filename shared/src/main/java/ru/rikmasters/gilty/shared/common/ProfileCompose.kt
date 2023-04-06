@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -25,9 +26,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
-import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.textFieldColors
-import ru.rikmasters.gilty.shared.shared.transparentTextFieldColors
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -257,20 +256,21 @@ private fun Description(
             readOnly = (profileType == ORGANIZER
                     || profileType == ANONYMOUS_ORGANIZER),
             shape = shapes.large, colors = textFieldColors(),
-            textStyle = typography.bodyMedium,
-            keyboardActions = KeyboardActions {
+            textStyle = typography.bodyMedium.copy(
+                baselineShift = BaselineShift(-0.3f)
+            ), keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
                 onSaveDescription()
             }, keyboardOptions = Default.copy(
                 imeAction = Done, keyboardType = Text,
                 capitalization = Sentences
-            ), placeholder = {
-                Text(
-                    stringResource(R.string.about_me_placeholder),
-                    color = colorScheme.onTertiary,
-                    style = typography.bodyMedium
+            ), placeholder = textFieldLabel(
+                (false), stringResource(R.string.about_me_placeholder),
+                holderFont = typography.bodyMedium.copy(
+                    colorScheme.onTertiary,
+                    baselineShift = BaselineShift(-0.3f)
                 )
-            }
+            )
         )
     }
 }

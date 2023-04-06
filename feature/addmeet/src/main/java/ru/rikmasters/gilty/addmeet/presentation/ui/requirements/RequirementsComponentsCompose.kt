@@ -172,6 +172,7 @@ fun memberCountInput(
             ) else null, placeholder = textFieldLabel(
                 (false), stringResource(R.string.requirements_member_count_place_holder)
             ), textStyle = typography.bodyMedium,
+            singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = NumberPassword
             ), visualTransformation = transformationOf(

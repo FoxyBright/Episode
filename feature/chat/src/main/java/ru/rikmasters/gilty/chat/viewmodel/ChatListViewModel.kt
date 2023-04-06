@@ -32,9 +32,6 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     private val _alertSelected = MutableStateFlow(0)
     val alertSelected = _alertSelected.asStateFlow()
     
-    val isPageRefreshing = MutableStateFlow(false)
-    override val pagingPull = isPageRefreshing
-    
     private val refresh = MutableStateFlow(false)
     
     private val _sortType = MutableStateFlow(SortTypeModel.MEETING_DATE)
@@ -65,10 +62,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val chats by lazy {
-        combine(
-            refresh,
-            _sortType
-        ) { refresh, sort ->
+        combine(refresh, _sortType) { refresh, sort ->
             Pair(refresh, sort)
         }.flatMapLatest {
             chatManager.getChats(it.second)

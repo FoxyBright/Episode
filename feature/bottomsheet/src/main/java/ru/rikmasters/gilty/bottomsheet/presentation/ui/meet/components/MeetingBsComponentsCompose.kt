@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -374,7 +375,10 @@ fun MeetingBsComment(
                 capitalization = Sentences
             ),
             placeholder = textFieldLabel(
-                (false), stringResource(R.string.meeting_comment_text_holder)
+                (false), stringResource(R.string.meeting_comment_text_holder),
+                holderFont = typography.bodyMedium.copy(
+                    baselineShift = BaselineShift(-0.3f)
+                )
             ), textStyle = typography.bodyMedium,
             clear = onTextClear
         )

@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -43,39 +44,40 @@ fun description(
     callback: DetailedCallback? = null,
 ) = FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
     Column {
-        Column(Modifier.fillMaxWidth()) {
-            GTextField(
-                state.description, {
-                    if(it.length <= 120)
-                        callback?.onDescriptionChange(it)
-                },
-                Modifier.fillMaxWidth(),
-                shape = shapes.medium,
-                colors = descriptionColors(state.online),
-                label = if(state.description.isNotEmpty())
-                    textFieldLabel(
-                        true,
-                        stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                    ) else null, placeholder = textFieldLabel(
-                    false,
-                    stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                ), textStyle = typography.bodyMedium,
-                keyboardOptions = Default.copy(
-                    imeAction = Done, keyboardType = Text,
-                    capitalization = Sentences
-                ),
-                clear = { callback?.onDescriptionClear() }
-            )
-            Text(
-                "${state.description.length}/120",
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                colorScheme.onTertiary,
-                textAlign = TextAlign.End,
-                style = typography.headlineSmall
-            )
-        }
+        GTextField(
+            state.description, {
+                if(it.length <= 120)
+                    callback?.onDescriptionChange(it)
+            },
+            Modifier.fillMaxWidth(),
+            colors = descriptionColors(state.online),
+            shape = shapes.medium,
+            label = if(state.description.isNotEmpty())
+                textFieldLabel(
+                    (true), stringResource(R.string.add_meet_detailed_meet_description_place_holder)
+                ) else null,
+            placeholder = textFieldLabel(
+                (false), stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                holderFont = typography.bodyMedium.copy(
+                    baselineShift = BaselineShift(-0.3f)
+                )
+            ), textStyle = typography.bodyMedium,
+            keyboardOptions = Default.copy(
+                imeAction = Done,
+                keyboardType = Text,
+                capitalization = Sentences
+            ),
+            clear = { callback?.onDescriptionClear() }
+        )
+        Text(
+            "${state.description.length}/120",
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, end = 16.dp),
+            colorScheme.onTertiary,
+            textAlign = TextAlign.End,
+            style = typography.headlineSmall
+        )
     }
 }
 
