@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -21,6 +22,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
@@ -251,56 +253,68 @@ private fun Notifications(
                 }
 
                 if (itemCount > 0) {
-                    val todayItems = notifications.itemSnapshotList.filter {
-                        todayControl(it!!.date)
-                    }
 
+                    val todayItems = notifications.itemSnapshotList.items.filter {
+                        todayControl(it.date)
+                    }
                     if (todayItems.isNotEmpty()) {
                         item { Label(R.string.meeting_profile_bottom_today_label) }
-                        itemsIndexed(todayItems) { count, item ->
-                            ElementNot(
-                                count,
-                                todayItems.size,
-                                item!!,
-                                state.ratings,
-                                callback
-                            )
+                        itemsIndexed(state.notifications) { count, item ->
+                            item?.let {
+                                if (todayControl(item.date)) {
+                                    ElementNot(
+                                        count,
+                                        todayItems.size,
+                                        item,
+                                        state.ratings,
+                                        callback
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    val weekItems = notifications.itemSnapshotList.filter {
-                        weekControl(it!!.date)
+                    val weekItems = notifications.itemSnapshotList.items.filter {
+                        weekControl(it.date)
                     }
-
                     if (weekItems.isNotEmpty()) {
                         item { Label(R.string.notification_on_this_week_label) }
-                        itemsIndexed(weekItems) { count, item ->
-                            ElementNot(
-                                count,
-                                weekItems.size,
-                                item!!,
-                                state.ratings,
-                                callback
-                            )
+                        itemsIndexed(state.notifications) { count, item ->
+                            item?.let {
+                                if (weekControl(item.date)) {
+                                    ElementNot(
+                                        count,
+                                        todayItems.size,
+                                        item,
+                                        state.ratings,
+                                        callback
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    val restItems = notifications.itemSnapshotList.filter {
-                        !weekControl(it!!.date) && !todayControl(it.date)
+                    val restItems = notifications.itemSnapshotList.items.filter {
+                        earlierWeekControl(it.date)
                     }
 
                     if (restItems.isNotEmpty()) {
                         item { Label(R.string.notification_earlier_label) }
-                        itemsIndexed(restItems) { count, item ->
-                            ElementNot(
-                                count,
-                                restItems.size,
-                                item!!,
-                                state.ratings,
-                                callback
-                            )
+                        itemsIndexed(state.notifications) { count, item ->
+                            item?.let {
+                                if ( earlierWeekControl(item.date)) {
+                                    ElementNot(
+                                        count,
+                                        todayItems.size,
+                                        item,
+                                        state.ratings,
+                                        callback
+                                    )
+                                }
+                            }
                         }
                     }
+
                     if (notifications.loadState.append is LoadState.Loading) {
                         item { PagingLoader(notifications.loadState) }
                     }
