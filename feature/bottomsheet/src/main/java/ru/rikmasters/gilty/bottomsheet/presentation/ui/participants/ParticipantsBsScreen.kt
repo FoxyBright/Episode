@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsBsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
@@ -22,12 +23,11 @@ fun ParticipantsBs(
     nav: NavHostController,
 ) {
     
-    val memberList by vm.participants.collectAsState()
+    val memberList = vm.participants.collectAsLazyPagingItems()
     val meeting by vm.meet.collectAsState()
     
     LaunchedEffect(Unit) {
         vm.getMeet(meetId)
-        vm.getParticipants(meetId)
     }
     
     Use<ParticipantsBsViewModel>(LoadingTrait) {

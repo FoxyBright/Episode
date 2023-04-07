@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -16,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.shared.R
@@ -25,12 +26,11 @@ import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.*
 
+/*
 @Preview
 @Composable
 private fun ObserveNotificationPreview() {
@@ -43,29 +43,36 @@ private fun ObserveNotificationPreview() {
     )
 }
 
+ */
+
 data class ObserveNotificationState(
     val notification: NotificationModel,
-    val participants: List<UserModel>,
+    val participants: LazyPagingItems<UserModel>,
     val participantsStates: List<Int>,
-    val emojiList: List<EmojiModel>,
+    val emojiList: List<EmojiModel>
 )
 
 @Composable
 fun ObserveNotification(
     state: ObserveNotificationState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback? = null,
+    callback: NotificationsCallback? = null
 ) {
     Column(modifier) {
-        if(state.notification.parent.meeting?.memberState != IS_ORGANIZER)
+        if (state.notification.parent.meeting?.memberState != IS_ORGANIZER) {
             NotificationItem(
                 NotificationItemState(
-                    state.notification, DragRowState(1f),
+                    state.notification,
+                    DragRowState(1f),
                     MaterialTheme.shapes.medium,
                     getDifferenceOfTime(state.notification.date),
                     state.emojiList
-                ), Modifier, callback
+                ),
+                Modifier,
+                callback
             )
+        }
+        val itemCount = state.participants.itemCount
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -73,24 +80,47 @@ fun ObserveNotification(
                 .background(
                     colorScheme.primaryContainer,
                     MaterialTheme.shapes.large
-                ),
+                )
         ) {
-            itemsIndexed(state.participants) { index, participant ->
-                Participant(
-                    index, participant, state.participants.size,
-                    state.participantsStates.contains(index),
-                    participant.meetRating?.emoji, state.emojiList,
-                    { part -> callback?.onParticipantClick(part) }
-                ) { emoji ->
-                    participant.id?.let {
-                        callback?.onEmojiClick(
-                            state.notification, emoji, it
-                        )
+            when {
+                state.participants.loadState.refresh is LoadState.Error -> {}
+                state.participants.loadState.append is LoadState.Error -> {}
+                state.participants.loadState.refresh is LoadState.Loading -> {
+                    item {
+                        PagingLoader(state.participants.loadState)
+                    }
+                }
+                else -> {
+                    itemsIndexed(state.participants) { index, participant ->
+                        participant?.let {
+                            Participant(
+                                index,
+                                participant,
+                                itemCount,
+                                state.participantsStates.contains(index),
+                                participant.meetRating?.emoji,
+                                state.emojiList,
+                                { part -> callback?.onParticipantClick(part) }
+                            ) { emoji ->
+                                participant.id?.let {
+                                    callback?.onEmojiClick(
+                                        state.notification,
+                                        emoji,
+                                        it
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    if (state.participants.loadState.append is LoadState.Loading) {
+                        item {
+                           PagingLoader(state.participants.loadState)
+                        }
                     }
                 }
             }
         }
-        if(state.participants.isNotEmpty()) Text(
+        if (itemCount != 0) Text(
             stringResource(R.string.notification_send_emotion),
             Modifier.padding(top = 6.dp, start = 16.dp),
             colorScheme.onTertiary,
@@ -102,16 +132,19 @@ fun ObserveNotification(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Participant(
-    index: Int, member: UserModel,
-    size: Int, unwrap: Boolean,
+    index: Int,
+    member: UserModel,
+    size: Int,
+    unwrap: Boolean,
     memberEmoji: EmojiModel?,
     emojiList: List<EmojiModel>,
     onClick: ((Int) -> Unit)? = null,
-    onEmojiClick: ((EmojiModel) -> Unit)? = null,
+    onEmojiClick: ((EmojiModel) -> Unit)? = null
 ) {
     Card(
         { onClick?.let { it(index) } },
-        Modifier.fillMaxWidth(), (true),
+        Modifier.fillMaxWidth(),
+        (true),
         lazyItemsShapes(index, size, 14.dp),
         cardColors(colorScheme.primaryContainer)
     ) {
@@ -121,12 +154,14 @@ private fun Participant(
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .padding(top = 12.dp),
-                SpaceBetween, CenterVertically
+                SpaceBetween,
+                CenterVertically
             ) {
                 BrieflyRow(
                     ("${member.username}, ${member.age}"),
-                    Modifier, member.avatar?.thumbnail?.url,
-                    member.emoji,
+                    Modifier,
+                    member.avatar?.thumbnail?.url,
+                    member.emoji
                 )
                 memberEmoji?.let {
                     GEmojiImage(
@@ -135,19 +170,23 @@ private fun Participant(
                     )
                 } ?: run {
                     Icon(
-                        if(unwrap) Filled.KeyboardArrowDown
+                        if (unwrap) Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight,
-                        (null), Modifier.size(24.dp),
+                        (null),
+                        Modifier.size(24.dp),
                         colorScheme.onTertiary
                     )
                 }
             }
-            if(unwrap && memberEmoji == null) EmojiRow(
-                emojiList, Modifier.padding(
-                    start = 60.dp, end = 20.dp
+            if (unwrap && memberEmoji == null) EmojiRow(
+                emojiList,
+                Modifier.padding(
+                    start = 60.dp,
+                    end = 20.dp
                 )
             ) { emoji -> onEmojiClick?.let { it(emoji) } }
         }
-    }; if(index < size - 1)
+    }; if (index < size - 1) {
         Divider(Modifier.padding(start = 60.dp))
+    }
 }

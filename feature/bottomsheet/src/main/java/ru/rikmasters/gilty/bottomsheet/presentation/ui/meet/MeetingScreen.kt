@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingBsViewModel
@@ -25,44 +26,50 @@ fun MeetingBs(
     vm: MeetingBsViewModel,
     meetId: String,
     detailed: Boolean,
-    nav: NavHostController,
+    nav: NavHostController
 ) {
-    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val globalNav = get<NavState>()
-    
+
     val lastResponse by vm.lastResponse.collectAsState()
-    val memberList by vm.memberList.collectAsState()
+    val memberList = vm.membersList.collectAsLazyPagingItems()
     val meeting by vm.meet.collectAsState()
     val distance by vm.distance.collectAsState()
     val comment by vm.comment.collectAsState()
     val hidden by vm.hidden.collectAsState()
     val menu by vm.menu.collectAsState()
-    
-    val details = if(detailed) Pair(comment, hidden) else null
+
+    val details = if (detailed) Pair(comment, hidden) else null
     val buttonState = meeting?.memberState == IS_ORGANIZER
     val backBut = nav.previousBackStackEntry != null
-    
+
     LaunchedEffect(Unit) {
         vm.getMeet(meetId)
         vm.clearComment()
         vm.changeHidden(false)
     }
-    
+
     Use<MeetingBsViewModel>(LoadingTrait) {
         meeting?.let { meet ->
             MeetingBsContent(
                 MeetingBsState(
-                    menu, meet, lastResponse,
-                    memberList, distance,
-                    buttonState, details, backBut
-                ), Modifier, object: MeetingBsCallback {
-                    
+                    menu,
+                    meet,
+                    lastResponse,
+                    memberList,
+                    distance,
+                    buttonState,
+                    details,
+                    backBut
+                ),
+                Modifier,
+                object : MeetingBsCallback {
+
                     override fun onMenuItemClick(index: Int, meetId: String) {
                         scope.launch {
-                            when(index) {
+                            when (index) {
                                 0 -> shareMeet(meetId, context)
                                 1 -> vm.leaveMeet(meetId)
                                 2 -> vm.canceledMeet(meetId)
@@ -72,7 +79,7 @@ fun MeetingBs(
                             }
                         }
                     }
-                    
+
                     override fun onRespond(meetId: String) {
                         scope.launch {
                             vm.respondForMeet(meetId)
@@ -82,51 +89,52 @@ fun MeetingBs(
                             asm.bottomSheet.collapse()
                         }
                     }
-                    
+
                     override fun onAvatarClick(
-                        organizerId: String, meetId: String,
+                        organizerId: String,
+                        meetId: String
                     ) {
-                        if(meet.type != MeetType.ANONYMOUS) nav.navigate(
+                        if (meet.type != MeetType.ANONYMOUS) nav.navigate(
                             "USER?user=$organizerId&meet=$meetId"
                         )
                     }
-                    
+
                     override fun onMemberClick(member: UserModel) {
-                        if(meet.type != MeetType.ANONYMOUS) nav.navigate(
+                        if (meet.type != MeetType.ANONYMOUS) nav.navigate(
                             "USER?user=${member.id}&meet=${meet.id}"
                         )
                     }
-                    
+
                     override fun onMeetPlaceClick(location: LocationModel?) {
                         nav.navigate(
                             "MAP?location=${mapper.writeValueAsString(location)}"
                         )
                     }
-                    
+
                     override fun onRespondsClick(meet: FullMeetingModel) {
                         nav.navigate("RESPONDS?meet=${meet.id}")
                     }
-                    
+
                     override fun onAllMembersClick(meetId: String) {
                         nav.navigate("PARTICIPANTS?meet=$meetId")
                     }
-                    
+
                     override fun onHiddenPhotoActive(hidden: Boolean) {
                         scope.launch { vm.changeHidden(hidden) }
                     }
-                    
+
                     override fun onCommentChange(text: String) {
                         scope.launch { vm.changeComment(text) }
                     }
-                    
+
                     override fun onKebabClick(state: Boolean) {
                         scope.launch { vm.menuDismiss(state) }
                     }
-                    
+
                     override fun onCommentTextClear() {
                         scope.launch { vm.clearComment() }
                     }
-                    
+
                     override fun onBack() {
                         nav.popBackStack()
                     }

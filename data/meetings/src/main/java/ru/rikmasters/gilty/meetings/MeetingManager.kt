@@ -1,6 +1,9 @@
 package ru.rikmasters.gilty.meetings
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import ru.rikmasters.gilty.meetings.addmeet.AddMeetStorage
+import ru.rikmasters.gilty.meetings.paging.MeetMembersPagingSource
 import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
@@ -10,20 +13,20 @@ import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
-    
+
     private val storage: AddMeetStorage,
-    
-    private val web: MeetingWebSource,
+
+    private val web: MeetingWebSource
 ) {
-    
+
     private data class MeetCount(val total: Int)
-    
+
     val addMeetFlow = storage.addMeetFlow
-    
+
     suspend fun clearAddMeet() {
         storage.clear()
     }
-    
+
     suspend fun update(
         category: CategoryModel? = null,
         type: MeetType? = null,
@@ -46,7 +49,7 @@ class MeetingManager(
         requirementsType: String? = null,
         requirements: List<RequirementModel>? = null,
         withoutResponds: Boolean? = null,
-        memberLimited: Boolean? = null,
+        memberLimited: Boolean? = null
     ) {
         storage.update(
             category, type, isOnline, condition,
@@ -58,9 +61,10 @@ class MeetingManager(
             memberLimited
         )
     }
-    
+
     private suspend inline fun <reified Type> getMeetings(
-        filter: MeetFiltersRequest, count: Boolean,
+        filter: MeetFiltersRequest,
+        count: Boolean
     ): Type? {
         return web.getMeetsList(
             count = count,
@@ -78,7 +82,7 @@ class MeetingManager(
             time = filter.time
         )?.wrapped()
     }
-    
+
     suspend fun getMeetings(filter: MeetFiltersModel): List<MeetingModel> {
         return getMeetings<List<MainMeetResponse>>(
             MeetFiltersRequest(
@@ -86,10 +90,11 @@ class MeetingManager(
                 filter.radius, filter.lat, filter.lng,
                 filter.meetTypes, filter.onlyOnline, filter.genders,
                 filter.conditions, filter.dates, filter.time
-            ), false
+            ),
+            false
         )?.map { it.map() } ?: emptyList()
     }
-    
+
     suspend fun getMeetCount(filter: MeetFiltersModel): Int =
         getMeetings<MeetCount>(
             MeetFiltersRequest(
@@ -97,17 +102,18 @@ class MeetingManager(
                 filter.radius, filter.lat, filter.lng,
                 filter.meetTypes, filter.onlyOnline, filter.genders,
                 filter.conditions, filter.dates, filter.time
-            ), true
+            ),
+            true
         )?.total ?: 0
-    
+
     suspend fun leaveMeet(meetId: String) {
         web.leaveMeet(meetId)
     }
-    
+
     suspend fun cancelMeet(meetId: String) {
         web.cancelMeet(meetId)
     }
-    
+
     @Suppress("unused")
     suspend fun addNewTag(tag: String) = web.addNewTag(tag)
     suspend fun getPopularTags(list: List<String?>) = web.getPopularTags(list)
@@ -117,58 +123,85 @@ class MeetingManager(
     suspend fun getOrientations() = web.getOrientations()
     suspend fun getLastPlaces() = web.getLastPlaces()
     suspend fun getCategoriesList() = web.getCategoriesList()
-    
-    suspend fun getMeetMembers(
-        meetId: String, excludeMe: Boolean = false,
-    ) = web.getMeetMembers(meetId, excludeMe.compareTo(false))
-    
+
+    fun getMeetMembers(
+        meetId: String,
+        excludeMe: Boolean = false
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 15,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            MeetMembersPagingSource(
+                webSource = web,
+                excludeMe = excludeMe.compareTo(false),
+                meet = meetId
+            )
+        }
+    ).flow
+
     suspend fun notInteresting(meetId: String) {
         web.notInteresting(meetId)
     }
-    
+
     suspend fun resetMeets() {
         web.resetMeets()
     }
-    
+
     suspend fun respondOfMeet(
-        meetId: String, comment: String?, hidden: Boolean,
+        meetId: String,
+        comment: String?,
+        hidden: Boolean
     ) {
         web.respondOfMeet(meetId, comment, hidden)
     }
-    
+
     suspend fun addMeet(meet: AddMeetModel) = web.addMeet(
         meet.category?.id, meet.type.name,
-        meet.isOnline, meet.condition.name, try {
+        meet.isOnline, meet.condition.name,
+        try {
             meet.price.toInt()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             null
-        }, meet.photoAccess,
+        },
+        meet.photoAccess,
         meet.chatForbidden, meet.tags.map { it.title },
         meet.description.ifEmpty { null },
         meet.dateTime,
         durationToMinutes(meet.duration),
-        if(!meet.isOnline) Location(
-            meet.hide, meet.lat, meet.lng,
-            meet.place, meet.address
-        ) else null, meet.isPrivate, try {
+        if (!meet.isOnline) Location(
+            meet.hide,
+            meet.lat,
+            meet.lng,
+            meet.place,
+            meet.address
+        ) else null,
+        meet.isPrivate,
+        try {
             meet.memberCount.toInt()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             1
-        }, meet.requirementsType, when {
+        },
+        meet.requirementsType,
+        when {
             meet.isPrivate -> null
             meet.requirementsType == "ALL" ->
                 listOf(meet.requirements.first().reqMap())
-            
+
             else -> meet.requirements.map { it.reqMap() }
-        }, meet.withoutResponds
+        },
+        meet.withoutResponds
     )
-    
+
     suspend fun setUserInterest(meets: List<CategoryModel>) {
         web.setUserInterest(meets.map { it.id })
     }
 }
 
 private fun RequirementModel.reqMap() = Requirement(
-    gender?.name, ageMin,
-    ageMax, orientation?.id ?: "HETERO"
+    gender?.name,
+    ageMin,
+    ageMax,
+    orientation?.id ?: "HETERO"
 )

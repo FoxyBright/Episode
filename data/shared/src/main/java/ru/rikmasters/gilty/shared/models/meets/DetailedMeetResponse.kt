@@ -17,7 +17,7 @@ import ru.rikmasters.gilty.shared.models.User
 
 data class RespondsInfo(
     val count: Int,
-    val thumbnail: Thumbnail
+    val thumbnail: Thumbnail?
 )
 
 data class DetailedMeetResponse(
@@ -42,7 +42,7 @@ data class DetailedMeetResponse(
     val hideAddress: Boolean? = null,
     val location: Location? = null,
     val place: String? = null,
-    val responds: RespondsInfo,
+    val responds: RespondsInfo? = null,
     val address: String? = null,
     val memberState: String,
     val price: Int? = null
@@ -80,9 +80,11 @@ data class DetailedMeetResponse(
         address = address,
         memberState = valueOf(memberState),
         price = price,
-        responds = RespondsInfoModel(
-            count = responds.count,
-            thumbnail = responds.thumbnail.map()
-        )
+        responds = responds?.let {
+            RespondsInfoModel(
+                count = responds.count,
+                thumbnail = responds.thumbnail?.map()
+            )
+        }
     )
 }

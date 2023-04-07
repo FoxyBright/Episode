@@ -13,7 +13,7 @@ import java.util.UUID.randomUUID
 
 data class RespondsInfoModel(
     val count: Int,
-    val thumbnail: ThumbnailModel
+    val thumbnail: ThumbnailModel?
 )
 
 data class MeetingModel(
@@ -85,10 +85,7 @@ data class MeetingModel(
         members = emptyList(),
         location = null,
         memberState = memberState,
-        responds = RespondsInfoModel(
-            count = 0,
-            thumbnail = DemoThumbnailModel
-        )
+        responds = null
     )
 }
 
@@ -116,7 +113,7 @@ data class FullMeetingModel(
     val place: String? = null,
     val address: String? = null,
     val memberState: MemberStateType?,
-    val responds: RespondsInfoModel,
+    val responds: RespondsInfoModel? = null,
     val price: Int? = null
 ) {
     

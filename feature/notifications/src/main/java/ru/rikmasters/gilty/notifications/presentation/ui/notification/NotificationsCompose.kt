@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -49,6 +48,7 @@ private fun previewData() = flowOf(
     PagingData.from(DemoNotificationModelList)
 ).collectAsLazyPagingItems()
 
+/*
 @Preview
 @Composable
 private fun NotificationsContentPreview() {
@@ -71,6 +71,9 @@ private fun NotificationsContentPreview() {
     }
 }
 
+ */
+
+/*
 @Preview
 @Composable
 private fun NotificationsBlurPreview() {
@@ -93,13 +96,15 @@ private fun NotificationsBlurPreview() {
     }
 }
 
+ */
+
 data class NotificationsState(
     val notifications: LazyPagingItems<NotificationModel>,
     val lastRespond: Pair<Int, String>,
     val navBar: List<NavIconState>,
     val blur: Boolean,
     val activeNotification: NotificationModel?,
-    val participants: List<UserModel>,
+    val participants: LazyPagingItems<UserModel>,
     val participantsStates: List<Int>,
     val listState: LazyListState,
     val ratings: List<RatingModel>
