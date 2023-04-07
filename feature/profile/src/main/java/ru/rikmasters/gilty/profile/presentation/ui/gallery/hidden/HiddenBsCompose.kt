@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells.Fixed
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -70,7 +71,7 @@ fun HiddenBsContent(
                 photoList.loadState.refresh is LoadState.Error -> {}
                 photoList.loadState.append is LoadState.Error -> {}
                 photoList.loadState.refresh is LoadState.Loading -> {
-                    item {
+                    item(span = { GridItemSpan(3) }) {
                         PagingLoader(photoList.loadState)
                     }
                 }
@@ -86,10 +87,11 @@ fun HiddenBsContent(
                         }
                     }
                     if (photoList.loadState.append is LoadState.Loading) {
-                        item {
+                        item(span = { GridItemSpan(3) }) {
                             PagingLoader(photoList.loadState)
                         }
                     }
+                    items(3) { Spacer(Modifier.size(115.dp)) }
                 }
             }
         }
