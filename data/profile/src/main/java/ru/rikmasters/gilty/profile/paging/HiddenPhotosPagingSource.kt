@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.profile.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.core.data.source.DbSource
@@ -30,6 +31,7 @@ class HiddenPhotosPagingSource(
                 perPage = loadSize,
                 albumId = profile?.albumPrivate?.id ?: ""
             )
+            Log.d("TEST","photos ${photos?.first}")
             val nextKey = if ((photos?.first?.size ?: 0) < loadSize) null else page + 1
             val prevKey = if (page == 1) null else page - 1
             LoadResult.Page(photos?.first?.map { it.map() } ?: emptyList(), prevKey, nextKey)

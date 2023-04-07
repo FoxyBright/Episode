@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 
@@ -35,23 +36,23 @@ data class GalleryState(
     val menuItems: List<String>? = null,
     val isOnline: Boolean = false,
     val buttonLabel: String = "",
-    val buttonEnabled: Boolean = false,
+    val buttonEnabled: Boolean = false
 )
 
 interface GalleryCallback {
-    
     fun onBack() {}
     fun onAttach() {}
     fun onKebabClick() {}
     fun onMenuDismiss(state: Boolean) {}
     fun onMenuItemClick(item: Int) {}
     fun onImageClick(image: String) {}
+    fun onHiddenImageClick(image: AvatarModel) {}
 }
 
 @Composable
 fun GalleryTopBar(
     menuState: Boolean,
-    callback: GalleryCallback?,
+    callback: GalleryCallback?
 ) {
     Row(
         Modifier
@@ -60,16 +61,16 @@ fun GalleryTopBar(
         SpaceBetween
     ) {
         Row(Modifier, Start, CenterVertically) {
-            RowActionBar(stringResource(R.string.profile_gallery_title))
-            { callback?.onBack() }
+            RowActionBar(stringResource(R.string.profile_gallery_title)) { callback?.onBack() }
             IconButton(
                 { callback?.onMenuDismiss(true) },
                 Modifier.size(30.dp)
             ) {
                 Icon(
-                    if(menuState) Filled.KeyboardArrowUp
+                    if (menuState) Filled.KeyboardArrowUp
                     else Filled.KeyboardArrowDown,
-                    (null), Modifier.fillMaxSize(),
+                    (null),
+                    Modifier.fillMaxSize(),
                     colorScheme.tertiary
                 )
             }
@@ -77,7 +78,8 @@ fun GalleryTopBar(
         IconButton({ callback?.onKebabClick() }) {
             Icon(
                 painterResource(R.drawable.ic_kebab),
-                (null), Modifier,
+                (null),
+                Modifier,
                 colorScheme.tertiary
             )
         }
@@ -91,7 +93,7 @@ fun GalleryGrid(
     selected: List<String>?,
     type: GalleryImageType,
     isWeb: Boolean = false,
-    callback: GalleryCallback?,
+    callback: GalleryCallback?
 ) {
     val cells = 3
     LazyVerticalGrid(
@@ -106,9 +108,12 @@ fun GalleryGrid(
             contentType = { i, _ -> i }
         ) { _, image ->
             GalleryImage(
-                image, type,
+                image,
+                type,
                 selected?.contains(image),
-                Modifier, isWeb, callback
+                Modifier,
+                isWeb,
+                callback
             )
         }
         items(cells) { Spacer(Modifier.size(115.dp)) }
@@ -119,17 +124,19 @@ fun GalleryGrid(
 fun GalleryDropMenu(
     state: Boolean,
     menuList: List<String>?,
-    callback: GalleryCallback?,
+    callback: GalleryCallback?
 ) {
     Box(Modifier.padding(start = 130.dp, top = 90.dp)) {
         DropdownMenu(
-            state, { callback?.onMenuDismiss(false) },
-            Modifier.background(colorScheme.primaryContainer),
+            state,
+            { callback?.onMenuDismiss(false) },
+            Modifier.background(colorScheme.primaryContainer)
         ) {
             menuList?.forEachIndexed { i, it ->
                 DropdownMenuItem({
                     Text(
-                        it, Modifier,
+                        it,
+                        Modifier,
                         colorScheme.tertiary,
                         style = typography.bodyMedium
                     )
@@ -145,25 +152,29 @@ fun GalleryDropMenu(
 @Composable
 fun StoragePermissionBs(
     modifier: Modifier = Modifier,
-    onSettingsClick: (() -> Unit)? = null,
+    onSettingsClick: (() -> Unit)? = null
 ) {
     Column(
         modifier
             .fillMaxWidth()
             .fillMaxHeight(0.6f)
-            .padding(16.dp), SpaceBetween
+            .padding(16.dp),
+        SpaceBetween
     ) {
         Text(
             stringResource(R.string.profile_gallery_title),
-            Modifier, style = typography.labelLarge,
+            Modifier,
+            style = typography.labelLarge
         )
         Column(
             Modifier.fillMaxWidth(),
-            Top, CenterHorizontally
+            Top,
+            CenterHorizontally
         ) {
             Icon(
                 painterResource(R.drawable.ic_image_box),
-                (null), Modifier.size(50.dp),
+                (null),
+                Modifier.size(50.dp),
                 colorScheme.primary
             )
             Text(
