@@ -146,7 +146,7 @@ fun Category(
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            SpaceBetween
+            SpaceBetween, CenterVertically
         ) {
             Text(
                 stringResource(R.string.meeting_filter_show_all_categories),
