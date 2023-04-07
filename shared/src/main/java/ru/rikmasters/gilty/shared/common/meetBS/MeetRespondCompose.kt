@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,7 +57,7 @@ fun MeetRespondContent(
 ) {
     Box(modifier.fillMaxSize()) {
         AsyncImage(
-            avatar?.url, (null),
+            avatar?.thumbnail?.url, (null),
             Modifier.fillMaxSize(),
             contentScale = Crop
         )
@@ -136,7 +135,7 @@ private fun CloseButton(
                 (null), Modifier
                     .padding(10.dp)
                     .size(10.dp),
-                White
+                colors.meetCloseCrossColor
             )
         }
     }
