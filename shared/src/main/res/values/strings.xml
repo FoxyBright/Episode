@@ -151,7 +151,8 @@
     <string name="meeting_join_button_name">Присоединиться</string>
     <string name="meeting_only_organizer_label">Только для организатора</string>
     <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
-    <string name="meeting_only_online_meetings_button">Сделать онлайн</string>
+    <string name="meeting_make_online_button">Сделать онлайн</string>
+    <string name="meeting_only_online_meetings_button">Только онлайн встречи</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
     <string name="meeting_respond_title">Отклик отправлен</string>
     <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат Episode</string>

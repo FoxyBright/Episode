@@ -150,7 +150,7 @@ private fun type(
     MeetingType(
         state.online,
         state.meetType,
-        stringResource(R.string.meeting_only_online_meetings_button),
+        stringResource(R.string.meeting_make_online_button),
         state.online,
         { callback?.onOnlineClick() },
         { callback?.onMeetingTypeSelect(it) }
