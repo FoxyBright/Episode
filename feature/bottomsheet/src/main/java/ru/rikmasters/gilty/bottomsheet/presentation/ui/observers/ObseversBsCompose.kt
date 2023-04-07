@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
@@ -102,7 +103,9 @@ fun ObserversListContent(
         LazyColumn(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(
+                    horizontal = 16.dp
+                )
                 .background(
                     colorScheme.primaryContainer,
                     shapes.medium
@@ -135,6 +138,15 @@ fun ObserversListContent(
                         if (state.observers.loadState.append is LoadState.Loading) {
                             item { PagingLoader(state.observers.loadState) }
                         }
+                        item {
+                            Spacer(
+                                modifier = Modifier.fillMaxWidth()
+                                    .height(40.dp)
+                                    .background(
+                                        color = colorScheme.background
+                                    )
+                            )
+                        }
                     }
                 }
             } else {
@@ -165,6 +177,15 @@ fun ObserversListContent(
                         }
                         if (state.observed.loadState.append is LoadState.Loading) {
                             item { PagingLoader(state.observed.loadState) }
+                        }
+                        item {
+                            Spacer(
+                                modifier = Modifier.fillMaxWidth()
+                                    .height(40.dp)
+                                    .background(
+                                        color = colorScheme.background
+                                    )
+                            )
                         }
                     }
                 }
