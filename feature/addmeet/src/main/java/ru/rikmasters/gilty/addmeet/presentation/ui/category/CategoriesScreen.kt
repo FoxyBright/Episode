@@ -40,7 +40,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             override fun onClose() {
                 scope.launch {
                     vm.clearAddMeet()
-                    nav.navigateAbsolute("main/meetings")
+                    nav.clearStackNavigation("main/meetings")
                 }
             }
         }

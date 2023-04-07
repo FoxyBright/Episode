@@ -244,6 +244,10 @@ class RequirementsViewModel: ViewModel() {
         )
     }
     
+    suspend fun clearAddMeet() {
+        manager.clearAddMeet()
+    }
+    
     suspend fun clearCount() {
         _memberCount.emit("")
         manager.update(memberCount = "")

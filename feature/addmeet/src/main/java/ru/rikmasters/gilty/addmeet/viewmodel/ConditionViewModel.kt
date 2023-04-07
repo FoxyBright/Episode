@@ -95,7 +95,7 @@ class ConditionViewModel: ViewModel() {
         _alert.emit(state)
     }
     
-    suspend fun clearBase() {
+    suspend fun clearAddMeet() {
         manager.clearAddMeet()
     }
 }

@@ -50,6 +50,20 @@ class NavState(
         navHostController.navigate(dest, routeOptions[dest])
     }
     
+    /**
+     * Очистка стека
+     *
+     * @param route маршрут пункта назначения
+     */
+    fun clearStackNavigation(route: String) {
+        navController.navigate(route) {
+            popUpTo(0)
+        }
+    }
+    
+    /**
+     * путь назад по графу
+     */
     fun navigationBack() {
         navController.popBackStack()
     }

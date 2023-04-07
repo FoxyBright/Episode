@@ -110,4 +110,8 @@ class DetailedViewModel: ViewModel() {
         _description.emit("")
         manager.update(description = "")
     }
+    
+    suspend fun clearAddMeet() {
+        manager.clearAddMeet()
+    }
 }

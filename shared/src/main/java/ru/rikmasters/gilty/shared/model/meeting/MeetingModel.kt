@@ -13,7 +13,7 @@ import java.util.UUID.randomUUID
 
 data class RespondsInfoModel(
     val count: Int,
-    val thumbnail: ThumbnailModel,
+    val thumbnail: ThumbnailModel? = null,
 )
 
 data class MeetingModel(

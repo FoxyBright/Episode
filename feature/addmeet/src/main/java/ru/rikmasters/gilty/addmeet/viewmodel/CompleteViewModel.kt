@@ -40,6 +40,10 @@ class CompleteViewModel: ViewModel() {
         _meet.emit(meet.value?.copy(id))
     }
     
+    suspend fun clearAddMeet() {
+        meetManager.clearAddMeet()
+    }
+    
     private suspend fun getProfile() = profileManager
         .getProfile(false).map()
 }

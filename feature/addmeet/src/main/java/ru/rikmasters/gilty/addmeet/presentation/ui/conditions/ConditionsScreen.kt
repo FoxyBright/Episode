@@ -39,8 +39,8 @@ fun ConditionsScreen(vm: ConditionViewModel) {
             
             override fun onClose() {
                 scope.launch {
-                    vm.clearBase()
-                    nav.navigateAbsolute("main/meetings")
+                    vm.clearAddMeet()
+                    nav.clearStackNavigation("main/meetings")
                 }
             }
             

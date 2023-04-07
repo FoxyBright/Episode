@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.shared.models.*
 
 data class RespondsInfo(
     val count: Int,
-    val thumbnail: Thumbnail,
+    val thumbnail: Thumbnail? = null,
 )
 
 data class DetailedMeetResponse(
@@ -79,8 +79,8 @@ data class DetailedMeetResponse(
         price = price,
         responds = responds?.let {
             RespondsInfoModel(
-                count = responds.count,
-                thumbnail = responds.thumbnail.map()
+                count = it.count,
+                thumbnail = it.thumbnail?.map()
             )
         }
     )

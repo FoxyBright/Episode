@@ -30,7 +30,10 @@ fun CompleteScreen(vm: CompleteViewModel) {
                 }
                 
                 override fun onClose() {
-                    nav.navigateAbsolute("main/meetings")
+                    scope.launch {
+                        vm.clearAddMeet()
+                        nav.clearStackNavigation("main/meetings")
+                    }
                 }
             }
         )

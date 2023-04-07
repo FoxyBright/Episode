@@ -24,6 +24,8 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
     private suspend fun event(data: Event) = _events.emit(data)
     
     protected suspend fun makeToast(text: String) = event("toast" to text)
+    
+    @Suppress("unused")
     protected suspend fun makeToast(@StringRes text: Int) =
         makeToast(getKoin().get<Context>().getString(text))
     
@@ -62,6 +64,7 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
         started: SharingStarted = SharingStarted.Lazily,
     ): StateFlow<T> = stateIn(coroutineScope, started, initial)
     
-    override fun onScopeClose(scope: Scope) { /* Для очистки */
+    override fun onScopeClose(scope: Scope) {
+        /* Для очистки */
     }
 }

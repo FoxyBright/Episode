@@ -90,7 +90,10 @@ fun DetailedScreen(vm: DetailedViewModel) {
             }
             
             override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
+                scope.launch {
+                    vm.clearAddMeet()
+                    nav.clearStackNavigation("main/meetings")
+                }
             }
             
             override fun onTagDelete(tag: TagModel) {

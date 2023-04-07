@@ -150,7 +150,10 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             }
             
             override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
+                scope.launch {
+                    vm.clearAddMeet()
+                    nav.clearStackNavigation("main/meetings")
+                }
             }
             
             override fun onBack() {
@@ -163,5 +166,6 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                     nav.navigate("complete")
                 }
             }
-        })
+        }
+    )
 }
