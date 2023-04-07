@@ -1,11 +1,9 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -15,15 +13,18 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModelWithPhotos
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
-import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
+import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.shared.EmptyScreen
+import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.RowActionBar
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-
+/*
 @Preview
 @Composable
 private fun ReceivedResponds() {
@@ -41,13 +42,15 @@ private fun ReceivedResponds() {
     }
 }
 
+ */
+
 data class RespondsListState(
-    val responds: List<MeetWithRespondsModelWithPhotos>,
-    val groupStates: List<Int>,
+    val responds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    val groupStates: List<Int>
 )
 
 interface RespondsListCallback {
-    
+
     fun onAcceptClick(respondId: String)
     fun onCancelClick(respondId: String)
     fun onRespondClick(authorId: String)
@@ -61,16 +64,46 @@ interface RespondsListCallback {
 fun RespondsListContent(
     state: RespondsListState,
     modifier: Modifier = Modifier,
-    callback: RespondsListCallback? = null,
+    callback: RespondsListCallback? = null
 ) {
-    LazyColumn(modifier) {
-        itemsIndexed(state.responds) { index, respond ->
-            GroupList(
-                index, respond.tags.first().title,
-                respond.responds, Modifier,
-                !(state.groupStates.contains(index)),
-                callback
-            )
+    when {
+        state.responds.loadState.refresh is LoadState.Error -> {}
+        state.responds.loadState.append is LoadState.Error -> {}
+        state.responds.loadState.refresh is LoadState.Loading -> {
+            PagingLoader(state.responds.loadState)
+        }
+        else -> {
+            LazyColumn(modifier) {
+                val itemCount = state.responds.itemCount
+                if (itemCount != 0) {
+                    itemsIndexed(state.responds) { index, respond ->
+                        respond?.let {
+                            GroupList(
+                                index,
+                                respond.tags.first().title,
+                                respond.responds,
+                                Modifier,
+                                !(state.groupStates.contains(index)),
+                                callback
+                            )
+                        }
+                    }
+                    if (state.responds.loadState.append is LoadState.Loading) {
+                        item { PagingLoader(state.responds.loadState) }
+                    }
+                } else {
+                    if (state.responds.loadState.refresh is LoadState.NotLoading) {
+                        item {
+                            EmptyScreen(
+                                stringResource(
+                                    R.string.profile_hasnt_sent_responds
+                                ),
+                                R.drawable.broken_heart
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -82,30 +115,35 @@ private fun GroupList(
     responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
-    callback: RespondsListCallback?,
+    callback: RespondsListCallback?
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             RowActionBar(
-                title, Modifier.clickable(
-                    MutableInteractionSource(), (null)
+                title,
+                Modifier.clickable(
+                    MutableInteractionSource(),
+                    (null)
                 ) {
                     callback?.onArrowClick(index)
-                }, responds.size.toString()
+                },
+                responds.size.toString()
             )
             IconButton({ callback?.onArrowClick(index) }) {
                 Icon(
-                    if(state) Filled.KeyboardArrowDown
+                    if (state) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
-                    (null), Modifier.size(24.dp),
+                    (null),
+                    Modifier.size(24.dp),
                     colorScheme.onTertiary
                 )
             }
         }
-        if(state) Column {
+        if (state) Column {
             responds.forEach {
                 ReceivedRespond(
-                    it, Modifier.padding(bottom = 6.dp),
+                    it,
+                    Modifier.padding(bottom = 6.dp),
                     callback
                 )
             }

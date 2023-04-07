@@ -102,6 +102,14 @@ fun weekControl(date: String): Boolean {
     return (localDate in thisWeek().first..thisWeek().second)
 }
 
+fun earlierWeekControl(date: String): Boolean {
+    val dateList = date.format(FORMAT).split(DASH)
+    val localDate = LocalDate.of(
+        dateList.first().toInt(), dateList[1].toInt(), dateList.last().toInt()
+    ).millis() / 1000
+    return (localDate < thisWeek().first)
+}
+
 fun thisWeek(): Pair<Long, Long> {
     val start = LOCAL_DATE.fistDayOfWeek()
     return Pair(
