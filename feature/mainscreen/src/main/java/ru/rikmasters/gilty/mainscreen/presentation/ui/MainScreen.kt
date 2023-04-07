@@ -10,8 +10,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.core.viewmodel.connector.Use
-import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time.TimeBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
@@ -44,89 +42,87 @@ fun MainScreen(vm: MainViewModel) {
         vm.getMeets()
     }
     
-    Use<MainViewModel>(LoadingTrait) {
-        MainContent(
-            MainContentState(
-                grid, today, days.isNotEmpty(),
-                time.isNotBlank(), meetings,
-                navBar, alert, hasFilters.isNotNullOrEmpty()
-            ), Modifier, object: MainContentCallback {
-                
-                override fun onNavBarSelect(point: Int) {
-                    if(point == 0) return
-                    scope.launch {
-                        nav.navigateAbsolute(
-                            vm.navBarNavigate(point)
-                        )
-                    }
-                }
-                
-                override fun onMeetClick(meet: MeetingModel) {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            BottomSheet(vm.scope, MEET, meet.id)
-                        }
-                    }
-                }
-                
-                override fun onRespond(meet: MeetingModel) {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            BottomSheet(vm.scope, SHORT_MEET, meet.id)
-                        }
-                    }
-                }
-                
-                override fun onOpenFiltersBottomSheet() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<FiltersBsViewModel>(vm.scope) {
-                                FiltersBs(it)
-                            }
-                        }
-                    }
-                }
-                
-                override fun onTimeFilterClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            if(today) Connector<TimeBsViewModel>(vm.scope) {
-                                TimeBs(it)
-                            } else Connector<CalendarBsViewModel>(vm.scope) {
-                                CalendarBs(it)
-                            }
-                        }
-                    }
-                }
-                
-                override fun meetInteraction(
-                    direction: DirectionType,
-                    meet: MeetingModel,
-                    state: SwipeableCardState,
-                ) {
-                    scope.launch { vm.meetInteraction(direction, meet, state) }
-                }
-                
-                override fun onMeetMoreClick() {
-                    scope.launch { vm.moreMeet() }
-                }
-                
-                override fun onResetMeets() {
-                    scope.launch { vm.resetMeets() }
-                }
-                
-                override fun onCloseAlert() {
-                    scope.launch { vm.alertDismiss(false) }
-                }
-                
-                override fun onTodayChange(today: Boolean) {
-                    scope.launch { vm.changeGroup(today) }
-                }
-                
-                override fun onStyleChange() {
-                    scope.launch { vm.changeGrid() }
+    MainContent(
+        MainContentState(
+            grid, today, days.isNotEmpty(),
+            time.isNotBlank(), meetings,
+            navBar, alert, hasFilters.isNotNullOrEmpty()
+        ), Modifier, object: MainContentCallback {
+            
+            override fun onNavBarSelect(point: Int) {
+                if(point == 0) return
+                scope.launch {
+                    nav.navigateAbsolute(
+                        vm.navBarNavigate(point)
+                    )
                 }
             }
-        )
-    }
+            
+            override fun onMeetClick(meet: MeetingModel) {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        BottomSheet(vm.scope, MEET, meet.id)
+                    }
+                }
+            }
+            
+            override fun onRespond(meet: MeetingModel) {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        BottomSheet(vm.scope, SHORT_MEET, meet.id)
+                    }
+                }
+            }
+            
+            override fun onOpenFiltersBottomSheet() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        Connector<FiltersBsViewModel>(vm.scope) {
+                            FiltersBs(it)
+                        }
+                    }
+                }
+            }
+            
+            override fun onTimeFilterClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        if(today) Connector<TimeBsViewModel>(vm.scope) {
+                            TimeBs(it)
+                        } else Connector<CalendarBsViewModel>(vm.scope) {
+                            CalendarBs(it)
+                        }
+                    }
+                }
+            }
+            
+            override fun meetInteraction(
+                direction: DirectionType,
+                meet: MeetingModel,
+                state: SwipeableCardState,
+            ) {
+                scope.launch { vm.meetInteraction(direction, meet, state) }
+            }
+            
+            override fun onMeetMoreClick() {
+                scope.launch { vm.moreMeet() }
+            }
+            
+            override fun onResetMeets() {
+                scope.launch { vm.resetMeets() }
+            }
+            
+            override fun onCloseAlert() {
+                scope.launch { vm.alertDismiss(false) }
+            }
+            
+            override fun onTodayChange(today: Boolean) {
+                scope.launch { vm.changeGroup(today) }
+            }
+            
+            override fun onStyleChange() {
+                scope.launch { vm.changeGrid() }
+            }
+        }
+    )
 }

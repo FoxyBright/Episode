@@ -1,12 +1,8 @@
 package ru.rikmasters.gilty.notifications
 
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.bottomsheet.BottomSheet
-import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingBsViewModel
-import ru.rikmasters.gilty.bottomsheet.viewmodel.ParticipantsBsViewModel
-import ru.rikmasters.gilty.bottomsheet.viewmodel.UserBsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingsData
@@ -26,12 +22,7 @@ object Notifications: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        scope<NotificationViewModel> {
-            scopedOf(::NotificationViewModel)
-            singleOf(::MeetingBsViewModel)
-            scopedOf(::ParticipantsBsViewModel)
-            scopedOf(::UserBsViewModel)
-        }
+        singleOf(::NotificationViewModel)
     }
     
     override fun include() = setOf(

@@ -4,6 +4,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.mainscreen.presentation.ui.MainScreen
@@ -39,9 +40,7 @@ object Main: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        scope<RespondsViewModel> {
-            scopedOf(::RespondsViewModel)
-        }
+        singleOf(::RespondsViewModel)
         
         scope<MainViewModel> {
             scopedOf(::MainViewModel)
