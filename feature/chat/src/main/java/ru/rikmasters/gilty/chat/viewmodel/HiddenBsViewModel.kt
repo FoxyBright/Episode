@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
@@ -15,7 +16,7 @@ class HiddenBsViewModel(
     private val profileManager by inject<ProfileManager>()
     
     val images by lazy {
-        profileManager.hiddenFlow.state(emptyList())
+        profileManager.getHiddenPhotos().cachedIn(coroutineScope)
     }
     
     private val _selected =
@@ -29,6 +30,8 @@ class HiddenBsViewModel(
             )
         }
     }
+
+    /*
     
     suspend fun selectImage(path: String) {
         val list = selected.value
@@ -42,6 +45,8 @@ class HiddenBsViewModel(
             )
         }
     }
+
+     */
     
     suspend fun clearSelect() {
         _selected.emit(emptyList())

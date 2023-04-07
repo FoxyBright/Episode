@@ -46,7 +46,7 @@ class ProfileManager(
     suspend fun getProfile(forceWeb: Boolean = false) =
         store.getProfile(forceWeb)
 
-    val hiddenFlow = store.hiddenFlow()
+    fun getHiddenPhotos() = store.getUserHiddenPaging()
 
     suspend fun getProfileHiddens(forceWeb: Boolean) =
         store.getUserHidden(forceWeb)

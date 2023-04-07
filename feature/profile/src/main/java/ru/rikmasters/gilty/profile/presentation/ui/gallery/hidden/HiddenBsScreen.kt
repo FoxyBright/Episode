@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -11,34 +12,34 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @Composable
 fun HiddenBsScreen(vm: HiddenBsViewModel) {
-    
     val nav = get<NavState>()
     val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
-    val photoList by vm.images.collectAsState()
-    
+    val photoList = vm.images.collectAsLazyPagingItems()
+
     LaunchedEffect(Unit) {
         vm.uploadPhotoList(false)
     }
-    
+
     HiddenBsContent(
-        photoList, Modifier,
-        object: HiddenBsCallback {
-            
+        photoList,
+        Modifier,
+        object : HiddenBsCallback {
+
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     asm.bottomSheet.collapse()
                     nav.navigate("avatar?type=0&image=${image.url}")
                 }
             }
-            
+
             override fun openGallery() {
                 scope.launch {
                     asm.bottomSheet.collapse()
                     nav.navigate("gallery?multi=true")
                 }
             }
-    
+
             override fun onDeleteImage(image: AvatarModel) {
                 scope.launch { vm.deleteImage(image.id) }
             }

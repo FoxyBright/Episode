@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.viewmodel.HiddenBsViewModel
@@ -24,7 +25,7 @@ fun HiddenBs(
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val images by vm.images.collectAsState()
+    val images = vm.images.collectAsLazyPagingItems()
     val selected by vm.selected.collectAsState()
     
     LaunchedEffect(Unit) {
@@ -36,7 +37,8 @@ fun HiddenBs(
         HiddenBsContent(
             GalleryState(
                 MULTIPLE,
-                images.map { it.thumbnail.url },
+                //images.map { it.thumbnail.url },
+                listOf("wegwe"),
                 selected.map { it.thumbnail.url },
                 (false), (null), isOnline,
                 stringResource(R.string.send_button),
@@ -51,7 +53,10 @@ fun HiddenBs(
                 }
                 
                 override fun onImageClick(image: String) {
+                    /*
                     scope.launch { vm.selectImage(image) }
+
+                     */
                 }
             }
         )
