@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.shared.shared
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,11 +14,13 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -137,20 +141,25 @@ fun ClosableActionBar(
                     )
                 }
             }
-            CrossButton(
-                Modifier
+            
+            Image(
+                painterResource(
+                    R.drawable.ic_cross_button
+                ), (null), Modifier
                     .padding(top = 16.dp, end = 16.dp)
-                    .size(20.dp)
                     .align(TopEnd)
-            ) { onClose?.let { it() } }
+                    .size(20.dp)
+                    .clickable { onClose?.let { it() } },
+                colorFilter = tint(colorScheme.scrim)
+            )
         }
         Text(
-            title,
-            Modifier
+            title, Modifier
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
-            style = typography.titleLarge,
-            color = colorScheme.tertiary
+            style = typography.titleLarge.copy(
+                lineHeight = 37.sp
+            ), color = colorScheme.tertiary
         )
         details?.let {
             Text(

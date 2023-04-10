@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -169,7 +170,12 @@ fun GTextField(
                     interactionSource, shape, colors
                 )
                 if(value.isNotEmpty()) clear?.let {
-                    IconButton({ it() }, Modifier.align(TopEnd)) {
+                    IconButton(
+                        { it() }, Modifier.align(
+                            if(singleLine || maxLines == 1)
+                            CenterEnd else TopEnd
+                        )
+                    ) {
                         if(value.isNotEmpty()) {
                             Icon(
                                 painterResource(R.drawable.ic_close),
@@ -183,9 +189,11 @@ fun GTextField(
         }
         errorBottomText?.let {
             if(isError) Text(
-                it, Modifier.padding(top = 4.dp),
-                colorScheme.primary,
-                style = typography.titleSmall
+                it, Modifier.padding(
+                    top = 5.dp,
+                    start = 16.dp
+                ), colorScheme.primary,
+                style = typography.headlineSmall
             )
         }
     }

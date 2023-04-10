@@ -66,7 +66,9 @@ fun RequirementsContent() {
                 (0), (1), (false),
                 GROUP, (false), (true),
                 (true), (true)
-            ), Modifier.background(colorScheme.background)
+            ), Modifier.background(
+                colorScheme.background
+            )
         )
     }
 }
@@ -81,7 +83,7 @@ fun RequirementsContent(
     Scaffold(modifier, {
         ClosableActionBar(
             stringResource(R.string.requirements_title),
-            Modifier.padding(bottom = 10.dp), (null),
+            Modifier.padding(bottom = 20.dp), (null),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
     }, {
@@ -117,30 +119,27 @@ fun RequirementsContent(
             }
             if(!state.private) item {
                 RequirementsList(
-                    state,
-                    Modifier.padding(horizontal = 16.dp),
+                    state, Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 20.dp),
                     callback
                 )
             }
             item {
-                Element(responds(state.online, state.withoutRespond) {
-                    callback?.onWithoutRespondClick()
-                })
-            }
-            item {
-                Spacer(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
+                Element(
+                    responds(
+                        state.online,
+                        state.withoutRespond
+                    ) { callback?.onWithoutRespondClick() },
+                    Modifier.padding(top = 24.dp)
                 )
             }
+            itemSpacer(40.dp)
         }
     }
+    val alClose = { callback?.onCloseAlert(false) }
     CloseAddMeetAlert(
-        state.alert, state.online, {
-            callback?.onCloseAlert(false)
-        }, {
-            callback?.onCloseAlert(false)
-            callback?.onClose()
-        })
+        state.alert, state.online, { alClose() },
+        { alClose(); callback?.onClose() }
+    )
 }

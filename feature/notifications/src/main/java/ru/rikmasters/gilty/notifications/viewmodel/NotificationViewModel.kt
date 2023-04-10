@@ -113,7 +113,10 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         navBarSetStates(list)
         return when(point) {
             0 -> "main/meetings"
-            2 -> "addmeet/category"
+            2 -> {
+                meetManager.clearAddMeet()
+                "addmeet/category"
+            }
             3 -> "chats/main"
             4 -> "profile/main"
             else -> "notification/list"

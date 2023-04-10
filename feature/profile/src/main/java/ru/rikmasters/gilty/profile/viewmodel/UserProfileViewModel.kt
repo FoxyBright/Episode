@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
 import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
@@ -22,6 +23,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
+    private val meetManager by inject<MeetingManager>()
     private val chatManager by inject<ChatManager>()
     
     private val _occupied = MutableStateFlow(false)
@@ -142,7 +144,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         return when(point) {
             0 -> "main/meetings"
             1 -> "notification/list"
-            2 -> "addmeet/category"
+            2 -> {
+                meetManager.clearAddMeet()
+                "addmeet/category"
+            }
             3 -> "chats/main"
             else -> "profile/main"
         }

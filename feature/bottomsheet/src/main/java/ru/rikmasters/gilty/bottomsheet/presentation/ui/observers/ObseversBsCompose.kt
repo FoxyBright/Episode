@@ -128,7 +128,7 @@ fun ObserversListContent(
                                     { callback?.onClick(member) }
                                 ) { callback?.onButtonClick(member, DELETE) }
                                 if (index < state.observers.itemCount - 1) {
-                                    Divider(Modifier.padding(start = 16.dp))
+                                    GDivider(Modifier.padding(start = 16.dp))
                                 }
                             }
                         }
@@ -159,7 +159,7 @@ fun ObserversListContent(
                                     { callback?.onClick(member) }
                                 ) { callback?.onButtonClick(member, subType) }
                                 if (index < state.observed.itemCount - 1) {
-                                    Divider(Modifier.padding(start = 16.dp))
+                                    GDivider(Modifier.padding(start = 16.dp))
                                 }
                             }
                         }

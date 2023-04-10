@@ -311,7 +311,7 @@ private fun ElementChat(
             Modifier,
             { callback?.onChatClick(it) }
         ) { callback?.onChatSwipe(it) }
-        if(index < size - 2) Divider(
+        if(index < size - 2) GDivider(
             Modifier.padding(start = 78.dp)
         )
     }

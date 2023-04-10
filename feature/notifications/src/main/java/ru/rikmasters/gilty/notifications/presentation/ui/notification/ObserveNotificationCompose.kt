@@ -149,5 +149,5 @@ private fun Participant(
             ) { emoji -> onEmojiClick?.let { it(emoji) } }
         }
     }; if(index < size - 1)
-        Divider(Modifier.padding(start = 60.dp))
+        GDivider(Modifier.padding(start = 60.dp))
 }

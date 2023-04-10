@@ -4,35 +4,29 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
 private fun GreenTrackCheckBoxActivePreview() {
     var checkBoxState by remember { mutableStateOf(true) }
     TrackCheckBox(
-        checkBoxState,
         Modifier.padding(10.dp),
+        checkBoxState,
         Color(0xFF35C65A)
     ) { checkBoxState = it }
 }
@@ -40,10 +34,10 @@ private fun GreenTrackCheckBoxActivePreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackCheckBox(
-    checked: Boolean = false,
     modifier: Modifier = Modifier,
+    checked: Boolean = false,
     activeColor: Color = colorScheme.primary,
-    sliderSize: Int = 24,
+    sliderSize: Int = 26,
     onCheckedChange: (Boolean) -> Unit
 ) {
     val padding = (sliderSize / 6)
@@ -52,8 +46,8 @@ fun TrackCheckBox(
         else (sliderSize / 3).dp
     )
     val borderColor by animateColorAsState(
-        if (checked) Color.Transparent
-        else ThemeExtra.colors.secondaryTrackCheckBox,
+        if (checked) Transparent
+        else colors.secondaryTrackCheckBox,
         tween(200)
     )
     Surface(
@@ -65,7 +59,7 @@ fun TrackCheckBox(
         RoundedCornerShape(50),
         animateColorAsState(
             if (checked) activeColor
-            else ThemeExtra.colors.mainTrackCheckBox,
+            else colors.mainTrackCheckBox,
             tween(200)
         ).value,
         border = BorderStroke(2.dp, borderColor)
@@ -92,10 +86,9 @@ fun TrackCheckBox(
                             else (sliderSize / 2 + padding).dp
                         ).value
                     )
-                    .clip(CircleShape),
-                true,
+                    .clip(CircleShape), (true),
                 RoundedCornerShape(50),
-                color = Color.White,
+                color = White,
                 border = BorderStroke(1.dp, borderColor)
             ) {}
         }

@@ -220,7 +220,7 @@ fun MeetingBsConditions(
                 colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             Row(
                 Modifier.fillMaxWidth(),
                 SpaceBetween, CenterVertically
@@ -335,7 +335,7 @@ fun MeetingBsParticipants(
                         colorScheme.onTertiary
                     )
                 }; if(list.size > 1 && index <= list.size - 2)
-                Divider(Modifier.padding(start = 60.dp))
+                GDivider(Modifier.padding(start = 60.dp))
             }
         }
         if(meet.type == ANONYMOUS) Text(

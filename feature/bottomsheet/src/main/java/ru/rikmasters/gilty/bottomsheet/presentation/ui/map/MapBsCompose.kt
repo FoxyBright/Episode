@@ -106,7 +106,7 @@ private fun Content(
                     lazyItemsShapes(index, state.lastPlaces.size)
                 ) { callback?.onItemClick(it) }
                 if(index < state.lastPlaces.size.minus(1))
-                    Divider(Modifier.padding(start = 16.dp))
+                    GDivider(Modifier.padding(start = 16.dp))
             }
         }
     }

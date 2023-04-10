@@ -27,8 +27,11 @@ fun Buttons(
         Center, CenterHorizontally
     ) {
         GradientButton(
-            Modifier, stringResource(R.string.next_button),
-            enabled, online
+            Modifier, stringResource(
+                if(activeDash == 3)
+                    R.string.add_meet_publish_button
+                else R.string.next_button
+            ), enabled, online
         ) { onNext() }
         Dashes(
             (4), activeDash,

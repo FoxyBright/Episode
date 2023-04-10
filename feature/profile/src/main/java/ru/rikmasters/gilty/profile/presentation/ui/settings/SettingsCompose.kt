@@ -177,19 +177,19 @@ private fun Information(
                 ThemeExtra.shapes.mediumTopRoundedShape,
                 Modifier, state.gender?.value ?: ""
             ) { callback?.onGenderClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.personal_info_age_placeholder),
                 ThemeExtra.shapes.zero,
                 Modifier, ageHolder(state.age)
             ) { callback?.onAgeClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.orientation_title),
                 ThemeExtra.shapes.zero,
                 Modifier, state.orientation?.name
             ) { callback?.onOrientationClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             Card(
                 stringResource(R.string.phone_number),
                 ThemeExtra.shapes.mediumBottomRoundedShape,
@@ -220,7 +220,7 @@ private fun Additionally(
                 ThemeExtra.shapes.mediumTopRoundedShape,
                 Modifier, (null)
             ) { callback?.onAboutAppClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             
             // TODO Функциональность смены иконки приложения
             //            Card(
@@ -229,7 +229,7 @@ private fun Additionally(
             //                Modifier, (null)
             //            ) { callback?.onIconAppClick() }
             
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             CheckBoxCard(
                 stringResource(R.string.notification_screen_name),
                 modifier.fillMaxWidth(),

@@ -28,7 +28,7 @@ import ru.rikmasters.gilty.shared.model.report.FalseInformation
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.shared.model.report.ReportSubtype
 import ru.rikmasters.gilty.shared.model.report.ReportSubtype.PHOTO_ANOTHER_USER
-import ru.rikmasters.gilty.shared.shared.Divider
+import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
@@ -137,7 +137,7 @@ fun ComplainElements(
                         (select?.display == item.display)
                     ) { onSelect?.let { it(item) } }
                     if(i < list.size - 1)
-                        Divider(Modifier.padding(start = 16.dp))
+                        GDivider(Modifier.padding(start = 16.dp))
                 }
             }
         }

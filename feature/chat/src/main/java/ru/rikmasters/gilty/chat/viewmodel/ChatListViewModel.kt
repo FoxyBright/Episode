@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
@@ -16,6 +17,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
+    private val meetManager by inject<MeetingManager>()
     private val chatManager by inject<ChatManager>()
     
     private val _completed = MutableStateFlow(false)
@@ -113,7 +115,10 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         return when(point) {
             0 -> "main/meetings"
             1 -> "notification/list"
-            2 -> "addmeet/category"
+            2 -> {
+                meetManager.clearAddMeet()
+                "addmeet/category"
+            }
             4 -> "profile/main"
             else -> "chats/main"
         }

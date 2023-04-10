@@ -71,18 +71,17 @@ fun RequirementsList(
         ) {
             CardRow(
                 stringResource(R.string.sex),
-                (state.gender ?: ""),
-                Modifier.padding(top = 8.dp),
+                (state.gender ?: ""), Modifier,
                 ThemeExtra.shapes.mediumTopRoundedShape,
                 state.online,
             ) { callback?.onGenderClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             CardRow(
                 stringResource(R.string.personal_info_age_placeholder),
                 (state.age ?: ""), Modifier,
                 ThemeExtra.shapes.zero, state.online
             ) { callback?.onAgeClick() }
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             CardRow(
                 stringResource(R.string.orientation_title),
                 (state.orientation ?: ""), Modifier,

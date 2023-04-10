@@ -32,8 +32,8 @@ import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
-import ru.rikmasters.gilty.shared.shared.Divider
 import ru.rikmasters.gilty.shared.shared.EmojiRow
+import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
@@ -250,6 +250,6 @@ private fun SwipeableContainer(
         }
         if(shape != shapes.mediumBottomRoundedShape
             && shape != MaterialTheme.shapes.medium
-        ) Divider(Modifier.padding(start = 60.dp))
+        ) GDivider(Modifier.padding(start = 60.dp))
     }
 }

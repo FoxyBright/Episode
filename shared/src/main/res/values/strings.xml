@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gilty</string>
+    <string name="app_name">Episode</string>
 
     <!-- Login -->
     <string name="phone_number">Номер телефона</string>
@@ -152,7 +152,7 @@
     <string name="meeting_only_organizer_label">Только для организатора</string>
     <string name="meeting_open_hidden_photos">Открыть свои скрытые фото</string>
     <string name="meeting_make_online_button">Сделать онлайн</string>
-    <string name="meeting_only_online_meetings_button">Только онлайн встречи</string>
+    <string name="meeting_only_online_meetings_button">Только онлайн episodes</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
     <string name="meeting_respond_title">Отклик отправлен</string>
     <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат Episode</string>
@@ -302,7 +302,7 @@
     <string name="requirements_member_count_label">Количество</string>
     <string name="requirements_member_count_place_holder">Сколько будет участников</string>
     <string name="requirements_private_check">Сделать приватным</string>
-    <string name="requirements_private_check_label">На ваш Episode можно попасть только по ссылке</string>
+    <string name="requirements_private_check_label">На ваш episode можно попасть только по ссылке</string>
     <string name="requirements_filter_all">Ко всем</string>
     <string name="requirements_filter_personal">К каждому</string>
     <string name="orientation_title">Ориентация</string>
@@ -319,11 +319,11 @@
     <string name="age_from">от</string>
     <string name="age_to">до</string>
     <string name="add_meet_without_respond_title">Участие без отклика</string>
-    <string name="add_meet_without_respond_label">Участники не присоединятся к Episode без вашего\nсогласия</string>
+    <string name="add_meet_without_respond_label">Участники не присоединятся к episode без вашего\nсогласия</string>
     <string name="add_meet_with_respond_label">Участники могут присоединиться к Episode\nбез вашего согласия</string>
     <string name="add_meet_member_limit_title">Ограничение участников</string>
     <string name="add_meet_member_limit_label">Введите количество участников</string>
-    <string name="add_meet_member_not_limited_label">У вашего Episode не будет ограничения участников</string>
+    <string name="add_meet_member_not_limited_label">У вашего episode не будет ограничения участников</string>
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
 

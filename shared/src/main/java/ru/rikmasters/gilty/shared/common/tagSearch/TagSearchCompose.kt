@@ -204,7 +204,7 @@ private fun AllTagItem(
                 )
             ) { onClick(item) }
         }; if(index < size - 1)
-        Divider(Modifier.padding(start = 16.dp))
+        GDivider(Modifier.padding(start = 16.dp))
     }
 }
 

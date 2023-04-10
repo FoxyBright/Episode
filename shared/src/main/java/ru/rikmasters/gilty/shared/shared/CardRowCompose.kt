@@ -21,33 +21,37 @@ fun CardRow(
     label: String, text: String,
     modifier: Modifier = Modifier,
     shape: Shape, online: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         onClick, modifier, (true), shape,
         cardColors(colorScheme.primaryContainer)
     ) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            Modifier.fillMaxWidth(),
             SpaceBetween, CenterVertically
         ) {
             Text(
-                label, Modifier, colorScheme.tertiary,
+                label, Modifier.padding(12.dp, 16.dp),
+                colorScheme.tertiary,
                 style = typography.bodyMedium
             )
             Row(Modifier, Start, CenterVertically) {
                 if(text.isNotBlank())
                     Text(
-                        text, Modifier, if(online)
+                        text, Modifier,
+                        if(online)
                             colorScheme.secondary
                         else colorScheme.primary,
                         style = typography.bodyMedium,
                     )
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
-                    (null), Modifier, colorScheme.onTertiary
+                    (null),
+                    Modifier
+                        .padding(end = 8.dp)
+                        .size(28.dp),
+                    colorScheme.scrim
                 )
             }
         }

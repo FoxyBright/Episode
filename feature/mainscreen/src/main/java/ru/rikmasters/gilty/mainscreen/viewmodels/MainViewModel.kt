@@ -148,7 +148,10 @@ class MainViewModel: ViewModel() {
         navBarSetStates(list)
         return when(point) {
             1 -> "notification/list"
-            2 -> "addmeet/category"
+            2 -> {
+                meetManager.clearAddMeet()
+                "addmeet/category"
+            }
             3 -> "chats/main"
             4 -> "profile/main"
             else -> "main/meetings"

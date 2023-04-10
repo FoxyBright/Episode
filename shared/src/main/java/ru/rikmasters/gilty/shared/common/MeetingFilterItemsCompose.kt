@@ -58,7 +58,7 @@ fun Country(
             stringResource(R.string.select_country), country,
             Modifier, ThemeExtra.shapes.mediumTopRoundedShape
         ) { onCountryClick() }
-        Divider(Modifier.padding(start = 16.dp))
+        GDivider(Modifier.padding(start = 16.dp))
         CardRow(
             stringResource(R.string.select_city), city, Modifier,
             ThemeExtra.shapes.mediumBottomRoundedShape
@@ -118,7 +118,7 @@ fun Category(
             if(!category.children.isNullOrEmpty()
                 && states.contains(index)
             ) {
-                Divider(); FlowLayout(
+                GDivider(); FlowLayout(
                     Modifier
                         .background(colorScheme.primaryContainer)
                         .padding(top = 16.dp)
@@ -287,7 +287,7 @@ fun Distance(
             }
         }
         if(state) {
-            Divider()
+            GDivider()
             Column {
                 Slider(
                     distance.toFloat(),

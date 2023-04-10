@@ -133,7 +133,7 @@ private fun AllTagItem(
             colorScheme.tertiary,
             style = typography.bodyMedium
         ); if(index < size - 1)
-        Divider(Modifier.padding(start = 16.dp))
+        GDivider(Modifier.padding(start = 16.dp))
     }
 }
 
@@ -163,7 +163,7 @@ private fun PopularTags(
                     fontWeight = SemiBold
                 )
             }
-            Divider(
+            GDivider(
                 Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)

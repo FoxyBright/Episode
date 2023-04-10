@@ -31,7 +31,7 @@ fun Element(
                         colorScheme.onTertiary
                     ).toSpanStyle()
                 ) { append(it.details ?: "") }
-            }, Modifier.padding(bottom = 18.dp),
+            }, Modifier.padding(bottom = 16.dp),
             style = typography.labelLarge.copy(
                 colorScheme.tertiary
             )

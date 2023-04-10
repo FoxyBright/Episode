@@ -260,7 +260,7 @@ private fun Filters(
     onOpenFilters: () -> Unit,
 ) {
     Box(modifier, BottomCenter) {
-        DividerBold(
+        GDividerBold(
             Modifier
                 .width(40.dp)
                 .padding(bottom = 22.dp)

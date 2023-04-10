@@ -164,7 +164,7 @@ private fun Categories(
                 if(!category.children.isNullOrEmpty()
                     && states.contains(index)
                 ) {
-                    Divider(); FlowLayout(
+                    GDivider(); FlowLayout(
                         Modifier
                             .background(colorScheme.primaryContainer)
                             .padding(top = 16.dp)

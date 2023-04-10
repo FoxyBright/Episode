@@ -74,7 +74,7 @@ fun LazyListScope.sentRespond(
                     organizer.avatar?.thumbnail?.url
                 )
                 Column(Modifier.padding(start = 66.dp)) {
-                    Divider(Modifier)
+                    GDivider(Modifier)
                     Buttons(Modifier.padding(vertical = 8.dp), (true)) { callback?.onCancelClick(respond.id) }
                 }
             }
@@ -112,7 +112,7 @@ fun ReceivedRespond(
                 user.emoji
             )
             Column(Modifier.padding(start = 66.dp)) {
-                Divider(Modifier)
+                GDivider(Modifier)
                 if (respond.comment.isNotBlank()) Text(
                     respond.comment,
                     Modifier

@@ -70,7 +70,7 @@ fun ParticipantsList(
                         Modifier.padding(16.dp),
                         member.avatar?.thumbnail?.url
                     ); if(index < membersList.size - 1)
-                    Divider(Modifier.padding(start = 60.dp))
+                    GDivider(Modifier.padding(start = 60.dp))
                 }
             }
         }

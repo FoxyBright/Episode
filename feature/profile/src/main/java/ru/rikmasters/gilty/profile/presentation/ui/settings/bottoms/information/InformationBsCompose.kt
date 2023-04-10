@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.BsContainer
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.shared.Divider
+import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -76,7 +76,7 @@ fun InformationBsContent(
                             index, state.list.size
                         )
                     ) { callback?.onItemClick(index) }
-                    if(index < state.list.size - 1) Divider(
+                    if(index < state.list.size - 1) GDivider(
                         Modifier.padding(start = 16.dp)
                     )
                 }
