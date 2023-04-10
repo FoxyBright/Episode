@@ -1,17 +1,13 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -113,8 +109,14 @@ private fun Item(
     add: Boolean = false,
     onClick: () -> Unit,
 ) {
-    if(add) AddButton(icon, onClick)
-    else Card(
+    if(add) Image(
+        painterResource(
+            if(isSystemInDarkTheme())
+                R.drawable.ic_add_button_day
+            else R.drawable.ic_add_button
+        ), (null),
+        Modifier.clickable { onClick() }
+    ) else Card(
         onClick, shape = CircleShape,
         colors = cardColors(
             when(state) {
@@ -130,23 +132,6 @@ private fun Item(
             Modifier
                 .padding(20.dp, 4.dp)
                 .size(24.dp),
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddButton(icon: Int, onClick: () -> Unit) {
-    Card(
-        onClick, shape = shapes.medium,
-        colors = cardColors(colors.navBarAddButton),
-    ) {
-        Icon(
-            painterResource(icon),
-            (null), Modifier
-                .padding(15.dp, 8.dp)
-                .size(10.dp),
-            colorScheme.primaryContainer
         )
     }
 }
