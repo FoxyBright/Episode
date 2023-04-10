@@ -40,17 +40,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
         vm.getLastResponse()
     }
 
-    /*
-    LaunchedEffect(notifications.loadState) {
-        val loadState = notifications.loadState
-        vm.isPageRefreshing.emit(
-            loadState.append is Loading
-                    || loadState.refresh is Loading
-        )
-    }
-
-     */
-
     fun refresh() = scope.launch {
         vm.forceRefresh()
     }

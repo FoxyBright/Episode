@@ -24,7 +24,7 @@ class NotificationListPagingSource(
                 page = page,
                 perPage = loadSize
             )
-            Log.d("TEST","notifications ${notifications.second.total}")
+            Log.d("TESTNOT","notifications ${notifications.second.total}")
             val nextKey = if (notifications.first.size < loadSize) null else page + 1
             val prevKey = if (page == 1) null else page - 1
             LoadResult.Page(notifications.first.map { it.map() }, prevKey, nextKey)
