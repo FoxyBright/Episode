@@ -68,12 +68,6 @@ class ProfileStore(
     suspend fun getProfile(forceWeb: Boolean) =
         uploadProfile(forceWeb).map()
 
-    fun hiddenFlow() = primarySource
-        .listenAll(Avatar::class)
-        .map { list ->
-            list.map { it.map() }
-        }
-
     suspend fun deleteHidden(imageId: String) {
         webSource.deleteHidden(
             uploadProfile(false)
@@ -92,6 +86,19 @@ class ProfileStore(
             )
         )
     }
+    fun getUserHiddenPaging() =
+        Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                HiddenPhotosPagingSource(
+                    webSource = webSource,
+                    localSource = primarySource
+                )
+            }
+        ).flow
 
     suspend fun getUserHidden(
         forceWeb: Boolean

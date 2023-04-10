@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
-import android.util.Log
-import androidx.paging.PagingData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -10,18 +9,25 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
-class MeetingBsViewModel: ViewModel() {
+class MeetingBsViewModel : ViewModel() {
 
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
 
+    private val _meetId = MutableStateFlow<String?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val membersList by lazy {
+        _meetId.flatMapLatest {
+            it?.let {
+                meetManager.getMeetMembers(it)
+            } ?: flow { }
+        }
+    }
+
     private val _meet = MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
-
-    private val _memberList = MutableStateFlow(listOf<UserModel>())
-    val memberList = _memberList.asStateFlow()
 
     private val _lastResponse = MutableStateFlow<Pair<Int, String?>?>(null)
     val lastResponse = _lastResponse.asStateFlow()
@@ -40,15 +46,15 @@ class MeetingBsViewModel: ViewModel() {
 
     suspend fun getMeet(meetId: String) {
         _meet.emit(meetManager.getDetailedMeet(meetId))
-        if(meet.value?.memberState == IS_ORGANIZER) {
+        if (meet.value?.memberState == IS_ORGANIZER) {
             _lastResponse.emit(
                 _meet.value?.responds?.count!! to _meet.value?.responds?.thumbnail?.url
             )
         }
-        if(meet.value?.isOnline == true) meet.value?.let {
+        if (meet.value?.isOnline == true) meet.value?.let {
             _distance.emit(distanceCalculator(it.map()))
         }
-        _memberList.emit(meetManager.getMeetMembers(meetId))
+        _meetId.value = meetId
     }
 
     suspend fun changeHidden(state: Boolean) {
@@ -69,7 +75,9 @@ class MeetingBsViewModel: ViewModel() {
 
     suspend fun respondForMeet(meetId: String) {
         meetManager.respondOfMeet(
-            meetId, comment.value.ifBlank { null }, hidden.value
+            meetId,
+            comment.value.ifBlank { null },
+            hidden.value
         )
     }
 

@@ -16,19 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
-import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.GDropMenu
 import ru.rikmasters.gilty.shared.shared.GKebabButton
 import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
+/*
 @Preview
 @Composable
 private fun MeetingBsDetailed() {
@@ -112,20 +110,21 @@ private fun MeetingBsWhenUser() {
         }
     }
 }
+ */
 
 data class MeetingBsState(
     val menuState: Boolean,
     val meet: FullMeetingModel,
     val lastRespond: Pair<Int, String?>?,
-    val membersList: List<UserModel>? = null,
+    val membersList: LazyPagingItems<UserModel>? = null,
     val meetDistance: String? = null,
     val buttonState: Boolean = true,
     val detailed: Pair<String, Boolean>? = null,
-    val backButton: Boolean = false,
+    val backButton: Boolean = false
 )
 
 interface MeetingBsCallback {
-    
+
     fun onKebabClick(state: Boolean) {}
     fun onMenuItemClick(index: Int, meetId: String) {}
     fun onMeetPlaceClick(location: LocationModel?) {}
@@ -144,81 +143,89 @@ interface MeetingBsCallback {
 fun MeetingBsContent(
     state: MeetingBsState,
     modifier: Modifier = Modifier,
-    callback: MeetingBsCallback? = null,
+    callback: MeetingBsCallback? = null
 ) {
     LazyColumn(
         modifier
             .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
-        
         item {
             TopBar(
-                state.meet, state.backButton,
+                state.meet,
+                state.backButton,
                 state.menuState,
                 { callback?.onBack() },
-                { callback?.onKebabClick(it) },
+                { callback?.onKebabClick(it) }
             ) { callback?.onMenuItemClick(it, state.meet.id) }
         }
-        
+
         item {
             MeetingBsTopBarCompose(
                 Modifier.padding(
                     bottom = state.detailed
                         ?.let { 28.dp } ?: 0.dp
-                ), MeetingBsTopBarState(
-                    state.meet, state.menuState,
+                ),
+                MeetingBsTopBarState(
+                    state.meet,
+                    state.menuState,
                     state.lastRespond,
                     description = state.detailed == null,
                     backButton = state.backButton
-                ), callback
+                ),
+                callback
             )
         }
-        
+
         state.detailed?.let {
-            
             item {
                 Text(
                     stringResource(R.string.meeting_question_comment_or_assess),
-                    Modifier, style = typography.labelLarge
+                    Modifier,
+                    style = typography.labelLarge
                 )
             }
-            
+
             item {
                 MeetingBsComment(
-                    it.first, state.meet.isOnline,
+                    it.first,
+                    state.meet.isOnline,
                     { callback?.onCommentChange(it) },
                     Modifier.padding(top = 22.dp)
                 ) { callback?.onCommentTextClear() }
             }
-            
+
             item {
                 MeetingBsHidden(
                     Modifier.padding(top = 8.dp),
-                    it.second, state.meet.isOnline
+                    it.second,
+                    state.meet.isOnline
                 ) { callback?.onHiddenPhotoActive(it) }
             }
         } ?: run {
-            
             item {
                 MeetingBsConditions(
-                    state.meet.map(), Modifier.padding(top = 32.dp)
+                    state.meet.map(),
+                    Modifier.padding(top = 32.dp)
                 )
             }
-            
+
             state.membersList?.let {
                 item {
                     MeetingBsParticipants(
-                        state.meet, it, Modifier,
-                        { callback?.onAllMembersClick(state.meet.id) })
-                    { callback?.onMemberClick(it) }
+                        state.meet,
+                        it,
+                        Modifier,
+                        { callback?.onAllMembersClick(state.meet.id) }
+                    ) { callback?.onMemberClick(it) }
                 }
             }
-            
+
             state.meetDistance?.let {
-                if(!state.meet.isOnline) item {
+                if (!state.meet.isOnline) item {
                     MeetingBsMap(
-                        state.meet, it,
+                        state.meet,
+                        it,
                         Modifier.padding(top = 28.dp)
                     ) { callback?.onMeetPlaceClick(state.meet.location) }
                 }
@@ -226,23 +233,24 @@ fun MeetingBsContent(
         }
         val memberState = state.meet.memberState
         item {
-            when(memberState) {
+            when (memberState) {
                 RESPOND_SENT -> TextButton(
-                    Modifier, state.meet.isOnline,
+                    Modifier,
+                    state.meet.isOnline,
                     stringResource(R.string.respond_to_meet)
                 )
-                
+
                 IS_MEMBER, IS_ORGANIZER -> {}
-                
+
                 else -> GradientButton(
                     Modifier.padding(top = 20.dp, bottom = 12.dp),
                     stringResource(R.string.meeting_respond),
                     online = state.meet.isOnline,
-                    enabled = when(memberState) {
+                    enabled = when (memberState) {
                         IS_KICKED, NOT_UNDER_REQUIREMENTS,
-                        RESPOND_REJECTED,
+                        RESPOND_REJECTED
                         -> false
-                        
+
                         else -> true
                     }
                 ) { callback?.onRespond(state.meet.id) }
@@ -259,31 +267,34 @@ private fun TopBar(
     menuState: Boolean,
     onBack: () -> Unit,
     onKebabClick: (Boolean) -> Unit,
-    onMenuItemSelect: (Int) -> Unit,
+    onMenuItemSelect: (Int) -> Unit
 ) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 18.dp),
-        SpaceBetween, CenterVertically
+        SpaceBetween,
+        CenterVertically
     ) {
         Row(
             Modifier.weight(1f),
-            Start, CenterVertically
+            Start,
+            CenterVertically
         ) {
-            if(backButton) IconButton(
+            if (backButton) IconButton(
                 { onBack() },
                 Modifier.padding(end = 16.dp)
             ) {
                 Icon(
                     painterResource(R.drawable.ic_back),
                     stringResource(R.string.action_bar_button_back),
-                    Modifier, colorScheme.tertiary
+                    Modifier,
+                    colorScheme.tertiary
                 )
             }
             Text(
-                meet.tags.joinToString(separator = ", ")
-                { it.title }, Modifier,
+                meet.tags.joinToString(separator = ", ") { it.title },
+                Modifier,
                 colorScheme.tertiary,
                 style = typography.labelLarge,
                 overflow = Ellipsis,
@@ -291,8 +302,9 @@ private fun TopBar(
             )
         }
         Menu(
-            menuState, meet,
-            { onKebabClick(false) },
+            menuState,
+            meet,
+            { onKebabClick(false) }
         ) { onMenuItemSelect(it) }
         GKebabButton { onKebabClick(true) }
     }
@@ -303,22 +315,18 @@ private fun Menu(
     menuState: Boolean,
     meet: FullMeetingModel,
     onDismiss: (Boolean) -> Unit,
-    onItemSelect: (Int) -> Unit,
+    onItemSelect: (Int) -> Unit
 ) {
     val menuItems = arrayListOf(
-        Pair(stringResource(R.string.meeting_shared_button))
-        { onItemSelect(0) }
+        Pair(stringResource(R.string.meeting_shared_button)) { onItemSelect(0) }
     )
-    if(meet.memberState == IS_MEMBER) menuItems.add(
-        Pair(stringResource(R.string.exit_from_meet))
-        { onItemSelect(1) }
+    if (meet.memberState == IS_MEMBER) menuItems.add(
+        Pair(stringResource(R.string.exit_from_meet)) { onItemSelect(1) }
     )
     menuItems.add(
-        if(meet.memberState == IS_ORGANIZER)
-            Pair(stringResource(R.string.meeting_canceled))
-            { onItemSelect(2) }
-        else Pair(stringResource(R.string.meeting_complain))
-        { onItemSelect(3) }
+        if (meet.memberState == IS_ORGANIZER) {
+            Pair(stringResource(R.string.meeting_canceled)) { onItemSelect(2) }
+        } else Pair(stringResource(R.string.meeting_complain)) { onItemSelect(3) }
     )
     GDropMenu(
         menuState,

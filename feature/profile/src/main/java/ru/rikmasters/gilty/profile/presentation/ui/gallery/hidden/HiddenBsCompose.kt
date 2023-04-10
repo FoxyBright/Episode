@@ -6,8 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells.Fixed
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -28,13 +28,17 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.items
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 interface HiddenBsCallback {
-    
+
     fun onSelectImage(image: AvatarModel) {}
     fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
@@ -42,7 +46,7 @@ interface HiddenBsCallback {
 
 @Composable
 fun HiddenBsContent(
-    photoList: List<AvatarModel>,
+    photoList: LazyPagingItems<AvatarModel>,
     modifier: Modifier = Modifier,
     callback: HiddenBsCallback? = null
 ) {
@@ -56,18 +60,39 @@ fun HiddenBsContent(
             style = typography.labelLarge
         )
         LazyVerticalGrid(
-            Fixed(3), Modifier
+            Fixed(3),
+            Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             verticalArrangement = spacedBy(4.dp),
             horizontalArrangement = spacedBy(4.dp)
         ) {
-            item { GalleryButton(callback) }
-            items(photoList) { image ->
-                LazyItem(
-                    image.thumbnail.url, Modifier,
-                    { callback?.onSelectImage(image) })
-                { callback?.onDeleteImage(image) }
+            when {
+                photoList.loadState.refresh is LoadState.Error -> {}
+                photoList.loadState.append is LoadState.Error -> {}
+                photoList.loadState.refresh is LoadState.Loading -> {
+                    item(span = { GridItemSpan(3) }) {
+                        PagingLoader(photoList.loadState)
+                    }
+                }
+                else -> {
+                    item { GalleryButton(callback) }
+                    items(photoList) { image ->
+                        image?.let {
+                            LazyItem(
+                                image.thumbnail.url,
+                                Modifier,
+                                { callback?.onSelectImage(image) }
+                            ) { callback?.onDeleteImage(image) }
+                        }
+                    }
+                    if (photoList.loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(3) }) {
+                            PagingLoader(photoList.loadState)
+                        }
+                    }
+                    items(3) { Spacer(Modifier.size(115.dp)) }
+                }
             }
         }
     }
@@ -81,7 +106,7 @@ private fun GalleryButton(
     Card(
         { callback?.openGallery() },
         Modifier.size(130.dp),
-        shape = shapes.large,
+        shape = shapes.large
     ) {
         Box(
             Modifier
@@ -96,9 +121,11 @@ private fun GalleryButton(
             ) {
                 Icon(
                     painterResource(R.drawable.ic_image_box),
-                    (null), Modifier
+                    (null),
+                    Modifier
                         .padding(6.dp)
-                        .size(32.dp), White
+                        .size(32.dp),
+                    White
                 )
             }
         }
@@ -121,7 +148,8 @@ private fun LazyItem(
         TopEnd
     ) {
         AsyncImage(
-            image, (null),
+            image,
+            (null),
             Modifier.fillMaxSize(),
             contentScale = Crop
         )
@@ -138,11 +166,14 @@ private fun LazyItem(
             Box(Modifier, Center) {
                 Image(
                     painterResource(R.drawable.transparency_circle),
-                    (null), Modifier.fillMaxSize()
+                    (null),
+                    Modifier.fillMaxSize()
                 )
                 Icon(
-                    Icons.Filled.Close, (null),
-                    Modifier.size(16.dp), White
+                    Icons.Filled.Close,
+                    (null),
+                    Modifier.size(16.dp),
+                    White
                 )
             }
         }

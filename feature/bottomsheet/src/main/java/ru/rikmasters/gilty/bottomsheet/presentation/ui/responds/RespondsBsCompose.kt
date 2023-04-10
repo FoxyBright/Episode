@@ -131,14 +131,25 @@ private fun SentResponds(
                     if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
+                    item {
+                        Spacer(
+                            modifier = Modifier.fillMaxWidth()
+                                .height(12.dp)
+                                .background(
+                                    color = colorScheme.background
+                                )
+                        )
+                    }
                 } else if (responds.loadState.refresh is LoadState.NotLoading) {
                     item {
-                        EmptyScreen(
-                            stringResource(
-                                R.string.profile_hasnt_received_responds
-                            ),
-                            R.drawable.broken_heart
-                        )
+                        Box(modifier = Modifier.fillParentMaxSize()) {
+                            EmptyScreen(
+                                stringResource(
+                                    R.string.profile_hasnt_sent_responds
+                                ),
+                                R.drawable.broken_heart
+                            )
+                        }
                     }
                 }
             }
@@ -175,15 +186,26 @@ private fun MeetResponds(
                     if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
+                    item {
+                        Spacer(
+                            modifier = Modifier.fillMaxWidth()
+                                .height(12.dp)
+                                .background(
+                                    color = colorScheme.background
+                                )
+                        )
+                    }
                 } else {
                     if (responds.loadState.refresh is LoadState.NotLoading) {
                         item {
-                            EmptyScreen(
-                                stringResource(
-                                    R.string.profile_hasnt_received_responds
-                                ),
-                                R.drawable.broken_heart
-                            )
+                            Box(modifier = Modifier.fillParentMaxSize()) {
+                                EmptyScreen(
+                                    stringResource(
+                                        R.string.profile_hasnt_received_responds
+                                    ),
+                                    R.drawable.broken_heart
+                                )
+                            }
                         }
                     }
                 }

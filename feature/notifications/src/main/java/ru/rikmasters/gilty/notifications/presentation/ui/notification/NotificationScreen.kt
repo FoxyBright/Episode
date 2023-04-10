@@ -28,7 +28,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val notifications = vm.notifications.collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
-    val participants by vm.participants.collectAsState()
+    val participants = vm.participants.collectAsLazyPagingItems()
     val lastRespond by vm.lastRespond.collectAsState()
     val navState by vm.navBar.collectAsState()
     val ratings by vm.ratings.collectAsState()
@@ -39,17 +39,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
         vm.getRatings()
         vm.getLastResponse()
     }
-
-    /*
-    LaunchedEffect(notifications.loadState) {
-        val loadState = notifications.loadState
-        vm.isPageRefreshing.emit(
-            loadState.append is Loading
-                    || loadState.refresh is Loading
-        )
-    }
-
-     */
 
     fun refresh() = scope.launch {
         vm.forceRefresh()

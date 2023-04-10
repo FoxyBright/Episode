@@ -11,48 +11,49 @@ import ru.rikmasters.gilty.shared.models.Location
 import ru.rikmasters.gilty.shared.models.Requirement
 import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.meets.*
+import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
-class MeetingWebSource: KtorSource() {
-    
+class MeetingWebSource : KtorSource() {
+
     private data class ShortLocation(
         val address: String,
-        val place: String,
+        val place: String
     )
-    
+
     private data class Respond(
         val description: String?,
-        val photoAccess: Boolean,
+        val photoAccess: Boolean
     )
-    
+
     suspend fun setUserInterest(meets: List<String>) {
         patch("http://$HOST$PREFIX_URL/profile/categories") {
             url { meets.forEach { query("category_ids[]" to it) } }
         }
     }
-    
+
     suspend fun notInteresting(meetId: String) {
         patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")
     }
-    
+
     suspend fun resetMeets() {
         post("http://$HOST$PREFIX_URL/meetings/reset")
     }
-    
+
     suspend fun respondOfMeet(
         meetId: String,
         comment: String?,
-        hidden: Boolean,
+        hidden: Boolean
     ) {
         post("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
             setBody(Respond(comment, hidden))
         }
     }
-    
+
     suspend fun leaveMeet(meetId: String) {
         patch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
     }
-    
+
     suspend fun getMeetsList(
         count: Boolean,
         group: String,
@@ -66,9 +67,9 @@ class MeetingWebSource: KtorSource() {
         conditions: List<String>? = null,
         genders: List<String>? = null,
         dates: List<String>? = null,
-        time: String? = null,
+        time: String? = null
     ) = get(
-        "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
+        "http://$HOST$PREFIX_URL/meetings${if (count) "/count" else ""}"
     ) {
         url {
             query("group" to group)
@@ -101,7 +102,7 @@ class MeetingWebSource: KtorSource() {
                     query("gender[]" to it)
                 }
             }
-            when(group) {
+            when (group) {
                 "TODAY" -> time?.let { query("time" to it) }
                 "AFTER" -> dates?.let { list ->
                     list.forEach {
@@ -111,54 +112,57 @@ class MeetingWebSource: KtorSource() {
             }
         }
     }
-    
+
     suspend fun cancelMeet(meetId: String) {
         patch("http://$HOST$PREFIX_URL/meetings/$meetId/cancel")
     }
-    
+
     suspend fun getUserActualMeets(
-        userId: String,
+        userId: String
     ) = get("http://$HOST$PREFIX_URL/users/$userId/meetings")
         ?.wrapped<List<Meeting>>()
         ?.map { it.map() }
         ?: emptyList()
-    
+
     suspend fun getDetailedMeet(
-        meet: String,
+        meet: String
     ) = get("http://$HOST$PREFIX_URL/meetings/$meet")
         ?.wrapped<DetailedMeetResponse>()
         ?.map()
-    
+
     suspend fun getMeetMembers(
         meet: String,
         excludeMe: Int,
-    ) = try {
+        page: Int,
+        perPage: Int
+    ) =
         get("http://$HOST$PREFIX_URL/meetings/$meet/members") {
-            url { query("exclude_me" to "$excludeMe") }
-        }?.wrapped<List<User>>()?.map { it.map() } ?: emptyList()
-    } catch(e: Exception) {
-        emptyList()
-    }
-    
+            url {
+                query("exclude_me" to "$excludeMe")
+                query("page" to "$page")
+                query("per_page" to "$perPage")
+            }
+        }?.paginateWrapped<List<User>>()
+
     suspend fun getOrientations() = try {
         get("http://$HOST$PREFIX_URL/orientations")
             ?.wrapped<List<OrientationModel>>()
             ?: emptyList()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         emptyList()
     }
-    
+
     suspend fun getLastPlaces() = try {
         get("http://$HOST$PREFIX_URL/meetings/places")
             ?.wrapped<List<ShortLocation>>()
             ?.map { Pair(it.address, it.place) }
             ?: emptyList()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         emptyList()
     }
-    
+
     suspend fun getPopularTags(
-        categoriesId: List<String?>,
+        categoriesId: List<String?>
     ) = try {
         get("http://$HOST$PREFIX_URL/tags/popular") {
             url {
@@ -167,30 +171,30 @@ class MeetingWebSource: KtorSource() {
                 }
             }
         }?.wrapped<List<TagModel>>() ?: emptyList()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         emptyList()
     }
-    
+
     suspend fun addNewTag(tag: String) {
         post("http://$HOST$PREFIX_URL/tags") {
             setBody(Tag(tag))
         }
     }
-    
+
     suspend fun searchTags(tag: String) = try {
         get("http://$HOST$PREFIX_URL/tags/search") {
             url { query("query" to tag) }
         }?.wrapped<List<TagModel>>() ?: emptyList()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         emptyList()
     }
-    
+
     suspend fun getCategoriesList() =
         get("http://$HOST$PREFIX_URL/categories")
             ?.wrapped<List<Category>>()
             ?.map { it.map() }
             ?: emptyList()
-    
+
     suspend fun addMeet(
         categoryId: String?,
         type: String?,
@@ -208,7 +212,7 @@ class MeetingWebSource: KtorSource() {
         memberCount: Int?,
         requirementsType: String?,
         requirements: List<Requirement>?,
-        withoutResponds: Boolean?,
+        withoutResponds: Boolean?
     ) = post("http://$HOST$PREFIX_URL/meetings") {
         setBody(
             MeetingRequest(

@@ -85,10 +85,7 @@ data class MeetingModel(
         members = emptyList(),
         location = null,
         memberState = memberState,
-        responds = RespondsInfoModel(
-            count = 0,
-            thumbnail = DemoThumbnailModel
-        )
+        responds = null
     )
 }
 

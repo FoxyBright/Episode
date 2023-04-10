@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -91,15 +92,26 @@ fun RespondsListContent(
                     if (state.responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(state.responds.loadState) }
                     }
+                    item {
+                        Spacer(
+                            modifier = Modifier.fillMaxWidth()
+                                .height(12.dp)
+                                .background(
+                                    color = colorScheme.background
+                                )
+                        )
+                    }
                 } else {
                     if (state.responds.loadState.refresh is LoadState.NotLoading) {
                         item {
-                            EmptyScreen(
-                                stringResource(
-                                    R.string.profile_hasnt_sent_responds
-                                ),
-                                R.drawable.broken_heart
-                            )
+                            Box(modifier = Modifier.fillParentMaxSize()) {
+                                EmptyScreen(
+                                    stringResource(
+                                        R.string.profile_hasnt_received_responds
+                                    ),
+                                    R.drawable.broken_heart
+                                )
+                            }
                         }
                     }
                 }
