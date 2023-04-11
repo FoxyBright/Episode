@@ -104,6 +104,7 @@ private fun Content(
     callback: DetailedCallback? = null,
 ) {
     LazyColumn(modifier.fillMaxSize()) {
+        itemSpacer(10.dp)
         item {
             Element(
                 tags(state, callback),

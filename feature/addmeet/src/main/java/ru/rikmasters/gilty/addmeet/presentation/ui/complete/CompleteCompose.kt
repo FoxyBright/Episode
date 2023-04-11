@@ -4,13 +4,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -51,34 +49,34 @@ interface CompleteCallBack {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun CompleteContent(
     meeting: MeetingModel,
     isOnline: Boolean,
     modifier: Modifier = Modifier,
     callback: CompleteCallBack? = null,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
-    ) {
-        ActionBar(
-            "Meet создан",
-            modifier = Modifier
-                .padding(top = 60.dp)
-        )
+    Scaffold(
+        modifier,
+        topBar = {
+            ActionBar(
+                stringResource(R.string.add_meet_created),
+                Modifier.padding(top = 60.dp)
+            )
+        },
+        bottomBar = {
+            Buttons(
+                Modifier, isOnline,
+                { callback?.onShare() }
+            ) { callback?.onClose() }
+        }) {
         PhoneContent(
             Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
+                .fillMaxSize()
+                .padding(it)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
         ) { MeetingCard(meeting, Modifier, isOnline) }
-    }
-    Box(Modifier.fillMaxSize()) {
-        Buttons(
-            Modifier.align(Alignment.BottomCenter), isOnline,
-            { callback?.onShare() }) { callback?.onClose() }
     }
 }
 

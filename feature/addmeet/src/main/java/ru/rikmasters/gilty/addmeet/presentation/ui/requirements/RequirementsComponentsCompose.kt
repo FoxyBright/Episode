@@ -167,9 +167,11 @@ fun memberCountInput(
             errorBottomText = stringResource(R.string.add_meet_member_limit_error),
             colors = descriptionColors(isOnline),
             label = if(text.isNotEmpty()) textFieldLabel(
-                (true), stringResource(R.string.requirements_member_count_place_holder)
+                (true),
+                stringResource(R.string.requirements_member_count_place_holder)
             ) else null, placeholder = textFieldLabel(
-                (false), stringResource(R.string.requirements_member_count_place_holder)
+                (false),
+                stringResource(R.string.requirements_member_count_place_holder)
             ), textStyle = typography.bodyMedium,
             singleLine = true,
             keyboardOptions = KeyboardOptions(

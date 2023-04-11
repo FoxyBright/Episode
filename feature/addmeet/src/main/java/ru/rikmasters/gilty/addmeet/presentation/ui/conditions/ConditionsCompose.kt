@@ -107,6 +107,7 @@ private fun Content(
 ) {
     val pay = state.condition.contains(3)
     LazyColumn(modifier) {
+        itemSpacer(10.dp)
         item {
             Element(
                 type(state, callback),

@@ -28,15 +28,20 @@ fun CardRow(
         cardColors(colorScheme.primaryContainer)
     ) {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
             SpaceBetween, CenterVertically
         ) {
             Text(
-                label, Modifier.padding(12.dp, 16.dp),
+                label, Modifier.padding(start = 12.dp),
                 colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Row(Modifier, Start, CenterVertically) {
+            Row(
+                Modifier.padding(end = 16.dp),
+                Start, CenterVertically
+            ) {
                 if(text.isNotBlank())
                     Text(
                         text, Modifier,
@@ -47,10 +52,7 @@ fun CardRow(
                     )
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
-                    (null),
-                    Modifier
-                        .padding(end = 8.dp)
-                        .size(28.dp),
+                    (null), Modifier.size(28.dp),
                     colorScheme.scrim
                 )
             }

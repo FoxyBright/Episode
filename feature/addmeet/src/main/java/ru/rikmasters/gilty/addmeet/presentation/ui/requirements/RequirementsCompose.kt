@@ -80,66 +80,82 @@ fun RequirementsContent(
     modifier: Modifier = Modifier,
     callback: RequirementsCallback? = null,
 ) {
-    Scaffold(modifier, {
-        ClosableActionBar(
-            stringResource(R.string.requirements_title),
-            Modifier.padding(bottom = 20.dp), (null),
-            { callback?.onCloseAlert(true) }
-        ) { callback?.onBack() }
-    }, {
-        Buttons(
-            Modifier, state.online,
-            state.isActive, (3)
-        ) { callback?.onNext() }
-    }) {
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.88f)
-                .padding(top = it.calculateTopPadding())
-        ) {
-            if(state.meetType != PERSONAL) item {
-                Element(
-                    memberCountInput(
-                        state.memberCount, state.online,
-                        state.memberLimited, Modifier,
-                        { callback?.onMemberLimit() },
-                        { callback?.onClearCount() }
-                    ) { count -> callback?.onCountChange(count) },
-                    Modifier.padding(bottom = 12.dp)
-                )
-            }
-            item {
-                TrackCard(
-                    stringResource(R.string.requirements_private_check),
-                    stringResource(R.string.requirements_private_check_label),
-                    state.online, state.private,
-                    Modifier.padding(horizontal = 16.dp)
-                ) { callback?.onHideMeetPlaceClick() }
-            }
-            if(!state.private) item {
-                RequirementsList(
-                    state, Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 20.dp),
-                    callback
-                )
-            }
-            item {
-                Element(
-                    responds(
-                        state.online,
-                        state.withoutRespond
-                    ) { callback?.onWithoutRespondClick() },
-                    Modifier.padding(top = 24.dp)
-                )
-            }
-            itemSpacer(40.dp)
-        }
+    Scaffold(
+        modifier,
+        topBar = {
+            ClosableActionBar(
+                stringResource(R.string.requirements_title),
+                Modifier.padding(bottom = 10.dp), (null),
+                { callback?.onCloseAlert(true) }
+            ) { callback?.onBack() }
+        },
+        bottomBar = {
+            Buttons(
+                Modifier, state.online,
+                state.isActive, (3)
+            ) { callback?.onNext() }
+        }) {
+        Content(
+            state, Modifier.padding(
+                top = it.calculateTopPadding()
+            ), callback
+        )
     }
     val alClose = { callback?.onCloseAlert(false) }
     CloseAddMeetAlert(
         state.alert, state.online, { alClose() },
         { alClose(); callback?.onClose() }
     )
+}
+
+@Composable
+private fun Content(
+    state: RequirementsState,
+    modifier: Modifier,
+    callback: RequirementsCallback?,
+) {
+    LazyColumn(
+        modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.88f)
+    ) {
+        itemSpacer(10.dp)
+        if(state.meetType != PERSONAL) item {
+            Element(
+                memberCountInput(
+                    state.memberCount, state.online,
+                    state.memberLimited, Modifier,
+                    { callback?.onMemberLimit() },
+                    { callback?.onClearCount() }
+                ) { count -> callback?.onCountChange(count) },
+                Modifier.padding(bottom = 12.dp)
+            )
+        }
+        item {
+            TrackCard(
+                stringResource(R.string.requirements_private_check),
+                stringResource(R.string.requirements_private_check_label),
+                state.online, state.private,
+                Modifier.padding(horizontal = 16.dp)
+            ) { callback?.onHideMeetPlaceClick() }
+        }
+        if(!state.private) item {
+            RequirementsList(
+                state, Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 20.dp),
+                callback
+            )
+        }
+        item {
+            Element(
+                responds(
+                    state.online,
+                    state.withoutRespond
+                ) { callback?.onWithoutRespondClick() },
+                Modifier.padding(top = 24.dp)
+            )
+        }
+        itemSpacer(40.dp)
+    }
 }

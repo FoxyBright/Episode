@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Episode</string>
+    <string name="app_name">episode</string>
 
     <!-- Login -->
     <string name="phone_number">Номер телефона</string>
@@ -17,11 +17,11 @@
 
     <!-- Select Categories -->
     <string name="interested_you">Что вам интересно?</string>
-    <string name="interested_you_details">Выберите какие категории Episode\nвам интересны</string>
+    <string name="interested_you_details">Выберите какие категории episode\nвам интересны</string>
 
     <!-- Give Permissions -->
     <string name="permissions_action_bar">Находите больше</string>
-    <string name="permissions_action_bar_details">Узнайте о самых актуальных Episode\nнедалеко от вас</string>
+    <string name="permissions_action_bar_details">Узнайте о самых актуальных episode\nнедалеко от вас</string>
     <string name="permissions_title">Разрешения</string>
     <string name="permission_geoposition_label">Геопозиция</string>
     <string name="permissions_finish_button">Завершить</string>
@@ -54,7 +54,7 @@
     <string name="profile_sent_responds">Отправленные</string>
     <string name="profile_received_responds">Полученные</string>
     <string name="profile_hasnt_sent_responds">Вы еще не оставляли\nотклики</string>
-    <string name="profile_hasnt_received_responds">На ваши Episode\nникто не отреагировал</string>
+    <string name="profile_hasnt_received_responds">На ваши episode\nникто не отреагировал</string>
     <string name="profile_gallery_title">Галерея</string>
     <string name="profile_gallery_attach_button">Прикрепить</string>
     <string name="profile_blocked_photo">Ваше фото\nзаблокировано</string>
@@ -102,43 +102,43 @@
 
     <!-- Notifications -->
     <string name="notification_screen_name">Уведомления</string>
-    <string name="notification_meeting_took_place">Состоялся Episode</string>
-    <string name="notification_meeting_took_place_for_organizer">Как прошел Episode</string>
-    <string name="notification_meeting_emoji_for_members">Вы оставили эмоции от участников Episode</string>
-    <string name="notification_meeting_emoji_for_meet">Вы оставили эмоции от Episode</string>
+    <string name="notification_meeting_took_place">Состоялся episode</string>
+    <string name="notification_meeting_took_place_for_organizer">Как прошел episode</string>
+    <string name="notification_meeting_emoji_for_members">Вы оставили эмоции от участников episode</string>
+    <string name="notification_meeting_emoji_for_meet">Вы оставили эмоции от episode</string>
     <string name="notification_words_connector">" c "</string>
     <string name="notification_organizer_label">Организатор</string>
-    <string name="notification_leave_meet_impressions">Оставьте эмоции от Episode</string>
+    <string name="notification_leave_meet_impressions">Оставьте эмоции от episode</string>
     <string name="notification_leave_members_impressions">Оставьте эмоции от участников</string>
-    <string name="notification_meet_RESPOND_ACCEPTED">принял%s ваш отклик на Episode</string>
+    <string name="notification_meet_RESPOND_ACCEPTED">принял%s ваш отклик на episode</string>
     <string name="notification_meet_PHOTO_BLOCKED">Администратор заблокировал вашу фотографию </string>
     <string name="notification_meet_ADMIN_NOTIFICATION">Сообщение от администратора</string>
-    <string name="notification_meet_RESPOND">откликнул%s на ваш Episode</string>
+    <string name="notification_meet_RESPOND">откликнул%s на ваш episode</string>
     <string name="notification_meet_WATCH">наблюдает за вами</string>
     <string name="notification_meet_MEETING_CANCELED_start">отменен.</string>
     <string name="notification_meet_MEETING_CANCELED_end">отменил%s</string>
-    <string name="notification_meet_MEETING_KICKED">исключил%s вас из Episode</string>
-    <string name="notification_meet_TRANSLATION_15MIN_start">начнет трансляцию Episode</string>
+    <string name="notification_meet_MEETING_KICKED">исключил%s вас из episode</string>
+    <string name="notification_meet_TRANSLATION_15MIN_start">начнет трансляцию episode</string>
     <string name="notification_meet_TRANSLATION_15MIN_end">через 15 минут </string>
     <string name="notification_meet_ADMIN_NOTIFICATION_start">Началась трансляция</string>
     <string name="notification_meet_ADMIN_NOTIFICATION_end">Зайдите в чат, чтобы присоединиться</string>
-    <string name="notification_meet_WATCH_MEETING_CREATED">создал%s Episode Присоединяйся к</string>
-    <string name="notification_leave_emotion">Вы оставили эмоции от Episode</string>
+    <string name="notification_meet_WATCH_MEETING_CREATED">создал%s episode Присоединяйся к</string>
+    <string name="notification_leave_emotion">Вы оставили эмоции от episode</string>
     <string name="notification_earlier_label">Ранее</string>
-    <string name="notification_responds_on_user_meetings">Отклики на ваши Episode</string>
+    <string name="notification_responds_on_user_meetings">Отклики на ваши episode</string>
     <string name="notification_on_this_week_label">На этой неделе</string>
     <string name="notification_respond_cancel_button">Отменить</string>
     <string name="notification_respond_accept_button">Принять</string>
-    <string name="notification_send_emotion">Оставьте эмоции участникам Episode</string>
+    <string name="notification_send_emotion">Оставьте эмоции участникам episode</string>
     <string name="notification_place_holder">Уведомлений пока нет</string>
 
     <!-- Meeting -->
-    <string name="meeting_canceled">Отменить Episode</string>
-    <string name="meeting_personal_type">Персональный Episode</string>
-    <string name="meeting_group_type">Групповой Episode</string>
-    <string name="meeting_anon_type">Анонимный Episode</string>
-    <string name="meeting_private_type">Приватный Episode</string>
-    <string name="meeting_private_and_anon_type">Анонимный, приватный Episode</string>
+    <string name="meeting_canceled">Отменить episode</string>
+    <string name="meeting_personal_type">Персональный episode</string>
+    <string name="meeting_group_type">Групповой episode</string>
+    <string name="meeting_anon_type">Анонимный episode</string>
+    <string name="meeting_private_type">Приватный episode</string>
+    <string name="meeting_private_and_anon_type">Анонимный, приватный episode</string>
     <string name="meeting_profile_bottom_today_label">Сегодня</string>
     <string name="meeting_profile_bottom_latest_label">Потом</string>
     <string name="meeting_avatar">Аватар</string>
@@ -155,9 +155,9 @@
     <string name="meeting_only_online_meetings_button">Только онлайн episodes</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
     <string name="meeting_respond_title">Отклик отправлен</string>
-    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат Episode</string>
+    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат episode</string>
     <string name="meeting_without_respond_title">Мгновенное\nучастие!</string>
-    <string name="meeting_without_respond_label">Вы стали участником, теперь вам\nдоступен чат Episode</string>
+    <string name="meeting_without_respond_label">Вы стали участником, теперь вам\nдоступен чат episode</string>
     <string name="meeting_shared_button">Поделиться</string>
     <string name="meeting_close_button">Закрыть</string>
     <string name="meeting_watch_all_members_in_meet">Смотреть всех</string>
@@ -165,11 +165,11 @@
     <string name="meeting_distance_from_user">От вас</string>
     <string name="meeting_question_comment_or_assess">Хотите написать комментарий\nили дать доступ к скрытым фото? </string>
     <string name="meeting_complain">Пожаловаться</string>
-    <string name="meeting_meet_time_label">Время Episode</string>
-    <string name="meeting_empty_meet_label">Вы просмотрели все\nактуальные Episode</string>
+    <string name="meeting_meet_time_label">Время episode</string>
+    <string name="meeting_empty_meet_label">Вы просмотрели все\nактуальные episode</string>
     <string name="meeting_repeat_button">Повторить</string>
     <string name="meeting_get_more_button">Хочу еще</string>
-    <string name="meeting_anonymous_members_label">Так как Episode анонимный, профили участников\nне будут видны на протяжении всего Episode</string>
+    <string name="meeting_anonymous_members_label">Так как episode анонимный, профили участников\nне будут видны на протяжении всего episode</string>
     <string name="meeting_maps_open_with">Открыть с помощью\nприложения</string>
     <string name="meeting_maps_alert_title">Открыть приложение</string>
     <string name="meeting_maps_alert_label">«Gilty» хочет открыть приложение «%s»</string>
@@ -192,7 +192,7 @@
     <string name="meeting_filter_select_meeting_type_does_not_matter">Неважно</string>
     <string name="meeting_filter_label_distance">%s км</string>
     <string name="meeting_filter_delete_tag_label">Удалить</string>
-    <string name="meeting_filter_meeting_find">найдено %s Episode</string>
+    <string name="meeting_filter_meeting_find">найдено %s episode</string>
     <string name="meeting_filter_complete_button">Готово</string>
     <string name="meeting_filter_popular_tags">Популярные</string>
     <string name="meeting_filter_search_from_tag">Поиск по тегам</string>
@@ -201,7 +201,7 @@
     <string name="meeting_filter_category">Категория</string>
     <string name="meeting_filter_tag_search">Поиск по тегам</string>
     <string name="meeting_filter_distance">Расстояние</string>
-    <string name="meeting_filter_meet_type">Тип Episode</string>
+    <string name="meeting_filter_meet_type">Тип episode</string>
     <string name="meeting_filter_conditions">Условия</string>
     <string name="select_button">Выбрать</string>
 
@@ -214,7 +214,7 @@
     <string name="chats_message_answer_photo_label">Фотография</string>
     <string name="chats_message_answer_video_label">Видео</string>
     <string name="chats_empty_hidden_photos">Скрытых фото нет</string>
-    <string name="chats_meet_ended_pinned_bar_label">Episode завершен</string>
+    <string name="chats_meet_ended_pinned_bar_label">episode завершен</string>
     <string name="chats_translation_pinned_bar_label">Трансляция</string>
     <string name="chats_translation_await_pinned_bar_label">До начала трансляции</string>
     <string name="chats_close_chat_pinned_bar_button">Закрыть чат</string>
@@ -233,8 +233,8 @@
     <string name="chats_message_translation_started">трансляция началась</string>
     <string name="chats_message_translation_completed">трансляция закончилась</string>
     <string name="chats_message_create_chat">cозда%s чат</string>
-    <string name="chats_message_join_meet">присоединил%s к Episode</string>
-    <string name="chats_message_leave_meet">покинул%s Episode</string>
+    <string name="chats_message_join_meet">присоединил%s к episode</string>
+    <string name="chats_message_leave_meet">покинул%s episode</string>
     <string name="chats_message_make_screenshot">сделал%s скриншот!</string>
 
     <!-- Image Descriptions -->
@@ -258,8 +258,8 @@
     <string name="complaints_description">Ваша жалоба будет анонимной</string>
     <string name="complaints_lie_anything_photo_label">Фотографии другого пользователя</string>
     <string name="complaints_lie_celebrity_label">Фотографии знаменитости</string>
-    <string name="complaints_lie_bad_category_label">Episode не соответсвует выбранной категории</string>
-    <string name="complaints_lie_suspicious_label">Подозрительное место Episode</string>
+    <string name="complaints_lie_bad_category_label">episode не соответсвует выбранной категории</string>
+    <string name="complaints_lie_suspicious_label">Подозрительное место episode</string>
     <string name="complaints_spam_advertisement_label">Реклама</string>
     <string name="complaints_spam_sending_label">Навязчивая рассылка</string>
     <string name="complaints_cheater_fraud_label">Мошенничество</string>
@@ -272,18 +272,18 @@
     <string name="send_button">Отправить</string>
 
     <!-- Add Meets -->
-    <string name="add_meet_create_title">Создать Episode</string>
+    <string name="add_meet_create_title">Создать episode</string>
     <string name="add_meet_create_description">Выберите категорию</string>
     <string name="add_meet_create_correct_description">Уточните чем именно хотите заняться</string>
     <string name="add_meet_conditions_continue">Продолжаем</string>
-    <string name="add_meet_conditions_online_meet">Сделать Episode онлайн</string>
+    <string name="add_meet_conditions_online_meet">Сделать episode онлайн</string>
     <string name="add_meet_conditions_additionally">Ещё</string>
     <string name="add_meet_conditions_hidden">Доступ к скрытым фото</string>
     <string name="add_meet_restrict_chat">Ограничить чат</string>
     <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
-    <string name="add_meet_conditions_hidden_label">Участники Episode получат доступ к скрытым фото.</string>
+    <string name="add_meet_conditions_hidden_label">Участники episode получат доступ к скрытым фото.</string>
     <string name="add_meet_detailed_meet_duration">Длительность</string>
     <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
     <string name="add_meet_detailed_meet_date">Дата и время</string>
@@ -292,12 +292,12 @@
     <string name="add_meet_detailed_title">Подробнее</string>
     <string name="add_meet_detailed_tags">Теги</string>
     <string name="add_meet_detailed_tags_maximum">(максимум %s)</string>
-    <string name="add_meet_detailed_tags_description">Первый тег будет отображаться в названии Episode</string>
+    <string name="add_meet_detailed_tags_description">Первый тег будет отображаться в названии episode</string>
     <string name="add_meet_detailed_meet_description">Описание</string>
     <string name="add_meet_detailed_meet_description_place_holder">Краткое описание</string>
-    <string name="add_meet_detailed_meet_place">Место Episode</string>
+    <string name="add_meet_detailed_meet_place">Место episode</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только участникам</string>
-    <string name="add_meet_detailed_meet_hide_place">Скрыть место Episode</string>
+    <string name="add_meet_detailed_meet_hide_place">Скрыть место episode</string>
     <string name="requirements_title">Требования к\nучастникам</string>
     <string name="requirements_member_count_label">Количество</string>
     <string name="requirements_member_count_place_holder">Сколько будет участников</string>
@@ -320,16 +320,17 @@
     <string name="age_to">до</string>
     <string name="add_meet_without_respond_title">Участие без отклика</string>
     <string name="add_meet_without_respond_label">Участники не присоединятся к episode без вашего\nсогласия</string>
-    <string name="add_meet_with_respond_label">Участники могут присоединиться к Episode\nбез вашего согласия</string>
+    <string name="add_meet_with_respond_label">Участники могут присоединиться к episode\nбез вашего согласия</string>
     <string name="add_meet_member_limit_title">Ограничение участников</string>
     <string name="add_meet_member_limit_label">Введите количество участников</string>
     <string name="add_meet_member_not_limited_label">У вашего episode не будет ограничения участников</string>
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
+    <string name="add_meet_created">Episode создан</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>
-    <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания Episode?</string>
+    <string name="add_meet_exit_alert_title">Выйти из режима\nсоздания episode?</string>
     <string name="add_meet_exit_alert_details">Все настройки будут сброшены</string>
     <string name="cancel_button">Отменить</string>
     <string name="bad_tag_error">Тег содержит недопустимый символ</string>
@@ -339,9 +340,9 @@
     <string name="out_button">Покинуть</string>
     <string name="cancel">Отмена</string>
     <string name="answer_button">Ответить</string>
-    <string name="exit_from_meet">Покинуть Episode</string>
+    <string name="exit_from_meet">Покинуть episode</string>
     <string name="respond_to_meet">Вы откликнулись</string>
-    <string name="exit_from_meet_label">Чат и отображение Episode в истории пропадут</string>
+    <string name="exit_from_meet_label">Чат и отображение episode в истории пропадут</string>
     <string name="chat_send_complaint">Жалоба отправлена</string>
     <string name="chat_complaint_moderate">Модераторы скоро рассмотрят вашу жалобу</string>
     <string name="image_preview_cropper">Отображение</string>
@@ -370,8 +371,8 @@
     <string name="empty_String" />
 
     <!-- Notifications Channels -->
-    <string name="meets_push_channel_name">Уведомления от Episode</string>
-    <string name="meets_push_channel_descriptions">Создаваемые Episode и обновление их статусов у пользователя и наблюдаемых</string>
+    <string name="meets_push_channel_name">Уведомления от episode</string>
+    <string name="meets_push_channel_descriptions">Создаваемые episode и обновление их статусов у пользователя и наблюдаемых</string>
     <string name="chats_push_channel_name">Уведомления от чатов</string>
     <string name="chats_push_channel_descriptions">Входящие сообщения и трансляции</string>
 
