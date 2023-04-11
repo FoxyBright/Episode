@@ -110,9 +110,7 @@ fun CodeContent(
             ) { callback?.onCodeSend() }
         }
     }
-    if(state.blur) BadCode {
-        callback?.onBlur()
-    }
+    if(state.blur) BadCode { callback?.onBlur() }
 }
 
 @Composable

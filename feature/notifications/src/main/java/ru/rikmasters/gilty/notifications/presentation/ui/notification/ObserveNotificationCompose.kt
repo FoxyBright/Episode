@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -24,42 +25,44 @@ import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.Notif
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.*
 
-/*
 @Preview
 @Composable
 private fun ObserveNotificationPreview() {
     ObserveNotification(
         ObserveNotificationState(
             DemoNotificationMeetingOverModel,
-            listOf(DemoUserModel, DemoUserModel),
+            pagingPreview(DemoUserModelList),
             listOf(0), EmojiModel.list
         )
     )
 }
 
- */
-
 data class ObserveNotificationState(
     val notification: NotificationModel,
     val participants: LazyPagingItems<UserModel>,
     val participantsStates: List<Int>,
-    val emojiList: List<EmojiModel>
+    val emojiList: List<EmojiModel>,
 )
 
 @Composable
 fun ObserveNotification(
     state: ObserveNotificationState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback? = null
+    callback: NotificationsCallback? = null,
 ) {
     Column(modifier) {
-        if (state.notification.parent.meeting?.memberState != IS_ORGANIZER) {
+        if(state.notification.parent.meeting?.memberState
+            != IS_ORGANIZER
+        ) {
             NotificationItem(
                 NotificationItemState(
                     state.notification,
@@ -67,9 +70,7 @@ fun ObserveNotification(
                     MaterialTheme.shapes.medium,
                     getDifferenceOfTime(state.notification.date),
                     state.emojiList
-                ),
-                Modifier,
-                callback
+                ), Modifier, callback
             )
         }
         val itemCount = state.participants.itemCount
@@ -94,9 +95,7 @@ fun ObserveNotification(
                     itemsIndexed(state.participants) { index, participant ->
                         participant?.let {
                             Participant(
-                                index,
-                                participant,
-                                itemCount,
+                                index, participant, itemCount,
                                 state.participantsStates.contains(index),
                                 participant.meetRating?.emoji,
                                 state.emojiList,
@@ -105,22 +104,21 @@ fun ObserveNotification(
                                 participant.id?.let {
                                     callback?.onEmojiClick(
                                         state.notification,
-                                        emoji,
-                                        it
+                                        emoji, it
                                     )
                                 }
                             }
                         }
                     }
-                    if (state.participants.loadState.append is LoadState.Loading) {
+                    if(state.participants.loadState.append is LoadState.Loading) {
                         item {
-                           PagingLoader(state.participants.loadState)
+                            PagingLoader(state.participants.loadState)
                         }
                     }
                 }
             }
         }
-        if (itemCount != 0) Text(
+        if(itemCount != 0) Text(
             stringResource(R.string.notification_send_emotion),
             Modifier.padding(top = 6.dp, start = 16.dp),
             colorScheme.onTertiary,
@@ -139,7 +137,7 @@ private fun Participant(
     memberEmoji: EmojiModel?,
     emojiList: List<EmojiModel>,
     onClick: ((Int) -> Unit)? = null,
-    onEmojiClick: ((EmojiModel) -> Unit)? = null
+    onEmojiClick: ((EmojiModel) -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it(index) } },
@@ -170,7 +168,7 @@ private fun Participant(
                     )
                 } ?: run {
                     Icon(
-                        if (unwrap) Filled.KeyboardArrowDown
+                        if(unwrap) Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight,
                         (null),
                         Modifier.size(24.dp),
@@ -178,7 +176,7 @@ private fun Participant(
                     )
                 }
             }
-            if (unwrap && memberEmoji == null) EmojiRow(
+            if(unwrap && memberEmoji == null) EmojiRow(
                 emojiList,
                 Modifier.padding(
                     start = 60.dp,
@@ -186,7 +184,7 @@ private fun Participant(
                 )
             ) { emoji -> onEmojiClick?.let { it(emoji) } }
         }
-    }; if (index < size - 1) {
+    }; if(index < size - 1) {
         GDivider(Modifier.padding(start = 60.dp))
     }
 }

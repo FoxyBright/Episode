@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import ru.rikmasters.gilty.core.R.drawable
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
@@ -54,9 +55,7 @@ fun NotificationItem(
     val notification = state.notification
     val type = notification.type
     val meet = notification.parent.meeting
-    
-    val adminMessage = "ADMIN MESSAGE" // TODO для сообщений от администрации приложения
-    
+    val adminMessage = "ADMIN MESSAGE"
     val user = when(type) {
         ADMIN_NOTIFICATION, PHOTO_BLOCKED -> null
         RESPOND -> notification.feedback?.respond?.author
@@ -191,10 +190,9 @@ private fun TextNotification(
 ) {
     SwipeableContainer(shape, modifier) {
         Row(
-            Modifier
-                .swipeableRow(
-                    rowState, LocalContext.current
-                ) { onSwiped() },
+            Modifier.swipeableRow(
+                rowState, LocalContext.current
+            ) { onSwiped() },
             Center, CenterVertically
         ) {
             Column(
@@ -209,14 +207,18 @@ private fun TextNotification(
                         .padding(12.dp),
                     Start, CenterVertically
                 ) {
+                    val image = ImageRequest
+                        .Builder(LocalContext.current)
+                        .data(thumbnail?.url)
+                        .allowHardware(false)
+                        .build()
                     AsyncImage(
-                        thumbnail?.url, (null), Modifier
+                        image, (null), Modifier
                             .padding(end = 16.dp)
                             .clip(CircleShape)
                             .size(40.dp),
                         contentScale = Crop
-                    )
-                    content.invoke()
+                    ); content.invoke()
                 }
                 if(emojiRawState) EmojiRow(
                     emojiList, Modifier.padding(

@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
@@ -13,8 +12,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 class MeetingBsViewModel : ViewModel() {
 
     private val meetManager by inject<MeetingManager>()
-    private val profileManager by inject<ProfileManager>()
-
+    
     private val _meetId = MutableStateFlow<String?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,7 +46,8 @@ class MeetingBsViewModel : ViewModel() {
         _meet.emit(meetManager.getDetailedMeet(meetId))
         if (meet.value?.memberState == IS_ORGANIZER) {
             _lastResponse.emit(
-                _meet.value?.responds?.count!! to _meet.value?.responds?.thumbnail?.url
+                _meet.value?.responds?.count!! to
+                        _meet.value?.responds?.thumbnail?.url
             )
         }
         if (meet.value?.isOnline == true) meet.value?.let {

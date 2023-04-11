@@ -24,9 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.*
-import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
@@ -38,6 +36,7 @@ import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
@@ -48,11 +47,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-@Composable
-private fun previewData() = flowOf(
-    PagingData.from(DemoChatModelList)
-).collectAsLazyPagingItems()
-
 @Preview
 @Composable
 private fun ChatListPreview() {
@@ -60,17 +54,10 @@ private fun ChatListPreview() {
         ChatListContent(
             ChatListState(
                 listOf(
-                    INACTIVE,
-                    INACTIVE,
-                    INACTIVE,
-                    INACTIVE,
-                    ACTIVE
-                ),
-                previewData(),
-                (true),
-                (false),
-                LIST,
-                (1),
+                    INACTIVE, INACTIVE, INACTIVE,
+                    INACTIVE, ACTIVE
+                ), pagingPreview(DemoChatModelList),
+                (true), (false), LIST, (1),
                 (SortTypeModel.MEETING_DATE),
                 LazyListState()
             ),

@@ -66,8 +66,7 @@ fun HiddenImage(
                 .background(linearGradient(red()))
                 .fillMaxSize()
         ) else AsyncImage(
-            image?.thumbnail?.url,
-            (null), Modifier
+            image?.thumbnail?.url, (null), Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,

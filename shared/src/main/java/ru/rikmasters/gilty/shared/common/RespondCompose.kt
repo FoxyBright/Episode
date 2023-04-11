@@ -70,8 +70,7 @@ fun LazyListScope.sentRespond(
                     Modifier.padding(
                         start = 16.dp,
                         top = 12.dp
-                    ),
-                    organizer.avatar?.thumbnail?.url
+                    ), organizer.avatar?.thumbnail?.url
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     GDivider(Modifier)

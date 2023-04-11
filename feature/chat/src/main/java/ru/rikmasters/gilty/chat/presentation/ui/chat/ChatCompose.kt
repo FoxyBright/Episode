@@ -18,19 +18,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
-import kotlinx.coroutines.flow.flowOf
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportAlert
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
@@ -40,11 +38,6 @@ import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
-
-@Composable
-private fun previewData() = flowOf(
-    PagingData.from(DemoMessageModelList)
-).collectAsLazyPagingItems()
 
 @Preview
 @Composable
@@ -65,7 +58,7 @@ private fun ChatPreview() {
                 answer = DemoMessageModel,
                 meet = DemoMeetingModel,
                 messageText = "Вводимое сообщение",
-                messageList = previewData(),
+                messageList = pagingPreview(DemoMessageModelList),
                 userId = "id",
                 alert = false,
                 meetAlert = false,
