@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.BsContainer
-import ru.rikmasters.gilty.shared.shared.GiltyChip
+import ru.rikmasters.gilty.shared.shared.GChip
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -56,7 +56,7 @@ fun SelectorBsContent(
                 .padding(8.dp), 8.dp
         ) {
             state.items.forEachIndexed { index, item ->
-                GiltyChip(
+                GChip(
                     Modifier.padding(end = 12.dp),
                     item, (state.selected == index)
                 ) { callback?.onItemSelect(index) }

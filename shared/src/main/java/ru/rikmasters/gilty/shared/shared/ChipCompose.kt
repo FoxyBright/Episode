@@ -41,14 +41,14 @@ import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun ChipsPreview() {
     GiltyTheme {
         val list = remember { mutableStateListOf(true, false, false) }
         LazyRow(Modifier.fillMaxWidth()) {
             itemsIndexed(list) { i, it ->
-                GiltyChip(
+                GChip(
                     Modifier.padding(6.dp, 12.dp),
                     "Чип ", it
                 ) {
@@ -62,7 +62,7 @@ private fun ChipsPreview() {
     }
 }
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun StringPreview() {
     GiltyTheme {
@@ -88,7 +88,7 @@ private fun StringPreview() {
 }
 
 @Composable
-fun GiltyChip(
+fun GChip(
     modifier: Modifier = Modifier,
     text: String,
     isSelected: Boolean = false,
@@ -98,12 +98,10 @@ fun GiltyChip(
     val primary = colorScheme.primary
     val empty = colorScheme.primaryContainer
     val border = colors.chipGray
-    
-    
     Box(
         modifier = modifier
             .sur(
-                shape = shapes.medium,
+                shape = shapes.extraSmall,
                 backgroundColor = Transparent,
                 border = BorderStroke(
                     1.dp, horizontalGradient(

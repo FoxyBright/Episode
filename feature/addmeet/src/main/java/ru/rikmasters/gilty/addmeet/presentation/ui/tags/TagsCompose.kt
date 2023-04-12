@@ -175,7 +175,7 @@ private fun PopularTags(
                 .padding(8.dp), 8.dp, 8.dp
         ) {
             popularTags.forEach {
-                GiltyChip(
+                GChip(
                     Modifier, it.title,
                     tagList.contains(it), online
                 ) { onClick(it) }

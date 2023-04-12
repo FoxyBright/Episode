@@ -91,7 +91,7 @@ fun SelectBottom(
                 .padding(8.dp), 8.dp
         ) {
             repeat(list.size) {
-                GiltyChip(
+                GChip(
                     Modifier.padding(end = 12.dp),
                     list[it], (select == it), online
                 ) { onItemClick?.let { c -> c(it) } }

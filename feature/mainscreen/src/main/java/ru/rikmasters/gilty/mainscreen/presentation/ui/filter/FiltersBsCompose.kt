@@ -21,7 +21,7 @@ import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.CardRow
-import ru.rikmasters.gilty.shared.shared.GiltyChip
+import ru.rikmasters.gilty.shared.shared.GChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -99,7 +99,7 @@ fun MeetingFilterBottom(
                         .padding(top = 28.dp, bottom = 18.dp)
                 ) {
                     items(state.interest) {
-                        GiltyChip(
+                        GChip(
                             Modifier.padding(end = 8.dp), it.name,
                             state.selectedCategories.contains(it)
                         ) { callback?.onSubClick(it) }

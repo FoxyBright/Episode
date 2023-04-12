@@ -172,7 +172,7 @@ private fun Categories(
                     ) {
                         category.children?.let {
                             it.forEach { sub ->
-                                GiltyChip(
+                                GChip(
                                     Modifier, sub.name,
                                     state.selected.contains(sub)
                                 ) { callback?.onSubClick(sub) }

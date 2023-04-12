@@ -287,28 +287,3 @@ fun descriptionColors(online: Boolean) =
         disabledPlaceholderColor = colorScheme.scrim,
         disabledTextColor = colorScheme.scrim,
     )
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun priceFieldColors(online: Boolean = false) =
-    textFieldColors(
-        textColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        cursorColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        containerColor = colorScheme.primaryContainer,
-        unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.scrim,
-        focusedLabelColor = colorScheme.tertiary,
-        disabledTrailingIconColor = Transparent,
-        focusedTrailingIconColor = Transparent,
-        unfocusedTrailingIconColor = Transparent,
-        focusedIndicatorColor = Transparent,
-        unfocusedIndicatorColor = Transparent,
-        disabledIndicatorColor = Transparent,
-        errorIndicatorColor = Transparent,
-        errorLabelColor = colorScheme.primary,
-        placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = colorScheme.scrim,
-        disabledTextColor = colorScheme.scrim,
-    )

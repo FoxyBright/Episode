@@ -99,7 +99,7 @@ fun Category(
                         .padding(horizontal = 8.dp), 8.dp, 8.dp
                 ) {
                     category.children.forEach { sub ->
-                        GiltyChip(
+                        GChip(
                             Modifier, sub.name,
                             selected.contains(sub)
                         ) { onSubClick(sub) }
@@ -331,7 +331,7 @@ fun MeetingType(
                 .padding(8.dp), 8.dp, 8.dp
         ) {
             repeat(types.size) {
-                GiltyChip(
+                GChip(
                     Modifier, types[it].displayShort,
                     selected.contains(it), online
                 ) { onMeetingTypeSelect(it) }
@@ -365,7 +365,7 @@ fun ConditionsSelect(
                 .padding(8.dp), 8.dp, 8.dp
         ) {
             repeat(conditions.size) {
-                GiltyChip(
+                GChip(
                     Modifier,
                     conditions[it].display,
                     selected.contains(it), online
@@ -392,7 +392,7 @@ fun Conditions(
                 .padding(8.dp), 8.dp, 8.dp
         ) {
             repeat(ConditionType.list.size) {
-                GiltyChip(
+                GChip(
                     Modifier,
                     ConditionType.list[it].display,
                     selectedConditions.contains(it)

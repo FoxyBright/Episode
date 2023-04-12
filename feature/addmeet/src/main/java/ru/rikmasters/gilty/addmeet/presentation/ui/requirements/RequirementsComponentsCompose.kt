@@ -56,7 +56,7 @@ fun RequirementsList(
                 val count = if(memberCount < 2)
                     2 else memberCount
                 items(count) {
-                    GiltyChip(
+                    GChip(
                         Modifier.padding(top = 4.dp, end = 8.dp),
                         "${it + 1}", (it == selected), state.online
                     ) { callback?.onMemberClick(it) }

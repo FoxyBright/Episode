@@ -103,7 +103,7 @@ fun PersonalContent(
                         .padding(16.dp)
                 ) {
                     items(sexList.size) {
-                        GiltyChip(
+                        GChip(
                             Modifier.padding(end = 12.dp),
                             sexList[it].value,
                             (state.selectGender == it)
