@@ -1,11 +1,11 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -32,10 +33,12 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.notification.DemoInfoNotificationModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.EmojiRow
 import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
+import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 data class NotificationItemState(
@@ -45,6 +48,21 @@ data class NotificationItemState(
     val duration: String,
     val emojiList: List<EmojiModel>,
 )
+
+@Preview
+@Composable
+private fun InfoNotificationPreview() {
+    GiltyTheme {
+        NotificationItem(
+            NotificationItemState(
+                DemoInfoNotificationModel,
+                DragRowState(0f),
+                MaterialTheme.shapes.medium,
+                "10 ч", emptyList()
+            )
+        )
+    }
+}
 
 @Composable
 fun NotificationItem(
@@ -153,21 +171,20 @@ private fun InfoNotification(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(12.dp, 16.dp),
                     Start, CenterVertically
                 ) {
-                    Image(
+                    Icon(
                         painterResource(drawable.ic_information),
                         (null), Modifier
-                            .padding(end = 16.dp)
-                            .clip(CircleShape)
-                            .size(40.dp),
-                        contentScale = Crop
+                            .padding(start = 8.dp, end = 24.dp)
+                            .size(24.dp),
+                        colorScheme.primary
                     )
                     NotificationText(
                         (null), notificationType, (null),
                         duration, Modifier.padding(
-                            end = 20.dp, top = 12.dp
+                            end = 20.dp
                         ), message
                     )
                 }
@@ -204,7 +221,8 @@ private fun TextNotification(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(12.dp, 6.dp)
+                        .padding(top = 6.dp),
                     Start, CenterVertically
                 ) {
                     val image = ImageRequest
@@ -216,7 +234,7 @@ private fun TextNotification(
                         image, (null), Modifier
                             .padding(end = 16.dp)
                             .clip(CircleShape)
-                            .size(40.dp),
+                            .size(38.dp),
                         contentScale = Crop
                     ); content.invoke()
                 }

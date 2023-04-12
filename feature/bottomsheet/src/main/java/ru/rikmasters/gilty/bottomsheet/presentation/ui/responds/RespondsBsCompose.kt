@@ -23,10 +23,13 @@ import androidx.paging.compose.items
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.FULL
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.SHORT
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
 import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.GiltyTab
 import ru.rikmasters.gilty.shared.shared.PagingLoader
@@ -41,7 +44,11 @@ fun RespondsList(
     respondsStates: List<Int>,
     selectTab: Int,
     modifier: Modifier = Modifier,
-    callback: RespondsListCallback? = null
+    photoViewState: Boolean = false,
+    viewerImages: List<AvatarModel?> = emptyList(),
+    viewerSelectImage: AvatarModel? = null,
+    viewerMenuState: Boolean = false,
+    callback: RespondsListCallback? = null,
 ) {
     Column(
         modifier
@@ -53,18 +60,18 @@ fun RespondsList(
             type,
             Modifier.padding(
                 top = 28.dp,
-                bottom = if (type == FULL) {
+                bottom = if(type == FULL) {
                     16.dp
                 } else 8.dp
             )
         ) { callback?.onBack() }
-        when (type) {
+        when(type) {
             MEET -> MeetResponds(
                 Modifier.padding(vertical = 8.dp),
                 responds,
                 callback
             )
-
+            
             FULL -> {
                 GiltyTab(
                     listOf(
@@ -73,13 +80,13 @@ fun RespondsList(
                     ),
                     selectTab,
                     Modifier.padding(
-                        bottom = if (selectTab == 0) {
+                        bottom = if(selectTab == 0) {
                             8.dp
                         } else 0.dp
                     )
                 ) { callback?.onTabChange(it) }
-
-                if (selectTab == 0) {
+                
+                if(selectTab == 0) {
                     SentResponds(
                         Modifier.padding(vertical = 8.dp),
                         meetResponds,
@@ -92,7 +99,7 @@ fun RespondsList(
                     callback
                 )
             }
-
+            
             SHORT -> ReceivedResponds(
                 Modifier.padding(vertical = 8.dp),
                 meetResponds,
@@ -101,13 +108,22 @@ fun RespondsList(
             )
         }
     }
+    if(photoViewState) PhotoView(
+        images = viewerImages,
+        selected = viewerSelectImage,
+        menuState = viewerMenuState,
+        type = LOAD,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
 }
 
 @Composable
 private fun SentResponds(
     modifier: Modifier = Modifier,
     responds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     when {
         responds.loadState.refresh is LoadState.Error -> {}
@@ -118,7 +134,7 @@ private fun SentResponds(
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if (itemCount != 0) {
+                if(itemCount != 0) {
                     responds.itemSnapshotList.items.forEach {
                         sentRespond(
                             it.tags.joinToString(separator = ", ") { t -> t.title },
@@ -128,19 +144,20 @@ private fun SentResponds(
                             callback
                         )
                     }
-                    if (responds.loadState.append is LoadState.Loading) {
+                    if(responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
                         Spacer(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .height(12.dp)
                                 .background(
                                     color = colorScheme.background
                                 )
                         )
                     }
-                } else if (responds.loadState.refresh is LoadState.NotLoading) {
+                } else if(responds.loadState.refresh is LoadState.NotLoading) {
                     item {
                         Box(modifier = Modifier.fillParentMaxSize()) {
                             EmptyScreen(
@@ -161,7 +178,7 @@ private fun SentResponds(
 private fun MeetResponds(
     modifier: Modifier = Modifier,
     responds: LazyPagingItems<RespondWithPhotos>,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     when {
         responds.loadState.refresh is LoadState.Error -> {}
@@ -172,7 +189,7 @@ private fun MeetResponds(
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if (itemCount != 0) {
+                if(itemCount != 0) {
                     items(responds) {
                         it?.let {
                             ReceivedRespond(
@@ -183,12 +200,13 @@ private fun MeetResponds(
                             )
                         }
                     }
-                    if (responds.loadState.append is LoadState.Loading) {
+                    if(responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
                         Spacer(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .height(12.dp)
                                 .background(
                                     color = colorScheme.background
@@ -196,7 +214,7 @@ private fun MeetResponds(
                         )
                     }
                 } else {
-                    if (responds.loadState.refresh is LoadState.NotLoading) {
+                    if(responds.loadState.refresh is LoadState.NotLoading) {
                         item {
                             Box(modifier = Modifier.fillParentMaxSize()) {
                                 EmptyScreen(
@@ -219,7 +237,7 @@ private fun ReceivedResponds(
     modifier: Modifier = Modifier,
     responds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
     respondsStates: List<Int>,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     RespondsListContent(
         RespondsListState(responds, respondsStates),
@@ -232,7 +250,7 @@ private fun ReceivedResponds(
 private fun TopBar(
     type: RespondsBsType,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     Row(
         modifier.fillMaxWidth(),
@@ -244,7 +262,7 @@ private fun TopBar(
             Start,
             CenterVertically
         ) {
-            if (type == MEET) IconButton(
+            if(type == MEET) IconButton(
                 { onBack() },
                 Modifier.padding(end = 16.dp)
             ) {

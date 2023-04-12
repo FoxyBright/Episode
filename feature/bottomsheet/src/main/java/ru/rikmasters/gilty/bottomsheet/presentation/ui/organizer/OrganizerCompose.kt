@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
@@ -27,6 +29,7 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.GDropMenu
 import ru.rikmasters.gilty.shared.shared.GKebabButton
@@ -54,6 +57,11 @@ data class UserState(
     val backButton: Boolean = false,
     val menuState: Boolean = false,
     val isMyProfile: Boolean = false,
+    
+    val photoViewState: Boolean = false,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
 )
 
 interface OrganizerCallback: ProfileCallback {
@@ -61,6 +69,9 @@ interface OrganizerCallback: ProfileCallback {
     fun onMenuDismiss(state: Boolean)
     fun onMenuItemSelect(point: Int, userId: String?)
     fun onMeetingClick(meet: MeetingModel)
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
 }
 
 @Composable
@@ -99,6 +110,15 @@ fun OrganizerContent(
             }
         }
     }
+    if(state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
+        type = PHOTO,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
 }
 
 @Composable

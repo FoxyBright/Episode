@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
@@ -82,6 +83,27 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         }
         .state(_username.value, SharingStarted.Eagerly)
     
+    private val _photoViewState = MutableStateFlow(false)
+    val photoViewState = _photoViewState.asStateFlow()
+    
+    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages = _viewerImages.asStateFlow()
+    
+    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage = _viewerSelectImage.asStateFlow()
+    
+    suspend fun changePhotoViewState(state: Boolean) {
+        _photoViewState.emit(state)
+    }
+    
+    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
+        _viewerImages.emit(list)
+    }
+    
+    suspend fun setPhotoViewSelected(photo: AvatarModel?) {
+        _viewerSelectImage.emit(photo)
+    }
+    
     suspend fun updateUsername() {
         if(!occupied.value) regManager.userUpdateData(
             username.value?.substringBefore(','),
@@ -99,7 +121,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
-    private val _lastRespond = MutableStateFlow<Pair<Int, String?>>(Pair(0, null))
+    private val _lastRespond =
+        MutableStateFlow<Pair<Int, String?>>(Pair(0, null))
     val lastRespond = _lastRespond.asStateFlow()
     
     private val _navBar = MutableStateFlow(
@@ -188,7 +211,12 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         _age.emit(user.age)
         _username.emit("${user.username}, ${user.age}")
         _description.emit(user.aboutMe ?: "")
-        _lastRespond.emit(Pair(user.respondsCount ?: 0, user.respondsImage?.url))
+        _lastRespond.emit(
+            Pair(
+                user.respondsCount ?: 0,
+                user.respondsImage?.url
+            )
+        )
         _profile.emit(
             user.copy(
                 username = username.value,

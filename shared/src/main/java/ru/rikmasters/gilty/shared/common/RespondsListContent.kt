@@ -20,7 +20,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.notification.*
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
+import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.RowActionBar
@@ -47,25 +49,28 @@ private fun ReceivedResponds() {
 
 data class RespondsListState(
     val responds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
-    val groupStates: List<Int>
+    val groupStates: List<Int>,
 )
 
 interface RespondsListCallback {
-
+    
     fun onAcceptClick(respondId: String)
     fun onCancelClick(respondId: String)
     fun onRespondClick(authorId: String)
-    fun onImageClick(image: String)
+    fun onImageClick(image: AvatarModel)
     fun onArrowClick(index: Int)
     fun onTabChange(tab: Int) {}
     fun onBack() {}
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
 }
 
 @Composable
 fun RespondsListContent(
     state: RespondsListState,
     modifier: Modifier = Modifier,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     when {
         state.responds.loadState.refresh is LoadState.Error -> {}
@@ -76,7 +81,7 @@ fun RespondsListContent(
         else -> {
             LazyColumn(modifier) {
                 val itemCount = state.responds.itemCount
-                if (itemCount != 0) {
+                if(itemCount != 0) {
                     itemsIndexed(state.responds) { index, respond ->
                         respond?.let {
                             GroupList(
@@ -89,12 +94,13 @@ fun RespondsListContent(
                             )
                         }
                     }
-                    if (state.responds.loadState.append is LoadState.Loading) {
+                    if(state.responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(state.responds.loadState) }
                     }
                     item {
                         Spacer(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .height(12.dp)
                                 .background(
                                     color = colorScheme.background
@@ -102,7 +108,7 @@ fun RespondsListContent(
                         )
                     }
                 } else {
-                    if (state.responds.loadState.refresh is LoadState.NotLoading) {
+                    if(state.responds.loadState.refresh is LoadState.NotLoading) {
                         item {
                             Box(modifier = Modifier.fillParentMaxSize()) {
                                 EmptyScreen(
@@ -127,7 +133,7 @@ private fun GroupList(
     responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
     state: Boolean = false,
-    callback: RespondsListCallback?
+    callback: RespondsListCallback?,
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
@@ -143,7 +149,7 @@ private fun GroupList(
             )
             IconButton({ callback?.onArrowClick(index) }) {
                 Icon(
-                    if (state) Filled.KeyboardArrowDown
+                    if(state) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
                     (null),
                     Modifier.size(24.dp),
@@ -151,7 +157,7 @@ private fun GroupList(
                 )
             }
         }
-        if (state) Column {
+        if(state) Column {
             responds.forEach {
                 ReceivedRespond(
                     it,

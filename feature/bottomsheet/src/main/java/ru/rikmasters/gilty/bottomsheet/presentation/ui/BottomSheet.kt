@@ -111,8 +111,10 @@ fun BottomSheet(
             
             it.GetStringArg("lat") { lat ->
                 it.GetStringArg("lng") { lng ->
-                    val googleMap = "https://maps.google.com/?daddr=$lat%2C$lng&zoom=18"
-                    val yandexMap = "https://maps.yandex.ru/?pt=$lng%2C$lat&z=18"
+                    val googleMap =
+                        "https://maps.google.com/?daddr=$lat%2C$lng&zoom=18"
+                    val yandexMap =
+                        "https://maps.yandex.ru/?pt=$lng%2C$lat&z=18"
                     MapApps(
                         alert, appIndex, Modifier, { state ->
                             if(state) {
@@ -129,7 +131,6 @@ fun BottomSheet(
                 }
             }
         }
-        
         
         composable(
             route = "MAP?location={location}&category={category}",
@@ -202,7 +203,12 @@ fun BottomSheet(
             stack.GetStringArg("id") { id ->
                 stack.GetStringArg("type") { type ->
                     Connector<ReportsBsViewModel>(scope) {
-                        ReportsBs(it, ReportObjectType.valueOf(type), id, nav)
+                        ReportsBs(
+                            it,
+                            ReportObjectType.valueOf(type),
+                            id,
+                            nav
+                        )
                     }
                 }
             }

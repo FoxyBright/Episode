@@ -42,15 +42,28 @@ private val dateCallback = object: LocalDateCallBack {
     override fun month(date: Long): Int = part(date, "MM")
     override fun day(date: Long): Int = part(date, "dd")
     override fun plusYear(date: Long, count: Int) = plus(date, YEAR, count)
-    override fun plusMonth(date: Long, count: Int) = plus(date, MONTH, count)
-    override fun plusDay(date: Long, count: Int) = plus(date, DAY_OF_MONTH, count)
-    override fun minusYear(date: Long, count: Int) = plus(date, YEAR, -count)
-    override fun minusMonth(date: Long, count: Int) = plus(date, MONTH, -count)
-    override fun minusDay(date: Long, count: Int) = plus(date, DAY_OF_MONTH, -count)
+    override fun plusMonth(date: Long, count: Int) =
+        plus(date, MONTH, count)
+    
+    override fun plusDay(date: Long, count: Int) =
+        plus(date, DAY_OF_MONTH, count)
+    
+    override fun minusYear(date: Long, count: Int) =
+        plus(date, YEAR, -count)
+    
+    override fun minusMonth(date: Long, count: Int) =
+        plus(date, MONTH, -count)
+    
+    override fun minusDay(date: Long, count: Int) =
+        plus(date, DAY_OF_MONTH, -count)
+    
     override fun isBefore(from: Long, to: Long) = from < to
     override fun isAfter(from: Long, to: Long) = from > to
-    override fun compareTo(date: Long, comp: Long) = Date(date).compareTo(Date(comp))
-    override fun dayOfWeek(date: Long) = DayOfWeek.dayOfWeek(Date(date).toString().substring(0, 3))
+    override fun compareTo(date: Long, comp: Long) =
+        Date(date).compareTo(Date(comp))
+    
+    override fun dayOfWeek(date: Long) =
+        DayOfWeek.dayOfWeek(Date(date).toString().substring(0, 3))
 }
 
 class LocalDate(private var millis: Long) {
@@ -155,6 +168,8 @@ class LocalDate(private var millis: Long) {
     fun dayOfWeek() = dateCallback.dayOfWeek(millis)
     fun millis() = millis
     
+    fun second() = millis / 1000
+    
     override fun equals(other: Any?): Boolean {
         if(this === other) return true
         if(javaClass != other?.javaClass) return false
@@ -190,12 +205,23 @@ private val timeCallback = object: LocalTimeCallBack {
     override fun minute(date: Long) = part(date, "mm")
     override fun second(date: Long) = part(date, "ss")
     override fun plusHour(date: Long, count: Int) = plus(date, HOUR, count)
-    override fun plusMinute(date: Long, count: Int) = plus(date, MINUTE, count)
-    override fun plusSecond(date: Long, count: Int) = plus(date, SECOND, count)
-    override fun minusHour(date: Long, count: Int) = plus(date, HOUR, -count)
-    override fun minusMinute(date: Long, count: Int) = plus(date, MINUTE, -count)
-    override fun minusSecond(date: Long, count: Int) = plus(date, SECOND, -count)
-    override fun compareTo(date: Long, comp: Long) = Date(date).compareTo(Date(comp))
+    override fun plusMinute(date: Long, count: Int) =
+        plus(date, MINUTE, count)
+    
+    override fun plusSecond(date: Long, count: Int) =
+        plus(date, SECOND, count)
+    
+    override fun minusHour(date: Long, count: Int) =
+        plus(date, HOUR, -count)
+    
+    override fun minusMinute(date: Long, count: Int) =
+        plus(date, MINUTE, -count)
+    
+    override fun minusSecond(date: Long, count: Int) =
+        plus(date, SECOND, -count)
+    
+    override fun compareTo(date: Long, comp: Long) =
+        Date(date).compareTo(Date(comp))
 }
 
 class LocalTime(private var millis: Long) {
@@ -216,7 +242,8 @@ class LocalTime(private var millis: Long) {
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis).format(pattern)
     
-    fun compareTo(comp: LocalTime) = timeCallback.compareTo(millis, comp.millis())
+    fun compareTo(comp: LocalTime) =
+        timeCallback.compareTo(millis, comp.millis())
     
     /** Прибавляет к дате день/месяц/год **/
     fun plusHour(count: Int) =
@@ -284,7 +311,8 @@ class LocalDateTime(
         fun now() = LocalDateTime(c.time.time)
     }
     
-    fun isBefore(to: LocalDateTime) = Date(millis).before(Date(to.millis()))
+    fun isBefore(to: LocalDateTime) =
+        Date(millis).before(Date(to.millis()))
     
     /** Возвращает true если дата больше, чем указаная для сравнения */
     fun isAfter(to: LocalDateTime) = Date(millis).after(Date(to.millis()))
@@ -302,20 +330,42 @@ class LocalDateTime(
     fun millis() = millis
     
     /** Прибавляет к дате выбранное количество единиц **/
-    fun plusYear(count: Int) = LocalDateTime(dateCallback.plusYear(millis, count))
-    fun plusMonth(count: Int) = LocalDateTime(dateCallback.plusMonth(millis, count))
-    fun plusDay(count: Int) = LocalDateTime(dateCallback.plusDay(millis, count))
-    fun plusHour(count: Int) = LocalDateTime(timeCallback.plusHour(millis, count))
-    fun plusMinute(count: Int) = LocalDateTime(timeCallback.plusMinute(millis, count))
-    fun plusSecond(count: Int) = LocalDateTime(timeCallback.plusSecond(millis, count))
+    fun plusYear(count: Int) =
+        LocalDateTime(dateCallback.plusYear(millis, count))
+    
+    fun plusMonth(count: Int) =
+        LocalDateTime(dateCallback.plusMonth(millis, count))
+    
+    fun plusDay(count: Int) =
+        LocalDateTime(dateCallback.plusDay(millis, count))
+    
+    fun plusHour(count: Int) =
+        LocalDateTime(timeCallback.plusHour(millis, count))
+    
+    fun plusMinute(count: Int) =
+        LocalDateTime(timeCallback.plusMinute(millis, count))
+    
+    fun plusSecond(count: Int) =
+        LocalDateTime(timeCallback.plusSecond(millis, count))
     
     /** Отнимает от даты выбранное количество единиц **/
-    fun minusYear(count: Int) = LocalDateTime(dateCallback.minusDay(millis, count))
-    fun minusMonth(count: Int) = LocalDateTime(dateCallback.minusMonth(millis, count))
-    fun minusDay(count: Int) = LocalDateTime(dateCallback.minusYear(millis, count))
-    fun minusHour(count: Int) = LocalDateTime(timeCallback.minusHour(millis, count))
-    fun minusMinute(count: Int) = LocalDateTime(timeCallback.minusMinute(millis, count))
-    fun minusSecond(count: Int) = LocalDateTime(timeCallback.minusSecond(millis, count))
+    fun minusYear(count: Int) =
+        LocalDateTime(dateCallback.minusDay(millis, count))
+    
+    fun minusMonth(count: Int) =
+        LocalDateTime(dateCallback.minusMonth(millis, count))
+    
+    fun minusDay(count: Int) =
+        LocalDateTime(dateCallback.minusYear(millis, count))
+    
+    fun minusHour(count: Int) =
+        LocalDateTime(timeCallback.minusHour(millis, count))
+    
+    fun minusMinute(count: Int) =
+        LocalDateTime(timeCallback.minusMinute(millis, count))
+    
+    fun minusSecond(count: Int) =
+        LocalDateTime(timeCallback.minusSecond(millis, count))
 }
 
 /* MONTH */
@@ -494,7 +544,8 @@ enum class DayOfWeek {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Возвращает часть даты указанную в патерне в числовом значении **/
-private fun part(date: Long, pattern: String) = Date(date).format(pattern).toInt()
+private fun part(date: Long, pattern: String) =
+    Date(date).format(pattern).toInt()
 
 /** Изменяет дату в определенном поле на указанное кол-во единиц **/
 private fun plus(date: Long, field: Int, count: Int): Long {
@@ -506,16 +557,20 @@ private fun plus(date: Long, field: Int, count: Int): Long {
 
 /** Задает определенный формат для объекта класса Date(). Возвращает строку**/
 @SuppressLint("SimpleDateFormat")
-fun Date.format(pattern: String): String = SimpleDateFormat(pattern).format(this)
+fun Date.format(pattern: String): String =
+    SimpleDateFormat(pattern).format(this)
 
 /** Задает определенный формат для даты в строке в формате ISO-8601. Возвращает строку**/
-fun String.format(pattern: String): String = Date(this.long()).format(pattern)
+fun String.format(pattern: String): String =
+    Date(this.long()).format(pattern)
 
 fun LocalDateTime.display(): String =
-    this.format("d 'M' yyyy, HH:mm").replace("M", Month.of(this.month()).display())
+    this.format("d 'M' yyyy, HH:mm")
+        .replace("M", Month.of(this.month()).display())
 
 fun LocalDateTime.displayDate(): String =
-    this.format("d 'M' yyyy").replace("M", Month.of(this.month()).display())
+    this.format("d 'M' yyyy")
+        .replace("M", Month.of(this.month()).display())
 
 fun Long.toDays() = this / 86_400_000
 

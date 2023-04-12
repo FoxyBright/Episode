@@ -25,12 +25,16 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.*
 
 /*
@@ -76,21 +80,30 @@ data class UserProfileState(
     val alert: Boolean,
     val menuState: Boolean = false,
     val listState: LazyListState,
-    val photoAlertState: Boolean = false
+    val photoAlertState: Boolean = false,
+    
+    val photoViewState: Boolean = false,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
+    val viewerType: PhotoViewType = PHOTO,
 )
 
-interface UserProfileCallback : ProfileCallback {
-
-    fun menu(state: Boolean) {}
-    fun onHistoryShow() {}
-    fun onMeetingClick(meet: MeetingModel) {}
-    fun onHistoryClick(meet: MeetingModel) {}
-    fun onRespondsClick() {}
-    fun onNavBarSelect(point: Int) {}
-    fun closeAlert() {}
-    fun closePhotoAlert() {}
-    fun onMenuClick(it: Boolean) {}
-    fun onMenuItemClick(point: Int) {}
+interface UserProfileCallback: ProfileCallback {
+    
+    fun menu(state: Boolean)
+    fun onHistoryShow()
+    fun onMeetingClick(meet: MeetingModel)
+    fun onHistoryClick(meet: MeetingModel)
+    fun onRespondsClick()
+    fun onNavBarSelect(point: Int)
+    fun closeAlert()
+    fun closePhotoAlert()
+    fun onMenuClick(it: Boolean)
+    fun onMenuItemClick(point: Int)
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,23 +111,28 @@ interface UserProfileCallback : ProfileCallback {
 fun ProfileContent(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null
+    callback: UserProfileCallback? = null,
 ) {
     Box {
         GDropMenu(
             state.menuState,
             { callback?.onMenuClick(false) },
-            DpOffset(180.dp, 300.dp),
-            listOf(
-                Pair(stringResource(R.string.profile_menu_watch_photo_button)) { callback?.onMenuItemClick(0) },
-                Pair(stringResource(R.string.edit_button)) { callback?.onMenuItemClick(1) }
+            DpOffset(180.dp, 300.dp), listOf(
+                Pair(stringResource(R.string.profile_menu_watch_photo_button)) {
+                    callback?.onMenuItemClick(0)
+                },
+                Pair(stringResource(R.string.edit_button)) {
+                    callback?.onMenuItemClick(1)
+                }
             )
         )
     }
     Scaffold(
         modifier,
         bottomBar = {
-            NavBar(state.stateList) { callback?.onNavBarSelect(it) }
+            NavBar(state.stateList) {
+                callback?.onNavBarSelect(it)
+            }
         }
     ) {
         Box(Modifier.padding(it)) {
@@ -123,6 +141,15 @@ fun ProfileContent(
             }
         }
     }
+    if(state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
+        type = state.viewerType,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
     GAlert(
         state.alert,
         title = stringResource(R.string.complaints_send_answer),
@@ -134,7 +161,11 @@ fun ProfileContent(
         state.photoAlertState,
         onDismissRequest = { callback?.closePhotoAlert() },
         title = stringResource(R.string.profile_blocked_photo_alert),
-        success = Pair(stringResource(R.string.edit_button)) { callback?.onMenuItemClick(1) },
+        success = Pair(stringResource(R.string.edit_button)) {
+            callback?.onMenuItemClick(
+                1
+            )
+        },
         cancel = Pair(stringResource(R.string.notification_respond_cancel_button)) { callback?.closePhotoAlert() }
     )
 }
@@ -143,7 +174,7 @@ fun ProfileContent(
 private fun Content(
     state: UserProfileState,
     modifier: Modifier = Modifier,
-    callback: UserProfileCallback? = null
+    callback: UserProfileCallback? = null,
 ) {
     LazyColumn(
         modifier
@@ -199,7 +230,7 @@ private fun Content(
             }
         }
         val userId = state.profileState.profile?.id ?: ""
-        if (state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item {
+        if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item {
             LazyRow {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
@@ -211,7 +242,9 @@ private fun Content(
                 }
             }
         }
-        if (state.meetingsHistory.itemSnapshotList.items.isNotEmpty()) item(5) {
+        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty()) item(
+            5
+        ) {
             MeetHistory(
                 userId,
                 state.historyState,
@@ -229,7 +262,7 @@ private fun MeetHistory(
     historyState: Boolean,
     historyList: LazyPagingItems<MeetingModel>,
     openHistory: () -> Unit,
-    onSelect: (MeetingModel) -> Unit
+    onSelect: (MeetingModel) -> Unit,
 ) {
     Row(
         Modifier
@@ -248,14 +281,14 @@ private fun MeetHistory(
             style = typography.labelLarge
         )
         Icon(
-            if (!historyState) Filled.KeyboardArrowRight
+            if(!historyState) Filled.KeyboardArrowRight
             else Filled.KeyboardArrowDown,
             (null),
             Modifier.size(24.dp),
             colorScheme.tertiary
         )
     }
-    if (historyState) LazyRow {
+    if(historyState) LazyRow {
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(

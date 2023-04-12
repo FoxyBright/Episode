@@ -43,8 +43,7 @@ fun PhoneField(
                     { callback?.changeCountry() }
             )
             PhoneTextField(
-                phone,
-                country,
+                phone, country,
                 Modifier.fillMaxWidth(),
                 { callback?.onClear() },
                 { callback?.onPhoneChange(it) }

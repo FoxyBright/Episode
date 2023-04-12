@@ -4,10 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.viewmodel.UserBsViewModel
-import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ANONYMOUS_ORGANIZER
@@ -23,11 +20,8 @@ fun OrganizerBs(
     nav: NavHostController,
 ) {
     
-    val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
-    val globalNav = get<NavState>()
-    
     val backButton = nav.previousBackStackEntry != null
+    val scope = rememberCoroutineScope()
     
     val meets by vm.userActualMeets.collectAsState()
     val isMyProfile by vm.isMyProfile.collectAsState()
@@ -35,6 +29,10 @@ fun OrganizerBs(
     val meetState by vm.meetType.collectAsState()
     val profile by vm.profile.collectAsState()
     val menuState by vm.menuState.collectAsState()
+    
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val photoViewState by vm.viewerState.collectAsState()
     
     LaunchedEffect(Unit) {
         vm.setUser(userId)
@@ -52,19 +50,23 @@ fun OrganizerBs(
     
     OrganizerContent(
         UserState(
-            profileState, meets,
-            backButton, menuState, isMyProfile
+            profileState, meets, backButton,
+            menuState, isMyProfile, photoViewState,
+            viewerImages, viewerSelectImage
         ), Modifier, object: OrganizerCallback {
+            
             override fun profileImage() {
-                
                 scope.launch {
-                    globalNav.navigateAbsolute(
-                        ("profile/avatar?type=2&image=${profile.avatar?.url}")
-                    )
-                    asm.bottomSheet.collapse()
+                    vm.setPhotoViewSelected(profile.avatar)
+                    vm.setPhotoViewImages(listOf(profile.avatar))
+                    vm.changePhotoViewState(true)
                 }
             }
-            
+        
+            override fun onPhotoViewDismiss(state: Boolean) {
+                scope.launch { vm.changePhotoViewState(state) }
+            }
+        
             override fun onMenuItemSelect(point: Int, userId: String?) {
                 nav.navigate("REPORTS?id=$userId&type=$PROFILE")
             }

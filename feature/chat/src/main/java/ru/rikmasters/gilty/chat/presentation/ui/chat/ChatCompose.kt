@@ -26,6 +26,9 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportAlert
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.common.pagingPreview
@@ -33,6 +36,7 @@ import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.PagingLoader
@@ -90,14 +94,20 @@ data class ChatState(
     val imageMenuState: Boolean,
     val listState: LazyListState,
     val unReadCount: Int,
-    val writingUsers: List<Pair<String, ThumbnailModel>>
+    val writingUsers: List<Pair<String, ThumbnailModel>>,
+    
+    val photoViewState: Boolean = false,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
+    val viewerType: PhotoViewType = PHOTO,
 )
 
-interface ChatCallback :
+interface ChatCallback:
     ChatAppBarCallback,
     MessengerBarCallback,
     MessCallBack {
-
+    
     fun closeAlert()
     fun onMenuItemClick(point: Int)
     fun onMeetOut()
@@ -109,8 +119,12 @@ interface ChatCallback :
     fun onListDown()
     fun onMessageMenuItemSelect(
         point: Int,
-        message: MessageModel
+        message: MessageModel,
     )
+    
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
 }
 
 @Composable
@@ -118,7 +132,7 @@ interface ChatCallback :
 fun ChatContent(
     state: ChatState,
     modifier: Modifier = Modifier,
-    callback: ChatCallback? = null
+    callback: ChatCallback? = null,
 ) {
     Scaffold(
         modifier,
@@ -162,9 +176,19 @@ fun ChatContent(
             )
         }
     )
-
+    
+    if(state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
+        type = state.viewerType,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
+    
     ReportAlert(state.alert) { callback?.closeAlert() }
-
+    
     GAlert(
         show = state.meetAlert,
         modifier = Modifier,
@@ -186,10 +210,10 @@ private fun PreviewLazy() {
                 row,
                 (index % 2 != 0),
                 (true),
-                if (index < DemoMessageModelList.size.minus(1)) {
+                if(index < DemoMessageModelList.size.minus(1)) {
                     list[index.plus(1)].first
                 } else null,
-                if (index in 1..DemoMessageModelList.size) {
+                if(index in 1..DemoMessageModelList.size) {
                     list[index.minus(1)].first
                 } else null
             )
@@ -202,11 +226,11 @@ private fun Content(
     padding: PaddingValues,
     state: ChatState,
     modifier: Modifier = Modifier,
-    callback: ChatCallback?
+    callback: ChatCallback?,
 ) {
     val list = state.messageList
-
-    if (LocalInspectionMode.current) PreviewLazy()
+    
+    if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(
         modifier
             .padding(padding)
@@ -220,32 +244,33 @@ private fun Content(
             state.messageList.loadState.append is LoadState.Error -> {}
             else -> {
                 item { Spacer(Modifier.height(28.dp)) }
-
-                if (state.writingUsers.isNotEmpty()) item {
+                
+                if(state.writingUsers.isNotEmpty()) item {
                     Writing(
                         state.writingUsers.map { it.second },
                         Modifier.padding(16.dp, 2.dp)
                     )
                 }
                 itemsIndexed(list) { index, item ->
-                    ((item ?: MessageModel()) to rememberDragRowState()).let { (mes, row) ->
+                    ((item
+                        ?: MessageModel()) to rememberDragRowState()).let { (mes, row) ->
                         ChatMessage(
                             mes,
                             row,
                             (mes.message?.author?.id == state.userId),
                             state.meet.isOnline,
-                            if (index < list.itemCount.minus(1)) {
+                            if(index < list.itemCount.minus(1)) {
                                 list[index.plus(1)]
                             } else null,
-                            if (index in 1..list.itemCount) {
+                            if(index in 1..list.itemCount) {
                                 list[index.minus(1)]
                             } else null,
                             callback
                         )
                     }
                 }
-                if (state.messageList.loadState.append is LoadState.Loading) {
-                    Log.d("TEST","append")
+                if(state.messageList.loadState.append is LoadState.Loading) {
+                    Log.d("TEST", "append")
                     item {
                         PagingLoader(list.loadState)
                     }
@@ -258,12 +283,12 @@ private fun Content(
 @Composable
 private fun Writing(
     list: List<ThumbnailModel>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier, Start, CenterVertically) {
         WritingMessage()
         list.forEachIndexed { i, it ->
-            val mod = if (i == 0) {
+            val mod = if(i == 0) {
                 Modifier.padding(start = 6.dp)
             } else Modifier.offset((-16).dp)
             AsyncImage(
@@ -294,7 +319,7 @@ private fun LazyListState.isScrollingUp(): Boolean {
     var previousScrollOffset by remember(this) { mutableStateOf(firstOffset) }
     return remember(this) {
         derivedStateOf {
-            if (previousIndex != firstIndex) {
+            if(previousIndex != firstIndex) {
                 previousIndex > firstIndex
             } else {
                 previousScrollOffset >= firstOffset

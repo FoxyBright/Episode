@@ -1,9 +1,5 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import android.icu.util.Calendar
-import android.util.Log
-import java.util.*
-
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
 const val TODAY_LABEL = "Сегодня"
@@ -16,7 +12,7 @@ const val MINUTES_IN_HOUR = 55
 const val HOURS_IN_DAY = 23
 val NOW_DATE = "${LOCAL_DATE}T$LOCAL_TIME.000Z"
 val TOMORROW = "${LOCAL_DATE.plusDays(1)}T$LOCAL_TIME.000Z"
-val YESTERDAY = "${LOCAL_DATE.minusDays(1)}T$LOCAL_TIME.000Z"
+
 fun getDate(period: Int = 150): List<String> {
     val list = arrayListOf<String>()
     getDateList(period).first.forEach { list.add(it) }
@@ -30,7 +26,7 @@ fun getDateList(times: Int): Pair<List<String>, List<String>> {
     val newList = arrayListOf<String>()
     var todayPlus = LOCAL_DATE.plusDays(1)
     var todayMinus = LOCAL_DATE.minusDays(1)
-    for (i in 1..times) {
+    for(i in 1..times) {
         newList.add("$todayPlus$ZERO_TIME".dateCalendar())
         lastList.add("$todayMinus$ZERO_TIME".dateCalendar())
         todayPlus = todayPlus.plusDays(1)
@@ -42,15 +38,15 @@ fun getDateList(times: Int): Pair<List<String>, List<String>> {
 fun getTime(range: Iterable<Int>, step: Int): List<String> {
     val list = arrayListOf<String>()
     list.add("start")
-    for (it in range as IntRange step step)
-        if (it.toString().length != 1) list.add(it.toString())
+    for(it in range as IntRange step step)
+        if(it.toString().length != 1) list.add(it.toString())
         else list.add("0$it")
     list.add("end")
     return list
 }
 
 fun replacer(it: String, end: String): String {
-    return when (it) {
+    return when(it) {
         "start" -> end
         "end" -> TIME_START
         else -> it
@@ -67,9 +63,9 @@ fun tomorrowControl(date: String) =
 
 fun getDifferenceOfTime(date: String): String {
     val difference = (
-        LocalDateTime.now().plusMinute(1).millis() -
-            LocalDateTime.of(date).millis()
-        ) / 1000
+            LocalDateTime.now().plusMinute(1).millis() -
+                    LocalDateTime.of(date).millis()
+            ) / 1000
     return when {
         difference < 60 -> "$difference cек"
         difference in 60..3599 -> "${difference / 60} мин"
@@ -124,30 +120,6 @@ fun earlierWeekControl(date: String): Boolean {
     return (localDate < thisWeek().first)
 }
 
-fun thisWeek(): Pair<Long, Long> {
-    val calendarTime = LOCAL_DATE
-    when (calendarTime.dayOfWeek()) {
-        DayOfWeek.MONDAY -> {}
-        DayOfWeek.TUESDAY -> { calendarTime.minusDays(1) }
-        DayOfWeek.WEDNESDAY -> { calendarTime.minusDays(2) }
-        DayOfWeek.THURSDAY -> { calendarTime.minusDays(3) }
-        DayOfWeek.FRIDAY -> { calendarTime.minusDays(4) }
-        DayOfWeek.SATURDAY -> { calendarTime.minusDays(5) }
-        DayOfWeek.SUNDAY -> { calendarTime.minusDays(6) }
-    }
-
-    val start = LocalDate.of(
-        LOCAL_DATE.year(),
-        LOCAL_DATE.month(),
-        calendarTime.day()
-    )
-
-    return Pair(
-        start.millis() / 1000,
-        LocalDate.of(
-            LOCAL_DATE.year(),
-            LOCAL_DATE.month(),
-            start.plusDays(7).format("dd").toInt()
-        ).millis() / 1000
-    )
-}
+fun thisWeek() = LOCAL_DATE
+    .let { it.minusDays(it.dayOfWeek().ordinal) }
+    .let { it.second() to it.plusDays(7).second() }

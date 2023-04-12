@@ -12,6 +12,7 @@ dependencies {
     ktor()
     
     implementation(project(":feature:yandexmap"))
+    implementation(project(":feature:gallery"))
     
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))

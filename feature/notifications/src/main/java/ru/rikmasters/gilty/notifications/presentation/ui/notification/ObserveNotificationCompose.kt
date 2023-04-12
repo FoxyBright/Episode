@@ -23,8 +23,7 @@ import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.DragRowState
-import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -142,8 +141,7 @@ private fun Participant(
     Card(
         { onClick?.let { it(index) } },
         Modifier.fillMaxWidth(),
-        (true),
-        lazyItemsShapes(index, size, 14.dp),
+        (true), lazyItemsShapes(index, size, 14.dp),
         cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier.padding(bottom = 12.dp)) {

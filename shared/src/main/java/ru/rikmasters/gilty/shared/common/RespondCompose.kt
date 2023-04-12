@@ -140,7 +140,7 @@ fun ReceivedRespond(
                                             !photo.hasAccess
                                         ) {
                                             if (!photo.hasAccess) {
-                                                callback?.onImageClick(photo.url)
+                                                callback?.onImageClick(photo)
                                             }
                                         }
                                     }

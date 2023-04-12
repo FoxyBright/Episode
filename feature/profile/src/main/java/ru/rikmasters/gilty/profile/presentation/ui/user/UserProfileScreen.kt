@@ -26,7 +26,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
-
+    
     val meetsHistory = vm.historyMeetsTest.collectAsLazyPagingItems()
     val photoAlertState by vm.photoAlertState.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
@@ -37,7 +37,11 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val history by vm.history.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
-
+    
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val photoViewState by vm.photoViewState.collectAsState()
+    
     LaunchedEffect(Unit) {
         vm.getChatStatus()
         vm.setUserDate()
@@ -46,16 +50,19 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         //            vm.photoAlertDismiss(true)
         //        }
     }
-
+    
     ProfileContent(
         UserProfileState(
             ProfileState(profile, USERPROFILE, (false), occupied),
             meets, meetsHistory, lastRespond, history,
-            navBar, alert, menuState, listState, photoAlertState
-        ),
-        Modifier,
-        object : UserProfileCallback {
-
+            navBar, alert, menuState, listState, photoAlertState,
+            photoViewState, viewerImages, viewerSelectImage,
+        ), Modifier, object: UserProfileCallback {
+            
+            override fun onPhotoViewDismiss(state: Boolean) {
+                scope.launch { vm.changePhotoViewState(state) }
+            }
+            
             override fun onHistoryClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -63,7 +70,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     }
                 }
             }
-
+            
             override fun onMeetingClick(meet: MeetingModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -71,7 +78,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     }
                 }
             }
-
+            
             override fun hiddenImages() {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -81,7 +88,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     }
                 }
             }
-
+            
             override fun onObserveClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -92,7 +99,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     }
                 }
             }
-
+            
             override fun onRespondsClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -104,62 +111,68 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     }
                 }
             }
-
+            
             override fun onHistoryShow() {
                 scope.launch {
                     vm.showHistory()
                     listState.animateScrollToItem(5)
                 }
             }
-
+            
             override fun onNavBarSelect(point: Int) {
-                if (point == 4) return
+                if(point == 4) return
                 scope.launch {
                     nav.navigateAbsolute(
                         vm.navBarNavigate(point)
                     )
                 }
             }
-
+            
             override fun onMenuItemClick(point: Int) {
-                when (point) {
-                    0 -> nav.navigate("avatar?type=0&image=${profile?.avatar?.url}")
+                when(point) {
+                    0 -> {
+                        scope.launch {
+                            vm.setPhotoViewSelected(profile?.avatar)
+                            vm.setPhotoViewImages(listOf(profile?.avatar))
+                            vm.changePhotoViewState(true)
+                        }
+                    }
                     else -> nav.navigate("gallery?multi=false")
                 }
             }
-
+            
             override fun closePhotoAlert() {
                 scope.launch { vm.photoAlertDismiss(false) }
             }
-
+            
             override fun closeAlert() {
                 scope.launch { vm.alertDismiss(false) }
             }
-
+            
             override fun onDescriptionChange(text: String) {
                 scope.launch { vm.changeDescription(text) }
             }
-
+            
             override fun profileImage() {
                 scope.launch { vm.menuDispose(true) }
             }
-
+            
             override fun onNameChange(text: String) {
                 scope.launch { vm.changeUsername(text) }
             }
-
+            
             override fun onSaveUserName() {
                 scope.launch { vm.updateUsername() }
             }
-
+            
             override fun onSaveDescription() {
                 scope.launch { vm.updateDescription() }
             }
-
+            
             override fun onMenuClick(it: Boolean) {
                 scope.launch { vm.menuDispose(it) }
             }
-
+            
             override fun menu(state: Boolean) {
                 nav.navigate("settings")
             }

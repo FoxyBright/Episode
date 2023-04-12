@@ -18,10 +18,10 @@ object BottomSheet: FeatureDefinition() {
     override fun Module.koin() {
         singleOf(::ParticipantsBsViewModel)
         singleOf(::RespondsBsViewModel)
-        singleOf(::YandexMapViewModel)
-        singleOf(::UserBsViewModel)
         singleOf(::MeetingBsViewModel)
         singleOf(::ReportsBsViewModel)
+        singleOf(::YandexMapViewModel)
+        singleOf(::UserBsViewModel)
     }
     
     override fun include() = setOf(

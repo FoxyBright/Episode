@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
@@ -145,12 +146,13 @@ fun GTextField(
         ru.rikmasters.gilty.shared.shared.textFieldColors(),
     clear: (() -> Unit)? = null,
     errorBottomText: String? = null,
+    containerColor: Color = colorScheme.primaryContainer,
 ) {
     Column(modifier) {
         Card(
             Modifier.fillMaxWidth(),
             shapes.large,
-            cardColors(colorScheme.primaryContainer),
+            cardColors(containerColor),
             border = if(isError)
                 BorderStroke(1.dp, colorScheme.primary)
             else null
@@ -173,7 +175,7 @@ fun GTextField(
                     IconButton(
                         { it() }, Modifier.align(
                             if(singleLine || maxLines == 1)
-                            CenterEnd else TopEnd
+                                CenterEnd else TopEnd
                         )
                     ) {
                         if(value.isNotEmpty()) {

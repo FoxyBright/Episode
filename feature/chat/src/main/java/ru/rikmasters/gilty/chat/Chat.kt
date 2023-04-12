@@ -6,7 +6,6 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
-import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
 import ru.rikmasters.gilty.chat.viewmodel.*
 import ru.rikmasters.gilty.chats.ChatData
 import ru.rikmasters.gilty.chats.manager.ChatManager
@@ -34,20 +33,6 @@ object Chat: FeatureDefinition() {
             ) { vm, it ->
                 it.arguments?.getString("id")?.let { id ->
                     ChatScreen(vm, id)
-                }
-            }
-            
-            screen("photo?type={type}&image={image}", listOf(
-                navArgument("image") {
-                    type = NavType.StringType; defaultValue = ""
-                }, navArgument("type") {
-                    type = NavType.IntType; defaultValue = 0
-                }
-            )) {
-                it.arguments?.getInt("type")?.let { type ->
-                    it.arguments?.getString("image")?.let { image ->
-                        PhotoViewScreen(image, type)
-                    }
                 }
             }
         }

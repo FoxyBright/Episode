@@ -33,12 +33,13 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import java.io.File
-import java.net.URLEncoder.encode
 
 @SuppressLint("Recycle")
 @Composable
@@ -88,6 +89,11 @@ fun ChatScreen(
     // информация о текущем чате
     val chat by vm.chat.collectAsState()
     
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val photoViewType by vm.viewerType.collectAsState()
+    val photoViewState by vm.viewerState.collectAsState()
+    
     DisposableEffect(Unit) {
         asm.keyboard.setSoftInputMode(Nothing)
         onDispose { asm.keyboard.resetSoftInputAdjust() }
@@ -131,7 +137,10 @@ fun ChatScreen(
         rememberLauncherForActivityResult(TakePicture()) { success ->
             if(success) context.contentResolver.openInputStream(uri)?.let {
                 scope.launch {
-                    vm.onSendMessage(chatId, photos = listOf(InputStreamSource(it)))
+                    vm.onSendMessage(
+                        chatId,
+                        photos = listOf(InputStreamSource(it))
+                    )
                     listState.animateScrollToItem(0)
                 }
             }
@@ -154,7 +163,9 @@ fun ChatScreen(
                 messages, chat.userId, alert,
                 meetOutAlert, kebabMenuState,
                 messageMenuState, imageMenuState,
-                listState, unreadCount, writingUsers
+                listState, unreadCount, writingUsers,
+                photoViewState, viewerImages, viewerSelectImage,
+                viewerType = photoViewType
             )
         }
     }
@@ -162,12 +173,15 @@ fun ChatScreen(
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
             ChatContent(
-                state,
-                Modifier,
+                state, Modifier,
                 object: ChatCallback {
                     
+                    override fun onPhotoViewDismiss(state: Boolean) {
+                        scope.launch { vm.changePhotoViewState(state) }
+                    }
+                    
                     override fun onAnswerClick(message: MessageModel) {
-                        // TODO для навигации к сообщению при клике на ответ
+                        // навигации к сообщению при клике на ответ
                     }
                     
                     override fun onPinnedBarButtonClick() {
@@ -198,7 +212,9 @@ fun ChatScreen(
                                             )
                                         }
                                         
-                                        2 -> Connector<HiddenBsViewModel>(vm.scope) {
+                                        2 -> Connector<HiddenBsViewModel>(
+                                            vm.scope
+                                        ) {
                                             HiddenBs(
                                                 it,
                                                 chat?.isOnline ?: false,
@@ -218,19 +234,24 @@ fun ChatScreen(
                             ?.file
                             ?: AvatarModel()
                         
-                        nav.navigate(
-                            "photo?type2&image=${encode(attach.url, "utf-8")}"
-                        )
+                        scope.launch {
+                            vm.changePhotoViewType(PHOTO)
+                            vm.setPhotoViewSelected(attach)
+                            vm.setPhotoViewImages(listOf(attach))
+                            vm.changePhotoViewState(true)
+                        }
                     }
                     
                     override fun onHiddenClick(message: MessageModel) {
                         val attach =
                             message.message?.attachments?.first()?.file
-                        
-                        if(attach?.hasAccess != true) {
-                            scope.launch { vm.onHiddenBlock() }
-                        } else {
-                            nav.navigate("photo?type=1&image=${encode(attach.url, ("utf-8"))}")
+                        scope.launch {
+                            if(attach?.hasAccess == false) {
+                                vm.changePhotoViewType(LOAD)
+                                vm.setPhotoViewSelected(attach)
+                                vm.setPhotoViewImages(listOf(attach))
+                                vm.changePhotoViewState(true)
+                            } else vm.onHiddenBlock()
                         }
                     }
                     

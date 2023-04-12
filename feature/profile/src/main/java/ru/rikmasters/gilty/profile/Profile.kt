@@ -8,7 +8,6 @@ import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.bottomsheet.viewmodel.ObserverBsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.profile.presentation.ui.gallery.AvatarScreen
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.CropperScreen
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.GalleryScreen
 import ru.rikmasters.gilty.profile.presentation.ui.respond.MeetRespondScreen
@@ -41,25 +40,6 @@ object Profile: FeatureDefinition() {
             ) { vm, stack ->
                 stack.arguments?.getString("image")?.let {
                     CropperScreen(vm, it)
-                }
-            }
-            
-            screen<AvatarViewModel>(
-                "avatar?type={type}&image={image}&hash={hash}",
-                listOf(navArgument("image") {
-                    type = NavType.StringType; defaultValue = ""
-                }, navArgument("hash") {
-                    type = NavType.StringType; defaultValue = ""
-                }, navArgument("type") {
-                    type = NavType.IntType; defaultValue = 0
-                })
-            ) { vm, it ->
-                it.arguments?.getString("image")?.let { image ->
-                    it.arguments?.getString("hash")?.let { hash ->
-                        it.arguments?.getInt("type")?.let { type ->
-                            AvatarScreen(vm, "$image&hash=$hash", type)
-                        }
-                    }
                 }
             }
             
@@ -102,7 +82,6 @@ object Profile: FeatureDefinition() {
         singleOf(::HiddenBsViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
-        singleOf(::AvatarViewModel)
         singleOf(::AgeBsViewModel)
     }
     

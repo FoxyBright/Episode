@@ -37,7 +37,6 @@ import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
-import java.io.File
 
 @Preview
 @Composable
@@ -157,7 +156,7 @@ private fun LazyItem(
         TopEnd
     ) {
         Image(
-            rememberAsyncImagePainter(File(image)),
+            rememberAsyncImagePainter(image),
             (null), Modifier.fillMaxSize(),
             contentScale = Crop,
         )

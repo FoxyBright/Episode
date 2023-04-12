@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.shared.CheckBox
@@ -30,15 +29,13 @@ fun GalleryImage(
             .size(115.dp)
             .clickable {
                 callback?.onImageClick(image)
-            }) {
-        if(isWeb) AsyncImage(
-            image, (null),
-            Modifier.fillMaxSize(),
+            }
+    ) {
+        Image(
+            rememberAsyncImagePainter(
+                if(isWeb) image else File(image)
+            ), (null), Modifier.fillMaxSize(),
             contentScale = Crop
-        ) else Image(
-            rememberAsyncImagePainter(File(image)),
-            (null), Modifier.fillMaxSize(),
-            contentScale = Crop,
         )
         if(type == MULTIPLE) CheckBox(
             (selected ?: false), Modifier

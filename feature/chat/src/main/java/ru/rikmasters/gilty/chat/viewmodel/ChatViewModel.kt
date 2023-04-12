@@ -11,6 +11,8 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.manager.MessageManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
@@ -27,9 +29,8 @@ class ChatViewModel: ViewModel() {
     private val messageManager by inject<MessageManager>()
     
     val writingUsers by lazy { messageManager.writingFlow.state(emptyList()) }
-
+    
     private val _chatId = MutableStateFlow("")
-    val chatId = _chatId.asStateFlow()
     
     private val _chat = MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
@@ -81,6 +82,34 @@ class ChatViewModel: ViewModel() {
     private val _imageMenuState = MutableStateFlow(false)
     val imageMenuState = _imageMenuState.asStateFlow()
     
+    private val _viewerState = MutableStateFlow(false)
+    val viewerState = _viewerState.asStateFlow()
+    
+    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages = _viewerImages.asStateFlow()
+    
+    private val _viewerType = MutableStateFlow(PHOTO)
+    val viewerType = _viewerType.asStateFlow()
+    
+    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage = _viewerSelectImage.asStateFlow()
+    
+    suspend fun changePhotoViewState(state: Boolean) {
+        _viewerState.emit(state)
+    }
+    
+    suspend fun changePhotoViewType(type: PhotoViewType) {
+        _viewerType.emit(type)
+    }
+    
+    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
+        _viewerImages.emit(list)
+    }
+    
+    suspend fun setPhotoViewSelected(photo: AvatarModel?) {
+        _viewerSelectImage.emit(photo)
+    }
+    
     suspend fun changeMeetOutAlert(state: Boolean) {
         _meetOutAlert.emit(state)
     }
@@ -126,11 +155,11 @@ class ChatViewModel: ViewModel() {
             makeToast("Чат для встречи ${it.title} был закрыт закрыт")
         }
     }
-
+    
     fun changeChatId(chatId: String) {
         _chatId.value = chatId
     }
-
+    
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatId.flatMapLatest { chatId ->
         messageManager.messages(chatId, coroutineScope)

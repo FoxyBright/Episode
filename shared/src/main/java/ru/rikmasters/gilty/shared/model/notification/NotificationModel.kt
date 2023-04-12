@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.notification
 import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus.DELETED
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationStatus.NEW
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.ADMIN_NOTIFICATION
 import java.util.UUID.randomUUID
@@ -22,6 +23,7 @@ data class NotificationModel(
     val feedback: FeedBackModel?,
 ) {
     
+    @Suppress("unused")
     constructor(): this(
         randomUUID().toString(),
         NOW_DATE, ADMIN_NOTIFICATION, DELETED,
@@ -60,6 +62,14 @@ val DemoShortNotification = ShortNotification(
     randomUUID().toString(),
     "NOTIFICATION",
     "DESCRIPTION"
+)
+
+val DemoInfoNotificationModel = NotificationModel(
+    randomUUID().toString(),
+    "2022-11-07T08:35:54.140Z",
+    ADMIN_NOTIFICATION, NEW,
+    DemoNotificationParentModel,
+    DemoFeedBackModel
 )
 
 val DemoNotificationMeetingOverModel = NotificationModel(

@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserBsViewModel: ViewModel() {
@@ -33,6 +34,27 @@ class UserBsViewModel: ViewModel() {
     
     private val _userActualMeets = MutableStateFlow(listOf<MeetingModel>())
     val userActualMeets = _userActualMeets.asStateFlow()
+    
+    private val _viewerState = MutableStateFlow(false)
+    val viewerState = _viewerState.asStateFlow()
+    
+    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages = _viewerImages.asStateFlow()
+    
+    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage = _viewerSelectImage.asStateFlow()
+    
+    suspend fun changePhotoViewState(state: Boolean) {
+        _viewerState.emit(state)
+    }
+    
+    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
+        _viewerImages.emit(list)
+    }
+    
+    suspend fun setPhotoViewSelected(photo: AvatarModel?) {
+        _viewerSelectImage.emit(photo)
+    }
     
     suspend fun checkMyProfile(userId: String) {
         _isMyProfile.emit(
@@ -72,11 +94,12 @@ class UserBsViewModel: ViewModel() {
         _profile.emit(profileManager.getUser(userId))
     }
     
-    suspend fun observeUser(state: Boolean, userId: String) = singleLoading {
-        if(state) profileManager.subscribeToUser(userId)
-        else profileManager.unsubscribeFromUser(userId)
-        _observe.emit(profileManager.getUser(userId).isWatching == true)
-    }
+    suspend fun observeUser(state: Boolean, userId: String) =
+        singleLoading {
+            if(state) profileManager.subscribeToUser(userId)
+            else profileManager.unsubscribeFromUser(userId)
+            _observe.emit(profileManager.getUser(userId).isWatching == true)
+        }
     
     suspend fun observeUser(state: Boolean?) {
         _observe.emit(state ?: false)

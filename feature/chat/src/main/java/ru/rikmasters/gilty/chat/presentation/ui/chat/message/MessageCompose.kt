@@ -185,7 +185,11 @@ private fun Content(
                     (message.replied != null) -> Text(
                         message, sender, state.shape,
                         state.isOnline, message.replied,
-                    ) { callback?.onAnswerClick(message.replied ?: MessageModel()) }
+                    ) {
+                        callback?.onAnswerClick(
+                            message.replied ?: MessageModel()
+                        )
+                    }
                     
                     
                     else -> Text(
@@ -219,8 +223,8 @@ private fun Image(
         
         PRIVATE_PHOTO -> {
             val hide = message.message?.attachments
-            val access = if(hide.isNullOrEmpty()) false
-            else hide.first().file?.hasAccess
+            val access = if(hide.isNullOrEmpty()) true
+            else !(hide.first().file?.hasAccess ?: false)
             HiddenImageMessage(
                 Modifier, message, sender, access, shape
             ) { callback?.onHiddenClick(message) }
