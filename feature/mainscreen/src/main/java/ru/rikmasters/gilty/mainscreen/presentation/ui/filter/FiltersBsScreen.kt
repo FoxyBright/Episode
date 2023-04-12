@@ -16,25 +16,24 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val screen by vm.screen.collectAsState()
-    val today by vm.mainVm.today.collectAsState()
-    val country by vm.country.collectAsState()
-    val city by vm.city.collectAsState()
-    
-    val interest by vm.myInterest.collectAsState()
-    val categories by vm.categories.collectAsState()
-    val categoriesStates by vm.categoriesStates.collectAsState()
+    val selectedCondition by vm.selectedCondition.collectAsState()
     val selectedCategories by vm.selectedCategories.collectAsState()
-    val topRow = (interest + vm.removeChildren(selectedCategories)
-        .filter { !interest.contains(it) })
-    
-    val tags by vm.tags.collectAsState()
+    val categoriesStates by vm.categoriesStates.collectAsState()
+    val categories by vm.categories.collectAsState()
+    val interest by vm.myInterest.collectAsState()
     val distanceState by vm.distanceState.collectAsState()
+    val meetTypes by vm.meetTypes.collectAsState()
+    val today by vm.mainVm.today.collectAsState()
+    val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
     val online by vm.online.collectAsState()
-    val meetTypes by vm.meetTypes.collectAsState()
-    val selectedCondition by vm.selectedCondition.collectAsState()
     val results by vm.results.collectAsState()
+    val screen by vm.screen.collectAsState()
+    val city by vm.city.collectAsState()
+    
+    val topRow = (
+            interest + vm.removeChildren(selectedCategories)
+                .filter { !interest.contains(it) })
     
     LaunchedEffect(Unit) {
         vm.getAllCategories()
@@ -45,14 +44,13 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     when(screen) {
         1 -> CategoriesScreen(vm)
         2 -> TagSearchScreen(vm)
-        //        3 -> страна
-        //        4 -> город
+        3 -> CitiesScreen(vm)
         else -> MeetingFilterBottom(
             Modifier, results, FilterListState(
                 today, distanceState, distance,
                 online, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
-                categoriesStates, country, city
+                categoriesStates, city
             ), object: MeetingFilterBottomCallback {
                 
                 override fun onCategoryClick(
@@ -77,21 +75,9 @@ fun FiltersBs(vm: FiltersBsViewModel) {
                     scope.launch { vm.navigate(2) }
                 }
                 
-                override fun onCountryClick() {
-                    scope.launch {
-                        vm.changeCountry("Россия")
-                        vm.navigate(3)
-                    }
-                }
-                
                 override fun onCityClick() {
-                    scope.launch {
-                        vm.changeCity("Москва")
-                        vm.navigate(4)
-                    }
+                    scope.launch { vm.navigate(3) }
                 }
-                
-                override fun onBack() {}
                 
                 override fun onDeleteTag(tag: TagModel) {
                     scope.launch { vm.deleteTag(tag) }
@@ -127,6 +113,7 @@ fun FiltersBs(vm: FiltersBsViewModel) {
                         asm.bottomSheet.collapse()
                     }
                 }
-            })
+            }
+        )
     }
 }

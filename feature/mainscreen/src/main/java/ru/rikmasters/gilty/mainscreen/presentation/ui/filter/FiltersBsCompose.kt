@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,9 +19,8 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
-import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.model.meeting.*
+import ru.rikmasters.gilty.shared.shared.CardRow
 import ru.rikmasters.gilty.shared.shared.GiltyChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -41,7 +41,7 @@ fun MeetingFilterBottomPreview() {
                     listOf("kaif", "pain", "fast", "launch")
                         .map { TagModel(it, it) },
                     listOf(), listOf(), listOf(),
-                    listOf(1), ("Россия"), ("Москва"),
+                    listOf(1), DemoCityModel
                 )
             )
         }
@@ -60,14 +60,12 @@ data class FilterListState(
     val categories: List<CategoryModel>,
     val selectedCategories: List<CategoryModel>,
     val categoriesStates: List<Int>,
-    val country: String,
-    val city: String,
+    val city: CityModel?,
 )
 
 interface MeetingFilterBottomCallback {
     
     fun onNext()
-    fun onBack()
     fun onCategoryClick(index: Int, category: CategoryModel)
     fun onSubClick(parent: CategoryModel)
     fun onAllCategoryClick()
@@ -78,7 +76,6 @@ interface MeetingFilterBottomCallback {
     fun onOnlyOnlineClick()
     fun onMeetingTypeSelect(index: Int)
     fun onConditionSelect(index: Int)
-    fun onCountryClick()
     fun onCityClick()
     fun onClear()
 }
@@ -131,7 +128,10 @@ fun MeetingFilterBottom(
                         .padding(top = 28.dp),
                     stringResource(R.string.confirm_button),
                     smallText = find?.let {
-                        stringResource(R.string.meeting_filter_meeting_find, it)
+                        stringResource(
+                            R.string.meeting_filter_meeting_find,
+                            it
+                        )
                     }
                 ) { callback?.onNext() }
             }
@@ -190,7 +190,8 @@ private fun filterList(
         }
     )
     if(state.today) filters.add(
-        (2), FilterModel(stringResource(R.string.meeting_filter_distance)) {
+        (2),
+        FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
                 state.distance,
                 state.distanceState,
@@ -200,10 +201,14 @@ private fun filterList(
         })
     else filters.add(
         (0), FilterModel(stringResource(add_meet_detailed_meet_place)) {
-            Country(state.country,
-                state.city,
-                { callback?.onCountryClick() })
-            { callback?.onCityClick() }
-        })
+            CardRow(
+                stringResource(R.string.select_city),
+                state.city?.name ?: "",
+                Modifier.background(
+                    colorScheme.primaryContainer
+                ), shapes.medium
+            ) { callback?.onCityClick() }
+        }
+    )
     return filters
 }

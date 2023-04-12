@@ -39,32 +39,6 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.Gradients.red
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-
-@Composable
-fun Country(
-    country: String,
-    city: String,
-    onCountryClick: () -> Unit,
-    onCityClick: () -> Unit,
-) {
-    Column(
-        Modifier.background(
-            colorScheme.primaryContainer,
-            shapes.medium
-        )
-    ) {
-        CardRow(
-            stringResource(R.string.select_country), country,
-            Modifier, ThemeExtra.shapes.mediumTopRoundedShape
-        ) { onCountryClick() }
-        GDivider(Modifier.padding(start = 16.dp))
-        CardRow(
-            stringResource(R.string.select_city), city, Modifier,
-            ThemeExtra.shapes.mediumBottomRoundedShape
-        ) { onCityClick() }
-    }
-}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -270,7 +244,10 @@ fun Distance(
                         .background(colorScheme.primary)
                 ) {
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, distance),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            distance
+                        ),
                         Modifier.padding(12.dp, 6.dp),
                         Color.White,
                         style = typography.labelSmall,
@@ -310,13 +287,19 @@ fun Distance(
                     SpaceBetween
                 ) {
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, 1),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            1
+                        ),
                         color = colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, 50),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            50
+                        ),
                         color = colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold

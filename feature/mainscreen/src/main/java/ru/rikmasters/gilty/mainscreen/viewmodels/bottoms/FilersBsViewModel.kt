@@ -9,13 +9,10 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
-import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
-import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.model.meeting.*
 
 @OptIn(FlowPreview::class)
 class FiltersBsViewModel(
-    
     val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
@@ -34,67 +31,132 @@ class FiltersBsViewModel(
         .onEach { findMeets() }
         .state(_distance.value, SharingStarted.Eagerly)
     
-    private val _distanceState = MutableStateFlow(false)
-    val distanceState = _distanceState.asStateFlow()
+    private val _distanceState =
+        MutableStateFlow(false)
+    val distanceState =
+        _distanceState.asStateFlow()
     
-    private val _online = MutableStateFlow(false)
-    val online = _online.asStateFlow()
+    private val _online =
+        MutableStateFlow(false)
+    val online =
+        _online.asStateFlow()
     
-    private val _selectedCondition = MutableStateFlow(emptyList<Int>())
-    val selectedCondition = _selectedCondition.asStateFlow()
+    private val _selectedCondition =
+        MutableStateFlow(emptyList<Int>())
+    val selectedCondition =
+        _selectedCondition.asStateFlow()
     
-    private val _meetTypes = MutableStateFlow(emptyList<Int>())
-    val meetTypes = _meetTypes.asStateFlow()
+    private val _meetTypes =
+        MutableStateFlow(emptyList<Int>())
+    val meetTypes =
+        _meetTypes.asStateFlow()
     
-    private val _country = MutableStateFlow("")
-    val country = _country.asStateFlow()
+    private val _city =
+        MutableStateFlow<CityModel?>(null)
+    val city =
+        _city.asStateFlow()
     
-    private val _city = MutableStateFlow("")
-    val city = _city.asStateFlow()
+    private val _cityList =
+        MutableStateFlow(emptyList<CityModel>())
+    val cityList =
+        _cityList.asStateFlow()
     
-    private val _results = MutableStateFlow<Int?>(null)
-    val results = _results.asStateFlow()
+    private val _searchCity =
+        MutableStateFlow("")
+    val searchCity =
+        _searchCity.asStateFlow()
+    
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
+    val searchCitiesDebounced = searchCity
+        .debounce(250)
+        .onEach { getCities() }
+        .state(_distance.value, SharingStarted.Eagerly)
+    
+    private val _searchCityState =
+        MutableStateFlow(false)
+    val searchCityState =
+        _searchCityState.asStateFlow()
+    
+    private val _results =
+        MutableStateFlow<Int?>(null)
+    val results =
+        _results.asStateFlow()
     
     private val _myInterest =
         MutableStateFlow(emptyList<CategoryModel>())
-    val myInterest = _myInterest.asStateFlow()
+    val myInterest =
+        _myInterest.asStateFlow()
     
     private val _allCategories =
         MutableStateFlow(emptyList<CategoryModel>())
-    val allCategories = _allCategories.asStateFlow()
+    val allCategories =
+        _allCategories.asStateFlow()
     
     private val _selectedCategories =
         MutableStateFlow(emptyList<CategoryModel>())
-    val selectedCategories = _selectedCategories.asStateFlow()
+    val selectedCategories =
+        _selectedCategories.asStateFlow()
     
     private val _selectedAdditionally =
         MutableStateFlow(emptyList<CategoryModel>())
-    val selectedAdditionally = _selectedAdditionally.asStateFlow()
+    val selectedAdditionally =
+        _selectedAdditionally.asStateFlow()
     
     private val _categories =
         MutableStateFlow(emptyList<CategoryModel>())
-    val categories = _categories.asStateFlow()
+    val categories =
+        _categories.asStateFlow()
     
-    private val _categoriesStates = MutableStateFlow(emptyList<Int>())
-    val categoriesStates = _categoriesStates.asStateFlow()
+    private val _categoriesStates =
+        MutableStateFlow(emptyList<Int>())
+    val categoriesStates =
+        _categoriesStates.asStateFlow()
     
-    private val _additionallyStates = MutableStateFlow(emptyList<Int>())
-    val additionallyStates = _additionallyStates.asStateFlow()
+    private val _additionallyStates =
+        MutableStateFlow(emptyList<Int>())
+    val additionallyStates =
+        _additionallyStates.asStateFlow()
     
-    private val _tags = MutableStateFlow(emptyList<TagModel>())
+    private val _tags =
+        MutableStateFlow(emptyList<TagModel>())
     val tags = _tags.asStateFlow()
     
-    private val _additionallyTags = MutableStateFlow(emptyList<TagModel>())
-    val additionallyTags = _additionallyTags.asStateFlow()
+    private val _additionallyTags =
+        MutableStateFlow(emptyList<TagModel>())
+    val additionallyTags =
+        _additionallyTags.asStateFlow()
     
-    private val _tagSearch = MutableStateFlow("")
+    private val _tagSearch =
+        MutableStateFlow("")
     val tagSearch = _tagSearch.asStateFlow()
     
-    private val _popularTags = MutableStateFlow(emptyList<TagModel>())
-    val popularTags = _popularTags.asStateFlow()
+    private val _popularTags =
+        MutableStateFlow(emptyList<TagModel>())
+    val popularTags =
+        _popularTags.asStateFlow()
     
-    private val _popularVisible = MutableStateFlow(true)
-    val popularVisible = _popularVisible.asStateFlow()
+    private val _popularVisible =
+        MutableStateFlow(true)
+    val popularVisible =
+        _popularVisible.asStateFlow()
+    
+    suspend fun changeSearchCountryState(state: Boolean) {
+        _searchCityState.emit(state)
+    }
+    
+    suspend fun getCities() {
+        _cityList.emit(
+            meetManager.getCities(
+                searchCity.value
+            )
+        )
+    }
+    
+    suspend fun changeSearchQuery(query: String) {
+        _searchCity.emit(query)
+    }
+    
     suspend fun getAllCategories() {
         _allCategories.emit(meetManager.getCategoriesList())
     }
@@ -212,15 +274,8 @@ class FiltersBsViewModel(
         _screen.emit(page)
     }
     
-    suspend fun changeCountry(country: String) {
-        _country.emit(country)
-        makeToast("Стран пока нет")
-        findMeets()
-    }
-    
-    suspend fun changeCity(city: String) {
+    suspend fun changeCity(city: CityModel) {
         _city.emit(city)
-        makeToast("Городов пока нет")
         findMeets()
     }
     
@@ -235,8 +290,7 @@ class FiltersBsViewModel(
     }
     
     suspend fun clearFilters() {
-        _country.emit("")
-        _city.emit("")
+        _city.emit(null)
         _selectedCategories.emit(emptyList())
         _tags.emit(emptyList())
         _distance.emit(15)

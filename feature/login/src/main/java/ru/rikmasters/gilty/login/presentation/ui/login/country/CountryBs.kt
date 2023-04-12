@@ -12,36 +12,35 @@ import ru.rikmasters.gilty.shared.country.Country
 
 @Composable
 fun CountryBs(vm: CountryBsViewModel) {
-    val asm = get<AppStateModel>()
+    
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
     
     val countries by vm.countries.collectAsState()
     val searchText by vm.query.collectAsState()
     
     var searchState by remember { mutableStateOf(false) }
     
-    LaunchedEffect(Unit) {
-        vm.loadCountries()
-    }
+    LaunchedEffect(Unit) { vm.loadCountries() }
     
     Use(vm, LoadingTrait) {
         CountryBottomSheetContent(
             CountryBottomSheetState(searchText, searchState, countries),
-            Modifier,
-            object: CountryCallBack {
-                override fun onSearchTextChange(text: String) {
-                    scope.launch { vm.changeQuery(text) }
-                }
-            
-                override fun onSearchStateChange() {
-                    searchState = !searchState
-                }
-            
+            Modifier, object: CountryCallBack {
+                
                 override fun onCountrySelect(country: Country) {
                     scope.launch {
                         vm.select(country)
                         asm.bottomSheet.collapse()
                     }
+                }
+                
+                override fun onSearchTextChange(text: String) {
+                    scope.launch { vm.changeQuery(text) }
+                }
+                
+                override fun onSearchStateChange() {
+                    searchState = !searchState
                 }
             }
         )

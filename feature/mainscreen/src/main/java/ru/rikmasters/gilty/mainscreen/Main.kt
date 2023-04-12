@@ -3,7 +3,7 @@ package ru.rikmasters.gilty.mainscreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -40,14 +40,11 @@ object Main: FeatureDefinition() {
     }
     
     override fun Module.koin() {
+        factoryOf(::CalendarBsViewModel)
+        factoryOf(::FiltersBsViewModel)
         singleOf(::RespondsViewModel)
-        
-        scope<MainViewModel> {
-            scopedOf(::MainViewModel)
-            scopedOf(::CalendarBsViewModel)
-            scopedOf(::TimeBsViewModel)
-            scopedOf(::FiltersBsViewModel)
-        }
+        factoryOf(::TimeBsViewModel)
+        singleOf(::MainViewModel)
     }
     
     override fun include() = setOf(MeetingsData, ProfileData)

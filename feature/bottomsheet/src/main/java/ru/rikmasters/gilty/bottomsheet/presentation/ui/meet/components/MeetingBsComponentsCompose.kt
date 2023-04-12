@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
@@ -42,7 +42,6 @@ import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-/*
 @Preview
 @Composable
 private fun MeetingBsMapPreview() {
@@ -77,7 +76,7 @@ private fun MeetingBsParticipantsPreview() {
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsParticipants(
                 DemoFullMeetingModel.copy(isOnline = true),
-                DemoUserModelList,
+                pagingPreview(DemoUserModelList),
                 Modifier.padding(16.dp)
             )
         }
@@ -110,7 +109,6 @@ private fun MeetingBsHiddenPreview() {
     }
 }
 
- */
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,7 +128,7 @@ fun MeetingBsMap(
             )
             Text(
                 distance, Modifier,
-                if (meet.isOnline) colorScheme.secondary
+                if(meet.isOnline) colorScheme.secondary
                 else colorScheme.primary,
                 style = typography.labelLarge
             )
@@ -145,7 +143,7 @@ fun MeetingBsMap(
                 Modifier.padding(horizontal = 16.dp),
                 SpaceBetween, CenterVertically
             ) {
-                if (meet.type == ANONYMOUS
+                if(meet.type == ANONYMOUS
                     || (meet.memberState != IS_MEMBER
                             && meet.memberState != IS_ORGANIZER)
                     || meet.address == null
@@ -235,7 +233,7 @@ fun MeetingBsConditions(
                     Modifier.padding(16.dp),
                     Start, CenterVertically
                 ) {
-                    if (meet.condition == MEMBER_PAY)
+                    if(meet.condition == MEMBER_PAY)
                         Image(
                             painterResource(R.drawable.ic_money),
                             (null), Modifier
@@ -248,10 +246,10 @@ fun MeetingBsConditions(
                         style = typography.bodyMedium
                     )
                 }
-                if (meet.condition == MEMBER_PAY) Text(
+                if(meet.condition == MEMBER_PAY) Text(
                     "${meet.price ?: "0"} ₽",
                     Modifier.padding(end = 16.dp),
-                    if (meet.isOnline) colorScheme.secondary
+                    if(meet.isOnline) colorScheme.secondary
                     else colorScheme.primary,
                     style = typography.headlineLarge
                 )
@@ -283,17 +281,17 @@ fun MeetingBsParticipants(
                 )
                 Text(
                     "${meet.membersCount}" +
-                            if (meet.membersMax > 0)
+                            if(meet.membersMax > 0)
                                 "/" + meet.membersMax else "",
                     Modifier.padding(start = 8.dp),
-                    if (meet.isOnline)
+                    if(meet.isOnline)
                         colorScheme.secondary
                     else colorScheme.primary,
                     style = typography.labelLarge
                 )
                 Image(
                     painterResource(
-                        if (meet.isPrivate)
+                        if(meet.isPrivate)
                             R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
                     ), (null), Modifier
@@ -301,12 +299,12 @@ fun MeetingBsParticipants(
                     colorFilter = tint(colorScheme.tertiary)
                 )
             }
-            if (meet.membersCount > 3) Text(
+            if(meet.membersCount > 3) Text(
                 stringResource(R.string.meeting_watch_all_members_in_meet),
                 Modifier.clickable(
                     MutableInteractionSource(), (null)
                 ) { onAllViewClick?.let { it() } },
-                if (meet.isOnline) colorScheme.secondary
+                if(meet.isOnline) colorScheme.secondary
                 else colorScheme.primary,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
@@ -318,33 +316,34 @@ fun MeetingBsParticipants(
                 .clip(shapes.large)
                 .background(colorScheme.primaryContainer)
         ) {
-            membersList.itemSnapshotList.items.take(3).forEachIndexed { index, member ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            if (meet.type != ANONYMOUS)
-                                onMemberClick?.let { it(member) }
-                        },
-                    SpaceBetween, CenterVertically
-                ) {
-                    BrieflyRow(
-                        "${member.username}, ${member.age}",
-                        Modifier.padding(12.dp, 8.dp),
-                        member.avatar?.thumbnail?.url,
-                        member.emoji
-                    )
-                    Icon(
-                        Filled.KeyboardArrowRight,
-                        (null), Modifier.padding(end = 16.dp),
-                        colorScheme.onTertiary
-                    )
-                }; if (membersList.itemSnapshotList.items.size > 1 && index <= membersList.itemSnapshotList.items.size - 2)
-                Divider(Modifier.padding(start = 60.dp))
-            }
+            membersList.itemSnapshotList.items.take(3)
+                .forEachIndexed { index, member ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if(meet.type != ANONYMOUS)
+                                    onMemberClick?.let { it(member) }
+                            },
+                        SpaceBetween, CenterVertically
+                    ) {
+                        BrieflyRow(
+                            "${member.username}, ${member.age}",
+                            Modifier.padding(12.dp, 8.dp),
+                            member.avatar?.thumbnail?.url,
+                            member.emoji
+                        )
+                        Icon(
+                            Filled.KeyboardArrowRight,
+                            (null), Modifier.padding(end = 16.dp),
+                            colorScheme.onTertiary
+                        )
+                    }; if(membersList.itemSnapshotList.items.size > 1 && index <= membersList.itemSnapshotList.items.size - 2)
+                    Divider(Modifier.padding(start = 60.dp))
+                }
         }
     }
-    if (meet.type == ANONYMOUS) Text(
+    if(meet.type == ANONYMOUS) Text(
         stringResource(R.string.meeting_anonymous_members_label), Modifier
             .fillMaxWidth()
             .padding(
@@ -365,19 +364,21 @@ fun MeetingBsComment(
 ) {
     Column(modifier) {
         GTextField(
-            text, { if (it.length <= 120) onTextChange(it) },
+            text, { if(it.length <= 120) onTextChange(it) },
             Modifier.fillMaxWidth(),
             shape = shapes.medium,
             colors = descriptionColors(online),
-            label = if (text.isNotEmpty()) textFieldLabel(
-                (true), stringResource(R.string.meeting_comment_text_holder)
+            label = if(text.isNotEmpty()) textFieldLabel(
+                (true),
+                stringResource(R.string.meeting_comment_text_holder)
             ) else null,
             keyboardOptions = Default.copy(
                 imeAction = Done, keyboardType = Text,
                 capitalization = Sentences
             ),
             placeholder = textFieldLabel(
-                (false), stringResource(R.string.meeting_comment_text_holder),
+                (false),
+                stringResource(R.string.meeting_comment_text_holder),
                 holderFont = typography.bodyMedium.copy(
                     baselineShift = BaselineShift(-0.3f)
                 )
@@ -439,7 +440,7 @@ fun TextButton(
                 MutableInteractionSource(), (null)
             ) { onClick?.let { it() } },
         color = online?.let {
-            if (it) colorScheme.secondary
+            if(it) colorScheme.secondary
             else colorScheme.primary
         } ?: colorScheme.tertiary,
         textAlign = TextAlign.Center,
