@@ -26,8 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
@@ -161,14 +161,14 @@ fun TagSearch(
                     painterResource(magnifier),
                     stringResource(R.string.search_placeholder),
                     Modifier.size(20.dp),
-                    colorScheme.onTertiary
+                    colorScheme.scrim
                 )
                 Text(
                     stringResource(R.string.meeting_filter_add_tag_text_holder),
                     Modifier.padding(start = 12.dp),
-                    colorScheme.onTertiary,
+                    colorScheme.scrim,
                     style = typography.bodyMedium,
-                    fontWeight = Bold
+                    fontWeight = W700
                 )
             }
         else FlowLayout(

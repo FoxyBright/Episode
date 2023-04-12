@@ -34,10 +34,10 @@ fun DataTimeCard(
         Column(Modifier.padding(18.dp)) {
             Icon(
                 painterResource(
-                    if(type == TIME) R.drawable.ic_clock
-                    else R.drawable.ic_calendar
+                    if(type == TIME) R.drawable.ic_clock_png
+                    else R.drawable.ic_calendar_png
                 ),
-                (null), Modifier.size(28.dp),
+                (null), Modifier.size(36.dp),
                 if(online) colorScheme.secondary
                 else colorScheme.primary
             )

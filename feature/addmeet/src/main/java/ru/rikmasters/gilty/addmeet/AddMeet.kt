@@ -1,7 +1,8 @@
 package ru.rikmasters.gilty.addmeet
 
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.addmeet.presentation.ui.category.CategoriesScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.complete.CompleteScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ConditionsScreen
@@ -49,35 +50,22 @@ object AddMeet: FeatureDefinition() {
     
     override fun Module.koin() {
         
-        scope<CategoryViewModel> {
-            scopedOf(::CategoryViewModel)
-        }
+        singleOf(::CategoryViewModel)
+        singleOf(::ConditionViewModel)
+    
+        singleOf(::DetailedViewModel)
+        factoryOf(::DurationBsViewModel)
+        factoryOf(::MapBsViewModel)
+        factoryOf(::TimeBsViewModel)
         
-        scope<ConditionViewModel> {
-            scopedOf(::ConditionViewModel)
-        }
-        
-        scope<DetailedViewModel> {
-            scopedOf(::DetailedViewModel)
-            scopedOf(::DurationBsViewModel)
-            scopedOf(::MapBsViewModel)
-            scopedOf(::TimeBsViewModel)
-        }
-        
-        scope<TagsViewModel> {
-            scopedOf(::TagsViewModel)
-        }
-        
-        scope<RequirementsViewModel> {
-            scopedOf(::RequirementsViewModel)
-            scopedOf(::GenderBsViewModel)
-            scopedOf(::OrientationBsViewModel)
-            scopedOf(::AgeBsViewModel)
-        }
-        
-        scope<CompleteViewModel> {
-            scopedOf(::CompleteViewModel)
-        }
+        factoryOf(::TagsViewModel)
+    
+        singleOf(::RequirementsViewModel)
+        factoryOf(::GenderBsViewModel)
+        factoryOf(::OrientationBsViewModel)
+        factoryOf(::AgeBsViewModel)
+
+        singleOf(::CompleteViewModel)
     }
     
     override fun include() = setOf(MeetingsData, ProfileData)

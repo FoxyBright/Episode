@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
@@ -140,7 +141,8 @@ fun MeetPlace(
                         stringResource(R.string.add_meet_detailed_meet_place),
                         Modifier.padding(16.dp),
                         colorScheme.onTertiary,
-                        style = typography.bodyMedium
+                        style = typography.bodyMedium,
+                        fontWeight = W600
                     )
                 }
             }

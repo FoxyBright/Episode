@@ -57,7 +57,6 @@ interface ConditionsCallback {
     fun onHiddenClick() {}
     fun onForbiddenClick() {}
     fun onPriceChange(price: String) {}
-    fun onClear() {}
     fun onMeetingTypeSelect(type: Int) {}
     fun onConditionSelect(condition: Int) {}
     fun onCloseAlert(state: Boolean) {}
@@ -107,7 +106,6 @@ private fun Content(
 ) {
     val pay = state.condition.contains(3)
     LazyColumn(modifier) {
-        itemSpacer(10.dp)
         item {
             Element(
                 type(state, callback),
@@ -173,8 +171,9 @@ private fun price(
     callback: ConditionsCallback? = null,
 ) = FilterModel(stringResource(R.string.add_meet_conditions_price)) {
     PriceTextField(
-        state.price, { callback?.onPriceChange(it) },
-        { callback?.onClear() }, state.online,
+        state.price,
+        { callback?.onPriceChange(it) },
+        state.online,
     )
 }
 
@@ -182,38 +181,39 @@ private fun price(
 private fun additional(
     state: ConditionState,
     callback: ConditionsCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-    Column {
-        CheckBoxCard(
-            stringResource(R.string.add_meet_conditions_hidden),
-            Modifier.fillMaxWidth(), state.hiddenPhoto,
-            online = state.online
-        ) { callback?.onHiddenClick() }
-        Text(
-            stringResource(R.string.add_meet_conditions_hidden_label),
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
-            colorScheme.onTertiary,
-            style = typography.headlineSmall
-        )
-        if(state.online) {
+) =
+    FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
+        Column {
             CheckBoxCard(
-                stringResource(R.string.add_meet_restrict_chat),
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                state.chatForbidden,
-                online = true
-            ) { callback?.onForbiddenClick() }
+                stringResource(R.string.add_meet_conditions_hidden),
+                Modifier.fillMaxWidth(), state.hiddenPhoto,
+                online = state.online
+            ) { callback?.onHiddenClick() }
             Text(
-                stringResource(R.string.add_meet_restrict_chat_label),
+                stringResource(R.string.add_meet_conditions_hidden_label),
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 16.dp),
                 colorScheme.onTertiary,
                 style = typography.headlineSmall
             )
+            if(state.online) {
+                CheckBoxCard(
+                    stringResource(R.string.add_meet_restrict_chat),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    state.chatForbidden,
+                    online = true
+                ) { callback?.onForbiddenClick() }
+                Text(
+                    stringResource(R.string.add_meet_restrict_chat_label),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, start = 16.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineSmall
+                )
+            }
         }
     }
-}

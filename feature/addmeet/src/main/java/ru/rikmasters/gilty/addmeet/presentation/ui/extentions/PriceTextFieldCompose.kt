@@ -18,7 +18,6 @@ import ru.rikmasters.gilty.shared.shared.textFieldLabel
 fun PriceTextField(
     value: String,
     onChange: (String) -> Unit,
-    onClear: () -> Unit,
     online: Boolean,
 ) {
     GTextField(
@@ -28,8 +27,7 @@ fun PriceTextField(
             ) onChange(onNull(it))
         }, Modifier.fillMaxWidth(),
         colors = priceFieldColors(online),
-        clear = onClear, label =
-        if(value.isNotEmpty()) textFieldLabel(
+        label = if(value.isNotEmpty()) textFieldLabel(
             true, stringResource(R.string.add_meet_conditions_price_description)
         ) else null, placeholder = textFieldLabel(
             false, stringResource(R.string.add_meet_conditions_price_description)

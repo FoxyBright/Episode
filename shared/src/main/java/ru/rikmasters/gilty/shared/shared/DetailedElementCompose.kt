@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
@@ -28,7 +29,8 @@ fun Element(
                 append("${it.name} ")
                 withStyle(
                     typography.labelSmall.copy(
-                        colorScheme.onTertiary
+                        colorScheme.onTertiary,
+                        fontWeight = SemiBold
                     ).toSpanStyle()
                 ) { append(it.details ?: "") }
             }, Modifier.padding(bottom = 16.dp),

@@ -204,9 +204,7 @@ private fun filterList(
             CardRow(
                 stringResource(R.string.select_city),
                 state.city?.name ?: "",
-                Modifier.background(
-                    colorScheme.primaryContainer
-                ), shapes.medium
+                Modifier, shapes.medium
             ) { callback?.onCityClick() }
         }
     )

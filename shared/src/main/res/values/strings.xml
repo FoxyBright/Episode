@@ -201,7 +201,7 @@
     <string name="meeting_filter_category">Категория</string>
     <string name="meeting_filter_tag_search">Поиск по тегам</string>
     <string name="meeting_filter_distance">Расстояние</string>
-    <string name="meeting_filter_meet_type">Тип episode</string>
+    <string name="meeting_filter_meet_type">Тип</string>
     <string name="meeting_filter_conditions">Условия</string>
     <string name="select_button">Выбрать</string>
 
@@ -283,7 +283,7 @@
     <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
-    <string name="add_meet_conditions_hidden_label">Участники episode получат доступ к скрытым фото.</string>
+    <string name="add_meet_conditions_hidden_label">Участники получат доступ к скрытым фото.</string>
     <string name="add_meet_detailed_meet_duration">Длительность</string>
     <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
     <string name="add_meet_detailed_meet_date">Дата и время</string>
@@ -297,7 +297,7 @@
     <string name="add_meet_detailed_meet_description_place_holder">Краткое описание</string>
     <string name="add_meet_detailed_meet_place">Место episode</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только участникам</string>
-    <string name="add_meet_detailed_meet_hide_place">Скрыть место episode</string>
+    <string name="add_meet_detailed_meet_hide_place">Скрыть место от всех</string>
     <string name="requirements_title">Требования к\nучастникам</string>
     <string name="requirements_member_count_label">Количество</string>
     <string name="requirements_member_count_place_holder">Сколько будет участников</string>

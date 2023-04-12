@@ -72,10 +72,6 @@ fun ConditionsScreen(vm: ConditionViewModel) {
                 scope.launch { vm.changeHidden(!hidden) }
             }
             
-            override fun onClear() {
-                scope.launch { vm.clearPrice() }
-            }
-            
             override fun onNext() {
                 nav.navigate("detailed")
             }

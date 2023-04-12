@@ -61,11 +61,6 @@ class ConditionViewModel: ViewModel() {
         manager.update(price = text)
     }
     
-    suspend fun clearPrice() {
-        _price.emit("")
-        manager.update(price = "")
-    }
-    
     suspend fun changeOnline(state: Boolean) {
         _online.emit(state)
         manager.update(isOnline = state)
