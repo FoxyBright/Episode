@@ -61,8 +61,7 @@ fun SearchActionBar(
         AnimatedVisibility(
             !state.state,
             Modifier.height(60.dp),
-            fadeIn(),
-            fadeOut()
+            fadeIn(), fadeOut()
         ) { LabelBar(Modifier, state) }
         AnimatedVisibility(
             state.state,
@@ -162,7 +161,7 @@ fun SearchBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun searchColors(online: Boolean) = textFieldColors(
+fun searchColors(online: Boolean) = textFieldColors(
     textColor = colorScheme.tertiary,
     cursorColor = if(online) colorScheme.secondary
     else colorScheme.primary,

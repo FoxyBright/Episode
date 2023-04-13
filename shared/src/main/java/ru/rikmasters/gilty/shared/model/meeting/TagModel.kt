@@ -9,7 +9,13 @@ data class TagModel(
     val title: String,
 ) {
     
-    constructor(): this("", "")
+    constructor(): this(
+        "", ""
+    )
+    
+    constructor(name: String): this(
+        name, name
+    )
 }
 
 val DemoTag = TagModel(

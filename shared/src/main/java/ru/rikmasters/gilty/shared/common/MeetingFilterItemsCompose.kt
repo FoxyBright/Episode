@@ -4,12 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.material.icons.Icons.Filled
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
@@ -37,6 +34,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.shared.tag.CrossTag
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,7 +134,7 @@ fun Category(
 }
 
 @Composable
-fun TagSearch(
+fun Tags(
     tagList: List<TagModel>,
     onClick: () -> Unit,
     online: Boolean = false,
@@ -181,44 +179,6 @@ fun TagSearch(
                     onDeleteTag(it)
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun CrossTag(
-    tag: TagModel,
-    isOnline: Boolean,
-    onDelete: () -> Unit,
-) {
-    Box(
-        Modifier
-            .background(
-                if(isOnline) colorScheme.secondary
-                else colorScheme.primary,
-                shapes.large
-            )
-    ) {
-        Row(
-            Modifier
-                .width(Max)
-                .padding(vertical = 7.dp)
-                .padding(start = 12.dp, end = 8.dp),
-            Center, CenterVertically
-        ) {
-            Text(
-                tag.title, Modifier
-                    .weight(1f)
-                    .padding(end = 10.dp),
-                White, style = typography.labelSmall,
-                fontWeight = SemiBold
-            )
-            Icon(
-                Filled.Close, (null), Modifier
-                    .size(18.dp)
-                    .clickable { onDelete() },
-                White
-            )
         }
     }
 }

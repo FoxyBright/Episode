@@ -82,7 +82,7 @@ class MeetingManager(
             count = count,
             group = filter.group,
             categories = filter.categories?.map { it.id },
-            tags = filter.tags?.map { it.id },
+            tags = filter.tags?.map { it.title },
             radius = filter.radius,
             lat = filter.lat,
             lng = filter.lng,

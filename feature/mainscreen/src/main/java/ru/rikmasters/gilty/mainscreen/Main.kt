@@ -41,7 +41,7 @@ object Main: FeatureDefinition() {
     
     override fun Module.koin() {
         factoryOf(::CalendarBsViewModel)
-        factoryOf(::FiltersBsViewModel)
+        singleOf(::FiltersBsViewModel)
         singleOf(::RespondsViewModel)
         factoryOf(::TimeBsViewModel)
         singleOf(::MainViewModel)

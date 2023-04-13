@@ -7,6 +7,9 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.shared.tag.TagsCallback
+import ru.rikmasters.gilty.shared.shared.tag.TagsContent
+import ru.rikmasters.gilty.shared.shared.tag.TagsState
 
 @Composable
 fun TagsScreen(vm: TagsViewModel) {
@@ -25,28 +28,33 @@ fun TagsScreen(vm: TagsViewModel) {
     
     TagsContent(
         TagsState(
-            search, selected, popular,
-            online, tags, category
+            selected, popular, search,
+            tags, online, category, (true)
         ), Modifier, object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {
                 scope.launch {
                     vm.selectTag(tag)
-                    if(!popular.contains(tag))
-                        vm.addToPopular(tag)
                     vm.searchClear()
                 }
             }
             
-            override fun onSave() {
+            override fun onSearchChange(text: String) {
+                scope.launch { vm.searchChange(text) }
+            }
+            
+            override fun onCreateTag(tagName: String) {
+                scope.launch {
+                    vm.selectTag(TagModel(tagName))
+                    vm.searchClear()
+                }
+            }
+            
+            override fun onComplete() {
                 scope.launch {
                     vm.onSave(selected)
                     nav.navigationBack()
                 }
-            }
-            
-            override fun onAddTag(text: String) {
-                scope.launch { vm.searchChange(text) }
             }
             
             override fun onDeleteTag(tag: TagModel) {

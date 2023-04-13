@@ -107,7 +107,7 @@ class MeetingWebSource: KtorSource() {
             }
             tags?.let { list ->
                 list.forEach {
-                    query("tag_ids[]" to it)
+                    query("tags[]" to it)
                 }
             }
             radius?.let { query("radius" to "$it") }

@@ -169,7 +169,7 @@ private fun filterList(
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_tag_search)) {
-            TagSearch(
+            Tags(
                 state.tags,
                 { callback?.onFilterClick() },
             ) { callback?.onDeleteTag(it) }

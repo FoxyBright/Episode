@@ -26,7 +26,7 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     val today by vm.mainVm.today.collectAsState()
     val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
-    val online by vm.online.collectAsState()
+    val online by vm.isOnline.collectAsState()
     val results by vm.results.collectAsState()
     val screen by vm.screen.collectAsState()
     val city by vm.city.collectAsState()

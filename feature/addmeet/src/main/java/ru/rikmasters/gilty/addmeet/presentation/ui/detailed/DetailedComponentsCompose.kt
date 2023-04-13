@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.TagSearch
+import ru.rikmasters.gilty.shared.common.Tags
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.*
 
@@ -31,7 +31,7 @@ fun tags(
     stringResource(R.string.add_meet_detailed_tags_maximum, (3))
 ) {
     Column {
-        TagSearch(
+        Tags(
             state.tagList,
             { callback?.onTagsClick() },
             state.online

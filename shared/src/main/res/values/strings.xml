@@ -180,6 +180,7 @@
 
     <!--Meeting Filters-->
     <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>
+    <string name="meeting_filter_selected_tag">Выбранные теги</string>
     <string name="meeting_filter_clear">Сбросить</string>
     <string name="meeting_filter_radius_of_search_label">Радиус поиска</string>
     <string name="meeting_filter_select_meeting_type_personal">Личные</string>

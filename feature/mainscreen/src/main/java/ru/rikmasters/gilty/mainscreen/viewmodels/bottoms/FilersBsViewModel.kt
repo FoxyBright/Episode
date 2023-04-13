@@ -38,7 +38,7 @@ class FiltersBsViewModel(
     
     private val _online =
         MutableStateFlow(false)
-    val online =
+    val isOnline =
         _online.asStateFlow()
     
     private val _selectedCondition =
@@ -135,11 +135,6 @@ class FiltersBsViewModel(
         MutableStateFlow(emptyList<TagModel>())
     val popularTags =
         _popularTags.asStateFlow()
-    
-    private val _popularVisible =
-        MutableStateFlow(true)
-    val popularVisible =
-        _popularVisible.asStateFlow()
     
     suspend fun changeSearchCountryState(state: Boolean) {
         _searchCityState.emit(state)
@@ -259,7 +254,7 @@ class FiltersBsViewModel(
         radius = if(mainVm.today.value) distance.value else null,
         lat = if(mainVm.today.value) 0 else null,
         lng = if(mainVm.today.value) 0 else null,
-        onlyOnline = online.value,
+        onlyOnline = isOnline.value,
         meetTypes = if(meetTypes.value.isNotEmpty()) {
             meetTypes.value.map { MeetType.get(it) }
         } else null,
@@ -317,7 +312,7 @@ class FiltersBsViewModel(
     }
     
     suspend fun changeOnline() {
-        _online.emit(!online.value)
+        _online.emit(!isOnline.value)
         findMeets()
     }
     
@@ -337,19 +332,15 @@ class FiltersBsViewModel(
         }.state(_searchResult.value)
     
     suspend fun getPopularTags() {
-        _popularTags.emit(tags.value + meetManager
-            .getPopularTags(selectedCategories.value.map { it.id })
-            .filter { !tags.value.contains(it) }
+        _popularTags.emit(
+            meetManager.getPopularTags(
+                selectedCategories.value.map { it.id }
+            )
         )
     }
     
     suspend fun clearTagSearch() {
         _tagSearch.emit("")
-        _popularVisible.emit(true)
-    }
-    
-    suspend fun addToPopular(tag: TagModel) {
-        _popularTags.emit(popularTags.value + tag)
     }
     
     suspend fun deleteTag(tag: TagModel) {
@@ -375,7 +366,6 @@ class FiltersBsViewModel(
     }
     
     suspend fun searchTags(text: String) {
-        _popularVisible.emit(text.isBlank())
         _tagSearch.emit(text)
     }
     
