@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.IntrinsicSize.Max
@@ -21,9 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush.Companion.linearGradient
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -37,8 +37,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.Gradients.green
-import ru.rikmasters.gilty.shared.theme.Gradients.red
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -175,40 +173,55 @@ fun TagSearch(
             Modifier
                 .background(colorScheme.primaryContainer)
                 .padding(top = 8.dp)
-                .padding(horizontal = 8.dp), 8.dp, 8.dp
+                .padding(horizontal = 12.dp),
+            12.dp, 16.dp
         ) {
             tagList.forEach {
-                Box(
-                    Modifier
-                        .clip(shapes.large)
-                        .background(linearGradient(if(online) green() else red()))
-                ) {
-                    Row(
-                        Modifier
-                            .width(Max)
-                            .padding(12.dp, 6.dp),
-                        Arrangement.Center, CenterVertically
-                    ) {
-                        Text(
-                            it.title,
-                            Modifier
-                                .weight(1f)
-                                .padding(end = 10.dp),
-                            Color.White,
-                            style = typography.labelSmall
-                        )
-                        Icon(
-                            Filled.Close, (null),
-                            Modifier.clickable { onDeleteTag(it) },
-                            Color.White
-                        )
-                    }
+                CrossTag(it, online) {
+                    onDeleteTag(it)
                 }
             }
         }
     }
 }
 
+@Composable
+private fun CrossTag(
+    tag: TagModel,
+    isOnline: Boolean,
+    onDelete: () -> Unit,
+) {
+    Box(
+        Modifier
+            .background(
+                if(isOnline) colorScheme.secondary
+                else colorScheme.primary,
+                shapes.large
+            )
+    ) {
+        Row(
+            Modifier
+                .width(Max)
+                .padding(vertical = 7.dp)
+                .padding(start = 12.dp, end = 8.dp),
+            Center, CenterVertically
+        ) {
+            Text(
+                tag.title, Modifier
+                    .weight(1f)
+                    .padding(end = 10.dp),
+                White, style = typography.labelSmall,
+                fontWeight = SemiBold
+            )
+            Icon(
+                Filled.Close, (null), Modifier
+                    .size(18.dp)
+                    .clickable { onDelete() },
+                White
+            )
+        }
+    }
+}
 
 @Composable
 fun Distance(
@@ -249,7 +262,7 @@ fun Distance(
                             distance
                         ),
                         Modifier.padding(12.dp, 6.dp),
-                        Color.White,
+                        White,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
