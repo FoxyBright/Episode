@@ -24,6 +24,7 @@ fun CodeScreen(vm: CodeViewModel) {
     val timer by vm.timer.collectAsState()
     
     LaunchedEffect(Unit) {
+        vm.firstFocus()
         while(true) {
             delay(1000L)
             vm.onTimerChange()

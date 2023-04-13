@@ -13,9 +13,9 @@ import ru.rikmasters.gilty.login.LoginErrorMessage
 
 class CodeViewModel(
     
-    private val repository: LoginRepository
-
-): ViewModel() {
+    private val repository: LoginRepository,
+    
+    ): ViewModel() {
     
     private val authManager by inject<AuthManager>()
     private val regManager by inject<RegistrationManager>()
@@ -72,6 +72,10 @@ class CodeViewModel(
         }
     }
     
+    fun firstFocus() {
+        focuses.value.first().requestFocus()
+    }
+    
     suspend fun onCodeClear() {
         _code.emit("")
         focuses.value[0].requestFocus()
@@ -83,7 +87,11 @@ class CodeViewModel(
                 _code.emit(text)
             } else if(text.length < 2) {
                 if(text == "") {
-                    _code.emit(code.value.substring(0, code.value.lastIndex))
+                    _code.emit(
+                        code.value.substring(
+                            0, code.value.lastIndex
+                        )
+                    )
                     if(index - 1 >= 0)
                         focuses.value[index - 1].requestFocus()
                 } else {

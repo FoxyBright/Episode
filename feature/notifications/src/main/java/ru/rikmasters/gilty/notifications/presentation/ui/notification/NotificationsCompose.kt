@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.LoadState.Loading
+import androidx.paging.LoadState.NotLoading
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
@@ -150,8 +152,7 @@ fun NotificationsContent(
         Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
                 Notifications(
-                    state,
-                    Modifier
+                    state, Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     callback
@@ -221,21 +222,25 @@ private fun Notifications(
     callback: NotificationsCallback?,
 ) {
     val notifications = state.notifications
-    
-    
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
+        
+        val hasResponds = state.lastRespond.first > 0
+        val firstItem by lazy {
+            state.notifications.itemSnapshotList.first()
+        }
+        
         when {
             notifications.loadState.refresh is LoadState.Error -> {}
             notifications.loadState.append is LoadState.Error -> {}
             else -> {
-                if(notifications.loadState.refresh is LoadState.Loading) {
+                if(notifications.loadState.refresh is Loading) {
                     item { PagingLoader(notifications.loadState) }
                 }
                 
                 val last = state.lastRespond
-                if(last.first > 0) item {
-                    Box(Modifier.padding(vertical = 22.dp)) {
+                if(hasResponds) item {
+                    Box(Modifier.padding(top = 20.dp)) {
                         Responds(
                             last.second,
                             last.first
@@ -250,13 +255,17 @@ private fun Notifications(
                         }
                     
                     if(todayItems.isNotEmpty()) {
-                        item { Label(R.string.meeting_profile_bottom_today_label) }
+                        item {
+                            Label(
+                                R.string.meeting_profile_bottom_today_label,
+                                hasResponds,
+                                (todayItems.first() == firstItem)
+                            )
+                        }
                         itemsIndexed(todayItems) { count, item ->
                             ElementNot(
-                                count,
-                                todayItems.size,
-                                item,
-                                state.ratings,
+                                count, todayItems.size,
+                                item, state.ratings,
                                 callback
                             )
                         }
@@ -268,14 +277,17 @@ private fun Notifications(
                         }
                     
                     if(weekItems.isNotEmpty()) {
-                        item { Label(R.string.notification_on_this_week_label) }
+                        item {
+                            Label(
+                                R.string.notification_on_this_week_label,
+                                hasResponds,
+                                (weekItems.first() == firstItem)
+                            )
+                        }
                         itemsIndexed(weekItems) { count, item ->
                             ElementNot(
-                                count,
-                                weekItems.size,
-                                item,
-                                state.ratings,
-                                callback
+                                count, weekItems.size,
+                                item, state.ratings, callback
                             )
                         }
                     }
@@ -286,30 +298,30 @@ private fun Notifications(
                         }
                     
                     if(restItems.isNotEmpty()) {
-                        item { Label(R.string.notification_earlier_label) }
+                        item {
+                            Label(
+                                R.string.notification_earlier_label,
+                                hasResponds,
+                                (restItems.first() == firstItem)
+                            )
+                        }
                         itemsIndexed(state.notifications) { count, item ->
-                            item?.let {
-                                if(earlierWeekControl(item.date)) {
+                            item?.let { not ->
+                                if(earlierWeekControl(not.date)) {
                                     ElementNot(
                                         count - todayItems.size - weekItems.size,
-                                        restItems.size,
-                                        item,
-                                        state.ratings,
-                                        callback
+                                        restItems.size, not,
+                                        state.ratings, callback
                                     )
                                 }
                             }
                         }
                     }
                     
-                    if(notifications.loadState.append is LoadState.Loading) {
+                    if(notifications.loadState.append is Loading)
                         item { PagingLoader(notifications.loadState) }
-                    }
-                } else {
-                    if(notifications.loadState.refresh is LoadState.NotLoading) {
-                        item { EmptyNotification() }
-                    }
-                }
+                } else if(notifications.loadState.refresh is NotLoading)
+                    item { EmptyNotification() }
             }
         }
         item { Spacer(Modifier.height(20.dp)) }
@@ -318,45 +330,62 @@ private fun Notifications(
 
 @Composable
 private fun PreviewLazy() {
-    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
-        item { Label(R.string.notification_earlier_label) }
-        itemsIndexed(DemoNotificationModelList) { it, not ->
-            ElementNot(it, (2), not, DemoRatingModelList)
+    LazyColumn(
+        Modifier.padding(horizontal = 16.dp)
+    ) {
+        item {
+            Label(
+                R.string.notification_earlier_label,
+                isFirst = true,
+                hasResponds = false
+            )
+        }
+        itemsIndexed(
+            DemoNotificationModelList
+        ) { it, not ->
+            ElementNot(
+                it, (2), not,
+                DemoRatingModelList
+            )
         }
     }
 }
 
 @Composable
 private fun ElementNot(
-    index: Int,
-    size: Int,
+    index: Int, size: Int,
     item: NotificationModel,
     ratings: List<RatingModel>,
     callback: NotificationsCallback? = null,
 ) {
-    val not = item to rememberDragRowState()
-    NotificationItem(
-        NotificationItemState(
-            not.first,
-            not.second,
-            lazyItemsShapes(index, size),
-            getDifferenceOfTime(not.first.date),
-            (
-                    not.first.feedback?.ratings?.map { it.emoji }
-                        ?: ratings.map { it.emoji }
-                    )
-        ),
-        Modifier,
-        callback
-    )
+    (item to rememberDragRowState())
+        .let { (not, row) ->
+            NotificationItem(
+                NotificationItemState(
+                    not, row, lazyItemsShapes(index, size),
+                    getDifferenceOfTime(not.date),
+                    (not.feedback?.ratings?.map { it.emoji }
+                        ?: ratings.map { it.emoji })
+                ), Modifier, callback
+            )
+        }
 }
 
 @Composable
-private fun Label(text: Int) {
+private fun Label(
+    text: Int,
+    hasResponds: Boolean,
+    isFirst: Boolean,
+) {
     Text(
         stringResource(text),
-        Modifier.padding(vertical = 20.dp),
-        colorScheme.tertiary,
+        Modifier.padding(
+            top = when {
+                hasResponds -> 24
+                isFirst -> 20
+                else -> 28
+            }.dp, bottom = 18.dp
+        ), colorScheme.tertiary,
         style = typography.labelLarge
     )
 }
