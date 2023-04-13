@@ -1,24 +1,27 @@
 package ru.rikmasters.gilty
 
-import ru.rikmasters.gilty.shared.model.enumeration.ReportObjectType
-import ru.rikmasters.gilty.shared.model.enumeration.ReportSubtype
-import ru.rikmasters.gilty.shared.model.enumeration.ReportType
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
+import ru.rikmasters.gilty.shared.model.report.Report
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType
+import ru.rikmasters.gilty.shared.model.report.ReportSubtype
 
 class ReportsManager(
-    
     private val web: ReportsWebSource,
 ) {
     
     suspend fun sendReport(
-        type: ReportType,
+        type: Report,
         subtype: ReportSubtype,
         description: String? = null,
         objectId: String,
         objectType: ReportObjectType,
     ) {
-        web.sendReport(
-            type, subtype, description,
-            objectId, objectType
-        )
+        withContext(IO) {
+            web.sendReport(
+                type, subtype, description,
+                objectId, objectType
+            )
+        }
     }
 }

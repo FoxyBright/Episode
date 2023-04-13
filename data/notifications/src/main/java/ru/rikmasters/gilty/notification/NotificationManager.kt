@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.notification
 
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 
@@ -13,28 +15,44 @@ class NotificationManager(
     
     // удаление уведомления
     suspend fun deleteNotifications(
-        notifyIds: List<String>, deleteAll: Boolean = false,
+        notifyIds: List<String>,
+        deleteAll: Boolean = false,
     ) {
-        web.deleteNotifications(
-            notifyIds, deleteAll.compareTo(false)
-        )
+        withContext(IO) {
+            web.deleteNotifications(
+                notifyIds,
+                deleteAll.compareTo(false)
+            )
+        }
     }
     
     // получение списка возможных реакций на встречу или участника
-    suspend fun getRatings() = web.getRatings()
+    suspend fun getRatings() = withContext(IO) {
+        web.getRatings()
+    }
     
     // выставление реакции на встречу или пользователю
     suspend fun putRatings(
-        meetId: String, userId: String, emoji: EmojiModel,
+        meetId: String, userId: String,
+        emoji: EmojiModel,
     ) {
-        web.putRatings(meetId, userId, emoji.type)
+        withContext(IO) {
+            web.putRatings(
+                meetId, userId, emoji.type
+            )
+        }
     }
     
     @Suppress("unused")
     // пометка уведомления как прочитанного
     suspend fun markNotifyAsRead(
-        notifyIds: List<String>, readAll: Boolean = false,
+        notifyIds: List<String>,
+        readAll: Boolean = false,
     ) {
-        web.markNotifiesAsRead(notifyIds, readAll)
+        withContext(IO) {
+            web.markNotifiesAsRead(
+                notifyIds, readAll
+            )
+        }
     }
 }

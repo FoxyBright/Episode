@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.auth.manager
 
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.profile.repository.ProfileStore
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
@@ -13,36 +15,48 @@ class RegistrationManager(
     private val profileStore: ProfileStore,
 ) {
     
-    suspend fun profileCompleted() =
+    suspend fun profileCompleted() = withContext(IO) {
         profileStore.checkCompletable()
-    
-    suspend fun userId() =
-        profileStore.getProfile(false).id
-    
-    suspend fun getProfile() =
-        profileStore.getProfile(true)
-    
-    suspend fun getHidden(albumId: String) =
-        profileWebSource.getFiles(albumId)
-            .map { it.thumbnail?.url ?: "" }
-    
-    suspend fun setAvatar(file: File, points: List<Float>) {
-        profileWebSource.setUserAvatar(file, points)
     }
     
-    suspend fun getUserCategories() =
+    suspend fun userId() = withContext(IO) {
+        profileStore.getProfile(false).id
+    }
+    
+    suspend fun getProfile() = withContext(IO) {
+        profileStore.getProfile(true)
+    }
+    
+    suspend fun getHidden(albumId: String) = withContext(IO) {
+        profileWebSource.getFiles(albumId)
+            .map { it.thumbnail?.url ?: "" }
+    }
+    
+    suspend fun setAvatar(file: File, points: List<Float>) {
+        withContext(IO) {
+            profileWebSource.setUserAvatar(file, points)
+        }
+    }
+    
+    suspend fun getUserCategories() = withContext(IO) {
         profileStore.getUserCategories(true)
+    }
     
     suspend fun deleteHidden(files: List<String>) {
-        files.forEach { profileStore.deleteHidden(it) }
+        withContext(IO) {
+            files.forEach { profileStore.deleteHidden(it) }
+        }
     }
     
     suspend fun addHidden(files: List<File>) {
-        profileStore.addHidden(files)
+        withContext(IO) {
+            profileStore.addHidden(files)
+        }
     }
     
-    suspend fun isNameOccupied(name: String): Boolean =
+    suspend fun isNameOccupied(name: String) = withContext(IO) {
         profileWebSource.checkUserName(name)
+    }
     
     suspend fun userUpdateData(
         username: String? = null,
@@ -50,9 +64,11 @@ class RegistrationManager(
         age: Int? = null,
         gender: GenderType? = null,
     ) {
-        profileStore.updateProfile(
-            username, aboutMe, age, gender,
-            OrientationModel("HETERO", "Гетеро")
-        )
+        withContext(IO) {
+            profileStore.updateProfile(
+                username, aboutMe, age, gender,
+                OrientationModel("HETERO", "Гетеро")
+            )
+        }
     }
 }

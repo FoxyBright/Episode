@@ -242,8 +242,7 @@ private fun Notifications(
                 if(hasResponds) item {
                     Box(Modifier.padding(top = 20.dp)) {
                         Responds(
-                            last.second,
-                            last.first
+                            last.second, last.first
                         ) { callback?.onRespondsClick() }
                     }
                 }

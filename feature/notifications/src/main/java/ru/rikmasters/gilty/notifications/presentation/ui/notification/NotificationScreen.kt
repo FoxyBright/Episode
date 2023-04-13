@@ -20,15 +20,16 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
 @Composable
 fun NotificationsScreen(vm: NotificationViewModel) {
+    
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
 
     val notifications = vm.notifications.collectAsLazyPagingItems()
+    val participants = vm.participants.collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
-    val participants = vm.participants.collectAsLazyPagingItems()
     val lastRespond by vm.lastRespond.collectAsState()
     val navState by vm.navBar.collectAsState()
     val ratings by vm.ratings.collectAsState()
@@ -50,9 +51,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             navState, blur, selected,
             participants, participantsStates,
             listState, ratings
-        ),
-        Modifier,
-        object : NotificationsCallback {
+        ), Modifier, object : NotificationsCallback {
 
             override fun onEmojiClick(
                 notification: NotificationModel,

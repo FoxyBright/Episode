@@ -3,7 +3,9 @@ package ru.rikmasters.gilty.chats.manager
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.chats.models.chat.mapDTO
 import ru.rikmasters.gilty.chats.paging.ChatListPagingSource
 import ru.rikmasters.gilty.chats.repository.ChatRepository
@@ -15,16 +17,13 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 
 class ChatManager(
-
     private val store: ChatRepository,
-
     private val webSocket: WebSocketHandler,
-
-    private val webSource: ChatWebSource
-) : CoroutineController() {
-
+    private val webSource: ChatWebSource,
+): CoroutineController() {
+    
     fun getChats(
-        sortTypeModel: SortTypeModel
+        sortTypeModel: SortTypeModel,
     ): Flow<PagingData<ChatModel>> {
         return Pager(
             config = PagingConfig(
@@ -40,51 +39,70 @@ class ChatManager(
             }
         ).flow
     }
-
+    
     // подписка на получение сообщений из выбранного чата
     suspend fun connectToChat(chatId: String) {
-        webSocket.connectToChat(chatId)
+        withContext(IO) {
+            webSocket.connectToChat(chatId)
+        }
     }
-
+    
     // отключение от веб сокетов
     fun disconnect() {
         webSocket.disconnect()
     }
-
+    
     // удаление чата
     suspend fun deleteChat(
         chatId: String,
-        forAll: Boolean
+        forAll: Boolean,
     ) {
-        webSource.deleteChat(chatId, forAll)
-        if (!forAll) store.deleteChat(chatId)
+        withContext(IO) {
+            webSource.deleteChat(chatId, forAll)
+            if(!forAll) store.deleteChat(chatId)
+        }
     }
-
+    
     // подключение к веб сокетам
     suspend fun connect(userId: String) = single(JOIN) {
-        webSocket.connect(userId)
+        withContext(IO) {
+            webSocket.connect(userId)
+        }
     }
-
+    
     // получить список непрочитанных во всех чатах
-    suspend fun getChatsStatus() = webSource.getChatsStatus()
-
+    suspend fun getChatsStatus() = withContext(IO) {
+        webSource.getChatsStatus()
+    }
+    
     @Suppress("unused")
     // разблокировать уведомления от чата
     suspend fun unmuteChatNotifications(chatId: String) {
-        webSource.unmuteChatNotifications(chatId)
+        withContext(IO) {
+            webSource.unmuteChatNotifications(
+                chatId
+            )
+        }
     }
-
+    
     @Suppress("unused")
     // заблокировать уведомления от чата
     suspend fun muteChatNotifications(
         chatId: String,
-        unmuteAt: String
+        unmuteAt: String,
     ) {
-        webSource.muteChatNotifications(chatId, unmuteAt)
+        withContext(IO) {
+            webSource.muteChatNotifications(
+                chatId, unmuteAt
+            )
+        }
     }
-
+    
     @Suppress("unused")
     // получить альбом медиа чата
-    suspend fun getChatAlbum(chatId: String) =
+    suspend fun getChatAlbum(
+        chatId: String,
+    ) = withContext(IO) {
         webSource.getChatAlbum(chatId)
+    }
 }

@@ -1,7 +1,8 @@
 package ru.rikmasters.gilty.auth.manager
 
 import io.ktor.client.plugins.auth.providers.BearerTokens
-import ru.rikmasters.gilty.auth.login.SendCode
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.auth.saga.AuthSaga
 import ru.rikmasters.gilty.auth.token.*
 import ru.rikmasters.gilty.auth.token.PushType.FIREBASE
@@ -16,77 +17,95 @@ import ru.rikmasters.gilty.core.util.random.randomAlphanumericString
 import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 
 class AuthManager(
-    
     private val tokenWebSource: TokenWebSource,
-    
     private val dbSource: DbSource,
-    
     override val primarySource: TokenStore,
 ): Repository<TokenStore>(primarySource) {
     
-    suspend fun isAuthorized(): Boolean {
+    suspend fun isAuthorized() = withContext(IO) {
         val token = primarySource.getTokensOrNull()
         logD("YOUR TOKENS: ----->>> $token")
-        return token != null
+        token != null
     }
     
     suspend fun savePushToken(
         token: String,
         type: PushType = FIREBASE,
     ) {
-        tokenWebSource.savePushToken(token, type)
+        withContext(IO) {
+            tokenWebSource.savePushToken(token, type)
+        }
     }
     
     @Suppress("unused")
     suspend fun deletePushToken(
         token: String,
         type: PushType = FIREBASE,
-    ) = tokenWebSource.deletePushToken(token, type)
-    
-    private suspend fun login(tokens: Tokens) =
-        primarySource.saveTokens(tokens)
-    
-    suspend fun logout() {
-        tokenWebSource.logout()
-        primarySource.deleteTokens()
-        updateAuth { copy(externalToken = null) }
+    ) = withContext(IO) {
+        tokenWebSource.deletePushToken(token, type)
     }
     
-    private suspend fun startAuth(): AuthSaga {
-        dbSource.deleteAll<AuthSaga>()
-        AuthSaga(generateExternalState()).let {
-            dbSource.save(it)
-            return it
+    private suspend fun login(
+        tokens: Tokens,
+    ) = withContext(IO) {
+        primarySource.saveTokens(tokens)
+    }
+    
+    suspend fun logout() {
+        withContext(IO) {
+            tokenWebSource.logout()
+            primarySource.deleteTokens()
+            updateAuth { copy(externalToken = null) }
         }
     }
     
-    suspend fun getSendCode(): SendCode? =
-        getAuth().sendCode
-    
-    suspend fun getAuth(): AuthSaga =
-        dbSource.find() ?: startAuth()
-    
-    suspend fun updateAuth(update: AuthSaga.() -> AuthSaga) {
-        val auth = getAuth()
+    private suspend fun startAuth() = withContext(IO) {
         dbSource.deleteAll<AuthSaga>()
-        return dbSource.save(auth.update())
+        AuthSaga(generateExternalState()).let {
+            dbSource.save(it)
+            it
+        }
     }
     
-    private fun generateExternalState(): String =
+    suspend fun getSendCode() = withContext(IO) {
+        getAuth().sendCode
+    }
+    
+    suspend fun getAuth() = withContext(IO) {
+        dbSource.find() ?: startAuth()
+    }
+    
+    suspend fun updateAuth(
+        update: AuthSaga.() -> AuthSaga,
+    ) {
+        withContext(IO) {
+            val auth = getAuth()
+            dbSource.deleteAll<AuthSaga>()
+            dbSource.save(auth.update())
+        }
+    }
+    
+    private fun generateExternalState() =
         randomAlphanumericString(32)
     
-    suspend fun isExternalLinked(token: String) =
+    suspend fun isExternalLinked(
+        token: String,
+    ) = withContext(IO) {
         tokens(
             grantType = External,
             token = token,
         )?.let { login(it); true } ?: false
+    }
     
-    suspend fun onOtpAuthentication(code: String?) =
+    suspend fun onOtpAuthentication(
+        code: String?,
+    ) = withContext(IO) {
         tokens(
             grantType = Otp,
             phone = getAuth().phone,
             code = code
         )?.let { login(it); true } ?: false
+    }
     
     private suspend fun tokens(
         grantType: TokenWebSource.GrantType,
@@ -94,29 +113,36 @@ class AuthManager(
         token: String? = null,
         phone: String? = null,
         code: String? = null,
-    ) = kotlin.runCatching {
-        tokenWebSource.getOauthTokens(
-            grantType, refreshToken,
-            token, phone, code
-        )
-    }.getOrNull()
-    
-    suspend fun linkExternal(token: String) {
-        tokenWebSource.linkExternal(token)
+    ) = withContext(IO) {
+        kotlin.runCatching {
+            tokenWebSource.getOauthTokens(
+                grantType, refreshToken,
+                token, phone, code
+            )
+        }.getOrNull()
     }
     
-    suspend fun getTokens() =
+    suspend fun linkExternal(token: String) {
+        withContext(IO) {
+            tokenWebSource.linkExternal(token)
+        }
+    }
+    
+    suspend fun getTokens() = withContext(IO) {
         primarySource.getTokensOrNull()?.bearer()
             ?: throw IllegalStateException("Нет токенов")
+    }
     
     suspend fun refreshTokens() = single(JOIN) {
-        val tokens = tokenWebSource.getOauthTokens(
-            Refresh, getTokens().refreshToken
-        ) ?: throw IllegalStateException("Сервер не отдал токены")
-        
-        primarySource.saveTokens(tokens)
-        
-        tokens.bearer()
+        withContext(IO) {
+            val tokens = tokenWebSource.getOauthTokens(
+                Refresh, getTokens().refreshToken
+            ) ?: throw IllegalStateException("Сервер не отдал токены")
+            
+            primarySource.saveTokens(tokens)
+            
+            tokens.bearer()
+        }
     }
     
     private fun Tokens.bearer() = BearerTokens(

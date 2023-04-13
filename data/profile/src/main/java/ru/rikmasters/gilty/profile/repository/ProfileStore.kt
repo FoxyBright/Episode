@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
 import ru.rikmasters.gilty.data.ktor.KtorSource
@@ -29,45 +28,47 @@ import ru.rikmasters.gilty.shared.models.meets.Category
 import java.io.File
 
 class ProfileStore(
-
+    
     override val webSource: ProfileWebSource,
-
-    override val primarySource: DbSource
-) : OfflineFirstRepository<KtorSource, DbSource>(
+    
+    override val primarySource: DbSource,
+): OfflineFirstRepository<KtorSource, DbSource>(
     webSource,
     primarySource
 ) {
-
+    
     suspend fun deleteProfile() {
         primarySource.deleteAll<Profile>()
         primarySource.deleteAll<ProfileCategories>()
         primarySource.deleteAll<ProfileMeets>()
         primarySource.deleteAll<Avatar>()
     }
-
+    
     suspend fun checkCompletable() =
         getProfile(true).isCompleted
-
+    
     private suspend fun uploadProfile(
-        forceWeb: Boolean
+        forceWeb: Boolean,
     ): Profile {
-        if (!forceWeb) primarySource.find<Profile>()
-
+        if(!forceWeb)
+            primarySource.find<Profile>()
+                ?.let { return it }
+        
         val profile = webSource.getUserData()
         primarySource.deleteAll<Profile>()
         primarySource.save(profile)
-
+        
         return profile
     }
-
+    
     suspend fun checkProfileStore() =
         primarySource
             .find<Profile>()
             ?.map() != null
-
+    
     suspend fun getProfile(forceWeb: Boolean) =
         uploadProfile(forceWeb).map()
-
+    
     suspend fun deleteHidden(imageId: String) {
         webSource.deleteHidden(
             uploadProfile(false)
@@ -76,7 +77,7 @@ class ProfileStore(
         )
         primarySource.deleteById<Avatar>(imageId)
     }
-
+    
     suspend fun addHidden(files: List<File>) {
         primarySource.saveAll(
             webSource.addHidden(
@@ -86,6 +87,7 @@ class ProfileStore(
             )
         )
     }
+    
     fun getUserHiddenPaging() =
         Pager(
             config = PagingConfig(
@@ -99,40 +101,40 @@ class ProfileStore(
                 )
             }
         ).flow
-
+    
     suspend fun getUserHidden(
-        forceWeb: Boolean
+        forceWeb: Boolean,
     ): List<AvatarModel> {
         val profile = uploadProfile(false)
-
+        
         fun List<Avatar>.map() = this.map { it.map() }
-
-        if (!forceWeb) primarySource
+        
+        if(!forceWeb) primarySource
             .findAll<Avatar>()
             .filter {
                 it.albumId == profile.albumPrivate?.id &&
-                    it.ownerId == profile.id
+                        it.ownerId == profile.id
             }.let {
-                if (it.isNotEmpty()) {
+                if(it.isNotEmpty()) {
                     return it.map()
                 }
             }
-
+        
         primarySource.deleteAll<Avatar>()
         val list = webSource.getFiles(
             profile.albumPrivate?.id ?: ""
         )
         primarySource.saveAll(list)
-
+        
         return list.map()
     }
-
+    
     suspend fun updateProfile(
         username: String? = null,
         aboutMe: String? = null,
         age: Int? = null,
         gender: GenderType? = null,
-        orientation: OrientationModel? = null
+        orientation: OrientationModel? = null,
     ) {
         webSource.setUserData(
             username,
@@ -142,12 +144,12 @@ class ProfileStore(
             orientation?.id
         )
     }
-
+    
     private fun List<Category>.map() = this.map { it.map() }
-
+    
     fun getObservers(
         query: String,
-        type: ObserversType
+        type: ObserversType,
     ): Flow<PagingData<UserModel>> {
         return Pager(
             config = PagingConfig(
@@ -163,9 +165,9 @@ class ProfileStore(
             }
         ).flow
     }
-
+    
     fun getFiles(
-        albumId: String
+        albumId: String,
     ): Flow<PagingData<AvatarModel>> {
         return Pager(
             config = PagingConfig(
@@ -180,9 +182,9 @@ class ProfileStore(
             }
         ).flow
     }
-
+    
     fun getMeetResponds(
-        meetId: String
+        meetId: String,
     ): Flow<PagingData<RespondModel>> {
         return Pager(
             config = PagingConfig(
@@ -197,9 +199,9 @@ class ProfileStore(
             }
         ).flow
     }
-
+    
     fun getResponds(
-        type: RespondType
+        type: RespondType,
     ): Flow<PagingData<MeetWithRespondsModel>> {
         return Pager(
             config = PagingConfig(
@@ -214,9 +216,9 @@ class ProfileStore(
             }
         ).flow
     }
-
+    
     fun getUserMeets(
-        type: MeetingsType
+        type: MeetingsType,
     ): Flow<PagingData<MeetingModel>> {
         return Pager(
             config = PagingConfig(
@@ -231,21 +233,21 @@ class ProfileStore(
             }
         ).flow
     }
-
+    
     suspend fun updateUserCategories(): List<CategoryModel> {
         primarySource.deleteAll<ProfileCategories>()
         val list = webSource.getUserCategories()
         primarySource.save(ProfileCategories(list))
         return list.map()
     }
-
+    
     suspend fun getUserCategories(
-        forceWeb: Boolean
+        forceWeb: Boolean,
     ): List<CategoryModel> {
-        if (!forceWeb) primarySource
+        if(!forceWeb) primarySource
             .find<ProfileCategories>()
             ?.let { return it.list.map() }
-
+        
         return updateUserCategories()
     }
 }

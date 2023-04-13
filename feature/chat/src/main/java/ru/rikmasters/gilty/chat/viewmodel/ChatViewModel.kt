@@ -162,7 +162,7 @@ class ChatViewModel: ViewModel() {
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatId.flatMapLatest { chatId ->
-        messageManager.messages(chatId, coroutineScope)
+        messageManager.messages(chatId)
     }.cachedIn(coroutineScope)
     
     suspend fun changeAnswer(message: MessageModel?) {

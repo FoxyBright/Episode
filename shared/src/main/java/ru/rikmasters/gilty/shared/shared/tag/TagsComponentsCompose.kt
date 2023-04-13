@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
@@ -27,6 +28,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.Gradients.green
 
 @Composable
 fun PopularTags(
@@ -39,10 +41,12 @@ fun PopularTags(
 ) {
     Column(modifier) {
         Text(
-            stringResource(R.string.meeting_filter_popular_tags),
-            Modifier.padding(bottom = 16.dp),
+            stringResource(
+                if(category == null) R.string.meeting_filter_popular
+                else R.string.meeting_filter_popular_tags
+            ), Modifier.padding(bottom = 16.dp),
             colorScheme.tertiary,
-            style = typography.titleLarge
+            style = typography.labelLarge
         )
         Card(Modifier, colors = cardColors(Transparent)) {
             category?.let { PopularCategory(it) }
@@ -95,8 +99,8 @@ private fun PopularFlow(
     FlowLayout(
         modifier
             .background(colorScheme.primaryContainer)
-            .padding(16.dp, 4.dp)
-            .padding(top = 12.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp, bottom = 4.dp),
         12.dp, 12.dp
     ) {
         tags.forEach {
@@ -121,7 +125,7 @@ fun SelectTags(
             stringResource(R.string.meeting_filter_selected_tag),
             Modifier.padding(bottom = 16.dp),
             colorScheme.tertiary,
-            style = typography.titleLarge
+            style = typography.labelLarge
         )
         Card(Modifier, colors = cardColors(Transparent)) {
             FlowLayout(
@@ -183,9 +187,13 @@ fun CrossTag(
     Box(
         Modifier
             .background(
-                if(isOnline) colorScheme.secondary
-                else colorScheme.primary,
-                shapes.large
+                Brush.linearGradient(
+                    if(isOnline) green()
+                    else listOf(
+                        colorScheme.primary,
+                        colorScheme.primary,
+                    )
+                ), shapes.large
             )
     ) {
         Row(

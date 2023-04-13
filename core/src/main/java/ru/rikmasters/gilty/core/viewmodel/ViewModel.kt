@@ -11,7 +11,11 @@ import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.common.ScopeComponent
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 
-abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, LoadingTrait {
+abstract class ViewModel:
+    CoroutineController(),
+    ScopeComponent,
+    ScopeCallback,
+    LoadingTrait {
     
     override lateinit var scope: Scope
     
@@ -20,7 +24,9 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
     
     @Suppress("unused")
     protected suspend fun event(key: String) = event(key to null)
-    private suspend fun event(pair: Pair<String, Any?>) = event(Event(pair))
+    private suspend fun event(pair: Pair<String, Any?>) =
+        event(Event(pair))
+    
     private suspend fun event(data: Event) = _events.emit(data)
     
     protected suspend fun makeToast(text: String) = event("toast" to text)
@@ -28,7 +34,6 @@ abstract class ViewModel: CoroutineController(), ScopeComponent, ScopeCallback, 
     @Suppress("unused")
     protected suspend fun makeToast(@StringRes text: Int) =
         makeToast(getKoin().get<Context>().getString(text))
-    
     
     private val loadingMut = MutableStateFlow(false)
     override val loading = loadingMut.asStateFlow()

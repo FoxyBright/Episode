@@ -19,11 +19,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.searchColors
@@ -65,6 +66,11 @@ fun TagSearch(
                     ) { onBack?.let { it() } },
                 colorScheme.onTertiary
             )
+            val font = typography.bodyMedium
+                .copy(
+                    fontSize = 17.sp,
+                    fontWeight = W700
+                )
             GTextField(
                 value = value,
                 { onTextChange?.let { t -> t(it) } },
@@ -79,8 +85,7 @@ fun TagSearch(
                             if(add) R.string.meeting_filter_add_tag_text_holder
                             else R.string.search_placeholder
                         ), color = colorScheme.onTertiary,
-                        style = typography.bodyMedium,
-                        fontWeight = Bold
+                        style = font
                     )
                 },
                 keyboardOptions = Default.copy(
@@ -92,8 +97,7 @@ fun TagSearch(
                     manager.clearFocus()
                     onEnterAction?.let { it(value) }
                 },
-                textStyle = typography.bodyMedium
-                    .copy(fontWeight = Bold),
+                textStyle = font,
                 singleLine = true,
             )
         }

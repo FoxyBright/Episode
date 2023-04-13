@@ -2,6 +2,8 @@ package ru.rikmasters.gilty.meetings
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.meetings.addmeet.AddMeetStorage
 import ru.rikmasters.gilty.meetings.paging.MeetMembersPagingSource
 import ru.rikmasters.gilty.shared.common.extentions.durationToMinutes
@@ -13,9 +15,7 @@ import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
-    
     private val storage: AddMeetStorage,
-    
     private val web: MeetingWebSource,
 ) {
     
@@ -24,7 +24,9 @@ class MeetingManager(
     val addMeetFlow = storage.addMeetFlow
     
     suspend fun clearAddMeet() {
-        storage.clear()
+        withContext(IO) {
+            storage.clear()
+        }
     }
     
     suspend fun getCities(
@@ -34,10 +36,12 @@ class MeetingManager(
         lat: Double? = null,
         lng: Double? = null,
         subjectId: String? = null,
-    ) = web.getCities(
-        query, page, perPage,
-        lat, lng, subjectId
-    )
+    ) = withContext(IO) {
+        web.getCities(
+            query, page, perPage,
+            lat, lng, subjectId
+        )
+    }
     
     suspend fun update(
         category: CategoryModel? = null,
@@ -63,15 +67,17 @@ class MeetingManager(
         withoutResponds: Boolean? = null,
         memberLimited: Boolean? = null,
     ) {
-        storage.update(
-            category, type, isOnline, condition,
-            price, photoAccess, chatForbidden, tags,
-            description, dateTime, duration, hide,
-            lat, lng, place, address, isPrivate,
-            memberCount, requirementsType,
-            requirements, withoutResponds,
-            memberLimited
-        )
+        withContext(IO) {
+            storage.update(
+                category, type, isOnline, condition,
+                price, photoAccess, chatForbidden, tags,
+                description, dateTime, duration, hide,
+                lat, lng, place, address, isPrivate,
+                memberCount, requirementsType,
+                requirements, withoutResponds,
+                memberLimited
+            )
+        }
     }
     
     private suspend inline fun <reified Type> getMeetings(
@@ -95,19 +101,22 @@ class MeetingManager(
         )?.wrapped()
     }
     
-    suspend fun getMeetings(filter: MeetFiltersModel): List<MeetingModel> {
-        return getMeetings<List<MainMeetResponse>>(
-            MeetFiltersRequest(
-                filter.group.value, filter.categories, filter.tags,
-                filter.radius, filter.lat, filter.lng,
-                filter.meetTypes, filter.onlyOnline, filter.genders,
-                filter.conditions, filter.dates, filter.time
-            ),
-            false
-        )?.map { it.map() } ?: emptyList()
-    }
+    suspend fun getMeetings(filter: MeetFiltersModel) =
+        withContext(IO) {
+            getMeetings<List<MainMeetResponse>>(
+                MeetFiltersRequest(
+                    filter.group.value, filter.categories, filter.tags,
+                    filter.radius, filter.lat, filter.lng,
+                    filter.meetTypes, filter.onlyOnline, filter.genders,
+                    filter.conditions, filter.dates, filter.time
+                ),
+                false
+            )?.map { it.map() } ?: emptyList()
+        }
     
-    suspend fun getMeetCount(filter: MeetFiltersModel): Int =
+    suspend fun getMeetCount(
+        filter: MeetFiltersModel,
+    ) = withContext(IO) {
         getMeetings<MeetCount>(
             MeetFiltersRequest(
                 filter.group.value, filter.categories, filter.tags,
@@ -117,30 +126,60 @@ class MeetingManager(
             ),
             true
         )?.total ?: 0
+    }
     
     suspend fun leaveMeet(meetId: String) {
-        web.leaveMeet(meetId)
+        withContext(IO) {
+            web.leaveMeet(meetId)
+        }
     }
     
     suspend fun cancelMeet(meetId: String) {
-        web.cancelMeet(meetId)
+        withContext(IO) {
+            web.cancelMeet(meetId)
+        }
     }
     
     @Suppress("unused")
-    suspend fun addNewTag(tag: String) = web.addNewTag(tag)
-    suspend fun getPopularTags(list: List<String?>) =
+    suspend fun addNewTag(tag: String) = withContext(IO) {
+        web.addNewTag(tag)
+    }
+    
+    suspend fun getPopularTags(
+        list: List<String?>,
+    ) = withContext(IO) {
         web.getPopularTags(list)
+    }
     
-    suspend fun getUserActualMeets(userId: String) =
+    suspend fun getUserActualMeets(
+        userId: String,
+    ) = withContext(IO) {
         web.getUserActualMeets(userId)
+    }
     
-    suspend fun getDetailedMeet(meetId: String) =
+    suspend fun getDetailedMeet(
+        meetId: String,
+    ) = withContext(IO) {
         web.getDetailedMeet(meetId)
+    }
     
-    suspend fun searchTags(tag: String) = web.searchTags(tag)
-    suspend fun getOrientations() = web.getOrientations()
-    suspend fun getLastPlaces() = web.getLastPlaces()
-    suspend fun getCategoriesList() = web.getCategoriesList()
+    suspend fun searchTags(
+        tag: String,
+    ) = withContext(IO) {
+        web.searchTags(tag)
+    }
+    
+    suspend fun getOrientations() = withContext(IO) {
+        web.getOrientations()
+    }
+    
+    suspend fun getLastPlaces() = withContext(IO) {
+        web.getLastPlaces()
+    }
+    
+    suspend fun getCategoriesList() = withContext(IO) {
+        web.getCategoriesList()
+    }
     
     fun getMeetMembers(
         meetId: String,
@@ -160,11 +199,15 @@ class MeetingManager(
     ).flow
     
     suspend fun notInteresting(meetId: String) {
-        web.notInteresting(meetId)
+        withContext(IO) {
+            web.notInteresting(meetId)
+        }
     }
     
     suspend fun resetMeets() {
-        web.resetMeets()
+        withContext(IO) {
+            web.resetMeets()
+        }
     }
     
     suspend fun respondOfMeet(
@@ -172,48 +215,58 @@ class MeetingManager(
         comment: String?,
         hidden: Boolean,
     ) {
-        web.respondOfMeet(meetId, comment, hidden)
+        withContext(IO) {
+            web.respondOfMeet(
+                meetId, comment, hidden
+            )
+        }
     }
     
-    suspend fun addMeet(meet: AddMeetModel) = web.addMeet(
-        meet.category?.id, meet.type.name,
-        meet.isOnline, meet.condition.name,
-        try {
-            meet.price.toInt()
-        } catch(e: Exception) {
-            null
-        },
-        meet.photoAccess,
-        meet.chatForbidden, meet.tags.map { it.title },
-        meet.description.ifEmpty { null },
-        meet.dateTime,
-        durationToMinutes(meet.duration),
-        if(!meet.isOnline) Location(
-            meet.hide,
-            meet.lat,
-            meet.lng,
-            meet.place,
-            meet.address
-        ) else null,
-        meet.isPrivate,
-        try {
-            meet.memberCount.toInt()
-        } catch(e: Exception) {
-            1
-        },
-        meet.requirementsType,
-        when {
-            meet.isPrivate -> null
-            meet.requirementsType == "ALL" ->
-                listOf(meet.requirements.first().reqMap())
-            
-            else -> meet.requirements.map { it.reqMap() }
-        },
-        meet.withoutResponds
-    )
+    suspend fun addMeet(meet: AddMeetModel) = withContext(IO) {
+        web.addMeet(
+            meet.category?.id, meet.type.name,
+            meet.isOnline, meet.condition.name,
+            try {
+                meet.price.toInt()
+            } catch(e: Exception) {
+                null
+            },
+            meet.photoAccess,
+            meet.chatForbidden, meet.tags.map { it.title },
+            meet.description.ifEmpty { null },
+            meet.dateTime,
+            durationToMinutes(meet.duration),
+            if(!meet.isOnline) Location(
+                meet.hide,
+                meet.lat,
+                meet.lng,
+                meet.place,
+                meet.address
+            ) else null,
+            meet.isPrivate,
+            try {
+                meet.memberCount.toInt()
+            } catch(e: Exception) {
+                1
+            },
+            meet.requirementsType,
+            when {
+                meet.isPrivate -> null
+                meet.requirementsType == "ALL" ->
+                    listOf(meet.requirements.first().reqMap())
+                
+                else -> meet.requirements.map { it.reqMap() }
+            },
+            meet.withoutResponds
+        )
+    }
     
-    suspend fun setUserInterest(meets: List<CategoryModel>) {
-        web.setUserInterest(meets.map { it.id })
+    suspend fun setUserInterest(
+        meets: List<CategoryModel>,
+    ) {
+        withContext(IO) {
+            web.setUserInterest(meets.map { it.id })
+        }
     }
 }
 

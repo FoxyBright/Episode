@@ -18,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -65,9 +67,14 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
+                val photo = ImageRequest
+                    .Builder(LocalContext.current)
+                    .data(image)
+                    .allowHardware(false)
+                    .build()
                 image?.let {
                     AsyncImage(
-                        it, (null), Modifier
+                        photo, (null), Modifier
                             .size(40.dp)
                             .clip(CircleShape),
                         contentScale = Crop
