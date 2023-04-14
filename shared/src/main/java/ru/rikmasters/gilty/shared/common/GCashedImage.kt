@@ -58,7 +58,6 @@ fun GCashedImage(
     
     val builder = remember(url) {
         val pair = getPhotoKey(host, url)
-        log.d("PHOTO KEY >>>>> $pair")
         val builder = ImageRequest.Builder(context)
             .data(pair?.first)
             .size(ORIGINAL)

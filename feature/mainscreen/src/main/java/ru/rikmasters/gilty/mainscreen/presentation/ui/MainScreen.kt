@@ -28,7 +28,6 @@ fun MainScreen(vm: MainViewModel) {
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
-    val hasFilters by vm.meetFilters.collectAsState()
     val meetings by vm.meetings.collectAsState()
     val navBar by vm.navBar.collectAsState()
     val days by vm.days.collectAsState()
@@ -36,6 +35,12 @@ fun MainScreen(vm: MainViewModel) {
     val today by vm.today.collectAsState()
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
+    
+    val hasFilters = vm
+        .meetFilters
+        .collectAsState()
+        .value
+        .isNotNullOrEmpty()
     
     LaunchedEffect(Unit) {
         vm.getChatStatus()
@@ -46,7 +51,7 @@ fun MainScreen(vm: MainViewModel) {
         MainContentState(
             grid, today, days.isNotEmpty(),
             time.isNotBlank(), meetings,
-            navBar, alert, hasFilters.isNotNullOrEmpty()
+            navBar, alert, hasFilters
         ), Modifier, object: MainContentCallback {
             
             override fun onNavBarSelect(point: Int) {

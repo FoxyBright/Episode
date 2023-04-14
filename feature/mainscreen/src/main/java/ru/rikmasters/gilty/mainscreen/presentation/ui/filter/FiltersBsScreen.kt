@@ -16,20 +16,33 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val selectedCondition by vm.selectedCondition.collectAsState()
     val selectedCategories by vm.selectedCategories.collectAsState()
+    val selectedCondition by vm.selectedCondition.collectAsState()
     val categoriesStates by vm.categoriesStates.collectAsState()
     val categories by vm.categories.collectAsState()
     val interest by vm.myInterest.collectAsState()
     val distanceState by vm.distanceState.collectAsState()
     val meetTypes by vm.meetTypes.collectAsState()
     val today by vm.mainVm.today.collectAsState()
+    val isOnline by vm.isOnline.collectAsState()
     val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
-    val online by vm.isOnline.collectAsState()
     val results by vm.results.collectAsState()
-    val screen by vm.screen.collectAsState()
     val city by vm.city.collectAsState()
+    val screen by vm.screen.collectAsState()
+    
+    val hasFilters = vm
+        .hasFilters
+        .collectAsState()
+        .value
+        .isNotNullOrEmpty()
+            || (city != null
+            || selectedCategories.isNotEmpty()
+            || tags.isNotEmpty()
+            || distance != 15
+            || meetTypes.isNotEmpty()
+            || isOnline
+            || selectedCondition.isNotEmpty())
     
     val topRow = (
             interest + vm.removeChildren(selectedCategories)
@@ -48,9 +61,9 @@ fun FiltersBs(vm: FiltersBsViewModel) {
         else -> MeetingFilterBottom(
             Modifier, results, FilterListState(
                 today, distanceState, distance,
-                online, meetTypes, selectedCondition, tags,
+                isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
-                categoriesStates, city
+                categoriesStates, city, hasFilters
             ), object: MeetingFilterBottomCallback {
                 
                 override fun onCategoryClick(

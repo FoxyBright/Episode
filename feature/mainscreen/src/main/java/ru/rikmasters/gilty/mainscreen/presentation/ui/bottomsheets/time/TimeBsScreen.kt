@@ -17,14 +17,11 @@ fun TimeBs(vm: TimeBsViewModel) {
     val hours by vm.hours.collectAsState()
     val time by vm.time.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.setTime()
-        vm.setLocTime()
-    }
+    LaunchedEffect(Unit) { vm.setLocTime() }
     
     TimeBsContent(
         TimeBsState(
-            minutes, hours, time
+            minutes, hours, time, vm.selectedTime
         ), Modifier, object: TimeBSCallback {
             
             override fun onSave() {

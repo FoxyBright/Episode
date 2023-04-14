@@ -4,6 +4,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.CityModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 data class MeetFiltersRequest(
@@ -19,4 +20,5 @@ data class MeetFiltersRequest(
     val conditions: List<ConditionType>? = null,
     val dates: List<String>? = null,
     val time: String? = null,
+    val city: CityModel? = null,
 )

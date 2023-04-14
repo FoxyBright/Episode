@@ -16,6 +16,7 @@ data class MeetFiltersModel(
     val conditions: List<ConditionType>? = null,
     val dates: List<String>? = null,
     val time: String? = null,
+    val city: CityModel? = null,
 ) {
     
     fun isNotNullOrEmpty() = (!categories.isNullOrEmpty()
@@ -27,5 +28,6 @@ data class MeetFiltersModel(
             || onlyOnline != null
             || !conditions.isNullOrEmpty()
             || !dates.isNullOrEmpty()
-            || !time.isNullOrBlank())
+            || !time.isNullOrBlank()
+            || city != null)
 }

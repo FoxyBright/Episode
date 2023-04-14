@@ -46,7 +46,7 @@ class MeetingWebSource: KtorSource() {
             perPage?.let { query("per_page" to "$it") }
             lat?.let { query("lat" to "$it") }
             lng?.let { query("lng" to "$it") }
-            query("country" to (getLocale()))
+            query("country" to getLocale())
             subjectId?.let { query("subject_id" to it) }
         }
     }?.wrapped<List<City>>()
@@ -95,6 +95,7 @@ class MeetingWebSource: KtorSource() {
         genders: List<String>? = null,
         dates: List<String>? = null,
         time: String? = null,
+        city: Int? = null,
     ) = get(
         "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
     ) {
@@ -137,6 +138,11 @@ class MeetingWebSource: KtorSource() {
                     }
                 }
             }
+    
+//            ("CITIIII" + filtersBuilder().city)
+    
+            city?.let { query("city_id" to "$it") }
+            query("country" to getLocale())
         }
     }
     

@@ -97,7 +97,8 @@ class MeetingManager(
             conditions = filter.conditions?.map { it.name },
             genders = filter.genders?.map { it.name },
             dates = filter.dates,
-            time = filter.time
+            time = filter.time,
+            city = filter.city?.id
         )?.wrapped()
     }
     
@@ -105,10 +106,12 @@ class MeetingManager(
         withContext(IO) {
             getMeetings<List<MainMeetResponse>>(
                 MeetFiltersRequest(
-                    filter.group.value, filter.categories, filter.tags,
-                    filter.radius, filter.lat, filter.lng,
-                    filter.meetTypes, filter.onlyOnline, filter.genders,
-                    filter.conditions, filter.dates, filter.time
+                    filter.group.value, filter.categories,
+                    filter.tags, filter.radius, filter.lat,
+                    filter.lng, filter.meetTypes,
+                    filter.onlyOnline, filter.genders,
+                    filter.conditions, filter.dates,
+                    filter.time, filter.city
                 ),
                 false
             )?.map { it.map() } ?: emptyList()
@@ -119,12 +122,13 @@ class MeetingManager(
     ) = withContext(IO) {
         getMeetings<MeetCount>(
             MeetFiltersRequest(
-                filter.group.value, filter.categories, filter.tags,
-                filter.radius, filter.lat, filter.lng,
-                filter.meetTypes, filter.onlyOnline, filter.genders,
-                filter.conditions, filter.dates, filter.time
-            ),
-            true
+                filter.group.value, filter.categories,
+                filter.tags, filter.radius, filter.lat,
+                filter.lng, filter.meetTypes,
+                filter.onlyOnline, filter.genders,
+                filter.conditions, filter.dates,
+                filter.time,filter.city
+            ), true
         )?.total ?: 0
     }
     

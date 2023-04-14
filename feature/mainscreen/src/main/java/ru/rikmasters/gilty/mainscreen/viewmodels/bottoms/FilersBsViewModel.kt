@@ -36,10 +36,10 @@ class FiltersBsViewModel(
     val distanceState =
         _distanceState.asStateFlow()
     
-    private val _online =
+    private val _isOnline =
         MutableStateFlow(false)
     val isOnline =
-        _online.asStateFlow()
+        _isOnline.asStateFlow()
     
     private val _selectedCondition =
         MutableStateFlow(emptyList<Int>())
@@ -235,12 +235,16 @@ class FiltersBsViewModel(
         findMeets()
     }
     
+    val hasFilters = mainVm.meetFilters
+    
     suspend fun findMeets() = singleLoading {
         _results.emit(
             meetManager.getMeetCount(
                 filtersBuilder().copy(
                     genders = listOf(
-                        profileManager.getProfile(false).gender
+                        profileManager
+                            .getProfile()
+                            .gender
                     )
                 )
             )
@@ -251,7 +255,8 @@ class FiltersBsViewModel(
         group = get(mainVm.today.value.compareTo(false)),
         categories = selectedCategories.value.ifEmpty { null },
         tags = tags.value.ifEmpty { null },
-        radius = if(mainVm.today.value) distance.value else null,
+        radius = if(mainVm.today.value)
+            (distance.value * 1000) else null,
         lat = if(mainVm.today.value) 0 else null,
         lng = if(mainVm.today.value) 0 else null,
         onlyOnline = isOnline.value,
@@ -262,7 +267,8 @@ class FiltersBsViewModel(
             selectedCondition.value.map { ConditionType.get(it) }
         else null,
         time = mainVm.time.value.ifBlank { null },
-        dates = mainVm.days.value.ifEmpty { null }
+        dates = mainVm.days.value.ifEmpty { null },
+        city = city.value
     )
     
     suspend fun navigate(page: Int) {
@@ -290,11 +296,10 @@ class FiltersBsViewModel(
         _tags.emit(emptyList())
         _distance.emit(15)
         _meetTypes.emit(emptyList())
-        _online.emit(false)
+        _isOnline.emit(false)
         _selectedCondition.emit(emptyList())
+        mainVm.moreMeet()
         findMeets()
-        mainVm.setFilters(filtersBuilder())
-        mainVm.getMeets()
     }
     
     suspend fun selectCondition(condition: Int) {
@@ -312,7 +317,7 @@ class FiltersBsViewModel(
     }
     
     suspend fun changeOnline() {
-        _online.emit(!isOnline.value)
+        _isOnline.emit(!isOnline.value)
         findMeets()
     }
     

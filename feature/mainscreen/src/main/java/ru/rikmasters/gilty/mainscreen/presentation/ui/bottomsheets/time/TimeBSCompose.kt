@@ -30,7 +30,10 @@ private fun TimeBsPreview() {
             )
         ) {
             TimeBsContent(
-                TimeBsState(("10"), ("12"), ("10:12"))
+                TimeBsState(
+                    ("10"), ("12"), ("10:12"),
+                    "00:00"
+                )
             )
         }
     }
@@ -40,6 +43,7 @@ data class TimeBsState(
     val minutes: String,
     val hours: String,
     val time: String,
+    val selectedTime: String,
 )
 
 interface TimeBSCallback {
@@ -72,7 +76,7 @@ fun TimeBsContent(
                 Modifier, colorScheme.tertiary,
                 style = typography.labelLarge,
             )
-            if(state.time.isNotBlank()) Text(
+            if(state.selectedTime.isNotBlank()) Text(
                 stringResource(R.string.meeting_filter_clear),
                 Modifier.clickable(
                     MutableInteractionSource(), (null)

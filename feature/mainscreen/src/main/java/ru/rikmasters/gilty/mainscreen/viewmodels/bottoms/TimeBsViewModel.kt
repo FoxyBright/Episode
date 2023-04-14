@@ -8,10 +8,11 @@ import ru.rikmasters.gilty.shared.common.extentions.LocalTime
 import java.util.Calendar
 
 class TimeBsViewModel(
-    
     private val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
+    
+    val selectedTime = mainVm.time.value
     
     private val _minutes = MutableStateFlow("00")
     val minutes = _minutes.asStateFlow()
@@ -27,29 +28,30 @@ class TimeBsViewModel(
     }
     
     suspend fun setLocTime() {
-        val c = Calendar.getInstance()
-        val lTime = LocalTime(c.time.time)
+        val lTime = selectedTime.let { lTime ->
+            if(lTime.isNotBlank()) lTime.split(":")
+                .map { it.toInt() }
+                .let { LocalTime.ofZ(it.first(), it.last()) }
+            else LocalTime(Calendar.getInstance().time.time)
+        }
         _hours.emit(lTime.hour().toString())
         _minutes.emit(lTime.minute().toString())
+        setTime()
     }
     
     suspend fun minutesChange(minute: String) {
         _minutes.emit(
-            when(minute) {
-                "start" -> "59"
-                "end" -> "00"
-                else -> minute
-            }
+            minute
+                .replace("start", "59")
+                .replace("end", "00")
         )
     }
     
     suspend fun hoursChange(hour: String) {
         _hours.emit(
-            when(hour) {
-                "start" -> "23"
-                "end" -> "00"
-                else -> hour
-            }
+            hour
+                .replace("start", "59")
+                .replace("end", "00")
         )
     }
     

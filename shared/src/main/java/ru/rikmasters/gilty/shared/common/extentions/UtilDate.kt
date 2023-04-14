@@ -232,6 +232,9 @@ class LocalTime(private var millis: Long) {
         fun of(hour: Int, minute: Int = 0, second: Int = 0) =
             LocalTime("$hour:$minute:$second".pattern(TIME_FORMAT) - offset)
         
+        fun ofZ(hour: Int, minute: Int = 0, second: Int = 0) =
+            LocalTime("$hour:$minute:$second".pattern(TIME_FORMAT))
+        
         /** Выдает экземпляр с текущей датой **/
         fun now() = LocalTime(c.time.time)
     }

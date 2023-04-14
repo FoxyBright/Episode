@@ -39,7 +39,7 @@ fun MeetingFilterBottomPreview() {
                     listOf("kaif", "pain", "fast", "launch")
                         .map { TagModel(it, it) },
                     listOf(), listOf(), listOf(),
-                    listOf(1), DemoCityModel
+                    listOf(1), DemoCityModel, true
                 )
             )
         }
@@ -59,6 +59,7 @@ data class FilterListState(
     val selectedCategories: List<CategoryModel>,
     val categoriesStates: List<Int>,
     val city: CityModel?,
+    val hasFilters: Boolean,
 )
 
 interface MeetingFilterBottomCallback {
@@ -89,26 +90,13 @@ fun MeetingFilterBottom(
     Scaffold(
         modifier.padding(top = 28.dp),
         topBar = {
-            LazyRow(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 6.dp)
-            ) {
-                itemSpacer(16.dp, true)
-                items(state.interest) {
-                    GChip(
-                        Modifier.padding(end = 8.dp), it.name,
-                        state.selectedCategories.contains(it)
-                    ) { callback?.onSubClick(it) }
-                }
-                itemSpacer(8.dp, true)
-            }
+            // TODO при свернутом BS
+            /*TopBar(state, callback)*/
         },
         bottomBar = {
             Buttons(
-                find, true,
-                Modifier,
-                { callback?.onFilter() }
+                find, state.hasFilters,
+                Modifier, { callback?.onFilter() }
             ) { callback?.onClear() }
         }
     ) { padding ->
@@ -118,6 +106,29 @@ fun MeetingFilterBottom(
                 bottom = padding.calculateBottomPadding() - 40.dp
             )
         )
+    }
+}
+
+@Composable
+@Suppress("unused")
+private fun TopBar(
+    state: FilterListState,
+    callback: MeetingFilterBottomCallback?,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier
+            .fillMaxWidth()
+            .padding(bottom = 6.dp)
+    ) {
+        itemSpacer(16.dp, true)
+        items(state.interest) {
+            GChip(
+                Modifier.padding(end = 8.dp), it.name,
+                state.selectedCategories.contains(it)
+            ) { callback?.onSubClick(it) }
+        }
+        itemSpacer(8.dp, true)
     }
 }
 
@@ -152,7 +163,7 @@ private fun Content(
 @Composable
 private fun Buttons(
     find: Int?,
-    clearState: Boolean,
+    hasFilter: Boolean,
     modifier: Modifier,
     onFilter: () -> Unit,
     onClear: () -> Unit,
@@ -161,15 +172,18 @@ private fun Buttons(
         GradientButton(
             Modifier
                 .padding(horizontal = 16.dp)
-                .padding(top = 28.dp),
-            stringResource(R.string.confirm_button),
+                .padding(
+                    top = 28.dp,
+                    bottom = if(hasFilter)
+                        0.dp else 28.dp
+                ), stringResource(R.string.confirm_button),
             smallText = find?.let {
                 stringResource(
                     R.string.meeting_filter_meeting_find, it
                 )
             }
         ) { onFilter() }
-        if(clearState) Text(
+        if(hasFilter) Text(
             stringResource(R.string.meeting_filter_clear),
             Modifier
                 .fillMaxWidth()
