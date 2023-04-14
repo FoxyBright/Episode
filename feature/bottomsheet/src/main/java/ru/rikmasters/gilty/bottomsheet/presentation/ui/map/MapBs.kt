@@ -42,7 +42,9 @@ fun MapBs(
                                 (36.586459), (""), ("")
                             )
                         )
-                    nav.navigate("MAP?location=$location&category=$category")
+                    nav.navigate(
+                        "MAP?location=$location&category=$category"
+                    )
                 }
             }
             

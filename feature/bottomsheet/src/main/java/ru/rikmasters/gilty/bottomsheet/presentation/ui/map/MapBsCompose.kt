@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.map
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.DemoLocationModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
@@ -144,8 +146,8 @@ private fun Item(
             }
             Icon(
                 Icons.Filled.KeyboardArrowRight,
-                (null), Modifier.size(20.dp),
-                colorScheme.onTertiary
+                (null), Modifier.size(24.dp),
+                colorScheme.scrim
             )
         }
     }
@@ -161,24 +163,36 @@ private fun Search(
     onBack: (() -> Unit)? = null,
 ) {
     Card(
-        modifier, shapes.large,
+        modifier.height(48.dp), shapes.medium,
         cardColors(colorScheme.primaryContainer)
     ) {
-        Row(Modifier.fillMaxWidth(), Start, CenterVertically) {
-            IconButton({ if(text.isNotBlank()) onBack?.let { it() } }) {
-                Icon(
-                    painterResource(
-                        if(text.isNotBlank()) R.drawable.ic_back
-                        else R.drawable.magnifier
-                    ), (null), Modifier, colorScheme.onTertiary
-                )
-            }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            Start, CenterVertically
+        ) {
+            val style = typography.bodyMedium.copy(
+                fontSize = 17.sp,
+                fontWeight = Bold
+            )
+            Icon(
+                painterResource(
+                    if(text.isNotBlank()) R.drawable.ic_back
+                    else R.drawable.magnifier
+                ), (null),
+                Modifier
+                    .size(20.dp)
+                    .clickable {
+                        if(text.isNotBlank())
+                            onBack?.let { it() }
+                    }, colorScheme.onTertiary
+            )
             GTextField(
                 text, { onChange?.let { text -> text(onNull(it)) } },
                 Modifier
-                    .padding(top = 4.dp)
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .weight(1f)
+                    .padding(start = 12.dp),
                 shape = shapes.large,
                 colors = placeSearchColors(online),
                 keyboardOptions = Default.copy(
@@ -187,17 +201,21 @@ private fun Search(
                 ),
                 singleLine = true,
                 placeholder = textFieldLabel(
-                    (false), stringResource(R.string.search_placeholder)
+                    (false), stringResource(R.string.search_placeholder),
+                    holderFont = style.copy(
+                        colorScheme.onTertiary
+                    )
                 ),
-                textStyle = typography.bodyMedium.copy(fontWeight = Bold),
+                textStyle = style,
             )
-            if(text.isBlank()) IconButton(
-                { onMapClick?.let { it() } }) {
-                Icon(
-                    painterResource(R.drawable.ic_map),
-                    (null), Modifier, colorScheme.onTertiary
-                )
-            }
+            if(text.isBlank()) Icon(
+                painterResource(R.drawable.ic_map),
+                (null), Modifier
+                    .size(24.dp)
+                    .clickable {
+                        onMapClick?.let { it() }
+                    }, colorScheme.onTertiary
+            )
         }
     }
 }

@@ -38,22 +38,62 @@ val baseTextStyle = TextStyle(
 val Typography = Typography(  //FONTS ШРИФТ - это для удобства поиска
     /*      SMALL TYPOGRAPHY      */
     bodySmall = baseTextStyle.copy(),
-    displaySmall = baseTextStyle.copy(fontSize = 8.sp, fontWeight = Medium, lineHeight = 10.sp),
-    titleSmall = baseTextStyle.copy(fontSize = 10.sp, fontWeight = Medium, lineHeight = 12.sp),
-    headlineSmall = baseTextStyle.copy(fontSize = 12.sp, fontWeight = Medium, lineHeight = 16.sp),
-    labelSmall = baseTextStyle.copy(fontSize = 14.sp, fontWeight = Medium, lineHeight = 18.sp),
-
+    displaySmall = baseTextStyle.copy(
+        fontSize = 8.sp,
+        fontWeight = Medium,
+        lineHeight = 10.sp
+    ),
+    titleSmall = baseTextStyle.copy(
+        fontSize = 10.sp,
+        fontWeight = Medium,
+        lineHeight = 12.sp
+    ),
+    headlineSmall = baseTextStyle.copy(
+        fontSize = 12.sp,
+        fontWeight = Medium,
+        lineHeight = 16.sp
+    ),
+    labelSmall = baseTextStyle.copy(
+        fontSize = 14.sp,
+        fontWeight = Medium,
+        lineHeight = 18.sp
+    ),
+    
     /*      MEDIUM TYPOGRAPHY      */
-    bodyMedium = baseTextStyle.copy(fontSize = 16.sp, fontWeight = Medium, lineHeight = 20.sp),
+    bodyMedium = baseTextStyle.copy(
+        fontSize = 16.sp,
+        fontWeight = Medium,
+        lineHeight = 20.sp
+    ),
     headlineMedium = baseTextStyle.copy(),
     labelMedium = baseTextStyle.copy(),
     titleMedium = baseTextStyle.copy(),
     displayMedium = baseTextStyle.copy(),
-
+    
     /*      LARGE TYPOGRAPHY      */
-    bodyLarge = baseTextStyle.copy(fontSize = 18.sp, fontWeight =  Bold, lineHeight = 22.sp),
-    labelLarge = baseTextStyle.copy(fontSize = 20.sp, fontWeight = Bold, lineHeight = 20.sp),
-    headlineLarge = baseTextStyle.copy(fontSize = 22.sp, fontWeight = Bold, lineHeight = 22.sp),
-    displayLarge = baseTextStyle.copy(fontSize = 24.sp, fontWeight =  Bold, lineHeight = 32.sp),
-    titleLarge = baseTextStyle.copy(fontSize = 28.sp, fontWeight = Bold, lineHeight = 32.sp)
+    bodyLarge = baseTextStyle.copy(
+        fontSize = 18.sp,
+        fontWeight = Bold,
+        lineHeight = 22.sp
+    ),
+    labelLarge = baseTextStyle.copy(
+        fontSize = 20.sp,
+        fontWeight = Bold,
+        lineHeight = 20.sp
+    ),
+    headlineLarge = baseTextStyle.copy(
+        fontSize = 22.sp,
+        fontWeight = Bold,
+        lineHeight = 22.sp
+    ),
+    displayLarge = baseTextStyle.copy(
+        fontSize = 24.sp,
+        fontWeight = Bold,
+        lineHeight = 32.sp
+    ),
+    titleLarge = baseTextStyle.copy(
+        fontSize = 28.sp,
+        fontWeight = Bold,
+        lineHeight = 32.sp
+    )
 )
