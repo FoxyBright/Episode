@@ -107,7 +107,7 @@ fun FiltersBs(vm: FiltersBsViewModel) {
                     scope.launch { vm.selectCondition(index) }
                 }
                 
-                override fun onNext() {
+                override fun onFilter() {
                     scope.launch {
                         vm.onSave()
                         asm.bottomSheet.collapse()

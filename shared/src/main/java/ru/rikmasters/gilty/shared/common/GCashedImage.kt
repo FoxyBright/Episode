@@ -4,23 +4,30 @@ import android.net.Uri
 import android.util.Base64
 import android.util.Base64.DEFAULT
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.FilterQuality.Companion.High
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
 import coil.memory.MemoryCache
+import coil.request.CachePolicy.ENABLED
 import coil.request.ImageRequest
+import coil.size.Size.Companion.ORIGINAL
 import org.json.JSONObject
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.util.extension.slash
 import ru.rikmasters.gilty.data.ktor.Ktor.logE
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import kotlin.text.Charsets.UTF_8
 
 @Composable
@@ -54,19 +61,37 @@ fun GCashedImage(
         log.d("PHOTO KEY >>>>> $pair")
         val builder = ImageRequest.Builder(context)
             .data(pair?.first)
+            .size(ORIGINAL)
+            .allowHardware(false)
         pair?.let {
             builder
                 .memoryCacheKey(pair.memoryCacheKey())
                 .diskCacheKey(pair.diskCacheKey())
+        } ?: run {
+            builder.diskCacheKey(url)
+                .memoryCacheKey(url)
+                .networkCachePolicy(ENABLED)
+                .diskCachePolicy(ENABLED)
+                .memoryCachePolicy(ENABLED)
         }
         
         builder.build()
     }
+    
+    
+    val painter = rememberAsyncImagePainter(
+        builder, filterQuality = High,
+        contentScale = contentScale
+    )
+    
     Image(
-        painter = rememberAsyncImagePainter(builder),
+        painter = painter,
         contentDescription = contentDescription,
-        modifier = modifier,
-        alignment = alignment,
+        modifier = modifier.background(
+            if(painter.state !is Success)
+                colors.meetCardPlaceHolder
+            else Transparent
+        ), alignment = alignment,
         alpha = alpha,
         contentScale = contentScale,
         colorFilter = colorFilter

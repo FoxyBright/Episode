@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -33,42 +34,36 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-/*
 @Preview
 @Composable
 private fun ProfilePreview() {
     GiltyTheme {
-        val meets = DemoMeetingList
         ProfileContent(
             UserProfileState(
                 ProfileState(
                     DemoProfileModel,
-                    USERPROFILE
-                ),
-                meets,
-                meets,
-                Pair(4, "image"),
-                (false),
-                listOf(
-                    INACTIVE,
-                    INACTIVE,
-                    INACTIVE,
-                    INACTIVE,
-                    ACTIVE
-                ),
-                alert = false,
+                    ProfileType.USERPROFILE
+                ), pagingPreview(DemoMeetingList),
+                pagingPreview(DemoMeetingList),
+                Pair(4, "image"), (false), listOf(
+                    INACTIVE, INACTIVE,
+                    INACTIVE, INACTIVE, ACTIVE
+                ), alert = false,
                 listState = rememberLazyListState()
-            ),
-            Modifier.background(colorScheme.background)
+            ), Modifier.background(colorScheme.background)
         )
     }
 }
-
- */
 
 data class UserProfileState(
     val profileState: ProfileState,
@@ -81,7 +76,6 @@ data class UserProfileState(
     val menuState: Boolean = false,
     val listState: LazyListState,
     val photoAlertState: Boolean = false,
-    
     val photoViewState: Boolean = false,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,

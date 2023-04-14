@@ -6,23 +6,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.add_meet_detailed_meet_place
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.model.meeting.*
-import ru.rikmasters.gilty.shared.shared.CardRow
-import ru.rikmasters.gilty.shared.shared.GChip
-import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -65,7 +63,7 @@ data class FilterListState(
 
 interface MeetingFilterBottomCallback {
     
-    fun onNext()
+    fun onFilter()
     fun onCategoryClick(index: Int, category: CategoryModel)
     fun onSubClick(parent: CategoryModel)
     fun onAllCategoryClick()
@@ -80,74 +78,107 @@ interface MeetingFilterBottomCallback {
     fun onClear()
 }
 
-
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun MeetingFilterBottom(
     modifier: Modifier = Modifier,
     find: Int? = null,
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null,
 ) {
+    Scaffold(
+        modifier.padding(top = 28.dp),
+        topBar = {
+            LazyRow(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 6.dp)
+            ) {
+                itemSpacer(16.dp, true)
+                items(state.interest) {
+                    GChip(
+                        Modifier.padding(end = 8.dp), it.name,
+                        state.selectedCategories.contains(it)
+                    ) { callback?.onSubClick(it) }
+                }
+                itemSpacer(8.dp, true)
+            }
+        },
+        bottomBar = {
+            Buttons(
+                find, true,
+                Modifier,
+                { callback?.onFilter() }
+            ) { callback?.onClear() }
+        }
+    ) { padding ->
+        Content(
+            state, callback, Modifier.padding(
+                top = padding.calculateTopPadding(),
+                bottom = padding.calculateBottomPadding() - 40.dp
+            )
+        )
+    }
+}
+
+@Composable
+private fun Content(
+    state: FilterListState,
+    callback: MeetingFilterBottomCallback?,
+    modifier: Modifier = Modifier,
+) {
     val list = filterList(state, callback)
-    Box(modifier.fillMaxSize()) {
-        LazyColumn(Modifier.fillMaxSize()) {
-            item {
-                LazyRow(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 28.dp, bottom = 18.dp)
-                ) {
-                    items(state.interest) {
-                        GChip(
-                            Modifier.padding(end = 8.dp), it.name,
-                            state.selectedCategories.contains(it)
-                        ) { callback?.onSubClick(it) }
-                    }
-                }
-            }
-            items(list) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        it.name,
-                        Modifier.padding(top = 28.dp, bottom = 18.dp),
-                        colorScheme.tertiary,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    it.content.invoke()
-                }
-            }
-            item {
-                GradientButton(
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 28.dp),
-                    stringResource(R.string.confirm_button),
-                    smallText = find?.let {
-                        stringResource(
-                            R.string.meeting_filter_meeting_find,
-                            it
-                        )
-                    }
-                ) { callback?.onNext() }
-            }
-            item {
+    LazyColumn(modifier.fillMaxSize()) {
+        items(list) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
                 Text(
-                    stringResource(R.string.meeting_filter_clear),
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { callback?.onClear() }
-                        .padding(top = 12.dp, bottom = 28.dp),
-                    colorScheme.tertiary,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
+                    it.name, Modifier.padding(
+                        top = 28.dp,
+                        bottom = 18.dp
+                    ), colorScheme.tertiary,
+                    style = typography.labelLarge
                 )
+                it.content.invoke()
             }
         }
+        itemSpacer(20.dp)
+    }
+}
+
+@Composable
+private fun Buttons(
+    find: Int?,
+    clearState: Boolean,
+    modifier: Modifier,
+    onFilter: () -> Unit,
+    onClear: () -> Unit,
+) {
+    Column(modifier) {
+        GradientButton(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 28.dp),
+            stringResource(R.string.confirm_button),
+            smallText = find?.let {
+                stringResource(
+                    R.string.meeting_filter_meeting_find, it
+                )
+            }
+        ) { onFilter() }
+        if(clearState) Text(
+            stringResource(R.string.meeting_filter_clear),
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClear() }
+                .padding(top = 12.dp, bottom = 28.dp),
+            colorScheme.tertiary,
+            textAlign = Center,
+            style = typography.bodyLarge
+        )
     }
 }
 

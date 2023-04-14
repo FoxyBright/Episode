@@ -8,12 +8,11 @@ import androidx.compose.ui.unit.dp
 
 fun LazyListScope.itemSpacer(
     thickness: Dp = 20.dp,
-    modifier: Modifier = Modifier,
     horizontal: Boolean = false,
 ) {
     item {
         Spacer(
-            modifier
+            Modifier
                 .fillMaxWidth()
                 .height(
                     if(horizontal) 0.dp
