@@ -16,11 +16,6 @@ import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingWebSource: KtorSource() {
     
-    private data class ShortLocation(
-        val address: String,
-        val place: String,
-    )
-    
     private data class Respond(
         val description: String?,
         val photoAccess: Boolean,
@@ -138,9 +133,6 @@ class MeetingWebSource: KtorSource() {
                     }
                 }
             }
-    
-//            ("CITIIII" + filtersBuilder().city)
-    
             city?.let { query("city_id" to "$it") }
             query("country" to getLocale())
         }
@@ -187,8 +179,8 @@ class MeetingWebSource: KtorSource() {
     
     suspend fun getLastPlaces() = try {
         get("http://$HOST$PREFIX_URL/meetings/places")
-            ?.wrapped<List<ShortLocation>>()
-            ?.map { Pair(it.address, it.place) }
+            ?.wrapped<List<Location>>()
+            ?.map { it.map() }
             ?: emptyList()
     } catch(e: Exception) {
         emptyList()

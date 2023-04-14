@@ -28,7 +28,9 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.meeting.DemoLocationModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
+import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -43,11 +45,8 @@ private fun SearchPreview() {
         ) {
             MapBottomSheet(
                 MapState(
-                    listOf(
-                        Pair("ул. Большая Дмитровская, д 13, Москва", "Kaif Provance"),
-                        Pair("ул. Ленина, д 117, Москва", "Eifel Burbershop"),
-                        Pair("ул. Льва Толстого, д 18, Калуга", "Дом Мудрых")
-                    ), "", false
+                    listOf(DemoLocationModel),
+                    "", false
                 )
             )
         }
@@ -55,7 +54,7 @@ private fun SearchPreview() {
 }
 
 data class MapState(
-    val lastPlaces: List<Pair<String, String>>,
+    val lastPlaces: List<LocationModel>,
     val text: String,
     val online: Boolean,
 )
@@ -64,7 +63,7 @@ interface MapCallback {
     
     fun onChange(text: String) {}
     fun onMapClick() {}
-    fun onItemClick(place: Pair<String, String>) {}
+    fun onItemClick(place: LocationModel) {}
     fun onBack() {}
 }
 
@@ -115,7 +114,7 @@ private fun Content(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun Item(
-    text: Pair<String, String>,
+    location: LocationModel,
     modifier: Modifier,
     shape: Shape,
     onClick: () -> Unit,
@@ -133,12 +132,12 @@ private fun Item(
         ) {
             Column {
                 Text(
-                    text.first, Modifier,
+                    location.address ?: "", Modifier,
                     colorScheme.onTertiary,
                     style = typography.headlineSmall
                 )
                 Text(
-                    text.second, Modifier,
+                    location.place ?: "", Modifier,
                     colorScheme.tertiary,
                     style = typography.bodyMedium
                 )

@@ -8,9 +8,11 @@ data class Location(
     val lng: Double? = null,
     val place: String? = null,
     val address: String? = null,
+    val country: String? = null,
 ) {
     
     fun map() = LocationModel(
-        hide, lat, lng, place, address
+        hide, lat, lng, place,
+        address,country
     )
 }

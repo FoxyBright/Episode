@@ -46,7 +46,7 @@ fun MapBs(
                 }
             }
             
-            override fun onItemClick(place: Pair<String, String>) {
+            override fun onItemClick(place: LocationModel) {
                 scope.launch {
                     vm.selectPlace(place)
                     asm.bottomSheet.collapse()

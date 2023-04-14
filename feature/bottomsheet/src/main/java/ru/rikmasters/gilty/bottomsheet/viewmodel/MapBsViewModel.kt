@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 
 class MapBsViewModel: ViewModel() {
     
@@ -13,7 +14,7 @@ class MapBsViewModel: ViewModel() {
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
     
-    private val _last = MutableStateFlow(emptyList<Pair<String, String>>())
+    private val _last = MutableStateFlow(emptyList<LocationModel>())
     val last = _last.asStateFlow()
     
     suspend fun changeSearch(text: String) {
@@ -24,9 +25,14 @@ class MapBsViewModel: ViewModel() {
         _last.emit(meetManager.getLastPlaces())
     }
     
-    suspend fun selectPlace(place: Pair<String, String>) {
-//        detailedVm.changePlace(place)
-//        Address = place.first
-//        Place = place.second
+    suspend fun selectPlace(
+        location: LocationModel,
+    ) {
+        meetManager.update(
+            place = location.place,
+            address = location.address,
+            lat = location.lat,
+            lng = location.lng,
+        )
     }
 }
