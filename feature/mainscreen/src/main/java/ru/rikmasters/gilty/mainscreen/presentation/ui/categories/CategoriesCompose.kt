@@ -1,13 +1,11 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -19,7 +17,6 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -47,7 +44,7 @@ private fun CategoryListPreview() {
                 CategoryListState(
                     DemoCategoryModelList,
                     emptyList(), emptyList()
-                ), Modifier.padding(16.dp)
+                ),
             )
         }
     }
@@ -75,22 +72,45 @@ fun CategoryList(
     modifier: Modifier = Modifier,
     callback: CategoryListCallback? = null,
 ) {
-    Scaffold(modifier.padding(16.dp), {
-        TopBar { callback?.onBack() }
-    }, {
-        Buttons(
-            Modifier, { callback?.onComplete() })
-        { callback?.onClear() }
-    }) { Categories(Modifier.padding(it), state, callback) }
+    Scaffold(
+        modifier,
+        topBar = {
+            TopBar(
+                Modifier.padding(
+                    horizontal = 16.dp
+                )
+            ) { callback?.onBack() }
+        },
+        bottomBar = {
+            Buttons(
+                state.selected.isNotEmpty(), Modifier,
+                { callback?.onComplete() }
+            ) { callback?.onClear() }
+        }
+    ) {
+        Categories(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(
+                    top = it.calculateTopPadding(),
+                    bottom = it.calculateBottomPadding() - 40.dp
+                ),
+            state, callback
+        )
+    }
 }
 
 @Composable
 private fun TopBar(
+    modifier: Modifier = Modifier,
     onBack: () -> Unit,
 ) {
     Row(
-        Modifier
-            .padding(bottom = 10.dp)
+        modifier
+            .padding(
+                top = 16.dp,
+                bottom = 10.dp
+            )
             .offset((-6).dp),
         Start, CenterVertically
     ) {
@@ -182,11 +202,13 @@ private fun Categories(
                 }
             }
         }
+        itemSpacer(20.dp)
     }
 }
 
 @Composable
 private fun Buttons(
+    hasSelected: Boolean,
     modifier: Modifier = Modifier,
     onComplete: () -> Unit,
     onClear: () -> Unit,
@@ -195,18 +217,19 @@ private fun Buttons(
         GradientButton(
             Modifier
                 .padding(horizontal = 16.dp)
-                .padding(top = 28.dp),
-            stringResource(R.string.meeting_filter_complete_button)
+                .padding(
+                    top = 28.dp,
+                    bottom = if(hasSelected)
+                        0.dp else 28.dp
+                ),
+            stringResource(R.string.meeting_filter_complete_button),
         ) { onComplete() }
-        Text(
+        if(hasSelected) Text(
             stringResource(R.string.meeting_filter_clear),
             Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 28.dp)
-                .clip(CircleShape)
-                .clickable(
-                    MutableInteractionSource(), (null)
-                ) { onClear() },
+                .clickable { onClear() }
+                .padding(top = 12.dp, bottom = 28.dp),
             colorScheme.tertiary,
             textAlign = TextAlign.Center,
             style = typography.bodyLarge

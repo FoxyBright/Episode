@@ -88,7 +88,7 @@ fun MeetingFilterBottom(
     callback: MeetingFilterBottomCallback? = null,
 ) {
     Scaffold(
-        modifier.padding(top = 28.dp),
+        modifier,
         topBar = {
             // TODO при свернутом BS
             /*TopBar(state, callback)*/
@@ -119,7 +119,10 @@ private fun TopBar(
     LazyRow(
         modifier
             .fillMaxWidth()
-            .padding(bottom = 6.dp)
+            .padding(
+                top = 28.dp,
+                bottom = 6.dp
+            )
     ) {
         itemSpacer(16.dp, true)
         items(state.interest) {
@@ -148,7 +151,9 @@ private fun Content(
             ) {
                 Text(
                     it.name, Modifier.padding(
-                        top = 28.dp,
+                        top = if(
+                            it.name == stringResource(R.string.meeting_filter_category)
+                        ) 0.dp else 28.dp,
                         bottom = 18.dp
                     ), colorScheme.tertiary,
                     style = typography.labelLarge

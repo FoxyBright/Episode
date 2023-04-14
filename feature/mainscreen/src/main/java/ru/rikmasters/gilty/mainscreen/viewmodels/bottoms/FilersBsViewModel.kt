@@ -202,6 +202,7 @@ class FiltersBsViewModel(
         )
         
         _categories.emit(removeChildren(selectedCategories.value))
+        
         findMeets()
     }
     
@@ -293,6 +294,7 @@ class FiltersBsViewModel(
     suspend fun clearFilters() {
         _city.emit(null)
         _selectedCategories.emit(emptyList())
+        _categories.emit(emptyList())
         _tags.emit(emptyList())
         _distance.emit(15)
         _meetTypes.emit(emptyList())
