@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -20,18 +21,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import ru.rikmasters.gilty.core.R.drawable
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
-import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoInfoNotificationModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
@@ -87,7 +85,7 @@ fun NotificationItem(
             val emoji = notification
                 .feedback?.ratings?.map { it.emoji }
             TextNotification(
-                user?.avatar?.thumbnail, state.rowState,
+                user, callback, state.rowState,
                 modifier, state.shape, (true),
                 { callback?.onSwiped(notification) },
                 (emoji ?: state.emojiList), {
@@ -100,17 +98,8 @@ fun NotificationItem(
                 NotificationText(
                     user, type, meet,
                     state.duration, emoji = emoji,
-                    onMeetClick = {
-                        callback?.onMeetClick(
-                            meet ?: MeetingModel()
-                        )
-                    },
-                    onUserClick = {
-                        callback?.onUserClick(
-                            user ?: UserModel(),
-                            meet ?: MeetingModel()
-                        )
-                    }
+                    onMeetClick = { callback?.onMeetClick(meet) },
+                    onUserClick = { callback?.onUserClick(user, meet) }
                 )
             }
         }
@@ -122,24 +111,15 @@ fun NotificationItem(
         ) { callback?.onSwiped(notification) }
         
         else -> TextNotification(
-            user?.avatar?.thumbnail, state.rowState,
+            user, callback, state.rowState,
             modifier, state.shape, (false),
             { callback?.onSwiped(notification) },
         ) {
             NotificationText(
                 user, type, meet,
                 state.duration,
-                onMeetClick = {
-                    callback?.onMeetClick(
-                        meet ?: MeetingModel()
-                    )
-                },
-                onUserClick = {
-                    callback?.onUserClick(
-                        user ?: UserModel(),
-                        meet ?: MeetingModel()
-                    )
-                }
+                onMeetClick = { callback?.onMeetClick(meet) },
+                onUserClick = { callback?.onUserClick(user, meet) }
             )
         }
     }
@@ -195,7 +175,8 @@ private fun InfoNotification(
 
 @Composable
 private fun TextNotification(
-    thumbnail: ThumbnailModel?,
+    user: UserModel?,
+    callback: NotificationsCallback?,
     rowState: DragRowState,
     modifier: Modifier = Modifier,
     shape: Shape,
@@ -225,18 +206,17 @@ private fun TextNotification(
                         .padding(top = 6.dp),
                     Start, CenterVertically
                 ) {
-                    val image = ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(thumbnail?.url)
-                        .allowHardware(false)
-                        .build()
-                    AsyncImage(
-                        image, (null), Modifier
+                    GCashedImage(
+                        user?.avatar?.thumbnail?.url, Modifier
                             .padding(end = 16.dp)
                             .clip(CircleShape)
-                            .size(38.dp),
-                        contentScale = Crop
-                    ); content.invoke()
+                            .size(38.dp)
+                            .clickable {
+                                callback?.onUserClick(user)
+                            },
+                        Crop
+                    )
+                    content.invoke()
                 }
                 if(emojiRawState) EmojiRow(
                     emojiList, Modifier.padding(

@@ -67,7 +67,7 @@ private fun MeetingBsObserve() {
                     (false), meet, Pair(0, null),
                     pagingPreview(DemoUserModelList),
                     distanceCalculator(meet.map()), (false)
-                ), Modifier.padding(16.dp)
+                ), Modifier
             )
         }
     }
@@ -211,16 +211,17 @@ fun MeetingBsContent(
             item {
                 MeetingBsConditions(
                     state.meet.map(),
-                    Modifier.padding(top = 32.dp)
+                    Modifier.padding(
+                        top = if(state.meet.description.isNotBlank())
+                            32.dp else 0.dp
+                    )
                 )
             }
             
             state.membersList?.let {
                 item {
                     MeetingBsParticipants(
-                        state.meet,
-                        it,
-                        Modifier,
+                        state.meet, it, Modifier,
                         { callback?.onAllMembersClick(state.meet.id) }
                     ) { callback?.onMemberClick(it) }
                 }
@@ -229,8 +230,7 @@ fun MeetingBsContent(
             state.meetDistance?.let {
                 if(!state.meet.isOnline) item {
                     MeetingBsMap(
-                        state.meet,
-                        it,
+                        state.meet, it,
                         Modifier.padding(top = 28.dp)
                     ) { callback?.onMeetPlaceClick(state.meet.location) }
                 }
@@ -278,13 +278,11 @@ private fun TopBar(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 18.dp),
-        SpaceBetween,
-        CenterVertically
+        SpaceBetween, CenterVertically
     ) {
         Row(
             Modifier.weight(1f),
-            Start,
-            CenterVertically
+            Start, CenterVertically
         ) {
             if(backButton) IconButton(
                 { onBack() },

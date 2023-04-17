@@ -53,7 +53,8 @@ private fun MeetingBsTopBarPreview() {
                 MeetingBsTopBarState(
                     DemoFullMeetingModel.copy(
                         type = ANONYMOUS,
-                        isPrivate = true
+                        isPrivate = true,
+                        description = "hello"
                     ),
                     (false),
                     lastRespond = 4 to "",

@@ -107,8 +107,12 @@ data class NotificationsState(
 interface NotificationsCallback {
     
     fun onSwiped(notification: NotificationModel)
-    fun onMeetClick(meet: MeetingModel)
-    fun onUserClick(user: UserModel, meet: MeetingModel)
+    fun onMeetClick(meet: MeetingModel?)
+    fun onUserClick(
+        user: UserModel?,
+        meet: MeetingModel? = null,
+    )
+    
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
