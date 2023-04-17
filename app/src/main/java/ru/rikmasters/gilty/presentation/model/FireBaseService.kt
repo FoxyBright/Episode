@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.content.SharedPreferences
@@ -41,7 +42,7 @@ class FireBaseService: FirebaseMessagingService() {
         token = newToken
     }
     
-    @SuppressLint("WrongConstant")
+    @SuppressLint("WrongConstant", "UnspecifiedImmutableFlag")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -84,7 +85,8 @@ class FireBaseService: FirebaseMessagingService() {
                 .setContentIntent(
                     PendingIntent.getActivity(
                         (this), (0), (intent),
-                        FLAG_UPDATE_CURRENT
+                        FLAG_UPDATE_CURRENT or
+                                FLAG_IMMUTABLE
                     )
                 ).build()
         )
