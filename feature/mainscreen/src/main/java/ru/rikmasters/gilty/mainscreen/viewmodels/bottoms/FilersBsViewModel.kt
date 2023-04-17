@@ -83,16 +83,6 @@ class FiltersBsViewModel(
     val results =
         _results.asStateFlow()
     
-    private val _myInterest =
-        MutableStateFlow(emptyList<CategoryModel>())
-    val myInterest =
-        _myInterest.asStateFlow()
-    
-    private val _allCategories =
-        MutableStateFlow(emptyList<CategoryModel>())
-    val allCategories =
-        _allCategories.asStateFlow()
-    
     private val _selectedCategories =
         MutableStateFlow(emptyList<CategoryModel>())
     val selectedCategories =
@@ -152,21 +142,9 @@ class FiltersBsViewModel(
         _searchCity.emit(query)
     }
     
-    suspend fun getAllCategories() {
-        _allCategories.emit(meetManager.getCategoriesList())
-    }
-    
-    suspend fun getUserCategories() {
-        _myInterest.emit(
-            removeChildren(
-                profileManager.getUserCategories()
-            )
-        )
-    }
-    
     fun removeChildren(categories: List<CategoryModel>) =
         categories.filter { my ->
-            !allCategories.value
+            !mainVm.categories.value
                 .filter { it.children != null }
                 .flatMap { it.children ?: emptyList() }.contains(my)
         }
@@ -211,7 +189,7 @@ class FiltersBsViewModel(
             val list = selectedAdditionally.value
             category.parentId?.let { parentId ->
                 val set = setOf(category,
-                    allCategories.value.first { it.id == parentId })
+                    mainVm.categories.value.first { it.id == parentId })
                 
                 (if(list.contains(category)) list - set
                 else list + set).distinct()
@@ -238,7 +216,7 @@ class FiltersBsViewModel(
     
     val hasFilters = mainVm.meetFilters
     
-    suspend fun findMeets() = singleLoading {
+    private suspend fun findMeets() = singleLoading {
         _results.emit(
             meetManager.getMeetCount(
                 filtersBuilder().copy(

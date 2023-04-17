@@ -45,6 +45,8 @@ fun MainScreen(vm: MainViewModel) {
     LaunchedEffect(Unit) {
         vm.getChatStatus()
         vm.getMeets()
+        vm.getAllCategories()
+        vm.getUserCategories()
     }
     
     MainContent(

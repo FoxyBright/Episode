@@ -12,7 +12,7 @@ fun CategoriesScreen(vm: FiltersBsViewModel) {
     val scope = rememberCoroutineScope()
     
     val selected by vm.selectedAdditionally.collectAsState()
-    val categories by vm.allCategories.collectAsState()
+    val categories by vm.mainVm.categories.collectAsState()
     val states by vm.additionallyStates.collectAsState()
     
     LaunchedEffect(Unit) {

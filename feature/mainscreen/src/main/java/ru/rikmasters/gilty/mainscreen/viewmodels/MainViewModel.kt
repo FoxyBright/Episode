@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
@@ -14,11 +15,13 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetFiltersModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 class MainViewModel: ViewModel() {
     
+    private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
     private val chatManager by inject<ChatManager>()
     
@@ -40,6 +43,16 @@ class MainViewModel: ViewModel() {
     private val _meetings = MutableStateFlow(emptyList<MeetingModel>())
     val meetings = _meetings.asStateFlow()
     
+    private val _categories = MutableStateFlow(
+        emptyList<CategoryModel>()
+    )
+    val categories = _categories.asStateFlow()
+    
+    private val _userCategories = MutableStateFlow(
+        emptyList<CategoryModel>()
+    )
+    val userCategories = _userCategories.asStateFlow()
+    
     private val _navBar = MutableStateFlow(
         listOf(ACTIVE, INACTIVE, INACTIVE, INACTIVE, INACTIVE)
     )
@@ -47,6 +60,16 @@ class MainViewModel: ViewModel() {
     
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
+    
+    suspend fun getAllCategories() {
+        _categories.emit(meetManager.getCategoriesList())
+    }
+    
+    suspend fun getUserCategories() {
+        _userCategories.emit(
+            profileManager.getUserCategories()
+        )
+    }
     
     suspend fun getChatStatus() {
         chatManager.getChatsStatus().let {

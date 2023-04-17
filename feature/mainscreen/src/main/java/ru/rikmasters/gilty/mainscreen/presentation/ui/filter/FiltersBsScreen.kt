@@ -17,10 +17,10 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     val asm = get<AppStateModel>()
     
     val selectedCategories by vm.selectedCategories.collectAsState()
+    val interest by vm.mainVm.userCategories.collectAsState()
     val selectedCondition by vm.selectedCondition.collectAsState()
     val categoriesStates by vm.categoriesStates.collectAsState()
     val categories by vm.categories.collectAsState()
-    val interest by vm.myInterest.collectAsState()
     val distanceState by vm.distanceState.collectAsState()
     val meetTypes by vm.meetTypes.collectAsState()
     val today by vm.mainVm.today.collectAsState()
@@ -47,12 +47,6 @@ fun FiltersBs(vm: FiltersBsViewModel) {
     val topRow = (
             interest + vm.removeChildren(selectedCategories)
                 .filter { !interest.contains(it) })
-    
-    LaunchedEffect(Unit) {
-        vm.getAllCategories()
-        vm.getUserCategories()
-        vm.findMeets()
-    }
     
     when(screen) {
         1 -> CategoriesScreen(vm)
