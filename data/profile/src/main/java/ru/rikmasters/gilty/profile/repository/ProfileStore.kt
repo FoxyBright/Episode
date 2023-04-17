@@ -28,13 +28,10 @@ import ru.rikmasters.gilty.shared.models.meets.Category
 import java.io.File
 
 class ProfileStore(
-    
     override val webSource: ProfileWebSource,
-    
     override val primarySource: DbSource,
 ): OfflineFirstRepository<KtorSource, DbSource>(
-    webSource,
-    primarySource
+    webSource, primarySource
 ) {
     
     suspend fun deleteProfile() {
@@ -61,10 +58,8 @@ class ProfileStore(
         return profile
     }
     
-    suspend fun checkProfileStore() =
-        primarySource
-            .find<Profile>()
-            ?.map() != null
+    suspend fun storageProfile() =
+        primarySource.find<Profile>()
     
     suspend fun getProfile(forceWeb: Boolean) =
         uploadProfile(forceWeb).map()

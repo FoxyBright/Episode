@@ -15,8 +15,8 @@ class ProfileManager(
     private val store: ProfileStore,
 ) {
     
-    suspend fun checkProfileStore() = withContext(IO) {
-        store.checkProfileStore()
+    suspend fun storageProfile() = withContext(IO) {
+        store.storageProfile()?.map()
     }
     
     suspend fun getUserCategories() = withContext(IO) {

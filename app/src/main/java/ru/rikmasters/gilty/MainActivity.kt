@@ -84,7 +84,13 @@ class MainActivity: ComponentActivity() {
                 { GBottomSheetBackground(it) },
                 { GSnackbar(it) },
                 { isLoading, content -> GLoader(isLoading, content) },
-                { state, offset, trigger -> LoadingIndicator(state, offset, trigger) }
+                { state, offset, trigger ->
+                    LoadingIndicator(
+                        state,
+                        offset,
+                        trigger
+                    )
+                }
             )
             
             if(errorState) ErrorConnection()
@@ -96,21 +102,22 @@ class MainActivity: ComponentActivity() {
                 }
             }
             
+            suspend fun authorize(userId: String) {
+                authManager.savePushToken(token)
+                chatManager.connect(userId)
+            }
+            
             LaunchedEffect(Unit) {
-                val userAuthorized = profileManager.checkProfileStore()
-                
-                if(internetCheck(context)) if(userAuthorized) {
-                    authManager.savePushToken(token)
-                    chatManager.connect(
-                        profileManager.getProfile(false).id
-                    )
-                } else if(
-                    authManager.isAuthorized()
-                    && regManager.profileCompleted()
-                ) {
-                    authManager.savePushToken(token)
-                    chatManager.connect(regManager.userId())
-                }
+                if(internetCheck(context))
+                    profileManager
+                        .storageProfile()
+                        ?.let { authorize(it.id) }
+                        ?: run {
+                            if(
+                                authManager.hasTokens()
+                                && regManager.profileCompleted()
+                            ) authorize(regManager.userId())
+                        }
                 
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
@@ -120,7 +127,7 @@ class MainActivity: ComponentActivity() {
             val nav by inject<NavState>()
             
             LaunchedEffect(intent) {
-                if(authManager.isAuthorized()
+                if(authManager.hasTokens()
                     && regManager.profileCompleted()
                 ) deepLink(scope, asm, intent, nav)
             }

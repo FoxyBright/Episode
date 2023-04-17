@@ -1,11 +1,12 @@
 package ru.rikmasters.gilty.shared.common
 
-import android.net.Uri
+import android.net.Uri.parse
 import android.util.Base64
 import android.util.Base64.DEFAULT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +25,6 @@ import coil.size.Size.Companion.ORIGINAL
 import org.json.JSONObject
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.env.Environment
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.util.extension.slash
 import ru.rikmasters.gilty.data.ktor.Ktor.logE
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -50,33 +50,32 @@ fun GCashedImage(
         }
     
     val host = remember(baseUrl) {
-        Uri.parse(baseUrl).let {
+        parse(baseUrl).let {
             val scheme = "http://"
-            scheme.plus(Uri.parse(scheme.plus(it)).host)
-        }.log()
+            val host = parse(scheme.plus(it)).host
+            scheme.plus(host)
+        }
     }
     
-    val builder = remember(url) {
-        val pair = getPhotoKey(host, url)
-        val builder = ImageRequest.Builder(context)
-            .data(pair?.first)
-            .size(ORIGINAL)
-            .allowHardware(false)
-        pair?.let {
-            builder
-                .memoryCacheKey(pair.memoryCacheKey())
-                .diskCacheKey(pair.diskCacheKey())
-        } ?: run {
-            builder.diskCacheKey(url)
-                .memoryCacheKey(url)
+    val builder = key(url) {
+        remember(url) {
+            val pair = getPhotoKey(host, url)
+            val builder = ImageRequest.Builder(context)
+                .data(pair?.first)
+                .size(ORIGINAL)
                 .networkCachePolicy(ENABLED)
                 .diskCachePolicy(ENABLED)
                 .memoryCachePolicy(ENABLED)
+                .allowHardware(false)
+            pair?.let {
+                builder
+                    .memoryCacheKey(pair.memoryCacheKey())
+                    .diskCacheKey(pair.diskCacheKey())
+            } ?: run { builder.diskCacheKey(url).memoryCacheKey(url) }
+            
+            builder.build()
         }
-        
-        builder.build()
     }
-    
     
     val painter = rememberAsyncImagePainter(
         builder, filterQuality = High,
@@ -111,7 +110,7 @@ private fun getPhotoKey(
 ): Pair<String, Boolean>? {
     return url?.let {
         try {
-            val uri = Uri.parse(url)
+            val uri = parse(url)
             
             val hash = uri.getQueryParameter("hash")
             

@@ -22,7 +22,7 @@ class AuthManager(
     override val primarySource: TokenStore,
 ): Repository<TokenStore>(primarySource) {
     
-    suspend fun isAuthorized() = withContext(IO) {
+    suspend fun hasTokens() = withContext(IO) {
         val token = primarySource.getTokensOrNull()
         logD("YOUR TOKENS: ----->>> $token")
         token != null

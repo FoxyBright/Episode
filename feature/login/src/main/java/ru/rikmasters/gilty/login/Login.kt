@@ -14,7 +14,9 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
-import ru.rikmasters.gilty.login.presentation.ui.gallery.*
+import ru.rikmasters.gilty.login.presentation.ui.gallery.CropperScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.GalleryScreen
+import ru.rikmasters.gilty.login.presentation.ui.gallery.HiddenScreen
 import ru.rikmasters.gilty.login.presentation.ui.login.LoginScreen
 import ru.rikmasters.gilty.login.presentation.ui.permissions.PermissionsScreen
 import ru.rikmasters.gilty.login.presentation.ui.personal.PersonalScreen
@@ -27,16 +29,17 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
     
+    private val regManager by inject<RegistrationManager>()
     private val authManager by inject<AuthManager>()
     
-    private val regManager by inject<RegistrationManager>()
-    
     private val authEntrypointResolver = EntrypointResolver {
-        if(
-            authManager.isAuthorized() &&
-            regManager.profileCompleted()
-        ) "main/meetings"
-        else "login"
+        regManager.storageProfile()
+            ?.let { "main/meetings" }
+            ?: if(
+                authManager.hasTokens() &&
+                regManager.profileCompleted()
+            ) "main/meetings"
+            else "login"
     }
     
     override fun DeepNavGraphBuilder.navigation() {
