@@ -49,11 +49,13 @@ private fun Content(
         else -> Unit
     }
     
-    remember(states) {
+    val list = remember(states) {
         val size = 3
         if(states.size <= size) states
         else states - states.dropLast(size).toSet()
-    }.forEachIndexed { index, (meeting, state) ->
+    }
+    
+    list.forEachIndexed { index, (meeting, state) ->
         xOffset = state.offset.value.x
         state.swipedDirection ?: run {
             MeetCard(
@@ -66,7 +68,7 @@ private fun Content(
                         onSwiped = { it.swipe(meeting, state) },
                         state = state
                     ), type = MEET,
-                stack = (index == states.size - 3),
+                stack = (index == list.size - 2),
                 meet = meeting, offset = xOffset
             ) { it.swipe(meeting, state) }
         }

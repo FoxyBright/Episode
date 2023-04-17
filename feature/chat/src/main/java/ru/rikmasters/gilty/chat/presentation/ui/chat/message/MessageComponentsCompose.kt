@@ -241,7 +241,10 @@ fun SystemMessage(
                 
                 when(notification.type) {
                     CHAT_CREATED -> append(
-                        stringResource(R.string.chats_message_create_chat, "н")
+                        stringResource(
+                            R.string.chats_message_create_chat,
+                            "н"
+                        )
                     )
                     
                     MEMBER_JOIN ->
@@ -256,8 +259,9 @@ fun SystemMessage(
                             append(
                                 " ${
                                     stringResource(
-                                        R.string.chats_message_join_meet, if(it.gender == FEMALE)
-                                            "a" else ""
+                                        R.string.chats_message_join_meet,
+                                        if(it.gender == FEMALE)
+                                            "aсь" else "ся"
                                     )
                                 }"
                             )
@@ -275,7 +279,8 @@ fun SystemMessage(
                             append(
                                 " ${
                                     stringResource(
-                                        R.string.chats_message_leave_meet, if(it.gender == FEMALE)
+                                        R.string.chats_message_leave_meet,
+                                        if(it.gender == FEMALE)
                                             "a" else ""
                                     )
                                 }"
@@ -413,7 +418,7 @@ fun ImageMessage(
                 AsyncImage(
                     it.first().file?.url, (null),
                     Modifier
-                        .size(224.dp)
+                        .wrapContentSize()
                         .background(
                             colorScheme.onTertiary,
                             shape

@@ -11,8 +11,8 @@ import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 class MessageManager(
-    private val messageRepository: MessageRepository,
-    private val webSource: ChatWebSource,
+    private val store: MessageRepository,
+    private val web: ChatWebSource,
 ): CoroutineController() {
     
     
@@ -22,16 +22,16 @@ class MessageManager(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun messages(chatId: String) =
         updateMessageFlow.flatMapLatest {
-            messageRepository.getMessagesPaging(chatId)
+            store.getMessagesPaging(chatId)
         }
     
     // список пишущих в данный момент пользователей в потоке
-    val writingFlow = messageRepository.writersFlow()
+    val writingFlow = store.writersFlow()
     
     // убрать пользователя из пишущих
     suspend fun deleteWriter(id: String) {
         withContext(IO) {
-            messageRepository.deleteWriter(id)
+            store.deleteWriter(id)
         }
     }
     
@@ -39,27 +39,42 @@ class MessageManager(
     suspend fun getChat(
         chatId: String,
     ) = withContext(IO) {
-        webSource.getChat(chatId)
+        web.getChat(chatId)
     }
+    
+    @Suppress("unused")
+    suspend fun getTranslationViewers(
+        chatId: String,
+        query: String? = null,
+        page: Int? = null, perPage: Int? = null,
+    ) = web.getTranslationViewers(
+        chatId, query, page, perPage
+    )?.first ?: emptyList()
+    
+    suspend fun getTranslationViewersCount(
+        chatId: String,
+    ) = web.getTranslationViewers(
+        chatId, null, null, null
+    )?.second?.total ?: 0
     
     // завершение чата
     suspend fun completeChat(chatId: String) {
         withContext(IO) {
-            webSource.completeChat(chatId)
+            web.completeChat(chatId)
         }
     }
     
     // пользователь печатает
     suspend fun isTyping(chatId: String) {
         withContext(IO) {
-            webSource.isTyping(chatId)
+            web.isTyping(chatId)
         }
     }
     
     // был сделан скриншот
     suspend fun madeScreenshot(chatId: String) {
         withContext(IO) {
-            webSource.madeScreenshot(chatId)
+            web.madeScreenshot(chatId)
         }
     }
     
@@ -70,7 +85,7 @@ class MessageManager(
         all: Boolean = false,
     ) {
         withContext(IO) {
-            webSource.markAsReadMessage(
+            web.markAsReadMessage(
                 chatId, messageIds, all
             )
         }
@@ -83,7 +98,7 @@ class MessageManager(
         allMembers: Boolean,
     ) {
         withContext(IO) {
-            webSource.deleteMessage(
+            web.deleteMessage(
                 chatId, messageIds,
                 allMembers.compareTo(false)
             )
@@ -100,7 +115,7 @@ class MessageManager(
         videos: List<FileSource>?,
     ) {
         withContext(IO) {
-            webSource.sendMessage(
+            web.sendMessage(
                 chatId, repliedId, text,
                 photos?.map { it.bytes() },
                 attachment,

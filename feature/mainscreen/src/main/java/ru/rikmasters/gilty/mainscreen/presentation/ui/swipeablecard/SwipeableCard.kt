@@ -39,7 +39,6 @@ fun Modifier.swipeableCard(
                                 ), 0f
                             )
                         }
-                    
                     if(
                         abs(coercedOffset.x) < state.maxWidth / 4 &&
                         abs(coercedOffset.y) < state.maxHeight / 4

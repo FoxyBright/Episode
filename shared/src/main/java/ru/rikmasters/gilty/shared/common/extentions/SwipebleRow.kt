@@ -69,7 +69,7 @@ fun rememberDragRowState(): DragRowState {
     return remember { DragRowState(screenWidth) }
 }
 
-class DragRowState(val maxWidth: Float) {
+class DragRowState(val maxWidth: Float = 0f) {
     
     val offset =
         Animatable(offset(0f), Offset.VectorConverter)

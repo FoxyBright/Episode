@@ -235,6 +235,10 @@ class LocalTime(private var millis: Long) {
         fun ofZ(hour: Int, minute: Int = 0, second: Int = 0) =
             LocalTime("$hour:$minute:$second".pattern(TIME_FORMAT))
         
+        fun ofZ(time: String) = LocalDateTime(
+            of(time).millis - offset
+        )
+        
         /** Выдает экземпляр с текущей датой **/
         fun now() = LocalTime(c.time.time)
     }
@@ -312,6 +316,8 @@ class LocalDateTime(
         
         /** Выдает экземпляр с текущей датой **/
         fun now() = LocalDateTime(c.time.time)
+        
+        fun nowZ() = LocalDateTime(now().millis() - offset)
     }
     
     fun isBefore(to: LocalDateTime) =

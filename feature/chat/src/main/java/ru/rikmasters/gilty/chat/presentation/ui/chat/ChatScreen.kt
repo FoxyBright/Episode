@@ -128,8 +128,7 @@ fun ChatScreen(
     }
     
     val uri = getUriForFile(
-        context,
-        ("ru.rikmasters.gilty.provider"),
+        context, ("ru.rikmasters.gilty.provider"),
         File(context.filesDir, "my_images")
     )
     

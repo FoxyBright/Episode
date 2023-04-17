@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.manager.MessageManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -15,8 +14,8 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.FileSource
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.nowZ
+import ru.rikmasters.gilty.shared.common.extentions.LocalTime.Companion.ofZ
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
@@ -201,34 +200,51 @@ class ChatViewModel: ViewModel() {
             _chatType.emit(
                 if(it.organizer.id != it.userId)
                     if(!it.isOnline) MEET
-                    else getTranslationType(it.datetime)
+                    else getTranslationType(
+                        it.datetime, chatId
+                    )
                 else when {
                     it.meetStatus != ACTIVE -> MEET_FINISHED
-                    it.isOnline -> getTranslationType(it.datetime)
+                    it.isOnline -> getTranslationType(
+                        it.datetime, chatId
+                    )
                     else -> MEET
                 }
             )
+            
         }
     }
     
     private suspend fun getTranslationType(
         date: String?,
-    ): PinnedBarType {
-        return date?.let {
-            val start = of(it).millis()
-            val now = now().millis()
-            val difference = start - now
-            if(now > start && difference < 1_800_000) {
-                // получение количества зрителей трансляции
-                _viewers.emit(0)
+        chatId: String,
+    ) = date?.let {
+        val start = ofZ(it).millis()
+        val now = nowZ().millis()
+        val difference = start - now
+        
+        logD("Data --->>> $date")
+        logD("Data --->>> ${ofZ(it)}")
+        logD("Data --->>> ${nowZ()}")
+        logD("Data --->>> ${ofZ(it).millis() - nowZ().millis()}")
+        logD("Data --->>> ${(ofZ(it).millis() - nowZ().millis()) / 3600000}")
+        
+        when {
+            (now > start) -> {
+                _viewers.emit(
+                    messageManager.getTranslationViewersCount(
+                        chatId
+                    )
+                )
                 TRANSLATION
-            } else {
-                // таймер отсчета до начала трансляции
+            }
+            (start - now) < 1_800_000 -> {
                 _translationTimer.emit(difference)
                 TRANSLATION_AWAIT
             }
-        } ?: MEET
-    }
+            else -> MEET
+        }
+    } ?: MEET
     
     suspend fun toTranslation() {
         makeToast("Трансляции пока что не доступны на Android-версии Gilty")

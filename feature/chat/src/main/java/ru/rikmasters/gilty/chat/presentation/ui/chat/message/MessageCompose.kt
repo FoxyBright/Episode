@@ -95,7 +95,7 @@ fun Message(
             .swipeableRow(
                 if(message.type == MESSAGE)
                     state.dragState
-                else DragRowState(0f),
+                else DragRowState(),
                 if(message.type == MESSAGE) {
                     LocalContext.current
                 } else null
@@ -115,9 +115,8 @@ fun Message(
             else CenterStart
         ) {
             Content(
-                state, Modifier
-                    .fillMaxWidth(0.8f),
-                callBack
+                state, callBack,
+                Modifier.fillMaxWidth(0.9f)
             )
         }
         if(!notification) Image(
@@ -133,8 +132,8 @@ fun Message(
 @Composable
 private fun Content(
     state: MessState,
+    callback: MessCallBack?,
     modifier: Modifier = Modifier,
-    callback: MessCallBack? = null,
 ) {
     val message = state.message
     val sender = state.sender

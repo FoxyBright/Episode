@@ -125,9 +125,8 @@ fun SwipeableChatRow(
         modifier
             .fillMaxWidth()
             .background(
-                if(chat.isOnline)
-                    colorScheme.secondary
-                else colorScheme.primary, shape
+                colorScheme.primary,
+                shape
             )
     ) {
         SwipeableRowBack(
@@ -166,7 +165,6 @@ private fun ChatRowContent(
                         .align(TopEnd)
                         .padding(12.dp)
                 )
-                
                 LocalDate.of(chat.datetime)
                     .isBefore(LOCAL_DATE) -> {
                     val date = LocalDate
@@ -204,8 +202,7 @@ private fun ChatRowContent(
             ) {
                 Avatar(
                     chat.organizer.avatar,
-                    chat.unreadCount,
-                    chat.isOnline,
+                    chat.unreadCount, chat.isOnline,
                     (chat.meetStatus == MeetStatusType.COMPLETED)
                 )
                 chat.lastMessage?.let {
@@ -255,16 +252,22 @@ private fun Message(
         MESSAGE -> message.message?.author ?: UserModel()
         NOTIFICATION -> message.notification?.member ?: organizer
     }
-    
     Column(modifier) {
         Text(
-            title, Modifier,
+            title, Modifier
+                .fillMaxWidth(0.7f)
+                .padding(bottom = 5.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = SemiBold
+            fontWeight = SemiBold,
+            maxLines = 1,
+            overflow = Ellipsis
         )
         BrieflyRow(
             "${user.username}, ${user.age}",
+            Modifier
+                .fillMaxWidth(0.7f)
+                .padding(bottom = 7.dp),
             emoji = user.emoji,
             textStyle = typography.labelSmall,
         )

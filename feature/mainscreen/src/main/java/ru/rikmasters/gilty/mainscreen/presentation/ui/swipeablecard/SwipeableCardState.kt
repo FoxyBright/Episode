@@ -1,8 +1,8 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+import androidx.compose.animation.core.Spring.StiffnessMedium
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
@@ -30,8 +30,6 @@ class SwipeableCardState(
     internal val maxHeight: Float,
 ) {
     
-    private val defaultTween = 500
-    
     val offset = Animatable(
         Offset(0f, 0f), Offset.VectorConverter
     )
@@ -41,16 +39,14 @@ class SwipeableCardState(
     var swipedDirection: DirectionType? by
     mutableStateOf(null)
     
-    internal suspend fun reset(
-        tween: Int = defaultTween,
-    ) = offset.animateTo(
+    internal suspend fun reset() = offset.animateTo(
         Offset(0f, 0f),
-        tween(tween)
+        spring(DampingRatioMediumBouncy, StiffnessMedium)
     )
     
     suspend fun swipe(
         direction: DirectionType,
-        tween: Int = defaultTween,
+        tween: Int = 500,
     ) {
         offset.animateTo(
             when(direction) {
