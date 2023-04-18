@@ -6,16 +6,18 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
@@ -30,13 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
@@ -45,7 +45,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
-import ru.rikmasters.gilty.shared.theme.Gradients
+import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -81,7 +81,7 @@ private fun EmptyMeetCardPreview() {
                 .background(
                     colorScheme.background
                 )
-        ) { EmptyMeetCard(Modifier.padding(16.dp)) }
+        ) { EmptyCard(Modifier.padding(16.dp)) }
     }
 }
 
@@ -152,51 +152,45 @@ fun MeetingStates(
     small: Boolean = false,
 ) {
     val today = todayControl(meet.datetime)
+    
+    val dtColor = if(meet.isOnline)
+        green() else listOf(
+        meet.category.color,
+        meet.category.color
+    )
+    
+    val dtTextStyle = if(small)
+        typography.displaySmall
+    else typography.labelSmall
+    
+    val iconState = !today &&
+            meet.condition == MEMBER_PAY
+    
+    val iconsSize = if(small) 10.dp else 16.dp
+    
     Box(modifier) {
-        Row(Modifier.align(Alignment.CenterEnd)) {
-            Column(horizontalAlignment = Alignment.End) {
+        Row(Modifier.align(CenterEnd)) {
+            Column(Modifier, Top, End) {
                 DateTimeCard(
-                    meet.datetime,
-                    if(meet.isOnline) Gradients.green()
-                    else listOf(
-                        meet.category.color,
-                        meet.category.color
-                    ), today, Modifier,
-                    if(small) typography.displaySmall
-                    else typography.labelSmall
+                    meet.datetime, dtColor,
+                    today, Modifier, dtTextStyle
                 )
-                if(!today && meet.condition
-                    == ConditionType.MEMBER_PAY
-                ) Icons(
-                    Modifier.padding(top = 8.dp), meet,
-                    if(small) 10.dp else 20.dp
-                )
+                if(iconState)
+                    CategoriesListCard(
+                        Modifier.padding(top = 8.dp),
+                        meet, (false), iconsSize
+                    )
             }
-            if(today || meet.condition
-                != ConditionType.MEMBER_PAY
-            ) Icons(
-                Modifier.padding(start = 4.dp), meet,
-                if(small) 10.dp else 20.dp
+            if(!iconState) CategoriesListCard(
+                Modifier.padding(start = 4.dp),
+                meet, (false), iconsSize
             )
         }
     }
 }
 
 @Composable
-private fun Icons(
-    modifier: Modifier,
-    meet: MeetingModel,
-    imageSize: Dp = 20.dp,
-) {
-    CategoriesListCard(
-        modifier,
-        meet, (false),
-        imageSize
-    )
-}
-
-@Composable
-fun EmptyMeetCard(
+fun EmptyCard(
     modifier: Modifier = Modifier,
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
@@ -308,7 +302,8 @@ fun MeetCard(
                 .offset(
                     y = animateDpAsState(
                         if(stack) 16.dp
-                        else 0.dp, tween(800)
+                        else 0.dp,
+                        tween(800)
                     ).value
                 )
         )
@@ -317,41 +312,54 @@ fun MeetCard(
                 .fillMaxSize()
                 .clip(shapes.large)
         ) {
-            when(type) {
-                EMPTY -> {
-                    EmptyTop(
-                        Modifier
-                            .weight(1f)
-                            .offset(y = 24.dp)
-                    )
-                    EmptyBottom(
-                        Modifier.fillMaxHeight(0.28f),
-                        hasFilters, {
-                            onRepeatClick?.let { it() }
-                        }) { onMoreClick?.let { it() } }
-                }
-                
-                MEET -> {
-                    meet?.let {
-                        Box {
-                            MeetTop(
-                                it.organizer?.avatar,
-                                Modifier
-                                    .fillMaxSize()
-                                    .offset(y = (-24).dp)
-                            )
-                            MeetBottom(
-                                it, offset,
-                                Modifier
-                                    .fillMaxHeight(0.28f)
-                                    .align(BottomCenter)
-                            ) { direction ->
-                                onSelect?.let { it(direction) }
-                            }
-                        }
-                    }
-                }
-            }
+            if(type == MEET) MeetCard(
+                meet, offset, onSelect
+            ) else EmptyCard(
+                hasFilters, onMoreClick,
+                onRepeatClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyCard(
+    hasFilters: Boolean,
+    onMoreClick: (() -> Unit)?,
+    onRepeatClick: (() -> Unit)?,
+) {
+    Column {
+        EmptyTop(
+            Modifier
+                .weight(1f)
+                .offset(y = 24.dp)
+        )
+        EmptyBottom(
+            Modifier.fillMaxHeight(0.28f),
+            hasFilters,
+            { onRepeatClick?.let { it() } }
+        ) { onMoreClick?.let { it() } }
+    }
+}
+
+@Composable
+private fun MeetCard(
+    meet: MeetingModel?,
+    offset: Float,
+    onSelect: ((DirectionType) -> Unit)?,
+) {
+    meet?.let {
+        Box {
+            MeetTop(
+                it.organizer?.avatar,
+                Modifier
+                    .clip(ThemeExtra.shapes.bigTopShapes)
+                    .fillMaxSize()
+                    .offset(y = (-24).dp)
+            )
+            MeetBottom(
+                it, offset, Modifier.align(BottomCenter)
+            ) { type -> onSelect?.let { it(type) } }
         }
     }
 }
@@ -383,8 +391,7 @@ private fun MeetTop(
         avatar?.thumbnail?.url,
         modifier
             .fillMaxSize()
-            .padding(horizontal = 1.dp)
-            .clip(ThemeExtra.shapes.bigTopShapes),
+            .padding(horizontal = 1.dp),
         contentScale = Crop
     )
 }
@@ -420,9 +427,7 @@ private fun MeetBottom(
             )
     ) {
         Column(
-            Modifier
-                .fillMaxHeight()
-                .padding(16.dp),
+            Modifier.padding(16.dp),
             Arrangement.SpaceBetween
         ) {
             MeetInfo(meet)
@@ -436,17 +441,21 @@ private fun MeetBottom(
                         .weight(1f)
                         .padding(end = 8.dp),
                     stringResource(R.string.not_interesting),
-                    if(leftSwipe) textColor else color,
-                    R.drawable.ic_cancel, if(leftSwipe) backColor else back
+                    color = if(leftSwipe)
+                        textColor else color,
+                    icon = R.drawable.ic_cancel,
+                    background = if(leftSwipe)
+                        backColor else back
                 ) { onSelect?.let { it(LEFT) } }
                 CardButton(
                     Modifier.weight(1f),
                     stringResource(R.string.meeting_respond),
-                    if(rightSwipe) textColor else color,
-                    R.drawable.ic_heart, if(rightSwipe) backColor else back
-                ) {
-                    onSelect?.let { it(RIGHT) }
-                }
+                    color = if(rightSwipe)
+                        textColor else color,
+                    icon = R.drawable.ic_heart,
+                    background = if(rightSwipe)
+                        backColor else back
+                ) { onSelect?.let { it(RIGHT) } }
             }
         }
     }

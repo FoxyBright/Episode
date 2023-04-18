@@ -144,7 +144,9 @@ fun MainContent(
             }
         })
     GAlert(
-        state.alert, Modifier, Pair(stringResource(R.string.meeting_close_button))
+        state.alert,
+        Modifier,
+        Pair(stringResource(R.string.meeting_close_button))
         { callback?.onCloseAlert() },
         stringResource(R.string.complaints_moderate_sen_answer),
         stringResource(R.string.complaints_send_answer),
@@ -177,7 +179,8 @@ private fun TopBar(
                 today
             ) { onTodayChange(true) }
             GiltyString(
-                Modifier, stringResource(R.string.meeting_profile_bottom_latest_label),
+                Modifier,
+                stringResource(R.string.meeting_profile_bottom_latest_label),
                 !today,
             ) { onTodayChange(false) }
         }
@@ -233,7 +236,9 @@ private fun Content(
             MeetingsListContent(
                 meetings.map {
                     it to rememberSwipeableCardState()
-                }, modifier.fillMaxHeight(0.9f),
+                }, modifier
+                    .fillMaxHeight(0.855f)
+                    .align(BottomCenter),
                 { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
                 { meet, it ->
                     callback?.onRespond(meet)
