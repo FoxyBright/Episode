@@ -43,7 +43,6 @@ fun MainScreen(vm: MainViewModel) {
         .isNotNullOrEmpty()
     
     LaunchedEffect(Unit) {
-        vm.getChatStatus()
         vm.getMeets()
         vm.getAllCategories()
         vm.getUserCategories()

@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -23,7 +22,6 @@ class MainViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
-    private val chatManager by inject<ChatManager>()
     
     private val _today = MutableStateFlow(true)
     val today = _today.asStateFlow()
@@ -69,18 +67,6 @@ class MainViewModel: ViewModel() {
         _userCategories.emit(
             profileManager.getUserCategories()
         )
-    }
-    
-    suspend fun getChatStatus() {
-        chatManager.getChatsStatus().let {
-            if(it > 0) _navBar.emit(
-                listOf(
-                    ACTIVE, INACTIVE,
-                    INACTIVE, NEW_INACTIVE,
-                    INACTIVE
-                )
-            )
-        }
     }
     
     suspend fun changeTime(time: String) {

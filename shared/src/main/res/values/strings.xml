@@ -28,7 +28,7 @@
     <string name="permissions_answer">Разрешить Guilty доступ к\nместоположению этого\nустройства?</string>
     <string name="permissions_when_using_button">При использовании</string>
     <string name="permissions_settings_button">Открыть настройки</string>
-    <string name="permissions_settings_label">Разрешите доступ к фото\nи видео для Gilty</string>
+    <string name="permissions_settings_label">Разрешите доступ к фото\nи видео для episode</string>
     <string name="permissions_once_button">Однократно</string>
     <string name="permissions_prohibit_button">Запретить</string>
 
@@ -67,7 +67,7 @@
     <string name="settings_delete_account_label">Удалить аккаунт</string>
     <string name="settings_about_app_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_about_app_agreement">Пользовательское соглашение</string>
-    <string name="settings_about_app_rules">Правила Gilty</string>
+    <string name="settings_about_app_rules">Правила episode</string>
     <string name="settings_about_app_help">Помощь и поддержка</string>
     <string name="settings_exit_alert">Вы хотите выйти?</string>
     <string name="settings_delete_account_alert">Вы хотите удалить аккаунт навсегда?</string>
@@ -172,7 +172,7 @@
     <string name="meeting_anonymous_members_label">Так как episode анонимный, профили участников\nне будут видны на протяжении всего episode</string>
     <string name="meeting_maps_open_with">Открыть с помощью\nприложения</string>
     <string name="meeting_maps_alert_title">Открыть приложение</string>
-    <string name="meeting_maps_alert_label">«Gilty» хочет открыть приложение «%s»</string>
+    <string name="meeting_maps_alert_label">«episode» хочет открыть приложение «%s»</string>
     <string name="meeting_maps_alert_open">Открыть</string>
     <string name="maps_google">Google\nMaps</string>
     <string name="maps_yandex">Yandex\nMaps</string>
@@ -242,7 +242,7 @@
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
     <string name="action_bar_button_back">Кнопка назад</string>
-    <string name="gilty_logo">Логотип Gilty</string>
+    <string name="episode_logo">Логотип episode</string>
     <string name="geolocation_icon">Иконка геолокации</string>
     <string name="map">Карта</string>
     <string name="map_get_route">Проложить маршрут</string>
@@ -328,7 +328,7 @@
     <string name="add_meet_member_not_limited_label">У вашего episode не будет ограничения участников</string>
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
-    <string name="add_meet_created">Episode создан</string>
+    <string name="add_meet_created">episode создан</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

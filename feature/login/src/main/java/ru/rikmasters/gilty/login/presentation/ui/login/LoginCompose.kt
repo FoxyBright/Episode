@@ -174,7 +174,7 @@ private fun Logo(
 ) {
     Image(
         painterResource(SR.drawable.ic_logo),
-        stringResource(SR.string.gilty_logo),
+        stringResource(SR.string.episode_logo),
         modifier
             .heightIn(64.dp, 210.dp)
             .padding(horizontal = 16.dp)

@@ -7,7 +7,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/gilty_logo"
+        android:contentDescription="@string/episode_logo"
         android:src="@drawable/ic_logo" />
 
 </LinearLayout>

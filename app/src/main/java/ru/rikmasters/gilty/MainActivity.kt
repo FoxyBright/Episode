@@ -40,12 +40,12 @@ import ru.rikmasters.gilty.ui.GSnackbar
 @ExperimentalMaterial3Api
 class MainActivity: ComponentActivity() {
     
-    private val env by inject<Environment>()
     private val authManager by inject<AuthManager>()
-    private val profileManager by inject<ProfileManager>()
-    private val regManager by inject<RegistrationManager>()
     private val chatManager by inject<ChatManager>()
+    private val regManager by inject<RegistrationManager>()
+    private val profileManager by inject<ProfileManager>()
     private val context by inject<Context>()
+    private val env by inject<Environment>()
     
     private var _intent: Intent? by mutableStateOf(null)
     
