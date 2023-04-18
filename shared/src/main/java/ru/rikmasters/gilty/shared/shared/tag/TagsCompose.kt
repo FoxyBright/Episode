@@ -113,7 +113,7 @@ fun TagsContent(
                 { callback?.onSearchChange(it) },
             ) { callback?.onCreateTag(it) }
         }, bottomBar = {
-            GradientButton(
+            if(state.selected.isNotEmpty()) GradientButton(
                 Modifier
                     .padding(
                         top = 28.dp,
