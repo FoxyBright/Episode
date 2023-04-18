@@ -12,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
 import ru.rikmasters.gilty.shared.model.meeting.*
@@ -47,7 +46,7 @@ private fun MeetingBsObserve() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet.map()), (false)
+                    "18 км", (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -67,7 +66,7 @@ private fun MeetingBsShared() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet.map()), (false)
+                    "18 км", (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -91,7 +90,7 @@ private fun MeetingBsWhenUser() {
             MeetingBsContent(
                 MeetingBsState(
                     (false), meet, DemoUserModelList,
-                    distanceCalculator(meet.map()), (true)
+                    "18 км", (true)
                 ), Modifier.padding(16.dp)
             )
         }

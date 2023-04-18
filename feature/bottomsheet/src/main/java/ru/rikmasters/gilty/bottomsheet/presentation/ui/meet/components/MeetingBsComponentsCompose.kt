@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
@@ -46,11 +45,10 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MeetingBsMapPreview() {
     GiltyTheme {
-        val meet = DemoMeetingModel
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsMap(
                 DemoFullMeetingModel,
-                distanceCalculator(meet),
+                "18 км",
                 Modifier.padding(16.dp)
             )
         }

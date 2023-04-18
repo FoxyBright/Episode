@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
@@ -66,7 +65,7 @@ private fun MeetingBsObserve() {
                 MeetingBsState(
                     (false), meet, Pair(0, null),
                     pagingPreview(DemoUserModelList),
-                    distanceCalculator(meet.map()), (false)
+                    "18 км", (false)
                 ), Modifier
             )
         }
@@ -87,7 +86,7 @@ private fun MeetingBsShared() {
                 MeetingBsState(
                     (false), meet, Pair(0, null),
                     pagingPreview(DemoUserModelList),
-                    distanceCalculator(meet.map()), (false)
+                    "18 км", (false)
                 )
             )
         }
@@ -112,7 +111,7 @@ private fun MeetingBsWhenUser() {
                 MeetingBsState(
                     (false), meet, Pair(0, null),
                     pagingPreview(DemoUserModelList),
-                    distanceCalculator(meet.map()), (true)
+                    "18 км", (true)
                 )
             )
         }

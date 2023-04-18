@@ -9,7 +9,6 @@ import ru.rikmasters.gilty.core.initApplication
 
 class MainApplication: Application(), ImageLoaderFactory {
     
-    
     override fun onCreate() {
         super.onCreate()
         initApplication(this, AppModule)

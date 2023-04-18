@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.distanceCalculator
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
@@ -43,11 +42,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MeetingBsMapPreview() {
     GiltyTheme {
-        val meet = DemoMeetingModel
         Box(Modifier.background(colorScheme.background)) {
             MeetingBsMap(
-                DemoFullMeetingModel,
-                distanceCalculator(meet),
+                DemoFullMeetingModel, "18 км",
                 Modifier.padding(16.dp)
             )
         }
@@ -339,7 +336,8 @@ fun MeetingBsParticipants(
             }
         }
         if(meet.type == ANONYMOUS) Text(
-            stringResource(R.string.meeting_anonymous_members_label), Modifier
+            stringResource(R.string.meeting_anonymous_members_label),
+            Modifier
                 .fillMaxWidth()
                 .padding(
                     top = 14.dp, start = 16.dp,
