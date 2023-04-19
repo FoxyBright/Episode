@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.pagingPreview
@@ -127,22 +128,24 @@ data class MeetingBsState(
     val buttonState: Boolean = true,
     val detailed: Pair<String, Boolean>? = null,
     val backButton: Boolean = false,
+    val meetReaction: Boolean = false,
 )
 
 interface MeetingBsCallback {
     
-    fun onKebabClick(state: Boolean) {}
-    fun onMenuItemClick(index: Int, meetId: String) {}
-    fun onMeetPlaceClick(location: LocationModel?) {}
-    fun onMemberClick(member: UserModel) {}
-    fun onRespond(meetId: String) {}
-    fun onAvatarClick(organizerId: String, meetId: String) {}
-    fun onAllMembersClick(meetId: String) {}
-    fun onHiddenPhotoActive(hidden: Boolean) {}
-    fun onCommentChange(text: String) {}
-    fun onCommentTextClear() {}
-    fun onRespondsClick(meet: FullMeetingModel) {}
-    fun onBack() {}
+    fun onKebabClick(state: Boolean)
+    fun onMenuItemClick(index: Int, meetId: String)
+    fun onMeetPlaceClick(location: LocationModel?)
+    fun onMemberClick(member: UserModel)
+    fun onRespond(meetId: String)
+    fun onAvatarClick(organizerId: String, meetId: String)
+    fun onAllMembersClick(meetId: String)
+    fun onHiddenPhotoActive(hidden: Boolean)
+    fun onCommentChange(text: String)
+    fun onCommentTextClear()
+    fun onRespondsClick(meet: FullMeetingModel)
+    fun onBack()
+    fun meetReactionDisable()
 }
 
 @Composable
@@ -262,6 +265,9 @@ fun MeetingBsContent(
         }
         item { Spacer(Modifier.height(40.dp)) }
     }
+    MeetReaction(
+        state.meet, state.meetReaction
+    ) { callback?.meetReactionDisable() }
 }
 
 @Composable

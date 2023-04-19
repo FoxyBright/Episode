@@ -10,11 +10,12 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.CropperScreen
 import ru.rikmasters.gilty.profile.presentation.ui.gallery.GalleryScreen
-import ru.rikmasters.gilty.profile.presentation.ui.respond.MeetRespondScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
-import ru.rikmasters.gilty.profile.viewmodel.*
+import ru.rikmasters.gilty.profile.viewmodel.CategoryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
@@ -43,18 +44,6 @@ object Profile: FeatureDefinition() {
                 }
             }
             
-            screen<RespondsViewModel>(
-                "reaction?meetId={meetId}",
-                listOf(navArgument("meetId") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                })
-            ) { vm, it ->
-                it.arguments?.getString("meetId")?.let { meetId ->
-                    MeetRespondScreen(vm, meetId)
-                }
-            }
-            
             screen<GalleryViewModel>(
                 "gallery?multi={multi}",
                 listOf(navArgument("multi") {
@@ -78,7 +67,6 @@ object Profile: FeatureDefinition() {
         singleOf(::CategoryViewModel)
         singleOf(::SettingsViewModel)
         singleOf(::GenderBsViewModel)
-        singleOf(::RespondsViewModel)
         singleOf(::HiddenBsViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)

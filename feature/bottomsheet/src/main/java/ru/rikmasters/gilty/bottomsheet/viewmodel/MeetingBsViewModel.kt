@@ -42,11 +42,18 @@ class MeetingBsViewModel: ViewModel() {
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
+    private val _meetReaction = MutableStateFlow(false)
+    val meetReaction = _meetReaction.asStateFlow()
+    
     private val _comment = MutableStateFlow("")
     val comment = _comment.asStateFlow()
     
     private val _distance = MutableStateFlow("")
     val distance = _distance.asStateFlow()
+    
+    suspend fun meetReactionDisable(state: Boolean) {
+        _meetReaction.emit(state)
+    }
     
     suspend fun getMeet(meetId: String) {
         _meet.emit(meetManager.getDetailedMeet(meetId))

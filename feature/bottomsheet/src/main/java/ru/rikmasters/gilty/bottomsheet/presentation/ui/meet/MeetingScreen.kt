@@ -6,10 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.viewmodel.MeetingBsViewModel
-import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
@@ -31,14 +28,13 @@ fun MeetingBs(
     nav: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
     val context = LocalContext.current
-    val globalNav = get<NavState>()
     val activity = getActivity()
     
     val memberList = vm.membersList.collectAsLazyPagingItems()
     val lastResponse by vm.lastResponse.collectAsState()
     val location by vm.location.collectAsState()
+    val meetReaction by vm.meetReaction.collectAsState()
     val meeting by vm.meet.collectAsState()
     val distance by vm.distance.collectAsState()
     val comment by vm.comment.collectAsState()
@@ -68,20 +64,17 @@ fun MeetingBs(
         meeting?.let { meet ->
             MeetingBsContent(
                 MeetingBsState(
-                    menu, meet,
-                    lastResponse,
-                    memberList,
-                    distance,
-                    buttonState,
-                    details,
-                    backBut
-                ),
-                Modifier,
-                object: MeetingBsCallback {
+                    menu, meet, lastResponse,
+                    memberList, distance, buttonState,
+                    details, backBut, meetReaction
+                ), Modifier, object: MeetingBsCallback {
+                    
+                    override fun meetReactionDisable() {
+                        scope.launch { vm.meetReactionDisable(false) }
+                    }
                     
                     override fun onMenuItemClick(
-                        index: Int,
-                        meetId: String,
+                        index: Int, meetId: String,
                     ) {
                         scope.launch {
                             when(index) {
@@ -98,10 +91,7 @@ fun MeetingBs(
                     override fun onRespond(meetId: String) {
                         scope.launch {
                             vm.respondForMeet(meetId)
-                            globalNav.navigateAbsolute(
-                                "main/reaction?meetId=$meetId"
-                            )
-                            asm.bottomSheet.collapse()
+                            vm.meetReactionDisable(true)
                         }
                     }
                     
