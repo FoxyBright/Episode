@@ -250,6 +250,9 @@ private fun Avatar(
                 shapes.large
             )
     ) {
+        
+        
+        
         AsyncImage(
             avatar, (null),
             Modifier
