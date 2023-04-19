@@ -14,7 +14,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -43,66 +42,67 @@ fun tags(
 fun description(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
-    Column {
-        GTextField(
-            state.description, {
-                if(it.length <= 120)
-                    callback?.onDescriptionChange(it)
-            },
-            Modifier.fillMaxWidth(),
-            colors = descriptionColors(state.online),
-            shape = shapes.medium,
-            label = if(state.description.isNotEmpty())
-                textFieldLabel(
-                    (true),
+) =
+    FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
+        Column {
+            GTextField(
+                state.description, {
+                    if(it.length <= 120)
+                        callback?.onDescriptionChange(it)
+                },
+                Modifier.fillMaxWidth(),
+                colors = descriptionColors(state.online),
+                shape = shapes.medium,
+                label = if(state.description.isNotEmpty())
+                    textFieldLabel(
+                        (true),
+                        stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                        labelFont = typography.headlineSmall.copy(
+                            colorScheme.onTertiary
+                        ),
+                    ) else null,
+                placeholder = textFieldLabel(
+                    (false),
                     stringResource(R.string.add_meet_detailed_meet_description_place_holder),
-                    labelFont = typography.headlineSmall.copy(
-                        colorScheme.onTertiary
-                    ),
-                ) else null,
-            placeholder = textFieldLabel(
-                (false), stringResource(R.string.add_meet_detailed_meet_description_place_holder),
-                holderFont = typography.bodyMedium.copy(
-                    baselineShift = BaselineShift(-0.3f)
-                )
-            ), textStyle = typography.bodyMedium,
-            keyboardOptions = Default.copy(
-                imeAction = Done,
-                keyboardType = Text,
-                capitalization = Sentences
-            ),
-            clear = { callback?.onDescriptionClear() }
-        )
-        Text(
-            "${state.description.length}/120",
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, end = 16.dp),
-            colorScheme.onTertiary,
-            textAlign = TextAlign.End,
-            style = typography.headlineSmall
-        )
+                    holderFont = typography.bodyMedium
+                ), textStyle = typography.bodyMedium,
+                keyboardOptions = Default.copy(
+                    imeAction = Done,
+                    keyboardType = Text,
+                    capitalization = Sentences
+                ),
+                clear = { callback?.onDescriptionClear() }
+            )
+            Text(
+                "${state.description.length}/120",
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, end = 16.dp),
+                colorScheme.onTertiary,
+                textAlign = TextAlign.End,
+                style = typography.headlineSmall
+            )
+        }
     }
-}
 
 @Composable
 fun additionally(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-    Row(Modifier.fillMaxWidth()) {
-        DataTimeCard(
-            state.date, DataTimeType.DATE,
-            state.online, Modifier.weight(1f)
-        ) { callback?.onDateClick() }
-        Spacer(Modifier.width(16.dp))
-        DataTimeCard(
-            state.time, DataTimeType.TIME,
-            state.online, Modifier.weight(1f)
-        ) { callback?.onTimeClick() }
+) =
+    FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
+        Row(Modifier.fillMaxWidth()) {
+            DataTimeCard(
+                state.date, DataTimeType.DATE,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onDateClick() }
+            Spacer(Modifier.width(16.dp))
+            DataTimeCard(
+                state.time, DataTimeType.TIME,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onTimeClick() }
+        }
     }
-}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

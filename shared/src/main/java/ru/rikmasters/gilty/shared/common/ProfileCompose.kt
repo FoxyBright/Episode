@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -249,16 +248,15 @@ private fun Description(
             style = typography.labelLarge
         )
         GTextField(
-            text, { onTextChange(it) },
-            Modifier
+            text, { onTextChange(it) }, Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
+            textOffset = true,
             readOnly = (profileType == ORGANIZER
                     || profileType == ANONYMOUS_ORGANIZER),
             shape = shapes.large, colors = textFieldColors(),
-            textStyle = typography.bodyMedium.copy(
-                baselineShift = BaselineShift(-0.3f)
-            ), keyboardActions = KeyboardActions {
+            textStyle = typography.bodyMedium,
+            keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
                 onSaveDescription()
             }, keyboardOptions = Default.copy(
@@ -268,7 +266,6 @@ private fun Description(
                 (false), stringResource(R.string.about_me_placeholder),
                 holderFont = typography.bodyMedium.copy(
                     colorScheme.onTertiary,
-                    baselineShift = BaselineShift(-0.3f)
                 )
             )
         )

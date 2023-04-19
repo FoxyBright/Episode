@@ -146,6 +146,7 @@ fun GTextField(
         ru.rikmasters.gilty.shared.shared.textFieldColors(),
     clear: (() -> Unit)? = null,
     errorBottomText: String? = null,
+    textOffset: Boolean = false,
     containerColor: Color = colorScheme.primaryContainer,
 ) {
     Column(modifier) {
@@ -164,6 +165,13 @@ fun GTextField(
                         .fillMaxWidth()
                         .padding(
                             end = clear?.let { 40.dp } ?: 0.dp
+                        )
+                        .offset(
+                            y = if((maxLines > 1
+                                        && !singleLine
+                                        && value.isBlank())
+                                || textOffset
+                            ) 4.dp else 0.dp
                         ), enabled, readOnly,
                     textStyle, label, placeholder, leadingIcon,
                     trailingIcon, supportingText, isError,

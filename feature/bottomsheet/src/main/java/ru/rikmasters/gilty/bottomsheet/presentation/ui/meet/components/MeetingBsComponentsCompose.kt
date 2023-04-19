@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -327,7 +326,7 @@ fun MeetingBsParticipants(
                     ) {
                         BrieflyRow(
                             "${member.username}${
-                                if (member.age in 18..99) {
+                                if(member.age in 18..99) {
                                     ", ${member.age}"
                                 } else ""
                             }",
@@ -381,9 +380,7 @@ fun MeetingBsComment(
             placeholder = textFieldLabel(
                 (false),
                 stringResource(R.string.meeting_comment_text_holder),
-                holderFont = typography.bodyMedium.copy(
-                    baselineShift = BaselineShift(-0.3f)
-                )
+                holderFont = typography.bodyMedium
             ), textStyle = typography.bodyMedium,
             clear = onTextClear
         )
