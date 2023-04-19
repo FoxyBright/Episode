@@ -66,7 +66,11 @@ fun ParticipantsList(
                     colors = cardColors(colorScheme.primaryContainer)
                 ) {
                     BrieflyRow(
-                        "${member.username}, ${member.age}",
+                        "${member.username}${
+                            if (member.age in 18..99) {
+                                ", ${member.age}"
+                            } else ""
+                        }",
                         Modifier.padding(16.dp),
                         member.avatar?.thumbnail?.url
                     ); if(index < membersList.size - 1)

@@ -154,7 +154,11 @@ private fun Participant(
                 CenterVertically
             ) {
                 BrieflyRow(
-                    ("${member.username}, ${member.age}"),
+                    "${member.username}${
+                        if (member.age in 18..99) {
+                            ", ${member.age}"
+                        } else ""
+                    }",
                     Modifier,
                     member.avatar?.thumbnail?.url,
                     member.emoji

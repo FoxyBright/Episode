@@ -88,7 +88,11 @@ fun OrganizerContent(
     ) {
         item {
             TopBar(
-                ("${user?.username}, ${user?.age}"),
+                "${user?.username}${
+                    if (user?.age in 18..99) {
+                        ", ${user?.age}"
+                    } else ""
+                }",
                 state.backButton, state.menuState,
                 state.isMyProfile,
                 { callback?.onBack() },

@@ -160,19 +160,13 @@ fun ChatContent(
                 state.unReadCount,
                 state.meet.isOnline,
                 Modifier,
-                {
-                    callback?.onListDown()
-                }
-            ) {
-                callback?.onDownButtonClick()
-            }
+                { callback?.onListDown() }
+            ) { callback?.onDownButtonClick() }
         },
         content = {
             Content(
-                it,
-                state,
-                Modifier,
-                callback
+                it, state,
+                Modifier, callback
             )
         }
     )
@@ -202,14 +196,12 @@ fun ChatContent(
 
 @Composable
 private fun PreviewLazy() {
-    val list = DemoMessageModelList.map { it to rememberDragRowState() }
+    val list =
+        DemoMessageModelList.map { it to rememberDragRowState() }
     LazyColumn(Modifier.padding(horizontal = 16.dp)) {
         itemsIndexed(list) { index, (mes, row) ->
             ChatMessage(
-                mes,
-                row,
-                (index % 2 != 0),
-                (true),
+                mes, row, (index % 2 != 0), (true),
                 if(index < DemoMessageModelList.size.minus(1)) {
                     list[index.plus(1)].first
                 } else null,
@@ -255,8 +247,7 @@ private fun Content(
                     ((item
                         ?: MessageModel()) to rememberDragRowState()).let { (mes, row) ->
                         ChatMessage(
-                            mes,
-                            row,
+                            mes, row,
                             (mes.message?.author?.id == state.userId),
                             state.meet.isOnline,
                             if(index < list.itemCount.minus(1)) {

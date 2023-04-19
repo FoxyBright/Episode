@@ -142,7 +142,11 @@ fun MeetingBsTopBarCompose(
             Start, CenterVertically
         ) {
             BrieflyRow(
-                ("${org.username}, ${org.age}"),
+                "${org.username}${
+                    if (org.age in 18..99) {
+                        ", ${org.age}"
+                    } else ""
+                }",
                 Modifier, (null), org.emoji
             )
             Text(

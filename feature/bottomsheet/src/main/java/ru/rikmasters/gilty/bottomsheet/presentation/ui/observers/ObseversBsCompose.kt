@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
@@ -219,7 +218,11 @@ private fun ObserveItem(
             CenterVertically
         ) {
             BrieflyRow(
-                "${member.username}, ${member.age}",
+                "${member.username}${
+                    if (member.age in 18..99) {
+                        ", ${member.age}"
+                    } else ""
+                }",
                 Modifier.weight(1f),
                 member.avatar?.thumbnail?.url,
                 member.emoji

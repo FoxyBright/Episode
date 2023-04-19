@@ -322,7 +322,11 @@ fun MeetingBsParticipants(
                     SpaceBetween, CenterVertically
                 ) {
                     BrieflyRow(
-                        "${member.username}, ${member.age}",
+                        "${member.username}${
+                            if (member.age in 18..99) {
+                                ", ${member.age}"
+                            } else ""
+                        }",
                         Modifier.padding(12.dp, 8.dp),
                         member.avatar?.thumbnail?.url,
                     )

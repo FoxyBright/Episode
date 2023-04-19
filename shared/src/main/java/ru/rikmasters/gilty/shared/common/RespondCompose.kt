@@ -66,8 +66,7 @@ fun LazyListScope.sentRespond(
         ) {
             Column {
                 BrieflyRow(
-                    name,
-                    Modifier.padding(
+                    name, Modifier.padding(
                         start = 16.dp,
                         top = 12.dp
                     ), organizer.avatar?.thumbnail?.url

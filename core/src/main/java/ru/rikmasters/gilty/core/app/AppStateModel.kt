@@ -19,7 +19,6 @@ class AppStateModel internal constructor(
     val bottomSheet: BottomSheetState,
     
     val keyboard: KeyboardController,
-    
 
 ): Loggable {
 

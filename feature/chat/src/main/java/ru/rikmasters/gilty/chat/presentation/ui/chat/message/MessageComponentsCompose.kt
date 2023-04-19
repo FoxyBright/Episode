@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -413,7 +413,7 @@ fun ImageMessage(
         modifier, (true), shape,
         cardColors(Transparent),
     ) {
-        Box {
+        Box(Modifier.fillMaxHeight(0.5f)) {
             message.message?.attachments?.let {
                 AsyncImage(
                     it.first().file?.url, (null),
@@ -424,7 +424,7 @@ fun ImageMessage(
                             shape
                         )
                         .clip(shape),
-                    contentScale = Crop,
+                    contentScale = FillWidth,
                 )
             }
             Box(

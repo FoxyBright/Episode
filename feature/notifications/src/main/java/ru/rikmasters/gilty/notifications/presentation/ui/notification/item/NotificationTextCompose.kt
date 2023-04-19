@@ -147,12 +147,21 @@ fun NotificationText(
     onMeetClick: (() -> Unit)? = null,
     onUserClick: (() -> Unit)? = null,
 ) {
-    val user = "${organizer?.username}, ${organizer?.age}"
+    val user = "${organizer?.username}${
+        if(organizer?.age in 18..99) {
+            ", ${organizer?.age}"
+        } else ""
+    }"
     val message = buildAnnotatedString {
         when(type) {
             MEETING_OVER -> if(meet?.memberState == IS_ORGANIZER) if(emoji.isNullOrEmpty()) {
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_took_place_for_organizer)) }
-                withStyle(style(MEET, meet.isOnline)) { append(" ${meet.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet.isOnline
+                    )
+                ) { append(" ${meet.title}") }
                 withStyle(style(TEXT)) { append("? ") }
                 withStyle(style(BOLD)) {
                     append(stringResource(R.string.notification_leave_members_impressions))
@@ -160,12 +169,22 @@ fun NotificationText(
                 withStyle(style(TIME)) { append(" $duration") }
             } else {
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_emoji_for_members)) }
-                withStyle(style(MEET, meet.isOnline)) { append(" ${meet.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet.isOnline
+                    )
+                ) { append(" ${meet.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             else if(emoji.isNullOrEmpty()) {
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
                 withStyle(style(USER)) { append("$user ") }
                 appendInlineContent("emoji")
@@ -175,7 +194,12 @@ fun NotificationText(
                 withStyle(style(TIME)) { append(" $duration") }
             } else {
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_emoji_for_meet)) }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title} ") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title} ") }
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_organizer_label)) }
                 withStyle(style(USER)) { append(" $user ") }
                 appendInlineContent("emoji")
@@ -189,11 +213,19 @@ fun NotificationText(
                     append(
                         stringResource(
                             R.string.notification_meet_RESPOND_ACCEPTED,
-                            genderEnding(organizer?.gender, RESPOND_ACCEPTED)
+                            genderEnding(
+                                organizer?.gender,
+                                RESPOND_ACCEPTED
+                            )
                         )
                     )
                 }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             
@@ -208,12 +240,22 @@ fun NotificationText(
                         )
                     )
                 }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             
             MEETING_CANCELED -> {
-                withStyle(style(MEET, meet?.isOnline)) { append("${meet?.title} ") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append("${meet?.title} ") }
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_MEETING_CANCELED_start)) }
                 withStyle(style(USER)) { append(" $user ") }
                 appendInlineContent("emoji")
@@ -221,11 +263,19 @@ fun NotificationText(
                     append(
                         stringResource(
                             R.string.notification_meet_MEETING_CANCELED_end,
-                            genderEnding(organizer?.gender, MEETING_CANCELED)
+                            genderEnding(
+                                organizer?.gender,
+                                MEETING_CANCELED
+                            )
                         )
                     )
                 }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             
@@ -240,7 +290,12 @@ fun NotificationText(
                         )
                     )
                 }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             
@@ -257,7 +312,12 @@ fun NotificationText(
                 withStyle(style(USER)) { append("$user ") }
                 appendInlineContent("emoji")
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_start)) }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title} ") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title} ") }
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_end)) }
                 withStyle(style(TIME)) { append(" $duration") }
             }
@@ -274,17 +334,30 @@ fun NotificationText(
                     append(
                         stringResource(
                             R.string.notification_meet_WATCH_MEETING_CREATED,
-                            genderEnding(organizer?.gender, WATCH_MEETING_CREATED)
+                            genderEnding(
+                                organizer?.gender,
+                                WATCH_MEETING_CREATED
+                            )
                         )
                     )
                 }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}") }
                 withStyle(style(TIME)) { append(" $duration") }
             }
             
             TRANSLATION_STARTED -> {
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_start)) }
-                withStyle(style(MEET, meet?.isOnline)) { append(" ${meet?.title}. ") }
+                withStyle(
+                    style(
+                        MEET,
+                        meet?.isOnline
+                    )
+                ) { append(" ${meet?.title}. ") }
                 withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_end)) }
                 withStyle(style(TIME)) { append(" $duration") }
             }
@@ -305,7 +378,11 @@ fun NotificationText(
         message, modifier, mapOf(
             "emoji" to InlineTextContent(
                 Placeholder(18.sp, 18.sp, TextCenter)
-            ) { GEmojiImage(organizer?.emoji, Modifier.size(18.dp)) }
+            ) {
+                organizer?.emoji?.let {
+                    GEmojiImage(it, Modifier.size(18.dp))
+                }
+            }
         )
     ) {
         message.getStringAnnotations(("meet"), it, it)

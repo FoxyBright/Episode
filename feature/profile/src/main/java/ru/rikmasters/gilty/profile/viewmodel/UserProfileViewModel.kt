@@ -114,7 +114,13 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun changeUsername(name: String) {
         if(!name.contains(',')) return
         val text = name.substringBefore(',')
-        _username.emit("$text, ${age.value}")
+        _username.emit(
+            "$text, ${
+                if(age.value in 18..99) {
+                    ", ${age.value}"
+                } else ""
+            }"
+        )
         updateProfile()
     }
     
@@ -209,7 +215,13 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun setUserDate(forceWeb: Boolean = true) = singleLoading {
         val user = profileManager.getProfile(forceWeb)
         _age.emit(user.age)
-        _username.emit("${user.username}, ${user.age}")
+        _username.emit(
+            "${user.username}${
+                if(user.age in 18..99) {
+                    ", ${user.age}"
+                } else ""
+            }"
+        )
         _description.emit(user.aboutMe ?: "")
         _lastRespond.emit(
             Pair(
