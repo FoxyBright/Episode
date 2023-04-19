@@ -53,12 +53,14 @@ fun SelectorBsContent(
                     colorScheme.primaryContainer,
                     shapes.large
                 )
-                .padding(8.dp), 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             state.items.forEachIndexed { index, item ->
                 GChip(
-                    Modifier.padding(end = 12.dp),
-                    item, (state.selected == index)
+                    Modifier, item,
+                    (state.selected == index)
                 ) { callback?.onItemSelect(index) }
             }
         }

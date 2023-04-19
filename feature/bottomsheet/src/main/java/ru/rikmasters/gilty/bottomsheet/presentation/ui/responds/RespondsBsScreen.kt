@@ -35,7 +35,10 @@ fun RespondsBs(
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
     
-    LaunchedEffect(Unit) { vm.updateMeetId(meetId) }
+    LaunchedEffect(Unit) {
+        vm.updateMeetId(meetId)
+        if(!full) vm.selectTab(1)
+    }
     
     Use<RespondsBsViewModel>(LoadingTrait) {
         RespondsList(

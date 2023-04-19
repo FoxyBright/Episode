@@ -77,9 +77,7 @@ fun RespondsList(
                     listOf(
                         stringResource(R.string.profile_sent_responds),
                         stringResource(R.string.profile_received_responds)
-                    ),
-                    selectTab,
-                    Modifier.padding(
+                    ), selectTab, Modifier.padding(
                         bottom = if(selectTab == 0) {
                             8.dp
                         } else 0.dp

@@ -99,8 +99,8 @@ private fun PopularFlow(
     FlowLayout(
         modifier
             .background(colorScheme.primaryContainer)
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp, bottom = 4.dp),
+            .padding(top = 16.dp, bottom = 4.dp)
+            .padding(horizontal = 16.dp),
         12.dp, 12.dp
     ) {
         tags.forEach {
@@ -130,13 +130,10 @@ fun SelectTags(
         Card(Modifier, colors = cardColors(Transparent)) {
             FlowLayout(
                 Modifier
-                    .background(
-                        colorScheme.primaryContainer
-                    )
-                    .padding(
-                        top = 12.dp,
-                        start = 16.dp
-                    ), 12.dp, 12.dp
+                    .background(colorScheme.primaryContainer)
+                    .padding(top = 12.dp)
+                    .padding(horizontal = 16.dp),
+                12.dp, 12.dp
             ) {
                 tags.forEach {
                     CrossTag(it, isOnline)

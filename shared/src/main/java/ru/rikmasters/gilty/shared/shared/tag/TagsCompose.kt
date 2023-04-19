@@ -115,16 +115,17 @@ fun TagsContent(
                 { callback?.onSearchChange(it) },
             ) { callback?.onCreateTag(it) }
         }, bottomBar = {
-            if(state.selected.isNotEmpty()) GradientButton(
-                Modifier
-                    .padding(
-                        top = 28.dp,
-                        bottom = 20.dp
-                    )
-                    .padding(horizontal = 16.dp),
-                stringResource(R.string.meeting_filter_complete_button),
-                online = state.isOnline
-            ) { callback?.onComplete() }
+            if(state.selected.isNotEmpty())
+                GradientButton(
+                    Modifier
+                        .padding(
+                            top = 28.dp,
+                            bottom = 20.dp
+                        )
+                        .padding(horizontal = 16.dp),
+                    stringResource(R.string.meeting_filter_complete_button),
+                    online = state.isOnline
+                ) { callback?.onComplete() }
         }
     ) {
         Content(

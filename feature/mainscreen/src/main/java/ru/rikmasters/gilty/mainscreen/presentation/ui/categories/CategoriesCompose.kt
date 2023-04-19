@@ -76,9 +76,7 @@ fun CategoryList(
         modifier,
         topBar = {
             TopBar(
-                Modifier.padding(
-                    horizontal = 16.dp
-                )
+                Modifier.padding(horizontal = 16.dp)
             ) { callback?.onBack() }
         },
         bottomBar = {
@@ -187,8 +185,9 @@ private fun Categories(
                     GDivider(); FlowLayout(
                         Modifier
                             .background(colorScheme.primaryContainer)
-                            .padding(top = 16.dp)
-                            .padding(horizontal = 8.dp), 8.dp, 8.dp
+                            .padding(top = 16.dp, bottom = 4.dp)
+                            .padding(horizontal = 16.dp),
+                        12.dp, 12.dp
                     ) {
                         category.children?.let {
                             it.forEach { sub ->

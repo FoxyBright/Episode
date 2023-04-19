@@ -91,8 +91,9 @@ fun Category(
                 GDivider(); FlowLayout(
                     Modifier
                         .background(colorScheme.primaryContainer)
-                        .padding(top = 16.dp)
-                        .padding(horizontal = 8.dp), 8.dp, 8.dp
+                        .padding(top = 16.dp, bottom = 4.dp)
+                        .padding(horizontal = 16.dp),
+                    12.dp, 12.dp
                 ) {
                     category.children.forEach { sub ->
                         GChip(
@@ -105,10 +106,7 @@ fun Category(
         }
     }
     Card(
-        Modifier
-            .clickable {
-                onAllCategoryClick()
-            },
+        Modifier.clickable { onAllCategoryClick() },
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
@@ -170,9 +168,9 @@ fun Tags(
         else FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(horizontal = 12.dp),
-            12.dp, 16.dp
+                .padding(top = 12.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             tagList.forEach {
                 CrossTag(it, online) {
@@ -300,8 +298,9 @@ fun MeetingType(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             repeat(types.size) {
                 GChip(
@@ -334,8 +333,9 @@ fun ConditionsSelect(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             repeat(conditions.size) {
                 GChip(
@@ -361,8 +361,9 @@ fun Conditions(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             repeat(ConditionType.list.size) {
                 GChip(

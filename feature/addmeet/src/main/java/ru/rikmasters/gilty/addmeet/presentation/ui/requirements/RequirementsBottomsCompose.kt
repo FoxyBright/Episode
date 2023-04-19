@@ -88,7 +88,9 @@ fun SelectBottom(
                     colorScheme.primaryContainer,
                     shapes.large
                 )
-                .padding(8.dp), 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             repeat(list.size) {
                 GChip(

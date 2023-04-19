@@ -133,6 +133,11 @@ class ProfileManager(
         }
     }
     
+    suspend fun getNotificationResponds() =
+        withContext(IO) {
+            web.getNotificationResponds()
+        }
+    
     suspend fun acceptRespond(
         respondId: String,
     ) {
