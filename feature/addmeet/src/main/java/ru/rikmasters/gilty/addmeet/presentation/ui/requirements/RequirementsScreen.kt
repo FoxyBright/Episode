@@ -49,13 +49,12 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     }
     
     fun checkRequirements(): Boolean {
-        requirements.isNotEmpty().let {
-            if(tabs == 0) reqControl(requirements.first())
-            else requirements.forEach {
-                if(reqControl(it)) return false
-            }
-            return true
+        requirements.ifEmpty { return true }
+        if(tabs == 0) reqControl(requirements.first())
+        else requirements.forEach {
+            if(reqControl(it)) return false
         }
+        return true
     }
     
     fun getGender(index: Int?) =

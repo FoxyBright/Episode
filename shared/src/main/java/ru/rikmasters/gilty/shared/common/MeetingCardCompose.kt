@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
@@ -45,7 +46,6 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
-import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -154,7 +154,10 @@ fun MeetingStates(
     val today = todayControl(meet.datetime)
     
     val dtColor = if(meet.isOnline)
-        green() else listOf(
+        listOf(
+            colorScheme.secondary,
+            colorScheme.secondary
+        ) else listOf(
         meet.category.color,
         meet.category.color
     )
@@ -521,7 +524,9 @@ private fun MeetInfo(meet: MeetingModel) {
         Text(
             meet.title, Modifier.weight(1f),
             colorScheme.tertiary,
-            style = typography.labelLarge
+            style = typography.labelLarge.copy(
+                lineHeight = 30.sp
+            )
         )
         MeetingStates(Modifier.weight(1f), meet)
     }
