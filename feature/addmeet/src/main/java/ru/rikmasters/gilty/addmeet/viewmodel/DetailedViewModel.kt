@@ -7,8 +7,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.shared.common.extentions.format
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
@@ -22,14 +20,6 @@ class DetailedViewModel: ViewModel() {
     
     private val _date = MutableStateFlow("")
     val date = _date.asStateFlow()
-    
-    fun getDate(date: String) = try {
-        if(todayControl(date))
-            "Сегодня, ${date.format("HH:mm")}"
-        else date.format("dd MMMM, HH:mm")
-    } catch(e: Exception) {
-        ""
-    }
     
     private val _alert = MutableStateFlow(false)
     
@@ -89,6 +79,7 @@ class DetailedViewModel: ViewModel() {
     
     suspend fun changeDate(date: String) {
         _date.emit(date)
+        manager.update(dateTime = date)
     }
     
     suspend fun changeDuration(duration: String) {

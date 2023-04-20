@@ -8,49 +8,33 @@ val LOCAL_TIME: LocalTime = LocalTime.now()
 val LOCAL_DATE: LocalDate = LocalDate.now()
 const val ZERO_TIME = "T00:00:00.000Z"
 const val TIME_START = "00"
-const val MINUTES_IN_HOUR = 55
-const val HOURS_IN_DAY = 23
 val NOW_DATE = "${LOCAL_DATE}T$LOCAL_TIME.000Z"
 val TOMORROW = "${LOCAL_DATE.plusDays(1)}T$LOCAL_TIME.000Z"
 
-fun getDate(period: Int = 150): List<String> {
-    val list = arrayListOf<String>()
-    getDateList(period).first.forEach { list.add(it) }
-    list.reverse(); list.add(TODAY_LABEL)
-    getDateList(period).second.forEach { list.add(it) }
-    return list
-}
-
-fun getDateList(times: Int): Pair<List<String>, List<String>> {
-    val lastList = arrayListOf<String>()
-    val newList = arrayListOf<String>()
-    var todayPlus = LOCAL_DATE.plusDays(1)
-    var todayMinus = LOCAL_DATE.minusDays(1)
-    for(i in 1..times) {
-        newList.add("$todayPlus$ZERO_TIME".dateCalendar())
-        lastList.add("$todayMinus$ZERO_TIME".dateCalendar())
-        todayPlus = todayPlus.plusDays(1)
-        todayMinus = todayMinus.minusDays(1)
+fun getDate() = arrayListOf<String>().let {
+    repeat(365) { i ->
+        it.add("${LOCAL_DATE.plusDays(i)}$ZERO_TIME")
     }
-    return Pair(lastList, newList)
+    it.toList()
 }
 
-fun getTime(range: Iterable<Int>, step: Int): List<String> {
-    val list = arrayListOf<String>()
-    list.add("start")
-    for(it in range as IntRange step step)
-        if(it.toString().length != 1) list.add(it.toString())
-        else list.add("0$it")
-    list.add("end")
-    return list
-}
-
-fun replacer(it: String, end: String): String {
-    return when(it) {
-        "start" -> end
-        "end" -> TIME_START
-        else -> it
-    }
+fun getTime() = arrayListOf<String>().let {
+    repeat(24) { i ->
+        it.add(
+            if(i in 0..9)
+                "0$i" else "$i"
+        )
+    }; it
+} to arrayListOf<String>().let {
+    repeat(12) { i ->
+        it.add(
+            when(i) {
+                0 -> "00"
+                1 -> "05"
+                else -> "${i * 5}"
+            }
+        )
+    }; it
 }
 
 fun todayControl(date: String) =
@@ -83,32 +67,37 @@ fun String.date(): LocalDate {
     )
 }
 
-fun String.timeClock(): String {
-    return this.format("HH:mm")
-}
+fun String.timeClock() =
+    this.format("HH:mm")
 
-fun String.dateCalendar(): String {
-    return this.format("dd MMMM")
-}
 
-fun String.time(): LocalTime {
-    val dateList = this.format(TIME_FORMAT).split(":")
-    return LocalTime.of(
-        dateList.first().toInt(),
-        dateList[1].toInt(),
-        dateList.last().toInt()
-    )
-}
+fun String.dateCalendar() =
+    this.format("dd MMMM")
 
-fun weekControl(date: String): Boolean {
-    val dateList = date.format(FORMAT).split(DASH)
-    val localDate = LocalDate.of(
-        dateList.first().toInt(),
-        dateList[1].toInt(),
-        dateList.last().toInt()
-    ).millis() / 1000
-    return (localDate in thisWeek().first..thisWeek().second)
-}
+
+fun String.time() = this
+    .format(TIME_FORMAT)
+    .split(":").let {
+        LocalTime.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        )
+    }
+
+
+fun weekControl(
+    date: String,
+) = (date.format(FORMAT)
+    .split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    } in thisWeek().first..
+        thisWeek().second)
+
 
 fun earlierWeekControl(date: String): Boolean {
     val dateList = date.format(FORMAT).split(DASH)

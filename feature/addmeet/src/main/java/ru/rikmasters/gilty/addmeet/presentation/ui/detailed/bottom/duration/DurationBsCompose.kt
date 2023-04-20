@@ -2,8 +2,8 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.duration
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
@@ -44,7 +44,7 @@ fun DurationBottomSheet(
             stringResource(R.string.add_meet_meet_duration_label),
             Modifier.padding(bottom = 16.dp, top = 10.dp),
             colorScheme.tertiary,
-            style = MaterialTheme.typography.labelLarge
+            style = typography.labelLarge
         )
         DurationPicker(value, Modifier.fillMaxWidth())
         { value -> onValueChange?.let { it(value) } }
@@ -67,7 +67,7 @@ private fun DurationPicker(
         modifier.background(colorScheme.background),
         Center
     ) {
-        ListItemPicker(value.ifBlank { list.last() }, list)
+        ListItemPicker(value.ifBlank { list[list.lastIndex - 2] }, list)
         { onValueChange?.let { c -> c(it) } }
     }
 }

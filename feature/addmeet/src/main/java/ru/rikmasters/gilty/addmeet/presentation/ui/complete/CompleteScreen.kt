@@ -20,7 +20,11 @@ fun CompleteScreen(vm: CompleteViewModel) {
     val meet by vm.meet.collectAsState()
     val online by vm.online.collectAsState()
     
-    LaunchedEffect(addMeet) { addMeet?.let { vm.addMeet(it) } }
+    LaunchedEffect(addMeet) {
+        addMeet?.let {
+            vm.addMeet(it)
+        }
+    }
     
     meet?.let {
         CompleteContent(it, online, Modifier,

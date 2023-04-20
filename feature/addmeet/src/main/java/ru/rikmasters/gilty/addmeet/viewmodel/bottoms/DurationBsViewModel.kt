@@ -35,7 +35,7 @@ class DurationBsViewModel(
     
     suspend fun onSave() {
         detailedVm.changeDuration(
-            duration.value.ifBlank { "20 минут" }
+            duration.value.ifBlank { "30 минут" }
         )
     }
     

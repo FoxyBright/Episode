@@ -9,23 +9,22 @@ import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.*
+import java.util.Calendar
 
 class TimeBsViewModel(
-    
     private val detailedVm: DetailedViewModel = DetailedViewModel(),
 ): ViewModel() {
     
     private val manager by inject<MeetingManager>()
     private val addMeet by lazy { manager.addMeetFlow }
     
-    private val _date = MutableStateFlow(TODAY_LABEL)
+    private val _date = MutableStateFlow("")
     val date = _date.asStateFlow()
     
-    private val _hour = MutableStateFlow(LOCAL_TIME.hour().toString())
+    private val _hour = MutableStateFlow("")
     val hour = _hour.asStateFlow()
     
-    private val min = (LOCAL_TIME.minute() - (LOCAL_TIME.minute() % 5) + 5).toString()
-    private val _minute = MutableStateFlow(min)
+    private val _minute = MutableStateFlow("")
     val minute = _minute.asStateFlow()
     
     private val _online = MutableStateFlow(false)
@@ -33,10 +32,52 @@ class TimeBsViewModel(
     
     init {
         coroutineScope.launch {
-            addMeet.collectLatest {
-                _online.emit(it?.isOnline ?: false)
+            addMeet.collectLatest { add ->
+                add?.dateTime?.ifBlank { null }.let { storeDate ->
+                    LocalDateTime(Calendar.getInstance().time.time).let { currentDate ->
+                        _date.emit(
+                            (storeDate?.format(FORMAT)
+                                ?: currentDate.format(FORMAT))
+                                .let { "$it$ZERO_TIME" }
+                        )
+                        _hour.emit(
+                            storeDate?.format("HH")
+                                ?: "${currentDate.hour()}"
+                        )
+                        _minute.emit(
+                            storeDate?.format("mm")
+                                ?: currentDate.minute().let {
+                                    val min = (it - (it % 5)) + 5
+                                    if(min == 5) "05" else "$min"
+                                }
+                        )
+                    }
+                }
+                _online.emit(add?.isOnline ?: false)
             }
         }
+    }
+    
+    fun isActive() = try {
+        LocalDateTime.of(
+            "${
+                date.value.format(FORMAT)
+            }T${hour.value}:${minute.value}:00"
+        ).minusMinute(offset / 60_000)
+            .isAfter(LocalDateTime.nowZ())
+    } catch(e: Exception) {
+        true
+    }
+    
+    suspend fun onSave() {
+        detailedVm.changeDate(
+            LocalDateTime.of(
+                "${
+                    date.value.format(FORMAT)
+                }T${hour.value}:${minute.value}:00"
+            ).minusMinute(offset / 60_000)
+                .format(FULL_DATE_FORMAT)
+        )
     }
     
     suspend fun changeHour(hour: String) {
@@ -49,26 +90,5 @@ class TimeBsViewModel(
     
     suspend fun changeDate(date: String) {
         _date.emit(date)
-    }
-    
-    fun normalizeDate(
-        date: String, hour: String, minute: String,
-    ): String { // FIXME год всегда текущий
-        val fullTime = "T$hour:$minute:00Z"
-        val fullDate = if(date == "Сегодня")
-            LOCAL_DATE.format("yyyy-MM-dd")
-        else "${LOCAL_DATE.year()}-" + date.format("dd MMMM", "MM-dd")
-        return fullDate + fullTime
-    }
-    
-    suspend fun onSave() {
-        detailedVm.changeDate(
-            "${_date.value}, ${hour.value}:${minute.value}"
-        )
-        manager.update(
-            dateTime = normalizeDate(
-                _date.value, _hour.value, _minute.value
-            )
-        )
     }
 }

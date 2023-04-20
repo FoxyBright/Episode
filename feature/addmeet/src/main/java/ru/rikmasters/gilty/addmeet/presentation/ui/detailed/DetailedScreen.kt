@@ -14,6 +14,8 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.LOCATION
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.common.extentions.offset
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
@@ -42,8 +44,14 @@ fun DetailedScreen(vm: DetailedViewModel) {
     
     DetailedContent(
         DetailedState(
-            duration, vm.getDate(date), description, tags,
-            place, hide, alert, online, isActive
+            duration, date.let {
+                it.ifEmpty { return@let "" }
+                LocalDateTime.ofZ(it)
+                    .minusMinute(offset / 6000)
+                    .plusDay(1)
+                    .format("d MMMM, HH:mm")
+            }, description, tags, place,
+            hide, alert, online, isActive
         ), Modifier, object: DetailedCallback {
             
             override fun onDateClick() {

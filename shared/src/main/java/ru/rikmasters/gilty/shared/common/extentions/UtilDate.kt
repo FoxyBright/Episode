@@ -298,6 +298,8 @@ class LocalDateTime(
         /** Создает объект с указанными данными **/
         fun of(datetime: String) = LocalDateTime(datetime.long())
         
+        fun ofZ(datetime: String) = LocalDateTime(datetime.long() + offset)
+        
         /** Создает объект с указанными данными **/
         fun of(localDate: LocalDate, localTime: LocalTime) = of(
             "${localDate.year()}-${localDate.month()}-${
@@ -566,8 +568,11 @@ private fun plus(date: Long, field: Int, count: Int): Long {
 
 /** Задает определенный формат для объекта класса Date(). Возвращает строку**/
 @SuppressLint("SimpleDateFormat")
-fun Date.format(pattern: String): String =
+fun Date.format(pattern: String): String = try {
     SimpleDateFormat(pattern).format(this)
+} catch(e:Exception){
+    this.toString()
+}
 
 /** Задает определенный формат для даты в строке в формате ISO-8601. Возвращает строку**/
 fun String.format(pattern: String): String =

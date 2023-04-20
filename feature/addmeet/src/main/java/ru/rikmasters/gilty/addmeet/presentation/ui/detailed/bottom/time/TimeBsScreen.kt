@@ -6,7 +6,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 
 @Composable
 fun TimeBs(vm: TimeBsViewModel) {
@@ -19,13 +18,9 @@ fun TimeBs(vm: TimeBsViewModel) {
     val hour by vm.hour.collectAsState()
     val date by vm.date.collectAsState()
     
-    val isActive = LocalDateTime.of(
-        vm.normalizeDate(date, hour, minute)
-    ).isAfter(LocalDateTime.now())
-    
     DateTimeBS(
         DateTimeBSState(
-            date, hour, minute, online, isActive
+            date, hour, minute, online, vm.isActive()
         ), Modifier, object: DateTimeBSCallback {
             
             override fun dateChange(it: String) {
