@@ -94,7 +94,8 @@ fun DetailedContent(
         }, {
             callback?.onCloseAlert(false)
             callback?.onClose()
-        })
+        }
+    )
 }
 
 @Composable
@@ -138,12 +139,6 @@ private fun Content(
                 callback
             )
         }
-        item {
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-            )
-        }
+        itemSpacer(60.dp)
     }
 }

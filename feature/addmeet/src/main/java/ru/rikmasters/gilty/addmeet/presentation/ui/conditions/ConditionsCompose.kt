@@ -131,13 +131,7 @@ private fun Content(
                 Modifier.padding(top = 28.dp)
             )
         }
-        item {
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-            )
-        }
+        itemSpacer(60.dp)
     }
 }
 

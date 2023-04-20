@@ -156,6 +156,6 @@ private fun Content(
                 Modifier.padding(top = 24.dp)
             )
         }
-        itemSpacer(40.dp)
+        itemSpacer(60.dp)
     }
 }

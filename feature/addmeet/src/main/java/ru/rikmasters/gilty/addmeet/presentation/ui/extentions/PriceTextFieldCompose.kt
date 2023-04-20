@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.extentions
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.core.text.isDigitsOnly
@@ -24,6 +26,7 @@ fun PriceTextField(
     onChange: (String) -> Unit,
     online: Boolean,
 ) {
+    val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
     GTextField(
         value, {
@@ -48,6 +51,9 @@ fun PriceTextField(
             true
         },
         errorBottomText = "До 1 000 000 ₽",
+        keyboardActions = KeyboardActions {
+            focusManager.clearFocus()
+        },
         keyboardOptions = KeyboardOptions(
             keyboardType = NumberPassword
         ), visualTransformation =
