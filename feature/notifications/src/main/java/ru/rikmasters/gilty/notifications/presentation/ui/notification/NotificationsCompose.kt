@@ -195,18 +195,15 @@ private fun EmptyNotification(
     Column(
         modifier
             .fillMaxSize()
-            .padding(top = 30.dp),
-        Top,
-        CenterHorizontally
+            .padding(top = 56.dp),
+        Top, CenterHorizontally
     ) {
         Image(
             painterResource(
                 if((isSystemInDarkTheme())) {
                     R.drawable.notify_dog_dark
                 } else R.drawable.notify_dog_light
-            ),
-            (null),
-            Modifier.fillMaxWidth()
+            ), (null), Modifier.fillMaxWidth()
         )
         Text(
             stringResource(R.string.notification_place_holder),
