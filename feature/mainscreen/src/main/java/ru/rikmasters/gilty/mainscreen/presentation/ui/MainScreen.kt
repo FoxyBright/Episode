@@ -2,12 +2,14 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
@@ -19,6 +21,8 @@ import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 @Composable
@@ -26,15 +30,23 @@ fun MainScreen(vm: MainViewModel) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
     
     val meetings by vm.meetings.collectAsState()
-    val navBar by vm.navBar.collectAsState()
     val days by vm.days.collectAsState()
     val alert by vm.alert.collectAsState()
     val today by vm.today.collectAsState()
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
+    
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val navBar = remember {
+        mutableListOf(
+            ACTIVE, INACTIVE, INACTIVE,
+            unreadMessages, INACTIVE
+        )
+    }
     
     val hasFilters = vm
         .meetFilters
@@ -46,6 +58,11 @@ fun MainScreen(vm: MainViewModel) {
         vm.getMeets()
         vm.getAllCategories()
         vm.getUserCategories()
+        context.listenPreference(
+            key = "unread_messages",
+            defValue = 0
+        ) { scope.launch { vm.setUnreadMessages(it > 0) } }
+        vm.getUnread()
     }
     
     MainContent(

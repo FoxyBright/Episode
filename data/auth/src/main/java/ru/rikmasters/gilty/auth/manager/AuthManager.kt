@@ -31,10 +31,9 @@ class AuthManager(
     suspend fun savePushToken(
         token: String,
         type: PushType = FIREBASE,
-    ) {
-        withContext(IO) {
-            tokenWebSource.savePushToken(token, type)
-        }
+    ) = withContext(IO) {
+        tokenWebSource.savePushToken(token, type)
+        token
     }
     
     @Suppress("unused")

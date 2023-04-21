@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import android.content.Context
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -12,7 +14,7 @@ import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MEETING_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
@@ -36,30 +38,29 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val refresh = MutableStateFlow(false)
     
-    private val _sortType = MutableStateFlow(SortTypeModel.MEETING_DATE)
+    private val _sortType = MutableStateFlow(MEETING_DATE)
     val sortType = _sortType.asStateFlow()
     
-    private val _navBar = MutableStateFlow(
-        listOf(INACTIVE, INACTIVE, INACTIVE, ACTIVE, INACTIVE)
+    private val _unreadMessages = MutableStateFlow(
+        lazy {
+            val count = getKoin().get<Context>()
+                .getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_messages", 0)
+            if(count > 0) NEW_ACTIVE else ACTIVE
+        }.value
     )
-    val navBar = _navBar.asStateFlow()
+    val unreadMessages = _unreadMessages.asStateFlow()
+    suspend fun setUnreadMessages(hasUnread: Boolean) {
+        _unreadMessages.emit(if(hasUnread) NEW_ACTIVE else ACTIVE)
+    }
+    
+    suspend fun getUnread() {
+        chatManager.updateUnreadMessages()
+    }
     
     suspend fun onChatClick(chatId: String) {
         chatManager.connectToChat(chatId)
-    }
-    
-    suspend fun getChatStatus() {
-        chatManager.getChatsStatus().let {
-            if(it > 0) _navBar.emit(
-                listOf(
-                    INACTIVE,
-                    INACTIVE,
-                    INACTIVE,
-                    NEW_ACTIVE,
-                    INACTIVE
-                )
-            )
-        }
     }
     
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,12 +84,6 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         _sortType.emit(sortType)
     }
     
-    private suspend fun navBarSetStates(
-        states: List<NavIconState>,
-    ) {
-        _navBar.emit(states)
-    }
-    
     suspend fun deleteChat(
         forAll: Boolean,
     ) = singleLoading {
@@ -100,28 +95,17 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         dismissAlert(false)
     }
     
-    suspend fun navBarNavigate(point: Int): String {
-        val list = arrayListOf<NavIconState>()
-        repeat(navBar.value.size) {
-            list.add(
-                when {
-                    navBar.value[it] == NEW_INACTIVE -> NEW_INACTIVE
-                    it == point -> ACTIVE
-                    else -> INACTIVE
-                }
-            )
+    suspend fun navBarNavigate(
+        point: Int,
+    ) = when(point) {
+        0 -> "main/meetings"
+        1 -> "notification/list"
+        2 -> {
+            meetManager.clearAddMeet()
+            "addmeet/category"
         }
-        navBarSetStates(list)
-        return when(point) {
-            0 -> "main/meetings"
-            1 -> "notification/list"
-            2 -> {
-                meetManager.clearAddMeet()
-                "addmeet/category"
-            }
-            4 -> "profile/main"
-            else -> "chats/main"
-        }
+        4 -> "profile/main"
+        else -> "chats/main"
     }
     
     suspend fun dismissAlert(state: Boolean) {

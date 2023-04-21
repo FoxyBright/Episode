@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -11,8 +12,11 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -24,6 +28,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
     
     val notifications = vm.notifications.collectAsLazyPagingItems()
@@ -31,14 +36,28 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
-    val navState by vm.navBar.collectAsState()
     val ratings by vm.ratings.collectAsState()
     val blur by vm.blur.collectAsState()
     
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val navBar = remember {
+        mutableListOf(
+            INACTIVE, ACTIVE, INACTIVE,
+            unreadMessages, INACTIVE
+        )
+    }
+    
     LaunchedEffect(Unit) {
-        vm.getChatStatus()
         vm.getRatings()
         vm.getLastResponse()
+        context.listenPreference(
+            key = "unread_messages",
+            defValue = 0
+        ) {
+            scope.launch {
+                vm.setUnreadMessages(it > 0)
+            }
+        }
     }
     
     fun refresh() = scope.launch {
@@ -48,7 +67,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     NotificationsContent(
         NotificationsState(
             notifications, lastRespond,
-            navState, blur, selected,
+            navBar, blur, selected,
             participants, participantsStates,
             listState, ratings
         ), Modifier, object: NotificationsCallback {
@@ -77,7 +96,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             
             override fun onMeetClick(meet: MeetingModel?) {
                 scope.launch {
-                    meet?.let { m->
+                    meet?.let { m ->
                         asm.bottomSheet.expand {
                             BottomSheet(vm.scope, MEET, m.id)
                         }

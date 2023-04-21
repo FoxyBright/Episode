@@ -104,9 +104,9 @@ class MainActivity: ComponentActivity() {
             
             suspend fun authorize(userId: String) {
                 authManager.savePushToken(token)
+                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 chatManager.connect(userId)
             }
-            
             LaunchedEffect(Unit) {
                 if(internetCheck(context))
                     profileManager
@@ -118,8 +118,6 @@ class MainActivity: ComponentActivity() {
                                 && regManager.profileCompleted()
                             ) authorize(regManager.userId())
                         }
-                
-                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
             }
             
             val scope = getKoin().createScope<MainActivity>()

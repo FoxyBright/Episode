@@ -1,17 +1,16 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
+import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -23,12 +22,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val notificationManger by inject<NotificationManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
-    private val chatManager by inject<ChatManager>()
-    
-    private val _navBar = MutableStateFlow(
-        listOf(INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE)
-    )
-    val navBar = _navBar.asStateFlow()
     
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
@@ -45,18 +38,17 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         }.cachedIn(coroutineScope)
     }
     
-    suspend fun getChatStatus() {
-        chatManager.getChatsStatus().let {
-            if(it > 0) _navBar.emit(
-                listOf(
-                    INACTIVE,
-                    ACTIVE,
-                    INACTIVE,
-                    NEW_INACTIVE,
-                    INACTIVE
-                )
-            )
-        }
+    private val _unreadMessages = MutableStateFlow(
+        lazy {
+            val count = getKoin().get<Context>().getSharedPreferences(
+                "sharedPref", ComponentActivity.MODE_PRIVATE
+            ).getInt("unread_messages", 0)
+            if(count > 0) NEW_INACTIVE else INACTIVE
+        }.value
+    )
+    val unreadMessages = _unreadMessages.asStateFlow()
+    suspend fun setUnreadMessages(hasUnread: Boolean) {
+        _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
     }
     
     override suspend fun forceRefresh() = singleLoading {
@@ -82,38 +74,21 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         }
     }
     
-    private suspend fun navBarSetStates(
-        states: List<NavIconState>,
-    ) {
-        _navBar.emit(states)
-    }
-    
     suspend fun clearSelectedNotification() {
         _selectedNotification.emit(null)
     }
     
-    suspend fun navBarNavigate(point: Int): String {
-        val list = arrayListOf<NavIconState>()
-        repeat(navBar.value.size) {
-            list.add(
-                when {
-                    navBar.value[it] == NEW_INACTIVE -> NEW_INACTIVE
-                    it == point -> ACTIVE
-                    else -> INACTIVE
-                }
-            )
+    suspend fun navBarNavigate(
+        point: Int,
+    ) = when(point) {
+        0 -> "main/meetings"
+        2 -> {
+            meetManager.clearAddMeet()
+            "addmeet/category"
         }
-        navBarSetStates(list)
-        return when(point) {
-            0 -> "main/meetings"
-            2 -> {
-                meetManager.clearAddMeet()
-                "addmeet/category"
-            }
-            3 -> "chats/main"
-            4 -> "profile/main"
-            else -> "notification/list"
-        }
+        3 -> "chats/main"
+        4 -> "profile/main"
+        else -> "notification/list"
     }
     
     suspend fun swipeNotification(

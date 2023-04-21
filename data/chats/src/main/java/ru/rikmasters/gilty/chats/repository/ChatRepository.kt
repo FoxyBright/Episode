@@ -9,14 +9,12 @@ import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.core.data.source.WebSource
 import ru.rikmasters.gilty.core.data.source.deleteById
 
-open class ChatRepository(
+class ChatRepository(
     override val primarySource: DbSource,
     override val webSource: ChatWebSource,
 ): OfflineFirstRepository<WebSource, DbSource>(
-    webSource,
-    primarySource
+    webSource, primarySource
 ) {
-    
     // чат удалился или обновился
     suspend fun chatUpdate(answer: Pair<AnswerType, Any?>?) {
         answer?.let { (type, data) ->
