@@ -6,7 +6,9 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,8 +25,8 @@ private fun DateTimeBSPreview() {
     GiltyTheme {
         DateTimeBS(
             DateTimeBSState(
-                TODAY_LABEL, TIME_START,
-                TIME_START, (false), (true)
+                "${LOCAL_DATE.plusDays(4)}$ZERO_TIME",
+                "14", "30", (false), (true)
             ), Modifier.padding(16.dp)
         )
     }
@@ -52,24 +54,32 @@ fun DateTimeBS(
     modifier: Modifier = Modifier,
     callback: DateTimeBSCallback? = null,
 ) {
-    Column(
+    Box(
         modifier
             .fillMaxWidth()
+            .fillMaxHeight(0.5f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
         Text(
             stringResource(R.string.add_meet_detailed_meet_date_episode),
-            Modifier.padding(bottom = 16.dp),
+            Modifier
+                .padding(bottom = 16.dp)
+                .align(TopStart),
             colorScheme.tertiary,
             style = typography.labelLarge
         )
         DateTimePickerContent(
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(Center),
             state, callback
         )
         GradientButton(
-            Modifier.padding(vertical = 28.dp),
+            Modifier
+                .padding(vertical = 28.dp)
+                .align(BottomCenter),
             stringResource(R.string.save_button),
             state.isActive, state.online
         ) { callback?.onSave() }
@@ -87,27 +97,32 @@ private fun DateTimePickerContent(
             colorScheme.background
         ), Center
     ) {
-        Row {
+        Row(modifier.padding(horizontal = 20.dp)) {
             ListItemPicker(
                 state.date.ifBlank {
                     "$LOCAL_DATE$ZERO_TIME"
-                }, getDate(), Modifier, {
+                }, getDate(),
+                Modifier.weight(2.5f), {
                     it.format("E dd MMM")
                         .replaceFirstChar { c ->
                             c.uppercase()
                         }
-                }
+                }, doublePlaceHolders = true
             ) { callback?.dateChange(it) }
-            getTime().let { time ->
+            getTime().let { (hours, minutes) ->
                 ListItemPicker(
                     state.hour.ifBlank {
-                        time.first.last()
-                    }, time.first
+                        hours.last()
+                    }, hours,
+                    Modifier.weight(1f),
+                    doublePlaceHolders = true
                 ) { callback?.hourChange(it) }
                 ListItemPicker(
                     state.minute.ifBlank {
-                        time.second.last()
-                    }, time.second
+                        minutes.last()
+                    }, minutes,
+                    Modifier.weight(1f),
+                    doublePlaceHolders = true
                 ) { callback?.minuteChange(it) }
             }
         }

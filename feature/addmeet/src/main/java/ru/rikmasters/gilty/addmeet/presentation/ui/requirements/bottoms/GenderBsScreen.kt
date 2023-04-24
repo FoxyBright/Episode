@@ -19,9 +19,7 @@ fun GenderBs(vm: GenderBsViewModel) {
     val online by vm.online.collectAsState()
     val select by vm.select.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.getGenders()
-    }
+    LaunchedEffect(Unit) { vm.getGenders() }
     
     SelectBottom(
         stringResource(R.string.sex),

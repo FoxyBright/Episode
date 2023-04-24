@@ -2,12 +2,10 @@ package ru.rikmasters.gilty.shared.common.extentions
 
 private const val DASH = "-"
 const val FORMAT = "yyyy-MM-dd"
-const val TODAY_LABEL = "Сегодня"
 const val TIME_FORMAT = "HH:mm:ss"
 val LOCAL_TIME: LocalTime = LocalTime.now()
 val LOCAL_DATE: LocalDate = LocalDate.now()
 const val ZERO_TIME = "T00:00:00.000Z"
-const val TIME_START = "00"
 val NOW_DATE = "${LOCAL_DATE}T$LOCAL_TIME.000Z"
 val TOMORROW = "${LOCAL_DATE.plusDays(1)}T$LOCAL_TIME.000Z"
 

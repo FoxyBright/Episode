@@ -1,14 +1,12 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,24 +14,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight.Companion.W500
+import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.shared.common.extentions.vibrate
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private fun <T> getItemIndexForOffset(
-    range: List<T>,
-    value: T,
-    offset: Float,
-    halfNumbersColumnHeightPx: Float,
-): Int {
-    val indexOf = range.indexOf(value) - (offset / halfNumbersColumnHeightPx).toInt()
-    return maxOf(0, minOf(indexOf, range.count() - 1))
-}
+    range: List<T>, value: T, offset: Float,
+    halfHeightPx: Float,
+) = maxOf(
+    (0), minOf(
+        a = range.indexOf(value) - (offset / halfHeightPx).toInt(),
+        b = range.count() - 1
+    )
+)
 
 @Composable
 fun <T> ListItemPicker(
@@ -41,164 +45,118 @@ fun <T> ListItemPicker(
     modifier: Modifier = Modifier,
     label: (T) -> String = { it.toString() },
     dividersColor: Color = colorScheme.outline,
-    textStyle: TextStyle = typography.bodyMedium,
+    textStyle: TextStyle = typography.labelLarge.copy(
+        colorScheme.tertiary, textAlign = Center
+    ),
+    align: Alignment = Alignment.Center,
+    horizontalMargin: Dp = 20.dp,
+    doublePlaceHolders: Boolean = false,
     onValueChange: (T) -> Unit,
 ) {
-    val minimumAlpha = 0.3f
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    
+    val height = 80.dp
     val verticalMargin = 8.dp
-    val numbersColumnHeight = 80.dp
-    val halfNumbersColumnHeight = numbersColumnHeight / 2
-    val halfNumbersColumnHeightPx = with(LocalDensity.current)
-    { halfNumbersColumnHeight.toPx() }
-    
-    val coroutineScope = rememberCoroutineScope()
-    
-    val animatedOffset = remember { Animatable(0f) }
-        .apply {
-            val index = list.indexOf(value)
-            val offsetRange = remember(value, list) {
-                -((list.count() - 1) - index) * halfNumbersColumnHeightPx to
-                        index * halfNumbersColumnHeightPx
+    val halfHeight = height / 2
+    val halfHeightPx = with(LocalDensity.current) {
+        halfHeight.toPx()
+    }
+    val animatedOffset = remember {
+        Animatable(0f)
+    }.apply {
+        list.indexOf(value).let { index ->
+            remember(value, list) {
+                -((list.count() - 1) - index) * halfHeightPx to
+                        index * halfHeightPx
             }
-            updateBounds(offsetRange.first, offsetRange.second)
+        }.let { (lower, upper) ->
+            updateBounds(lower, upper)
         }
-    
-    val coercedAnimatedOffset = animatedOffset.value % halfNumbersColumnHeightPx
-    
-    val indexOfElement =
-        getItemIndexForOffset(list, value, animatedOffset.value, halfNumbersColumnHeightPx)
-    
-    var dividersWidth by remember { mutableStateOf(0.dp) }
-    
-    
-    Layout(
-        {
-            Box(
-                Modifier
-                    .width(dividersWidth)
-                    .height(2.dp)
-                    .background(color = dividersColor)
-            )
-            Box(
-                modifier = Modifier
-                    .padding(vertical = verticalMargin, horizontal = 20.dp)
-                    .offset { IntOffset(x = 0, y = coercedAnimatedOffset.roundToInt()) }
-            ) {
-                val baseLabelModifier = Modifier.align(Alignment.Center)
-                ProvideTextStyle(textStyle) {
-                    if(indexOfElement > 0) Label(
-                        text = label(list.elementAt(indexOfElement - 1)),
-                        modifier = baseLabelModifier
-                            .offset(y = -halfNumbersColumnHeight)
-                            .alpha(
-                                maxOf(
-                                    minimumAlpha,
-                                    coercedAnimatedOffset / halfNumbersColumnHeightPx
-                                )
-                            ),
-                        typography.bodyLarge
-                    )
-                    Label(
-                        text = label(list.elementAt(indexOfElement)),
-                        modifier = baseLabelModifier
-                            .alpha(
-                                (maxOf(
-                                    minimumAlpha,
-                                    1 - abs(coercedAnimatedOffset) / halfNumbersColumnHeightPx
-                                ))
-                            ),
-                        typography.displayLarge
-                    )
-                    if(indexOfElement < list.count() - 1) Label(
-                        text = label(list.elementAt(indexOfElement + 1)),
-                        modifier = baseLabelModifier
-                            .offset(y = halfNumbersColumnHeight)
-                            .alpha(
-                                maxOf(
-                                    minimumAlpha,
-                                    -coercedAnimatedOffset / halfNumbersColumnHeightPx
-                                )
-                            ),
-                        typography.bodyLarge
-                    )
+    }
+    val coercedAnimatedOffset = animatedOffset.value % halfHeightPx
+    val indexOfElement = getItemIndexForOffset(
+        list, value, animatedOffset.value, halfHeightPx
+    )
+    LaunchedEffect(indexOfElement) { vibrate(context) }
+    Layout({
+        GDivider(Modifier.fillMaxWidth(), dividersColor)
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontalMargin, verticalMargin)
+                .offset {
+                    IntOffset((0), coercedAnimatedOffset.roundToInt())
                 }
-            }
-            Box(
-                Modifier
-                    .width(dividersWidth)
-                    .height(2.dp)
-                    .background(color = dividersColor)
-            )
-        },
-        modifier
-            .draggable(
-                rememberDraggableState { deltaY ->
-                    coroutineScope.launch {
-                        animatedOffset.snapTo(animatedOffset.value + deltaY)
-                    }
-                },
-                Orientation.Vertical,
-                onDragStopped = { velocity ->
-                    coroutineScope.launch {
-                        val endValue = animatedOffset.fling(
-                            initialVelocity = velocity,
-                            animationSpec = exponentialDecay(frictionMultiplier = 20f),
-                            adjustTarget = { target ->
-                                val coercedTarget = target % halfNumbersColumnHeightPx
-                                val coercedAnchors =
-                                    listOf(
-                                        -halfNumbersColumnHeightPx,
-                                        0f,
-                                        halfNumbersColumnHeightPx
-                                    )
-                                val coercedPoint =
-                                    coercedAnchors.minByOrNull { abs(it - coercedTarget) } ?: 0f
-                                val base =
-                                    halfNumbersColumnHeightPx * (target / halfNumbersColumnHeightPx).toInt()
-                                coercedPoint + base
-                            }
-                        ).endState.value
-                    
-                        val result = list.elementAt(
-                            getItemIndexForOffset(list, value, endValue, halfNumbersColumnHeightPx)
-                        )
-                        onValueChange(result)
-                        animatedOffset.snapTo(0f)
-                    }
-                }
-            )
-            .padding(vertical = numbersColumnHeight / 3 + verticalMargin * 2)
-    ) { measurables, constraints ->
-        // Don't constrain child views further, measure them with given constraints
-        // List of measured children
-        val placeables = measurables.map { measurable ->
-            // Measure each children
-            measurable.measure(constraints)
-        }
-        
-        dividersWidth = placeables
-            .drop(1)
-            .first()
-            .width
-            .toDp()
-        
-        // Set the size of the layout as big as it can
-        layout(dividersWidth.toPx().toInt(), placeables
-            .sumOf {
-                it.height
-            }
         ) {
-            // Track the y co-ord we have placed children up to
-            var yPosition = 0
-            
-            // Place children in the parent layout
-            placeables.forEach { placeable ->
-                
-                // Position item on the screen
-                placeable.placeRelative(x = 0, y = yPosition)
-                
-                // Record the y co-ord placed up to
-                yPosition += placeable.height
+            val lModifier = Modifier.align(align)
+            if(doublePlaceHolders && indexOfElement > 1) Label(
+                label(list.elementAt(indexOfElement - 2)),
+                lModifier.offset(y = -(halfHeight * 2)),
+                textStyle.copy(fontWeight = W500), (0.1f),
+                (coercedAnimatedOffset / halfHeightPx)
+            )
+            if(indexOfElement > 0) Label(
+                label(list.elementAt(indexOfElement - 1)),
+                lModifier.offset(y = -halfHeight),
+                textStyle.copy(
+                    fontWeight = if(doublePlaceHolders)
+                        W600 else W500
+                ), (0.2f),
+                (coercedAnimatedOffset / (halfHeightPx / 2))
+            )
+            Label(
+                label(list.elementAt(indexOfElement)),
+                lModifier, textStyle.copy(fontWeight = W700), (0.3f),
+                (1 - abs(coercedAnimatedOffset) / halfHeightPx)
+            )
+            if(indexOfElement < list.count() - 1)
+                Label(
+                    label(list.elementAt(indexOfElement + 1)),
+                    lModifier.offset(y = halfHeight),
+                    textStyle.copy(
+                        fontWeight = if(doublePlaceHolders)
+                            W600 else W500
+                    ), (0.2f),
+                    (-coercedAnimatedOffset / (halfHeightPx / 2))
+                )
+            if(doublePlaceHolders && indexOfElement < list.count() - 2)
+                Label(
+                    label(list.elementAt(indexOfElement + 2)),
+                    lModifier.offset(y = halfHeight * 2),
+                    textStyle.copy(fontWeight = W500), (0.1f),
+                    (-coercedAnimatedOffset / halfHeightPx)
+                )
+        }
+        GDivider(Modifier.fillMaxWidth(), dividersColor)
+    }, modifier
+        .draggable(
+            rememberDraggableState { deltaY ->
+                scope.launch {
+                    animatedOffset.snapTo(
+                        (animatedOffset.value + deltaY)
+                    )
+                }
+            }, Vertical,
+            onDragStopped = {
+                onDragStopped(
+                    it, halfHeightPx, list, value,
+                    animatedOffset, onValueChange
+                )
+            }
+        )
+        .padding(0.dp, (height / 3 + verticalMargin * 2))
+    ) { measurables, constraints ->
+        measurables.map { it.measure(constraints) }.let { list ->
+            layout(
+                list.drop(1).first().width,
+                list.sumOf { it.height }
+            ) {
+                var y = 0
+                list.forEach {
+                    it.placeRelative((0), y)
+                    y += it.height
+                }
             }
         }
     }
@@ -209,12 +167,39 @@ private fun Label(
     text: String,
     modifier: Modifier,
     textStyle: TextStyle,
+    minAlpha: Float = 1f,
+    maxAlpha: Float = 1f,
 ) {
     Text(
-        text, modifier, colorScheme.tertiary,
-        textAlign = Center,
-        style = textStyle
+        text, modifier.alpha(
+            maxOf(minAlpha, maxAlpha)
+        ), style = textStyle
     )
+}
+
+private suspend fun <T> onDragStopped(
+    velocity: Float,
+    halfHeightPx: Float,
+    list: List<T>, value: T,
+    animatedOffset: Animatable<Float, AnimationVector1D>,
+    onValueChange: (T) -> Unit,
+) {
+    val endValue = animatedOffset.fling(
+        velocity, exponentialDecay((20f)), { target ->
+            (listOf(-halfHeightPx, 0f, halfHeightPx).minByOrNull {
+                abs(it - target % halfHeightPx)
+            } ?: 0f) + halfHeightPx * (target / halfHeightPx).toInt()
+        }
+    ).endState.value
+    onValueChange(
+        list.elementAt(
+            getItemIndexForOffset(
+                list, value,
+                endValue, halfHeightPx
+            )
+        )
+    )
+    animatedOffset.snapTo(0f)
 }
 
 private suspend fun Animatable<Float, AnimationVector1D>.fling(
@@ -222,20 +207,7 @@ private suspend fun Animatable<Float, AnimationVector1D>.fling(
     animationSpec: DecayAnimationSpec<Float>,
     adjustTarget: ((Float) -> Float)?,
     block: (Animatable<Float, AnimationVector1D>.() -> Unit)? = null,
-): AnimationResult<Float, AnimationVector1D> {
-    val targetValue = animationSpec.calculateTargetValue(value, initialVelocity)
-    val adjustedTarget = adjustTarget?.invoke(targetValue)
-    return if(adjustedTarget != null) {
-        animateTo(
-            adjustedTarget,
-            initialVelocity = initialVelocity,
-            block = block
-        )
-    } else {
-        animateDecay(
-            initialVelocity = initialVelocity,
-            animationSpec = animationSpec,
-            block = block,
-        )
-    }
-}
+) = adjustTarget?.invoke(
+    animationSpec.calculateTargetValue(value, initialVelocity)
+)?.let { animateTo(it, initialVelocity = initialVelocity, block = block) }
+    ?: animateDecay(initialVelocity, animationSpec, block)

@@ -34,7 +34,7 @@ fun AgeBottomSheetContent(
         ) {
             Spacer(modifier.width(1.dp))
             NumberPicker(
-                Modifier, {
+                Modifier.padding(horizontal = 16.dp), {
                     if(it == 17) noMatter
                     else it.toString()
                 }, value ?: range.first, {

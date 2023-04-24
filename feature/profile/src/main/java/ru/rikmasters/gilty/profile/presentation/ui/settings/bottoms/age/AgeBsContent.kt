@@ -40,7 +40,9 @@ fun AgeBsContent(
         ) {
             Spacer(modifier.width(1.dp))
             NumberPicker(
-                Modifier, {
+                Modifier.padding(
+                    horizontal = 20.dp
+                ), {
                     if(it == 17) noMatter
                     else it.toString()
                 }, state.age, {
