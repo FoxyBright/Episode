@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,24 +41,24 @@ fun DurationBottomSheet(
     Box(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
+            .fillMaxHeight(0.55f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
+        DurationPicker(
+            value, Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(TopCenter)
+        ) { onValueChange?.let { c -> c(it) } }
         Text(
-            stringResource(R.string.add_meet_detailed_meet_date_episode),
+            stringResource(R.string.add_meet_detailed_meet_duration),
             Modifier
                 .padding(bottom = 16.dp)
                 .align(TopStart),
             colorScheme.tertiary,
             style = typography.labelLarge
         )
-        DurationPicker(
-            value, Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .align(Center)
-        ) { onValueChange?.let { c -> c(it) } }
         GradientButton(
             Modifier
                 .padding(vertical = 28.dp)
@@ -79,7 +80,7 @@ private fun DurationPicker(
             colorScheme.background
         ), Center
     ) {
-        Box(modifier.padding(horizontal = 20.dp)) {
+        Box(Modifier.padding(horizontal = 20.dp)) {
             getDuration().let { list ->
                 ListItemPicker(
                     value.ifBlank {

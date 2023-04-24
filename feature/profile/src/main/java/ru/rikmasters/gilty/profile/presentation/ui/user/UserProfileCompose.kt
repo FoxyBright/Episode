@@ -276,8 +276,7 @@ private fun MeetHistory(
         )
         Icon(
             if(!historyState) Filled.KeyboardArrowRight
-            else Filled.KeyboardArrowDown,
-            (null),
+            else Filled.KeyboardArrowDown, (null),
             Modifier.size(24.dp),
             colorScheme.tertiary
         )
@@ -286,8 +285,7 @@ private fun MeetHistory(
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(
-                userId,
-                it!!,
+                userId, it!!,
                 Modifier.padding(horizontal = 4.dp),
                 old = true
             ) { onSelect(it) }

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,10 +58,17 @@ fun DateTimeBS(
     Box(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
+            .fillMaxHeight(0.55f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
+        DateTimePickerContent(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(TopCenter),
+            state, callback
+        )
         Text(
             stringResource(R.string.add_meet_detailed_meet_date_episode),
             Modifier
@@ -68,13 +76,6 @@ fun DateTimeBS(
                 .align(TopStart),
             colorScheme.tertiary,
             style = typography.labelLarge
-        )
-        DateTimePickerContent(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .align(Center),
-            state, callback
         )
         GradientButton(
             Modifier
@@ -97,7 +98,7 @@ private fun DateTimePickerContent(
             colorScheme.background
         ), Center
     ) {
-        Row(modifier.padding(horizontal = 20.dp)) {
+        Row(Modifier.padding(horizontal = 20.dp)) {
             ListItemPicker(
                 state.date.ifBlank {
                     "$LOCAL_DATE$ZERO_TIME"

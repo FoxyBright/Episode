@@ -201,6 +201,8 @@ fun MeetingCategoryCard(
                 .offset(-(8).dp)
                 .width(156.dp)
         ) {
+            val user = meeting.organizer
+            val hasAvatar = user?.id != null && userId != user.id
             Box(
                 Modifier
                     .background(
@@ -212,16 +214,23 @@ fun MeetingCategoryCard(
                     )
                     .size(126.dp), Center
             ) {
-                val user = meeting.organizer
-                if(user?.id != null && userId != user.id) Image(
+                if(hasAvatar) Image(
                     rememberAsyncImagePainter(
-                        user.avatar?.thumbnail?.url
+                        user?.avatar?.thumbnail?.url
                     ), (null), Modifier
                         .fillMaxSize()
                         .clip(CircleShape),
                     contentScale = Crop
                 )
-                Text(
+                if(old && hasAvatar) Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(
+                            colors.meetingTransparencyShape,
+                            CircleShape
+                        )
+                )
+                if(!hasAvatar) Text(
                     meeting.category.name,
                     Modifier.padding(horizontal = 16.dp), White,
                     style = typography.labelSmall,

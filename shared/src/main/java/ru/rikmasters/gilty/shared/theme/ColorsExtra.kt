@@ -33,6 +33,7 @@ data class ExtraColors(
     val meetCloseCrossColor: Color = Color.Unspecified,
     val meetCardPlaceHolder: Color = Color.Unspecified,
     val notificationCloud: Color = Color.Unspecified,
+    val meetingTransparencyShape: Color = Color.Unspecified,
     
     // Categories Colors
     val sport: Color = Color.Unspecified,
@@ -82,6 +83,7 @@ val LightExtraColors = ExtraColors(
     meetCloseCrossColor = Colors.RatGray,
     meetCardPlaceHolder = Colors.NickelGray,
     notificationCloud = Colors.Gray,
+    meetingTransparencyShape = Colors.halfTransparentlyGray,
     
     // Categories Colors
     sport = Colors.Orange,
@@ -131,6 +133,7 @@ val DarkExtraColors = ExtraColors(
     meetCloseCrossColor = Colors.White,
     meetCardPlaceHolder = Colors.NickelDarkGray,
     notificationCloud = Colors.NickelDarkGray,
+    meetingTransparencyShape = Colors.halfTransparentlyGray,
     
     // Categories Colors
     sport = Colors.DarkOrange,
