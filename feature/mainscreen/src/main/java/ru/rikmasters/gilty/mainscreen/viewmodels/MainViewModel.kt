@@ -169,8 +169,12 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun moreMeet() {
+        _days.emit(emptyList())
+        _time.emit("")
         _meetFilters.emit(
-            MeetFiltersModel(get(today.value.compareTo(false)))
+            MeetFiltersModel(
+                get(today.value.compareTo(false))
+            )
         )
         getMeets()
     }

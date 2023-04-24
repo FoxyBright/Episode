@@ -11,7 +11,6 @@ class TimeBsViewModel(
     private val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
-    
     val selectedTime = mainVm.time.value
     
     private val _minutes = MutableStateFlow("00")
@@ -29,13 +28,14 @@ class TimeBsViewModel(
     
     suspend fun setLocTime() {
         val lTime = selectedTime.let { lTime ->
-            if(lTime.isNotBlank()) lTime.split(":")
-                .map { it.toInt() }
-                .let { LocalTime.ofZ(it.first(), it.last()) }
-            else LocalTime(Calendar.getInstance().time.time)
+            if(lTime.isNotBlank()) lTime.split(":").let {
+                it.first() to it.last()
+            } else LocalTime(Calendar.getInstance().time.time).let {
+                "${it.hour()}" to "${it.minute()}"
+            }
         }
-        _hours.emit(lTime.hour().toString())
-        _minutes.emit(lTime.minute().toString())
+        _hours.emit(lTime.first)
+        _minutes.emit(lTime.second)
         setTime()
     }
     
@@ -50,7 +50,7 @@ class TimeBsViewModel(
     suspend fun hoursChange(hour: String) {
         _hours.emit(
             hour
-                .replace("start", "59")
+                .replace("start", "23")
                 .replace("end", "00")
         )
     }

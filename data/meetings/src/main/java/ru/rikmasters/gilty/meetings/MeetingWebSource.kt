@@ -126,8 +126,8 @@ class MeetingWebSource: KtorSource() {
                 }
             }
             when(group) {
-                "TODAY" -> time?.let { query("time" to it) }
-                "AFTER" -> dates?.let { list ->
+                "today" -> time?.let { query("time" to it) }
+                "after" -> dates?.let { list ->
                     list.forEach {
                         query("dates[]" to it)
                     }
