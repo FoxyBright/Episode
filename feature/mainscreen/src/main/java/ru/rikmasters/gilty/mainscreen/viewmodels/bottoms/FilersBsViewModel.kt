@@ -16,8 +16,8 @@ class FiltersBsViewModel(
     val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
-    private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
+    private val meetManager by inject<MeetingManager>()
     
     private val _screen = MutableStateFlow(0)
     val screen = _screen.asStateFlow()
@@ -230,14 +230,16 @@ class FiltersBsViewModel(
         )
     }
     
+    private val location = mainVm.location
+    
     private fun filtersBuilder() = MeetFiltersModel(
         group = get(mainVm.today.value.compareTo(false)),
         categories = selectedCategories.value.ifEmpty { null },
         tags = tags.value.ifEmpty { null },
         radius = if(mainVm.today.value)
             (distance.value * 1000) else null,
-        lat = if(mainVm.today.value) 0 else null,
-        lng = if(mainVm.today.value) 0 else null,
+        lat = if(mainVm.today.value) location.value?.first else null,
+        lng = if(mainVm.today.value) location.value?.second else null,
         onlyOnline = isOnline.value,
         meetTypes = if(meetTypes.value.isNotEmpty()) {
             meetTypes.value.map { MeetType.get(it) }

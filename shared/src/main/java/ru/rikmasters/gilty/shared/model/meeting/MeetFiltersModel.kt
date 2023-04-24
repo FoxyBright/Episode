@@ -8,8 +8,8 @@ data class MeetFiltersModel(
     val categories: List<CategoryModel>? = null,
     val tags: List<TagModel>? = null,
     val radius: Int? = null,
-    val lat: Int? = null,
-    val lng: Int? = null,
+    val lat: Double? = null,
+    val lng: Double? = null,
     val meetTypes: List<MeetType>? = null,
     val onlyOnline: Boolean? = null,
     val genders: List<GenderType>? = null,
@@ -22,8 +22,6 @@ data class MeetFiltersModel(
     fun isNotNullOrEmpty() = (!categories.isNullOrEmpty()
             || !tags.isNullOrEmpty()
             || radius != null
-            || (lat != 0 && lat != null)
-            || (lng != 0 && lng != null)
             || !meetTypes.isNullOrEmpty()
             || onlyOnline != null
             || !conditions.isNullOrEmpty()

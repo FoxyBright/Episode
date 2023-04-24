@@ -11,6 +11,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time.TimeBs
@@ -31,6 +32,7 @@ fun MainScreen(vm: MainViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
+    val activity = getActivity()
     val nav = get<NavState>()
     
     val meetings by vm.meetings.collectAsState()
@@ -39,6 +41,8 @@ fun MainScreen(vm: MainViewModel) {
     val today by vm.today.collectAsState()
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
+    
+    val location by vm.location.collectAsState()
     
     val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
@@ -55,6 +59,7 @@ fun MainScreen(vm: MainViewModel) {
         .isNotNullOrEmpty()
     
     LaunchedEffect(Unit) {
+        vm.getLocation(activity)
         vm.getMeets()
         vm.getAllCategories()
         vm.getUserCategories()
@@ -64,6 +69,8 @@ fun MainScreen(vm: MainViewModel) {
         ) { scope.launch { vm.setUnreadMessages(it > 0) } }
         vm.getUnread()
     }
+    
+    LaunchedEffect(location) { vm.getMeets() }
     
     MainContent(
         MainContentState(

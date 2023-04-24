@@ -1,11 +1,17 @@
 package ru.rikmasters.gilty.mainscreen.viewmodels
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import androidx.activity.ComponentActivity
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chats.manager.ChatManager
+import ru.rikmasters.gilty.core.app.checkGPS
+import ru.rikmasters.gilty.core.app.checkLocationPermissions
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -24,6 +30,7 @@ class MainViewModel: ViewModel() {
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
     private val chatManager by inject<ChatManager>()
+    private val context = getKoin().get<Context>()
     
     private val _today = MutableStateFlow(true)
     val today = _today.asStateFlow()
@@ -103,6 +110,25 @@ class MainViewModel: ViewModel() {
         )
     }
     
+    val location =
+        MutableStateFlow<Pair<Double, Double>?>(null)
+    
+    @SuppressLint("MissingPermission")
+    suspend fun getLocation(activity: Activity) {
+        if(!activity.checkLocationPermissions()
+            || !activity.checkGPS()
+        ) return
+        LocationServices.getFusedLocationProviderClient(context)
+            .lastLocation
+            .addOnSuccessListener {
+                coroutineScope.launch {
+                    location.emit(it?.let {
+                        it.latitude to it.longitude
+                    })
+                }
+            }
+    }
+    
     suspend fun getMeets() = singleLoading {
         _meetFilters.emit(
             meetFilters.value.copy(
@@ -111,10 +137,8 @@ class MainViewModel: ViewModel() {
                 time = time.value.ifBlank { null },
                 radius = if(today.value)
                     meetFilters.value.radius else null,
-                lat = if(today.value)
-                    meetFilters.value.lat else null,
-                lng = if(today.value)
-                    meetFilters.value.lng else null
+                lat = if(today.value) location.value?.first else null,
+                lng = if(today.value) location.value?.second else null
             )
         )
         _meetings.emit(meetManager.getMeetings(meetFilters.value))
