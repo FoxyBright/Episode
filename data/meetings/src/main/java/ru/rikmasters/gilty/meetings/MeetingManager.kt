@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.meetings
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import io.ktor.http.HttpStatusCode.Companion.OK
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.meetings.addmeet.AddMeetStorage
@@ -80,56 +81,63 @@ class MeetingManager(
         }
     }
     
-    private suspend inline fun <reified Type> getMeetings(
+    private suspend fun getMeetings(
         filter: MeetFiltersRequest,
         count: Boolean,
-    ): Type? {
-        return web.getMeetsList(
-            count = count,
-            group = filter.group,
-            categories = filter.categories?.map { it.id },
-            tags = filter.tags?.map { it.title },
-            radius = filter.radius,
-            lat = filter.lat,
-            lng = filter.lng,
-            meetTypes = filter.meetTypes?.map { it.name },
-            onlyOnline = filter.onlyOnline?.compareTo(false),
-            conditions = filter.conditions?.map { it.name },
-            genders = filter.genders?.map { it.name },
-            dates = filter.dates,
-            time = filter.time,
-            city = filter.city?.id
-        )?.wrapped()
-    }
+    ) = web.getMeetsList(
+        count = count,
+        group = filter.group,
+        categories = filter.categories?.map { it.id },
+        tags = filter.tags?.map { it.title },
+        radius = filter.radius,
+        lat = filter.lat,
+        lng = filter.lng,
+        meetTypes = filter.meetTypes?.map { it.name },
+        onlyOnline = filter.onlyOnline?.compareTo(false),
+        conditions = filter.conditions?.map { it.name },
+        genders = filter.genders?.map { it.name },
+        dates = filter.dates,
+        time = filter.time,
+        city = filter.city?.id
+    )
     
-    suspend fun getMeetings(filter: MeetFiltersModel) =
-        withContext(IO) {
-            getMeetings<List<MainMeetResponse>>(
-                MeetFiltersRequest(
-                    filter.group.value, filter.categories,
-                    filter.tags, filter.radius, filter.lat,
-                    filter.lng, filter.meetTypes,
-                    filter.onlyOnline, filter.genders,
-                    filter.conditions, filter.dates,
-                    filter.time, filter.city
-                ),
-                false
-            )?.map { it.map() } ?: emptyList()
-        }
-    
-    suspend fun getMeetCount(
+    suspend fun getMeetings(
         filter: MeetFiltersModel,
     ) = withContext(IO) {
-        getMeetings<MeetCount>(
+        getMeetings(
             MeetFiltersRequest(
                 filter.group.value, filter.categories,
                 filter.tags, filter.radius, filter.lat,
                 filter.lng, filter.meetTypes,
                 filter.onlyOnline, filter.genders,
                 filter.conditions, filter.dates,
-                filter.time,filter.city
+                filter.time, filter.city
+            ), false
+        )?.let { response ->
+            if(response.status == OK)
+                response.wrapped<List<MainMeetResponse>>()
+                    .map { it.map() }
+            else null
+        } ?: emptyList()
+    }
+    
+    suspend fun getMeetCount(
+        filter: MeetFiltersModel,
+    ) = withContext(IO) {
+        getMeetings(
+            MeetFiltersRequest(
+                filter.group.value, filter.categories,
+                filter.tags, filter.radius, filter.lat,
+                filter.lng, filter.meetTypes,
+                filter.onlyOnline, filter.genders,
+                filter.conditions, filter.dates,
+                filter.time, filter.city
             ), true
-        )?.total ?: 0
+        )?.let {
+            if(it.status == OK)
+                it.wrapped<MeetCount>().total
+            else null
+        } ?: 0
     }
     
     suspend fun leaveMeet(meetId: String) {

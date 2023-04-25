@@ -11,7 +11,10 @@ import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
-fun FiltersBs(vm: FiltersBsViewModel) {
+fun FiltersBs(
+    vm: FiltersBsViewModel,
+    alpha: Float,
+) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -44,9 +47,9 @@ fun FiltersBs(vm: FiltersBsViewModel) {
             || isOnline
             || selectedCondition.isNotEmpty())
     
-    val topRow = (
-            interest + vm.removeChildren(selectedCategories)
-                .filter { !interest.contains(it) })
+    val topRow = interest + vm
+        .removeChildren(selectedCategories)
+        .filter { !interest.contains(it) }
     
     when(screen) {
         1 -> CategoriesScreen(vm)
@@ -57,7 +60,8 @@ fun FiltersBs(vm: FiltersBsViewModel) {
                 today, distanceState, distance,
                 isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
-                categoriesStates, city, hasFilters
+                categoriesStates, city, hasFilters,
+                alpha
             ), object: MeetingFilterBottomCallback {
                 
                 override fun onCategoryClick(

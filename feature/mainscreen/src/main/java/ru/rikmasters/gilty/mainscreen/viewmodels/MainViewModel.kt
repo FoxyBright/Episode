@@ -72,6 +72,7 @@ class MainViewModel: ViewModel() {
         }.value
     )
     val unreadMessages = _unreadMessages.asStateFlow()
+    
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
     }

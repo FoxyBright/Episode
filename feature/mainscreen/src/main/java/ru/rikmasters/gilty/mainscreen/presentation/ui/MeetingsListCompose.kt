@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,21 +18,6 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 fun MeetingsListContent(
     states: List<Pair<MeetingModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
-    notInteresting: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
-    onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
-    onClick: ((MeetingModel) -> Unit)? = null,
-) {
-    Box(modifier.fillMaxSize()) {
-        Content(
-            states, notInteresting,
-            onSelect, onClick
-        )
-    }
-}
-
-@Composable
-private fun Content(
-    states: List<Pair<MeetingModel, SwipeableCardState>>,
     notInteresting: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
@@ -59,7 +43,7 @@ private fun Content(
         xOffset = state.offset.value.x
         state.swipedDirection ?: run {
             MeetCard(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .clickable(
                         MutableInteractionSource(), (null)

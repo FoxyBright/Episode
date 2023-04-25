@@ -15,16 +15,17 @@ import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time.TimeBs
-import ru.rikmasters.gilty.mainscreen.presentation.ui.filter.FiltersBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
-import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue
+import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 
 @Composable
 fun MainScreen(vm: MainViewModel) {
@@ -59,16 +60,20 @@ fun MainScreen(vm: MainViewModel) {
         .isNotNullOrEmpty()
     
     LaunchedEffect(Unit) {
-        vm.getLocation(activity)
-        vm.getMeets()
         vm.getAllCategories()
         vm.getUserCategories()
+        vm.getUnread()
+        vm.getMeets()
+        vm.getLocation(activity)
         context.listenPreference(
             key = "unread_messages",
             defValue = 0
         ) { scope.launch { vm.setUnreadMessages(it > 0) } }
-        vm.getUnread()
     }
+    
+    val bsState = rememberBottomSheetScaffoldState(
+        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+    )
     
     LaunchedEffect(location) { vm.getMeets() }
     
@@ -76,7 +81,8 @@ fun MainScreen(vm: MainViewModel) {
         MainContentState(
             grid, today, days.isNotEmpty(),
             time.isNotBlank(), meetings,
-            navBar, alert, hasFilters
+            navBar, alert, hasFilters,
+            bsState, vm.scope
         ), Modifier, object: MainContentCallback {
             
             override fun onNavBarSelect(point: Int) {
@@ -100,16 +106,6 @@ fun MainScreen(vm: MainViewModel) {
                 scope.launch {
                     asm.bottomSheet.expand {
                         BottomSheet(vm.scope, SHORT_MEET, meet.id)
-                    }
-                }
-            }
-            
-            override fun onOpenFiltersBottomSheet() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<FiltersBsViewModel>(vm.scope) {
-                            FiltersBs(it)
-                        }
                     }
                 }
             }

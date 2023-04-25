@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,8 +39,9 @@ fun MeetingFilterBottomPreview() {
                     listOf(0, 2), emptyList(),
                     listOf("kaif", "pain", "fast", "launch")
                         .map { TagModel(it, it) },
-                    listOf(), listOf(), listOf(),
-                    listOf(1), DemoCityModel, true
+                    DemoCategoryModelList, DemoCategoryModelList,
+                    listOf(), listOf(1), DemoCityModel,
+                    (true), (1f)
                 )
             )
         }
@@ -60,6 +62,7 @@ data class FilterListState(
     val categoriesStates: List<Int>,
     val city: CityModel?,
     val hasFilters: Boolean,
+    val alpha: Float,
 )
 
 interface MeetingFilterBottomCallback {
@@ -88,12 +91,12 @@ fun MeetingFilterBottom(
     callback: MeetingFilterBottomCallback? = null,
 ) {
     Scaffold(
-        modifier,
-        topBar = {
-            // TODO при свернутом BS
-            /*TopBar(state, callback)*/
-        },
-        bottomBar = {
+        modifier, topBar = {
+            TopBar(
+                state, callback,
+                Modifier.alpha(state.alpha)
+            )
+        }, bottomBar = {
             Buttons(
                 find, state.hasFilters,
                 Modifier, { callback?.onFilter() }
@@ -110,7 +113,6 @@ fun MeetingFilterBottom(
 }
 
 @Composable
-@Suppress("unused")
 private fun TopBar(
     state: FilterListState,
     callback: MeetingFilterBottomCallback?,
@@ -119,10 +121,7 @@ private fun TopBar(
     LazyRow(
         modifier
             .fillMaxWidth()
-            .padding(
-                top = 28.dp,
-                bottom = 6.dp
-            )
+            .padding(top = 14.dp, bottom = 8.dp)
     ) {
         itemSpacer(16.dp, true)
         items(state.interest) {
@@ -142,6 +141,12 @@ private fun Content(
     modifier: Modifier = Modifier,
 ) {
     val list = filterList(state, callback)
+    Box(
+        Modifier
+            .fillMaxSize()
+            .alpha(state.alpha)
+            .background(colorScheme.primaryContainer)
+    )
     LazyColumn(modifier.fillMaxSize()) {
         items(list) {
             Column(
