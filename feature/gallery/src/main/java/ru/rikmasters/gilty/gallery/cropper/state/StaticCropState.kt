@@ -1,10 +1,10 @@
-package com.smarttoolfactory.cropper.state
+package ru.rikmasters.gilty.gallery.cropper.state
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.unit.IntSize
-import com.smarttoolfactory.cropper.model.AspectRatio
 import kotlinx.coroutines.coroutineScope
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
 
 /**
  *  * State for cropper with dynamic overlay. When this state is selected instead of overlay
@@ -28,7 +28,7 @@ class StaticCropState internal constructor(
     drawAreaSize: IntSize,
     aspectRatio: AspectRatio,
     overlayRatio: Float,
-    maxZoom: Float = 5f,
+    maxZoom: Float = 10f,
     fling: Boolean = false,
     zoomable: Boolean = true,
     pannable: Boolean = true,
@@ -116,9 +116,8 @@ class StaticCropState internal constructor(
     ) {
         doubleTapped = true
 
-        if (fling) {
-            resetTracking()
-        }
+        if (fling) resetTracking()
+        
         resetWithAnimation(pan = pan, zoom = zoom, rotation = rotation)
         drawAreaRect = updateImageDrawRectFromTransformation()
         animateTransformationToOverlayBounds(overlayRect, true)

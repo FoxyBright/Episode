@@ -1,13 +1,7 @@
-package com.smarttoolfactory.cropper.state
+package ru.rikmasters.gilty.gallery.cropper.state
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.exponentialDecay
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -37,67 +31,73 @@ open class TransformState(
     val drawAreaSize: IntSize,
     initialZoom: Float = 1f,
     initialRotation: Float = 0f,
-    minZoom: Float = 1f,
+    minZoom: Float = 0.5f,
     maxZoom: Float = 10f,
     internal var zoomable: Boolean = true,
     internal var pannable: Boolean = true,
     internal var rotatable: Boolean = true,
-    internal var limitPan: Boolean = false
+    internal var limitPan: Boolean = false,
 ) {
-
+    
     var drawAreaRect: Rect by mutableStateOf(
         Rect(
             offset = Offset(
                 x = ((containerSize.width - drawAreaSize.width) / 2).toFloat(),
                 y = ((containerSize.height - drawAreaSize.height) / 2).toFloat()
             ),
-            size = Size(drawAreaSize.width.toFloat(), drawAreaSize.height.toFloat())
+            size = Size(
+                drawAreaSize.width.toFloat(),
+                drawAreaSize.height.toFloat()
+            )
         )
     )
-
-    internal val zoomMin = minZoom.coerceAtLeast(1f)
+    
+    internal var zoomMin = minZoom.coerceAtLeast(0.5f)
     internal var zoomMax = maxZoom.coerceAtLeast(1f)
     private val zoomInitial = initialZoom.coerceIn(zoomMin, zoomMax)
     private val rotationInitial = initialRotation % 360
-
+    
     internal val animatablePanX = Animatable(0f)
     internal val animatablePanY = Animatable(0f)
     internal val animatableZoom = Animatable(zoomInitial)
     internal val animatableRotation = Animatable(rotationInitial)
-
+    
     private val velocityTracker = VelocityTracker()
-
+    
     init {
         animatableZoom.updateBounds(zoomMin, zoomMax)
         require(zoomMax >= zoomMin)
     }
-
+    
     val pan: Offset
         get() = Offset(animatablePanX.value, animatablePanY.value)
-
+    
     val zoom: Float
         get() = animatableZoom.value
-
+    
     val rotation: Float
         get() = animatableRotation.value
-
+    
     val isZooming: Boolean
         get() = animatableZoom.isRunning
-
+    
     val isPanning: Boolean
         get() = animatablePanX.isRunning || animatablePanY.isRunning
-
+    
     val isRotating: Boolean
         get() = animatableRotation.isRunning
-
+    
     val isAnimationRunning: Boolean
         get() = isZooming || isPanning || isRotating
-
-    internal open fun updateBounds(lowerBound: Offset?, upperBound: Offset?) {
+    
+    internal open fun updateBounds(
+        lowerBound: Offset?,
+        upperBound: Offset?,
+    ) {
         animatablePanX.updateBounds(lowerBound?.x, upperBound?.x)
         animatablePanY.updateBounds(lowerBound?.y, upperBound?.y)
     }
-
+    
     /**
      * Update centroid, pan, zoom and rotation of this state when transform gestures are
      * invoked with one or multiple pointers
@@ -108,23 +108,23 @@ open class TransformState(
         zoomChange: Float,
         rotationChange: Float = 1f,
     ) {
-        val newZoom = (this.zoom * zoomChange).coerceIn(zoomMin, zoomMax)
-
+        val newZoom = (this.zoom * zoomChange)
+            .coerceIn(zoomMin, zoomMax)
+        
         snapZoomTo(newZoom)
-        val newRotation = if (rotatable) {
+        val newRotation = if(rotatable)
             this.rotation + rotationChange
-        } else {
-            0f
-        }
+        else 0f
+        
         snapRotationTo(newRotation)
-
-        if (pannable) {
+        
+        if(pannable) {
             val newPan = this.pan + panChange.times(this.zoom)
             snapPanXto(newPan.x)
             snapPanYto(newPan.y)
         }
     }
-
+    
     /**
      * Reset [pan], [zoom] and [rotation] with animation.
      */
@@ -132,75 +132,75 @@ open class TransformState(
         pan: Offset = Offset.Zero,
         zoom: Float = 1f,
         rotation: Float = 0f,
-        animationSpec: AnimationSpec<Float> = tween(400)
+        animationSpec: AnimationSpec<Float> = tween(400),
     ) = coroutineScope {
         launch { animatePanXto(pan.x, animationSpec) }
         launch { animatePanYto(pan.y, animationSpec) }
         launch { animateZoomTo(zoom, animationSpec) }
         launch { animateRotationTo(rotation, animationSpec) }
     }
-
+    
     internal suspend fun animatePanXto(
         panX: Float,
-        animationSpec: AnimationSpec<Float> = tween(400)
+        animationSpec: AnimationSpec<Float> = tween(400),
     ) {
-        if (pannable && pan.x != panX) {
+        if(pannable && pan.x != panX) {
             animatablePanX.animateTo(panX, animationSpec)
         }
     }
-
+    
     internal suspend fun animatePanYto(
         panY: Float,
-        animationSpec: AnimationSpec<Float> = tween(400)
+        animationSpec: AnimationSpec<Float> = tween(400),
     ) {
-        if (pannable && pan.y != panY) {
+        if(pannable && pan.y != panY) {
             animatablePanY.animateTo(panY, animationSpec)
         }
     }
-
-    internal suspend fun animateZoomTo(
-        zoom: Float,
-        animationSpec: AnimationSpec<Float> = tween(400)
+    
+    private suspend fun animateZoomTo(
+        zoom: Float, animationSpec: AnimationSpec<Float>,
     ) {
-        if (zoomable && this.zoom != zoom) {
-            val newZoom = zoom.coerceIn(zoomMin, zoomMax)
-            animatableZoom.animateTo(newZoom, animationSpec)
-        }
+        if(zoomable && this.zoom != zoom)
+            animatableZoom.animateTo(
+                zoom.coerceIn(zoomMin, zoomMax),
+                animationSpec
+            )
     }
-
+    
     internal suspend fun animateRotationTo(
         rotation: Float,
-        animationSpec: AnimationSpec<Float> = tween(400)
+        animationSpec: AnimationSpec<Float> = tween(400),
     ) {
-        if (rotatable && this.rotation != rotation) {
+        if(rotatable && this.rotation != rotation) {
             animatableRotation.animateTo(rotation, animationSpec)
         }
     }
-
+    
     internal suspend fun snapPanXto(panX: Float) {
-        if (pannable) {
+        if(pannable) {
             animatablePanX.snapTo(panX)
         }
     }
-
+    
     internal suspend fun snapPanYto(panY: Float) {
-        if (pannable) {
+        if(pannable) {
             animatablePanY.snapTo(panY)
         }
     }
-
+    
     internal suspend fun snapZoomTo(zoom: Float) {
-        if (zoomable) {
-            animatableZoom.snapTo(zoom.coerceIn(zoomMin, zoomMax))
-        }
+        if(zoomable) animatableZoom.snapTo(
+            zoom.coerceIn(zoomMin, zoomMax)
+        )
     }
-
+    
     internal suspend fun snapRotationTo(rotation: Float) {
-        if (rotatable) {
+        if(rotatable) {
             animatableRotation.snapTo(rotation)
         }
     }
-
+    
     /*
     Fling gesture
  */
@@ -210,7 +210,7 @@ open class TransformState(
             position = position
         )
     }
-
+    
     /**
      * Create a fling gesture when user removes finger from scree to have continuous movement
      * until [velocityTracker] speed reached to lower bound
@@ -219,28 +219,28 @@ open class TransformState(
         val velocityTracker = velocityTracker.calculateVelocity()
         val velocity = Offset(velocityTracker.x, velocityTracker.y)
         var flingStarted = false
-
+        
         launch {
             animatablePanX.animateDecay(
                 velocity.x,
                 exponentialDecay(absVelocityThreshold = 20f),
                 block = {
                     // This callback returns target value of fling gesture initially
-                    if (!flingStarted) {
+                    if(!flingStarted) {
                         onFlingStart()
                         flingStarted = true
                     }
                 }
             )
         }
-
+        
         launch {
             animatablePanY.animateDecay(
                 velocity.y,
                 exponentialDecay(absVelocityThreshold = 20f),
                 block = {
                     // This callback returns target value of fling gesture initially
-                    if (!flingStarted) {
+                    if(!flingStarted) {
                         onFlingStart()
                         flingStarted = true
                     }
@@ -248,7 +248,7 @@ open class TransformState(
             )
         }
     }
-
+    
     internal fun resetTracking() {
         velocityTracker.resetTracking()
     }

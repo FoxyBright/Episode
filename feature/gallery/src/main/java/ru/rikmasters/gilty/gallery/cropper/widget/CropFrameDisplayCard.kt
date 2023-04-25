@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.widget
+package ru.rikmasters.gilty.gallery.cropper.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,12 +26,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smarttoolfactory.cropper.model.CropOutline
-import com.smarttoolfactory.cropper.model.CropPath
-import com.smarttoolfactory.cropper.model.CropShape
-import com.smarttoolfactory.cropper.util.scale
+import ru.rikmasters.gilty.gallery.cropper.model.CropOutline
+import ru.rikmasters.gilty.gallery.cropper.model.CropPath
+import ru.rikmasters.gilty.gallery.cropper.model.CropShape
+import ru.rikmasters.gilty.gallery.cropper.util.scale
 
 @Composable
+@Suppress("unused")
 fun CropFrameDisplayCard(
     modifier: Modifier = Modifier,
     editable: Boolean,

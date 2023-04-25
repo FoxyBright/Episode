@@ -1,10 +1,10 @@
-package com.smarttoolfactory.cropper.state
+package ru.rikmasters.gilty.gallery.cropper.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntSize
 import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
-import com.smarttoolfactory.cropper.settings.CropType
+import ru.rikmasters.gilty.gallery.cropper.settings.CropType
 
 
 /**

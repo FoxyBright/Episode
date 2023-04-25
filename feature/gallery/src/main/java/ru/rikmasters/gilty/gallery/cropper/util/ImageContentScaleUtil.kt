@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints

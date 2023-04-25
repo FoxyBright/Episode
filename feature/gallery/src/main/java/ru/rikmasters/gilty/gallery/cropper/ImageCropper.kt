@@ -20,22 +20,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
-import com.smarttoolfactory.cropper.draw.DrawingOverlay
-import com.smarttoolfactory.cropper.draw.ImageDrawCanvas
-import com.smarttoolfactory.cropper.handlesTouched
-import com.smarttoolfactory.cropper.image.ImageWithConstraints
-import com.smarttoolfactory.cropper.image.getScaledImageBitmap
-import com.smarttoolfactory.cropper.model.CropOutline
-import com.smarttoolfactory.cropper.settings.*
-import com.smarttoolfactory.cropper.state.DynamicCropState
-import com.smarttoolfactory.cropper.state.rememberCropState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import ru.rikmasters.gilty.gallery.cropper.crop.CropAgent
-import ru.rikmasters.gilty.gallery.cropper.settings.CropDefaults
-import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
-import ru.rikmasters.gilty.gallery.cropper.settings.CropStyle
+import ru.rikmasters.gilty.gallery.cropper.draw.DrawingOverlay
+import ru.rikmasters.gilty.gallery.cropper.draw.ImageDrawCanvas
+import ru.rikmasters.gilty.gallery.cropper.image.ImageWithConstraints
+import ru.rikmasters.gilty.gallery.cropper.image.getScaledImageBitmap
+import ru.rikmasters.gilty.gallery.cropper.model.CropOutline
+import ru.rikmasters.gilty.gallery.cropper.settings.*
+import ru.rikmasters.gilty.gallery.cropper.state.DynamicCropState
+import ru.rikmasters.gilty.gallery.cropper.state.rememberCropState
 
 @Composable
 fun ImageCropper(
@@ -142,7 +138,7 @@ fun ImageCropper(
                 cropState = cropState
             )
         
-        LaunchedEffect(key1 = cropProperties) {
+        LaunchedEffect(cropProperties) {
             cropState.updateProperties(cropProperties)
         }
         

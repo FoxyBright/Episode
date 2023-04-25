@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.model
+package ru.rikmasters.gilty.gallery.cropper.model
 
 /**
  * Interface for containing multiple [CropOutline]s, currently selected item and index

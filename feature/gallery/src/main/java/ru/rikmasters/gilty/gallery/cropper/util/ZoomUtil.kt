@@ -1,11 +1,12 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 import androidx.compose.ui.graphics.GraphicsLayerScope
-import com.smarttoolfactory.cropper.state.TransformState
+import ru.rikmasters.gilty.gallery.cropper.state.TransformState
 
 /**
  * Calculate zoom level and zoom value when user double taps
  */
+@Suppress("unused")
 internal fun calculateZoom(
     zoomLevel: ZoomLevel,
     initial: Float,

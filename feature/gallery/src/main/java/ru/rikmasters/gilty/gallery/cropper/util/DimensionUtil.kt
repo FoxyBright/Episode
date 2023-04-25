@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 /**
  * [Linear Interpolation](https://en.wikipedia.org/wiki/Linear_interpolation) function that moves
@@ -21,6 +21,7 @@ fun scale(start1: Float, end1: Float, pos: Float, start2: Float, end2: Float) =
 /**
  * Scale x.start, x.endInclusive from a1..b1 range to a2..b2 range
  */
+@Suppress("unused")
 fun scale(
     start1: Float,
     end1: Float,

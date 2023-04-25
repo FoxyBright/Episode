@@ -1,14 +1,11 @@
-package com.smarttoolfactory.cropper.model
+package ru.rikmasters.gilty.gallery.cropper.model
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import com.smarttoolfactory.cropper.util.createPolygonShape
+import androidx.compose.ui.graphics.*
+import ru.rikmasters.gilty.gallery.cropper.util.createPolygonShape
 
 /**
  * Common ancestor for list of shapes, paths or images to crop inside [CropOutlineContainer]

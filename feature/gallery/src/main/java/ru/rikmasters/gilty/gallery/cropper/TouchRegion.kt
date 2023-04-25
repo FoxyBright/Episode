@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper
+package ru.rikmasters.gilty.gallery.cropper
 
 /**
  * Enum for detecting which section of Composable user has initially touched

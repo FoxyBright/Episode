@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.widget
+package ru.rikmasters.gilty.gallery.cropper.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,9 +16,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smarttoolfactory.cropper.model.CropAspectRatio
+import ru.rikmasters.gilty.gallery.cropper.model.CropAspectRatio
 
 @Composable
+@Suppress("unused")
 fun AspectRatioSelectionCard(
     modifier: Modifier = Modifier,
     contentColor: Color = MaterialTheme.colorScheme.surface,

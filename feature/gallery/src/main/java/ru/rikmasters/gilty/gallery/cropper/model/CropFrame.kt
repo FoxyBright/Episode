@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.model
+package ru.rikmasters.gilty.gallery.cropper.model
 
 import androidx.compose.runtime.Immutable
 
@@ -9,33 +9,37 @@ import androidx.compose.runtime.Immutable
 data class CropFrame(
     val outlineType: OutlineType,
     val editable: Boolean = false,
-    val cropOutlineContainer: CropOutlineContainer<out CropOutline>
+    val cropOutlineContainer: CropOutlineContainer<out CropOutline>,
 ) {
+    
+    @Suppress("unused")
     var selectedIndex: Int
         get() = cropOutlineContainer.selectedIndex
         set(value) {
             cropOutlineContainer.selectedIndex = value
         }
-
-    val outlines: List<CropOutline>
+    
+    private val outlines: List<CropOutline>
         get() = cropOutlineContainer.outlines
-
+    
+    @Suppress("unused")
     val outlineCount: Int
         get() = cropOutlineContainer.size
-
+    
+    @Suppress("unused")
     fun addOutline(outline: CropOutline): CropFrame {
         outlines.toMutableList().add(outline)
-       return this
+        return this
     }
 }
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "unused")
 fun getOutlineContainer(
     outlineType: OutlineType,
     index: Int,
-    outlines: List<CropOutline>
+    outlines: List<CropOutline>,
 ): CropOutlineContainer<out CropOutline> {
-    return when (outlineType) {
+    return when(outlineType) {
         OutlineType.RoundedRect -> {
             RoundedRectOutlineContainer(
                 selectedIndex = index,
@@ -48,28 +52,28 @@ fun getOutlineContainer(
                 outlines = outlines as List<CutCornerCropShape>
             )
         }
-
+        
         OutlineType.Oval -> {
             OvalOutlineContainer(
                 selectedIndex = index,
                 outlines = outlines as List<OvalCropShape>
             )
         }
-
+        
         OutlineType.Polygon -> {
             PolygonOutlineContainer(
                 selectedIndex = index,
                 outlines = outlines as List<PolygonCropShape>
             )
         }
-
+        
         OutlineType.Custom -> {
             CustomOutlineContainer(
                 selectedIndex = index,
                 outlines = outlines as List<CustomPathOutline>
             )
         }
-
+        
         OutlineType.ImageMask -> {
             ImageMaskOutlineContainer(
                 selectedIndex = index,

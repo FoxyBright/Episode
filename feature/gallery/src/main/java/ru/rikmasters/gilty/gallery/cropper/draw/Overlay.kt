@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.draw
+package ru.rikmasters.gilty.gallery.cropper.draw
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -14,13 +14,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import com.smarttoolfactory.cropper.model.CropImageMask
-import com.smarttoolfactory.cropper.model.CropOutline
-import com.smarttoolfactory.cropper.model.CropPath
-import com.smarttoolfactory.cropper.model.CropShape
-import com.smarttoolfactory.cropper.util.drawGrid
-import com.smarttoolfactory.cropper.util.drawWithLayer
-import com.smarttoolfactory.cropper.util.scaleAndTranslatePath
+import ru.rikmasters.gilty.gallery.cropper.model.*
+import ru.rikmasters.gilty.gallery.cropper.util.drawGrid
+import ru.rikmasters.gilty.gallery.cropper.util.drawWithLayer
+import ru.rikmasters.gilty.gallery.cropper.util.scaleAndTranslatePath
 
 /**
  * Draw overlay composed of 9 rectangles. When [drawHandles]

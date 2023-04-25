@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.state
+package ru.rikmasters.gilty.gallery.cropper.state
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -6,10 +6,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.unit.IntSize
-import com.smarttoolfactory.cropper.TouchRegion
-import com.smarttoolfactory.cropper.model.AspectRatio
-import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
 import kotlinx.coroutines.coroutineScope
+import ru.rikmasters.gilty.gallery.cropper.TouchRegion
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
+import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
 
 /**
  * State for cropper with dynamic overlay. Overlay of this state can be moved or resized

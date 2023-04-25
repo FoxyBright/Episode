@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 /**
  * Enum class for zoom levels

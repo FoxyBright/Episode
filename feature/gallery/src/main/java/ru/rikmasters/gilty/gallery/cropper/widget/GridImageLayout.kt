@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.widget
+package ru.rikmasters.gilty.gallery.cropper.widget
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -6,15 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 
 /**
  * Composable that positions and displays [Image]s based on count as one element,
@@ -29,10 +26,10 @@ fun GridImageLayout(
     modifier: Modifier = Modifier,
     thumbnails: List<Int>,
     divider: Dp = 2.dp,
-    onClick: ((List<Int>) -> Unit)? = null
+    onClick: ((List<Int>) -> Unit)? = null,
 ) {
-    if (thumbnails.isNotEmpty()) {
-
+    if(thumbnails.isNotEmpty()) {
+        
         ImageDrawLayout(
             modifier = modifier
                 .clickable {
@@ -41,9 +38,9 @@ fun GridImageLayout(
             divider = divider,
             itemCount = thumbnails.size
         ) {
-
+            
             val size = thumbnails.size
-            if (size < 5) {
+            if(size < 5) {
                 thumbnails.forEach {
                     Image(
                         painter = painterResource(id = it),
@@ -52,20 +49,19 @@ fun GridImageLayout(
                     )
                 }
             } else {
-                thumbnails.take(3).forEach { it ->
+                thumbnails.take(3).forEach {
                     Image(
                         painter = painterResource(id = it),
                         contentDescription = "Icon",
                         contentScale = ContentScale.Crop,
                     )
-
+                    
                 }
-
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    val carry = size - 3
-                    Text(text = "+$carry", fontSize = 20.sp)
+                Box(Modifier, Center) {
+                    Text(
+                        text = "+${size - 3}",
+                        fontSize = 20.sp
+                    )
                 }
             }
         }
@@ -77,15 +73,15 @@ private fun ImageDrawLayout(
     modifier: Modifier = Modifier,
     itemCount: Int,
     divider: Dp,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-
+    
     val spacePx = LocalDensity.current.run { (divider).roundToPx() }
-
+    
     val measurePolicy = remember(itemCount, spacePx) {
         MeasurePolicy { measurables, constraints ->
-
-            val newConstraints = when (itemCount) {
+            
+            val newConstraints = when(itemCount) {
                 1 -> constraints
                 2 -> Constraints.fixed(
                     width = constraints.maxWidth / 2 - spacePx / 2,
@@ -96,8 +92,8 @@ private fun ImageDrawLayout(
                     height = constraints.maxHeight / 2 - spacePx / 2
                 )
             }
-
-            val placeables: List<Placeable> = if (measurables.size != 3) {
+            
+            val placeables: List<Placeable> = if(measurables.size != 3) {
                 measurables.map { measurable: Measurable ->
                     measurable.measure(constraints = newConstraints)
                 }
@@ -116,9 +112,9 @@ private fun ImageDrawLayout(
                                 )
                             )
             }
-
+            
             layout(constraints.maxWidth, constraints.maxHeight) {
-                when (itemCount) {
+                when(itemCount) {
                     1 -> {
                         placeables.forEach { placeable: Placeable ->
                             placeable.placeRelative(0, 0)
@@ -134,17 +130,17 @@ private fun ImageDrawLayout(
                     else -> {
                         var xPos = 0
                         var yPos = 0
-
+                        
                         placeables.forEachIndexed { index: Int, placeable: Placeable ->
                             placeable.placeRelative(xPos, yPos)
-
-                            if (index % 2 == 0) {
+                            
+                            if(index % 2 == 0) {
                                 xPos += placeable.width + spacePx
                             } else {
                                 xPos = 0
                             }
-
-                            if (index % 2 == 1) {
+                            
+                            if(index % 2 == 1) {
                                 yPos += placeable.height + spacePx
                             }
                         }
@@ -153,7 +149,7 @@ private fun ImageDrawLayout(
             }
         }
     }
-
+    
     Layout(
         modifier = modifier,
         content = content,

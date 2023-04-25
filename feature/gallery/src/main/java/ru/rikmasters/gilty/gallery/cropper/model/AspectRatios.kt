@@ -1,10 +1,11 @@
-package com.smarttoolfactory.cropper.model
+package ru.rikmasters.gilty.gallery.cropper.model
 
-import com.smarttoolfactory.cropper.util.createRectShape
+import ru.rikmasters.gilty.gallery.cropper.util.createRectShape
 
 /**
  * Aspect ratio list with pre-defined aspect ratios
  */
+@Suppress("unused")
 val aspectRatios = listOf(
     CropAspectRatio(
         title = "9:16",

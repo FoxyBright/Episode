@@ -10,15 +10,15 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
-import com.smarttoolfactory.cropper.model.CropData
-import com.smarttoolfactory.cropper.state.CropState
-import com.smarttoolfactory.cropper.state.cropData
-import com.smarttoolfactory.cropper.util.ZoomLevel
-import com.smarttoolfactory.cropper.util.getNextZoomLevel
-import com.smarttoolfactory.cropper.util.update
 import com.smarttoolfactory.gesture.detectMotionEventsAsList
 import com.smarttoolfactory.gesture.detectTransformGestures
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.gallery.cropper.model.CropData
+import ru.rikmasters.gilty.gallery.cropper.state.CropState
+import ru.rikmasters.gilty.gallery.cropper.state.cropData
+import ru.rikmasters.gilty.gallery.cropper.util.ZoomLevel
+import ru.rikmasters.gilty.gallery.cropper.util.getNextZoomLevel
+import ru.rikmasters.gilty.gallery.cropper.util.update
 
 /**
  * Modifier that zooms in or out of Composable set to. This zoom modifier has option
@@ -159,7 +159,7 @@ fun Modifier.crop(
 internal val CropState.DefaultOnDoubleTap: (ZoomLevel) -> Float
     get() = { zoomLevel: ZoomLevel ->
         when (zoomLevel) {
-            ZoomLevel.Min -> 1f
+            ZoomLevel.Min -> 0.5f.coerceAtLeast(zoomMin)
             ZoomLevel.Mid -> 3f.coerceIn(zoomMin, zoomMax)
             ZoomLevel.Max -> 5f.coerceAtLeast(zoomMax)
         }

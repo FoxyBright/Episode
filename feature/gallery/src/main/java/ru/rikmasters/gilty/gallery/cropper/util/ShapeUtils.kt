@@ -1,17 +1,14 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 import android.graphics.Matrix
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import com.smarttoolfactory.cropper.model.AspectRatio
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
 import kotlin.math.cos
 import kotlin.math.sin
 

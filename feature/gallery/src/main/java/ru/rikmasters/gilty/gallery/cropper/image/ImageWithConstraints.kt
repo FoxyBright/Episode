@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.image
+package ru.rikmasters.gilty.gallery.cropper.image
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,16 +13,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
-import com.smarttoolfactory.cropper.util.getParentSize
-import com.smarttoolfactory.cropper.util.getScaledBitmapRect
+import androidx.compose.ui.semantics.*
+import androidx.compose.ui.unit.*
+import ru.rikmasters.gilty.gallery.cropper.util.getParentSize
+import ru.rikmasters.gilty.gallery.cropper.util.getScaledBitmapRect
 
 
 /**
@@ -57,9 +51,9 @@ import com.smarttoolfactory.cropper.util.getScaledBitmapRect
  * @param content is a Composable that can be matched at exact position where [imageBitmap] is drawn.
  * This is useful for drawing thumbs, cropping or another layout that should match position
  * with the image that is scaled is drawn
- * @param drawImage flag to draw image on canvas. Some Composables might only require
+ * @param drawImage flag to draw image on canvas. Some Composable might only require
  * the calculation and rectangle bounds of image after scaling but not drawing.
- * Composables like image cropper that scales or
+ * Composable like image cropper that scales or
  * rotates image. Drawing here again have 2 drawings overlap each other.
  */
 @Composable

@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.draw
+package ru.rikmasters.gilty.gallery.cropper.draw
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable

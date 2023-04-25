@@ -7,13 +7,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.gallery.cropper.crop
-import com.smarttoolfactory.cropper.model.*
-import com.smarttoolfactory.cropper.settings.CropType
-import com.smarttoolfactory.cropper.state.CropState
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
+import ru.rikmasters.gilty.gallery.cropper.model.CropOutline
+import ru.rikmasters.gilty.gallery.cropper.model.OutlineType
+import ru.rikmasters.gilty.gallery.cropper.state.CropState
 
-/**
- * Contains the default values used by [ImageCropper]
- */
 object CropDefaults {
     
     /**
@@ -54,6 +52,7 @@ data class CropProperties(
     val rotatable: Boolean,
     val zoomable: Boolean,
     val maxZoom: Float,
+    val minZoom: Float = 0.5f,
 )
 
 /**
@@ -71,9 +70,6 @@ data class CropStyle(
     val cropTheme: CropTheme = CropTheme.System,
 )
 
-/**
- * Property for passing [CropOutline] between settings UI to [ImageCropper]
- */
 @Immutable
 data class CropOutlineProperty(
     val outlineType: OutlineType,

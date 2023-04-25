@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.model
+package ru.rikmasters.gilty.gallery.cropper.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset

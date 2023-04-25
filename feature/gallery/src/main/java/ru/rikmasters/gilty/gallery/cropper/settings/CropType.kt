@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.settings
+package ru.rikmasters.gilty.gallery.cropper.settings
 
 /**
  * Type of cropping operation

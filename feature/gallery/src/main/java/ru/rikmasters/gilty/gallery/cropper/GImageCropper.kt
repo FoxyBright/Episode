@@ -26,13 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smarttoolfactory.cropper.model.AspectRatio
-import com.smarttoolfactory.cropper.model.OutlineType
-import com.smarttoolfactory.cropper.model.RoundedCornerCropShape
-import com.smarttoolfactory.cropper.settings.*
-import ru.rikmasters.gilty.gallery.cropper.settings.CropOutlineProperty
-import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
-import ru.rikmasters.gilty.gallery.cropper.settings.CropStyle
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
+import ru.rikmasters.gilty.gallery.cropper.model.OutlineType
+import ru.rikmasters.gilty.gallery.cropper.model.RoundedCornerCropShape
+import ru.rikmasters.gilty.gallery.cropper.settings.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable
 import ru.rikmasters.gilty.shared.R.string
@@ -48,7 +45,7 @@ private fun ImageCropperPreview() {
             GImageCropperState(
                 ImageBitmap.imageResource(
                     LocalContext.current.resources,
-                    drawable.image_test
+                    drawable.test_image
                 )
             )
         )
@@ -134,25 +131,22 @@ fun ImageCropper(
                 crop = false
                 croppedImage?.let {
                     callback?.onCrop(
-                        it, listOf(
-                            rect.left,
-                            rect.top,
-                            rect.width,
-                            rect.height,
+                        state.image, listOf(
+                            rect.left, rect.top,
+                            rect.width, rect.height,
                         )
                     )
                     croppedImage = null
                 }
             }
             Frame()
-            if(isCropping)
-                Box(Modifier, Center) {
-                    AnimatedImage(
-                        R.raw.loaging,
-                        Modifier.size(24.dp),
-                        isPlaying = isCropping
-                    )
-                }
+            if(isCropping) Box(Modifier, Center) {
+                AnimatedImage(
+                    R.raw.loaging,
+                    Modifier.size(24.dp),
+                    isPlaying = isCropping
+                )
+            }
         }
     }
 }

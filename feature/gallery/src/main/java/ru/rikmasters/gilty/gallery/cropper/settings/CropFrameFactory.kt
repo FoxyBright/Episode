@@ -1,10 +1,11 @@
-package com.smarttoolfactory.cropper.settings
+package ru.rikmasters.gilty.gallery.cropper.settings
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.ImageBitmap
-import com.smarttoolfactory.cropper.model.*
-import com.smarttoolfactory.cropper.util.createPolygonShape
+import ru.rikmasters.gilty.gallery.cropper.model.*
+import ru.rikmasters.gilty.gallery.cropper.util.createPolygonShape
 
+@Suppress("unused")
 class CropFrameFactory(private val defaultImages: List<ImageBitmap>) {
 
     private val cropFrames = mutableStateListOf<CropFrame>()
@@ -20,7 +21,7 @@ class CropFrameFactory(private val defaultImages: List<ImageBitmap>) {
         return cropFrames
     }
 
-    fun getCropFrame(outlineType: OutlineType): CropFrame {
+    private fun getCropFrame(outlineType: OutlineType): CropFrame {
         return cropFrames
             .firstOrNull { it.outlineType == outlineType } ?: createDefaultFrame(outlineType)
     }

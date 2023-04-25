@@ -1,4 +1,4 @@
-package com.smarttoolfactory.cropper.util
+package ru.rikmasters.gilty.gallery.cropper.util
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.smarttoolfactory.cropper.model.AspectRatio
+import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
 
 /**
  * Draw grid that is divided by 2 vertical and 2 horizontal lines for overlay
@@ -85,6 +85,7 @@ fun DrawScope.drawWithLayer(block: DrawScope.() -> Unit) {
 /**
  * Modifier that calls [Modifier.drawWithContent] with [DrawScope.drawWithLayer]
  */
+@Suppress("unused")
 fun Modifier.drawWithLayer(block: DrawScope.() -> Unit) = this.then(
     Modifier.drawWithContent {
         drawWithLayer {
@@ -97,6 +98,7 @@ fun Modifier.drawWithLayer(block: DrawScope.() -> Unit) = this.then(
  * Draws [shape] as [Outline] with a checker background by clipping image with [shape] using
  * [BlendMode.SrcIn]. Shape contains image while background is checker
  */
+@Suppress("unused")
 fun Modifier.drawOutlineWithBlendModeAndChecker(
     aspectRatio: AspectRatio,
     shape: Shape,
