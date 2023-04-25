@@ -37,7 +37,7 @@ private fun ErrorPReview() {
 fun ErrorConnection() {
     Box(
         Modifier
-            .fillMaxHeight(0.8f)
+            .fillMaxHeight(0.9f)
             .fillMaxWidth()
     ) {
         Box(

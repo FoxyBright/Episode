@@ -31,6 +31,8 @@ class RequirementsViewModel: ViewModel() {
     private val manager by inject<MeetingManager>()
     private val addMeet by lazy { manager.addMeetFlow }
     
+    val date = MutableStateFlow<String?>(null)
+    
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
@@ -49,7 +51,8 @@ class RequirementsViewModel: ViewModel() {
     private val _orientation = MutableStateFlow<OrientationModel?>(null)
     val orientation = _orientation.asStateFlow()
     
-    private val _requirements = MutableStateFlow(emptyList<RequirementModel>())
+    private val _requirements =
+        MutableStateFlow(emptyList<RequirementModel>())
     val requirements = _requirements.asStateFlow()
     
     private val _age = MutableStateFlow("")
@@ -98,6 +101,7 @@ class RequirementsViewModel: ViewModel() {
                         reqList
                     } ?: emptyList()
                 )
+                date.emit(add?.dateTime)
                 _private.emit(add?.isPrivate ?: false)
                 _limited.emit(add?.memberLimited ?: false)
                 _withoutRespond.emit(add?.withoutResponds ?: false)

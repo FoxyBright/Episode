@@ -85,11 +85,7 @@ class MainActivity: ComponentActivity() {
                 { GSnackbar(it) },
                 { isLoading, content -> GLoader(isLoading, content) },
                 { state, offset, trigger ->
-                    LoadingIndicator(
-                        state,
-                        offset,
-                        trigger
-                    )
+                    LoadingIndicator(state, offset, trigger)
                 }
             )
             
@@ -104,10 +100,11 @@ class MainActivity: ComponentActivity() {
             
             suspend fun authorize(userId: String) {
                 authManager.savePushToken(token)
-                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 chatManager.connect(userId)
             }
+            
             LaunchedEffect(Unit) {
+                env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 if(internetCheck(context))
                     profileManager
                         .storageProfile()

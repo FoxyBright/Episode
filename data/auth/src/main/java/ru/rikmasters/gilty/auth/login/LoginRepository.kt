@@ -1,6 +1,9 @@
 package ru.rikmasters.gilty.auth.login
 
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.data.ktor.KtorSource
@@ -11,12 +14,11 @@ import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class LoginRepository(
-    
     override val webSource: KtorSource,
-    
     override val primarySource: DbSource,
-    
-    ): OfflineFirstRepository<KtorSource, DbSource>(webSource, primarySource) {
+): OfflineFirstRepository<KtorSource, DbSource>(
+    webSource, primarySource
+) {
     
     suspend fun getLoginMethods(state: String): Set<LoginMethod> =
         webSource.unauthorizedGet("/auth/externals") {
@@ -32,28 +34,19 @@ class LoginRepository(
             ?.toSet()
             ?: emptySet()
     
-    suspend fun sendCode(phone: String): Pair<SendCode?, String?> {
-        val response = webSource
-            .unauthorizedPost("auth/sendCode") {
+    suspend fun sendCode(phone: String) = withContext(IO) {
+        webSource.unauthorizedClient
+            .post("auth/sendCode") {
                 setBody(
                     SendCodeRequest(
-                        phone,
-                        CLIENT_ID,
+                        phone, CLIENT_ID,
                         CLIENT_SECRET
                     )
                 )
+            }.let {
+                if(it.status.value == 200)
+                    it.wrapped<SendCode>() to null
+                else null to it.errorWrapped().error.message
             }
-        
-        var message: String? = null
-        var sendCode: SendCode? = null
-        
-        try {
-            sendCode = response?.wrapped<SendCode>()
-        } catch(_: Exception) {
-            message = response?.errorWrapped()?.error?.message
-                ?: "Плохое соединение с интернетом"
-        }
-        
-        return Pair(sendCode, message)
     }
 }

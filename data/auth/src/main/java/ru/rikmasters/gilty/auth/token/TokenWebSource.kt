@@ -26,10 +26,6 @@ class TokenWebSource: KtorSource() {
         }
     }
     
-    suspend fun logout() {
-        post("http://$HOST/auth/logout")
-    }
-    
     suspend fun linkExternal(token: String) {
         post("http://$HOST$PREFIX_URL/auth/externals/link") {
             url { query("token" to token) }

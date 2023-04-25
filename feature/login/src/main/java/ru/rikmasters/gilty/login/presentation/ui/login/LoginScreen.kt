@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.login.presentation.ui.login
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -99,8 +100,12 @@ fun LoginScreen(vm: LoginViewModel) {
         
         override fun onNext() {
             scope.launch {
-                vm.sendCode()
-                vm.getSendCode()?.let {
+                vm.sendCode()?.let {
+                    Toast.makeText(
+                        context, it,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } ?: vm.getSendCode()?.let {
                     nav.navigate("registration/code")
                 }
             }

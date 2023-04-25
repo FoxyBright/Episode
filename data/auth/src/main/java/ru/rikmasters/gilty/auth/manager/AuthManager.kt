@@ -52,7 +52,6 @@ class AuthManager(
     
     suspend fun logout() {
         withContext(IO) {
-            tokenWebSource.logout()
             primarySource.deleteTokens()
             updateAuth { copy(externalToken = null) }
         }

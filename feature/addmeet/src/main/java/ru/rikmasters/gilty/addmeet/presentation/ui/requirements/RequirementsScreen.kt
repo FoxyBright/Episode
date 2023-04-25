@@ -11,9 +11,12 @@ import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.GenderBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.OrientationBsViewModel
+import ru.rikmasters.gilty.bottomsheet.BottomSheet.logD
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.common.extentions.offset
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
@@ -161,8 +164,22 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             
             override fun onNext() {
                 scope.launch {
+                    val toComplete = vm.date.value?.let {
+                        it.ifBlank { return@let false }
+                        LocalDateTime.of(it)
+                            .minusMinute(offset / 60_000)
+                            .isAfter(LocalDateTime.nowZ())
+                    } ?: false
+                    
+                    logD("DATECONTROl   -- > "+LocalDateTime.nowZ().toString())
+                    logD("DATECONTROl   -- > "+vm.date.value.toString())
+                    logD("DATECONTROl   -- > "+toComplete.toString())
+                    
                     vm.setRequirements()
-                    nav.navigate("complete")
+                    nav.navigate(
+                        if(toComplete) "complete"
+                        else "detailed"
+                    )
                 }
             }
         }
