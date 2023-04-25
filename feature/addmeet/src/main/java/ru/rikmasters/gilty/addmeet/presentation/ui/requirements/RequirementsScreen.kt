@@ -1,7 +1,10 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.AgeBs
@@ -11,10 +14,10 @@ import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.GenderBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.OrientationBsViewModel
-import ru.rikmasters.gilty.bottomsheet.BottomSheet.logD
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.offset
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
@@ -27,6 +30,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val nav = get<NavState>()
+    val context = LocalContext.current
     
     val requirements by vm.requirements.collectAsState()
     val orientation by vm.orientation.collectAsState()
@@ -75,7 +79,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
             && age.isNotBlank()
             && orientation != null
             && checkRequirements()
-    
+    val badDate = stringResource(R.string.add_meet_bad_date)
     RequirementsContent(
         RequirementsState(
             private, count, getGender(gender), age,
@@ -170,15 +174,16 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                             .minusMinute(offset / 60_000)
                             .isAfter(LocalDateTime.nowZ())
                     } ?: false
-                    
-                    logD("DATECONTROl   -- > "+LocalDateTime.nowZ().toString())
-                    logD("DATECONTROl   -- > "+vm.date.value.toString())
-                    logD("DATECONTROl   -- > "+toComplete.toString())
-                    
                     vm.setRequirements()
                     nav.navigate(
                         if(toComplete) "complete"
-                        else "detailed"
+                        else {
+                            Toast.makeText(
+                                context, badDate,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            "detailed"
+                        }
                     )
                 }
             }

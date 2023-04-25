@@ -329,6 +329,7 @@
     <string name="add_meet_member_not_limited_label">У вашего episode не будет ограничения участников</string>
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
+    <string name="add_meet_bad_date">"Указанная дата уже не актуальна"</string>
     <string name="add_meet_created">episode создан</string>
 
     <!-- Alerts -->
