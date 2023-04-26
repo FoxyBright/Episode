@@ -13,7 +13,7 @@ import ru.rikmasters.gilty.shared.shared.tag.TagsContent
 import ru.rikmasters.gilty.shared.shared.tag.TagsState
 
 @Composable
-fun TagSearchScreen(vm: FiltersBsViewModel) {
+fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
     
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -37,7 +37,8 @@ fun TagSearchScreen(vm: FiltersBsViewModel) {
     TagsContent(
         TagsState(
             selected, popular, search,
-            searchResult, isOnline, (null)
+            searchResult, isOnline,
+            (null), (false), alpha
         ), Modifier, object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {

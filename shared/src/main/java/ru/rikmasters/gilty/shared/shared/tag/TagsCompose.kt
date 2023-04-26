@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +43,8 @@ private fun TagSearchPreview() {
                         "Бэтмэн", "Кингсмен",
                         "Лобби", "Lorem", "Lolly"
                     ).map { TagModel(it, it) },
-                    (""), allTags, (true), (null)
+                    (""), allTags, (true), (null),
+                    (false), 0f,
                 ), Modifier.padding(16.dp)
             )
         }
@@ -62,7 +64,8 @@ private fun TagSearchListPreview() {
                 TagsState(
                     listOf(allTags.first()),
                     emptyList(), ("love"),
-                    allTags, (false), (null)
+                    allTags, (false), (null),
+                    (false), 0f,
                 ), Modifier.padding(16.dp)
             )
         }
@@ -77,6 +80,7 @@ data class TagsState(
     val isOnline: Boolean,
     val category: CategoryModel?,
     val add: Boolean = false,
+    val alpha: Float,
 )
 
 interface TagsCallback {
@@ -143,6 +147,12 @@ private fun Content(
     modifier: Modifier,
     callback: TagsCallback?,
 ) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .alpha(state.alpha)
+            .background(colorScheme.primaryContainer)
+    )
     if(state.search.isNotBlank()
         && state.searchResult.isEmpty()
     ) Box(Modifier.fillMaxSize()) {

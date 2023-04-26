@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -43,7 +44,7 @@ private fun CategoryListPreview() {
             CategoryList(
                 CategoryListState(
                     DemoCategoryModelList,
-                    emptyList(), emptyList()
+                    emptyList(), emptyList(),(0f)
                 ),
             )
         }
@@ -63,6 +64,7 @@ data class CategoryListState(
     val categories: List<CategoryModel>,
     val selected: List<CategoryModel>,
     val states: List<Int>,
+    val alpha: Float
 )
 
 @Composable
@@ -137,6 +139,12 @@ private fun Categories(
     callback: CategoryListCallback? = null,
 ) {
     val states = state.states
+    Box(
+        Modifier
+            .fillMaxSize()
+            .alpha(state.alpha)
+            .background(colorScheme.primaryContainer)
+    )
     LazyColumn(modifier) {
         itemsIndexed(state.categories) { index, category ->
             Card(

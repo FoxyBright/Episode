@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-enum class BottomSheetValue { Collapsed, Expanded }
+enum class BottomSheetValue { Collapsed, Expanded, HalfExpand }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Stable
@@ -43,7 +43,14 @@ class BottomSheetState(
     val isCollapsed: Boolean
         get() = currentValue == BottomSheetValue.Collapsed
     
+    @Suppress("unused")
+    val isHalfExpand: Boolean
+        get() = currentValue == BottomSheetValue.HalfExpand
+    
     suspend fun expand() = animateTo(BottomSheetValue.Expanded)
+    
+    @Suppress("unused")
+    suspend fun halfExpand() = animateTo(BottomSheetValue.HalfExpand)
     
     suspend fun collapse() = animateTo(BottomSheetValue.Collapsed)
     

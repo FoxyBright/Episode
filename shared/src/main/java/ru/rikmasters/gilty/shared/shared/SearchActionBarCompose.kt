@@ -84,14 +84,18 @@ private fun LabelBar(
         Arrangement.SpaceBetween,
         Alignment.CenterVertically
     ) {
-        Text(state.name ?: "", style = typography.labelLarge)
+        Text(
+            state.name ?: "", style = typography.labelLarge,
+            color = colorScheme.tertiary
+        )
         IconButton({
             state.state = true
             state.onExpandSearch?.let { it(true) }
         }) {
             Icon(
                 painterResource(R.drawable.magnifier),
-                (state.placeHolder ?: stringResource(R.string.search_placeholder)),
+                (state.placeHolder
+                    ?: stringResource(R.string.search_placeholder)),
                 Modifier.size(22.dp),
                 colorScheme.tertiary
             )
@@ -141,14 +145,16 @@ fun SearchBar(
                 colors = searchColors(state.online),
                 placeholder = {
                     Text(
-                        (state.placeHolder ?: stringResource(R.string.search_placeholder)),
+                        (state.placeHolder
+                            ?: stringResource(R.string.search_placeholder)),
                         color = colorScheme.onTertiary,
                         style = typography.bodyMedium,
                         fontWeight = Bold
                     )
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Sentences
                 ),
                 textStyle = typography.bodyMedium

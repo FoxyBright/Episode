@@ -9,7 +9,7 @@ import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CityModel
 
 @Composable
-fun CitiesScreen(vm: FiltersBsViewModel) {
+fun CitiesScreen(vm: FiltersBsViewModel, alpha: Float) {
     
     val scope = rememberCoroutineScope()
     
@@ -23,7 +23,8 @@ fun CitiesScreen(vm: FiltersBsViewModel) {
     Use<FiltersBsViewModel>(LoadingTrait) {
         CitiesContent(
             CitiesState(
-                selected, cities, search, searchState
+                selected, cities, search,
+                searchState,alpha
             ), Modifier, object: CitiesCallback {
                 
                 override fun onSelectCity(city: CityModel) {

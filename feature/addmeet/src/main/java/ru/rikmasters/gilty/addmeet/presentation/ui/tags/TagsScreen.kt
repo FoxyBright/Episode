@@ -29,7 +29,7 @@ fun TagsScreen(vm: TagsViewModel) {
     TagsContent(
         TagsState(
             selected, popular, search,
-            tags, online, category, (true)
+            tags, online, category, (true), (0f)
         ), Modifier, object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {

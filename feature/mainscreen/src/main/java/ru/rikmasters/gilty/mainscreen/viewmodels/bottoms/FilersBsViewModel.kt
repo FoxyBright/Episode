@@ -143,11 +143,22 @@ class FiltersBsViewModel(
     }
     
     fun removeChildren(categories: List<CategoryModel>) =
-        categories.filter { my ->
-            !mainVm.categories.value
-                .filter { it.children != null }
-                .flatMap { it.children ?: emptyList() }.contains(my)
+        categories.filter { mainVm.categories.value.contains(it) }
+    
+    fun getParentCategory(
+        category: CategoryModel,
+    ): CategoryModel {
+        var result: CategoryModel? = null
+        for(it in mainVm.categories.value) {
+            it.children?.let { children ->
+                if(children.contains(category)) {
+                    result = it; return@let
+                }
+            }
+            result?.let { return it }
         }
+        return category
+    }
     
     suspend fun changeCategoryState(category: Int) {
         val list = categoriesStates.value

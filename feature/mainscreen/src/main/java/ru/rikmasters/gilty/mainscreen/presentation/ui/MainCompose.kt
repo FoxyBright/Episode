@@ -1,20 +1,28 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -40,6 +48,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.shared.bottomsheet.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 @Preview
 @Composable
@@ -113,7 +122,9 @@ fun MainContent(
     modifier: Modifier = Modifier,
     callback: MainContentCallback? = null,
 ) {
-    Filters(Modifier, state) {
+    val alpha = state.bsState.bottomSheetState
+        .offset.value / 1500
+    Filters(state, alpha) {
         Column(
             Modifier.background(
                 colorScheme.background
@@ -136,9 +147,14 @@ fun MainContent(
         }
     }
     Box(Modifier.fillMaxSize(), BottomCenter) {
-        NavBar(state.navBarStates) {
-            callback?.onNavBarSelect(it)
-        }
+        NavBar(
+            state.navBarStates,
+            Modifier.alpha(
+                if(state.bsState.bottomSheetState.isAnimationRunning
+                    || state.bsState.bottomSheetState.isExpanded
+                ) alpha else 1f
+            )
+        ) { callback?.onNavBarSelect(it) }
     }
     GAlert(
         state.alert,
@@ -256,25 +272,84 @@ private fun Floating(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun Filters(
-    modifier: Modifier = Modifier,
     state: MainContentState,
+    alpha: Float,
     content: @Composable () -> Unit,
 ) {
-    val alpha = state.bsState
-        .bottomSheetState.offset
-        .value / 1500
     BottomSheetScaffold(
         sheetContent = {
-            state.vmScope?.let { scope ->
-                Connector<FiltersBsViewModel>(scope) {
-                    FiltersBs(it, alpha)
-                }
-            }
-        }, modifier = modifier,
-        scaffoldState = state.bsState,
-        sheetShape = RoundedCornerShape(
-            topStart = 24.dp, topEnd = 24.dp
-        ), sheetBackgroundColor = colorScheme.primaryContainer,
-        sheetPeekHeight = 114.dp
+            Filters(
+                state.bsState.bottomSheetState
+                    .isCollapsed, alpha,
+                state.vmScope
+            )
+        }, scaffoldState = state.bsState,
+        sheetShape = shapes.bigTopShapes,
+        sheetBackgroundColor = Transparent,
+        sheetPeekHeight = 126.dp
     ) { content.invoke() }
+}
+
+@Composable
+private fun Filters(
+    isCollapsed: Boolean,
+    alpha: Float,
+    scope: Scope?,
+) {
+    if(scope == null) return
+    Box {
+        Box(
+            Modifier
+                .offset(y = gripOffset(isCollapsed))
+                .clip(shapes.bigTopShapes)
+        ) {
+            Connector<FiltersBsViewModel>(scope) {
+                FiltersBs(it, alpha, isCollapsed)
+            }
+        }
+        Grip(Modifier.align(TopCenter), !isCollapsed)
+    }
+}
+
+@Composable
+private fun gripOffset(
+    state: Boolean,
+    offset: Dp = 12.dp,
+) = animateDpAsState(
+    if(state) offset else 0.dp
+).value
+
+@Composable
+private fun Grip(
+    modifier: Modifier,
+    state: Boolean,
+) {
+    @Composable
+    fun gripOffset(
+        state: Boolean,
+        offset: Dp = 12.dp,
+    ) = animateDpAsState(
+        if(state) offset else 0.dp
+    ).value
+    Column(
+        modifier, Top,
+        CenterHorizontally
+    ) {
+        Spacer(
+            Modifier.height(
+                gripOffset(state, 8.dp)
+            )
+        )
+        Box(
+            Modifier
+                .background(
+                    colorScheme.scrim,
+                    CircleShape
+                )
+                .size(40.dp, 5.dp)
+                .padding(
+                    bottom = gripOffset(state)
+                )
+        )
+    }
 }

@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,7 @@ data class CitiesState(
     val cities: List<CityModel>,
     val search: String,
     val searchState: Boolean,
+    val alpha: Float,
 )
 
 interface CitiesCallback {
@@ -44,57 +46,69 @@ fun CitiesContent(
     modifier: Modifier = Modifier,
     callback: CitiesCallback? = null,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        SearchActionBar(
-            SearchState(
-                stringResource(R.string.select_city),
-                state.searchState, state.search,
-                { callback?.onSearchChange(it) },
-            ) { callback?.onSearchStateChange(it) },
-            Modifier.padding(
-                top = if(state.searchState)
-                    28.dp else 0.dp,
-                bottom = if(state.searchState)
-                    12.dp else 0.dp,
-            )
+    Box(
+        modifier.background(
+            colorScheme.background
         )
-        if(state.cities.isNotEmpty()) LazyColumn(
+    ) {
+        Box(
             Modifier
-                .clip(shapes.medium)
+                .fillMaxSize()
+                .alpha(state.alpha)
                 .background(colorScheme.primaryContainer)
+        )
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            itemsIndexed(
-                state.cities,
-                { _, it -> it.id },
-                { _, _ -> 0 }
-            ) { index, item ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { callback?.onSelectCity(item) },
-                    SpaceBetween, CenterVertically
-                ) {
-                    Text(
-                        item.name, Modifier
-                            .weight(1f)
-                            .padding(16.dp),
-                        colorScheme.tertiary,
-                        style = typography.bodyMedium
-                    )
-                    if(state.selected?.id == item.id) Image(
-                        painterResource(R.drawable.enabled_check_box),
-                        (null), Modifier
-                            .padding(end = 12.dp)
-                            .size(24.dp)
+            SearchActionBar(
+                SearchState(
+                    stringResource(R.string.select_city),
+                    state.searchState, state.search,
+                    { callback?.onSearchChange(it) },
+                ) { callback?.onSearchStateChange(it) },
+                Modifier.padding(
+                    top = if(state.searchState)
+                        28.dp else 0.dp,
+                    bottom = if(state.searchState)
+                        12.dp else 0.dp,
+                )
+            )
+            if(state.cities.isNotEmpty()) LazyColumn(
+                Modifier
+                    .clip(shapes.medium)
+                    .background(colorScheme.primaryContainer)
+            ) {
+                itemsIndexed(
+                    state.cities,
+                    { _, it -> it.id },
+                    { _, _ -> 0 }
+                ) { index, item ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { callback?.onSelectCity(item) },
+                        SpaceBetween, CenterVertically
+                    ) {
+                        Text(
+                            item.name, Modifier
+                                .weight(1f)
+                                .padding(16.dp),
+                            colorScheme.tertiary,
+                            style = typography.bodyMedium
+                        )
+                        if(state.selected?.id == item.id) Image(
+                            painterResource(R.drawable.enabled_check_box),
+                            (null), Modifier
+                                .padding(end = 12.dp)
+                                .size(24.dp)
+                        )
+                    }
+                    if(index < state.cities.size - 1) GDivider(
+                        Modifier.padding(start = 16.dp)
                     )
                 }
-                if(index < state.cities.size - 1) GDivider(
-                    Modifier.padding(start = 16.dp)
-                )
             }
         }
     }

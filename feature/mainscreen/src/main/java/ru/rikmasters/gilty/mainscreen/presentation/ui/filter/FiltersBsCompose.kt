@@ -166,7 +166,7 @@ private fun Content(
                 it.content.invoke()
             }
         }
-        itemSpacer(20.dp)
+        itemSpacer(40.dp)
     }
 }
 

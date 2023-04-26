@@ -12,8 +12,3 @@ fun GDivider(
     modifier: Modifier = Modifier,
     color: Color = colorScheme.outline,
 ) { Divider(modifier, 1.dp, color) }
-
-@Composable
-fun GDividerBold(modifier: Modifier = Modifier) {
-    Divider(modifier, 5.dp, colorScheme.outline)
-}

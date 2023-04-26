@@ -14,6 +14,7 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 fun FiltersBs(
     vm: FiltersBsViewModel,
     alpha: Float,
+    isCollapsed: Boolean,
 ) {
     
     val scope = rememberCoroutineScope()
@@ -34,6 +35,10 @@ fun FiltersBs(
     val city by vm.city.collectAsState()
     val screen by vm.screen.collectAsState()
     
+    LaunchedEffect(isCollapsed) {
+        if(isCollapsed) vm.navigate(0)
+    }
+    
     val hasFilters = vm
         .hasFilters
         .collectAsState()
@@ -47,21 +52,23 @@ fun FiltersBs(
             || isOnline
             || selectedCondition.isNotEmpty())
     
-    val topRow = interest + vm
-        .removeChildren(selectedCategories)
-        .filter { !interest.contains(it) }
+    val topRow = vm.removeChildren(interest)
+        .let { favour ->
+            favour + selectedCategories
+                .map { vm.getParentCategory(it) }
+                .filter { !favour.contains(it) }
+        }.distinct()
     
     when(screen) {
-        1 -> CategoriesScreen(vm)
-        2 -> TagSearchScreen(vm)
-        3 -> CitiesScreen(vm)
+        1 -> CategoriesScreen(vm, alpha)
+        2 -> TagSearchScreen(vm, alpha)
+        3 -> CitiesScreen(vm, alpha)
         else -> MeetingFilterBottom(
             Modifier, results, FilterListState(
                 today, distanceState, distance,
                 isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
-                categoriesStates, city, hasFilters,
-                alpha
+                categoriesStates, city, hasFilters, alpha
             ), object: MeetingFilterBottomCallback {
                 
                 override fun onCategoryClick(

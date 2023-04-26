@@ -7,7 +7,7 @@ import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 @Composable
-fun CategoriesScreen(vm: FiltersBsViewModel) {
+fun CategoriesScreen(vm: FiltersBsViewModel, alpha:Float) {
     
     val scope = rememberCoroutineScope()
     
@@ -21,7 +21,7 @@ fun CategoriesScreen(vm: FiltersBsViewModel) {
     
     CategoryList(
         CategoryListState(
-            categories, selected, states
+            categories, selected, states, alpha
         ), Modifier, object: CategoryListCallback {
             
             override fun onBack() {
