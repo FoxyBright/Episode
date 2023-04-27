@@ -126,8 +126,10 @@ fun PhotoView(
         label = ""
     ) {
         scope.launch {
-            if(select != images.lastIndex)
+            if(select != images.lastIndex) {
                 listState.animateScrollToItem(select + 1)
+                // TODO - обновление таймера нужно сделать
+            }
             else onBack?.let { it() }
         }
     }.value
@@ -185,8 +187,7 @@ fun PhotoView(
             ) {
                 items(images) { photo ->
                     ZoomableAsyncImage(
-                        photo?.thumbnail?.url,
-                        Modifier
+                        photo?.url, Modifier
                             .width(screenWidth.dp)
                             .fillMaxHeight()
                     ) { scrollState = it }
