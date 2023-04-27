@@ -138,6 +138,17 @@ class ProfileStore(
             gender,
             orientation?.id
         )
+        primarySource.find<Profile>()?.let {
+            primarySource.save(
+                it.copy(
+                    username = username ?: it.username,
+                    aboutMe = aboutMe ?: it.aboutMe,
+                    age = age ?: it.age,
+                    gender = gender?.name ?: it.gender,
+                    orientation = orientation ?: it.orientation
+                )
+            )
+        } ?: getProfile(true)
     }
     
     private fun List<Category>.map() = this.map { it.map() }

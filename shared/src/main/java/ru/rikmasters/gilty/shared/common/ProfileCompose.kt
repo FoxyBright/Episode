@@ -9,9 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -118,6 +120,7 @@ fun Profile(
     Column(modifier) {
         TopBar(
             (profile?.username ?: ""),
+            (profile?.age ?: -1),
             state.profileType, Modifier,
             { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
@@ -187,13 +190,14 @@ private fun AboutMe(
 @Composable
 private fun TopBar(
     text: String,
+    userAge: Int,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
     onSaveUsername: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
-    val focusManager =
-        LocalFocusManager.current
+    val focusManager = LocalFocusManager.current
+    var focus by remember { mutableStateOf(false) }
     if(
         profileType != ORGANIZER
         && profileType != ANONYMOUS_ORGANIZER
@@ -201,7 +205,8 @@ private fun TopBar(
         text, onTextChange,
         modifier
             .offset((-16).dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .onFocusChanged { focus = it.isFocused },
         colors = transparentTextFieldColors(),
         textStyle = typography.headlineLarge,
         placeholder = {
@@ -226,8 +231,13 @@ private fun TopBar(
         keyboardOptions = Default.copy(
             imeAction = Done, keyboardType = Text,
             capitalization = Sentences
-        ),
-        singleLine = true,
+        ), singleLine = true,
+        visualTransformation = transformationOf(
+            CharArray(text.length) { '#' }
+                .concatToString(), if(
+                userAge in 18..99 && !focus
+            ) ", $userAge" else ""
+        )
     )
 }
 

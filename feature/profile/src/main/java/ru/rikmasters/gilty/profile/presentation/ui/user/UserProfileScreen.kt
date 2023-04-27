@@ -26,6 +26,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
 @Composable
 fun UserProfileScreen(vm: UserProfileViewModel) {
+    
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -45,7 +46,6 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewState by vm.photoViewState.collectAsState()
-    
     
     val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {

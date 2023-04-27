@@ -43,10 +43,11 @@ class SettingsViewModel: ViewModel() {
         MutableStateFlow<List<OrientationModel>?>(null)
     val orientations = _orientations.asStateFlow()
     
-    suspend fun changeOrientation(orientation: OrientationModel) = singleLoading {
-        profileManager.userUpdateData(orientation = orientation)
-        _orientation.emit(orientation)
-    }
+    suspend fun changeOrientation(orientation: OrientationModel) =
+        singleLoading {
+            profileManager.userUpdateData(orientation = orientation)
+            _orientation.emit(orientation)
+        }
     
     suspend fun changeGender(gender: GenderType) = singleLoading {
         profileManager.userUpdateData(gender = gender)

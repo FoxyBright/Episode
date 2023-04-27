@@ -34,9 +34,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
-    private val _age = MutableStateFlow(0)
-    private val age = _age.asStateFlow()
-    
     private val _history = MutableStateFlow(false)
     val history = _history.asStateFlow()
     
@@ -70,7 +67,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     val usernameDebounced = username
         .debounce(250)
         .onEach {
-            it?.substringBefore(',')?.let { name ->
+            it?.let { name ->
                 _occupied.emit(
                     regManager.isNameOccupied(name)
                             && profileManager
@@ -103,23 +100,17 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun updateUsername() {
-        if(!occupied.value) regManager.userUpdateData(
-            username.value?.substringBefore(','),
-            description.value, age.value
-        )
+        if(!occupied.value) regManager
+            .userUpdateData(username.value)
     }
     
     suspend fun changeUsername(name: String) {
-        if(!name.contains(',')) return
-        val text = name.substringBefore(',')
-        _username.emit(
-            "$text, ${
-                if(age.value in 18..99) {
-                    ", ${age.value}"
-                } else ""
-            }"
+        _username.emit(name)
+        _profile.emit(
+            profile.value?.copy(
+                username = username.value
+            )
         )
-        updateProfile()
     }
     
     private val _alert = MutableStateFlow(false)
@@ -163,22 +154,16 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun changeDescription(text: String) {
         _description.emit(text)
-        updateProfile()
+        _profile.emit(
+            profile.value?.copy(
+                aboutMe = description.value
+            )
+        )
     }
     
     suspend fun updateDescription() {
         regManager.userUpdateData(
-            username.value?.substringBefore(','),
-            description.value
-        )
-    }
-    
-    private suspend fun updateProfile() {
-        _profile.emit(
-            profile.value?.copy(
-                username = username.value,
-                aboutMe = description.value
-            )
+            aboutMe = description.value
         )
     }
     
@@ -187,29 +172,26 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         refresh.value = !refresh.value
     }
     
-    suspend fun setUserDate(forceWeb: Boolean = true) = singleLoading {
-        val user = profileManager.getProfile(forceWeb)
-        _age.emit(user.age)
-        _username.emit(
-            "${user.username}${
-                if(user.age in 18..99) {
-                    ", ${user.age}"
-                } else ""
-            }"
-        )
-        _description.emit(user.aboutMe ?: "")
-        _lastRespond.emit(
-            Pair(
-                user.respondsCount ?: 0,
-                user.respondsImage?.url
-            )
-        )
-        _profile.emit(
-            user.copy(
-                username = username.value,
-                aboutMe = description.value
-            )
-        )
+    suspend fun setUserDate(
+        forceWeb: Boolean = false,
+    ) = singleLoading {
+        profileManager.getProfile(forceWeb)
+            .let { user ->
+                _username.emit(user.username ?: "")
+                _description.emit(user.aboutMe ?: "")
+                _lastRespond.emit(
+                    Pair(
+                        user.respondsCount ?: 0,
+                        user.respondsImage?.url
+                    )
+                )
+                _profile.emit(
+                    user.copy(
+                        username = username.value,
+                        aboutMe = description.value
+                    )
+                )
+            }
     }
     
     suspend fun showHistory() {
