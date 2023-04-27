@@ -181,16 +181,19 @@ fun MeetingBsMap(
                 )
             }
         }
-        Text(
-            stringResource(R.string.add_meet_detailed_meet_place_place_holder),
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = 14.dp, start = 16.dp,
-                    bottom = 12.dp
-                ), colorScheme.onTertiary,
-            style = typography.headlineSmall
-        )
+        when(meet.memberState) {
+            IS_MEMBER, IS_ORGANIZER -> Text(
+                stringResource(R.string.add_meet_detailed_meet_place_place_holder),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 14.dp, start = 16.dp,
+                        bottom = 12.dp
+                    ), colorScheme.onTertiary,
+                style = typography.headlineSmall
+            )
+            else -> Unit
+        }
     }
 }
 

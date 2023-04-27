@@ -229,7 +229,9 @@ class MeetingManager(
     ) {
         withContext(IO) {
             web.respondOfMeet(
-                meetId, comment, hidden
+                meetId, comment?.let {
+                    it.ifBlank { null }
+                }, hidden
             )
         }
     }

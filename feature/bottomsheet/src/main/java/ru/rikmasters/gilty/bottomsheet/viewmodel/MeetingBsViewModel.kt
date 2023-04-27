@@ -55,7 +55,9 @@ class MeetingBsViewModel: ViewModel() {
         _meetReaction.emit(state)
     }
     
-    suspend fun getMeet(meetId: String) {
+    suspend fun getMeet(
+        meetId: String,
+    ) = singleLoading {
         _meet.emit(meetManager.getDetailedMeet(meetId))
         if(meet.value?.memberState == IS_ORGANIZER) {
             _lastResponse.emit(
@@ -109,7 +111,9 @@ class MeetingBsViewModel: ViewModel() {
         _menu.emit(state)
     }
     
-    suspend fun respondForMeet(meetId: String) {
+    suspend fun respondForMeet(
+        meetId: String,
+    ) = singleLoading {
         meetManager.respondOfMeet(
             meetId,
             comment.value.ifBlank { null },
@@ -117,11 +121,15 @@ class MeetingBsViewModel: ViewModel() {
         )
     }
     
-    suspend fun leaveMeet(meetId: String) {
+    suspend fun leaveMeet(
+        meetId: String,
+    ) = singleLoading {
         meetManager.leaveMeet(meetId)
     }
     
-    suspend fun canceledMeet(meetId: String) {
+    suspend fun canceledMeet(
+        meetId: String,
+    ) = singleLoading {
         meetManager.cancelMeet(meetId)
     }
 }

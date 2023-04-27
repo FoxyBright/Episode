@@ -41,7 +41,6 @@ fun MeetingBs(
     val hidden by vm.hidden.collectAsState()
     val menu by vm.menu.collectAsState()
     
-    val details = if(detailed) Pair(comment, hidden) else null
     val buttonState = meeting?.memberState == IS_ORGANIZER
     val backBut = nav.previousBackStackEntry != null
     
@@ -64,9 +63,9 @@ fun MeetingBs(
         meeting?.let { meet ->
             MeetingBsContent(
                 MeetingBsState(
-                    menu, meet, lastResponse,
-                    memberList, distance, buttonState,
-                    details, backBut, meetReaction
+                    menu, meet, lastResponse, memberList,
+                    distance, buttonState, detailed,
+                    comment, hidden, backBut, meetReaction,
                 ), Modifier, object: MeetingBsCallback {
                     
                     override fun meetReactionDisable() {
@@ -92,6 +91,8 @@ fun MeetingBs(
                         scope.launch {
                             vm.respondForMeet(meetId)
                             vm.meetReactionDisable(true)
+                            vm.clearComment()
+                            vm.changeHidden(hidden)
                         }
                     }
                     
