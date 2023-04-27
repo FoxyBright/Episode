@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.notification.model.MarkAsReadRequest
 import ru.rikmasters.gilty.notification.model.PutRatingRequest
 import ru.rikmasters.gilty.shared.models.Notification
 import ru.rikmasters.gilty.shared.models.Rating
+import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -67,6 +68,6 @@ class NotificationWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<Notification>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получения уведомлений")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<Notification>() to ResponseWrapper.Paginator())
 }

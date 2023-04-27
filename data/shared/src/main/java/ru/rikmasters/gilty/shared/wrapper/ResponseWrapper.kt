@@ -28,7 +28,13 @@ data class ResponseWrapper<T: Any?>(
         val list_page: Int,
         val limit: Int,
         val offset: Int,
-    )
+    ) {
+        
+        constructor(): this(
+            (0), (0), (0),
+            (0), (0), (0)
+        )
+    }
     
     data class Error(
         val code: String? = null,

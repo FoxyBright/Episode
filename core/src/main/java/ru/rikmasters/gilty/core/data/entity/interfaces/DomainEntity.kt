@@ -8,17 +8,20 @@ interface DomainEntity: Entity {
      */
     fun primaryKey(): Any? = null
     
-    fun db(): DbEntity<*> =
-        throw NotImplementedError()
+    fun db(): DbEntity<*> = throw NotImplementedError()
     
     fun dbOrNull(): DbEntity<*>? = try {
         db()
-    } catch(nie: NotImplementedError) { null }
+    } catch(nie: NotImplementedError) {
+        null
+    }
     
-    fun web(): WebEntity<*> =
-        throw NotImplementedError()
+    fun web(): WebEntity<*> = throw NotImplementedError()
     
+    @Suppress("unused")
     fun webOrNull(): WebEntity<*>? = try {
         web()
-    } catch(nie: NotImplementedError) { null }
+    } catch(nie: NotImplementedError) {
+        null
+    }
 }

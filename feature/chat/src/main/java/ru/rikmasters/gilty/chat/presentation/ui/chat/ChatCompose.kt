@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.*
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportAlert
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
@@ -30,6 +29,7 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R.string.*
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -279,13 +279,12 @@ private fun Writing(
     Row(modifier, Start, CenterVertically) {
         WritingMessage()
         list.forEachIndexed { i, it ->
-            val mod = if(i == 0) {
+            val mod = if(i == 0)
                 Modifier.padding(start = 6.dp)
-            } else Modifier.offset((-16).dp)
-            AsyncImage(
-                it.url,
-                (null),
-                mod
+            else
+                Modifier.offset((-16).dp)
+            GCashedImage(
+                it.url, mod
                     .size(24.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop

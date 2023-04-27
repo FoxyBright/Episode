@@ -60,10 +60,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
         }
     }
     
-    fun refresh() = scope.launch {
-        vm.forceRefresh()
-    }
-    
     NotificationsContent(
         NotificationsState(
             notifications, lastRespond,
@@ -86,7 +82,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                                 userId ?: ""
                             )
                         }
-                        refresh()
+                        vm.forceRefresh()
                     } ?: run {
                         vm.selectNotification(notification)
                         vm.blur(true)
@@ -150,7 +146,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { refresh() }
+                scope.launch { vm.forceRefresh() }
             }
         }
     )

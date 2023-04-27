@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.notifications.viewmodel
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.*
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

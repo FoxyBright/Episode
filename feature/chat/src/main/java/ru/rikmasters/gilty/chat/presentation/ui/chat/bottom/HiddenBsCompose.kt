@@ -17,16 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.gallery.gallery.GalleryCallback
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.items
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.shared.CheckBox
-import ru.rikmasters.gilty.shared.shared.EmptyScreen
-import ru.rikmasters.gilty.shared.shared.GradientButton
-import ru.rikmasters.gilty.shared.shared.PagingLoader
+import ru.rikmasters.gilty.shared.shared.*
 
 data class HiddenGalleryState(
     val type: GalleryImageType,
@@ -36,7 +33,7 @@ data class HiddenGalleryState(
     val menuItems: List<String>? = null,
     val isOnline: Boolean = false,
     val buttonLabel: String = "",
-    val buttonEnabled: Boolean = false
+    val buttonEnabled: Boolean = false,
 )
 
 @Composable
@@ -45,8 +42,7 @@ fun HiddenGalleryGrid(
     images: LazyPagingItems<AvatarModel>,
     selected: List<AvatarModel>?,
     type: GalleryImageType,
-    isWeb: Boolean = false,
-    callback: GalleryCallback?
+    callback: GalleryCallback?,
 ) {
     val cells = 3
     LazyVerticalGrid(
@@ -55,7 +51,7 @@ fun HiddenGalleryGrid(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        if (images.loadState.refresh is LoadState.Loading) {
+        if(images.loadState.refresh is LoadState.Loading) {
             item(span = { GridItemSpan(cells) }) {
                 PagingLoader(images.loadState)
             }
@@ -63,16 +59,13 @@ fun HiddenGalleryGrid(
         items(images) { image ->
             image?.let {
                 HiddenGalleryImage(
-                    image,
-                    type,
-                    selected?.contains(image),
-                    Modifier,
-                    isWeb,
-                    callback
+                    it, type,
+                    selected?.contains(it),
+                    Modifier, callback
                 )
             }
         }
-        if (images.loadState.append is LoadState.Loading) {
+        if(images.loadState.append is LoadState.Loading) {
             item(span = { GridItemSpan(cells) }) {
                 PagingLoader(images.loadState)
             }
@@ -87,8 +80,7 @@ fun HiddenGalleryImage(
     type: GalleryImageType,
     selected: Boolean?,
     modifier: Modifier = Modifier,
-    isWeb: Boolean = false,
-    callback: GalleryCallback? = null
+    callback: GalleryCallback? = null,
 ) {
     Box(
         modifier
@@ -97,13 +89,12 @@ fun HiddenGalleryImage(
                 callback?.onHiddenImageClick(image)
             }
     ) {
-        AsyncImage(
+        GCashedImage(
             image.thumbnail.url,
-            (null),
             Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        if (type == GalleryImageType.MULTIPLE) CheckBox(
+        if(type == GalleryImageType.MULTIPLE) CheckBox(
             (selected ?: false),
             Modifier
                 .align(Alignment.TopEnd)
@@ -116,7 +107,7 @@ fun HiddenGalleryImage(
 fun HiddenBsContent(
     state: HiddenGalleryState,
     modifier: Modifier,
-    callback: GalleryCallback? = null
+    callback: GalleryCallback? = null,
 ) {
     when {
         state.images.loadState.refresh is LoadState.Error -> {}
@@ -137,7 +128,6 @@ fun HiddenBsContent(
                     state.images,
                     state.selectedImages,
                     state.type,
-                    (true),
                     callback
                 )
                 GradientButton(
@@ -147,20 +137,19 @@ fun HiddenBsContent(
                     state.isOnline
                 ) { callback?.onAttach() }
             }
-            /*
-            val itemCount = state.images.itemCount
-            if (itemCount != 0 && state.images.loadState.refresh is LoadState.NotLoading) {
+            if(state.images.itemCount == 0
+                && state.images.loadState.refresh
+                        is LoadState.NotLoading
+            ) {
                 EmptyHiddenBs()
-            } else
-
-             */
+            }
         }
     }
 }
 
 @Composable
 private fun EmptyHiddenBs(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         Modifier

@@ -30,12 +30,12 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.PARTICIPANT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.VIEWER
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.*
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.Gradients.green
@@ -286,9 +286,8 @@ private fun Information(
     state: ChatAppBarState,
 ) {
     Row(modifier, verticalAlignment = CenterVertically) {
-        AsyncImage(
+        GCashedImage(
             state.avatar?.thumbnail?.url,
-            stringResource(R.string.meeting_avatar),
             Modifier
                 .size(32.dp)
                 .clip(CircleShape),

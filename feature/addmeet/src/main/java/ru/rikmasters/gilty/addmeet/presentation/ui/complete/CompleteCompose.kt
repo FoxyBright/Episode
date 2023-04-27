@@ -23,9 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.MeetingStates
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -117,10 +117,9 @@ private fun MeetingCard(
 ) {
     Box(modifier) {
         Box {
-            AsyncImage(
-                meeting.organizer?.avatar?.thumbnail?.url,
-                stringResource(R.string.meeting_avatar),
-                Modifier
+            GCashedImage(
+                meeting.organizer?.avatar
+                    ?.thumbnail?.url, Modifier
                     .clip(shapes.large)
                     .fillMaxHeight(0.94f),
                 contentScale = ContentScale.Crop

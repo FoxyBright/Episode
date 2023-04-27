@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
+import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper.Paginator
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
@@ -50,8 +51,8 @@ class ProfileWebSource: KtorSource() {
             query("is_completed" to type.ordinal.toString())
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<Meeting>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получить участников встречи")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<Meeting>() to Paginator())
     
     
     suspend fun getUserCategories() = get(
@@ -96,8 +97,8 @@ class ProfileWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<User>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получить наблюдателей")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<User>() to Paginator())
     
     suspend fun deleteHidden(albumId: String, imageId: String) {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
@@ -207,8 +208,8 @@ class ProfileWebSource: KtorSource() {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<MeetWithRespondsResponse>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получения откликов")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<MeetWithRespondsResponse>() to Paginator())
     
     suspend fun getFilesPaging(
         albumId: String,
@@ -219,8 +220,8 @@ class ProfileWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<Avatar>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получения файлов")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<Avatar>() to Paginator())
     
     suspend fun getMeetResponds(
         meetId: String,
@@ -231,8 +232,8 @@ class ProfileWebSource: KtorSource() {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<RespondResponse>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получения откликов на встречу")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<RespondResponse>() to Paginator())
     
     suspend fun deleteRespond(respondId: String) {
         delete("http://$HOST$PREFIX_URL/responds/$respondId")

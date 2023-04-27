@@ -39,9 +39,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
@@ -419,9 +419,8 @@ fun ImageMessage(
     ) {
         Box(Modifier.fillMaxHeight(0.5f)) {
             message.message?.attachments?.let {
-                AsyncImage(
-                    it.first().file?.url, (null),
-                    Modifier
+                GCashedImage(
+                    it.first().file?.url, Modifier
                         .wrapContentSize()
                         .background(
                             colorScheme.onTertiary,

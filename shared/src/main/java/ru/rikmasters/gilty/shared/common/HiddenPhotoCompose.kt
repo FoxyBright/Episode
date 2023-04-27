@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -155,9 +154,8 @@ private fun LazyItem(
             .clickable { onSelect(image) },
         TopEnd
     ) {
-        Image(
-            rememberAsyncImagePainter(image),
-            (null), Modifier.fillMaxSize(),
+        GCashedImage(
+            image, Modifier.fillMaxSize(),
             contentScale = Crop,
         )
         Card(

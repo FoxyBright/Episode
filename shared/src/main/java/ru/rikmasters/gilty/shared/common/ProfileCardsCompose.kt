@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.core.R.drawable.ic_information
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
@@ -114,13 +113,12 @@ fun HiddenContent(
             .background(colorScheme.primaryContainer)
             .clickable { onCardClick() }, BottomCenter
     ) {
-        AsyncImage(
-            image, (null),
-            Modifier.fillMaxSize(),
+        GCashedImage(
+            image, Modifier.fillMaxSize(),
             contentScale = Crop
         )
         val emptyImage = image.isNullOrBlank()
-                || image.contains("null")  //TODO Появляется null в строке - поправить
+                || image.contains("null")
         Box(
             Modifier
                 .padding(8.dp)

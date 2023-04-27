@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.image.AlbumModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.models.Album
 import ru.rikmasters.gilty.shared.models.User
@@ -33,16 +34,15 @@ class ChatWebSource: KtorSource() {
         page: Int? = null,
         perPage: Int? = null,
         sortType: SortType = SortType.MEETING_DATE,
-    ): Pair<List<Chat>, Paginator> {
-        return get("http://$HOST$PREFIX_URL/chats") {
-            url {
-                page?.let { query("page" to "$page") }
-                perPage?.let { query("per_page" to "$perPage") }
-                query("sort_type" to sortType.stringName)
-            }
-        }?.let { if(it.status == OK) it.paginateWrapped() else null }
-            ?: throw IllegalArgumentException("Ошибка при получении диалогов")
-    }
+    ) = get("http://$HOST$PREFIX_URL/chats") {
+        url {
+            page?.let { query("page" to "$page") }
+            perPage?.let { query("per_page" to "$perPage") }
+            query("sort_type" to sortType.stringName)
+        }
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<Chat>() to Paginator())
+    
     
     suspend fun markAsReadMessage(
         chatId: String,
@@ -182,8 +182,8 @@ class ChatWebSource: KtorSource() {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped<List<Message>>() else null }
-        ?: throw IllegalArgumentException("Ошибка при попытке получить сообщения")
+    }?.let { if(it.status == OK) it.paginateWrapped() else null }
+        ?: (emptyList<Message>() to Paginator())
     
     suspend fun getChat(chatId: String) = get(
         "http://$HOST$PREFIX_URL/chats/$chatId"
@@ -207,8 +207,7 @@ class ChatWebSource: KtorSource() {
             res.paginateWrapped<List<User>>().let { (list, pag) ->
                 list.map { it.map() } to pag
             } else null
-    }
-        ?: throw IllegalArgumentException("Ошибка при попытке получить зрителей")
+    } ?: (emptyList<UserModel>() to Paginator())
     
     suspend fun completeChat(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/complete")

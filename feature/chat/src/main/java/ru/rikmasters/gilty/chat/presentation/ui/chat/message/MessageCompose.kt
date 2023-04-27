@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_reply
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType
@@ -146,10 +146,9 @@ private fun Content(
         if(!state.sender &&
             message.type != NOTIFICATION
             && state.avatar
-        ) AsyncImage(
+        ) GCashedImage(
             message.message?.author?.avatar
                 ?.thumbnail?.url,
-            (null),
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)

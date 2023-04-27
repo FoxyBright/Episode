@@ -15,9 +15,9 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_open
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -65,8 +65,8 @@ fun HiddenImage(
             Modifier
                 .background(linearGradient(red()))
                 .fillMaxSize()
-        ) else AsyncImage(
-            image?.thumbnail?.url, (null), Modifier
+        ) else GCashedImage(
+            image?.thumbnail?.url, Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,

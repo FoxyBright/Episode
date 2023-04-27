@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,17 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoriesListCard
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
@@ -134,10 +130,9 @@ fun MeetingCard(
                 .offset(-(26).dp, 10.dp)
                 .width(156.dp)
         ) {
-            AsyncImage(
-                meeting.organizer?.avatar?.thumbnail?.url,
-                stringResource(R.string.meeting_avatar),
-                Modifier
+            GCashedImage(
+                meeting.organizer?.avatar
+                    ?.thumbnail?.url, Modifier
                     .clip(CircleShape)
                     .size(135.dp),
                 contentScale = Crop
@@ -214,10 +209,9 @@ fun MeetingCategoryCard(
                     )
                     .size(126.dp), Center
             ) {
-                if(hasAvatar) Image(
-                    rememberAsyncImagePainter(
-                        user?.avatar?.thumbnail?.url
-                    ), (null), Modifier
+                if(hasAvatar) GCashedImage(
+                    user?.avatar?.thumbnail?.url,
+                    Modifier
                         .fillMaxSize()
                         .clip(CircleShape),
                     contentScale = Crop
