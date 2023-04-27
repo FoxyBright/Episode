@@ -35,6 +35,11 @@ fun FiltersBs(
     val city by vm.city.collectAsState()
     val screen by vm.screen.collectAsState()
     
+    LaunchedEffect(
+        vm.mainVm.filterCleaner
+            .collectAsState().value
+    ) { vm.clearFilters() }
+    
     LaunchedEffect(isCollapsed) {
         if(isCollapsed) vm.navigate(0)
     }
@@ -75,9 +80,9 @@ fun FiltersBs(
                     index: Int, category: CategoryModel,
                 ) {
                     scope.launch {
-                        category.children?.let {
-                            vm.changeCategoryState(index)
-                        } ?: run { vm.selectCategory(category) }
+                        category.children
+                            ?.let { vm.changeCategoryState(index) }
+                            ?: run { vm.selectCategory(category) }
                     }
                 }
                 

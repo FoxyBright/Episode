@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.notification
 
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -50,8 +51,11 @@ class NotificationWebSource: KtorSource() {
     // получение списка возможных реакций на встречу или участника
     suspend fun getRatings() =
         get("http://$HOST$PREFIX_URL/ratings")
-            ?.wrapped<List<Rating>>()?.map { it.map() }
-            ?: emptyList()
+            ?.let { res ->
+                if(res.status == OK)
+                    res.wrapped<List<Rating>>().map { it.map() }
+                else null
+            } ?: emptyList()
     
     // получение списка уведомлений
     suspend
@@ -63,5 +67,6 @@ class NotificationWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }!!.paginateWrapped<List<Notification>>()
+    }?.let { if(it.status == OK) it.paginateWrapped<List<Notification>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получения уведомлений")
 }

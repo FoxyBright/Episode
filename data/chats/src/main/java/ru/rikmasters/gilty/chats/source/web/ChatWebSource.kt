@@ -1,9 +1,12 @@
+@file:Suppress("unused")
+
 package ru.rikmasters.gilty.chats.source.web
 
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.chats.models.chat.Chat
 import ru.rikmasters.gilty.chats.models.chat.SortType
 import ru.rikmasters.gilty.chats.models.message.MarkAsReadRequest
@@ -37,7 +40,8 @@ class ChatWebSource: KtorSource() {
                 perPage?.let { query("per_page" to "$perPage") }
                 query("sort_type" to sortType.stringName)
             }
-        }!!.paginateWrapped()
+        }?.let { if(it.status == OK) it.paginateWrapped() else null }
+            ?: throw IllegalArgumentException("Ошибка при получении диалогов")
     }
     
     suspend fun markAsReadMessage(
@@ -63,23 +67,28 @@ class ChatWebSource: KtorSource() {
         }
     }
     
-    suspend fun getChatAlbum(chatId: String): AlbumModel {
-        return get("http://$HOST$PREFIX_URL/chats/$chatId/album")
-            ?.wrapped<Album>()
-            ?.map()
-            ?: AlbumModel()
-    }
+    suspend fun getChatAlbum(
+        chatId: String,
+    ) = get(
+        "http://$HOST$PREFIX_URL/chats/$chatId/album"
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<Album>().map()
+        else null
+    } ?: AlbumModel()
     
     suspend fun unmuteChatNotifications(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/unmute")
     }
     
-    suspend fun getChatsStatus(): Int {
-        return get("http://$HOST$PREFIX_URL/chats/status")
-            ?.wrapped<ChatStatus>()
-            ?.unreadCount
-            ?: 0
-    }
+    suspend fun getChatsStatus() =
+        get("http://$HOST$PREFIX_URL/chats/status")
+            ?.let {
+                if(it.status == OK)
+                    it.wrapped<ChatStatus>()
+                        .unreadCount
+                else null
+            } ?: 0
     
     suspend fun muteChatNotifications(
         chatId: String,
@@ -165,25 +174,24 @@ class ChatWebSource: KtorSource() {
     }
     
     suspend fun getMessages(
-        chatId: String,
-        page: Int?,
-        perPage: Int?,
-    ): Pair<List<Message>, Paginator> {
-        return get(
-            "http://$HOST$PREFIX_URL/chats/$chatId/messages"
-        ) {
-            url {
-                page?.let { query("page" to "$it") }
-                perPage?.let { query("per_page" to "$it") }
-            }
-        }!!.paginateWrapped()
-    }
+        chatId: String, page: Int?, perPage: Int?,
+    ) = get(
+        "http://$HOST$PREFIX_URL/chats/$chatId/messages"
+    ) {
+        url {
+            page?.let { query("page" to "$it") }
+            perPage?.let { query("per_page" to "$it") }
+        }
+    }?.let { if(it.status == OK) it.paginateWrapped<List<Message>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получить сообщения")
     
-    suspend fun getChat(chatId: String): ChatModel {
-        return get(
-            "http://$HOST$PREFIX_URL/chats/$chatId"
-        )?.wrapped<Chat>()?.map() ?: ChatModel()
-    }
+    suspend fun getChat(chatId: String) = get(
+        "http://$HOST$PREFIX_URL/chats/$chatId"
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<Chat>().map()
+        else null
+    } ?: ChatModel()
     
     suspend fun getTranslationViewers(
         chatId: String, query: String?,
@@ -194,9 +202,13 @@ class ChatWebSource: KtorSource() {
             perPage?.let { query("per_page" to "$it") }
             query?.let { query("query" to it) }
         }
-    }?.paginateWrapped<List<User>>()?.let { (list, pag) ->
-        list.map { it.map() } to pag
+    }?.let { res ->
+        if(res.status == OK)
+            res.paginateWrapped<List<User>>().let { (list, pag) ->
+                list.map { it.map() } to pag
+            } else null
     }
+        ?: throw IllegalArgumentException("Ошибка при попытке получить зрителей")
     
     suspend fun completeChat(chatId: String) {
         post("http://$HOST$PREFIX_URL/chats/$chatId/complete")

@@ -52,7 +52,12 @@ import kotlin.math.*
 private fun PhotoPreview() {
     GiltyTheme {
         PhotoView(
-            listOf(DemoAvatarModel),
+            listOf(
+                DemoAvatarModel,
+                DemoAvatarModel,
+                DemoAvatarModel,
+                DemoAvatarModel,
+            ),
             DemoAvatarModel,
             (false), PHOTO
         )
@@ -64,7 +69,12 @@ private fun PhotoPreview() {
 private fun HiddenPhotoPreview() {
     GiltyTheme {
         PhotoView(
-            listOf(DemoAvatarModel),
+            listOf(
+                DemoAvatarModel,
+                DemoAvatarModel,
+                DemoAvatarModel,
+                DemoAvatarModel,
+            ),
             DemoAvatarModel,
             (false), LOAD, Modifier,
         )
@@ -142,12 +152,9 @@ fun PhotoView(
                     
                 }
                 GDropMenu(
-                    menuState, {
-                        onMenuClick?.let { it(false) }
-                    }, DpOffset(
-                        (screenWidth - 160).dp,
-                        -(100).dp
-                    ), listOf(
+                    menuState, { onMenuClick?.let { it(false) } },
+                    DpOffset((screenWidth - 160).dp, -(100).dp),
+                    listOf(
                         Pair(stringResource(R.string.edit_button)) {
                             onMenuItemClick?.let {
                                 it(images[select]?.id!!)
@@ -162,12 +169,10 @@ fun PhotoView(
                     listState.firstVisibleItemScrollOffset
                 }
             }.value
-            if(!listState.isScrollInProgress) {
-                if(offset <= 250) scope.scrollBasic(listState, (true))
-                else scope.scrollBasic(listState)
-                if(offset > 250) scope.scrollBasic(listState)
-                else scope.scrollBasic(listState, (true))
-            }
+            
+            if(!listState.isScrollInProgress)
+                scope.scrollBasic(listState, offset <= 250)
+            
             var scrollState by remember {
                 mutableStateOf(true)
             }
@@ -293,7 +298,7 @@ fun ZoomableAsyncImage(
     backgroundColor: Color = Transparent,
     imageAlign: Alignment = Center,
     shape: Shape = RectangleShape,
-    maxScale: Float = 1f,
+    maxScale: Float = 0.5f,
     minScale: Float = 5f,
     contentScale: ContentScale = Fit,
     isRotation: Boolean = false,

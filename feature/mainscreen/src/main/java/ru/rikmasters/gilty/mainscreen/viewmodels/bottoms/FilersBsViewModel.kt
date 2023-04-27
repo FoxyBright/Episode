@@ -192,6 +192,7 @@ class FiltersBsViewModel(
         
         _categories.emit(removeChildren(selectedCategories.value))
         
+        onSave()
         findMeets()
     }
     

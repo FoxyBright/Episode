@@ -156,14 +156,12 @@ private fun Content(
             ) {
                 Text(
                     it.name, Modifier.padding(
-                        top = if(
-                            it.name == stringResource(R.string.meeting_filter_category)
-                        ) 0.dp else 28.dp,
+                        top = 28.dp,
                         bottom = 18.dp
                     ), colorScheme.tertiary,
                     style = typography.labelLarge
                 )
-                it.content.invoke()
+                it.content()
             }
         }
         itemSpacer(40.dp)
@@ -245,8 +243,7 @@ private fun filterList(
         }
     )
     if(state.today) filters.add(
-        (2),
-        FilterModel(stringResource(R.string.meeting_filter_distance)) {
+        (2), FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
                 state.distance,
                 state.distanceState,
@@ -259,7 +256,8 @@ private fun filterList(
             CardRow(
                 stringResource(R.string.select_city),
                 state.city?.name ?: "",
-                Modifier, shapes.medium
+                Modifier.padding(),
+                shapes.medium
             ) { callback?.onCityClick() }
         }
     )

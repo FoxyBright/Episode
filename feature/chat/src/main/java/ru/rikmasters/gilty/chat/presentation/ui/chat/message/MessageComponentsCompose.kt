@@ -252,7 +252,11 @@ fun SystemMessage(
                             emoji = it.emoji
                             withStyle(bold) {
                                 append(
-                                    "${it.username}, ${it.age} "
+                                    "${it.username}, ${
+                                        if(it.age in 18..99)
+                                            it.age
+                                        else ""
+                                    } "
                                 )
                             }
                             appendInlineContent("emoji")

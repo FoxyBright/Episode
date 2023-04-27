@@ -1,11 +1,11 @@
 package ru.rikmasters.gilty.profile
 
-import io.ktor.client.call.body
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
+import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -34,24 +34,33 @@ class ProfileWebSource: KtorSource() {
     
     suspend fun getUser(id: String) =
         get("http://$HOST$PREFIX_URL/users/$id")
-            ?.wrapped<Profile>()?.map() ?: ProfileModel()
+            ?.let {
+                if(it.status == OK)
+                    it.wrapped<Profile>().map()
+                else null
+            } ?: ProfileModel()
     
     suspend fun getUserMeets(
         page: Int? = null,
         perPage: Int? = null,
         type: MeetingsType,
-    ) =
-        get("http://$HOST$PREFIX_URL/profile/meetings") {
-            url {
-                page?.let { query("page" to "$it") }
-                query("is_completed" to type.ordinal.toString())
-                perPage?.let { query("per_page" to "$it") }
-            }
-        }!!.paginateWrapped<List<Meeting>>()
+    ) = get("http://$HOST$PREFIX_URL/profile/meetings") {
+        url {
+            page?.let { query("page" to "$it") }
+            query("is_completed" to type.ordinal.toString())
+            perPage?.let { query("per_page" to "$it") }
+        }
+    }?.let { if(it.status == OK) it.paginateWrapped<List<Meeting>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получить участников встречи")
+    
     
     suspend fun getUserCategories() = get(
         "http://$HOST$PREFIX_URL/profile/categories"
-    )?.wrapped<List<Category>>() ?: emptyList()
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<List<Category>>()
+        else null
+    } ?: emptyList()
     
     suspend fun subscribeToUser(memberId: String) {
         post("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
@@ -87,16 +96,20 @@ class ProfileWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.paginateWrapped<List<User>>()
+    }?.let { if(it.status == OK) it.paginateWrapped<List<User>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получить наблюдателей")
     
     suspend fun deleteHidden(albumId: String, imageId: String) {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
     }
     
-    suspend fun getFiles(albumId: String) =
-        get("http://$HOST$PREFIX_URL/albums/$albumId/files")
-            ?.wrapped<List<Avatar>>()
-            ?: emptyList()
+    suspend fun getFiles(albumId: String) = get(
+        "http://$HOST$PREFIX_URL/albums/$albumId/files"
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<List<Avatar>>()
+        else null
+    } ?: emptyList()
     
     suspend fun addHidden(albumId: String, files: List<File>) =
         postFormData(
@@ -117,8 +130,11 @@ class ProfileWebSource: KtorSource() {
                     )
                 }
             }
-        )?.wrapped<List<Avatar>>()
-            ?: emptyList()
+        )?.let {
+            if(it.status == OK)
+                it.wrapped<List<Avatar>>()
+            else null
+        } ?: emptyList()
     
     suspend fun setUserAvatar(
         avatar: File,
@@ -146,15 +162,10 @@ class ProfileWebSource: KtorSource() {
         )
     }
     
-    private data class Status(val status: String)
-    
-    suspend fun checkUserName(username: String) = try {
-        get("http://$HOST$PREFIX_URL/profile/checkname") { url { query("username" to username) } }
-            ?.let { it.body<Status>().status == "error" }
-            ?: false
-    } catch(e: Exception) {
-        false
-    }
+    suspend fun checkUserName(username: String) = get(
+        "http://$HOST$PREFIX_URL/profile/checkname"
+    ) { url { query("username" to username) } }
+        ?.let { it.status.value == 400 } ?: false
     
     suspend fun setUserData(
         username: String?,
@@ -176,50 +187,52 @@ class ProfileWebSource: KtorSource() {
         }
     }
     
-    suspend fun getUserData() =
-        get("http://$HOST$PREFIX_URL/profile")
-            ?.wrapped<Profile>() ?: Profile()
+    suspend fun getUserData() = get(
+        "http://$HOST$PREFIX_URL/profile"
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<Profile>()
+        else null
+    } ?: Profile()
     
     suspend fun deleteAccount() {
         delete("http://$HOST$PREFIX_URL/profile/account")
     }
     
     suspend fun getResponds(
-        type: RespondType,
-        page: Int?,
-        perPage: Int?,
+        type: RespondType, page: Int?, perPage: Int?,
     ) = get("http://$HOST$PREFIX_URL/responds") {
         url {
             query("type" to type.name)
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.paginateWrapped<List<MeetWithRespondsResponse>>()
+    }?.let { if(it.status == OK) it.paginateWrapped<List<MeetWithRespondsResponse>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получения откликов")
     
     suspend fun getFilesPaging(
         albumId: String,
         page: Int,
         perPage: Int,
-    ) =
-        get("http://$HOST$PREFIX_URL/albums/$albumId/files") {
-            url {
-                query("page" to "$page")
-                query("per_page" to "$perPage")
-            }
-        }?.paginateWrapped<List<Avatar>>()
+    ) = get("http://$HOST$PREFIX_URL/albums/$albumId/files") {
+        url {
+            query("page" to "$page")
+            query("per_page" to "$perPage")
+        }
+    }?.let { if(it.status == OK) it.paginateWrapped<List<Avatar>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получения файлов")
     
     suspend fun getMeetResponds(
         meetId: String,
         page: Int?,
         perPage: Int?,
-    ) = get(
-        "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
-    ) {
+    ) = get("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
         url {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.paginateWrapped<List<RespondResponse>>()
+    }?.let { if(it.status == OK) it.paginateWrapped<List<RespondResponse>>() else null }
+        ?: throw IllegalArgumentException("Ошибка при попытке получения откликов на встречу")
     
     suspend fun deleteRespond(respondId: String) {
         delete("http://$HOST$PREFIX_URL/responds/$respondId")
@@ -227,10 +240,10 @@ class ProfileWebSource: KtorSource() {
     
     suspend fun getNotificationResponds() = getResponds(
         RECEIVED, null, null
-    ).let {
-        val respond = it?.first?.firstOrNull()
-        (respond?.responds_count ?: 0) to (respond?.responds?.firstOrNull()
-            ?.author?.avatar?.thumbnail?.url ?: "")
+    ).first.firstOrNull().let { respond ->
+        (respond?.responds_count ?: 0) to
+                (respond?.responds?.firstOrNull()
+                    ?.author?.avatar?.thumbnail?.url ?: "")
     }
     
     suspend fun acceptRespond(respondId: String) {

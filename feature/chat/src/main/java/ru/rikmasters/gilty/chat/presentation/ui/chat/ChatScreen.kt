@@ -37,7 +37,6 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import java.io.File
 
@@ -227,17 +226,15 @@ fun ChatScreen(
                     }
                     
                     override fun onImageClick(message: MessageModel) {
-                        val attach = message.message
-                            ?.attachments
-                            ?.first()
-                            ?.file
-                            ?: AvatarModel()
-                        
                         scope.launch {
-                            vm.changePhotoViewType(PHOTO)
-                            vm.setPhotoViewSelected(attach)
-                            vm.setPhotoViewImages(listOf(attach))
-                            vm.changePhotoViewState(true)
+                            message.message
+                                ?.attachments?.first()
+                                ?.file?.let { attach ->
+                                    vm.changePhotoViewType(PHOTO)
+                                    vm.setPhotoViewSelected(attach)
+                                    vm.setPhotoViewImages(listOf(attach))
+                                    vm.changePhotoViewState(true)
+                                }
                         }
                     }
                     

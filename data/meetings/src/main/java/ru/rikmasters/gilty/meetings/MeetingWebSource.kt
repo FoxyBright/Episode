@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.meetings
 import android.content.res.Resources.getSystem
 import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -32,9 +33,7 @@ class MeetingWebSource: KtorSource() {
         lat: Double?,
         lng: Double?,
         subjectId: String?,
-    ) = get(
-        "http://$HOST$PREFIX_URL/location/cities"
-    ) {
+    ) = get("http://$HOST$PREFIX_URL/location/cities") {
         url {
             if(query.isNotBlank()) query("query" to query)
             page?.let { query("page" to "$it") }
@@ -44,9 +43,12 @@ class MeetingWebSource: KtorSource() {
             query("country" to getLocale())
             subjectId?.let { query("subject_id" to it) }
         }
-    }?.wrapped<List<City>>()
-        ?.map { it.map() }
-        ?: emptyList()
+    }?.let { res ->
+        if(res.status == OK)
+            res.wrapped<List<City>>()
+                .map { it.map() }
+        else null
+    } ?: emptyList()
     
     suspend fun setUserInterest(meets: List<String>) {
         patch("http://$HOST$PREFIX_URL/profile/categories") {
@@ -145,60 +147,69 @@ class MeetingWebSource: KtorSource() {
     suspend fun getUserActualMeets(
         userId: String,
     ) = get("http://$HOST$PREFIX_URL/users/$userId/meetings")
-        ?.wrapped<List<Meeting>>()
-        ?.map { it.map() }
-        ?: emptyList()
+        ?.let { res ->
+            if(res.status == OK)
+                res.wrapped<List<Meeting>>()
+                    .map { it.map() }
+            else null
+        } ?: emptyList()
     
     suspend fun getDetailedMeet(
         meet: String,
     ) = get("http://$HOST$PREFIX_URL/meetings/$meet")
-        ?.wrapped<DetailedMeetResponse>()
-        ?.map()
+        ?.let {
+            if(it.status == OK)
+                it.wrapped<DetailedMeetResponse>().map()
+            else null
+        }
     
     suspend fun getMeetMembers(
         meet: String,
         excludeMe: Int,
         page: Int,
         perPage: Int,
-    ) =
-        get("http://$HOST$PREFIX_URL/meetings/$meet/members") {
-            url {
-                query("exclude_me" to "$excludeMe")
-                query("page" to "$page")
-                query("per_page" to "$perPage")
-            }
-        }?.paginateWrapped<List<User>>()
-    
-    suspend fun getOrientations() = try {
-        get("http://$HOST$PREFIX_URL/orientations")
-            ?.wrapped<List<OrientationModel>>()
-            ?: emptyList()
-    } catch(e: Exception) {
-        emptyList()
+    ) = get("http://$HOST$PREFIX_URL/meetings/$meet/members") {
+        url {
+            query("exclude_me" to "$excludeMe")
+            query("page" to "$page")
+            query("per_page" to "$perPage")
+        }
+    }?.let {
+        if(it.status == OK)
+            it.paginateWrapped<List<User>>()
+        else null
     }
     
-    suspend fun getLastPlaces() = try {
-        get("http://$HOST$PREFIX_URL/meetings/places")
-            ?.wrapped<List<Location>>()
-            ?.map { it.map() }
-            ?: emptyList()
-    } catch(e: Exception) {
-        emptyList()
-    }
+    suspend fun getOrientations() = get(
+        "http://$HOST$PREFIX_URL/orientations"
+    )?.let {
+        if(it.status == OK)
+            it.wrapped<List<OrientationModel>>()
+        else null
+    } ?: emptyList()
+    
+    suspend fun getLastPlaces() = get(
+        "http://$HOST$PREFIX_URL/meetings/places"
+    )?.let { res ->
+        if(res.status == OK)
+            res.wrapped<List<Location>>()
+                .map { it.map() }
+        else null
+    } ?: emptyList()
     
     suspend fun getPopularTags(
         categoriesId: List<String?>,
-    ) = try {
-        get("http://$HOST$PREFIX_URL/tags/popular") {
-            url {
-                categoriesId.forEach {
-                    query("category_ids[]" to "$it")
-                }
+    ) = get("http://$HOST$PREFIX_URL/tags/popular") {
+        url {
+            categoriesId.forEach {
+                query("category_ids[]" to "$it")
             }
-        }?.wrapped<List<TagModel>>() ?: emptyList()
-    } catch(e: Exception) {
-        emptyList()
-    }
+        }
+    }?.let {
+        if(it.status == OK)
+            it.wrapped<List<TagModel>>()
+        else null
+    } ?: emptyList()
     
     suspend fun addNewTag(tag: String) {
         post("http://$HOST$PREFIX_URL/tags") {
@@ -206,19 +217,24 @@ class MeetingWebSource: KtorSource() {
         }
     }
     
-    suspend fun searchTags(tag: String) = try {
+    suspend fun searchTags(tag: String) =
         get("http://$HOST$PREFIX_URL/tags/search") {
             url { query("query" to tag) }
-        }?.wrapped<List<TagModel>>() ?: emptyList()
-    } catch(e: Exception) {
-        emptyList()
-    }
+        }?.let {
+            if(it.status == OK)
+                it.wrapped<List<TagModel>>()
+            else null
+        } ?: emptyList()
     
     suspend fun getCategoriesList() =
         get("http://$HOST$PREFIX_URL/categories")
-            ?.wrapped<List<Category>>()
-            ?.map { it.map() }
-            ?: emptyList()
+            ?.let { res ->
+                if(res.status == OK)
+                    res.wrapped<List<Category>>()
+                        .map { it.map() }
+                else null
+            } ?: emptyList()
+    
     
     suspend fun addMeet(
         categoryId: String?,
@@ -249,5 +265,9 @@ class MeetingWebSource: KtorSource() {
                 requirements, withoutResponds
             )
         )
-    }?.wrapped<DetailedMeetResponse>()?.id ?: ""
+    }?.let {
+        if(it.status == OK)
+            it.wrapped<DetailedMeetResponse>().id
+        else null
+    } ?: ""
 }

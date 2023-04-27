@@ -10,6 +10,7 @@ class ReportsManager(
     private val web: ReportsWebSource,
 ) {
     
+    @Suppress("unused")
     suspend fun sendReport(
         type: Report,
         subtype: ReportSubtype,

@@ -127,11 +127,20 @@ fun MainScreen(vm: MainViewModel) {
                 meet: MeetingModel,
                 state: SwipeableCardState,
             ) {
-                scope.launch { vm.meetInteraction(direction, meet, state) }
+                scope.launch {
+                    vm.meetInteraction(
+                        direction, meet, state
+                    )
+                }
             }
             
             override fun onMeetMoreClick() {
-                scope.launch { vm.moreMeet() }
+                scope.launch {
+                    vm.moreMeet()
+                    vm.filterCleaner.emit(
+                        !vm.filterCleaner.value
+                    )
+                }
             }
             
             override fun onResetMeets() {

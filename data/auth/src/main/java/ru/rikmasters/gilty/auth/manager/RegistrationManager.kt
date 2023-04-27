@@ -58,7 +58,9 @@ class RegistrationManager(
         }
     }
     
-    suspend fun isNameOccupied(name: String) = withContext(IO) {
+    suspend fun isNameOccupied(
+        name: String,
+    ) = withContext(IO) {
         profileWebSource.checkUserName(name)
     }
     

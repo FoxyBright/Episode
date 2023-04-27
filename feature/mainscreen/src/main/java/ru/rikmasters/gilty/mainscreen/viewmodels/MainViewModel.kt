@@ -169,6 +169,8 @@ class MainViewModel: ViewModel() {
         _grid.emit(!grid.value)
     }
     
+    val filterCleaner = MutableStateFlow(false)
+    
     suspend fun moreMeet() {
         _days.emit(emptyList())
         _time.emit("")
