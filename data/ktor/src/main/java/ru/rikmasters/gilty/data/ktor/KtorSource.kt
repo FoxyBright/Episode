@@ -34,7 +34,7 @@ open class KtorSource: WebSource() {
     private val baseClient by lazy {
         HttpClient(OkHttp) {
             
-            expectSuccess = false
+            expectSuccess = true
             
             engine {
                 config { writeTimeout(5, MINUTES) }

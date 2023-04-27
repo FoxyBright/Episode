@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.models.Profile
 
 class MessageRepository(
     override val primarySource: DbSource,
@@ -27,6 +28,8 @@ class MessageRepository(
     // поток пишущих
     fun writersFlow() = primarySource.listenAll(UserWs::class)
         .map { list -> list.map { Pair(it.id, it.thumbnail.map()) } }
+        
+    suspend fun getUser() = primarySource.find<Profile>()?.id
     
     // кто-то больше не пишет
     suspend fun deleteWriter(id: String) = primarySource.deleteById<UserWs>(id)

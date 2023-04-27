@@ -31,7 +31,8 @@ class WebSocketHandler(
     private val messageRepository: MessageRepository,
 ): KtorSource() {
     
-    private val socketURL = "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
+    private val socketURL =
+        "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
     
     private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
     private val socketId = MutableStateFlow<String?>(null)
@@ -142,7 +143,8 @@ class WebSocketHandler(
                             else -> DELETE_MESSAGE
                         },
                         if(event == MESSAGE_SENT)
-                            mapper.readValue<MessageWs>(response.data).map(chatId.value)
+                            mapper.readValue<MessageWs>(response.data)
+                                .map(chatId.value)
                         else
                             mapper.readValue<ShortMessageWs>(response.data).id
                     )
@@ -152,13 +154,15 @@ class WebSocketHandler(
             }
             
             MESSAGE_TYPING -> {
-                val user = mapper.readValue<User>(response.data)
-                messageRepository.writersUpdate(
-                    UserWs(
-                        (user.id ?: ""),
-                        (user.avatar?.thumbnail ?: Thumbnail())
+                mapper.readValue<User>(response.data).let { user ->
+                    if(user.id == messageRepository.getUser()) return
+                    else messageRepository.writersUpdate(
+                        UserWs(
+                            (user.id ?: ""),
+                            (user.avatar?.thumbnail ?: Thumbnail())
+                        )
                     )
-                )
+                }
                 logD("$response")
             }
             
@@ -191,7 +195,8 @@ class WebSocketHandler(
         inPing = true
     }
     
-    private val mySession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+    private val mySession =
+        MutableStateFlow<DefaultClientWebSocketSession?>(null)
     private val _userId = MutableStateFlow("")
     private var sessionHandlerJob: Job? = null
     
