@@ -26,9 +26,9 @@ fun OrganizerBs(
     val meets by vm.userActualMeets.collectAsState()
     val isMyProfile by vm.isMyProfile.collectAsState()
     val observeState by vm.observe.collectAsState()
+    val menuState by vm.menuState.collectAsState()
     val meetState by vm.meetType.collectAsState()
     val profile by vm.profile.collectAsState()
-    val menuState by vm.menuState.collectAsState()
     
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
@@ -45,7 +45,8 @@ fun OrganizerBs(
     val profileState = ProfileState(
         profile, if(meetState == ANONYMOUS)
             ANONYMOUS_ORGANIZER else ORGANIZER,
-        observeState
+        observeState, (false),
+        profile.hiddenAccess
     )
     
     OrganizerContent(

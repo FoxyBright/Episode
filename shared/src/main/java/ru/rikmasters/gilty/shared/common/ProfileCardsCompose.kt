@@ -20,9 +20,8 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
@@ -56,7 +55,7 @@ private fun HiddenPhotoContentPreview() {
     GiltyTheme {
         HiddenContent(
             Modifier.width(160.dp),
-            (null), CREATE
+            (null), CREATE, (false)
         ) {}
     }
 }
@@ -67,7 +66,8 @@ private fun ProfileImageContentPreview() {
     GiltyTheme {
         ProfileImageContent(
             Modifier.width(160.dp),
-            DemoAvatarModel, ORGANIZER, (false),
+            DemoAvatarModel, ORGANIZER,
+            (false),
             {}) {}
     }
 }
@@ -100,6 +100,7 @@ fun HiddenContent(
     modifier: Modifier,
     image: String?,
     profileType: ProfileType,
+    lockState: Boolean,
     onCardClick: () -> Unit,
 ) {
     Box(
@@ -119,13 +120,12 @@ fun HiddenContent(
         )
         val emptyImage = image.isNullOrBlank()
                 || image.contains("null")
-        Box(
+        if(profileType == ORGANIZER) Lock(
             Modifier
-                .padding(8.dp)
-                .size(26.dp)
-                .clip(CircleShape)
-                .align(TopStart), Alignment.Center
-        ) { if(profileType != USERPROFILE || emptyImage) Lock() }
+                .align(TopStart)
+                .padding(8.dp),
+            lockState
+        )
         CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
             when(profileType) {
@@ -141,25 +141,22 @@ fun HiddenContent(
 @Composable
 private fun Lock(
     modifier: Modifier = Modifier,
+    state: Boolean,
 ) {
     Box(
-        modifier
-            .height(IntrinsicSize.Max)
-            .width(IntrinsicSize.Max)
-    ) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .alpha(0.5f)
-                .background(
-                    Black, CircleShape
-                )
+        modifier.background(
+            Color(0x4D000000),
+            CircleShape
         )
+    ) {
         Icon(
-            painterResource(R.drawable.ic_lock_open),
-            (null), Modifier
-                .padding(6.dp)
-                .size(12.dp), White
+            painterResource(
+                if(state) R.drawable.ic_lock_open
+                else R.drawable.ic_lock_close
+            ), (null), Modifier
+                .padding(8.dp)
+                .size(16.dp),
+            White
         )
     }
 }

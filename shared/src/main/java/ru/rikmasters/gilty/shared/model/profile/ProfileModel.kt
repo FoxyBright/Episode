@@ -31,6 +31,7 @@ data class ProfileModel(
     val isOnline: Boolean?,
     val isAnonymous: Boolean?,
     val status: String?,
+    val hiddenAccess: Boolean
 ) {
     
     constructor(): this(
@@ -54,7 +55,8 @@ data class ProfileModel(
         unblockAt = null,
         isOnline = null,
         isAnonymous = null,
-        status = null
+        status = null,
+        hiddenAccess = false
     )
     
     fun map() = UserModel(
@@ -92,5 +94,6 @@ val DemoProfileModel = ProfileModel(
     unblockAt = "",
     isOnline = true,
     isAnonymous = true,
-    status = ""
+    status = "",
+    hiddenAccess = false
 )

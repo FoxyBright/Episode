@@ -79,7 +79,9 @@ data class Profile(
         unblockAt = unblockAt,
         isOnline = isOnline,
         isAnonymous = isAnonymous,
-        status = status
+        status = status,
+        hiddenAccess = albumPrivate?.hasAccess
+            ?: false
     )
     
     override fun primaryKey() = id

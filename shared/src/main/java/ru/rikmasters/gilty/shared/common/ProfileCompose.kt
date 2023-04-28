@@ -90,6 +90,7 @@ data class ProfileState(
     val profileType: ProfileType = CREATE,
     var observeState: Boolean = false,
     val occupiedName: Boolean = false,
+    val lockState: Boolean = false
 )
 
 interface ProfileCallback {
@@ -161,7 +162,8 @@ fun Profile(
                 )
                 HiddenContent(
                     Modifier, hidden,
-                    state.profileType
+                    state.profileType,
+                    state.lockState
                 ) { callback?.hiddenImages() }
             }
         }
