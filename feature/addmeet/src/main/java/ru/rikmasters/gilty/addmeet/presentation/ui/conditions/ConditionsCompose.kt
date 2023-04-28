@@ -112,7 +112,7 @@ private fun Content(
                 Modifier.padding(top = 18.dp)
             )
         }
-        item {
+        if(!state.online) item {
             Element(
                 conditions(state, callback),
                 Modifier.padding(top = 28.dp)

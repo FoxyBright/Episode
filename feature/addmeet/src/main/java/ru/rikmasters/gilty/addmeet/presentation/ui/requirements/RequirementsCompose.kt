@@ -150,8 +150,7 @@ private fun Content(
         item {
             Element(
                 responds(
-                    state.online,
-                    state.withoutRespond
+                    state.online, state.withoutRespond
                 ) { callback?.onWithoutRespondClick() },
                 Modifier.padding(top = 24.dp)
             )

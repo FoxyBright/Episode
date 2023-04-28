@@ -7,8 +7,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.IntrinsicSize.Max
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
@@ -44,20 +42,21 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Preview
 @Composable
 private fun ChipsPreview() {
+    @Composable
+    fun chip(
+        state: Boolean,
+        online: Boolean,
+        gradient: Boolean,
+    ) = GChip(
+        Modifier.padding(6.dp, 12.dp),
+        "Чип", state, online, gradient,
+    ) {}
     GiltyTheme {
-        val list = remember { mutableStateListOf(true, false, false) }
-        LazyRow(Modifier.fillMaxWidth()) {
-            itemsIndexed(list) { i, it ->
-                GChip(
-                    Modifier.padding(6.dp, 12.dp),
-                    "Чип ", it
-                ) {
-                    for(i1 in 0..list.lastIndex) {
-                        list[i1] = false
-                    }
-                    list[i] = true
-                }
-            }
+        Row(Modifier.fillMaxWidth()) {
+            chip((false), (false), (false))
+            chip((true), (false), (false))
+            chip((true), (true), (true))
+            chip((true), (true), (false))
         }
     }
 }
@@ -92,10 +91,12 @@ fun GChip(
     modifier: Modifier = Modifier,
     text: String,
     isSelected: Boolean = false,
-    online: Boolean = false,
+    isOnline: Boolean = false,
+    onlineGradient: Boolean = true,
     onClick: () -> Unit,
 ) {
     val primary = colorScheme.primary
+    val secondary = colorScheme.secondary
     val empty = colorScheme.primaryContainer
     val border = colors.chipGray
     Box(
@@ -105,9 +106,12 @@ fun GChip(
                 backgroundColor = Transparent,
                 border = BorderStroke(
                     1.dp, horizontalGradient(
-                        if(isSelected) if(online) green()
-                        else listOf(primary, primary)
-                        else listOf(border, border)
+                        when {
+                            !isSelected -> listOf(border, border)
+                            !isOnline -> listOf(primary, primary)
+                            !onlineGradient -> listOf(secondary, secondary)
+                            else -> green()
+                        }
                     )
                 ),
             )
@@ -124,9 +128,12 @@ fun GChip(
             Modifier
                 .background(
                     horizontalGradient(
-                        if(isSelected) if(online) green()
-                        else listOf(primary, primary)
-                        else listOf(empty, empty)
+                        when {
+                            !isSelected -> listOf(empty, empty)
+                            !isOnline -> listOf(primary, primary)
+                            !onlineGradient -> listOf(secondary, secondary)
+                            else -> green()
+                        }
                     )
                 )
         ) {

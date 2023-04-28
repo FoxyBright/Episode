@@ -180,7 +180,7 @@ fun SelectBottom(
             repeat(list.size) {
                 GChip(
                     Modifier, list[it],
-                    (select == it), online
+                    (select == it), online, (false)
                 ) { onItemClick?.let { c -> c(it) } }
             }
         }

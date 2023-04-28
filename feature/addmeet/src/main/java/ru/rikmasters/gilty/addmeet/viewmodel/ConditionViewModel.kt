@@ -63,7 +63,16 @@ class ConditionViewModel: ViewModel() {
     
     suspend fun changeOnline(state: Boolean) {
         _online.emit(state)
-        manager.update(isOnline = state)
+        val condition = if(state)
+            listOf(0) else emptyList()
+        _condition.emit(condition)
+        manager.update(
+            condition = condition
+                .firstOrNull()
+                ?.let { ConditionType.get(it) }
+                ?: ConditionType.NON_SELECT,
+            isOnline = state
+        )
     }
     
     suspend fun changeHidden(state: Boolean) {

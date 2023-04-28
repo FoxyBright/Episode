@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
@@ -337,11 +338,11 @@ fun ConditionsSelect(
                 .padding(horizontal = 16.dp),
             12.dp, 12.dp
         ) {
+            selected.log("THIS IS selected")
             repeat(conditions.size) {
                 GChip(
-                    Modifier,
-                    conditions[it].display,
-                    selected.contains(it), online
+                    Modifier, conditions[it].display,
+                    selected.log().contains(it.log()).log(), online
                 ) { onConditionSelect(it) }
             }
         }

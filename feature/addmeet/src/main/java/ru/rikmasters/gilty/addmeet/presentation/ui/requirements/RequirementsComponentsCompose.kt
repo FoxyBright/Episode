@@ -58,7 +58,8 @@ fun RequirementsList(
                 items(count) {
                     GChip(
                         Modifier.padding(top = 4.dp, end = 8.dp),
-                        "${it + 1}", (it == selected), state.online
+                        "${it + 1}", (it == selected),
+                        state.online, (false)
                     ) { callback?.onMemberClick(it) }
                 }
             }
