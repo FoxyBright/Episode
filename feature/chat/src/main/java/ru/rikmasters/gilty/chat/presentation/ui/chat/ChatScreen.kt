@@ -4,7 +4,6 @@ import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,7 +48,7 @@ fun ChatScreen(
 ) {
     val cameraPermissions = rememberPermissionState(CAMERA)
     val focusManager = LocalFocusManager.current
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListScrollState("chat_$chatId")
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val asm = get<AppStateModel>()

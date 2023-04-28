@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -12,13 +11,14 @@ import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListScrollState("chat_list")
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val nav = get<NavState>()

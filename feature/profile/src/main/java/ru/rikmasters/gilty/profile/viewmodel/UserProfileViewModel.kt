@@ -49,15 +49,15 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     @OptIn(ExperimentalCoroutinesApi::class)
     val meetsTest by lazy {
         refresh.flatMapLatest {
-            profileManager.getUserMeets(ACTUAL).cachedIn(coroutineScope)
-        }
+            profileManager.getUserMeets(ACTUAL)
+        }.cachedIn(coroutineScope)
     }
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyMeetsTest by lazy {
         refresh.flatMapLatest {
-            profileManager.getUserMeets(HISTORY).cachedIn(coroutineScope)
-        }
+            profileManager.getUserMeets(HISTORY)
+        }.cachedIn(coroutineScope)
     }
     
     private val refresh = MutableStateFlow(false)

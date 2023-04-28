@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +14,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
+import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -25,7 +25,7 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 @Composable
 fun NotificationsScreen(vm: NotificationViewModel) {
     
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListScrollState("notifications")
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current

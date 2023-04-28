@@ -33,6 +33,7 @@ import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
+import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -176,7 +177,7 @@ private fun Content(
             .background(colorScheme.background),
         state.listState
     ) {
-        item {
+        item(key = 1) {
             Box(
                 Modifier
                     .padding(top = 80.dp)
@@ -197,15 +198,14 @@ private fun Content(
                     ) {
                         Icon(
                             painterResource(ic_kebab),
-                            null,
-                            Modifier,
+                            (null), Modifier,
                             colorScheme.tertiary
                         )
                     }
                 }
             }
         }
-        item {
+        item(key = 2) {
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
                 Modifier
@@ -215,7 +215,7 @@ private fun Content(
                 style = typography.labelLarge
             )
         }
-        item {
+        item(key = 3) {
             Box(Modifier.padding(16.dp, 12.dp)) {
                 Responds(
                     state.lastRespond.second,
@@ -224,29 +224,37 @@ private fun Content(
             }
         }
         val userId = state.profileState.profile?.id ?: ""
-        if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item {
-            LazyRow {
+        if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
+            key = 4
+        ) {
+            LazyRow(
+                state = rememberLazyListScrollState(
+                    "profile_meet"
+                )
+            ) {
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
                     MeetingCategoryCard(
-                        userId,
-                        it!!,
+                        userId, it!!,
                         Modifier.padding(horizontal = 4.dp)
                     ) { callback?.onMeetingClick(it) }
                 }
             }
         }
-        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty()) item(
-            5
-        ) {
-            MeetHistory(
-                userId,
-                state.historyState,
-                state.meetingsHistory,
-                { callback?.onHistoryShow() }
-            ) { callback?.onHistoryClick(it) }
+        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
+            item(5) {
+                MeetHistory(
+                    userId, state.historyState,
+                    state.meetingsHistory,
+                    { callback?.onHistoryShow() }
+                ) { callback?.onHistoryClick(it) }
+            }
+        item(key = 6) {
+            Divider(
+                Modifier.fillMaxWidth(),
+                20.dp, Transparent
+            )
         }
-        item { Divider(Modifier.fillMaxWidth(), 20.dp, Transparent) }
     }
 }
 
@@ -281,7 +289,11 @@ private fun MeetHistory(
             colorScheme.tertiary
         )
     }
-    if(historyState) LazyRow {
+    if(historyState) LazyRow(
+        state = rememberLazyListScrollState(
+            "profile_history_meet"
+        )
+    ) {
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(
