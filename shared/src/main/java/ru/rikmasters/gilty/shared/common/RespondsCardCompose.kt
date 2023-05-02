@@ -104,10 +104,10 @@ fun Responds(
                     }
                 }
                 Icon(
-                    Filled.KeyboardArrowRight, (null),
-                    Modifier
+                    Filled.KeyboardArrowRight,
+                    (null), Modifier
                         .padding(start = 2.dp)
-                        .size(24.dp),
+                        .size(28.dp),
                     colorScheme.onTertiary
                 )
             }

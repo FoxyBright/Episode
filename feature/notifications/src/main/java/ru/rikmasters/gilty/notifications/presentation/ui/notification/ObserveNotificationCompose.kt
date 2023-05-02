@@ -172,8 +172,7 @@ private fun Participant(
                     Icon(
                         if(unwrap) Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight,
-                        (null),
-                        Modifier.size(24.dp),
+                        (null), Modifier.size(28.dp),
                         colorScheme.onTertiary
                     )
                 }

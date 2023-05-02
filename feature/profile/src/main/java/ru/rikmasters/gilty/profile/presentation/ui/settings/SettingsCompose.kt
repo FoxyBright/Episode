@@ -273,7 +273,8 @@ private fun Card(
                 )
                 if(arrow) Icon(
                     Icons.Filled.KeyboardArrowRight,
-                    (null), Modifier, colorScheme.onTertiary
+                    (null), Modifier.size(28.dp),
+                    colorScheme.onTertiary
                 )
             }
         }

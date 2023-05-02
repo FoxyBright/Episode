@@ -146,7 +146,7 @@ private fun Item(
             }
             Icon(
                 Icons.Filled.KeyboardArrowRight,
-                (null), Modifier.size(24.dp),
+                (null), Modifier.size(28.dp),
                 colorScheme.scrim
             )
         }

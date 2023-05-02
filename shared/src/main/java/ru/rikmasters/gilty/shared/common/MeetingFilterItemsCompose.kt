@@ -78,8 +78,9 @@ fun Category(
                     )
                 }
                 if(!category.children.isNullOrEmpty()) Icon(
-                    Filled.KeyboardArrowRight, (null),
-                    Modifier, colorScheme.onTertiary
+                    Filled.KeyboardArrowRight,
+                    (null), Modifier.size(28.dp),
+                    colorScheme.onTertiary
                 )
                 else if(selected.contains(category)) Image(
                     painterResource(R.drawable.enabled_check_box),
@@ -125,7 +126,7 @@ fun Category(
             )
             Icon(
                 Filled.KeyboardArrowRight,
-                stringResource(R.string.next_button),
+                (null),Modifier.size(28.dp),
                 tint = colorScheme.onTertiary
             )
         }
@@ -229,8 +230,9 @@ fun Distance(
                 Icon(
                     if(state) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    Modifier.padding(horizontal = 16.dp),
+                    (null), Modifier
+                        .padding(horizontal = 16.dp)
+                        .size(28.dp),
                     colorScheme.onTertiary
                 )
             }

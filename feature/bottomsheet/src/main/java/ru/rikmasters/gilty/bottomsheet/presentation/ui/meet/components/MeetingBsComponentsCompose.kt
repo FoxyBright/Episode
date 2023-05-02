@@ -176,7 +176,7 @@ fun MeetingBsMap(
                 }
                 Icon(
                     Filled.KeyboardArrowRight,
-                    (null), Modifier,
+                    (null), Modifier.size(28.dp),
                     colorScheme.onTertiary
                 )
             }
@@ -339,7 +339,10 @@ fun MeetingBsParticipants(
                         )
                         Icon(
                             Filled.KeyboardArrowRight,
-                            (null), Modifier.padding(end = 16.dp),
+                            (null),
+                            Modifier
+                                .padding(end = 16.dp)
+                                .size(28.dp),
                             colorScheme.onTertiary
                         )
                     }; if(membersList.itemSnapshotList.items.size > 1 && index <= membersList.itemSnapshotList.items.size - 2)

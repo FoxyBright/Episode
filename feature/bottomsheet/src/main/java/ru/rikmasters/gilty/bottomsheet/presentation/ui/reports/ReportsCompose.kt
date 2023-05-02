@@ -41,7 +41,6 @@ fun ReportsBsContent(
             .padding(16.dp)
     ) {
         state.screen?.let { screen ->
-            
             if(screen is Other)
                 Other(
                     screen, state.description,
@@ -52,8 +51,13 @@ fun ReportsBsContent(
                 SubReports(
                     screen, state.selected,
                     { callback?.onNavigate(null) }
-                ) { callback?.onSelectReport(it) }
-            
+                ) {
+                    if(it == ReportSubtype.OTHER)
+                        callback?.onNavigate(
+                            Other(state.objectType)
+                        )
+                    else callback?.onSelectReport(it)
+                }
         } ?: run {
             MainScreen(
                 state.objectType,
@@ -64,8 +68,9 @@ fun ReportsBsContent(
         
         state.screen?.let {
             Button(
-                state.enabled,
-                Modifier.align(BottomCenter)
+                state.enabled, Modifier
+                    .imePadding()
+                    .align(BottomCenter)
             ) { callback?.onSendReport() }
         }
     }

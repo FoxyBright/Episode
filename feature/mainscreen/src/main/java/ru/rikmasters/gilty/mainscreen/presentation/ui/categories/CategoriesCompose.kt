@@ -180,7 +180,8 @@ private fun Categories(
                         if(states.contains(index))
                             Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight, (null),
-                        Modifier, colorScheme.onTertiary
+                        Modifier.size(28.dp),
+                        colorScheme.onTertiary
                     )
                     else if(state.selected.contains(category)) Image(
                         painterResource(R.drawable.enabled_check_box),

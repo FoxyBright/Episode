@@ -16,13 +16,16 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.BoxLabel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.report.FalseInformation
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
@@ -32,7 +35,6 @@ import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.GTextField
 import ru.rikmasters.gilty.shared.shared.RowActionBar
 import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
-import ru.rikmasters.gilty.shared.shared.textFieldColors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private val list = FalseInformation(MEETING).subTypes
@@ -87,12 +89,17 @@ fun ComplainTextBox(
             .background(colorScheme.background)
     ) {
         RowActionBar(
-            title, Modifier.padding(bottom = 12.dp)
+            title, Modifier
+                .offset(x = -(12).dp)
+                .padding(bottom = 26.dp),
+            distanceBetween = 8.dp
         ) { onBack?.let { it() } }
         GTextField(
-            text, { onTextChange(it) },
-            Modifier.fillMaxWidth(),
-            colors = textFieldColors(),
+            text, {
+                if(it.length <= 120)
+                    onTextChange(it)
+            }, Modifier.fillMaxWidth(),
+            colors = complaintsTextFieldColors(),
             clear = onClear,
             keyboardOptions = Default.copy(
                 imeAction = Done, keyboardType = Text,
@@ -102,8 +109,36 @@ fun ComplainTextBox(
                 label(true) else null,
             placeholder = label()
         )
+        BoxLabel(
+            "${text.length}/120", Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            TextAlign.End
+        )
     }
 }
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun complaintsTextFieldColors() =
+    TextFieldDefaults.textFieldColors(
+        textColor = colorScheme.tertiary,
+        containerColor = colorScheme.primaryContainer,
+        unfocusedLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.scrim,
+        focusedLabelColor = colorScheme.onTertiary,
+        disabledTrailingIconColor = Color.Transparent,
+        focusedTrailingIconColor = Color.Transparent,
+        unfocusedTrailingIconColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        disabledIndicatorColor = Color.Transparent,
+        errorIndicatorColor = Color.Transparent,
+        errorLabelColor = colorScheme.primary,
+        placeholderColor = colorScheme.onTertiary,
+        disabledPlaceholderColor = colorScheme.scrim,
+        disabledTextColor = colorScheme.scrim,
+    )
 
 @Composable
 fun ComplainElements(
@@ -121,7 +156,11 @@ fun ComplainElements(
             .background(colorScheme.background)
     ) {
         RowActionBar(
-            title, Modifier.padding(bottom = 12.dp),
+            title,
+            Modifier
+                .offset(x = -(12).dp)
+                .padding(bottom = 26.dp),
+            distanceBetween = 8.dp,
             description = description
         ) { onBack?.let { it() } }
         LazyColumn(
@@ -199,10 +238,10 @@ private fun Icon(
             painterResource(R.drawable.ic_done),
             (null), modifier.size(24.dp),
             colorScheme.primary
-        )
+        ) else null
     } ?: Icon(
         Filled.KeyboardArrowRight,
-        (null), modifier.size(24.dp),
+        (null), modifier.size(28.dp),
         colorScheme.onTertiary
     )
 }

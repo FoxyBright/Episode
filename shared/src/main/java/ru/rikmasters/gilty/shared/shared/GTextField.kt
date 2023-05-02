@@ -180,11 +180,17 @@ fun GTextField(
                     interactionSource, shape, colors
                 )
                 if(value.isNotEmpty()) clear?.let {
+                    val single = singleLine || maxLines == 1
                     IconButton(
-                        { it() }, Modifier.align(
-                            if(singleLine || maxLines == 1)
-                                CenterEnd else TopEnd
-                        )
+                        { it() }, Modifier
+                            .align(
+                                if(single) CenterEnd
+                                else TopEnd
+                            )
+                            .padding(
+                                top = if(single) 0.dp
+                                else 4.dp
+                            )
                     ) {
                         if(value.isNotEmpty()) {
                             Icon(

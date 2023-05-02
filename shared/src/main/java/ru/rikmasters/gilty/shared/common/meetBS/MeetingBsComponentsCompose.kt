@@ -172,7 +172,7 @@ fun MeetingBsMap(
                 }
                 Icon(
                     Filled.KeyboardArrowRight,
-                    (null), Modifier,
+                    (null), Modifier.size(28.dp),
                     colorScheme.onTertiary
                 )
             }
@@ -323,7 +323,7 @@ fun MeetingBsParticipants(
                 ) {
                     BrieflyRow(
                         "${member.username}${
-                            if (member.age in 18..99) {
+                            if(member.age in 18..99) {
                                 ", ${member.age}"
                             } else ""
                         }",
@@ -332,7 +332,9 @@ fun MeetingBsParticipants(
                     )
                     Icon(
                         Filled.KeyboardArrowRight,
-                        (null), Modifier.padding(end = 16.dp),
+                        (null), Modifier
+                            .padding(end = 16.dp)
+                            .size(28.dp),
                         colorScheme.onTertiary
                     )
                 }; if(list.size > 1 && index <= list.size - 2)
@@ -367,10 +369,12 @@ fun MeetingBsComment(
             shape = shapes.medium,
             colors = descriptionColors(online),
             label = if(text.isNotEmpty()) textFieldLabel(
-                (true), stringResource(R.string.meeting_comment_text_holder)
+                (true),
+                stringResource(R.string.meeting_comment_text_holder)
             ) else null,
             placeholder = textFieldLabel(
-                (false), stringResource(R.string.meeting_comment_text_holder)
+                (false),
+                stringResource(R.string.meeting_comment_text_holder)
             ), keyboardOptions = Default.copy(
                 imeAction = Done, keyboardType = Text,
                 capitalization = Sentences

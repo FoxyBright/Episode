@@ -284,8 +284,8 @@ private fun MeetHistory(
         )
         Icon(
             if(!historyState) Filled.KeyboardArrowRight
-            else Filled.KeyboardArrowDown, (null),
-            Modifier.size(24.dp),
+            else Filled.KeyboardArrowDown,
+            (null), Modifier.size(28.dp),
             colorScheme.tertiary
         )
     }

@@ -82,8 +82,9 @@ fun RowActionBar(
         Row(verticalAlignment = CenterVertically) {
             onBack?.let {
                 IconButton(
-                    it,
-                    Modifier.padding(end = distanceBetween ?: 16.dp)
+                    it, Modifier.padding(
+                        end = distanceBetween ?: 16.dp
+                    )
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_back),
@@ -108,9 +109,8 @@ fun RowActionBar(
         }
         description?.let {
             Text(
-                it,
-                if(onBack != null) Modifier.padding(start = 32.dp)
-                else Modifier, colorScheme.onTertiary,
+                it, Modifier.padding(start = 16.dp),
+                colorScheme.onTertiary,
                 style = typography.labelSmall
             )
         }
@@ -141,7 +141,6 @@ fun ClosableActionBar(
                     )
                 }
             }
-            
             Image(
                 painterResource(
                     R.drawable.ic_cross_button

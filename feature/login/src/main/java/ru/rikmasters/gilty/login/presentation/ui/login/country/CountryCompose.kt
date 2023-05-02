@@ -114,7 +114,8 @@ fun CountryBottomSheetContent(
                                 )
                                 Icon(
                                     Icons.Filled.KeyboardArrowRight,
-                                    (null), Modifier, MaterialTheme.colorScheme.outline
+                                    (null), Modifier.size(28.dp),
+                                    MaterialTheme.colorScheme.outline
                                 )
                             }
                         }

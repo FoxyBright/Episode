@@ -337,8 +337,7 @@ private fun ActionRow(
         Icon(
             if(state) Filled.KeyboardArrowDown
             else Filled.KeyboardArrowRight,
-            (null),
-            Modifier.size(24.dp),
+            (null), Modifier.size(28.dp),
             colorScheme.tertiary
         )
     }
