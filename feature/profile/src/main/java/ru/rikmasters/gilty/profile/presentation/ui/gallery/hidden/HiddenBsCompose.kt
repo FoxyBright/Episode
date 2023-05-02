@@ -35,10 +35,11 @@ import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.items
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.PagingLoader
+import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 interface HiddenBsCallback {
-
+    
     fun onSelectImage(image: AvatarModel) {}
     fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
@@ -48,7 +49,7 @@ interface HiddenBsCallback {
 fun HiddenBsContent(
     photoList: LazyPagingItems<AvatarModel>,
     modifier: Modifier = Modifier,
-    callback: HiddenBsCallback? = null
+    callback: HiddenBsCallback? = null,
 ) {
     Column(modifier) {
         Text(
@@ -60,8 +61,7 @@ fun HiddenBsContent(
             style = typography.labelLarge
         )
         LazyVerticalGrid(
-            Fixed(3),
-            Modifier
+            Fixed(3), Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             verticalArrangement = spacedBy(4.dp),
@@ -76,22 +76,28 @@ fun HiddenBsContent(
                     }
                 }
                 else -> {
-                    item { GalleryButton(callback) }
+                    item { GalleryButton(Modifier.weight(1f), callback) }
                     items(photoList) { image ->
-                        image?.let {
+                        image?.let { img ->
                             LazyItem(
-                                image.thumbnail.url,
-                                Modifier,
-                                { callback?.onSelectImage(image) }
-                            ) { callback?.onDeleteImage(image) }
+                                img.thumbnail.url, Modifier.weight(1f),
+                                { callback?.onSelectImage(img) }
+                            ) { callback?.onDeleteImage(img) }
                         }
                     }
-                    if (photoList.loadState.append is LoadState.Loading) {
+                    if(photoList.loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(3) }) {
                             PagingLoader(photoList.loadState)
                         }
                     }
-                    items(3) { Spacer(Modifier.size(115.dp)) }
+                    
+                    items(3) {
+                        Spacer(
+                            Modifier
+                                .fillMaxSize()
+                                .weight(1f)
+                        )
+                    }
                 }
             }
         }
@@ -101,11 +107,12 @@ fun HiddenBsContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun GalleryButton(
-    callback: HiddenBsCallback?
+    modifier: Modifier,
+    callback: HiddenBsCallback?,
 ) {
     Card(
         { callback?.openGallery() },
-        Modifier.size(130.dp),
+        modifier.size((screenWidth.dp - 72.dp) / 3),
         shape = shapes.large
     ) {
         Box(
@@ -138,11 +145,11 @@ private fun LazyItem(
     image: String,
     modifier: Modifier = Modifier,
     onSelect: (String) -> Unit,
-    onDelete: (String) -> Unit
+    onDelete: (String) -> Unit,
 ) {
     Box(
         modifier
-            .size(130.dp)
+            .fillMaxSize()
             .clip(shapes.small)
             .clickable { onSelect(image) },
         TopEnd

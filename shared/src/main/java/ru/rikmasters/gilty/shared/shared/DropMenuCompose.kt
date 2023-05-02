@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 val METRICS: DisplayMetrics = Resources.getSystem().displayMetrics
+val screenWidth = METRICS.widthPixels / METRICS.density
+@Suppress("unused")
+val screenHeight = METRICS.heightPixels / METRICS.density
 
 @Composable
 fun GDropMenu(
@@ -42,7 +45,7 @@ fun GDropMenu(
 @Composable
 private fun MenuItem(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text, modifier, colorScheme.tertiary,

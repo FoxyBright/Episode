@@ -230,13 +230,8 @@ private fun Button(
         else -> GradientButton(
             modifier.padding(bottom = 50.dp),
             stringResource(R.string.meeting_join_button_name),
-            online = isOnline,
-            enabled = when(memberState) {
-                IS_KICKED, NOT_UNDER_REQUIREMENTS,
-                RESPOND_REJECTED,
-                -> false
-                else -> true
-            }
+            (memberState == UNDER_REQUIREMENTS),
+            isOnline
         ) { onClick() }
     }
 }
