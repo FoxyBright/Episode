@@ -50,9 +50,18 @@ fun getDifferenceOfTime(date: String): String {
             ) / 1000
     return when {
         difference < 60 -> "$difference cек"
-        difference in 60..3599 -> "${difference / 60} мин"
-        difference in 3600..86399 -> "${difference / 3600} ч"
-        else -> "${difference / 86400} д"
+        difference in 60..3_599 -> "${difference / 60} мин"
+        difference in 3_600..86_399 -> "${difference / 3_600} час"
+        difference in 86_400..604_799 -> "${difference / 86_400} д"
+        difference in 604_800..2_591_999 -> "${difference / 604_800} нед"
+        difference in 2_592_000..946_079_999 -> "${difference / 2_592_000} мес"
+        else -> (difference / 946_080_000).let {
+            when("$it".last()) {
+                '1' -> "$it год"
+                '2', '3', '4' -> "$it года"
+                else -> "$it лет"
+            }
+        }
     }
 }
 
