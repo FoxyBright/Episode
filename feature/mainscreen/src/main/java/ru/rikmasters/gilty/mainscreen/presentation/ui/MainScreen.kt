@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
@@ -58,6 +59,13 @@ fun MainScreen(vm: MainViewModel) {
         .collectAsState()
         .value
         .isNotNullOrEmpty()
+    
+    val meetBsState by asm.bottomSheet
+        .current.collectAsState()
+    LaunchedEffect(meetBsState) {
+        if(meetBsState == COLLAPSED)
+            vm.resetMeets()
+    }
     
     LaunchedEffect(Unit) {
         vm.getAllCategories()

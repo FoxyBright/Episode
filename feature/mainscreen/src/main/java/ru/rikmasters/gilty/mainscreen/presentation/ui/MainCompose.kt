@@ -247,8 +247,7 @@ private fun Content(
             MeetingsListContent(
                 meetings.map {
                     it to rememberSwipeableCardState()
-                },
-                modifier.padding(top = 24.dp),
+                }, modifier.padding(top = 24.dp),
                 { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
                 { meet, it ->
                     callback?.onRespond(meet)

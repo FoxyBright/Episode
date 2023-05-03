@@ -118,11 +118,7 @@ fun MessengerBar(
     isOnline: Boolean,
     callback: MessengerBarCallback? = null,
 ) {
-    Column(
-        modifier
-            .imePadding()
-            .background(colorScheme.primaryContainer)
-    ) {
+    Column(modifier.background(colorScheme.primaryContainer)) {
         answer?.let {
             Answer(it, isOnline) {
                 callback?.onCancelAnswer()
