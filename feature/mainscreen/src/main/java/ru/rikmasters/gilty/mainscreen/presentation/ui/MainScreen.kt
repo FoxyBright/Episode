@@ -90,7 +90,7 @@ fun MainScreen(vm: MainViewModel) {
             grid, today, days.isNotEmpty(),
             time.isNotBlank(), meetings,
             navBar, alert, hasFilters,
-            bsState, vm.scope
+            bsState, vm.scope,
         ), Modifier, object: MainContentCallback {
             
             override fun onNavBarSelect(point: Int) {

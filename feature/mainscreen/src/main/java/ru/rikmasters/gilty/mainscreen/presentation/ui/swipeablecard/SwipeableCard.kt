@@ -26,6 +26,7 @@ fun Modifier.swipeableCard(
         }
         
         detectDragGestures(
+            
             onDragEnd = {
                 launch {
                     val coercedOffset = state

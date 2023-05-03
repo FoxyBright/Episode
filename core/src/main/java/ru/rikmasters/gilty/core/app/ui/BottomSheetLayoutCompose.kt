@@ -80,15 +80,6 @@ class BottomSheetState(
         MutableStateFlow(COLLAPSED)
     val current = _current.asStateFlow()
     
-    @Suppress("unused")
-    val isCollapsed = current.value == COLLAPSED
-    
-    @Suppress("unused")
-    val isExpanded = current.value == EXPANDED
-    
-    @Suppress("unused")
-    val isHalfExpanded = current.value == HALF_EXPANDED
-    
     var gripLightColor: @Composable () -> Color
             by mutableStateOf({ colorScheme.outlineVariant })
     var gripDarkColor: @Composable () -> Color

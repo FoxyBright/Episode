@@ -232,9 +232,8 @@ private fun Content(
     callback: MainContentCallback?,
 ) {
     Box {
-        if(meetings.size <= 2) MeetCard(
-            modifier,
-            EMPTY, hasFilters = hasFilters,
+        if(meetings.size < 2) MeetCard(
+            modifier, EMPTY, hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
@@ -243,18 +242,15 @@ private fun Content(
                 .background(colorScheme.background)
                 .fillMaxSize(), meetings
         ) { callback?.onRespond(it) }
-        else {
-            MeetingsListContent(
-                meetings.map {
-                    it to rememberSwipeableCardState()
-                }, modifier.padding(top = 24.dp),
-                { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
-                { meet, it ->
-                    callback?.onRespond(meet)
-                    callback?.meetInteraction(RIGHT, meet, it)
-                }
-            ) { callback?.onMeetClick(it) }
-        }
+        else MeetingsListContent(
+            meetings.map { it to rememberSwipeableCardState() },
+            modifier.padding(top = 24.dp),
+            { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
+            { meet, it ->
+                callback?.onRespond(meet)
+                callback?.meetInteraction(RIGHT, meet, it)
+            }
+        ) { callback?.onMeetClick(it) }
     }
 }
 

@@ -3,7 +3,8 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.swipeableCard
@@ -22,8 +23,29 @@ fun MeetingsListContent(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-    var xOffset by remember { mutableStateOf(0f) }
+    val list = remember(states) {
+        if(states.size <= 2) states
+        else states - states.dropLast(2).toSet()
+    }
     
+    list.forEachIndexed { index, (meeting, state) ->
+        EpisodeCard(
+            meeting, state, (index < list.lastIndex), modifier,
+            notInteresting, onSelect, onClick
+        )
+    }
+}
+
+@Composable
+private fun EpisodeCard(
+    meeting: MeetingModel,
+    state: SwipeableCardState,
+    stack: Boolean,
+    modifier: Modifier = Modifier,
+    notInteresting: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
+    onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
+    onClick: ((MeetingModel) -> Unit)? = null,
+) {
     fun DirectionType.swipe(
         meeting: MeetingModel,
         state: SwipeableCardState,
@@ -33,28 +55,18 @@ fun MeetingsListContent(
         else -> Unit
     }
     
-    val list = remember(states) {
-        val size = 3
-        if(states.size <= size) states
-        else states - states.dropLast(size).toSet()
-    }
-    
-    list.forEachIndexed { index, (meeting, state) ->
-        xOffset = state.offset.value.x
-        state.swipedDirection ?: run {
-            MeetCard(
-                modifier = modifier
-                    .fillMaxSize()
-                    .clickable(
-                        MutableInteractionSource(), (null)
-                    ) { onClick?.let { it(meeting) } }
-                    .swipeableCard(
-                        onSwiped = { it.swipe(meeting, state) },
-                        state = state
-                    ), type = MEET,
-                stack = (index == list.size - 2),
-                meet = meeting, offset = xOffset
-            ) { it.swipe(meeting, state) }
-        }
+    state.swipedDirection ?: run {
+        MeetCard(
+            modifier = modifier
+                .fillMaxSize()
+                .clickable(
+                    MutableInteractionSource(), (null)
+                ) { onClick?.let { it(meeting) } }
+                .swipeableCard(
+                    onSwiped = { it.swipe(meeting, state) },
+                    state = state,
+                ), type = MEET, stack = stack,
+            meet = meeting, offset = state.offset.value.x
+        ) { it.swipe(meeting, state) }
     }
 }
