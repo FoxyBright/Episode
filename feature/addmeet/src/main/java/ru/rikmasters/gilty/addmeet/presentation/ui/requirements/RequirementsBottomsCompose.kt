@@ -29,7 +29,7 @@ fun GenderPreview() {
         SelectBottom(
             stringResource(R.string.sex),
             GenderType.shortList
-                .map { it.name },
+                .map { it.value },
             (1), false
         )
     }
@@ -166,7 +166,7 @@ fun SelectBottom(
             style = typography.labelLarge
         )
     }
-    Box(Modifier.padding(bottom = 16.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp)) {
         FlowLayout(
             Modifier
                 .background(
@@ -184,5 +184,6 @@ fun SelectBottom(
                 ) { onItemClick?.let { c -> c(it) } }
             }
         }
+        Spacer(Modifier.height(40.dp))
     }
 }

@@ -40,6 +40,8 @@ import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MEETING_DATE
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MESSAGE_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -58,7 +60,7 @@ private fun ChatListPreview() {
                     INACTIVE, ACTIVE
                 ), pagingPreview(DemoChatModelList),
                 (true), (false), LIST, (1),
-                (SortTypeModel.MEETING_DATE),
+                (MEETING_DATE),
                 LazyListState()
             ),
             Modifier.background(colorScheme.background)
@@ -111,12 +113,11 @@ fun ChatListContent(
         },
         content = {
             Box(Modifier.padding(it)) {
+                if(state.chats.loadState.refresh
+                            is LoadState.NotLoading
+                ) EmptyChats()
                 Use<ChatListViewModel>(PullToRefreshTrait) {
-                    Content(
-                        state,
-                        Modifier,
-                        callback
-                    )
+                    Content(state, Modifier, callback)
                 }
             }
         }
@@ -161,12 +162,12 @@ private fun TopBar(
                     (null)
                 ) {
                     onSortTypeChanged(
-                        if(sortType == SortTypeModel.MEETING_DATE) SortTypeModel.MESSAGE_DATE
-                        else SortTypeModel.MEETING_DATE
+                        if(sortType == MEETING_DATE) MESSAGE_DATE
+                        else MEETING_DATE
                     )
                 },
             colorFilter = ColorFilter.tint(
-                if(sortType == SortTypeModel.MESSAGE_DATE) colorScheme.primary
+                if(sortType == MESSAGE_DATE) colorScheme.primary
                 else colorScheme.onTertiary
             )
         )
@@ -190,46 +191,47 @@ private fun Content(
         state.listState
     ) {
         when {
-            chats.loadState.refresh is LoadState.Error -> {}
-            chats.loadState.append is LoadState.Error -> {}
+            chats.loadState.refresh is LoadState.Error -> Unit
+            chats.loadState.append is LoadState.Error -> Unit
             else -> {
-                if(chats.loadState.refresh is LoadState.Loading) {
+                if(chats.loadState.refresh is LoadState.Loading)
                     item { PagingLoader(state.chats.loadState) }
-                }
                 if(itemCount != 0) {
                     getSortedChats(
                         state.chats.itemSnapshotList.items.filter {
                             it.meetStatus == MeetStatusType.ACTIVE
                         }
                     ).let {
-                        if(it.isNotEmpty() && state.sortType == SortTypeModel.MEETING_DATE) {
+                        if(it.isNotEmpty() && state.sortType == MEETING_DATE) {
                             items(it) { (label, list) ->
                                 Label(
-                                    label,
-                                    Modifier.padding(
+                                    label, Modifier.padding(
                                         top = 28.dp,
                                         bottom = 18.dp
                                     )
                                 )
                                 list.map { chatModel ->
                                     chatModel to rememberDragRowState()
-                                }.forEachIndexed { index, (chat, row) ->
+                                }.forEachIndexed { index, chat ->
                                     ElementChat(
-                                        chat,
-                                        index,
-                                        list.size,
-                                        row,
-                                        callback
+                                        chat.first, index, list.size,
+                                        chat.second, callback
                                     )
                                 }
                             }
                         }
                     }
-                    val inactiveItems =
-                        state.chats.itemSnapshotList.items.filter {
+                    
+                    val inactiveItems = state
+                        .chats.itemSnapshotList
+                        .items.filter {
                             it.meetStatus != MeetStatusType.ACTIVE
                         }
-                    if(state.sortType == SortTypeModel.MEETING_DATE && inactiveItems.isNotEmpty()) item {
+                    
+                    if(
+                        state.sortType == MEETING_DATE
+                        && inactiveItems.isNotEmpty()
+                    ) item {
                         ActionRow(
                             Modifier.padding(
                                 top = 28.dp,
@@ -240,37 +242,34 @@ private fun Content(
                         ) { callback?.onEndedClick() }
                     }
                     
-                    if(state.endedState || state.sortType == SortTypeModel.MESSAGE_DATE) {
+                    if(
+                        state.endedState
+                        || state.sortType == MESSAGE_DATE
+                    ) {
                         itemsIndexed(state.chats) { index, item ->
                             if(item?.meetStatus != MeetStatusType.ACTIVE) {
                                 val chat =
                                     (item
                                         ?: ChatModel()) to rememberDragRowState()
-                                val inactiveChatsSize =
-                                    state.chats.itemSnapshotList.items.filter {
+                                val inactiveChatsSize = state
+                                    .chats.itemSnapshotList
+                                    .items.filter {
                                         it.meetStatus != MeetStatusType.ACTIVE
                                     }.size
-                                val indexCalc =
-                                    if(index == (itemCount - inactiveChatsSize)) {
-                                        0
-                                    } else index
+                                val indexCalc = if(
+                                    index == (itemCount - inactiveChatsSize)
+                                ) 0 else index
                                 ElementChat(
-                                    chat.first,
-                                    indexCalc,
-                                    itemCount,
-                                    chat.second,
+                                    chat.first, indexCalc,
+                                    itemCount, chat.second,
                                     callback
                                 )
                             }
                         }
                     }
-                    if(state.chats.loadState.append is LoadState.Loading && state.endedState) {
-                        item { PagingLoader(state.chats.loadState) }
-                    }
-                } else {
-                    if(chats.loadState.refresh is LoadState.NotLoading) {
-                        item { EmptyChats() }
-                    }
+                    if(state.chats.loadState.append is LoadState.Loading
+                        && state.endedState
+                    ) item { PagingLoader(state.chats.loadState) }
                 }
             }
         }
@@ -280,13 +279,26 @@ private fun Content(
 
 @Composable
 private fun PreviewLazy() {
-    val list = DemoChatModelList.map {
+    DemoChatModelList.map {
         it to rememberDragRowState()
-    }
-    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
-        item { Label(stringResource(R.string.chats_unread)) }
-        itemsIndexed(list) { i, (chat, row) ->
-            ElementChat(chat, i, list.size, row)
+    }.let { list ->
+        LazyColumn(
+            Modifier.padding(
+                horizontal = 16.dp
+            )
+        ) {
+            item {
+                Label(
+                    stringResource(R.string.chats_unread)
+                )
+            }
+            itemsIndexed(list) { i, chat ->
+                ElementChat(
+                    chat.first, i,
+                    list.size,
+                    chat.second
+                )
+            }
         }
     }
 }
@@ -294,8 +306,7 @@ private fun PreviewLazy() {
 @Composable
 private fun ElementChat(
     chat: ChatModel,
-    index: Int,
-    size: Int,
+    index: Int, size: Int,
     rowState: DragRowState,
     callback: ChatListCallback? = null,
 ) {
@@ -307,10 +318,7 @@ private fun ElementChat(
         )
     ) {
         SwipeableChatRow(
-            rowState,
-            chat,
-            shape,
-            Modifier,
+            rowState, chat, shape, Modifier,
             { callback?.onChatClick(it) }
         ) { callback?.onChatSwipe(it) }
         if(index < size - 1) GDivider(

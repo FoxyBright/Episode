@@ -524,6 +524,10 @@ enum class DayOfWeek {
         
         fun list() = values().toList()
         
+        fun valueList() = values().map {
+            it.displayShort().uppercase()
+        }
+        
         private val shortNames = arrayOf(
             "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
         )
@@ -570,7 +574,7 @@ private fun plus(date: Long, field: Int, count: Int): Long {
 @SuppressLint("SimpleDateFormat")
 fun Date.format(pattern: String): String = try {
     SimpleDateFormat(pattern).format(this)
-} catch(e:Exception){
+} catch(e: Exception) {
     this.toString()
 }
 
