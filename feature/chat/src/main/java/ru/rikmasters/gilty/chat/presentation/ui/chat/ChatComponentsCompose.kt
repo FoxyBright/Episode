@@ -82,13 +82,11 @@ fun ChatFloatingButton(
             listState.firstVisibleItemIndex
         }
     }.value
-    val unRead = "${
-        if(unReadCount <= first) unReadCount
-        else {
-            onListDown()
-            unReadCount
-        }
-    }"
+    val unRead = unReadCount
+        .let { unread ->
+            if(unread <= first) unread
+            else onListDown().let { unread }
+        }.toString()
     val offset = when(unRead.length) {
         0 -> DpOffset(0.dp, 0.dp)
         1 -> DpOffset(4.dp, 4.dp)
