@@ -144,6 +144,16 @@ fun ChatContent(
                 callback
             )
         },
+        bottomBar = {
+            ChatBottomBar(
+                state.imageMenuState,
+                state.messageText,
+                state.answer,
+                state.meet.isOnline,
+                Modifier.imePadding(),
+                callback
+            )
+        },
         floatingActionButton = {
             ChatFloatingButton(
                 state.listState,
@@ -159,15 +169,6 @@ fun ChatContent(
                 Modifier, callback
             )
         }
-    )
-    
-    ChatBottomBar(
-        state.imageMenuState,
-        state.messageText,
-        state.answer,
-        state.meet.isOnline,
-        Modifier.imePadding(),
-        callback
     )
     
     if(state.photoViewState) PhotoView(
@@ -224,10 +225,7 @@ private fun Content(
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(
         modifier
-            .padding(top = padding.calculateTopPadding(),
-                bottom = state.answer?.let {
-                    300.dp
-                } ?: 200.dp)
+            .padding(padding)
             .fillMaxSize()
             .background(colors.chatBack),
         state.listState,

@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.itemSpacer
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private val allTags = listOf(
@@ -103,7 +104,6 @@ fun TagsContent(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .imePadding()
             .padding(
                 bottom = if(state.add)
                     0.dp else 20.dp
@@ -122,6 +122,7 @@ fun TagsContent(
             if(state.selected.isNotEmpty())
                 GradientButton(
                     Modifier
+                        .imePadding()
                         .padding(
                             top = 28.dp,
                             bottom = 20.dp
@@ -134,6 +135,7 @@ fun TagsContent(
     ) {
         Content(
             state, Modifier
+                .imePadding()
                 .padding(horizontal = 16.dp)
                 .padding(top = it.calculateTopPadding()),
             callback
@@ -192,13 +194,7 @@ private fun Content(
                         item, i, state.searchResult.size,
                     ) { tag -> callback?.onTagClick(tag) }
                 }
-            item {
-                Spacer(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                )
-            }
+            itemSpacer(40.dp)
         }
     }
 }

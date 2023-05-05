@@ -4,10 +4,11 @@ import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -92,9 +93,11 @@ fun ChatScreen(
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
     
-    DisposableEffect(Unit) {
-        asm.keyboard.setSoftInputMode(Nothing)
-        onDispose { asm.keyboard.resetSoftInputAdjust() }
+    val imeExpandOffset = WindowInsets.ime
+        .getBottom(LocalDensity.current)
+    LaunchedEffect(imeExpandOffset) {
+        if(imeExpandOffset > 0)
+            asm.keyboard.setSoftInputMode(Nothing)
     }
     
     LaunchedEffect(Unit) {
