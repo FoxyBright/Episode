@@ -16,6 +16,7 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
     implementationIf(!excludeCore, project(":core"))
     paging()
     yandexmap()
+    rtmp()
 }
 
 private fun DependencyHandlerScope.yandexmap() = implementation(
@@ -43,6 +44,9 @@ fun DependencyHandlerScope.compose() = implementation(
 
 val pagingVer = "3.1.1"
 
+fun DependencyHandlerScope.rtmp() = implementation(
+    "com.github.pedroSG94.rtmp-rtsp-stream-client-java:rtplibrary:2.1.9"
+)
 fun DependencyHandlerScope.imageCropper() = implementation(
     "com.github.SmartToolFactory:Compose-Colorful-Sliders:1.1.0",
     "com.github.SmartToolFactory:Compose-Color-Picker-Bundle:1.0.1",

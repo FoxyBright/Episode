@@ -2,6 +2,9 @@
 
 import java.net.URI
 
+include(":feature:translation")
+
+
 include(":feature:yandexmap")
 
 
