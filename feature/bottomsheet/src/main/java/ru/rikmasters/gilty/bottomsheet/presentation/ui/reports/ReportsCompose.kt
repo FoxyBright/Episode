@@ -6,6 +6,8 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportArrowState.ARROW
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportArrowState.NONE
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.report.*
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -47,17 +49,16 @@ fun ReportsBsContent(
                     { callback?.onDescriptionChange(it) },
                     { callback?.onClearDescription() }
                 ) { callback?.onNavigate(null) }
-            else
-                SubReports(
-                    screen, state.selected,
-                    { callback?.onNavigate(null) }
-                ) {
-                    if(it == ReportSubtype.OTHER)
-                        callback?.onNavigate(
-                            Other(state.objectType)
-                        )
-                    else callback?.onSelectReport(it)
-                }
+            else SubReports(
+                screen, state.selected,
+                { callback?.onNavigate(null) }
+            ) {
+                if(it == ReportSubtype.OTHER)
+                    callback?.onNavigate(
+                        Other(state.objectType)
+                    )
+                else callback?.onSelectReport(it)
+            }
         } ?: run {
             MainScreen(
                 state.objectType,
@@ -103,7 +104,7 @@ private fun SubReports(
     ComplainElements(
         screen.display(),
         screen.subTypes, Modifier,
-        (null), selected,
+        (null), selected, NONE,
         { onBack() }
     ) { onSelect(it) }
 }
@@ -120,7 +121,7 @@ private fun MainScreen(
         stringResource(R.string.complaints_title),
         list, modifier,
         (stringResource(R.string.complaints_description)),
-        (null), { onBack() },
+        (null), ARROW, { onBack() },
     ) { onSelect(it.report(objectType)) }
 }
 

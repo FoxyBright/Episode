@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.bottomsheet.presentation.ui.reports
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
@@ -26,6 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.BoxLabel
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportArrowState.ARROW
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportArrowState.CHECK
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportArrowState.NONE
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.report.FalseInformation
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
@@ -147,6 +151,7 @@ fun ComplainElements(
     modifier: Modifier = Modifier,
     description: String? = null,
     select: ReportSubtype? = null,
+    state: ReportArrowState = NONE,
     onBack: (() -> Unit)? = null,
     onSelect: ((ReportSubtype) -> Unit)? = null,
 ) {
@@ -173,7 +178,10 @@ fun ComplainElements(
                 Column {
                     ComplainItem(
                         i, item, list.size, Modifier,
-                        (select?.display == item.display)
+                        select?.let {
+                            if(it.display == item.display)
+                                CHECK else NONE
+                        } ?: state
                     ) { onSelect?.let { it(item) } }
                     if(i < list.size - 1)
                         GDivider(Modifier.padding(start = 16.dp))
@@ -183,6 +191,10 @@ fun ComplainElements(
     }
 }
 
+enum class ReportArrowState {
+    ARROW, NONE, CHECK
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ComplainItem(
@@ -190,7 +202,7 @@ private fun ComplainItem(
     item: ReportSubtype,
     size: Int,
     modifier: Modifier = Modifier,
-    select: Boolean? = null,
+    state: ReportArrowState,
     onClick: () -> Unit,
 ) {
     Card(
@@ -201,6 +213,7 @@ private fun ComplainItem(
         Row(
             Modifier
                 .fillMaxWidth()
+                .height(Max)
                 .padding(16.dp, 20.dp),
             SpaceBetween, CenterVertically
         ) {
@@ -209,7 +222,7 @@ private fun ComplainItem(
                 colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Icon(Modifier, select)
+            Icon(Modifier, state)
         }
     }
 }
@@ -231,17 +244,20 @@ private fun label(
 @Composable
 private fun Icon(
     modifier: Modifier = Modifier,
-    select: Boolean? = null,
+    state: ReportArrowState,
 ) {
-    select?.let {
-        if(it) Icon(
+    when(state) {
+        ARROW -> Icon(
+            Filled.KeyboardArrowRight,
+            (null), modifier.size(28.dp),
+            colorScheme.onTertiary
+        )
+        else -> Icon(
             painterResource(R.drawable.ic_done),
             (null), modifier.size(24.dp),
-            colorScheme.primary
-        ) else null
-    } ?: Icon(
-        Filled.KeyboardArrowRight,
-        (null), modifier.size(28.dp),
-        colorScheme.onTertiary
-    )
+            if(state == CHECK)
+                colorScheme.primary
+            else colorScheme.primaryContainer
+        )
+    }
 }
