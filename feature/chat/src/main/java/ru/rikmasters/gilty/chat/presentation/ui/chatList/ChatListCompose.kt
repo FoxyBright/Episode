@@ -115,6 +115,7 @@ fun ChatListContent(
             Box(Modifier.padding(it)) {
                 if(state.chats.loadState.refresh
                             is LoadState.NotLoading
+                    && state.chats.itemCount == 0
                 ) EmptyChats()
                 Use<ChatListViewModel>(PullToRefreshTrait) {
                     Content(state, Modifier, callback)

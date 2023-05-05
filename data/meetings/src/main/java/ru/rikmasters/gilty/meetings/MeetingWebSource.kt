@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.meetings
 
-import android.content.res.Resources.getSystem
-import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
@@ -22,9 +20,7 @@ class MeetingWebSource: KtorSource() {
         val photoAccess: Boolean,
     )
     
-    private fun getLocale() = getLocales(
-        getSystem().configuration
-    )[0]?.language?.uppercase() ?: "RU"
+    private fun getLocale() = "RU"
     
     suspend fun getCities(
         query: String,

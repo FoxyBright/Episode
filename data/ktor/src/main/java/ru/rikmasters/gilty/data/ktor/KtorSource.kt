@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.data.ktor
 
-import android.content.res.Resources.getSystem
-import androidx.core.os.ConfigurationCompat.getLocales
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
@@ -63,11 +61,7 @@ open class KtorSource: WebSource() {
             }
             defaultRequest {
                 contentType(Json)
-                getLocales(
-                    getSystem().configuration
-                )[0]?.language?.let {
-                    headers { append("Accept-Language", it) }
-                }
+                headers { append("Accept-Language", "ru") }
                 host = env[ENV_BASE_URL] ?: ""
             }
             install(HttpTimeout) { socketTimeoutMillis = 15000 }
