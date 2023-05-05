@@ -32,7 +32,10 @@ fun ReportsBs(
     
     val enabled = selected != null || description.isNotBlank()
     
-    LaunchedEffect(Unit) { vm.getReports(type) }
+    LaunchedEffect(Unit) {
+        vm.navigate(null)
+        vm.getReports(type)
+    }
     
     Use<ReportsBsViewModel>(LoadingTrait) {
         ReportsBsContent(

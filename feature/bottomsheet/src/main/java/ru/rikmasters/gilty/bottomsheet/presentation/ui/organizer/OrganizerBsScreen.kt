@@ -70,6 +70,7 @@ fun OrganizerBs(
         
             override fun onMenuItemSelect(point: Int, userId: String?) {
                 nav.navigate("REPORTS?id=$userId&type=$PROFILE")
+                this.onMenuDismiss(false)
             }
             
             override fun onObserveChange(state: Boolean) {
