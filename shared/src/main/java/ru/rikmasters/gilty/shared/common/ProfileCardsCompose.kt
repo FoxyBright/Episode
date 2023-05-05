@@ -213,7 +213,8 @@ private fun Avatar(
         GCashedImage(
             image?.thumbnail?.url,
             Modifier.fillMaxSize(),
-            contentScale = Crop
+            contentScale = Crop,
+            placeholderColor = colorScheme.primaryContainer
         )
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(

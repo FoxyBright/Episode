@@ -395,7 +395,8 @@ private fun MeetTop(
         modifier
             .fillMaxSize()
             .padding(horizontal = 1.dp),
-        contentScale = Crop
+        contentScale = Crop,
+        placeholderColor = colors.meetCardPlaceHolder
     )
 }
 

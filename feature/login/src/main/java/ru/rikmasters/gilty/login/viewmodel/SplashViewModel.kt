@@ -16,14 +16,14 @@ class SplashViewModel: ViewModel() {
     val screen = _screen.asStateFlow()
     
     suspend fun getScreen() {
-        _screen.emit(
-            regManager.storageProfile()
-                ?.let { "main/meetings" }
-                ?: if(
-                    authManager.hasTokens() &&
-                    regManager.profileCompleted()
-                ) "main/meetings"
-                else "login"
-        )
+        _screen.emit(getPath())
+    }
+    
+    private suspend fun getPath(): String {
+        if(!authManager.hasTokens()) return "login"
+        regManager.getProfile(false).let {
+            return if(it.isCompleted) "main/meetings"
+            else "login"
+        }
     }
 }

@@ -26,10 +26,10 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBsCallback
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
@@ -118,7 +118,7 @@ fun MeetingBsTopBarCompose(
         ) {
             BrieflyRow(
                 "${org.username}${
-                    if (org.age in 18..99) {
+                    if(org.age in 18..99) {
                         ", ${org.age}"
                     } else ""
                 }",
@@ -250,9 +250,8 @@ private fun Avatar(
                 shapes.large
             )
     ) {
-        AsyncImage(
-            avatar, (null),
-            Modifier
+        GCashedImage(
+            avatar, Modifier
                 .fillMaxWidth()
                 .clip(shapes.large)
                 .clickable { onClick() },

@@ -19,16 +19,12 @@ class RegistrationManager(
         profileStore.checkCompletable()
     }
     
-    suspend fun storageProfile() = withContext(IO) {
-        profileStore.storageProfile()?.map()
-    }
-    
     suspend fun userId() = withContext(IO) {
         profileStore.getProfile(false).id
     }
     
-    suspend fun getProfile() = withContext(IO) {
-        profileStore.getProfile(true)
+    suspend fun getProfile(forceWeb: Boolean = true) = withContext(IO) {
+        profileStore.getProfile(forceWeb)
     }
     
     suspend fun getHidden(albumId: String) = withContext(IO) {

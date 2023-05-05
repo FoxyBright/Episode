@@ -10,20 +10,29 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.FilterQuality.Companion.High
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy.ENABLED
 import coil.request.ImageRequest
 import coil.size.Size.Companion.ORIGINAL
 import org.json.JSONObject
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
+import ru.rikmasters.gilty.shared.common.CachedImageType.FILE
+import ru.rikmasters.gilty.shared.common.CachedImageType.STORE
+import ru.rikmasters.gilty.shared.common.CachedImageType.URL
+import java.io.File
 import kotlin.text.Charsets.UTF_8
+
+enum class CachedImageType {
+    URL, FILE, STORE
+}
 
 @Composable
 fun GCashedImage(
@@ -34,7 +43,10 @@ fun GCashedImage(
     alpha: Float = DefaultAlpha,
     contentDescription: String? = null,
     colorFilter: ColorFilter? = null,
+    placeholderColor: Color = Transparent,
+    type: CachedImageType = URL,
 ) {
+    
     val context = LocalContext.current
     val key = url?.getPhotoKey()
     
@@ -49,8 +61,8 @@ fun GCashedImage(
                 .memoryCachePolicy(ENABLED)
                 .allowHardware(false)
             key?.let {
-                builder.memoryCacheKey(it)
-                builder.diskCacheKey(it)
+                builder.memoryCacheKey(key)
+                builder.diskCacheKey(key)
             }
             builder.build()
         }
@@ -62,11 +74,17 @@ fun GCashedImage(
     )
     
     Image(
-        painter = painter,
+        painter = url?.let {
+            when(type) {
+                URL -> painter
+                FILE -> rememberAsyncImagePainter(File(it))
+                STORE -> painterResource(it.toInt())
+            }
+        } ?: rememberAsyncImagePainter(""),
         contentDescription = contentDescription,
         modifier = modifier.background(
             if(painter.state !is Success)
-                colors.meetCardPlaceHolder
+                placeholderColor
             else Transparent
         ), alignment = alignment,
         alpha = alpha,
