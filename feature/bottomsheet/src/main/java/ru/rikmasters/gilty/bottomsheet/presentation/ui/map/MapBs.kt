@@ -20,7 +20,7 @@ fun MapBs(
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val last by vm.last.collectAsState()
+    val last by vm.searchResult.collectAsState()
     val placeSearch by vm.search.collectAsState()
     
     LaunchedEffect(Unit) { vm.getLastPlaces() }
