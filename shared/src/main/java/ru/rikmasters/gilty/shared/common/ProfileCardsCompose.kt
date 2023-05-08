@@ -120,7 +120,7 @@ fun HiddenContent(
         )
         val emptyImage = image.isNullOrBlank()
                 || image.contains("null")
-        if(profileType == ORGANIZER) Lock(
+        if(profileType != USERPROFILE) Lock(
             Modifier
                 .align(TopStart)
                 .padding(8.dp),

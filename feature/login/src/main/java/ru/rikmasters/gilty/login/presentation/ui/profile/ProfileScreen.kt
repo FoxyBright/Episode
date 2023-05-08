@@ -65,7 +65,10 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun onBack() {
-                nav.navigateAbsolute("login")
+                scope.launch {
+                    vm.clearLoginData()
+                    nav.navigateAbsolute("login")
+                }
             }
             
             override fun onNext() {

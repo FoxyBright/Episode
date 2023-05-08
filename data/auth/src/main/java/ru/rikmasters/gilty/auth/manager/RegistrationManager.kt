@@ -19,6 +19,10 @@ class RegistrationManager(
         profileStore.checkCompletable()
     }
     
+    suspend fun clearProfile(){
+        profileStore.deleteProfile()
+    }
+    
     suspend fun userId() = withContext(IO) {
         profileStore.getProfile(false).id
     }
