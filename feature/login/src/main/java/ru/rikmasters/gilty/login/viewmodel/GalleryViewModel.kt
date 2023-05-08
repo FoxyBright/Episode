@@ -60,10 +60,6 @@ class GalleryViewModel: ViewModel() {
         _menuState.emit(state)
     }
     
-    suspend fun kebab() {
-        makeToast("В меню пока пусто")
-    }
-    
     suspend fun onMenuItemClick(item: String) {
         _images.emit(getImages(context, item))
         _menuState.emit(false)

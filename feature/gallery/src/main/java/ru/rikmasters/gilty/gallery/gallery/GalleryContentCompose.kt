@@ -42,7 +42,6 @@ data class GalleryState(
 interface GalleryCallback {
     fun onBack() {}
     fun onAttach() {}
-    fun onKebabClick() {}
     fun onMenuDismiss(state: Boolean) {}
     fun onMenuItemClick(item: Int) {}
     fun onImageClick(image: String) {}
@@ -74,14 +73,6 @@ fun GalleryTopBar(
                     colorScheme.tertiary
                 )
             }
-        }
-        IconButton({ callback?.onKebabClick() }) {
-            Icon(
-                painterResource(R.drawable.ic_kebab),
-                (null),
-                Modifier,
-                colorScheme.tertiary
-            )
         }
     }
 }
