@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -55,7 +55,7 @@ fun StoragePermissionBs(
             Text(
                 stringResource(R.string.permissions_settings_label),
                 Modifier.padding(top = 22.dp), style = typography.labelLarge,
-                textAlign = TextAlign.Center
+                textAlign = Center
             )
         }
         GradientButton(

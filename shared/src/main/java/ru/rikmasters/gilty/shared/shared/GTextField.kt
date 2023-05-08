@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -102,13 +102,15 @@ private fun Placeholder() {
 fun textFieldLabel(
     label: Boolean = false,
     text: String? = null,
+    labelFont: TextStyle = typography.headlineSmall,
+    holderFont: TextStyle = typography.bodyMedium,
 ): @Composable (() -> Unit) {
     return {
         text?.let {
             Text(
-                it, Modifier, style = if(label)
-                    typography.headlineSmall
-                else typography.bodyMedium
+                it, Modifier,
+                style = if(label) labelFont
+                else holderFont
             )
         }
     }
@@ -126,26 +128,32 @@ fun GTextField(
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null, // TODO Иконка Error пока не применима
-        /*{ Icon(painterResource(R.drawable.ic_trailing), (null)) },*/
+    trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(
+        imeAction = ImeAction.Done, keyboardType = KeyboardType.Text,
+        capitalization = KeyboardCapitalization.Sentences
+    ),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource =
         remember { MutableInteractionSource() },
     shape: Shape = shapes.large,
-    colors: TextFieldColors = textFieldColors(),
+    colors: TextFieldColors =
+        ru.rikmasters.gilty.shared.shared.textFieldColors(),
     clear: (() -> Unit)? = null,
     errorBottomText: String? = null,
+    textOffset: Boolean = false,
+    containerColor: Color = colorScheme.primaryContainer,
 ) {
     Column(modifier) {
-        
         Card(
-            colors = cardColors(Transparent),
+            Modifier.fillMaxWidth(),
+            shapes.large,
+            cardColors(containerColor),
             border = if(isError)
                 BorderStroke(1.dp, colorScheme.primary)
             else null
@@ -153,7 +161,18 @@ fun GTextField(
             Box(Modifier, TopEnd) {
                 TextField(
                     value, { onValueChange(it) },
-                    Modifier.fillMaxWidth(), enabled, readOnly,
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            end = clear?.let { 40.dp } ?: 0.dp
+                        )
+                        .offset(
+                            y = if((maxLines > 1
+                                        && !singleLine
+                                        && value.isBlank())
+                                || textOffset
+                            ) 4.dp else 0.dp
+                        ), enabled, readOnly,
                     textStyle, label, placeholder, leadingIcon,
                     trailingIcon, supportingText, isError,
                     visualTransformation, keyboardOptions,
@@ -161,7 +180,18 @@ fun GTextField(
                     interactionSource, shape, colors
                 )
                 if(value.isNotEmpty()) clear?.let {
-                    IconButton({ it() }, Modifier.align(CenterEnd)) {
+                    val single = singleLine || maxLines == 1
+                    IconButton(
+                        { it() }, Modifier
+                            .align(
+                                if(single) CenterEnd
+                                else TopEnd
+                            )
+                            .padding(
+                                top = if(single) 0.dp
+                                else 4.dp
+                            )
+                    ) {
                         if(value.isNotEmpty()) {
                             Icon(
                                 painterResource(R.drawable.ic_close),
@@ -174,11 +204,13 @@ fun GTextField(
             }
         }
         errorBottomText?.let {
-            if(isError)
-                Text(
-                    it, Modifier.padding(start = 16.dp, top = 4.dp),
-                    colorScheme.primary, style = typography.titleSmall
-                )
+            if(isError) Text(
+                it, Modifier.padding(
+                    top = 5.dp,
+                    start = 16.dp
+                ), colorScheme.primary,
+                style = typography.headlineSmall
+            )
         }
     }
 }
@@ -189,7 +221,7 @@ fun textFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
     unfocusedLabelColor = colorScheme.onTertiary,
-    disabledLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
     focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
@@ -200,7 +232,8 @@ fun textFieldColors() = textFieldColors(
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
-    disabledPlaceholderColor = Transparent,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -209,7 +242,7 @@ fun transparentTextFieldColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = Transparent,
     unfocusedLabelColor = colorScheme.onTertiary,
-    disabledLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
     focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
@@ -220,7 +253,8 @@ fun transparentTextFieldColors() = textFieldColors(
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
     placeholderColor = colorScheme.onTertiary,
-    disabledPlaceholderColor = Transparent,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -228,9 +262,9 @@ fun transparentTextFieldColors() = textFieldColors(
 private fun previewColors() = textFieldColors(
     textColor = colorScheme.tertiary,
     containerColor = colorScheme.primaryContainer,
-    unfocusedLabelColor = Color(0xFF98989F),
-    disabledLabelColor = Color(0xFF98989F),
-    focusedLabelColor = Color(0xFF000000),
+    unfocusedLabelColor = colorScheme.onTertiary,
+    disabledLabelColor = colorScheme.scrim,
+    focusedLabelColor = colorScheme.tertiary,
     disabledTrailingIconColor = Transparent,
     focusedTrailingIconColor = Transparent,
     unfocusedTrailingIconColor = Transparent,
@@ -239,8 +273,9 @@ private fun previewColors() = textFieldColors(
     disabledIndicatorColor = Transparent,
     errorIndicatorColor = Transparent,
     errorLabelColor = colorScheme.primary,
-    placeholderColor = Color(0xFF98989F),
-    disabledPlaceholderColor = Transparent,
+    placeholderColor = colorScheme.onTertiary,
+    disabledPlaceholderColor = colorScheme.scrim,
+    disabledTextColor = colorScheme.scrim,
 )
 
 @Composable
@@ -252,7 +287,7 @@ fun descriptionColors(online: Boolean) =
         else colorScheme.primary,
         containerColor = colorScheme.primaryContainer,
         unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
+        disabledLabelColor = colorScheme.scrim,
         focusedLabelColor = colorScheme.tertiary,
         disabledTrailingIconColor = Transparent,
         focusedTrailingIconColor = Transparent,
@@ -263,29 +298,6 @@ fun descriptionColors(online: Boolean) =
         errorIndicatorColor = Transparent,
         errorLabelColor = colorScheme.primary,
         placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
-    )
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun priceFieldColors(online: Boolean = false) =
-    textFieldColors(
-        textColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        cursorColor = if(online) colorScheme.secondary
-        else colorScheme.primary,
-        containerColor = colorScheme.primaryContainer,
-        unfocusedLabelColor = colorScheme.onTertiary,
-        disabledLabelColor = colorScheme.onTertiary,
-        focusedLabelColor = colorScheme.tertiary,
-        disabledTrailingIconColor = Transparent,
-        focusedTrailingIconColor = Transparent,
-        unfocusedTrailingIconColor = Transparent,
-        focusedIndicatorColor = Transparent,
-        unfocusedIndicatorColor = Transparent,
-        disabledIndicatorColor = Transparent,
-        errorIndicatorColor = Transparent,
-        errorLabelColor = colorScheme.primary,
-        placeholderColor = colorScheme.onTertiary,
-        disabledPlaceholderColor = Transparent,
+        disabledPlaceholderColor = colorScheme.scrim,
+        disabledTextColor = colorScheme.scrim,
     )

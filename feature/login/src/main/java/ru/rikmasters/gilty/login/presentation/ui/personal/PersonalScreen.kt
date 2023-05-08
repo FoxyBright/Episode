@@ -7,25 +7,22 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.login.viewmodel.AgeBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.PersonalViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.AgeBsViewModel
 
 @Composable
 fun PersonalScreen(vm: PersonalViewModel) {
     
-    val nav = get<NavState>()
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
-    val age by vm.age.collectAsState()
     val gender by vm.gender.collectAsState()
+    val age by vm.age.collectAsState()
     
     PersonalContent(
         PersonalState(age, gender),
         Modifier, object: PersonalCallback {
-            override fun onBack() {
-                nav.navigationBack()
-            }
             
             override fun onAgeClick() {
                 scope.launch {
@@ -36,16 +33,18 @@ fun PersonalScreen(vm: PersonalViewModel) {
                     }
                 }
             }
-            
+        
             override fun onGenderChange(index: Int) {
                 scope.launch { vm.setGender(index) }
             }
-            
+        
             override fun onNext() {
-                scope.launch {
-                    vm.updateProfile()
-                    nav.navigate("categories")
-                }
+                nav.navigate("categories")
             }
-        })
+        
+            override fun onBack() {
+                nav.navigationBack()
+            }
+        }
+    )
 }

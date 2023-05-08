@@ -5,12 +5,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.get
@@ -22,9 +22,9 @@ import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.util.composable.getOrNull
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,17 +32,19 @@ fun AppEntrypoint(
     theme: AppTheme,
     bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
     snackbar: @Composable (SnackbarData) -> Unit,
-    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null
+    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null,
+    indicator: (@Composable (state: SwipeRefreshState, offset: Dp, trigger: Dp) -> Unit)? = null,
 ) {
     
     LoadingTrait.loader = loader
-
+    PullToRefreshTrait.indicator = indicator
+    
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetSwipeableState = rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
     val keyboardController = rememberKeyboardController()
-
+    
     val asm = remember {
         AppStateModel(
             isSystemInDarkMode,
@@ -52,27 +54,27 @@ fun AppEntrypoint(
             keyboardController
         )
     }
-
+    
     val navController = rememberNavController()
     val entrypointResolver = getOrNull<EntrypointResolver>()
     val startDestination = remember(entrypointResolver) {
         runBlocking { entrypointResolver?.resolve() ?: "entrypoint" }
     }
-
+    
     val navState = remember(startDestination) {
         NavState(
             navController,
             startDestination
         )
     }
-
+    
     val env: Environment = get()
-
+    
     theme.apply(
         asm.darkMode,
         asm.dynamicColor
     ) {
-    
+        
         val backgroundColor = colorScheme.background
         
         LaunchedEffect(backgroundColor) {
@@ -103,7 +105,7 @@ fun AppEntrypoint(
             )
         }
     }
-
+    
     LaunchedEffect(env, asm) {
         loadAsModule(env, asm)
     }

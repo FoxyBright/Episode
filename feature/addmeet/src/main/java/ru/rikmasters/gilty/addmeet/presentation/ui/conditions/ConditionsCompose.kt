@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.components.Buttons
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Buttons
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.PriceTextField
 import ru.rikmasters.gilty.shared.R
@@ -30,8 +30,8 @@ fun ConditionPreview() {
         ConditionContent(
             ConditionState(
                 (true), (true), listOf(2),
-                listOf(3), ("1000"),
-                (false), (true), (true)
+                listOf(3), (true), ("1000"),
+                (false), (true)
             ), Modifier.background(colorScheme.background)
         )
     }
@@ -42,9 +42,9 @@ data class ConditionState(
     val hiddenPhoto: Boolean,
     val meetType: List<Int>,
     val condition: List<Int>,
+    val chatForbidden: Boolean,
     val price: String,
     val alert: Boolean,
-    val restrictChat: Boolean,
     val isActive: Boolean,
 )
 
@@ -55,9 +55,8 @@ interface ConditionsCallback {
     fun onClose() {}
     fun onOnlineClick() {}
     fun onHiddenClick() {}
-    fun onRestrictClick() {}
+    fun onForbiddenClick() {}
     fun onPriceChange(price: String) {}
-    fun onClear() {}
     fun onMeetingTypeSelect(type: Int) {}
     fun onConditionSelect(condition: Int) {}
     fun onCloseAlert(state: Boolean) {}
@@ -73,7 +72,7 @@ fun ConditionContent(
     Scaffold(modifier, {
         ClosableActionBar(
             stringResource(R.string.add_meet_conditions_continue),
-            (null), Modifier.padding(bottom = 10.dp),
+            Modifier.padding(bottom = 10.dp), (null),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
     }, {
@@ -91,7 +90,7 @@ fun ConditionContent(
         )
     }
     CloseAddMeetAlert(
-        state.alert, {
+        state.alert, state.online, {
             callback?.onCloseAlert(false)
         }, {
             callback?.onCloseAlert(false)
@@ -113,7 +112,7 @@ private fun Content(
                 Modifier.padding(top = 18.dp)
             )
         }
-        item {
+        if(!state.online) item {
             Element(
                 conditions(state, callback),
                 Modifier.padding(top = 28.dp)
@@ -132,13 +131,7 @@ private fun Content(
                 Modifier.padding(top = 28.dp)
             )
         }
-        item {
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-            )
-        }
+        itemSpacer(60.dp)
     }
 }
 
@@ -150,7 +143,7 @@ private fun type(
     MeetingType(
         state.online,
         state.meetType,
-        stringResource(R.string.meeting_only_online_meetings_button),
+        stringResource(R.string.meeting_make_online_button),
         state.online,
         { callback?.onOnlineClick() },
         { callback?.onMeetingTypeSelect(it) }
@@ -174,7 +167,7 @@ private fun price(
     PriceTextField(
         state.price,
         { callback?.onPriceChange(it) },
-        { callback?.onClear() }, state.online,
+        state.online,
     )
 }
 
@@ -182,38 +175,39 @@ private fun price(
 private fun additional(
     state: ConditionState,
     callback: ConditionsCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-    Column {
-        CheckBoxCard(
-            stringResource(R.string.add_meet_conditions_hidden),
-            Modifier.fillMaxWidth(), state.hiddenPhoto,
-            online = state.online
-        ) { callback?.onHiddenClick() }
-        Text(
-            stringResource(R.string.add_meet_conditions_hidden_label),
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
-            colorScheme.onTertiary,
-            style = typography.headlineSmall
-        )
-        if(state.online) {
+) =
+    FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
+        Column {
             CheckBoxCard(
-                stringResource(R.string.add_meet_restrict_chat),
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                state.restrictChat,
-                online = true
-            ) { callback?.onRestrictClick() }
+                stringResource(R.string.add_meet_conditions_hidden),
+                Modifier.fillMaxWidth(), state.hiddenPhoto,
+                online = state.online
+            ) { callback?.onHiddenClick() }
             Text(
-                stringResource(R.string.add_meet_restrict_chat_label),
+                stringResource(R.string.add_meet_conditions_hidden_label),
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 16.dp),
                 colorScheme.onTertiary,
                 style = typography.headlineSmall
             )
+            if(state.online) {
+                CheckBoxCard(
+                    stringResource(R.string.add_meet_restrict_chat),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    state.chatForbidden,
+                    online = true
+                ) { callback?.onForbiddenClick() }
+                Text(
+                    stringResource(R.string.add_meet_restrict_chat_label),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, start = 16.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineSmall
+                )
+            }
         }
     }
-}

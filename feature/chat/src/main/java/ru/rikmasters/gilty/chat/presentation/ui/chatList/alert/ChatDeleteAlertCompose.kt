@@ -18,11 +18,7 @@ enum class AlertState { LIST, CONFIRM }
 @Composable
 private fun AlertListPreview() {
     GiltyTheme {
-        ChatDeleteAlert(
-            true, LIST, listOf(
-                Pair(stringResource(delete_my_chat_button), true),
-                Pair(stringResource(delete_my_and_other_chat_button), false)
-            ), {}, {}, {})
+        ChatDeleteAlert((true), LIST, (1))
     }
 }
 
@@ -30,11 +26,7 @@ private fun AlertListPreview() {
 @Composable
 private fun AlertConfirmPreview() {
     GiltyTheme {
-        ChatDeleteAlert(
-            true, CONFIRM, listOf(
-                Pair(stringResource(delete_my_chat_button), true),
-                Pair(stringResource(delete_my_and_other_chat_button), false)
-            ), {}, {}, {})
+        ChatDeleteAlert((true), CONFIRM)
     }
 }
 
@@ -42,33 +34,40 @@ private fun AlertConfirmPreview() {
 fun ChatDeleteAlert(
     active: Boolean,
     state: AlertState,
-    list: List<Pair<String, Boolean>>,
-    listItemSelect: ((Int) -> Unit),
-    onDismiss: () -> Unit,
-    onSuccess: () -> Unit
+    select: Int? = null,
+    listItemSelect: ((Int) -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+    onSuccess: (() -> Unit)? = null,
 ) {
-    val items: List<Pair<String, Boolean>>?
+    val items: List<String>?
+    val selected: Int?
     val title: String
     val label: String?
     val button: String
     if(state == LIST) {
-        items = list
+        items = listOf(
+            stringResource(delete_my_chat_button),
+            stringResource(delete_my_and_other_chat_button)
+        )
+        selected = select
         title = stringResource(chats_delete)
         label = null
         button = stringResource(confirm_button)
     } else {
         items = null
+        selected = null
         title = stringResource(chats_delete_label)
         label = stringResource(
             chats_delete_answer
         ); button = stringResource(meeting_filter_delete_tag_label)
     }
     GAlert(
-        active, onDismiss, title, Modifier
+        active, Modifier
             .wrapContentHeight()
-            .fillMaxWidth(), label,
-        Pair(button, onSuccess),
-        Pair(stringResource(notification_respond_cancel_button), onDismiss),
-        items, listItemSelect
+            .fillMaxWidth(),
+        Pair(button) { onSuccess?.let { it() } },
+        label, title, { onDismiss?.let { it() } },
+        Pair(stringResource(notification_respond_cancel_button)) { onDismiss?.let { it() } },
+        items, selected, listItemSelect
     )
 }

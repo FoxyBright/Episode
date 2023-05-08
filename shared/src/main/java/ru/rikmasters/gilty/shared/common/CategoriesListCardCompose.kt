@@ -23,8 +23,8 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 fun CategoriesListCard(
     modifier: Modifier,
     meeting: MeetingModel,
-    border: Boolean,
-    imageSize: Dp = 20.dp,
+    border: Boolean = false,
+    imageSize: Dp = 16.dp,
 ) {
     Surface(
         modifier, shapes.medium,
@@ -39,7 +39,7 @@ fun CategoriesListCard(
         ) {
             val emoji = meeting.category.emoji
             Image(
-                if(emoji.type == "D")
+                if(emoji.type != "URL")
                     painterResource(emoji.path.toInt())
                 else rememberAsyncImagePainter(emoji.path),
                 (null),

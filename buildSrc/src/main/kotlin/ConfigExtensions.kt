@@ -13,13 +13,13 @@ fun Project.baseConfig(name: String = project.name) =
         app = { baseAppModuleConfig() },
         library = { libraryConfig() },
         feature = { featureConfig() },
-        common = { baseConfig(name) }
+        common = { baseConfig(name, this@baseConfig) }
     )
 
 fun Project.compose(enable: Boolean = true) = android {
     buildFeatures.compose = enable
     composeOptions {
-        kotlinCompilerExtensionVersion = Config.kotlinCompilerExtensionVersion
+        kotlinCompilerExtensionVersion = Config.composeCompilerVer
     }
 }
 
@@ -76,10 +76,12 @@ fun DynamicFeatureExtension.featureConfig() {
 
 }
 
-fun BaseExtension.baseConfig(name: String) {
+fun BaseExtension.baseConfig(name: String, project: Project) {
 
     namespace = if(name == "app") Config.applicationId
-    else "${Config.namespacePrefix}.$name"
+    else if(project.rootProject.equals(project.parent))
+        "${Config.namespacePrefix}.$name"
+    else "${Config.namespacePrefix}.${project.parent!!.name}.$name"
 
     defaultConfig {
         minSdk = Config.minSdk

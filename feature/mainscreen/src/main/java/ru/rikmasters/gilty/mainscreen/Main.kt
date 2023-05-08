@@ -1,40 +1,34 @@
 package ru.rikmasters.gilty.mainscreen
 
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
-import ru.rikmasters.gilty.mainscreen.presentation.ui.main.screen.MainScreen
-import ru.rikmasters.gilty.mainscreen.presentation.ui.reaction.ReactionScreen
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.mainscreen.presentation.ui.MainScreen
+import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.CalendarBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.TimeBsViewModel
+import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.profile.ProfileData
 
 object Main: FeatureDefinition() {
     
     override fun DeepNavGraphBuilder.navigation() {
-        
         nested("main", "meetings") {
-            
-            screen("meetings") { MainScreen() }
-            
-            screen(
-                "reaction?avatar={avatar}&meetType={meetType}",
-                listOf(navArgument("avatar") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                }, navArgument("meetType") {
-                    type = NavType.IntType
-                    defaultValue = 0
-                })
-            ) {
-                it.arguments?.getString("avatar")?.let { avatar ->
-                    it.arguments?.getInt("meetType")?.let { meetType ->
-                        ReactionScreen(avatar, DemoCategoryModel)
-                    }
-                }
+            screen<MainViewModel>("meetings") { vm, _ ->
+                MainScreen(vm)
             }
         }
     }
     
-    override fun Module.koin() {}
+    override fun Module.koin() {
+        factoryOf(::CalendarBsViewModel)
+        singleOf(::FiltersBsViewModel)
+        factoryOf(::TimeBsViewModel)
+        singleOf(::MainViewModel)
+    }
+    
+    override fun include() = setOf(MeetingsData, ProfileData)
 }

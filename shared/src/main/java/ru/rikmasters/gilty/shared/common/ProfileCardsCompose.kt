@@ -13,16 +13,15 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
@@ -36,14 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import ru.rikmasters.gilty.core.R.drawable.ic_information
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -56,7 +55,7 @@ private fun HiddenPhotoContentPreview() {
     GiltyTheme {
         HiddenContent(
             Modifier.width(160.dp),
-            (null), CREATE
+            (null), CREATE, (false)
         ) {}
     }
 }
@@ -67,7 +66,8 @@ private fun ProfileImageContentPreview() {
     GiltyTheme {
         ProfileImageContent(
             Modifier.width(160.dp),
-            (""), ORGANIZER, (false),
+            DemoAvatarModel, ORGANIZER,
+            (false),
             {}) {}
     }
 }
@@ -100,6 +100,7 @@ fun HiddenContent(
     modifier: Modifier,
     image: String?,
     profileType: ProfileType,
+    lockState: Boolean,
     onCardClick: () -> Unit,
 ) {
     Box(
@@ -113,24 +114,22 @@ fun HiddenContent(
             .background(colorScheme.primaryContainer)
             .clickable { onCardClick() }, BottomCenter
     ) {
-        AsyncImage(
-            image, (null),
-            Modifier.fillMaxSize(),
+        GCashedImage(
+            image, Modifier.fillMaxSize(),
             contentScale = Crop
         )
         val emptyImage = image.isNullOrBlank()
-                || image.contains("null")  //TODO Появляется null в строке - поправить
-        Box(
+                || image.contains("null")
+        if(profileType == ORGANIZER) Lock(
             Modifier
-                .padding(8.dp)
-                .size(26.dp)
-                .clip(CircleShape)
-                .align(TopStart), Center
-        ) { if(profileType != USERPROFILE || emptyImage) Lock() }
+                .align(TopStart)
+                .padding(8.dp),
+            lockState
+        )
         CreateProfileCardRow(
             stringResource(R.string.profile_hidden_photo),
             when(profileType) {
-                ORGANIZER -> USERPROFILE
+                ORGANIZER, ANONYMOUS_ORGANIZER -> USERPROFILE
                 CREATE -> CREATE
                 USERPROFILE -> if(emptyImage)
                     CREATE else USERPROFILE
@@ -141,26 +140,23 @@ fun HiddenContent(
 
 @Composable
 private fun Lock(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    state: Boolean,
 ) {
     Box(
-        modifier
-            .height(IntrinsicSize.Max)
-            .width(IntrinsicSize.Max)
-    ) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .alpha(0.5f)
-                .background(
-                    Black, CircleShape
-                )
+        modifier.background(
+            Color(0x4D000000),
+            CircleShape
         )
+    ) {
         Icon(
-            painterResource(R.drawable.ic_lock_open),
-            (null), Modifier
-                .padding(6.dp)
-                .size(12.dp), White
+            painterResource(
+                if(state) R.drawable.ic_lock_open
+                else R.drawable.ic_lock_close
+            ), (null), Modifier
+                .padding(8.dp)
+                .size(16.dp),
+            White
         )
     }
 }
@@ -168,16 +164,16 @@ private fun Lock(
 @Composable
 fun ProfileImageContent(
     modifier: Modifier,
-    image: String,
-    profileType: ProfileType,
+    image: AvatarModel?,
+    type: ProfileType,
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier
             .height(
-                if(profileType == CREATE)
+                if(type == CREATE)
                     200.dp else 254.dp
             )
             .fillMaxWidth(0.45f)
@@ -185,29 +181,60 @@ fun ProfileImageContent(
             .background(colorScheme.primaryContainer)
             .clickable { onClick() }, BottomCenter
     ) {
-        AsyncImage(
-            image,
-            stringResource(R.string.meeting_avatar),
-            Modifier.fillMaxSize(),
-            contentScale = Crop
-        )
-        when(profileType) {
+        Avatar(image, type)
+        when(type) {
             CREATE -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_user_photo),
-                    profileType
+                    type
                 )
             }
             
             ORGANIZER -> {
                 CreateProfileCardRow(
                     stringResource(R.string.profile_organizer_observe),
-                    profileType,
+                    type,
                     observeState,
                 ) { onObserveChange(it) }
             }
             
-            USERPROFILE -> {}
+            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
+        }
+    }
+}
+
+@Composable
+private fun Avatar(
+    image: AvatarModel?,
+    type: ProfileType,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier) {
+        GCashedImage(
+            image?.thumbnail?.url,
+            Modifier.fillMaxSize(),
+            contentScale = Crop
+        )
+        image?.blockedAt?.let {
+            if(type == USERPROFILE) Column(
+                Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+                Arrangement.Center,
+                CenterHorizontally
+            ) {
+                Image(
+                    painterResource(ic_information),
+                    (null), Modifier.size(40.dp)
+                )
+                Text(
+                    stringResource(R.string.profile_blocked_photo),
+                    Modifier.padding(top = 16.dp),
+                    style = typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = White
+                )
+            }
         }
     }
 }
@@ -217,7 +244,7 @@ private fun CreateProfileCardRow(
     text: String,
     profileType: ProfileType,
     observeState: Boolean = false,
-    onClick: ((Boolean) -> Unit)? = null
+    onClick: ((Boolean) -> Unit)? = null,
 ) {
     Row(
         Modifier
@@ -259,7 +286,7 @@ private fun CreateProfileCardRow(
             ORGANIZER -> ObserveCheckBox(observeState)
             { bool -> onClick?.let { it(bool) } }
             
-            USERPROFILE -> {}
+            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
         }
     }
 }
@@ -273,7 +300,7 @@ fun ProfileStatisticContent(
     observed: Int,
     profileType: ProfileType,
     emoji: EmojiModel? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
@@ -325,7 +352,7 @@ fun ProfileStatisticContent(
 private fun RatingText(
     text: String,
     profileType: ProfileType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val style = if(profileType == CREATE)
         ThemeExtra.typography.RatingSmallText
@@ -356,7 +383,7 @@ private fun RatingText(
 private fun Observe(
     modifier: Modifier = Modifier,
     profileType: ProfileType,
-    text: String, count: Int
+    text: String, count: Int,
 ) {
     Column(
         modifier, Top, CenterHorizontally
@@ -421,7 +448,7 @@ fun digitalConverter(digit: Int): String {
 private fun Cloud(
     profileType: ProfileType,
     modifier: Modifier,
-    emoji: EmojiModel?
+    emoji: EmojiModel?,
 ) {
     val create = profileType == CREATE
     Row(modifier, Start, Bottom) {
@@ -469,7 +496,7 @@ private fun Cloud(
 private fun MiniCloud(
     modifier: Modifier = Modifier,
     content: @Composable
-    (() -> Unit)? = null
+    (() -> Unit)? = null,
 ) = Box(
     modifier.background(
         colors.chipGray,

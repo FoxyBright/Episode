@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 fun CardRow(
     label: String, text: String,
-    shape: Shape, online: Boolean = false,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    shape: Shape, online: Boolean = false,
+    onClick: () -> Unit,
 ) {
     Card(
         onClick, modifier, (true), shape,
@@ -30,24 +30,30 @@ fun CardRow(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = 12.dp),
             SpaceBetween, CenterVertically
         ) {
             Text(
-                label, Modifier, colorScheme.tertiary,
+                label, Modifier.padding(start = 12.dp),
+                colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Row(Modifier, Start, CenterVertically) {
+            Row(
+                Modifier.padding(end = 16.dp),
+                Start, CenterVertically
+            ) {
                 if(text.isNotBlank())
                     Text(
-                        text, Modifier, if(online)
+                        text, Modifier,
+                        if(online)
                             colorScheme.secondary
                         else colorScheme.primary,
                         style = typography.bodyMedium,
                     )
                 Icon(
                     Icons.Filled.KeyboardArrowRight,
-                    (null), Modifier, colorScheme.onTertiary
+                    (null), Modifier.size(28.dp),
+                    colorScheme.scrim
                 )
             }
         }

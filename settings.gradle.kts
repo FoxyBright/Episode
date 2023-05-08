@@ -2,6 +2,36 @@
 
 import java.net.URI
 
+include(":feature:yandexmap")
+
+
+include(":domain:paginator")
+
+
+include(":domain")
+
+
+include(":feature:gallery")
+
+
+include(":data:chats")
+
+
+include(":feature:bottomsheet")
+
+
+include(":data:reports")
+
+
+include(":data:meetings")
+
+
+include(":data:profile")
+
+
+include(":data:notifications")
+
+
 include(":data:shared")
 
 
@@ -24,12 +54,6 @@ include(":feature:bubbles")
 
 
 include(":dataexample")
-
-
-include(":feature:complaints")
-
-
-include(":feature:settings")
 
 
 include(":feature:chat")

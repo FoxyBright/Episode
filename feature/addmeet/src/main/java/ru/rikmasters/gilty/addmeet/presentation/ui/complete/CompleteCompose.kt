@@ -23,10 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.MEETING
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.MeetingStates
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -39,7 +38,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 fun CompleteContent() {
     GiltyTheme {
-        CompleteContent(DemoMeetingModel)
+        CompleteContent(DemoMeetingModel, (false))
     }
 }
 
@@ -50,33 +49,34 @@ interface CompleteCallBack {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun CompleteContent(
     meeting: MeetingModel,
+    isOnline: Boolean,
     modifier: Modifier = Modifier,
-    callback: CompleteCallBack? = null
+    callback: CompleteCallBack? = null,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
-    ) {
-        ActionBar(
-            "Meet создан",
-            modifier = Modifier
-                .padding(top = 60.dp)
-        )
+    Scaffold(
+        modifier,
+        topBar = {
+            ActionBar(
+                stringResource(R.string.add_meet_created),
+                Modifier.padding(top = 60.dp)
+            )
+        },
+        bottomBar = {
+            Buttons(
+                Modifier, isOnline,
+                { callback?.onShare() }
+            ) { callback?.onClose() }
+        }) {
         PhoneContent(
             Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
+                .fillMaxSize()
+                .padding(it)
                 .padding(top = 34.dp)
                 .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting, Modifier, MEETING.isOnline) }
-    }
-    Box(Modifier.fillMaxSize()) {
-        Buttons(
-            Modifier.align(Alignment.BottomCenter), MEETING.isOnline,
-            { callback?.onShare() }) { callback?.onClose() }
+        ) { MeetingCard(meeting, Modifier, isOnline) }
     }
 }
 
@@ -85,7 +85,7 @@ private fun Buttons(
     modifier: Modifier = Modifier,
     online: Boolean,
     onShare: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
 ) {
     Column(
         modifier,
@@ -113,14 +113,13 @@ private fun Buttons(
 private fun MeetingCard(
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean
+    online: Boolean,
 ) {
     Box(modifier) {
         Box {
-            AsyncImage(
-                meeting.organizer?.avatar?.id,
-                stringResource(R.string.meeting_avatar),
-                Modifier
+            GCashedImage(
+                meeting.organizer?.avatar
+                    ?.thumbnail?.url, Modifier
                     .clip(shapes.large)
                     .fillMaxHeight(0.94f),
                 contentScale = ContentScale.Crop
@@ -138,7 +137,7 @@ private fun MeetingCard(
 @Composable
 private fun PhoneContent(
     modifier: Modifier = Modifier,
-    content: (@Composable () -> Unit)?
+    content: (@Composable () -> Unit)?,
 ) {
     Box(modifier.fillMaxSize(), Center) {
         Image(
@@ -160,7 +159,7 @@ private fun PhoneContent(
 fun MeetBottom(
     modifier: Modifier,
     meet: MeetingModel,
-    online: Boolean
+    online: Boolean,
 ) {
     Box(modifier) {
         Image(
@@ -225,7 +224,7 @@ fun CardButton(
     text: String,
     icon: Int,
     online: Boolean,
-    betweenDistance: Dp = 2.dp
+    betweenDistance: Dp = 2.dp,
 ) {
     val color = if(online) colorScheme.secondary
     else colorScheme.primary

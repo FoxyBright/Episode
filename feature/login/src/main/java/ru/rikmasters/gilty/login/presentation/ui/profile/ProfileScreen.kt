@@ -5,73 +5,63 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.login.viewmodel.Avatar
-import ru.rikmasters.gilty.login.viewmodel.Hidden
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.model.enumeration.PhotoType.PHOTO
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
+import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 @Composable
-fun ProfileScreen(
-    vm: ProfileViewModel,
-    photo: String = "",
-    hiddenPhoto: String = "",
-) {
+fun ProfileScreen(vm: ProfileViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
+    val nav = get<NavState>()
     
+    val description by vm.description.collectAsState()
+    val profile by vm.profile.collectAsState()
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
-    val description by vm.description.collectAsState()
+    
+    LaunchedEffect(Unit) { vm.getProfile() }
     
     val profileState = ProfileState(
-        DemoEmptyProfileModel.copy(
+        ProfileModel().copy(
             username = username,
-            hidden = AvatarModel(
-                id = if(hiddenPhoto == "") Hidden
-                else hiddenPhoto,
-                albumId = "",
-                ownerId = "",
-                type = PHOTO,
-                mimeType = "photo/jpeg",
-                (0), (0), (0), (0), (0),
-                (null), (true)
-            ),
-            avatar = AvatarModel(
-                id = if(photo == "") Avatar else photo,
-                albumId = "",
-                ownerId = "",
-                type = PHOTO,
-                mimeType = "photo/jpeg",
-                (0), (0), (0), (0), (0),
-                (null), (true)
-            ),
+            hidden = profile?.hidden,
+            avatar = profile?.avatar,
             aboutMe = description,
-            ),
-        occupiedName = occupied
+        ), occupiedName = occupied
     )
     
+    val isActive = username.isNotBlank()
+            && !occupied && !profile?.avatar
+        ?.thumbnail?.url.isNullOrBlank()
+    
     ProfileContent(
-        profileState, Modifier,
+        profileState, isActive, Modifier,
         object: ProfileCallback {
-            override fun onNameChange(text: String) {
-                scope.launch { vm.usernameChange(text) }
-            }
-            
-            override fun onDescriptionChange(text: String) {
-                scope.launch { vm.descriptionChange(text) }
-            }
             
             override fun profileImage() {
                 nav.navigateAbsolute("registration/gallery?multi=false")
             }
             
             override fun hiddenImages() {
-                nav.navigateAbsolute("registration/hidden")
+                nav.navigate("hidden")
+            }
+            
+            override fun onDescriptionChange(text: String) {
+                scope.launch { vm.descriptionChange(text) }
+            }
+            
+            override fun onSaveDescription() {
+                scope.launch { vm.onDescriptionSave() }
+            }
+            
+            override fun onNameChange(text: String) {
+                scope.launch { vm.usernameChange(text) }
+            }
+            
+            override fun onSaveUserName() {
+                scope.launch { vm.onUsernameSave() }
             }
             
             override fun onBack() {
@@ -81,5 +71,6 @@ fun ProfileScreen(
             override fun onNext() {
                 nav.navigate("personal")
             }
-        })
+        }
+    )
 }

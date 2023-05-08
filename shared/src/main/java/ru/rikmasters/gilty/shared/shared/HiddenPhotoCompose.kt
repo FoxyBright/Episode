@@ -15,11 +15,11 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_open
+import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
-import ru.rikmasters.gilty.shared.model.profile.ImageModel
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -48,10 +48,10 @@ private fun HiddenImageUnlockPreview() {
 
 @Composable
 fun HiddenImage(
-    image: ImageModel,
+    image: AvatarModel?,
     modifier: Modifier = Modifier,
     hidden: Boolean = true,
-    onClick: ((ImageModel) -> Unit)? = null
+    onClick: ((AvatarModel?) -> Unit)? = null,
 ) {
     Box(
         modifier
@@ -61,19 +61,18 @@ fun HiddenImage(
                 MutableInteractionSource(), (null)
             ) { onClick?.let { it(image) } }
     ) {
-        if(hidden) Box(
+        if(!hidden) Box(
             Modifier
                 .background(linearGradient(red()))
                 .fillMaxSize()
-        ) else AsyncImage(
-            image.id, (null),
-            Modifier
+        ) else GCashedImage(
+            image?.thumbnail?.url, Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),
             contentScale = Crop,
         )
         CheckBox(
-            !hidden, Modifier
+            hidden, Modifier
                 .size(24.dp)
                 .align(Center),
             listOf(ic_lock_open, ic_lock_close), White

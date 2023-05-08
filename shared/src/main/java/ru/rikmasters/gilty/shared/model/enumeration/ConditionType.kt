@@ -10,11 +10,11 @@ enum class ConditionType {
     DIVIDE,
     ORGANIZER_PAY,
     MEMBER_PAY,
-    NO_MATTER;
+    NON_SELECT;
     
     companion object {
         
-        val list = values().toList()
+        val list = values().toList() - NON_SELECT
         
         fun get(index: Int) = list[index]
     }
@@ -22,11 +22,11 @@ enum class ConditionType {
     val display
         @Composable get() = stringResource(
             when(this) {
+                FREE -> meeting_filter_select_meeting_type_free
+                DIVIDE -> condition_divide
                 ORGANIZER_PAY -> condition_organizer_pay
                 MEMBER_PAY -> meeting_filter_select_meeting_type_paid
-                DIVIDE -> condition_divide
-                FREE -> meeting_filter_select_meeting_type_free
-                NO_MATTER -> condition_no_matter
+                NON_SELECT -> empty_String
             }
         )
 }

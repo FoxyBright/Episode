@@ -1,14 +1,11 @@
 package ru.rikmasters.gilty.auth.token
 
 import io.ktor.client.call.body
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
-import ru.rikmasters.gilty.shared.BuildConfig
-import ru.rikmasters.gilty.shared.BuildConfig.HOST
-import ru.rikmasters.gilty.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.data.shared.BuildConfig.*
 
 class TokenWebSource: KtorSource() {
     
@@ -18,20 +15,22 @@ class TokenWebSource: KtorSource() {
         External("external")
     }
     
-    suspend fun logout(): HttpResponse {
-        updateClientToken()
-        return client.post(
-            "http://$HOST/auth/logout"
-        ) {}
+    suspend fun savePushToken(token: String, type: PushType) {
+        post("http://$HOST$PREFIX_URL/utils/device") {
+            setBody(SavePushTokenRequest(("ANDROID"), type.name, token))
+        }
     }
     
-    suspend fun linkExternal(
-        token: String
-    ): HttpResponse {
-        updateClientToken()
-        return client.post(
-            "http://$HOST$PREFIX_URL/auth/externals/link"
-        ) { url { query("token" to token) } }
+    suspend fun deletePushToken(token: String, type: PushType) {
+        delete("http://$HOST$PREFIX_URL/utils/device") {
+            url { query("device_id" to token, "type" to type.name) }
+        }
+    }
+    
+    suspend fun linkExternal(token: String) {
+        post("http://$HOST$PREFIX_URL/auth/externals/link") {
+            url { query("token" to token) }
+        }
     }
     
     suspend fun getOauthTokens(
@@ -40,19 +39,19 @@ class TokenWebSource: KtorSource() {
         token: String? = null,
         phone: String? = null,
         code: String? = null,
-    ) = unauthorizedClient.post(
+    ) = unauthorizedPost(
         "http://$HOST/oauth/token"
     ) {
         setBody(
             TokensRequest(
-                grantType.value,
-                BuildConfig.CLIENT_ID,
-                BuildConfig.CLIENT_SECRET,
-                refreshToken,
-                token,
-                phone,
-                code
+                grantType.value, CLIENT_ID,
+                CLIENT_SECRET, refreshToken,
+                token, phone, code
             )
         )
-    }.body<TokensResponse?>()?.domain()
+    }?.let {
+        if(it.status == OK)
+            it.body<TokensResponse?>()?.domain()
+        else null
+    }
 }

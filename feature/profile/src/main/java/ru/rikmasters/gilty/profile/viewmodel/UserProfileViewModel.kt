@@ -1,51 +1,38 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import android.content.Context
+import androidx.activity.ComponentActivity
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.ProfileManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.ACTUAL
-import ru.rikmasters.gilty.auth.profile.ProfileWebSource.MeetingsType.HISTORY
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
+import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.profile.DemoEmptyProfileModel
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
-class UserProfileViewModel: ViewModel() {
+class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
-    private val profileManager by inject<ProfileManager>()
     private val regManager by inject<RegistrationManager>()
-    
-    private suspend fun getUserProfile() = profileManager.getProfile()
-    
-    private val profileModel = DemoEmptyProfileModel
-    
-    private val navBarStateList = listOf(
-        INACTIVE, NEW, INACTIVE, NEW, ACTIVE
-    )
+    private val profileManager by inject<ProfileManager>()
+    private val meetManager by inject<MeetingManager>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
     
-    private val _errorConnection = MutableStateFlow(false)
-    val errorConnection = _errorConnection.asStateFlow()
+    private val _photoAlertState = MutableStateFlow(false)
+    val photoAlertState = _photoAlertState.asStateFlow()
     
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
-    
-    private val _age = MutableStateFlow(0)
-    private val age = _age.asStateFlow()
-    
-    private val _meets = MutableStateFlow(listOf<MeetingModel>())
-    val meets = _meets.asStateFlow()
-    
-    private val _meetsHistory = MutableStateFlow(listOf<MeetingModel>())
-    val meetsHistory = _meetsHistory.asStateFlow()
     
     private val _history = MutableStateFlow(false)
     val history = _history.asStateFlow()
@@ -53,103 +40,158 @@ class UserProfileViewModel: ViewModel() {
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
     
-    private val _description = MutableStateFlow(profileModel.aboutMe)
+    private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
     
-    private val _username = MutableStateFlow(profileModel.username)
+    private val _username = MutableStateFlow<String?>(null)
     private val username = _username.asStateFlow()
     
-    private val _complaintsAlert = MutableStateFlow(false)
-    val complaintsAlert = _complaintsAlert.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val meetsTest by lazy {
+        refresh.flatMapLatest {
+            profileManager.getUserMeets(ACTUAL)
+        }.cachedIn(coroutineScope)
+    }
     
-    private val _navBar = MutableStateFlow(navBarStateList)
-    val navBar = _navBar.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val historyMeetsTest by lazy {
+        refresh.flatMapLatest {
+            profileManager.getUserMeets(HISTORY)
+        }.cachedIn(coroutineScope)
+    }
     
-    private val _lastRespond = MutableStateFlow(Pair(0, ""))
+    private val refresh = MutableStateFlow(false)
+    
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
+    val usernameDebounced = username
+        .debounce(250)
+        .onEach {
+            it?.let { name ->
+                _occupied.emit(
+                    regManager.isNameOccupied(name)
+                            && profileManager
+                        .getProfile(false)
+                        .username != name
+                )
+            }
+        }
+        .state(_username.value, SharingStarted.Eagerly)
+    
+    private val _photoViewState = MutableStateFlow(false)
+    val photoViewState = _photoViewState.asStateFlow()
+    
+    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages = _viewerImages.asStateFlow()
+    
+    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage = _viewerSelectImage.asStateFlow()
+    
+    suspend fun changePhotoViewState(state: Boolean) {
+        _photoViewState.emit(state)
+    }
+    
+    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
+        _viewerImages.emit(list)
+    }
+    
+    suspend fun setPhotoViewSelected(photo: AvatarModel?) {
+        _viewerSelectImage.emit(photo)
+    }
+    
+    suspend fun updateUsername() {
+        if(!occupied.value) regManager
+            .userUpdateData(username.value)
+    }
+    
+    suspend fun changeUsername(name: String) {
+        _username.emit(name)
+        _profile.emit(
+            profile.value?.copy(
+                username = username.value
+            )
+        )
+    }
+    
+    private val _alert = MutableStateFlow(false)
+    val alert = _alert.asStateFlow()
+    
+    private val _lastRespond =
+        MutableStateFlow<Pair<Int, String?>>(Pair(0, null))
     val lastRespond = _lastRespond.asStateFlow()
     
-    private suspend fun navBarSetStates(
-        states: List<NavIconState>,
-    ) {
-        _navBar.emit(states)
+    private val _unreadMessages = MutableStateFlow(
+        lazy {
+            val count = getKoin().get<Context>().getSharedPreferences(
+                "sharedPref", ComponentActivity.MODE_PRIVATE
+            ).getInt("unread_messages", 0)
+            if(count > 0) NEW_INACTIVE else INACTIVE
+        }.value
+    )
+    val unreadMessages = _unreadMessages.asStateFlow()
+    suspend fun setUnreadMessages(hasUnread: Boolean) {
+        _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
     }
     
-    suspend fun errorConnection(state: Boolean) {
-        _errorConnection.emit(state)
+    suspend fun photoAlertDismiss(state: Boolean) {
+        _photoAlertState.emit(state)
     }
     
-    suspend fun navBarNavigate(point: Int): String {
-        val list = arrayListOf<NavIconState>()
-        repeat(navBar.value.size) {
-            list.add(
-                when {
-                    navBar.value[it] == NEW -> NEW
-                    it == point -> ACTIVE
-                    else -> INACTIVE
-                }
-            )
+    suspend fun navBarNavigate(point: Int) = when(point) {
+        0 -> "main/meetings"
+        1 -> "notification/list"
+        2 -> {
+            meetManager.clearAddMeet()
+            "addmeet/category"
         }
-        navBarSetStates(list)
-        return when(point) {
-            0 -> "main/meetings"
-            1 -> "notification/list"
-            2 -> "addmeet/category"
-            3 -> "chats/main"
-            else -> "profile/main"
-        }
+        3 -> "chats/main"
+        else -> "profile/main"
     }
     
-    suspend fun setComplaintAlertState(state: Boolean) {
-        _complaintsAlert.emit(state)
+    suspend fun alertDismiss(state: Boolean) {
+        _alert.emit(state)
     }
     
     suspend fun changeDescription(text: String) {
         _description.emit(text)
-        updateProfile()
-        regManager.userUpdateData(
-            username.value?.substringBefore(','),
-            description.value
-        )
-    }
-    
-    private suspend fun updateProfile() {
         _profile.emit(
             profile.value?.copy(
-                username = username.value,
                 aboutMe = description.value
             )
         )
     }
     
-    private suspend fun getUserMeets() {
-        _meetsHistory.emit(profileManager.getUserMeets(HISTORY))
-        _meets.emit(profileManager.getUserMeets(ACTUAL))
+    suspend fun updateDescription() {
+        regManager.userUpdateData(
+            aboutMe = description.value
+        )
     }
     
-    suspend fun setUserDate() {
-        val user = getUserProfile()
-        _age.emit(user.age)
-        _username.emit("${user.username}, ${user.age}")
-        _description.emit(user.aboutMe ?: "")
-        _lastRespond.emit(Pair(user.respondsCount ?: 0, user.respondsImage?.id ?: ""))
-        _profile.emit(
-            user.copy(
-                username = username.value,
-                aboutMe = description.value
-            )
-        )
-        getUserMeets()
+    override suspend fun forceRefresh() {
+        setUserDate(true)
+        refresh.value = !refresh.value
     }
     
-    suspend fun changeUsername(name: String) {
-        if(!name.contains(',')) return
-        val text = name.substringBefore(',')
-        _username.emit("$text, ${age.value}")
-        updateProfile()
-        _occupied.emit(regManager.isNameOccupied(text))
-        if(!occupied.value) regManager.userUpdateData(
-            text, description.value, age.value
-        )
+    suspend fun setUserDate(
+        forceWeb: Boolean = false,
+    ) = singleLoading {
+        profileManager.getProfile(forceWeb)
+            .let { user ->
+                _username.emit(user.username ?: "")
+                _description.emit(user.aboutMe ?: "")
+                _lastRespond.emit(
+                    Pair(
+                        user.respondsCount ?: 0,
+                        user.respondsImage?.url
+                    )
+                )
+                _profile.emit(
+                    user.copy(
+                        username = username.value,
+                        aboutMe = description.value
+                    )
+                )
+            }
     }
     
     suspend fun showHistory() {

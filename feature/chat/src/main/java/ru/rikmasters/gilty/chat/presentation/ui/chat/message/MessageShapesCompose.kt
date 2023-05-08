@@ -5,13 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
-import ru.rikmasters.gilty.shared.model.chat.MessageType
-import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
-import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 @Composable
-fun MessageShapes(
+fun messageShapes(
     type: MessageType,
     sender: Boolean,
     last: MessageModel? = null,

@@ -47,7 +47,7 @@ fun CategoriesContent(
         ) {
             ActionBar(
                 stringResource(R.string.interested_you),
-                stringResource(R.string.interested_you_details),
+                Modifier, stringResource(R.string.interested_you_details),
             ) { callback?.onBack() }
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)

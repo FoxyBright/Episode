@@ -2,64 +2,75 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.common.extentions.format
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
-var Description: String = ""
-var HideAddress: Boolean = false
-
-var Address: String = ""
-var Place: String = ""
-var Tags: List<String> = emptyList()
-var Date: String = ""
-var Duration: String = ""
+var Tags: List<TagModel> = emptyList()
 
 class DetailedViewModel: ViewModel() {
     
-    private fun getDate() = try {
-        if(todayControl(Date))
-            "Сегодня, ${Date.format("HH:mm")}"
-        else Date.format("dd MMMM, HH:mm")
-    } catch(_: Exception) {
-        ""
-    }
+    private val manager by inject<MeetingManager>()
     
-    private val _alert = MutableStateFlow(false)
-    val alert = _alert.asStateFlow()
+    private val addMeet by lazy { manager.addMeetFlow }
     
-    private val _hideAddress = MutableStateFlow(HideAddress)
-    val hideAddress = _hideAddress.asStateFlow()
-    
-    private val _description = MutableStateFlow(Description)
-    val description = _description.asStateFlow()
-    
-    private val address = MutableStateFlow(Address)
-    private val point = MutableStateFlow(Place)
-    private val _place = MutableStateFlow(
-        if(address.value.isNotBlank() && point.value.isNotBlank())
-            Pair(address.value, point.value)
-        else null
-    )
-    val place = _place.asStateFlow()
-    
-    private val _date = MutableStateFlow(getDate())
+    private val _date = MutableStateFlow("")
     val date = _date.asStateFlow()
     
-    private val _duration = MutableStateFlow(Duration)
+    private val _alert = MutableStateFlow(false)
+    
+    val alert = _alert.asStateFlow()
+    
+    private val _tags = MutableStateFlow(emptyList<TagModel>())
+    val tags = _tags.asStateFlow()
+    
+    private val _description = MutableStateFlow("")
+    val description = _description.asStateFlow()
+    
+    private val _duration = MutableStateFlow("")
     val duration = _duration.asStateFlow()
     
-    private val _tags = MutableStateFlow(Tags)
-    val tags = _tags.asStateFlow()
-    suspend fun changePlace(place: Pair<String, String>) {
-        _place.emit(place)
-        Address = place.first
-        Place = place.second
+    private val _hide = MutableStateFlow(false)
+    val hide = _hide.asStateFlow()
+    
+    private val _place = MutableStateFlow<Pair<String, String>?>(null)
+    val place = _place.asStateFlow()
+    
+    private val _online = MutableStateFlow(false)
+    val online = _online.asStateFlow()
+    
+    private val _category = MutableStateFlow<CategoryModel?>(null)
+    val category = _category.asStateFlow()
+    
+    init {
+        coroutineScope.launch {
+            addMeet.collectLatest { add ->
+                _date.emit(add?.dateTime ?: "")
+                _tags.emit(add?.tags ?: emptyList())
+                _description.emit(add?.description ?: "")
+                _duration.emit(add?.duration ?: "")
+                _place.emit(add?.let {
+                    if(
+                        it.place.isNotBlank()
+                        || it.address.isNotBlank()
+                    ) it.place to it.address
+                    else null
+                })
+                _hide.emit(add?.hide ?: false)
+                _online.emit(add?.isOnline ?: false)
+                _category.emit(add?.category)
+            }
+        }
     }
     
-    suspend fun deleteTag(tag: String) {
-        _tags.emit(tags.value - tag)
-        Tags = tags.value
+    suspend fun deleteTag(tag: TagModel) {
+        val list = tags.value - tag
+        _tags.emit(list)
+        manager.update(tags = list)
     }
     
     suspend fun alertDismiss(state: Boolean) {
@@ -68,25 +79,30 @@ class DetailedViewModel: ViewModel() {
     
     suspend fun changeDate(date: String) {
         _date.emit(date)
+        manager.update(dateTime = date)
     }
     
     suspend fun changeDuration(duration: String) {
         _duration.emit(duration)
-        Duration = duration
+        manager.update(duration = duration)
     }
     
     suspend fun hideMeetPlace() {
-        _hideAddress.emit(!hideAddress.value)
-        HideAddress = hideAddress.value
+        _hide.emit(!hide.value)
+        manager.update(hide = hide.value)
     }
     
     suspend fun changeDescription(text: String) {
         _description.emit(text)
-        Description = text
+        manager.update(description = text)
     }
     
     suspend fun clearDescription() {
         _description.emit("")
-        Description = ""
+        manager.update(description = "")
+    }
+    
+    suspend fun clearAddMeet() {
+        manager.clearAddMeet()
     }
 }

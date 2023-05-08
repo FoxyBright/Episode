@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -28,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
 import ru.rikmasters.gilty.core.log.log
+import ru.rikmasters.gilty.feature.bubbles.R
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -85,7 +84,7 @@ fun <T> Bubbles(
     
     val scope = rememberCoroutineScope()
     
-    AndroidView(
+    if(data.isNotEmpty()) AndroidView(
         modifier = modifier
             .fillMaxSize()
             .onGloballyPositioned {
@@ -129,7 +128,7 @@ fun <T> Bubbles(
             
             return@AndroidView layout
         },
-        update = { }
+        update = {}
     )
 }
 

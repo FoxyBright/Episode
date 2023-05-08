@@ -1,134 +1,125 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.MEET_FINISHED
-import ru.rikmasters.gilty.chat.presentation.ui.chat.navigation.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
+import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
+import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
-import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
-import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import ru.rikmasters.gilty.shared.model.chat.getChatWithData
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
 
 @Composable
-fun ChatListScreen(nav: NavState = get()) {
-    
-    val stateList = remember {
-        mutableStateListOf(INACTIVE, NEW, INACTIVE, ACTIVE, INACTIVE)
-    }
-    
-    val chatsList = remember {
-        mutableStateListOf(
-            getChatWithData(id = "1", dateTime = NOW_DATE, isOnline = true, hasUnread = true),
-            getChatWithData(id = "2", dateTime = TOMORROW),
-            getChatWithData(id = "3", dateTime = NOW_DATE, hasUnread = true),
-            getChatWithData(id = "4", dateTime = YESTERDAY, isOnline = true),
-            getChatWithData(id = "5", dateTime = YESTERDAY, hasUnread = true)
-        )
-    }
-    
-    val chats = getSortedChats(chatsList)
-    
-    var ended by remember { mutableStateOf(false) }
+fun ChatListScreen(vm: ChatListViewModel) {
+    val listState = rememberLazyListScrollState("chat_list")
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var active by
-    remember { mutableStateOf(false) }
+    val nav = get<NavState>()
     
-    val delForMe = stringResource(delete_my_chat_button)
-    val delForOther = stringResource(delete_my_and_other_chat_button)
-    val list = remember {
-        mutableStateListOf(
-            Pair(delForMe, true),
-            Pair(delForOther, false)
+    val chats = vm.chats.collectAsLazyPagingItems()
+    val alertSelected by vm.alertSelected.collectAsState()
+    val alertState by vm.alertState.collectAsState()
+    val sortType by vm.sortType.collectAsState()
+    val completed by vm.completed.collectAsState()
+    val alert by vm.alert.collectAsState()
+    
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val navBar = remember {
+        mutableListOf(
+            INACTIVE, INACTIVE, INACTIVE,
+            unreadMessages, INACTIVE
         )
     }
-    val chatToDelete =
-        remember { mutableStateOf<ChatModel?>(null) }
-    var state by
-    remember { mutableStateOf(LIST) }
+    
+    LaunchedEffect(Unit) {
+        context.listenPreference(
+            key = "unread_messages",
+            defValue = 0
+        ) {
+            scope.launch {
+                vm.setUnreadMessages(it > 0)
+            }
+        }
+        vm.getUnread()
+    }
     
     ChatListContent(
         ChatListState(
-            stateList, chats,
-            ended, active, state, list
-        ), Modifier, object: ChatListCallback {
+            navBar, chats, completed, alert,
+            alertState, alertSelected, sortType,
+            listState
+        ),
+        Modifier,
+        object: ChatListCallback {
+            
             override fun onNavBarSelect(point: Int) {
-                repeat(stateList.size) {
-                    if(it == point) stateList[it] = ACTIVE
-                    else if(stateList[it] != NEW)
-                        stateList[it] = INACTIVE
-                    when(point) {
-                        0 -> nav.navigateAbsolute("main/meetings")
-                        1 -> nav.navigateAbsolute("notification/list")
-                        2 -> nav.navigateAbsolute("addmeet/category")
-                        3 -> nav.navigateAbsolute("chats/main")
-                        4 -> nav.navigateAbsolute("profile/main")
-                    }
+                if(point == 3) return
+                scope.launch {
+                    nav.navigateAbsolute(
+                        vm.navBarNavigate(point)
+                    )
                 }
             }
             
             override fun onAlertSuccess() {
-                if(state == LIST) state = CONFIRM
-                else {
-                    val select = list.indexOf(list.first { it.second })
-                    chatsList.remove(chatToDelete.value)
-                    Toast.makeText(
-                        context,
-                        "Чат ${chatToDelete.value?.title} был удален ${
-                            when(select) {
-                                0 -> "у вас"
-                                else -> "у всех участников"
-                            }
-                        }",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    state = LIST
-                    active = false
+                scope.launch {
+                    if(alertState == LIST) {
+                        vm.changeAlertState(CONFIRM)
+                    } else {
+                        vm.deleteChat((alertSelected != 0))
+                    }
                 }
             }
             
             override fun onChatSwipe(chat: ChatModel) {
-                chatToDelete.value = chat
-                active = true
+                scope.launch {
+                    vm.setChatToDelete(chat)
+                    if(chat.userId != chat.organizer.id) {
+                        vm.changeAlertState(CONFIRM)
+                        vm.dismissAlert(true)
+                    } else {
+                        vm.setChatToDelete(chat)
+                        vm.dismissAlert(true)
+                    }
+                }
             }
             
             override fun onAlertDismiss() {
-                active = false
-                state = LIST
+                scope.launch {
+                    vm.dismissAlert(false)
+                    vm.changeAlertState(LIST)
+                }
             }
             
-            override fun listAlertSelect(index: Int) {
-                repeat(list.size) {
-                    if(it == index) list[it] =
-                        Pair(list[it].first, true)
-                    else list[it] = Pair(list[it].first, false)
+            override fun onSortTypeChanged(sortType: SortTypeModel) {
+                scope.launch {
+                    vm.changeSortType(sortType)
                 }
+            }
+            
+            override fun onListUpdate() {
+                scope.launch { vm.forceRefresh() }
+            }
+            
+            override fun onListAlertSelect(index: Int) {
+                scope.launch { vm.alertSelect(index) }
             }
             
             override fun onChatClick(chat: ChatModel) {
-                val type = when {
-                    LocalDate.of(chat.dateTime)
-                        .isBefore(LOCAL_DATE) -> MEET_FINISHED
-                    
-                    chat.isOnline -> TRANSLATION_AWAIT
-                    else -> MEET
-                }
-                nav.navigate("chat?type=${type.name}")
+                scope.launch { vm.onChatClick(chat.id) }
+                nav.navigate("chat?id=${chat.id}")
             }
             
             override fun onEndedClick() {
-                ended = !ended
+                scope.launch { vm.changeCompletedState() }
             }
-        })
+        }
+    )
 }

@@ -2,26 +2,22 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Center
-import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.shared.shared.Element
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.meeting.FilterModel
-import ru.rikmasters.gilty.shared.shared.GiltyChip
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.shared.GChip
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ListItemPicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -31,30 +27,10 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 fun GenderPreview() {
     GiltyTheme {
         SelectBottom(
-            stringResource(R.string.sex), listOf(
-                stringResource(R.string.female_sex),
-                stringResource(R.string.male_sex),
-                stringResource(R.string.others_sex)
-            ), (1), false
-        )
-    }
-}
-
-@Preview
-@Composable
-fun OrientationPreview() {
-    GiltyTheme {
-        SelectBottom(
-            stringResource(R.string.orientation_title), listOf(
-                stringResource(R.string.orientation_hetero),
-                stringResource(R.string.orientation_gay),
-                stringResource(R.string.orientation_lesbian),
-                stringResource(R.string.orientation_bisexual),
-                stringResource(R.string.orientation_asexual),
-                stringResource(R.string.orientation_demisexual),
-                stringResource(R.string.orientation_pansexual),
-                stringResource(R.string.orientation_queer)
-            ), (2), false
+            stringResource(R.string.sex),
+            GenderType.shortList
+                .map { it.value },
+            (1), false
         )
     }
 }
@@ -63,34 +39,9 @@ fun OrientationPreview() {
 @Composable
 fun AgePreview() {
     GiltyTheme {
-        AgeBottom("19", "40")
-    }
-}
-
-@Composable
-fun SelectBottom(
-    title: String,
-    list: List<String>,
-    select: Int?,
-    online: Boolean,
-    onItemClick: ((Int) -> Unit)? = null,
-) {
-    BottomContainer(title) {
-        FlowLayout(
-            Modifier
-                .background(
-                    colorScheme.primaryContainer,
-                    shapes.large
-                )
-                .padding(8.dp), 8.dp, 8.dp
-        ) {
-            repeat(list.size) {
-                GiltyChip(
-                    Modifier.padding(end = 12.dp),
-                    list[it], (select == it), online
-                ) { onItemClick?.let { c -> c(it) } }
-            }
-        }
+        Box(
+            Modifier.background(colorScheme.background)
+        ) { AgeBottom("19", "40") }
     }
 }
 
@@ -104,75 +55,135 @@ fun AgeBottom(
     toChange: ((String) -> Unit)? = null,
     onSave: (() -> Unit)? = null,
 ) {
-    BottomContainer(stringResource(R.string.personal_info_age_placeholder)) {
-        Column {
-            Box(
-                modifier.background(colorScheme.background),
-                Alignment.Center
+    Box(
+        modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
+            .padding(16.dp)
+            .padding(top = 10.dp)
+    ) {
+        Text(
+            stringResource(R.string.personal_info_age_placeholder),
+            Modifier
+                .padding(bottom = 16.dp)
+                .align(Alignment.TopStart),
+            colorScheme.tertiary,
+            style = typography.labelLarge
+        )
+        AgeBottomContent(
+            from, to, Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(Center),
+            fromChange, toChange
+        )
+        GradientButton(
+            Modifier
+                .padding(vertical = 28.dp)
+                .align(BottomCenter),
+            stringResource(R.string.save_button),
+            online = online
+        ) { onSave?.let { it() } }
+    }
+}
+
+@Composable
+private fun AgeBottomContent(
+    from: String,
+    to: String,
+    modifier: Modifier = Modifier,
+    fromChange: ((String) -> Unit)? = null,
+    toChange: ((String) -> Unit)? = null,
+) {
+    arrayListOf<String>().let { list ->
+        (18..99).forEach { list.add("$it") }
+        list
+    }.let { ageList ->
+        Box(
+            modifier.background(
+                colorScheme.background
+            ), Center
+        ) {
+            Row(
+                modifier.padding(horizontal = 20.dp),
+                Arrangement.Center
             ) {
                 Row(
-                    Modifier.fillMaxWidth(),
-                    Center, CenterVertically
+                    Modifier.weight(1f),
+                    Arrangement.End
                 ) {
-                    DivText(stringResource(R.string.age_from))
                     ListItemPicker(
-                        from, listGenerator(), Modifier
-                    ) { f -> fromChange?.let { it(f) } }
-                    DivText(stringResource(R.string.age_to))
+                        "от", listOf("от"),
+                        Modifier.weight(1f),
+                        align = Alignment.CenterEnd,
+                        horizontalMargin = 2.dp
+                    ) {}
                     ListItemPicker(
-                        to, listGenerator(), Modifier
-                    ) { t -> toChange?.let { it(t) } }
+                        from.ifBlank {
+                            ageList.first()
+                        }, ageList, Modifier.weight(1f),
+                        align = Alignment.CenterStart,
+                        horizontalMargin = 2.dp,
+                        doublePlaceHolders = true
+                    ) { fromChange?.let { c -> c(it) } }
+                }
+                Row(
+                    Modifier.weight(1f),
+                    Arrangement.Start
+                ) {
+                    ListItemPicker(
+                        "до", listOf("до"),
+                        Modifier.weight(1f),
+                        align = Alignment.CenterEnd,
+                        horizontalMargin = 2.dp
+                    ) {}
+                    ListItemPicker(
+                        to.ifBlank {
+                            ageList.first()
+                        }, ageList, Modifier.weight(2f),
+                        align = Alignment.CenterStart,
+                        doublePlaceHolders = true,
+                        horizontalMargin = 2.dp
+                    ) { toChange?.let { c -> c(it) } }
                 }
             }
-            GradientButton(
-                Modifier.padding(top = 20.dp),
-                stringResource(R.string.save_button),
-                online = online
-            ) { onSave?.let { it() } }
         }
     }
 }
 
 @Composable
-private fun BottomContainer(
+fun SelectBottom(
     title: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    list: List<String>,
+    select: Int?,
+    online: Boolean,
+    onItemClick: ((Int) -> Unit)? = null,
 ) {
-    Element(
-        FilterModel(title) {
-            Box {
-                Box(Modifier.padding(bottom = 40.dp)) {
-                    content()
-                }
-            }
-        }, modifier.padding(16.dp, 28.dp)
-    )
-}
-
-@Composable
-private fun DivText(text: String) {
-    Column(Modifier, Top, End) {
-        Div(); Text(
-        text, Modifier.padding(vertical = 8.dp),
-        colorScheme.tertiary,
-        style = typography.bodyMedium
-    ); Div()
+    Column(Modifier.padding(16.dp)) {
+        Text(
+            title, Modifier.padding(top = 12.dp),
+            colorScheme.tertiary,
+            style = typography.labelLarge
+        )
     }
-}
-
-@Composable
-private fun Div() {
-    Divider(
-        Modifier.width(22.dp),
-        2.dp, colorScheme.outline
-    )
-}
-
-private fun listGenerator(
-    range: IntRange = 18..99,
-): List<String> {
-    val list = arrayListOf<String>()
-    range.forEach { list.add(it.toString()) }
-    return list
+    Column(Modifier.padding(horizontal = 16.dp)) {
+        FlowLayout(
+            Modifier
+                .background(
+                    colorScheme.primaryContainer,
+                    shapes.large
+                )
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
+        ) {
+            repeat(list.size) {
+                GChip(
+                    Modifier, list[it],
+                    (select == it), online, (false)
+                ) { onItemClick?.let { c -> c(it) } }
+            }
+        }
+        Spacer(Modifier.height(40.dp))
+    }
 }

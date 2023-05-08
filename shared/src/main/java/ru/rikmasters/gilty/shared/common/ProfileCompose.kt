@@ -9,26 +9,25 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.CREATE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
-import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.textFieldColors
-import ru.rikmasters.gilty.shared.shared.transparentTextFieldColors
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -61,7 +60,7 @@ private fun OrganizerProfilePreview() {
                 ProfileState(
                     DemoProfileModel,
                     profileType = ORGANIZER
-                )
+                ), Modifier.padding(16.dp)
             )
         }
     }
@@ -80,7 +79,7 @@ private fun UserProfilePreview() {
                 ProfileState(
                     DemoProfileModel,
                     profileType = USERPROFILE
-                )
+                ), Modifier.padding(16.dp)
             )
         }
     }
@@ -91,6 +90,7 @@ data class ProfileState(
     val profileType: ProfileType = CREATE,
     var observeState: Boolean = false,
     val occupiedName: Boolean = false,
+    val lockState: Boolean = false
 )
 
 interface ProfileCallback {
@@ -101,6 +101,8 @@ interface ProfileCallback {
     fun hiddenImages() {}
     fun onNameChange(text: String) {}
     fun onDescriptionChange(text: String) {}
+    fun onSaveUserName() {}
+    fun onSaveDescription() {}
     fun onObserveChange(state: Boolean) {}
     fun onObserveClick() {}
 }
@@ -112,11 +114,16 @@ fun Profile(
     callback: ProfileCallback? = null,
     onChange: ((Boolean) -> Unit)? = null,
 ) {
+    val profile = state.profile
+    val rating = profile?.rating?.average.toString()
+    val hidden = profile?.hidden?.thumbnail?.url
+    
     Column(modifier) {
         TopBar(
-            (state.profile?.username ?: ""),
-            state.profileType,
-            Modifier, { callback?.onBack() }
+            (profile?.username ?: ""),
+            (profile?.age ?: -1),
+            state.profileType, Modifier,
+            { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
         if(state.occupiedName)
             Text(
@@ -129,10 +136,8 @@ fun Profile(
             )
         Row {
             ProfileImageContent(
-                Modifier.weight(1f),
-                (state.profile?.avatar?.id ?: ""),
-                state.profileType,
-                state.observeState,
+                Modifier.weight(1f), profile?.avatar,
+                state.profileType, state.observeState,
                 { bool -> onChange?.let { it(bool) } },
                 { callback?.profileImage() })
             Spacer(
@@ -143,12 +148,11 @@ fun Profile(
             )
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
-                    Modifier,
-                    (state.profile?.rating?.average ?: ""),
-                    state.profile?.count_watchers ?: 0,
-                    state.profile?.count_watching ?: 0,
+                    Modifier, rating,
+                    (profile?.countWatchers ?: 0),
+                    (profile?.countWatching ?: 0),
                     state.profileType,
-                    state.profile?.rating?.emoji
+                    profile?.rating?.emoji
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
@@ -157,65 +161,86 @@ fun Profile(
                     )
                 )
                 HiddenContent(
-                    Modifier,
-                    state.profile?.hidden?.id,
-                    state.profileType
+                    Modifier, hidden,
+                    state.profileType,
+                    state.lockState
                 ) { callback?.hiddenImages() }
             }
         }
-        Description(
-            (state.profile?.aboutMe ?: ""),
-            state.profileType,
-            Modifier.padding(top = 20.dp)
-        ) { callback?.onDescriptionChange(it) }
+        when(state.profileType) {
+            CREATE, USERPROFILE -> AboutMe(state, callback)
+            ORGANIZER, ANONYMOUS_ORGANIZER ->
+                if((profile?.aboutMe ?: "").isNotBlank())
+                    AboutMe(state, callback)
+        }
     }
+}
+
+@Composable
+private fun AboutMe(
+    state: ProfileState,
+    callback: ProfileCallback?,
+) {
+    Description(
+        (state.profile?.aboutMe ?: ""),
+        state.profileType, Modifier.padding(top = 20.dp),
+        { callback?.onSaveDescription() }
+    ) { callback?.onDescriptionChange(it) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
     text: String,
+    userAge: Int,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
+    onSaveUsername: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
-    Row(modifier) {
-        if(profileType == ORGANIZER) IconButton(
-            onBack, Modifier.padding(
-                top = 10.dp, end = 16.dp
-            )
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_back),
-                stringResource(R.string.action_bar_button_back),
-                Modifier, colorScheme.tertiary
-            )
-        }
-        TextField(
-            text, onTextChange, Modifier
-                .offset((-16).dp)
-                .fillMaxWidth(),
-            colors = transparentTextFieldColors(),
-            textStyle = typography.headlineLarge,
-            placeholder = {
-                Row(Modifier, Center, CenterVertically) {
-                    Text(
-                        stringResource(R.string.user_name),
-                        Modifier.padding(end = 8.dp),
-                        colorScheme.onTertiary,
-                        style = typography.headlineLarge
-                    )
-                    Icon(
-                        painterResource(R.drawable.ic_edit),
-                        (null), Modifier.padding(top = 4.dp),
-                        colorScheme.onTertiary
-                    )
-                }
-            }, readOnly = profileType == ORGANIZER,
-            singleLine = true
+    val focusManager = LocalFocusManager.current
+    var focus by remember { mutableStateOf(false) }
+    if(
+        profileType != ORGANIZER
+        && profileType != ANONYMOUS_ORGANIZER
+    ) TextField(
+        text, onTextChange,
+        modifier
+            .offset((-16).dp)
+            .fillMaxWidth()
+            .onFocusChanged { focus = it.isFocused },
+        colors = transparentTextFieldColors(),
+        textStyle = typography.headlineLarge,
+        placeholder = {
+            Row(Modifier, Center, CenterVertically) {
+                Text(
+                    stringResource(R.string.user_name),
+                    Modifier.padding(end = 8.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineLarge
+                )
+                Icon(
+                    painterResource(R.drawable.ic_edit),
+                    (null), Modifier.padding(top = 4.dp),
+                    colorScheme.onTertiary
+                )
+            }
+        },
+        keyboardActions = KeyboardActions {
+            focusManager.clearFocus()
+            onSaveUsername()
+        },
+        keyboardOptions = Default.copy(
+            imeAction = Done, keyboardType = Text,
+            capitalization = Sentences
+        ), singleLine = true,
+        visualTransformation = transformationOf(
+            CharArray(text.length) { '#' }
+                .concatToString(), if(
+                userAge in 18..99 && !focus
+            ) ", $userAge" else ""
         )
-    }
+    )
 }
 
 @Composable
@@ -223,6 +248,7 @@ private fun Description(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
+    onSaveDescription: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager =
@@ -234,24 +260,26 @@ private fun Description(
             style = typography.labelLarge
         )
         GTextField(
-            text, { onTextChange(it) },
-            Modifier
+            text, { onTextChange(it) }, Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            readOnly = (profileType == ORGANIZER),
+            textOffset = true,
+            readOnly = (profileType == ORGANIZER
+                    || profileType == ANONYMOUS_ORGANIZER),
             shape = shapes.large, colors = textFieldColors(),
             textStyle = typography.bodyMedium,
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
+                onSaveDescription()
             }, keyboardOptions = Default.copy(
-                imeAction = Done, keyboardType = Text
-            ), placeholder = {
-                Text(
-                    stringResource(R.string.about_me_placeholder),
-                    color = colorScheme.onTertiary,
-                    style = typography.bodyMedium
+                imeAction = Done, keyboardType = Text,
+                capitalization = Sentences
+            ), placeholder = textFieldLabel(
+                (false), stringResource(R.string.about_me_placeholder),
+                holderFont = typography.bodyMedium.copy(
+                    colorScheme.onTertiary,
                 )
-            }
+            )
         )
     }
 }

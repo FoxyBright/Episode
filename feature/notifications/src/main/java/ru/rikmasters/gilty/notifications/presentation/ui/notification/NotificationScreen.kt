@@ -1,159 +1,153 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.notifications.presentation.ui.responds.NotificationRespondsContent
-import ru.rikmasters.gilty.notifications.presentation.ui.responds.NotificationRespondsState
-import ru.rikmasters.gilty.shared.common.RespondCallback
-import ru.rikmasters.gilty.shared.common.extentions.MeetSeparate
+import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
+import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.notification.DemoNotificationLeaveEmotionModel
-import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondModelWithoutPhoto
-import ru.rikmasters.gilty.shared.model.notification.DemoReceivedRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.DemoTodayNotificationRespondAccept
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Composable
-fun NotificationsScreen(nav: NavState = get()) {
-    GiltyTheme {
-        val asm = get<AppStateModel>()
-        val scope = rememberCoroutineScope()
-        val context = LocalContext.current
-        var activeNotification by
-        remember { mutableStateOf<NotificationModel?>(null) }
-        var blur by remember { mutableStateOf(true) }
-        val notificationsList = remember {
-            mutableStateListOf(
-                DemoNotificationLeaveEmotionModel,
-                DemoNotificationMeetingOverModel,
-                DemoTodayNotificationRespondAccept,
-                DemoNotificationMeetingOverModel,
-                DemoTodayNotificationRespondAccept,
-                DemoTodayNotificationRespondAccept,
-                DemoNotificationMeetingOverModel,
-            )
-        }
-        val stateList = remember {
-            mutableStateListOf(INACTIVE, ACTIVE, INACTIVE, INACTIVE, INACTIVE)
-        }
-        val memberList by
-        remember { mutableStateOf(listOf(DemoMemberModel, DemoMemberModel)) }
-        val memberListWrap =
-            remember { mutableStateListOf<Boolean>() }
-        val respondsList =
-            remember {
-                mutableStateListOf(
-                    DemoReceivedRespondModelWithoutPhoto,
-                    DemoReceivedRespondsModel
-                )
-            }
-        val respondListStates =
-            remember { mutableStateListOf<Boolean>() }
-        repeat(respondsList.size) {
-            if (it == 0) respondListStates.add(true) else
-                respondListStates.add(false)
-        }
-        val notificationCallback = object : RespondCallback {
-            override fun onCancelClick(respond: RespondModel) {
-                respondsList.remove(respond)
-                Toast.makeText(
-                    context, "Втреча отклонена",
-                    Toast.LENGTH_SHORT
-                ).show()
-                if (respondsList.size == 0)
-                    scope.launch { asm.bottomSheet.collapse() }
-            }
-
-            override fun onArrowClick(index: Int) {
-                respondListStates[index] = !respondListStates[index]
-            }
-
-            override fun onAcceptClick(respond: RespondModel) {
-                respondsList.remove(respond)
-                Toast.makeText(
-                    context, "Втреча принята",
-                    Toast.LENGTH_SHORT
-                ).show()
-                if (respondsList.size == 0)
-                    scope.launch { asm.bottomSheet.collapse() }
+fun NotificationsScreen(vm: NotificationViewModel) {
+    
+    val listState = rememberLazyListScrollState("notifications")
+    val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val context = LocalContext.current
+    val nav = get<NavState>()
+    
+    val notifications = vm.notifications.collectAsLazyPagingItems()
+    val participants = vm.participants.collectAsLazyPagingItems()
+    val participantsStates by vm.participantsStates.collectAsState()
+    val selected by vm.selectedNotification.collectAsState()
+    val lastRespond by vm.lastRespond.collectAsState()
+    val ratings by vm.ratings.collectAsState()
+    val blur by vm.blur.collectAsState()
+    
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val navBar = remember {
+        mutableListOf(
+            INACTIVE, ACTIVE, INACTIVE,
+            unreadMessages, INACTIVE
+        )
+    }
+    
+    LaunchedEffect(Unit) {
+        vm.getRatings()
+        vm.getLastResponse()
+        context.listenPreference(
+            key = "unread_messages",
+            defValue = 0
+        ) {
+            scope.launch {
+                vm.setUnreadMessages(it > 0)
             }
         }
-
-        repeat(memberList.size) { memberListWrap.add(false) }
-        NotificationsContent(
-            NotificationsState(
-                notificationsList,
-                DemoMeetingModel, respondsList.size, stateList,
-                blur, activeNotification, memberList, memberListWrap
-            ), Modifier, object : NotificationsCallback {
-                override fun onClick(notification: NotificationModel) {
-                    activeNotification = notification; blur = true
-                }
-
-                override fun onParticipantClick(index: Int) {
-                    memberListWrap[index] = !memberListWrap[index]
-                }
-
-                override fun onBlurClick() {
-                    blur = false
-                }
-
-                override fun onEmojiClick(emoji: EmojiModel) {
-                    Toast.makeText(context, "Emoji!", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onNavBarSelect(point: Int) {
-                    repeat(stateList.size) {
-                        if (it == point) stateList[it] = ACTIVE
-                        else if (stateList[it] != NEW)
-                            stateList[it] = INACTIVE
-                        when (point) {
-                            0 -> nav.navigateAbsolute("main/meetings")
-                            1 -> nav.navigateAbsolute("notification/list")
-                            2 -> nav.navigateAbsolute("addmeet/category")
-                            3 -> nav.navigateAbsolute("chats/main")
-                            4 -> nav.navigateAbsolute("profile/main")
-                        }
-                    }
-                }
-
-                override fun onRespondsClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            NotificationRespondsContent(
-                                NotificationRespondsState(
-                                    MeetSeparate(respondsList),
-                                    respondListStates
-                                ), Modifier, notificationCallback
+    }
+    
+    NotificationsContent(
+        NotificationsState(
+            notifications, lastRespond,
+            navBar, blur, selected,
+            participants, participantsStates,
+            listState, ratings
+        ), Modifier, object: NotificationsCallback {
+            
+            override fun onEmojiClick(
+                notification: NotificationModel,
+                emoji: EmojiModel,
+                userId: String?,
+            ) {
+                scope.launch {
+                    selected?.let {
+                        if(notification.feedback?.ratings == null) {
+                            vm.emojiClick(
+                                emoji,
+                                notification.parent.meeting?.id ?: "",
+                                userId ?: ""
                             )
                         }
+                        vm.forceRefresh()
+                    } ?: run {
+                        vm.selectNotification(notification)
+                        vm.blur(true)
                     }
                 }
-
-                override fun onSwiped(notification: NotificationModel) {
-                    if (notificationsList.contains(notification))
-                        notificationsList.remove(notification)
+            }
+            
+            override fun onMeetClick(meet: MeetingModel?) {
+                scope.launch {
+                    meet?.let { m ->
+                        asm.bottomSheet.expand {
+                            BottomSheet(vm.scope, MEET, m.id)
+                        }
+                    }
                 }
-            })
-    }
+            }
+            
+            override fun onUserClick(
+                user: UserModel?,
+                meet: MeetingModel?,
+            ) {
+                scope.launch {
+                    user?.id?.let { u ->
+                        asm.bottomSheet.expand {
+                            BottomSheet(vm.scope, USER, meet?.id, u)
+                        }
+                    }
+                }
+            }
+            
+            override fun onBlurClick() {
+                scope.launch {
+                    vm.blur(false)
+                    vm.clearSelectedNotification()
+                }
+            }
+            
+            override fun onNavBarSelect(point: Int) {
+                if(point == 1) return
+                scope.launch {
+                    nav.navigateAbsolute(
+                        vm.navBarNavigate(point)
+                    )
+                }
+            }
+            
+            override fun onRespondsClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        BottomSheet(vm.scope, RESPONDS)
+                    }
+                }
+            }
+            
+            override fun onSwiped(notification: NotificationModel) {
+                scope.launch { vm.swipeNotification(notification) }
+            }
+            
+            override fun onParticipantClick(index: Int) {
+                scope.launch { vm.selectParticipants(index) }
+            }
+            
+            override fun onListUpdate() {
+                scope.launch { vm.forceRefresh() }
+            }
+        }
+    )
 }

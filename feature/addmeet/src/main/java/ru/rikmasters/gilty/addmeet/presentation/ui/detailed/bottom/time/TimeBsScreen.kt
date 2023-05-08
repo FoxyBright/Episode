@@ -4,25 +4,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 
 @Composable
 fun TimeBs(vm: TimeBsViewModel) {
     
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
     
-    val date by vm.date.collectAsState()
-    val hour by vm.hour.collectAsState()
+    val online by vm.online.collectAsState()
     val minute by vm.minute.collectAsState()
+    val hour by vm.hour.collectAsState()
+    val date by vm.date.collectAsState()
     
     DateTimeBS(
         DateTimeBSState(
-            date, hour,
-            minute, Online
+            date, hour, minute, online, vm.isActive()
         ), Modifier, object: DateTimeBSCallback {
+            
             override fun dateChange(it: String) {
                 scope.launch { vm.changeDate(it) }
             }

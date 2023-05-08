@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,13 +39,12 @@ fun PhoneTextField(
     country: Country,
     modifier: Modifier = Modifier,
     onClear: () -> Unit,
-    onValueChanged: (String) -> Unit
+    onValueChanged: (String) -> Unit,
 ) {
     val dial = country.phoneDial
     val mask = remember(country.phoneMask, dial) {
         country.phoneMask.replace(
-            dial,
-            dial.replace(Regex("\\d"), "#")
+            dial, dial.replace(Regex("\\d"), "#")
         )
     }
     val length = remember(mask) {
@@ -75,6 +75,7 @@ fun PhoneTextField(
         ),
         visualTransformation = transform,
         clear = onClear,
-        singleLine = true
+        singleLine = true,
+        containerColor = Color.Transparent
     )
 }

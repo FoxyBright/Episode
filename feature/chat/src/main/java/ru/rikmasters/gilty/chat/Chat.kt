@@ -3,11 +3,18 @@ package ru.rikmasters.gilty.chat
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
-import ru.rikmasters.gilty.chat.presentation.ui.chat.chatInstance.ChatScreen
+import org.koin.core.module.dsl.singleOf
+import ru.rikmasters.gilty.chat.presentation.ui.chat.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
-import ru.rikmasters.gilty.chat.presentation.ui.photoView.PhotoViewScreen
+import ru.rikmasters.gilty.chat.viewmodel.*
+import ru.rikmasters.gilty.chats.ChatData
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.profile.ProfileData
+import ru.rikmasters.gilty.profile.ProfileManager
 
 object Chat: FeatureDefinition() {
     
@@ -15,34 +22,31 @@ object Chat: FeatureDefinition() {
         
         nested("chats", "main") {
             
-            screen("main") { ChatListScreen() }
-            
-            screen(
-                "chat?type={type}", listOf(
-                    navArgument("type") {
-                        type = NavType.StringType; defaultValue = ""
-                    })
-            ) {
-                it.arguments?.getString("type")?.let { type ->
-                    ChatScreen(type)
-                }
+            screen<ChatListViewModel>("main") { vm, _ ->
+                ChatListScreen(vm)
             }
             
-            screen("photo?image={image}&type={type}", listOf(  //TODO Убрать лишние аргументы
-                navArgument("image") {
-                    type = NavType.StringType; defaultValue = ""
-                }, navArgument("type") {
-                    type = NavType.IntType; defaultValue = 0
-                }
-            )) {
-                it.arguments?.getInt("type")?.let { type ->
-                    it.arguments?.getString("image")?.let { image ->
-                        PhotoViewScreen(image, type)
-                    }
+            screen<ChatViewModel>(
+                route = "chat?id={id}",
+                arguments = listOf(navArgument("id")
+                { type = NavType.StringType; defaultValue = "" })
+            ) { vm, it ->
+                it.arguments?.getString("id")?.let { id ->
+                    ChatScreen(vm, id)
                 }
             }
         }
     }
     
-    override fun Module.koin() {}
+    override fun Module.koin() {
+        singleOf(::ChatManager)
+        singleOf(::ProfileManager)
+        singleOf(::MeetingManager)
+        singleOf(::ChatViewModel)
+        singleOf(::ChatListViewModel)
+        singleOf(::GalleryViewModel)
+        singleOf(::HiddenBsViewModel)
+    }
+    
+    override fun include() = setOf(ChatData, ProfileData, MeetingsData)
 }

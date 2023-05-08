@@ -29,7 +29,11 @@ data class ExtraColors(
     val chatBack: Color = Color.Unspecified,
     val meetButtonColors: Color = Color.Unspecified,
     val meetCardShadow: Color = Color.Unspecified,
-    val meetTransparencyCircleColor: Color = Color.Unspecified,
+    val meetCloseCircleColor: Color = Color.Unspecified,
+    val meetCloseCrossColor: Color = Color.Unspecified,
+    val meetCardPlaceHolder: Color = Color.Unspecified,
+    val notificationCloud: Color = Color.Unspecified,
+    val meetingTransparencyShape: Color = Color.Unspecified,
     
     // Categories Colors
     val sport: Color = Color.Unspecified,
@@ -75,7 +79,11 @@ val LightExtraColors = ExtraColors(
     chatBack = Colors.BlackerWhite,
     meetButtonColors = Colors.DoubleAddWhite,
     meetCardShadow = Colors.WhiteShadow,
-    meetTransparencyCircleColor = Colors.RatGray,
+    meetCloseCircleColor = Colors.White,
+    meetCloseCrossColor = Colors.RatGray,
+    meetCardPlaceHolder = Colors.NickelGray,
+    notificationCloud = Colors.Gray,
+    meetingTransparencyShape = Colors.halfTransparentlyGray,
     
     // Categories Colors
     sport = Colors.Orange,
@@ -108,7 +116,7 @@ val DarkExtraColors = ExtraColors(
     lockColors = Colors.lockColors,
     lockColorsBackground = Colors.lockColorsBackgroundNight,
     meetingCardBackBackground = Colors.meetingCardBackBackgroundNight,
-    navBarActiveBackground = Colors.AlmostDark,
+    navBarActiveBackground = Colors.LightPink,
     navBarActive = Colors.White,
     navBarInactive = Colors.Zircon,
     navBarAddButton = Colors.White,
@@ -121,7 +129,11 @@ val DarkExtraColors = ExtraColors(
     chatBack = Colors.Black,
     meetButtonColors = Colors.Lead,
     meetCardShadow = Colors.DarkShadow,
-    meetTransparencyCircleColor = Colors.RatGray,
+    meetCloseCircleColor = Colors.RatGray,
+    meetCloseCrossColor = Colors.White,
+    meetCardPlaceHolder = Colors.NickelDarkGray,
+    notificationCloud = Colors.NickelDarkGray,
+    meetingTransparencyShape = Colors.halfTransparentlyGray,
     
     // Categories Colors
     sport = Colors.DarkOrange,

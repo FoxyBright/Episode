@@ -7,7 +7,16 @@ data class TagModel(
     val id: String,
     
     val title: String,
-)
+) {
+    
+    constructor(): this(
+        "", ""
+    )
+    
+    constructor(name: String): this(
+        name, name
+    )
+}
 
 val DemoTag = TagModel(
     UUID.randomUUID().toString(),

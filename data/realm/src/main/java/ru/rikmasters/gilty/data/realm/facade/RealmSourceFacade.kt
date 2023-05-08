@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import ru.rikmasters.gilty.core.data.entity.interfaces.DbEntity
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.core.data.source.DbSource
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.realm.container.RealmContainerSource
 import ru.rikmasters.gilty.data.realm.`object`.RealmSource
 import kotlin.reflect.KClass
@@ -111,7 +110,7 @@ class RealmSourceFacade(
             { containerSource.deleteAll(it) }
         )
     
-    override fun <T: DomainEntity> listenAll(domainClass: KClass<T>): Flow<List<T>> =
+    override fun <T : DomainEntity> listenAll(domainClass: KClass<T>): Flow<List<T>> =
         domainClass.ifRealmOrElse(
             { objectSource.listenAll(it) },
             { containerSource.listenAll(it) }

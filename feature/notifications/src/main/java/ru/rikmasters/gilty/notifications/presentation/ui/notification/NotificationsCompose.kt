@@ -1,129 +1,218 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.lazy.*
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.notifications.presentation.ui.item.Item
-import ru.rikmasters.gilty.notifications.presentation.ui.item.NotificationItemState
-import ru.rikmasters.gilty.notifications.presentation.ui.item.NotificationsByDateSeparator
+import androidx.paging.LoadState
+import androidx.paging.LoadState.Loading
+import androidx.paging.LoadState.NotLoading
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
+import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.BackBlur
 import ru.rikmasters.gilty.shared.common.Responds
-import ru.rikmasters.gilty.shared.common.extentions.DragRowState
-import ru.rikmasters.gilty.shared.common.extentions.getDifferenceOfTime
-import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
+import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
-import ru.rikmasters.gilty.shared.model.notification.*
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
-import ru.rikmasters.gilty.shared.shared.NavBar
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import ru.rikmasters.gilty.shared.model.notification.DemoNotificationMeetingOverModel
+import ru.rikmasters.gilty.shared.model.notification.DemoNotificationModelList
+import ru.rikmasters.gilty.shared.model.notification.NotificationModel
+import ru.rikmasters.gilty.shared.model.profile.DemoRatingModelList
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import java.util.*
 
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 @Composable
 private fun NotificationsContentPreview() {
     GiltyTheme {
-        val list = listOf(
-            DemoNotificationLeaveEmotionModel,
-            DemoNotificationMeetingOverModel,
-            DemoTodayNotificationRespondAccept,
-            DemoTodayNotificationMeetingOver,
-        )
-        NotificationsContent(
-            NotificationsState(
-                list, DemoMeetingModel,
-                (3), listOf(), true,
-                DemoNotificationLeaveEmotionModel,
-                listOf(), listOf()
+        Box(
+            Modifier.background(
+                colorScheme.background
             )
-        )
+        ) {
+            NotificationsContent(
+                NotificationsState(
+                    pagingPreview(DemoNotificationModelList),
+                    Pair((3), ""), listOf(), (false),
+                    DemoNotificationMeetingOverModel,
+                    pagingPreview(DemoUserModelList),
+                    listOf(), LazyListState(),
+                    DemoRatingModelList
+                )
+            )
+        }
     }
 }
 
-interface NotificationsCallback {
-    
-    fun onClick(notification: NotificationModel) {}
-    fun onSwiped(notification: NotificationModel) {}
-    fun onEmojiClick(emoji: EmojiModel) {}
-    fun onRespondsClick() {}
-    fun onBlurClick() {}
-    fun onParticipantClick(index: Int) {}
-    fun onNavBarSelect(point: Int) {}
+@Preview
+@Composable
+private fun NotificationsBlurPreview() {
+    GiltyTheme {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            NotificationsContent(
+                NotificationsState(
+                    pagingPreview(DemoNotificationModelList),
+                    Pair((3), ""), listOf(), (true),
+                    DemoNotificationMeetingOverModel,
+                    pagingPreview(DemoUserModelList),
+                    listOf(), LazyListState(),
+                    DemoRatingModelList
+                )
+            )
+        }
+    }
 }
 
 data class NotificationsState(
-    val notificationsList: List<NotificationModel> = listOf(),
-    val lastRespond: MeetingModel,
-    val myResponds: Int = 0,
-    val stateList: List<NavIconState>,
-    val blur: Boolean = false,
-    val activeNotification: NotificationModel? = null,
-    val participants: List<MemberModel>,
-    val participantsWrap: List<Boolean>
+    val notifications: LazyPagingItems<NotificationModel>,
+    val lastRespond: Pair<Int, String>,
+    val navBar: List<NavIconState>,
+    val blur: Boolean,
+    val activeNotification: NotificationModel?,
+    val participants: LazyPagingItems<UserModel>,
+    val participantsStates: List<Int>,
+    val listState: LazyListState,
+    val ratings: List<RatingModel>,
 )
 
+interface NotificationsCallback {
+    
+    fun onSwiped(notification: NotificationModel)
+    fun onMeetClick(meet: MeetingModel?)
+    fun onUserClick(
+        user: UserModel?,
+        meet: MeetingModel? = null,
+    )
+    
+    fun onRespondsClick()
+    fun onBlurClick()
+    fun onParticipantClick(index: Int)
+    fun onNavBarSelect(point: Int)
+    fun onListUpdate()
+    fun onEmojiClick(
+        notification: NotificationModel,
+        emoji: EmojiModel,
+        userId: String?,
+    )
+}
+
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun NotificationsContent(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    callback: NotificationsCallback? = null
+    callback: NotificationsCallback? = null,
+) {
+    Scaffold(
+        modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+        topBar = {
+            Text(
+                stringResource(R.string.notification_screen_name),
+                Modifier.padding(
+                    start = 16.dp,
+                    top = 80.dp,
+                    bottom = 10.dp
+                ), colorScheme.tertiary,
+                style = typography.titleLarge
+            )
+        }, bottomBar = {
+            NavBar(
+                state.navBar,
+                Modifier
+            ) { callback?.onNavBarSelect(it) }
+        }
+    ) { padding ->
+        Box(Modifier.padding(padding)) {
+            Use<NotificationViewModel>(PullToRefreshTrait) {
+                Notifications(
+                    state, Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    callback
+                )
+            }
+        }
+    }
+    state.activeNotification?.let {
+        if(state.blur) BackBlur(
+            Modifier.clickable {
+                callback?.onBlurClick()
+            }, radius = 25
+        ) {
+            ObserveNotification(
+                ObserveNotificationState(
+                    it,
+                    state.participants,
+                    state.participantsStates,
+                    (it.feedback?.ratings?.map {
+                        it.emoji
+                    } ?: state.ratings.map { it.emoji })
+                ), Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 84.dp)
+                    .align(TopCenter),
+                callback
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyNotification(
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .background(MaterialTheme.colorScheme.background)
+            .padding(top = 56.dp),
+        Top, CenterHorizontally
     ) {
-        Text(
-            stringResource(R.string.notification_screen_name),
-            Modifier.padding(top = 80.dp, bottom = 10.dp),
-            MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.titleLarge
+        Image(
+            painterResource(
+                if((isSystemInDarkTheme())) {
+                    R.drawable.notify_dog_dark
+                } else R.drawable.notify_dog_light
+            ), (null), Modifier.fillMaxWidth()
         )
-        Notifications(state,
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.90f),
-            { callback?.onClick(it) },
-            { callback?.onRespondsClick() },
-            { callback?.onEmojiClick(it) })
-        { callback?.onSwiped(it) }
-    }
-    Box(Modifier.fillMaxSize()) {
-        NavBar(
-            state.stateList, Modifier.align(Alignment.BottomCenter)
-        ) { callback?.onNavBarSelect(it) }
-    }
-    state.activeNotification?.let {
-        if(state.blur) Box(
-            Modifier
-                .fillMaxSize() /*TODO заменить на блюр*/
-                .background(MaterialTheme.colorScheme.background)
-                .clickable { callback?.onBlurClick() }
-        ) {
-            ObserveNotification(
-                it, state.participants,
-                state.participantsWrap,
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .align(Alignment.Center),
-                { callback?.onParticipantClick(it) }
-            ) { callback?.onEmojiClick(it) }
-        }
+        Text(
+            stringResource(R.string.notification_place_holder),
+            Modifier.padding(top = 26.dp),
+            color = colorScheme.scrim,
+            style = typography.bodyMedium.copy(
+                fontWeight = SemiBold
+            )
+        )
     }
 }
 
@@ -131,66 +220,172 @@ fun NotificationsContent(
 private fun Notifications(
     state: NotificationsState,
     modifier: Modifier = Modifier,
-    onClick: ((NotificationModel) -> Unit)? = null,
-    onRespondsClick: (() -> Unit)? = null,
-    onEmojiClick: ((EmojiModel) -> Unit)? = null,
-    onSwiped: ((NotificationModel) -> Unit)? = null,
+    callback: NotificationsCallback?,
 ) {
-    val separator = NotificationsByDateSeparator(state.notificationsList)
-    val todayList = separator
-        .getTodayList().map { it to rememberDragRowState() }
-    val weekList = separator
-        .getWeekList().map { it to rememberDragRowState() }
-    val earlierList = separator
-        .getEarlyList().map { it to rememberDragRowState() }
-    LazyColumn(modifier) {
-        if(state.myResponds != 0) item {
-            Responds(
-                stringResource(R.string.notification_responds_on_user_meetings),
-                state.myResponds, state.lastRespond.organizer?.avatar,
-                Modifier.padding(vertical = 12.dp)
-            ) { onRespondsClick?.let { it() } }
-        };if(todayList.isNotEmpty()) {; item { Label(R.string.meeting_profile_bottom_today_label) }
-        itemsIndexed(todayList) { i, not ->
-            Item(i, todayList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
+    val notifications = state.notifications
+    if(LocalInspectionMode.current) PreviewLazy()
+    else LazyColumn(modifier, state.listState) {
+        
+        val hasResponds = state.lastRespond.first > 0
+        val firstItem by lazy {
+            state.notifications.itemSnapshotList.first()
         }
-    }; if(weekList.isNotEmpty()) {; item { Label(R.string.notification_on_this_week_label) }
-        itemsIndexed(weekList) { i, not ->
-            Item(i, weekList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
+        
+        when {
+            notifications.loadState.refresh is LoadState.Error -> {}
+            notifications.loadState.append is LoadState.Error -> {}
+            else -> {
+                if(notifications.loadState.refresh is Loading) {
+                    item { PagingLoader(notifications.loadState) }
+                }
+                
+                val last = state.lastRespond
+                if(hasResponds) item {
+                    Box(Modifier.padding(top = 20.dp)) {
+                        Responds(
+                            last.second, last.first
+                        ) { callback?.onRespondsClick() }
+                    }
+                }
+                val itemCount = notifications.itemCount
+                if(itemCount > 0) {
+                    val todayItems =
+                        notifications.itemSnapshotList.items.filter {
+                            todayControl(it.date)
+                        }
+                    
+                    if(todayItems.isNotEmpty()) {
+                        item {
+                            Label(
+                                R.string.meeting_profile_bottom_today_label,
+                                hasResponds,
+                                (todayItems.first() == firstItem)
+                            )
+                        }
+                        itemsIndexed(todayItems) { count, item ->
+                            ElementNot(
+                                count, todayItems.size,
+                                item, state.ratings,
+                                callback
+                            )
+                        }
+                    }
+                    
+                    val weekItems =
+                        notifications.itemSnapshotList.items.filter {
+                            weekControl(it.date) && !todayControl(it.date)
+                        }
+                    
+                    if(weekItems.isNotEmpty()) {
+                        item {
+                            Label(
+                                R.string.notification_on_this_week_label,
+                                hasResponds,
+                                (weekItems.first() == firstItem)
+                            )
+                        }
+                        itemsIndexed(weekItems) { count, item ->
+                            ElementNot(
+                                count, weekItems.size,
+                                item, state.ratings, callback
+                            )
+                        }
+                    }
+                    
+                    val restItems =
+                        notifications.itemSnapshotList.items.filter {
+                            earlierWeekControl(it.date)
+                        }
+                    
+                    if(restItems.isNotEmpty()) {
+                        item {
+                            Label(
+                                R.string.notification_earlier_label,
+                                hasResponds,
+                                (restItems.first() == firstItem)
+                            )
+                        }
+                        itemsIndexed(state.notifications) { count, item ->
+                            item?.let { not ->
+                                if(earlierWeekControl(not.date)) {
+                                    ElementNot(
+                                        count - todayItems.size - weekItems.size,
+                                        restItems.size, not,
+                                        state.ratings, callback
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    
+                    if(notifications.loadState.append is Loading)
+                        item { PagingLoader(notifications.loadState) }
+                } else if(notifications.loadState.refresh is NotLoading)
+                    item { EmptyNotification() }
+            }
         }
-    }; if(earlierList.isNotEmpty()) {; item { Label(R.string.notification_earlier_label) }
-        itemsIndexed(earlierList) { i, not ->
-            Item(i, earlierList.size, not, { n -> onClick?.let { it(n) } },
-                { e -> onEmojiClick?.let { it(e) } }) { n -> onSwiped?.let { it(n) } }
-        }
-    }; item { Divider(Modifier, 20.dp, Color.Transparent) }
+        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 
 @Composable
-private fun Item(
-    index: Int, size: Int,
-    item: Pair<NotificationModel, DragRowState>,
-    onClick: (NotificationModel) -> Unit,
-    onEmojiClick: (EmojiModel) -> Unit,
-    onSwiped: (NotificationModel) -> Unit,
-) {
-    Item(
-        NotificationItemState(
-            item.first, item.second, lazyItemsShapes(index, size),
-            getDifferenceOfTime(item.first.date)
-        ), Modifier, onClick = { onClick(item.first) },
-        onEmojiClick = { onEmojiClick(it) },
-        onSwiped = { onSwiped(item.first) })
+private fun PreviewLazy() {
+    LazyColumn(
+        Modifier.padding(horizontal = 16.dp)
+    ) {
+        item {
+            Label(
+                R.string.notification_earlier_label,
+                isFirst = true,
+                hasResponds = false
+            )
+        }
+        itemsIndexed(
+            DemoNotificationModelList
+        ) { it, not ->
+            ElementNot(
+                it, (2), not,
+                DemoRatingModelList
+            )
+        }
+    }
 }
 
 @Composable
-private fun Label(text: Int) {
+private fun ElementNot(
+    index: Int, size: Int,
+    item: NotificationModel,
+    ratings: List<RatingModel>,
+    callback: NotificationsCallback? = null,
+) {
+    (item to rememberDragRowState())
+        .let { (not, row) ->
+            NotificationItem(
+                NotificationItemState(
+                    not, row, lazyItemsShapes(index, size),
+                    getDifferenceOfTime(not.date),
+                    (not.feedback?.ratings?.map { it.emoji }
+                        ?: ratings.map { it.emoji })
+                ), Modifier, callback
+            )
+        }
+}
+
+@Composable
+private fun Label(
+    text: Int,
+    hasResponds: Boolean,
+    isFirst: Boolean,
+) {
     Text(
-        stringResource(text), Modifier.padding(vertical = 20.dp),
-        MaterialTheme.colorScheme.tertiary,
-        style = MaterialTheme.typography.labelLarge
+        stringResource(text),
+        Modifier.padding(
+            top = when {
+                hasResponds -> 24
+                isFirst -> 20
+                else -> 28
+            }.dp, bottom = 18.dp
+        ), colorScheme.tertiary,
+        style = typography.labelLarge
     )
 }

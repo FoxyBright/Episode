@@ -1,7 +1,15 @@
 package ru.rikmasters.gilty.shared.model.enumeration
 
 enum class NotificationType {
-    
-    MEETING_OVER, RESPOND_ACCEPT,
-    LEAVE_EMOTIONS,
+    WATCH_MEETING_CREATED,
+    TRANSLATION_STARTED,
+    ADMIN_NOTIFICATION,
+    TRANSLATION_15MIN,
+    MEETING_CANCELED,
+    RESPOND_ACCEPTED,
+    MEETING_KICKED,
+    PHOTO_BLOCKED,
+    MEETING_OVER,
+    RESPOND,
+    WATCH
 }

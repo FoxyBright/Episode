@@ -1,11 +1,12 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.material.icons.Icons.Filled
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
@@ -18,111 +19,96 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush.Companion.linearGradient
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.magnifier
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.Gradients.green
-import ru.rikmasters.gilty.shared.theme.Gradients.red
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.shared.tag.CrossTag
 
 @Composable
-fun Country(
-    country: String,
-    city: String,
-    onCountryClick: () -> Unit,
-    onCityClick: () -> Unit,
-) {
-    Column {
-        CardRow(
-            stringResource(R.string.select_country), country,
-            ThemeExtra.shapes.mediumTopRoundedShape
-        ) { onCountryClick() }
-        Divider(Modifier.padding(start = 16.dp))
-        CardRow(
-            stringResource(R.string.select_city), city,
-            ThemeExtra.shapes.mediumBottomRoundedShape
-        ) { onCityClick() }
-    }
-}
-
-@Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun Category(
     categories: List<CategoryModel>,
-    categoryStatus: List<Boolean>,
-    onCategoryClick: (selected: Int) -> Unit,
+    states: List<Int>,
+    selected: List<CategoryModel>,
+    onCategoryClick: (Int, CategoryModel) -> Unit,
+    onSubClick: (CategoryModel) -> Unit,
     onAllCategoryClick: () -> Unit,
 ) {
     categories.forEachIndexed { index, category ->
         Card(
+            { onCategoryClick(index, category) },
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp)
-                .clickable { onCategoryClick(index) },
-            shapes.large,
-            cardColors(colorScheme.primaryContainer),
+                .padding(bottom = 12.dp),
+            shape = shapes.large,
+            colors = cardColors(colorScheme.primaryContainer),
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp),
                 SpaceBetween, CenterVertically
             ) {
-                Row {
+                Row(Modifier, Start, CenterVertically) {
                     GEmojiImage(
                         category.emoji,
                         Modifier.size(20.dp)
                     )
                     Text(
                         category.name,
-                        Modifier.padding(start = 18.dp),
+                        Modifier
+                            .padding(start = 18.dp)
+                            .padding(vertical = 16.dp),
                         colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                 }
-                Icon(
+                if(!category.children.isNullOrEmpty()) Icon(
                     Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    tint = colorScheme.onTertiary
+                    (null), Modifier.size(28.dp),
+                    colorScheme.onTertiary
+                )
+                else if(selected.contains(category)) Image(
+                    painterResource(R.drawable.enabled_check_box),
+                    (null), Modifier.size(32.dp)
                 )
             }
-            category.children?.let {
-                if(categoryStatus[index]) {
-                    Divider(); FlowLayout(
-                        Modifier
-                            .background(colorScheme.primaryContainer)
-                            .padding(top = 16.dp)
-                            .padding(horizontal = 8.dp), 8.dp, 8.dp
-                    ) {
-                        it.forEach { category ->
-                            GiltyChip(
-                                Modifier,
-                                category.name,
-                                false
-                            ) { /*TODO: Выбор подкатегорий*/ }
-                        }
+            if(!category.children.isNullOrEmpty()
+                && states.contains(index)
+            ) {
+                GDivider(); FlowLayout(
+                    Modifier
+                        .background(colorScheme.primaryContainer)
+                        .padding(top = 16.dp, bottom = 4.dp)
+                        .padding(horizontal = 16.dp),
+                    12.dp, 12.dp
+                ) {
+                    category.children.forEach { sub ->
+                        GChip(
+                            Modifier, sub.name,
+                            selected.contains(sub)
+                        ) { onSubClick(sub) }
                     }
                 }
             }
         }
     }
     Card(
-        Modifier
-            .clickable {
-                onAllCategoryClick()
-            },
+        Modifier.clickable { onAllCategoryClick() },
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
@@ -130,7 +116,7 @@ fun Category(
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            SpaceBetween
+            SpaceBetween, CenterVertically
         ) {
             Text(
                 stringResource(R.string.meeting_filter_show_all_categories),
@@ -140,7 +126,7 @@ fun Category(
             )
             Icon(
                 Filled.KeyboardArrowRight,
-                stringResource(R.string.next_button),
+                (null),Modifier.size(28.dp),
                 tint = colorScheme.onTertiary
             )
         }
@@ -148,11 +134,11 @@ fun Category(
 }
 
 @Composable
-fun TagSearch(
-    tagList: List<String>,
+fun Tags(
+    tagList: List<TagModel>,
     onClick: () -> Unit,
     online: Boolean = false,
-    onDeleteTag: (Int) -> Unit,
+    onDeleteTag: (TagModel) -> Unit,
 ) {
     Card(
         Modifier
@@ -171,51 +157,31 @@ fun TagSearch(
                     painterResource(magnifier),
                     stringResource(R.string.search_placeholder),
                     Modifier.size(20.dp),
-                    colorScheme.onTertiary
+                    colorScheme.scrim
                 )
                 Text(
                     stringResource(R.string.meeting_filter_add_tag_text_holder),
                     Modifier.padding(start = 12.dp),
-                    colorScheme.onTertiary,
+                    colorScheme.scrim,
                     style = typography.bodyMedium,
-                    fontWeight = Bold
+                    fontWeight = W700
                 )
             }
         else FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(horizontal = 8.dp), 8.dp, 8.dp
+                .padding(top = 12.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
-            tagList.forEachIndexed { index, item ->
-                Box(
-                    Modifier
-                        .clip(shapes.large)
-                        .background(linearGradient(if(online) green() else red()))
-                ) {
-                    Row(
-                        Modifier.padding(12.dp, 6.dp),
-                        Arrangement.Center, CenterVertically
-                    ) {
-                        Text(
-                            item,
-                            Modifier.padding(end = 10.dp),
-                            Color.White,
-                            style = typography.labelSmall
-                        )
-                        Icon(
-                            Filled.Close,
-                            stringResource(R.string.meeting_filter_delete_tag_label),
-                            Modifier.clickable { onDeleteTag(index) },
-                            Color.White
-                        )
-                    }
+            tagList.forEach {
+                CrossTag(it, online) {
+                    onDeleteTag(it)
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun Distance(
@@ -251,9 +217,12 @@ fun Distance(
                         .background(colorScheme.primary)
                 ) {
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, distance),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            distance
+                        ),
                         Modifier.padding(12.dp, 6.dp),
-                        Color.White,
+                        White,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
@@ -261,14 +230,15 @@ fun Distance(
                 Icon(
                     if(state) Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
-                    stringResource(R.string.next_button),
-                    Modifier.padding(horizontal = 16.dp),
+                    (null), Modifier
+                        .padding(horizontal = 16.dp)
+                        .size(28.dp),
                     colorScheme.onTertiary
                 )
             }
         }
         if(state) {
-            Divider()
+            GDivider()
             Column {
                 Slider(
                     distance.toFloat(),
@@ -291,13 +261,19 @@ fun Distance(
                     SpaceBetween
                 ) {
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, 1),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            1
+                        ),
                         color = colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
                     )
                     Text(
-                        stringResource(R.string.meeting_filter_label_distance, 50),
+                        stringResource(
+                            R.string.meeting_filter_label_distance,
+                            50
+                        ),
                         color = colorScheme.tertiary,
                         style = typography.bodyMedium,
                         fontWeight = SemiBold
@@ -312,7 +288,7 @@ fun Distance(
 fun MeetingType(
     checkState: Boolean,
     selected: List<Int>,
-    CheckLabel: String,
+    checkLabel: String,
     online: Boolean = false,
     onOnlyOnlineClick: (Boolean) -> Unit,
     onMeetingTypeSelect: (Int) -> Unit,
@@ -325,11 +301,12 @@ fun MeetingType(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
             repeat(types.size) {
-                GiltyChip(
+                GChip(
                     Modifier, types[it].displayShort,
                     selected.contains(it), online
                 ) { onMeetingTypeSelect(it) }
@@ -337,7 +314,7 @@ fun MeetingType(
         }
     }
     CheckBoxCard(
-        CheckLabel,
+        checkLabel,
         Modifier
             .padding(top = 12.dp)
             .fillMaxWidth(), checkState,
@@ -359,14 +336,15 @@ fun ConditionsSelect(
         FlowLayout(
             Modifier
                 .background(colorScheme.primaryContainer)
-                .padding(top = 8.dp)
-                .padding(8.dp), 8.dp, 8.dp
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
         ) {
+            selected.log("THIS IS selected")
             repeat(conditions.size) {
-                GiltyChip(
-                    Modifier,
-                    conditions[it].display,
-                    selected.contains(it), online
+                GChip(
+                    Modifier, conditions[it].display,
+                    selected.log().contains(it.log()).log(), online
                 ) { onConditionSelect(it) }
             }
         }
@@ -374,67 +352,28 @@ fun ConditionsSelect(
 }
 
 @Composable
-fun GenderAndConditions(
-    selectedGenders: List<Boolean>,
-    selectedMeetingTypes: List<Boolean>,
-    onGenderSelect: (Int, Boolean) -> Unit,
-    onConditionSelect: (Int, Boolean) -> Unit,
+fun Conditions(
+    selectedConditions: List<Int>,
+    onConditionSelect: (Int) -> Unit,
 ) {
-    val genderList = listOf(
-        stringResource(R.string.female_sex),
-        stringResource(R.string.male_sex),
-        stringResource(R.string.others_sex)
-    )
-    val conditionList = listOf(
-        stringResource(R.string.meeting_filter_select_meeting_type_free),
-        stringResource(R.string.meeting_filter_select_meeting_type_divide_amount),
-        stringResource(R.string.meeting_filter_select_meeting_type_organizer_pays),
-        stringResource(R.string.meeting_filter_select_meeting_type_paid),
-        stringResource(R.string.meeting_filter_select_meeting_type_does_not_matter)
-    )
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp),
-        shapes.large,
-        cardColors(colorScheme.primaryContainer),
-    ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedGenders.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier,
-                        genderList[index],
-                        item
-                    ) { onGenderSelect(index, item) }
-                }
-            }
-        }
-    }
     Card(
         Modifier.fillMaxWidth(),
         shapes.large,
         cardColors(colorScheme.primaryContainer),
     ) {
-        Surface {
-            FlowLayout(
-                Modifier
-                    .background(colorScheme.primaryContainer)
-                    .padding(top = 8.dp)
-                    .padding(8.dp), 8.dp, 8.dp
-            ) {
-                selectedMeetingTypes.forEachIndexed { index, item ->
-                    GiltyChip(
-                        Modifier,
-                        conditionList[index],
-                        item
-                    ) { onConditionSelect(index, item) }
-                }
+        FlowLayout(
+            Modifier
+                .background(colorScheme.primaryContainer)
+                .padding(top = 16.dp, bottom = 4.dp)
+                .padding(horizontal = 16.dp),
+            12.dp, 12.dp
+        ) {
+            repeat(ConditionType.list.size) {
+                GChip(
+                    Modifier,
+                    ConditionType.list[it].display,
+                    selectedConditions.contains(it)
+                ) { onConditionSelect(it) }
             }
         }
     }

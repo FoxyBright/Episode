@@ -6,16 +6,18 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
@@ -30,14 +32,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
-import ru.rikmasters.gilty.shared.model.enumeration.ConditionType
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
@@ -46,7 +46,6 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
-import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -66,7 +65,7 @@ private fun MeetingCardPreview() {
         ) {
             MeetCard(
                 Modifier.padding(16.dp),
-                MEET, (true), meeting
+                MEET, (true), meeting, (0f), (true)
             )
         }
     }
@@ -82,7 +81,7 @@ private fun EmptyMeetCardPreview() {
                 .background(
                     colorScheme.background
                 )
-        ) { EmptyMeetCard(Modifier.padding(16.dp)) }
+        ) { EmptyCard(Modifier.padding(16.dp)) }
     }
 }
 
@@ -150,54 +149,54 @@ fun CardButton(
 fun MeetingStates(
     modifier: Modifier,
     meet: MeetingModel,
-    small: Boolean = false
+    small: Boolean = false,
 ) {
-    val today = todayControl(meet.dateTime)
+    val today = todayControl(meet.datetime)
+    
+    val dtColor = if(meet.isOnline)
+        listOf(
+            colorScheme.secondary,
+            colorScheme.secondary
+        ) else listOf(
+        meet.category.color,
+        meet.category.color
+    )
+    
+    val dtTextStyle = if(small)
+        typography.displaySmall
+    else typography.labelSmall
+    
+    val iconState = !today &&
+            meet.condition == MEMBER_PAY
+    
+    val iconsSize = if(small) 10.dp else 16.dp
+    
     Box(modifier) {
-        Row(Modifier.align(Alignment.CenterEnd)) {
-            Column(horizontalAlignment = Alignment.End) {
+        Row(Modifier.align(CenterEnd)) {
+            Column(Modifier, Top, End) {
                 DateTimeCard(
-                    meet.dateTime,
-                    if(meet.isOnline) Gradients.green()
-                    else Gradients.red(), today, Modifier,
-                    if(small) typography.displaySmall
-                    else typography.labelSmall
+                    meet.datetime, dtColor,
+                    today, Modifier, dtTextStyle
                 )
-                if(!today && meet.condition
-                    == ConditionType.MEMBER_PAY
-                ) Icons(
-                    Modifier.padding(top = 8.dp), meet,
-                    if(small) 10.dp else 20.dp
-                )
+                if(iconState)
+                    CategoriesListCard(
+                        Modifier.padding(top = 8.dp),
+                        meet, (false), iconsSize
+                    )
             }
-            if(today || meet.condition
-                != ConditionType.MEMBER_PAY
-            ) Icons(
-                Modifier.padding(start = 4.dp), meet,
-                if(small) 10.dp else 20.dp
+            if(!iconState) CategoriesListCard(
+                Modifier.padding(start = 4.dp),
+                meet, (false), iconsSize
             )
         }
     }
 }
 
 @Composable
-private fun Icons(
-    modifier: Modifier,
-    meet: MeetingModel,
-    imageSize: Dp = 20.dp
-) {
-    CategoriesListCard(
-        modifier,
-        meet, (false),
-        imageSize
-    )
-}
-
-@Composable
-fun EmptyMeetCard(
+fun EmptyCard(
     modifier: Modifier = Modifier,
     onMoreClick: (() -> Unit)? = null,
-    onRepeatClick: (() -> Unit)? = null
+    onRepeatClick: (() -> Unit)? = null,
 ) {
     Card(
         modifier, shapes.large,
@@ -290,9 +289,10 @@ fun MeetCard(
     stack: Boolean = true,
     meet: MeetingModel? = null,
     offset: Float = 0f,
+    hasFilters: Boolean = false,
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
-    onSelect: ((DirectionType) -> Unit)? = null
+    onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     Box(modifier) {
         if(type == MEET) Image(
@@ -305,7 +305,8 @@ fun MeetCard(
                 .offset(
                     y = animateDpAsState(
                         if(stack) 16.dp
-                        else 0.dp, tween(800)
+                        else 0.dp,
+                        tween(800)
                     ).value
                 )
         )
@@ -314,37 +315,61 @@ fun MeetCard(
                 .fillMaxSize()
                 .clip(shapes.large)
         ) {
-            when(type) {
-                EMPTY -> {
-                    EmptyTop(
-                        Modifier
-                            .weight(1f)
-                            .offset(y = 24.dp)
-                    )
-                    EmptyBottom(Modifier, {
-                        onRepeatClick?.let { it() }
-                    }) { onMoreClick?.let { it() } }
-                }
-                
-                MEET -> {
-                    meet?.let {
-                        MeetTop(
-                            it.organizer?.avatar, Modifier
-                                .weight(1f)
-                                .offset(y = 24.dp)
-                        )
-                        MeetBottom(it, offset)
-                        { direction -> onSelect?.let { it(direction) } }
-                    }
-                }
-            }
+            if(type == MEET) MeetCard(
+                meet, offset, onSelect
+            ) else EmptyCard(
+                hasFilters, onMoreClick,
+                onRepeatClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyCard(
+    hasFilters: Boolean,
+    onMoreClick: (() -> Unit)?,
+    onRepeatClick: (() -> Unit)?,
+) {
+    Column {
+        EmptyTop(
+            Modifier
+                .weight(1f)
+                .offset(y = 24.dp)
+        )
+        EmptyBottom(
+            Modifier.fillMaxHeight(0.28f),
+            hasFilters,
+            { onRepeatClick?.let { it() } }
+        ) { onMoreClick?.let { it() } }
+    }
+}
+
+@Composable
+private fun MeetCard(
+    meet: MeetingModel?,
+    offset: Float,
+    onSelect: ((DirectionType) -> Unit)?,
+) {
+    meet?.let {
+        Box {
+            MeetTop(
+                it.organizer?.avatar,
+                Modifier
+                    .clip(ThemeExtra.shapes.bigTopShapes)
+                    .fillMaxSize()
+                    .offset(y = (-24).dp)
+            )
+            MeetBottom(
+                it, offset, Modifier.align(BottomCenter)
+            ) { type -> onSelect?.let { it(type) } }
         }
     }
 }
 
 @Composable
 private fun EmptyTop(
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     AnimatedImage(
         if(isSystemInDarkTheme())
@@ -363,13 +388,13 @@ private fun EmptyTop(
 @Composable
 private fun MeetTop(
     avatar: AvatarModel?,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
-    AsyncImage(
-        avatar?.id, stringResource(R.string.meeting_avatar),
+    GCashedImage(
+        avatar?.thumbnail?.url,
         modifier
             .fillMaxSize()
-            .clip(ThemeExtra.shapes.bigTopShapes),
+            .padding(horizontal = 1.dp),
         contentScale = Crop
     )
 }
@@ -378,7 +403,8 @@ private fun MeetTop(
 private fun MeetBottom(
     meet: MeetingModel,
     offset: Float,
-    onSelect: ((DirectionType) -> Unit)? = null
+    modifier: Modifier = Modifier,
+    onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     val leftSwipe = offset < -(50)
     val rightSwipe = offset > 50
@@ -397,13 +423,16 @@ private fun MeetBottom(
         backColor = back
     }
     Box(
-        Modifier
+        modifier
             .background(
                 colorScheme.primaryContainer,
                 ThemeExtra.shapes.bigShapes
             )
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(
+            Modifier.padding(16.dp),
+            Arrangement.SpaceBetween
+        ) {
             MeetInfo(meet)
             Row(
                 Modifier
@@ -415,17 +444,21 @@ private fun MeetBottom(
                         .weight(1f)
                         .padding(end = 8.dp),
                     stringResource(R.string.not_interesting),
-                    if(leftSwipe) textColor else color,
-                    R.drawable.ic_cancel, if(leftSwipe) backColor else back
+                    color = if(leftSwipe)
+                        textColor else color,
+                    icon = R.drawable.ic_cancel,
+                    background = if(leftSwipe)
+                        backColor else back
                 ) { onSelect?.let { it(LEFT) } }
                 CardButton(
                     Modifier.weight(1f),
                     stringResource(R.string.meeting_respond),
-                    if(rightSwipe) textColor else color,
-                    R.drawable.ic_heart, if(rightSwipe) backColor else back
-                ) {
-                    onSelect?.let { it(RIGHT) }
-                }
+                    color = if(rightSwipe)
+                        textColor else color,
+                    icon = R.drawable.ic_heart,
+                    background = if(rightSwipe)
+                        backColor else back
+                ) { onSelect?.let { it(RIGHT) } }
             }
         }
     }
@@ -434,8 +467,9 @@ private fun MeetBottom(
 @Composable
 private fun EmptyBottom(
     modifier: Modifier,
+    hasFilters: Boolean,
     onRepeatClick: (() -> Unit)? = null,
-    onMoreClick: (() -> Unit)? = null
+    onMoreClick: (() -> Unit)? = null,
 ) {
     Box(modifier.fillMaxWidth()) {
         ShadowBack(Modifier.offset(y = (-30).dp))
@@ -445,7 +479,12 @@ private fun EmptyBottom(
                 ThemeExtra.shapes.bigShapes
             )
         ) {
-            Column(Modifier.padding(16.dp)) {
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(16.dp),
+                Arrangement.SpaceBetween
+            ) {
                 Text(
                     stringResource(R.string.meeting_empty_meet_label),
                     Modifier.fillMaxWidth(),
@@ -465,7 +504,7 @@ private fun EmptyBottom(
                         stringResource(R.string.meeting_repeat_button),
                         colorScheme.primary
                     ) { onRepeatClick?.let { it() } }
-                    CardButton(
+                    if(hasFilters) CardButton(
                         Modifier.weight(1f),
                         stringResource(R.string.meeting_get_more_button),
                         colorScheme.primary
@@ -485,7 +524,9 @@ private fun MeetInfo(meet: MeetingModel) {
         Text(
             meet.title, Modifier.weight(1f),
             colorScheme.tertiary,
-            style = typography.labelLarge
+            style = typography.labelLarge.copy(
+                lineHeight = 30.sp
+            )
         )
         MeetingStates(Modifier.weight(1f), meet)
     }

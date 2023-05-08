@@ -1,30 +1,24 @@
 package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.paging.cachedIn
 import org.koin.core.component.inject
-import ru.rikmasters.gilty.auth.manager.ProfileManager
-import ru.rikmasters.gilty.auth.profile.Image
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
+import ru.rikmasters.gilty.profile.ProfileManager
 
-class HiddenBsViewModel(
-    
-    private val profileVm: UserProfileViewModel
-
-): ViewModel() {
+class HiddenBsViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
     
-    private val _photoList = MutableStateFlow(listOf<Image>())
-    val photoList = _photoList.asStateFlow()
-    
-    suspend fun uploadPhotoList() {
-        _photoList.emit(profileManager.getProfileHiddens())
+    val images by lazy {
+        profileManager.getHiddenPhotos().cachedIn(coroutineScope)
     }
     
-    suspend fun deleteImage(image: Image) {
-        profileManager.deleteHidden(image)
-        uploadPhotoList()
+    suspend fun uploadPhotoList(forceWeb: Boolean = false) {
+        profileManager.getProfileHiddens(forceWeb)
+    }
+    
+    suspend fun deleteImage(imageId: String) {
+        profileManager.deleteHidden(imageId)
+        profileManager.getProfile(true)
     }
 }

@@ -20,11 +20,10 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview
 @Composable
 fun SmallButtonPreview() {
-    GiltyTheme() {
+    GiltyTheme {
         SmallButton(
             stringResource(R.string.notification_respond_accept_button),
-            colorScheme.primary, White,
-            Modifier.padding(6.dp)
+            Modifier.padding(6.dp),
         ) {}
     }
 }
@@ -33,11 +32,11 @@ fun SmallButtonPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 fun SmallButton(
     text: String,
-    color: Color,
-    textColor: Color,
     modifier: Modifier = Modifier,
+    color: Color = colorScheme.primary,
+    textColor: Color = White,
     enabled: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         onClick, modifier, enabled,
@@ -45,8 +44,8 @@ fun SmallButton(
     ) {
         Text(
             text, Modifier.padding(12.dp, 8.dp),
-            textColor, style = typography.bodyMedium,
-            fontWeight = SemiBold
+            textColor, fontWeight = SemiBold,
+            style = typography.bodyMedium
         )
     }
 }

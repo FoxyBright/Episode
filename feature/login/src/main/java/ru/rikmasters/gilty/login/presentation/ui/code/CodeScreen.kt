@@ -14,17 +14,18 @@ import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
 @Composable
 fun CodeScreen(vm: CodeViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
-    val code by vm.code.collectAsState()
-    val blur by vm.blur.collectAsState()
     val focuses by vm.focuses.collectAsState()
+    val blur by vm.blur.collectAsState()
+    val code by vm.code.collectAsState()
     val timer by vm.timer.collectAsState()
     
     LaunchedEffect(Unit) {
-        while(true) { // TODO Пока единственный рабочий метод постоянной работы таймера - исправить
+        vm.firstFocus()
+        while(true) {
             delay(1000L)
             vm.onTimerChange()
         }
@@ -33,38 +34,23 @@ fun CodeScreen(vm: CodeViewModel) {
     CodeContent(
         CodeState(code, focuses, timer, blur),
         Modifier, object: CodeCallback {
-            override fun onBack() {
-                nav.navigationBack()
-            }
-            
-            override fun onBlur() {
-                scope.launch {
-                    vm.onCodeClear()
-                    vm.onBlur(false)
-                }
-            }
-            
-            override fun onCodeSend() {
-                scope.launch {
-                    vm.updateSendCode()
-                }
-            }
             
             override fun onCodeChange(index: Int, text: String) {
                 scope.launch {
                     vm.onCodeChange(index, text)
-        
-                    if(vm.code.value.length == vm.codeLength.value) {
-                        try {
-                            vm.onOtpAuthentication(vm.code.value)
-                            vm.linkExternalToken()
-                            if(vm.isUserRegistered())
-                                nav.navigateAbsolute("main/meetings")
-                            else
-                                nav.navigate("profile")
-                        } catch(_: Exception) {
-                            badCode()
-                        }
+                    
+                    if(vm.code.value.length == vm.codeLength.value) try {
+                        
+                        vm.onOtpAuthentication(vm.code.value)
+                        vm.linkExternalToken()
+                        
+                        if(vm.profileCompleted())
+                            nav.navigateAbsolute("main/meetings")
+                        else
+                            nav.navigate("profile")
+                    } catch(e: Exception) {
+                        e.stackTraceToString()
+                        badCode()
                     }
                 }
             }
@@ -75,5 +61,21 @@ fun CodeScreen(vm: CodeViewModel) {
                     vm.onBlur(true)
                 }
             }
-        })
+            
+            override fun onBlur() {
+                scope.launch {
+                    vm.onCodeClear()
+                    vm.onBlur(false)
+                }
+            }
+            
+            override fun onCodeSend() {
+                scope.launch { vm.updateSendCode() }
+            }
+            
+            override fun onBack() {
+                nav.navigationBack()
+            }
+        }
+    )
 }

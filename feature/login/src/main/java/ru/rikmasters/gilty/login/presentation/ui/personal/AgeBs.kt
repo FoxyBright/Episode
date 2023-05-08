@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.login.viewmodel.AgeBsViewModel
+import ru.rikmasters.gilty.login.viewmodel.bottoms.AgeBsViewModel
 
 @Composable
 fun AgeBs(vm: AgeBsViewModel) {
@@ -13,7 +13,7 @@ fun AgeBs(vm: AgeBsViewModel) {
     val scope = rememberCoroutineScope()
     
     val age by vm.age.collectAsState()
-    val range = 18..99
+    val range = 17..99
     
     AgeBottomSheetContent(age, range, {
         scope.launch { vm.changeAge(it) }

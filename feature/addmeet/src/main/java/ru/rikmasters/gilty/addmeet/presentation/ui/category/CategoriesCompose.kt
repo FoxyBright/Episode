@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Dashes
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
@@ -27,6 +28,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategory: CategoryModel?,
+    val online: Boolean,
     val alert: Boolean = false,
 )
 
@@ -38,43 +40,51 @@ interface CategoriesCallback {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun CategoriesContent(
     modifier: Modifier = Modifier,
     state: CategoriesState,
     callback: CategoriesCallback? = null,
 ) {
-    Column(modifier.fillMaxSize()) {
-        Column(Modifier.weight(1f)) {
+    Scaffold(
+        modifier,
+        topBar = {
             ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
+                Modifier,
                 stringResource(R.string.add_meet_create_description),
-                Modifier, { callback?.onCloseAlert(true) }
+                { callback?.onCloseAlert(true) }
             )
-            if(LocalInspectionMode.current)
-                BubblesForPreview(state, callback)
-            else Bubbles(
-                state.categoryList,
-                CATEGORY_ELEMENT_SIZE.dp,
-                Modifier.padding(top = 8.dp),
-            ) { element ->
-                CategoryItem(
-                    element.name, element.emoji, element.color,
-                    (element == state.selectCategory), modifier
-                ) { callback?.onCategoryClick(element) }
-            }
+        },
+        bottomBar = {
+            Dashes(
+                (4), (0), Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 48.dp)
+                    .padding(horizontal = 16.dp),
+                color = if(state.online)
+                    colorScheme.secondary
+                else colorScheme.primary
+            )
         }
-        Dashes(
-            (4), (0), Modifier
-                .fillMaxWidth()
-                .padding(bottom = 48.dp)
-                .padding(horizontal = 16.dp),
-            color = if(Online)
-                colorScheme.secondary
-            else colorScheme.primary
-        )
+    ) {
+        if(LocalInspectionMode.current)
+            BubblesForPreview(state, callback)
+        else Bubbles(
+            state.categoryList,
+            CATEGORY_ELEMENT_SIZE.dp,
+            Modifier
+                .padding(it)
+                .padding(top = 8.dp),
+        ) { element ->
+            CategoryItem(
+                element.name, element.emoji, element.color,
+                (element == state.selectCategory), modifier
+            ) { callback?.onCategoryClick(element) }
+        }
     }
     CloseAddMeetAlert(
-        state.alert,
+        state.alert, state.online,
         { callback?.onCloseAlert(false) },
         { callback?.onCloseAlert(false); callback?.onClose() })
 }
@@ -121,7 +131,7 @@ private fun CategoriesPreview() {
                 Modifier,
                 CategoriesState(
                     listOf(DemoCategoryModel),
-                    DemoCategoryModel
+                    DemoCategoryModel, (false)
                 )
             )
         }

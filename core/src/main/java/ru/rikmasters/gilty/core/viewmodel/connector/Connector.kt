@@ -34,7 +34,6 @@ fun <T: ViewModel> Connector(
     content: @Composable (T) -> Unit
 ) { Connector(rememberConnectorState(clazz, scope), clazz, content) }
 
-
 @Composable
 fun <T: ViewModel> Connector(
     state: ConnectorState<T>,
@@ -66,6 +65,7 @@ fun <T: ViewModel> Connector(
 }
 
 @Composable
+@Suppress("unused")
 inline fun <reified T: ViewModel> Use(
     vararg traits: TraitWrapperFactory,
     crossinline content: @Composable () -> Unit

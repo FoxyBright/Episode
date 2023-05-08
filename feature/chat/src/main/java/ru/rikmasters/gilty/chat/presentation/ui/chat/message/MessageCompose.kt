@@ -25,30 +25,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R.drawable.ic_reply
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
-import ru.rikmasters.gilty.shared.model.chat.MessageList
+import ru.rikmasters.gilty.shared.model.chat.DemoMessageModelList
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
-import ru.rikmasters.gilty.shared.model.chat.MessageType.MESSAGE
-import ru.rikmasters.gilty.shared.model.chat.MessageType.NOTIFICATION
-import ru.rikmasters.gilty.shared.model.chat.MessageType.WRITING
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
+import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import kotlin.random.Random
 
 @Preview
 @Composable
 fun MessPreview() {
     GiltyTheme {
         LazyColumn {
-            items(MessageList) {
+            items(DemoMessageModelList) {
                 Message(
                     MessState(
-                        it, (false),
+                        it, (Random.nextBoolean()),
                         DragRowState(0f),
                         shapes.large, (true), (false)
                     ),
@@ -86,7 +86,7 @@ interface MessCallBack {
 fun Message(
     state: MessState,
     modifier: Modifier = Modifier,
-    callBack: MessCallBack? = null
+    callBack: MessCallBack? = null,
 ) {
     val message = state.message
     val notification = message.type == NOTIFICATION
@@ -95,10 +95,10 @@ fun Message(
             .swipeableRow(
                 if(message.type == MESSAGE)
                     state.dragState
-                else DragRowState(0f),
-                if(message.type == MESSAGE)
+                else DragRowState(),
+                if(message.type == MESSAGE) {
                     LocalContext.current
-                else null
+                } else null
             ) {
                 callBack?.onSwipe(message)
             },
@@ -115,9 +115,8 @@ fun Message(
             else CenterStart
         ) {
             Content(
-                state, Modifier
-                    .fillMaxWidth(0.8f),
-                callBack
+                state, callBack,
+                Modifier.fillMaxWidth(0.9f)
             )
         }
         if(!notification) Image(
@@ -133,12 +132,12 @@ fun Message(
 @Composable
 private fun Content(
     state: MessState,
+    callback: MessCallBack?,
     modifier: Modifier = Modifier,
-    callback: MessCallBack? = null
 ) {
     val message = state.message
     val sender = state.sender
-    val attach = message.attachments
+    val attach = message.message?.attachments
     Row(
         modifier,
         if(sender) End
@@ -147,8 +146,9 @@ private fun Content(
         if(!state.sender &&
             message.type != NOTIFICATION
             && state.avatar
-        ) AsyncImage(
-            message.sender.avatar.id, (null),
+        ) GCashedImage(
+            message.message?.author?.avatar
+                ?.thumbnail?.url,
             Modifier
                 .padding(end = 6.dp)
                 .size(24.dp)
@@ -174,20 +174,21 @@ private fun Content(
             
             MESSAGE -> {
                 when {
-                    (attach != null) -> Image(
-                        attach.type, message,
+                    (!attach.isNullOrEmpty()) -> Image(
+                        attach.first().type, message,
                         sender, state.shape,
                         state.isOnline, callback,
                     )
                     
-                    (message.answer != null) -> {
-                        message.answer?.let {
-                            Text(
-                                message, sender, state.shape,
-                                state.isOnline, it,
-                            ) { callback?.onAnswerClick(it) }
-                        }
+                    (message.replied != null) -> Text(
+                        message, sender, state.shape,
+                        state.isOnline, message.replied,
+                    ) {
+                        callback?.onAnswerClick(
+                            message.replied ?: MessageModel()
+                        )
                     }
+                    
                     
                     else -> Text(
                         message, sender,
@@ -196,8 +197,6 @@ private fun Content(
                     )
                 }
             }
-            
-            WRITING -> WritingMessage()
         }
     }
 }
@@ -209,7 +208,7 @@ private fun Image(
     sender: Boolean,
     shape: Shape,
     isOnline: Boolean,
-    callback: MessCallBack?
+    callback: MessCallBack?,
 ) {
     when(type) {
         
@@ -221,10 +220,11 @@ private fun Image(
         }
         
         PRIVATE_PHOTO -> {
+            val hide = message.message?.attachments
+            val access = if(hide.isNullOrEmpty()) true
+            else !(hide.first().file?.hasAccess ?: false)
             HiddenImageMessage(
-                Modifier, message, sender,
-                message.attachments
-                    ?.file?.hasAccess ?: false, shape
+                Modifier, message, sender, access, shape
             ) { callback?.onHiddenClick(message) }
         }
         
@@ -239,7 +239,7 @@ private fun Text(
     shape: Shape,
     isOnline: Boolean,
     answer: MessageModel? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     TextMessage(
         message, sender,

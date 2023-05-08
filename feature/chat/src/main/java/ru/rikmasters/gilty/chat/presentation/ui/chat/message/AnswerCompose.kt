@@ -13,22 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.ic_image_empty
-import ru.rikmasters.gilty.shared.R.string.chats_message_answer_photo_label
-import ru.rikmasters.gilty.shared.R.string.chats_message_answer_video_label
-import ru.rikmasters.gilty.shared.R.string.profile_hidden_photo
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PHOTO
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.PRIVATE_PHOTO
-import ru.rikmasters.gilty.shared.model.chat.AttachmentType.VIDEO
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -36,8 +28,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun AnswerLongPreview() {
     GiltyTheme {
         AnswerContent(
-            DemoMessageModelLongMessage,
-            Modifier.padding(16.dp)
+            DemoLongMessageModel,
+            Modifier.padding(16.dp),
+            isOnline = false,
         )
     }
 }
@@ -49,6 +42,7 @@ private fun MyAnswer() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
+            isOnline = false,
             (true), (false)
         )
     }
@@ -59,8 +53,9 @@ private fun MyAnswer() {
 private fun ImageAnswerTextBox() {
     GiltyTheme {
         AnswerContent(
-            DemoImageMessage,
-            Modifier.padding(16.dp)
+            DemoImageMessageModel,
+            Modifier.padding(16.dp),
+            isOnline = true,
         )
     }
 }
@@ -72,7 +67,8 @@ private fun AnswerTextField() {
         AnswerContent(
             DemoMessageModel,
             Modifier.padding(16.dp),
-            textField = true
+            isOnline = false,
+            textField = true,
         )
     }
 }
@@ -81,8 +77,9 @@ private fun AnswerTextField() {
 fun AnswerContent(
     message: MessageModel,
     modifier: Modifier = Modifier,
+    isOnline: Boolean,
     sender: Boolean = false,
-    textField: Boolean = false
+    textField: Boolean = false,
 ) {
     Row(
         modifier, Start,
@@ -92,34 +89,32 @@ fun AnswerContent(
             Modifier
                 .background(
                     if(!sender)
-                        colorScheme.primary
+                        if(isOnline) colorScheme.secondary
+                        else colorScheme.primary
                     else White
                 )
                 .width(1.dp)
                 .height(38.dp)
         )
-        message.attachments?.let {
-            it.file?.let { file ->
-                AsyncImage(
-                    file.id, (null), Modifier
-                        .padding(start = 8.dp)
-                        .size(38.dp)
-                        .clip(shapes.small),
-                    contentScale = Crop,
-                    placeholder = painterResource(
-                        ic_image_empty
-                    )
-                )
-            }
+        val attach = message.message?.attachments
+        if(!attach.isNullOrEmpty()) {
+            GCashedImage(
+                attach.last().file?.thumbnail?.url,
+                Modifier
+                    .padding(start = 8.dp)
+                    .size(38.dp)
+                    .clip(shapes.small),
+                contentScale = Crop,
+            )
         }
-        val user = message.sender.username
+        val user = message.message?.author?.username
         Column(Modifier.padding(start = 12.dp)) {
             Text(
                 if(textField) "${
                     stringResource(R.string.chats_message_answer_recipient)
-                } $user" else user, Modifier,
-                if(!sender) colorScheme.primary
-                else White,
+                } $user" else user ?: "", Modifier,
+                if(!sender) if(isOnline) colorScheme.secondary
+                else colorScheme.primary else White,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             ); Label(message, sender)
@@ -133,17 +128,12 @@ private fun Label(
     sender: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val attach = message.message?.attachments
+    val text = if(!attach.isNullOrEmpty())
+        attach.last().type.value
+    else message.message?.text ?: ""
     Text(
-        text = message.attachments?.let {
-            stringResource(
-                when(it.type) {
-                    PHOTO -> chats_message_answer_photo_label
-                    PRIVATE_PHOTO -> profile_hidden_photo
-                    VIDEO -> chats_message_answer_video_label
-                }
-            )
-        } ?: message.text,
-        modifier,
+        text, modifier,
         if(!sender) colorScheme.onTertiary
         else White,
         overflow = Ellipsis,

@@ -7,8 +7,5 @@ abstract class OfflineFirstRepository<W: WebSource, D: DbSource>(
     
     protected open val webSource: W,
     
-    override val primarySource: D
-    
-): Repository<DbSource>(primarySource) {
-
-}
+    override val primarySource: D,
+): Repository<DbSource>(primarySource)

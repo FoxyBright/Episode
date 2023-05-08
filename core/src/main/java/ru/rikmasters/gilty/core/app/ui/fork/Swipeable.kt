@@ -24,30 +24,19 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Offset.Companion.Zero
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Drag
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -57,10 +46,7 @@ import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.AnimationSpec
 import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.StandardResistanceFactor
 import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.VelocityThreshold
 import ru.rikmasters.gilty.core.app.ui.fork.SwipeableDefaults.resistanceConfig
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.sign
-import kotlin.math.sin
+import kotlin.math.*
 
 /**
  * State of the [swipeable] modifier.
@@ -77,8 +63,9 @@ import kotlin.math.sin
 open class SwipeableState<T>(
     initialValue: T,
     val animationSpec: AnimationSpec<Float> = AnimationSpec,
-    val confirmStateChange: (newValue: T) -> Boolean = { true }
+    val confirmStateChange: (newValue: T) -> Boolean = { true },
 ) {
+    
     /**
      * The current value of the state.
      *
@@ -88,13 +75,13 @@ open class SwipeableState<T>(
      */
     var currentValue: T by mutableStateOf(initialValue)
         private set
-
+    
     /**
      * Whether the state is currently animating.
      */
     var isAnimationRunning: Boolean by mutableStateOf(false)
         private set
-
+    
     /**
      * The current position (in pixels) of the [swipeable].
      *
@@ -102,50 +89,47 @@ open class SwipeableState<T>(
      * use `Modifier.offsetPx`. This includes the resistance by default, if resistance is enabled.
      */
     val offset: State<Float> get() = offsetState
-
+    
     /**
      * The amount by which the [swipeable] has been swiped past its bounds.
      */
     val overflow: State<Float> get() = overflowState
-
+    
     // Use `Float.NaN` as a placeholder while the state is uninitialised.
     private val offsetState = mutableStateOf(0f)
     private val overflowState = mutableStateOf(0f)
-
+    
     // the source of truth for the "real"(non ui) position
     // basically position in bounds + overflow
     private val absoluteOffset = mutableStateOf(0f)
-
+    
     // current animation target, if animating, otherwise null
     private val animationTarget = mutableStateOf<Float?>(null)
-
+    
     var anchors by mutableStateOf(emptyMap<Float, T>())
-
+    
     private val latestNonEmptyAnchorsFlow: Flow<Map<Float, T>> =
         snapshotFlow { anchors }
             .filter { it.isNotEmpty() }
             .take(1)
-
+    
     var minBound = Float.NEGATIVE_INFINITY
     var maxBound = Float.POSITIVE_INFINITY
-
+    
     fun ensureInit(newAnchors: Map<Float, T>) {
-        if (anchors.isEmpty()) {
-            // need to do initial synchronization synchronously :(
-            val initialOffset = newAnchors.getOffset(currentValue)
-            requireNotNull(initialOffset) {
-                "The initial value must have an associated anchor."
-            }
-            offsetState.value = initialOffset
-            absoluteOffset.value = initialOffset
+        if(anchors.isEmpty()) requireNotNull(
+            newAnchors.getOffset(currentValue)
+        ).let {
+            offsetState.value = it
+            absoluteOffset.value = it
         }
     }
-
+    
     suspend fun processNewAnchors(
         oldAnchors: Map<Float, T>,
-        newAnchors: Map<Float, T>
+        newAnchors: Map<Float, T>,
     ) {
-        if (oldAnchors.isEmpty()) {
+        if(oldAnchors.isEmpty()) {
             // If this is the first time that we receive anchors, then we need to initialise
             // the state so we snap to the offset associated to the initial value.
             minBound = newAnchors.keys.minOrNull()!!
@@ -155,7 +139,7 @@ open class SwipeableState<T>(
                 "The initial value must have an associated anchor."
             }
             snapInternalToOffset(initialOffset)
-        } else if (newAnchors != oldAnchors) {
+        } else if(newAnchors != oldAnchors) {
             // If we have received new anchors, then the offset of the current value might
             // have changed, so we need to animate to the new offset. If the current value
             // has been removed from the anchors then we animate to the closest anchor
@@ -164,7 +148,7 @@ open class SwipeableState<T>(
             maxBound = Float.POSITIVE_INFINITY
             val animationTargetValue = animationTarget.value
             // if we're in the animation already, let's find it a new home
-            val targetOffset = if (animationTargetValue != null) {
+            val targetOffset = if(animationTargetValue != null) {
                 // first, try to map old state to the new state
                 val oldState = oldAnchors[animationTargetValue]
                 val newState = newAnchors.getOffset(oldState)
@@ -173,13 +157,13 @@ open class SwipeableState<T>(
             } else {
                 // we're not animating, proceed by finding the new anchors for an old value
                 val actualOldValue = oldAnchors[offset.value]
-                val value = if (actualOldValue == currentValue) currentValue else actualOldValue
+                val value = if(actualOldValue == currentValue) currentValue else actualOldValue
                 newAnchors.getOffset(value) ?: newAnchors
                     .keys.minByOrNull { abs(it - offset.value) }!!
             }
             try {
                 animateInternalToOffset(targetOffset, animationSpec)
-            } catch (c: CancellationException) {
+            } catch(c: CancellationException) {
                 // If the animation was interrupted for any reason, snap as a last resort.
                 snapInternalToOffset(targetOffset)
             } finally {
@@ -189,13 +173,13 @@ open class SwipeableState<T>(
             }
         }
     }
-
+    
     var thresholds: (Float, Float) -> Float by mutableStateOf({ _, _ -> 0f })
-
+    
     var velocityThreshold by mutableStateOf(0f)
-
+    
     var resistance: ResistanceConfig? by mutableStateOf(null)
-
+    
     val draggableState = DraggableState {
         val newAbsolute = absoluteOffset.value + it
         val clamped = newAbsolute.coerceIn(minBound, maxBound)
@@ -205,13 +189,13 @@ open class SwipeableState<T>(
         overflowState.value = overflow
         absoluteOffset.value = newAbsolute
     }
-
+    
     private suspend fun snapInternalToOffset(target: Float) {
         draggableState.drag {
             dragBy(target - absoluteOffset.value)
         }
     }
-
+    
     private suspend fun animateInternalToOffset(target: Float, spec: AnimationSpec<Float>) {
         draggableState.drag {
             var prevValue = absoluteOffset.value
@@ -228,7 +212,7 @@ open class SwipeableState<T>(
             }
         }
     }
-
+    
     /**
      * The target value of the state.
      *
@@ -250,7 +234,7 @@ open class SwipeableState<T>(
             )
             return anchors[target] ?: currentValue
         }
-
+    
     /**
      * Information about the ongoing swipe or animation, if any. See [SwipeProgress] for details.
      *
@@ -263,20 +247,22 @@ open class SwipeableState<T>(
             val from: T
             val to: T
             val fraction: Float
-            when (bounds.size) {
+            when(bounds.size) {
                 0 -> {
                     from = currentValue
                     to = currentValue
                     fraction = 1f
                 }
+                
                 1 -> {
                     from = anchors.getValue(bounds[0])
                     to = anchors.getValue(bounds[0])
                     fraction = 1f
                 }
+                
                 else -> {
                     val (a, b) =
-                        if (direction > 0f) {
+                        if(direction > 0f) {
                             bounds[0] to bounds[1]
                         } else {
                             bounds[1] to bounds[0]
@@ -288,7 +274,7 @@ open class SwipeableState<T>(
             }
             return SwipeProgress(from, to, fraction)
         }
-
+    
     /**
      * The direction in which the [swipeable] is moving, relative to the current [currentValue].
      *
@@ -298,7 +284,7 @@ open class SwipeableState<T>(
     @ExperimentalMaterial3Api
     val direction: Float
         get() = anchors.getOffset(currentValue)?.let { sign(offset.value - it) } ?: 0f
-
+    
     /**
      * Set the state without any animation and suspend until it's set
      *
@@ -315,7 +301,7 @@ open class SwipeableState<T>(
             currentValue = targetValue
         }
     }
-
+    
     /**
      * Set the state to the target value by starting an animation.
      *
@@ -340,7 +326,7 @@ open class SwipeableState<T>(
             }
         }
     }
-
+    
     /**
      * Perform fling with settling to one of the anchors which is determined by the given
      * [velocity]. Fling with settling [swipeable] will always consume all the velocity provided
@@ -354,7 +340,6 @@ open class SwipeableState<T>(
      *
      * @return the reason fling ended
      */
-    @OptIn(ExperimentalMaterial3Api::class)
     suspend fun performFling(velocity: Float) {
         latestNonEmptyAnchorsFlow.collect { anchors ->
             val lastAnchor = anchors.getOffset(currentValue)!!
@@ -367,12 +352,12 @@ open class SwipeableState<T>(
                 velocityThreshold = velocityThreshold
             )
             val targetState = anchors[targetValue]
-            if (targetState != null && confirmStateChange(targetState)) animateTo(targetState)
+            if(targetState != null && confirmStateChange(targetState)) animateTo(targetState)
             // If the user vetoed the state change, rollback to the previous state.
             else animateInternalToOffset(lastAnchor, animationSpec)
         }
     }
-
+    
     /**
      * Force [swipeable] to consume drag delta provided from outside of the regular [swipeable]
      * gesture flow.
@@ -393,19 +378,19 @@ open class SwipeableState<T>(
         val potentiallyConsumed = absoluteOffset.value + delta
         val clamped = potentiallyConsumed.coerceIn(minBound, maxBound)
         val deltaToConsume = clamped - absoluteOffset.value
-        if (abs(deltaToConsume) > 0) {
+        if(abs(deltaToConsume) > 0)
             draggableState.dispatchRawDelta(deltaToConsume)
-        }
         return deltaToConsume
     }
-
+    
     companion object {
+        
         /**
          * The default [Saver] implementation for [SwipeableState].
          */
-        fun <T : Any> Saver(
+        fun <T: Any> Saver(
             animationSpec: AnimationSpec<Float>,
-            confirmStateChange: (T) -> Boolean
+            confirmStateChange: (T) -> Boolean,
         ) = Saver<SwipeableState<T>, T>(
             save = { it.currentValue },
             restore = { SwipeableState(it, animationSpec, confirmStateChange) }
@@ -429,26 +414,27 @@ class SwipeProgress<T>(
     val from: T,
     val to: T,
     /*@FloatRange(from = 0.0, to = 1.0)*/
-    val fraction: Float
+    val fraction: Float,
 ) {
+    
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is SwipeProgress<*>) return false
-
-        if (from != other.from) return false
-        if (to != other.to) return false
-        if (fraction != other.fraction) return false
-
+        if(this === other) return true
+        if(other !is SwipeProgress<*>) return false
+        
+        if(from != other.from) return false
+        if(to != other.to) return false
+        if(fraction != other.fraction) return false
+        
         return true
     }
-
+    
     override fun hashCode(): Int {
         var result = from?.hashCode() ?: 0
         result = 31 * result + (to?.hashCode() ?: 0)
         result = 31 * result + fraction.hashCode()
         return result
     }
-
+    
     override fun toString(): String {
         return "SwipeProgress(from=$from, to=$to, fraction=$fraction)"
     }
@@ -463,10 +449,10 @@ class SwipeProgress<T>(
  */
 @Composable
 @ExperimentalMaterial3Api
-fun <T : Any> rememberSwipeableState(
+fun <T: Any> rememberSwipeableState(
     initialValue: T,
     animationSpec: AnimationSpec<Float> = AnimationSpec,
-    confirmStateChange: (newValue: T) -> Boolean = { true }
+    confirmStateChange: (newValue: T) -> Boolean = { true },
 ): SwipeableState<T> {
     return rememberSaveable(
         saver = SwipeableState.Saver(
@@ -492,10 +478,10 @@ fun <T : Any> rememberSwipeableState(
  */
 @Composable
 @ExperimentalMaterial3Api
-fun <T : Any> rememberSwipeableStateFor(
+fun <T: Any> rememberSwipeableStateFor(
     value: T,
     onValueChange: (T) -> Unit,
-    animationSpec: AnimationSpec<Float> = AnimationSpec
+    animationSpec: AnimationSpec<Float> = AnimationSpec,
 ): SwipeableState<T> {
     val swipeableState = remember {
         SwipeableState(
@@ -506,12 +492,12 @@ fun <T : Any> rememberSwipeableStateFor(
     }
     val forceAnimationCheck = remember { mutableStateOf(false) }
     LaunchedEffect(value, forceAnimationCheck.value) {
-        if (value != swipeableState.currentValue) {
+        if(value != swipeableState.currentValue) {
             swipeableState.animateTo(value)
         }
     }
     DisposableEffect(swipeableState.currentValue) {
-        if (value != swipeableState.currentValue) {
+        if(value != swipeableState.currentValue) {
             onValueChange(swipeableState.currentValue)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
@@ -563,7 +549,7 @@ fun <T> Modifier.swipeable(
     interactionSource: MutableInteractionSource? = null,
     thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
     resistance: ResistanceConfig? = resistanceConfig(anchors.keys),
-    velocityThreshold: Dp = VelocityThreshold
+    velocityThreshold: Dp = VelocityThreshold,
 ) = composed(
     inspectorInfo = debugInspectorInfo {
         name = "swipeable"
@@ -600,7 +586,7 @@ fun <T> Modifier.swipeable(
         }
         state.processNewAnchors(oldAnchors, anchors)
     }
-
+    
     Modifier.draggable(
         orientation = orientation,
         enabled = enabled,
@@ -620,6 +606,7 @@ fun <T> Modifier.swipeable(
 @Stable
 @ExperimentalMaterial3Api
 interface ThresholdConfig {
+    
     /**
      * Compute the value of the threshold (in pixels), once the values of the anchors are known.
      */
@@ -633,7 +620,8 @@ interface ThresholdConfig {
  */
 @Immutable
 @ExperimentalMaterial3Api
-data class FixedThreshold(private val offset: Dp) : ThresholdConfig {
+data class FixedThreshold(private val offset: Dp): ThresholdConfig {
+    
     override fun Density.computeThreshold(fromValue: Float, toValue: Float): Float {
         return fromValue + offset.toPx() * sign(toValue - fromValue)
     }
@@ -648,8 +636,9 @@ data class FixedThreshold(private val offset: Dp) : ThresholdConfig {
 @ExperimentalMaterial3Api
 data class FractionalThreshold(
     /*@FloatRange(from = 0.0, to = 1.0)*/
-    private val fraction: Float
-) : ThresholdConfig {
+    private val fraction: Float,
+): ThresholdConfig {
+    
     override fun Density.computeThreshold(fromValue: Float, toValue: Float): Float {
         return lerp(fromValue, toValue, fraction)
     }
@@ -684,33 +673,34 @@ class ResistanceConfig(
     /*@FloatRange(from = 0.0)*/
     val factorAtMin: Float = StandardResistanceFactor,
     /*@FloatRange(from = 0.0)*/
-    val factorAtMax: Float = StandardResistanceFactor
+    val factorAtMax: Float = StandardResistanceFactor,
 ) {
+    
     fun computeResistance(overflow: Float): Float {
-        val factor = if (overflow < 0) factorAtMin else factorAtMax
-        if (factor == 0f) return 0f
+        val factor = if(overflow < 0) factorAtMin else factorAtMax
+        if(factor == 0f) return 0f
         val progress = (overflow / basis).coerceIn(-1f, 1f)
         return basis / factor * sin(progress * PI.toFloat() / 2)
     }
-
+    
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ResistanceConfig) return false
-
-        if (basis != other.basis) return false
-        if (factorAtMin != other.factorAtMin) return false
-        if (factorAtMax != other.factorAtMax) return false
-
+        if(this === other) return true
+        if(other !is ResistanceConfig) return false
+        
+        if(basis != other.basis) return false
+        if(factorAtMin != other.factorAtMin) return false
+        if(factorAtMax != other.factorAtMax) return false
+        
         return true
     }
-
+    
     override fun hashCode(): Int {
         var result = basis.hashCode()
         result = 31 * result + factorAtMin.hashCode()
         result = 31 * result + factorAtMax.hashCode()
         return result
     }
-
+    
     override fun toString(): String {
         return "ResistanceConfig(basis=$basis, factorAtMin=$factorAtMin, factorAtMax=$factorAtMax)"
     }
@@ -727,24 +717,27 @@ class ResistanceConfig(
  */
 private fun findBounds(
     offset: Float,
-    anchors: Set<Float>
+    anchors: Set<Float>,
 ): List<Float> {
     // Find the anchors the target lies between with a little bit of rounding error.
     val a = anchors.filter { it <= offset + 0.001 }.maxOrNull()
     val b = anchors.filter { it >= offset - 0.001 }.minOrNull()
-
+    
     return when {
         a == null ->
             // case 1 or 3
             listOfNotNull(b)
+        
         b == null ->
             // case 4
             listOf(a)
+        
         a == b ->
             // case 2
             // Can't return offset itself here since it might not be exactly equal
             // to the anchor, despite being considered an exact match.
             listOf(a)
+        
         else ->
             // case 5
             listOf(a, b)
@@ -757,30 +750,30 @@ private fun computeTarget(
     anchors: Set<Float>,
     thresholds: (Float, Float) -> Float,
     velocity: Float,
-    velocityThreshold: Float
+    velocityThreshold: Float,
 ): Float {
     val bounds = findBounds(offset, anchors)
-    return when (bounds.size) {
+    return when(bounds.size) {
         0 -> lastValue
         1 -> bounds[0]
         else -> {
             val lower = bounds[0]
             val upper = bounds[1]
-            if (lastValue <= offset) {
+            if(lastValue <= offset) {
                 // Swiping from lower to upper (positive).
-                if (velocity >= velocityThreshold) {
+                if(velocity >= velocityThreshold) {
                     return upper
                 } else {
                     val threshold = thresholds(lower, upper)
-                    if (offset < threshold) lower else upper
+                    if(offset < threshold) lower else upper
                 }
             } else {
                 // Swiping from upper to lower (negative).
-                if (velocity <= -velocityThreshold) {
+                if(velocity <= -velocityThreshold) {
                     return lower
                 } else {
                     val threshold = thresholds(upper, lower)
-                    if (offset > threshold) upper else lower
+                    if(offset > threshold) upper else lower
                 }
             }
         }
@@ -795,26 +788,27 @@ private fun <T> Map<Float, T>.getOffset(state: T): Float? {
  * Contains useful defaults for [swipeable] and [SwipeableState].
  */
 object SwipeableDefaults {
+    
     /**
      * The default animation used by [SwipeableState].
      */
     val AnimationSpec = SpringSpec<Float>()
-
+    
     /**
      * The default velocity threshold (1.8 dp per millisecond) used by [swipeable].
      */
     val VelocityThreshold = 125.dp
-
+    
     /**
      * A stiff resistance factor which indicates that swiping isn't available right now.
      */
     const val StiffResistanceFactor = 20f
-
+    
     /**
      * A standard resistance factor which indicates that the user has run out of things to see.
      */
     const val StandardResistanceFactor = 10f
-
+    
     /**
      * The default resistance config used by [swipeable].
      *
@@ -824,60 +818,54 @@ object SwipeableDefaults {
     fun resistanceConfig(
         anchors: Set<Float>,
         factorAtMin: Float = StandardResistanceFactor,
-        factorAtMax: Float = StandardResistanceFactor
-    ): ResistanceConfig? {
-        return if (anchors.size <= 1) {
-            null
-        } else {
-            val basis = anchors.maxOrNull()!! - anchors.minOrNull()!!
-            ResistanceConfig(basis, factorAtMin, factorAtMax)
-        }
-    }
+        factorAtMax: Float = StandardResistanceFactor,
+    ) = if(anchors.size <= 1) null
+    else ResistanceConfig(
+        (anchors.maxOrNull()!! - anchors.minOrNull()!!),
+        factorAtMin, factorAtMax
+    )
 }
 
 // temp default nested scroll connection for swipeables which desire as an opt in
 // revisit in b/174756744 as all types will have their own specific connection probably
 @ExperimentalMaterial3Api
 val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScrollConnection
-    get() = object : NestedScrollConnection {
-        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            val delta = available.toFloat()
-            return if (delta < 0 && source == NestedScrollSource.Drag) {
+    get() = object: NestedScrollConnection {
+        
+        override fun onPreScroll(
+            available: Offset, source: NestedScrollSource,
+        ) = available.toFloat().let { delta ->
+            if(delta < 0 && source == Drag)
                 performDrag(delta).toOffset()
-            } else {
-                Offset.Zero
-            }
+            else Zero
         }
-
+        
         override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            return if (source == NestedScrollSource.Drag) {
-                performDrag(available.toFloat()).toOffset()
-            } else {
-                Offset.Zero
-            }
+            consumed: Offset, available: Offset,
+            source: NestedScrollSource,
+        ) = if(source == Drag)
+            performDrag(available.toFloat()).toOffset()
+        else Zero
+        
+        override suspend fun onPreFling(
+            available: Velocity,
+        ): Velocity {
+            val fling = available.toFling()
+            return if(fling < 0 && offset.value > minBound) {
+                performFling(fling); available
+            } else Velocity.Zero
         }
-
-        override suspend fun onPreFling(available: Velocity): Velocity {
-            val toFling = Offset(available.x, available.y).toFloat()
-            return if (toFling < 0 && offset.value > minBound) {
-                performFling(velocity = toFling)
-                // since we go to the anchor with tween settling, consume all for the best UX
-                available
-            } else {
-                Velocity.Zero
-            }
-        }
-
-        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            performFling(velocity = Offset(available.x, available.y).toFloat())
+        
+        override suspend fun onPostFling(
+            consumed: Velocity, available: Velocity,
+        ): Velocity {
+            performFling(available.toFling())
             return available
         }
-
+        
+        private fun Velocity.toFling() = Offset(this.x, this.y).toFloat()
+        
         private fun Float.toOffset(): Offset = Offset(0f, this)
-
+        
         private fun Offset.toFloat(): Float = this.y
     }

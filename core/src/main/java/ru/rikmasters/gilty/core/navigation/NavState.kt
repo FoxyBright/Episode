@@ -8,17 +8,17 @@ import ru.rikmasters.gilty.core.util.extension.slash
 
 @Stable
 class NavState(
-
+    
     internal val navHostController: NavHostController,
-
-    val startDestination: String
-
-): Loggable {
-
+    
+    val startDestination: String,
+    
+    ): Loggable {
+    
     internal val routeOptions: MutableMap<String, NavOptions> = HashMap()
-
-    val navController = navHostController
-
+    
+    private val navController = navHostController
+    
     /**
      * Перейти по относительному пути (внутри текущего nested)
      *
@@ -36,11 +36,10 @@ class NavState(
         } catch(e: RuntimeException) {
             throw IllegalStateException("Не удалось получить получить текущую позицию", e)
         }
-
+        
         navigateAbsolute(path slash dest)
     }
-
-
+    
     /**
      * Перейти по абсолютному пути
      *
@@ -51,7 +50,21 @@ class NavState(
         navHostController.navigate(dest, routeOptions[dest])
     }
     
-    fun navigationBack(){
+    /**
+     * Очистка стека
+     *
+     * @param route маршрут пункта назначения
+     */
+    fun clearStackNavigation(route: String) {
+        navController.navigate(route) {
+            popUpTo(0)
+        }
+    }
+    
+    /**
+     * путь назад по графу
+     */
+    fun navigationBack() {
         navController.popBackStack()
     }
 }

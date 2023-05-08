@@ -11,9 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.addmeet.presentation.ui.components.Buttons
+import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.Buttons
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.CloseAddMeetAlert
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -36,7 +37,7 @@ data class DetailedState(
     val time: String,
     val date: String,
     val description: String,
-    val tagList: List<String>,
+    val tagList: List<TagModel>,
     val meetPlace: Pair<String, String>?,
     val hideMeetPlace: Boolean,
     val alert: Boolean,
@@ -52,7 +53,7 @@ interface DetailedCallback {
     fun onDateClick() {}
     fun onTimeClick() {}
     fun onTagsClick() {}
-    fun onTagDelete(tag: String) {}
+    fun onTagDelete(tag: TagModel) {}
     fun onDescriptionChange(text: String) {}
     fun onDescriptionClear() {}
     fun onMeetPlaceClick() {}
@@ -70,7 +71,7 @@ fun DetailedContent(
     Scaffold(modifier, {
         ClosableActionBar(
             stringResource(R.string.add_meet_detailed_title),
-            (null), Modifier.padding(bottom = 10.dp),
+            Modifier.padding(bottom = 10.dp), (null),
             { callback?.onCloseAlert(true) }
         ) { callback?.onBack() }
     }, {
@@ -88,12 +89,13 @@ fun DetailedContent(
         )
     }
     CloseAddMeetAlert(
-        state.alert, {
+        state.alert, state.online, {
             callback?.onCloseAlert(false)
         }, {
             callback?.onCloseAlert(false)
             callback?.onClose()
-        })
+        }
+    )
 }
 
 @Composable
@@ -137,12 +139,6 @@ private fun Content(
                 callback
             )
         }
-        item {
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-            )
-        }
+        itemSpacer(60.dp)
     }
 }

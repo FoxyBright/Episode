@@ -1,37 +1,39 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-private const val title = "Заголовок"
-private const val details = "Детали"
-private const val description = "Описание"
+private const val TITLE = "Заголовок"
+private const val DETAILS = "Детали"
+private const val DESCRIPTION = "Описание"
 
 @Composable
 fun ActionBar(
     title: String,
-    details: String? = null,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null
+    details: String? = null,
+    onBack: (() -> Unit)? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
         onBack?.let {
@@ -42,7 +44,7 @@ fun ActionBar(
                     ),
                     stringResource(R.string.action_bar_button_back),
                     Modifier.size(24.dp),
-                    MaterialTheme.colorScheme.tertiary
+                    colorScheme.tertiary
                 )
             }
         }
@@ -51,16 +53,16 @@ fun ActionBar(
             Modifier
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.tertiary
+            style = typography.titleLarge,
+            color = colorScheme.tertiary
         )
         details?.let {
             Text(
                 it, Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, start = 16.dp),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onTertiary
+                style = typography.labelSmall,
+                color = colorScheme.onTertiary
             )
         }
     }
@@ -69,46 +71,47 @@ fun ActionBar(
 @Composable
 fun RowActionBar(
     title: String,
-    details: String? = null,
     modifier: Modifier = Modifier,
+    details: String? = null,
+    detailsColor: Color = colorScheme.primary,
     description: String? = null,
     distanceBetween: Dp? = null,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
 ) {
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             onBack?.let {
                 IconButton(
-                    it,
-                    Modifier.padding(end = distanceBetween ?: 16.dp)
+                    it, Modifier.padding(
+                        end = distanceBetween ?: 16.dp
+                    )
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),
                         Modifier.size(24.dp),
-                        MaterialTheme.colorScheme.tertiary
+                        colorScheme.tertiary
                     )
                 }
             }
             Text(
                 title,
                 Modifier.padding(end = 8.dp),
-                MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.labelLarge
+                colorScheme.tertiary,
+                style = typography.labelLarge
             )
             details?.let {
                 Text(
-                    details, style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    details, style = typography.labelLarge,
+                    color = detailsColor
                 )
             }
         }
         description?.let {
             Text(
-                it,
-                if (onBack != null) Modifier.padding(start = 32.dp)
-                else Modifier, MaterialTheme.colorScheme.onTertiary,
-                style = MaterialTheme.typography.labelSmall
+                it, Modifier.padding(start = 16.dp),
+                colorScheme.onTertiary,
+                style = typography.labelSmall
             )
         }
     }
@@ -117,8 +120,8 @@ fun RowActionBar(
 @Composable
 fun ClosableActionBar(
     title: String,
-    details: String? = null,
     modifier: Modifier = Modifier,
+    details: String? = null,
     onClose: (() -> Unit)? = null,
     onBack: (() -> Unit)? = null,
 ) {
@@ -134,101 +137,141 @@ fun ClosableActionBar(
                         painterResource(R.drawable.ic_back),
                         stringResource(R.string.action_bar_button_back),
                         Modifier.size(24.dp),
-                        MaterialTheme.colorScheme.tertiary
+                        colorScheme.tertiary
                     )
                 }
             }
-            CrossButton(
-                Modifier
+            Image(
+                painterResource(
+                    R.drawable.ic_cross_button
+                ), (null), Modifier
                     .padding(top = 16.dp, end = 16.dp)
-                    .size(20.dp)
                     .align(TopEnd)
-            ) { onClose?.let { it() } }
+                    .size(20.dp)
+                    .clickable { onClose?.let { it() } },
+                colorFilter = tint(colorScheme.scrim)
+            )
         }
         Text(
-            title,
-            Modifier
+            title, Modifier
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.tertiary
+            style = typography.titleLarge.copy(
+                lineHeight = 37.sp
+            ), color = colorScheme.tertiary
         )
         details?.let {
             Text(
                 it, Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, start = 16.dp),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onTertiary
+                style = typography.labelSmall,
+                color = colorScheme.onTertiary
             )
         }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun ClosableActionBarPreview() {
     GiltyTheme {
-        ClosableActionBar(
-            title, details,
-            Modifier.padding(16.dp)
-        )
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            ClosableActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DETAILS
+            )
+        }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun ClosableActionBarWithBackPreview() {
     GiltyTheme {
-        ClosableActionBar(
-            title, details,
-            Modifier.padding(16.dp)
-        ) {}
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            ClosableActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DETAILS
+            ) {}
+        }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun BackRowActionBarPreview() {
     GiltyTheme {
-        RowActionBar(
-            title, details,
-            Modifier.padding(16.dp),
-            description
-        ) {}
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            RowActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DETAILS, colorScheme.primary,
+                DESCRIPTION
+            ) {}
+        }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun RowActionBarPreview() {
     GiltyTheme {
-        RowActionBar(
-            title, details,
-            Modifier.padding(16.dp),
-            description
-        )
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            RowActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DETAILS, colorScheme.primary,
+                DESCRIPTION
+            )
+        }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun ActionBarPreview() {
     GiltyTheme {
-        ActionBar(
-            title, details,
-            Modifier.padding(16.dp)
-        )
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            ActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DETAILS
+            )
+        }
     }
 }
 
 @Composable
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+@Preview
 private fun ActionBarWithBackPreview() {
     GiltyTheme {
-        ActionBar(
-            title, description,
-            Modifier.padding(16.dp)
-        ) {}
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
+            ActionBar(
+                TITLE, Modifier.padding(16.dp),
+                DESCRIPTION
+            ) {}
+        }
     }
 }

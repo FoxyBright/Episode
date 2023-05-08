@@ -3,98 +3,97 @@ package ru.rikmasters.gilty.shared.model.profile
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
-import ru.rikmasters.gilty.shared.model.meeting.OrganizerModel
+import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
+import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import java.util.UUID.randomUUID
 
 data class ProfileModel(
-    
     val id: String,
-    
     val phone: String?,
-    
     val username: String?,
-    
     val gender: GenderType,
-    
     val orientation: OrientationModel?,
-    
     val age: Int,
-    
     val aboutMe: String?,
-    
     val rating: RatingModel,
-    
-    val avatar: ImageModel,
-    
-    val thumbnail: ImageModel,
-    
-    val isComplete: Boolean,
-    
+    val avatar: AvatarModel? = null,
+    val thumbnail: ThumbnailModel? = null,
+    val isCompleted: Boolean,
     val subscriptionExpiredAt: String?,
-    
     val respondsCount: Int?,
-    
-    val respondsImage: ImageModel?,
-    
-    val hidden: ImageModel?,
-    
-    val count_watchers: Int?,
-    
-    val count_watching: Int?,
-    
-    val is_watching: Boolean?,
-    
-    val unblock_at: String?,
-    
-    val is_completed: Boolean?,
-    
-    val is_online: Boolean?,
-    
-    val is_anonymous: Boolean?,
-    
+    val respondsImage: ThumbnailModel?,
+    val hidden: AvatarModel?,
+    val countWatchers: Int?,
+    val countWatching: Int?,
+    val isWatching: Boolean?,
+    val unblockAt: String?,
+    val isOnline: Boolean?,
+    val isAnonymous: Boolean?,
     val status: String?,
+    val hiddenAccess: Boolean
 ) {
     
-    fun mapToOrganizerModel() = OrganizerModel(
-        id, username.toString(), rating.emoji,
-        avatar.map(), age, gender
+    constructor(): this(
+        id = randomUUID().toString(),
+        phone = null,
+        username = null,
+        gender = MALE,
+        orientation = null,
+        age = 0, aboutMe = null,
+        rating = RatingModel(),
+        avatar = AvatarModel(),
+        thumbnail = ThumbnailModel(),
+        isCompleted = true,
+        subscriptionExpiredAt = null,
+        respondsCount = null,
+        respondsImage = null,
+        hidden = null,
+        countWatchers = null,
+        countWatching = null,
+        isWatching = null,
+        unblockAt = null,
+        isOnline = null,
+        isAnonymous = null,
+        status = null,
+        hiddenAccess = false
     )
     
-    @Suppress("unused")
-    fun mapToMemberModel() = MemberModel(
-        id, username.toString(), rating.emoji,
-        avatar.map(), age, gender
+    fun map() = UserModel(
+        id = id,
+        gender = gender,
+        username = username.toString(),
+        emoji = rating.emoji,
+        avatar = avatar,
+        thumbnail = thumbnail,
+        age = age,
+        isAnonymous = isAnonymous == true,
+        isOnline = isOnline == true
     )
 }
 
 val DemoProfileModel = ProfileModel(
-    ("0"), ("+7 910 524-12-12"),
-    ("alina.loon"),
-    FEMALE,
-    DemoOrientationModel, (27),
-    ("Instagram @cristi"),
-    DemoRatingModel,
-    DemoAvatarModel,
-    DemoAvatarModel,
-    (true), (""), (6),
-    DemoAvatarModel,
-    DemoAvatarModel,
-    (10), (1500), (true),
-    (""), (true), (true),
-    (true), ("")
-)
-
-private const val empty = ""
-val DemoEmptyProfileModel = ProfileModel(
-    empty, empty, empty, MALE,
-    OrientationModel(empty, empty),
-    (0), empty,
-    RatingModel(empty, getEmoji(empty)),
-    getDemoAvatarModel(empty),
-    getDemoAvatarModel(empty),
-    (false), empty, (0),
-    getDemoAvatarModel(empty),
-    getDemoAvatarModel(empty),
-    (0), (0), (false), empty,
-    (false), (false), (false), empty
+    id = randomUUID().toString(),
+    phone = "+7 910 524-12-12",
+    username = "alina.loon",
+    gender = FEMALE,
+    orientation = DemoOrientationModel,
+    age = 27,
+    aboutMe = "Instagram @cristi",
+    rating = DemoRatingModel,
+    avatar = DemoAvatarModel,
+    thumbnail = DemoThumbnailModel,
+    isCompleted = true,
+    subscriptionExpiredAt = "",
+    respondsCount = 6,
+    respondsImage = DemoThumbnailModel,
+    hidden = DemoAvatarModel,
+    countWatchers = 10,
+    countWatching = 1500,
+    isWatching = true,
+    unblockAt = "",
+    isOnline = true,
+    isAnonymous = true,
+    status = "",
+    hiddenAccess = false
 )

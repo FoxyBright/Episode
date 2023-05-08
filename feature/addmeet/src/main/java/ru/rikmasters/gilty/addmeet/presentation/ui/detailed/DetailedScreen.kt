@@ -5,45 +5,53 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.duration.DurationBs
-import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.map.MapBs
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time.TimeBs
 import ru.rikmasters.gilty.addmeet.viewmodel.DetailedViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.Online
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.DurationBsViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.MapBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.TimeBsViewModel
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.LOCATION
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.common.extentions.offset
+import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 @Composable
 fun DetailedScreen(vm: DetailedViewModel) {
     
-    val nav = get<NavState>()
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val nav = get<NavState>()
     
+    val category by vm.category.collectAsState()
     val description by vm.description.collectAsState()
-    val alert by vm.alert.collectAsState()
-    val hideAddress by vm.hideAddress.collectAsState()
-    val date by vm.date.collectAsState()
+    val place by vm.place.collectAsState()
     val duration by vm.duration.collectAsState()
     val tags by vm.tags.collectAsState()
-    val place by vm.place.collectAsState()
+    val online by vm.online.collectAsState()
+    val alert by vm.alert.collectAsState()
+    val hide by vm.hide.collectAsState()
+    val date by vm.date.collectAsState()
     
-    val isActive = /*date.isNotBlank()
+    val isActive = date.isNotBlank()
             && duration.isNotBlank()
             && tags.isNotEmpty()
-            && description.isNotBlank()
-            && if(!Online)
+            && if(!online)
         place != null
-    else */true
+    else true
     
     DetailedContent(
         DetailedState(
-            duration, date, description,
-            tags, place, hideAddress,
-            alert, Online, isActive
+            duration, date.let {
+                it.ifEmpty { return@let "" }
+                LocalDateTime.ofZ(it)
+                    .minusMinute(offset / 6000)
+                    .plusDay(1)
+                    .format("d MMMM, HH:mm")
+            }, description, tags, place,
+            hide, alert, online, isActive
         ), Modifier, object: DetailedCallback {
             
             override fun onDateClick() {
@@ -69,31 +77,39 @@ fun DetailedScreen(vm: DetailedViewModel) {
             override fun onMeetPlaceClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
-                        Connector<MapBsViewModel>(vm.scope) {
-                            MapBs(it)
-                        }
+                        BottomSheet(
+                            vm.scope, LOCATION,
+                            category = category
+                        )
                     }
                 }
-            }
-            
-            override fun onTagDelete(tag: String) {
-                scope.launch { vm.deleteTag(tag) }
             }
             
             override fun onDescriptionChange(text: String) {
                 scope.launch { vm.changeDescription(text) }
             }
             
-            override fun onHideMeetPlaceClick() {
-                scope.launch { vm.hideMeetPlace() }
-            }
-            
             override fun onDescriptionClear() {
                 scope.launch { vm.clearDescription() }
             }
             
+            override fun onCloseAlert(state: Boolean) {
+                scope.launch { vm.alertDismiss(state) }
+            }
+            
             override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
+                scope.launch {
+                    vm.clearAddMeet()
+                    nav.clearStackNavigation("main/meetings")
+                }
+            }
+            
+            override fun onTagDelete(tag: TagModel) {
+                scope.launch { vm.deleteTag(tag) }
+            }
+            
+            override fun onHideMeetPlaceClick() {
+                scope.launch { vm.hideMeetPlace() }
             }
             
             override fun onNext() {
@@ -106,10 +122,6 @@ fun DetailedScreen(vm: DetailedViewModel) {
             
             override fun onBack() {
                 nav.navigationBack()
-            }
-            
-            override fun onCloseAlert(state: Boolean) {
-                scope.launch { vm.alertDismiss(state) }
             }
         }
     )

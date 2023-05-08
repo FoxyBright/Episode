@@ -2,58 +2,128 @@ package ru.rikmasters.gilty.shared.model.chat
 
 import ru.rikmasters.gilty.shared.common.extentions.NOW_DATE
 import ru.rikmasters.gilty.shared.common.extentions.TOMORROW
-import ru.rikmasters.gilty.shared.common.extentions.YESTERDAY
-import ru.rikmasters.gilty.shared.model.meeting.*
-
-enum class ChatStatus { ACTIVE, INACTIVE }
+import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus
+import ru.rikmasters.gilty.shared.model.enumeration.ChatStatus.COMPLETED
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
+import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
+import java.util.UUID.randomUUID
 
 data class ChatModel(
     val id: String,
     val meetingId: String,
     val userId: String,
-    val meetStatus: MeetStatus,
+    val meetStatus: MeetStatusType,
     val status: ChatStatus,
     val isOnline: Boolean,
-    val organizer: OrganizerModel,
+    val translationStartedAt: String? = null,
+    val organizer: UserModel,
     val organizerOnly: Boolean,
     val title: String,
-    val lastMessage: MessageModel,
-    val dateTime: String,
-    val hasUnread: Boolean,
+    val lastMessage: MessageModel? = null,
+    val datetime: String,
+    val unreadCount: Int,
     val canMessage: Boolean,
-    val memberCount: Int,
-    val createdAt: String
+    val membersCount: Int,
+    val createdAt: String,
+) {
+    
+    constructor(): this(
+        id = randomUUID().toString(),
+        meetingId = "",
+        userId = "",
+        meetStatus = CANCELED,
+        status = COMPLETED,
+        isOnline = false,
+        translationStartedAt = null,
+        organizer = UserModel(),
+        organizerOnly = false,
+        title = "",
+        lastMessage = MessageModel(),
+        datetime = NOW_DATE,
+        unreadCount = 0,
+        canMessage = true,
+        membersCount = 0,
+        createdAt = NOW_DATE
+    )
+    
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + meetingId.hashCode()
+        result = 31 * result + userId.hashCode()
+        result = 31 * result + meetStatus.hashCode()
+        result = 31 * result + status.hashCode()
+        result = 31 * result + isOnline.hashCode()
+        result = 31 * result + (translationStartedAt?.hashCode() ?: 0)
+        result = 31 * result + organizer.hashCode()
+        result = 31 * result + organizerOnly.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + lastMessage.hashCode()
+        result = 31 * result + datetime.hashCode()
+        result = 31 * result + unreadCount
+        result = 31 * result + canMessage.hashCode()
+        result = 31 * result + membersCount
+        result = 31 * result + createdAt.hashCode()
+        return result
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        if(this === other) return true
+        if(javaClass != other?.javaClass) return false
+        
+        other as ChatModel
+        
+        if(id != other.id) return false
+        if(meetingId != other.meetingId) return false
+        if(userId != other.userId) return false
+        if(meetStatus != other.meetStatus) return false
+        if(status != other.status) return false
+        if(isOnline != other.isOnline) return false
+        if(translationStartedAt != other.translationStartedAt) return false
+        if(organizer != other.organizer) return false
+        if(organizerOnly != other.organizerOnly) return false
+        if(title != other.title) return false
+        if(lastMessage != other.lastMessage) return false
+        if(datetime != other.datetime) return false
+        if(unreadCount != other.unreadCount) return false
+        if(canMessage != other.canMessage) return false
+        if(membersCount != other.membersCount) return false
+        if(createdAt != other.createdAt) return false
+        
+        return true
+    }
+}
+
+val DemoChatModel = ChatModel(
+    "1",
+    "1",
+    "1",
+    MeetStatusType.ACTIVE,
+    ChatStatus.ACTIVE,
+    false,
+    null,
+    DemoUserModel,
+    false,
+    DemoMeetingModel.title,
+    DemoMessageModel,
+    "2022-11-28T20:00:54.140Z",
+    0,
+    true,
+    DemoMeetingModel.memberCount,
+    "2022-11-28T20:00:54.140Z"
 )
 
-fun getChatWithData(
-    id: String = "1",
-    meetingId: String = "1",
-    userId: String = "1",
-    meetStatus: MeetStatus = MeetStatus.ACTIVE,
-    status: ChatStatus = ChatStatus.ACTIVE,
-    isOnline: Boolean = false,
-    organizer: OrganizerModel = DemoOrganizerModel,
-    organizerOnly: Boolean = false,
-    title: String = DemoMeetingModel.title,
-    lastMessage: MessageModel = DemoMessageModel,
-    dateTime: String = "2022-11-28T20:00:54.140Z",
-    hasUnread: Boolean = false,
-    canMessage: Boolean = false,
-    memberCount: Int = DemoMeetingModel.memberCount,
-    createdAt: String = "2022-11-28T20:00:54.140Z"
-) = ChatModel(
-    id, meetingId, userId, meetStatus,
-    status, isOnline, organizer,
-    organizerOnly, title,
-    lastMessage, dateTime,
-    hasUnread, canMessage,
-    memberCount, createdAt
-)
-
-val DemoChatListModel = listOf(
-    getChatWithData(id = "1", dateTime = NOW_DATE, isOnline = true, hasUnread = true),
-    getChatWithData(id = "2", dateTime = TOMORROW),
-    getChatWithData(id = "3", dateTime = TOMORROW, hasUnread = true),
-    getChatWithData(id = "4", dateTime = YESTERDAY, isOnline = true),
-    getChatWithData(id = "5", dateTime = YESTERDAY)
+val DemoChatModelList = listOf(
+    DemoChatModel.copy(id = "1", datetime = NOW_DATE, isOnline = true, unreadCount = 10),
+    DemoChatModel.copy(id = "2", datetime = TOMORROW),
+    DemoChatModel.copy(id = "3", datetime = TOMORROW, unreadCount = 4),
+    DemoChatModel.copy(
+        id = "4",
+        status = COMPLETED,
+        isOnline = true,
+        unreadCount = 1412
+    ),
+    DemoChatModel.copy(id = "5", status = COMPLETED)
 )

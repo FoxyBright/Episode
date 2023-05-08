@@ -9,23 +9,25 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
 
 @Composable
 fun GEmojiImage(
-    emoji: EmojiModel,
+    emoji: EmojiModel?,
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
     contentScale: ContentScale = ContentScale.Fit,
     alpha: Float = DefaultAlpha,
-    colorFilter: ColorFilter? = null
+    colorFilter: ColorFilter? = null,
 ) {
-    Image(
-        if(emoji.type == "D")
-            painterResource(emoji.path.toInt())
-        else rememberAsyncImagePainter(emoji.path),
-        (null), modifier, alignment,
-        contentScale, alpha, colorFilter
-    )
+    emoji?.let {
+        Image(
+            if(it.type != "URL")
+                painterResource(it.path.toInt())
+            else rememberAsyncImagePainter(it.path),
+            (null), modifier, alignment,
+            contentScale, alpha, colorFilter
+        )
+    }
 }
 

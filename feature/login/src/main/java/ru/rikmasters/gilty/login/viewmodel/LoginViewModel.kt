@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.login.viewmodel
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,20 +9,16 @@ import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.login.SendCode
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.login.LoginErrorMessage
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.CountryManager
 
 class LoginViewModel(
     
     private val repository: LoginRepository,
-    
-    countryManager: CountryManager
-
+    countryManager: CountryManager,
 ): ViewModel() {
     
     private val authManager by inject<AuthManager>()
-    private val context = getKoin().get<Context>()
     
     private val _country = MutableStateFlow(countryManager.defaultCountry)
     val country = _country.asStateFlow()
@@ -33,7 +28,8 @@ class LoginViewModel(
         clearPhone()
     }
     
-    private val _loginMethods = MutableStateFlow<Set<LoginMethod>>(emptySet())
+    private val _loginMethods =
+        MutableStateFlow<Set<LoginMethod>>(emptySet())
     val loginMethods = _loginMethods.asStateFlow()
     
     private val _externalLogin = MutableStateFlow(false)
@@ -78,7 +74,7 @@ class LoginViewModel(
     }
     
     suspend fun handle(
-        deepLink: Uri
+        deepLink: Uri,
     ): Pair<Boolean, Boolean> {
         
         if(deepLink.host != "external")
@@ -100,23 +96,20 @@ class LoginViewModel(
         return Pair(false, false)
     }
     
-    suspend fun sendCode() {
-        repository.sendCode(_phone.value)
-            .let { (sendCode, message) ->
-                
-                if(sendCode == null)
-                    message?.let {
-                        makeToast(
-                            LoginErrorMessage(it, context).message
+    suspend fun sendCode(): String? {
+        repository
+            .sendCode(_phone.value)
+            .let { (code, message) ->
+                message?.let { return it }
+                code?.let {
+                    authManager.updateAuth {
+                        copy(
+                            phone = _phone.value,
+                            sendCode = it
                         )
                     }
-                
-                authManager.updateAuth {
-                    copy(
-                        phone = _phone.value,
-                        sendCode = sendCode
-                    )
                 }
+                return null
             }
     }
 }

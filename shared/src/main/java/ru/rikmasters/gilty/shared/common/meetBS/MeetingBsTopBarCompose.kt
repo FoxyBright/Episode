@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -20,26 +19,29 @@ import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale.Companion.FillHeight
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
-import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.getDemoMeetingModel
-import ru.rikmasters.gilty.shared.model.notification.DemoSendRespondsModel
-import ru.rikmasters.gilty.shared.model.notification.RespondModel
-import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
+import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.notification.DemoMeetWithRespondsModel
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModel
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -50,11 +52,11 @@ private fun MeetingBsTopBarPreview() {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    getDemoMeetingModel(
+                    DemoFullMeetingModel.copy(
                         type = ANONYMOUS,
                         isPrivate = true
                     ), (false), respondsCount = 3,
-                    lastRespond = DemoSendRespondsModel,
+                    lastRespond = DemoMeetWithRespondsModel,
                     responds = true
                 )
             )
@@ -70,7 +72,7 @@ private fun MeetingBsTopBarOnlinePreview() {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    getDemoMeetingModel(isOnline = true),
+                    DemoFullMeetingModel.copy(isOnline = true),
                     (false)
                 )
             )
@@ -79,12 +81,13 @@ private fun MeetingBsTopBarOnlinePreview() {
 }
 
 data class MeetingBsTopBarState(
-    val meet: MeetingModel,
+    val meet: FullMeetingModel,
     val menuState: Boolean = false,
     val responds: Boolean = false,
     val respondsCount: Int? = null,
-    val lastRespond: RespondModel? = null,
+    val lastRespond: MeetWithRespondsModel? = null,
     val description: Boolean = false,
+    val backButton: Boolean = false,
 )
 
 @Composable
@@ -101,28 +104,36 @@ fun MeetingBsTopBarCompose(
                 .padding(bottom = 16.dp),
             SpaceBetween, CenterVertically
         ) {
-            Text(
-                state.meet.title,
-                Modifier, colorScheme.tertiary,
-                style = typography.labelLarge
-            )
-            GDropMenu(
-                state.menuState,
-                { callback?.onKebabClick(false) },
-                menuItem = listOf(Pair(stringResource(R.string.meeting_complain))
-                { callback?.onMenuItemClick(0) })
-            )
+            Row(Modifier, Start, CenterVertically) {
+                if(state.backButton) IconButton(
+                    { callback?.onBack() },
+                    Modifier.padding(end = 16.dp)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_back),
+                        stringResource(R.string.action_bar_button_back),
+                        Modifier, colorScheme.tertiary
+                    )
+                }
+                Text(
+                    state.meet.tags.joinToString(separator = ", ")
+                    { it.title }, Modifier, colorScheme.tertiary,
+                    style = typography.labelLarge
+                )
+            }
+            Menu(state.menuState, state.meet, {
+                callback?.onKebabClick(it)
+            }) { callback?.onMenuItemClick(it, state.meet.id) }
             GKebabButton { callback?.onKebabClick(true) }
         }
         if(state.responds) Responds(
-            stringResource(R.string.profile_responds_label),
+            state.lastRespond?.organizer?.avatar?.url,
             state.respondsCount,
-            state.lastRespond?.sender?.avatar,
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick() }
         Row(Modifier.height(IntrinsicSize.Max)) {
-            Avatar(org?.avatar, Modifier.weight(1f))
-            { callback?.onAvatarClick() }
+            Avatar(org.thumbnail?.url, Modifier.weight(1f))
+            { org.id?.let { callback?.onAvatarClick(it) } }
             Spacer(Modifier.width(18.dp))
             Meet(state.meet, Modifier.weight(1f))
         }
@@ -131,8 +142,12 @@ fun MeetingBsTopBarCompose(
             Start, CenterVertically
         ) {
             BrieflyRow(
-                (null), ("${org?.username}, ${org?.age}"),
-                org?.emoji
+                "${org.username}${
+                    if (org.age in 18..99) {
+                        ", ${org.age}"
+                    } else ""
+                }",
+                Modifier, (null), org.emoji
             )
             Text(
                 state.meet.display(),
@@ -161,7 +176,36 @@ fun MeetingBsTopBarCompose(
 }
 
 @Composable
-private fun MeetingModel.display(): String {
+private fun Menu(
+    menuState: Boolean,
+    meet: FullMeetingModel,
+    onDismiss: (Boolean) -> Unit,
+    onItemSelect: (Int) -> Unit,
+) {
+    val menuItems = arrayListOf(
+        Pair(stringResource(R.string.meeting_shared_button))
+        { onItemSelect(0) }
+    )
+    if(meet.memberState == IS_MEMBER) menuItems.add(
+        Pair(stringResource(R.string.exit_from_meet))
+        { onItemSelect(1) }
+    )
+    menuItems.add(
+        if(meet.memberState == IS_ORGANIZER)
+            Pair(stringResource(R.string.meeting_canceled))
+            { onItemSelect(2) }
+        else Pair(stringResource(R.string.meeting_complain))
+        { onItemSelect(3) }
+    )
+    GDropMenu(
+        menuState,
+        { onDismiss(false) },
+        menuItem = menuItems.toList()
+    )
+}
+
+@Composable
+private fun FullMeetingModel.display(): String {
     val anonymous = this.type == ANONYMOUS
     return stringResource(
         when {
@@ -175,7 +219,7 @@ private fun MeetingModel.display(): String {
 
 @Composable
 private fun Meet(
-    meet: MeetingModel,
+    meet: FullMeetingModel,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -186,7 +230,9 @@ private fun Meet(
             val category = meet.category
             CategoryItem(
                 category.name, category.emoji,
-                category.color, (true),
+                if(meet.status == COMPLETED) colorScheme.onTertiary
+                else if(meet.isOnline) colorScheme.secondary
+                else category.color, (true),
                 Modifier.offset(12.dp, -(18).dp)
             )
             MeetDetails(
@@ -201,14 +247,14 @@ private fun Meet(
 
 @Composable
 private fun MeetDetails(
-    meet: MeetingModel,
+    meet: FullMeetingModel,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Text(
-            if(todayControl(meet.dateTime))
+            if(todayControl(meet.datetime))
                 stringResource(R.string.meeting_profile_bottom_today_label)
-            else meet.dateTime.dateCalendar(),
+            else meet.datetime.dateCalendar(),
             Modifier.padding(bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
@@ -216,8 +262,9 @@ private fun MeetDetails(
         )
         Row(Modifier, SpaceBetween) {
             DateTimeCard(
-                DemoMeetingModel.dateTime,
-                if(meet.isOnline) listOf(
+                meet.datetime,
+                if(meet.status == COMPLETED) gray()
+                else if(meet.isOnline) listOf(
                     colorScheme.secondary,
                     colorScheme.secondary
                 ) else listOf(
@@ -246,7 +293,7 @@ private fun MeetDetails(
 
 @Composable
 private fun Avatar(
-    avatar: AvatarModel?,
+    avatar: String?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -257,13 +304,12 @@ private fun Avatar(
                 shapes.large
             )
     ) {
-        AsyncImage(
-            avatar?.id, (null),
-            Modifier
+        GCashedImage(
+            avatar, Modifier
                 .fillMaxWidth()
                 .clip(shapes.large)
                 .clickable { onClick() },
-            contentScale = FillHeight
+            contentScale = Crop
         )
     }
 }

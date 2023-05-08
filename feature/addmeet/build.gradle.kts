@@ -9,7 +9,12 @@ compose()
 dependencies {
     androidBase()
     compose()
-    implementation(project(":shared"))
+    
+    implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:bubbles"))
-    implementation(project(":data:auth"))
+    
+    implementation(project(":data:meetings"))
+    implementation(project(":data:profile"))
+    
+    implementation(project(":shared"))
 }

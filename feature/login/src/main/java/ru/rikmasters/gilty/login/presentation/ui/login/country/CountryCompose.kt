@@ -18,10 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.login.R
+import ru.rikmasters.gilty.feature.login.R
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
-import ru.rikmasters.gilty.shared.shared.Divider
+import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.SearchActionBar
 import ru.rikmasters.gilty.shared.shared.SearchState
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -114,12 +114,13 @@ fun CountryBottomSheetContent(
                                 )
                                 Icon(
                                     Icons.Filled.KeyboardArrowRight,
-                                    (null), Modifier, MaterialTheme.colorScheme.outline
+                                    (null), Modifier.size(28.dp),
+                                    MaterialTheme.colorScheme.outline
                                 )
                             }
                         }
                     }
-                    if (index < state.countries.size - 1) Divider(Modifier.padding(start = 54.dp))
+                    if (index < state.countries.size - 1) GDivider(Modifier.padding(start = 54.dp))
                 }
             }
     }

@@ -11,7 +11,7 @@ import ru.rikmasters.gilty.core.module.FeatureDefinition
 
 fun initApplication(context: Context, root: FeatureDefinition) {
 
-    val env = Environment(context, root)
+    val env = Environment(root)
 
     val koin = startKoin {
         androidLogger()

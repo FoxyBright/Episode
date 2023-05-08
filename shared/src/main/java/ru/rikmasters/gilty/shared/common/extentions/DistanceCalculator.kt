@@ -1,15 +1,25 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-
-fun distanceCalculator(
-    meet: MeetingModel
+import android.location.Location
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+infix fun FullMeetingModel.distance(
+    myLocation: Pair<Double, Double>?
 ): String {
     
-    // TODO Здесь вычислять расстояние
-    //  от пользователя до встречи
+    if(location?.lat == null
+        || location.lng == null
+        || myLocation == null
+    ) return ""
     
-    return "18 км"
+    val array = FloatArray(2)
+    
+    Location.distanceBetween(
+        location.lat,
+        location.lng,
+        myLocation.first,
+        myLocation.second,
+        array
+    )
+    
+    return "${array[0].toInt() / 1000} км"
 }
-
-

@@ -23,19 +23,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
-import ru.rikmasters.gilty.login.R
+import ru.rikmasters.gilty.feature.login.R
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.R as SR
 
 private val loginMethods = listOf(
@@ -137,12 +137,25 @@ fun LoginContent(
             Column(
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 36.dp)) {
-                PhoneField(Modifier, state.phone, state.country, callback)
-                NextButton(Modifier, state.isNextActive) { callback?.onNext() }
+                    .padding(top = 36.dp)
+            ) {
+                PhoneField(
+                    Modifier, state.phone,
+                    state.country, callback
+                )
+                NextButton(
+                    Modifier,
+                    state.isNextActive
+                ) { callback?.onNext() }
             }
             
-            external?.let { LoginMethodsButtons(Modifier, state.methods, callback) }
+            external?.let {
+                LoginMethodsButtons(
+                    Modifier,
+                    state.methods,
+                    callback
+                )
+            }
         }
         external?.let {
             Spacer(Modifier.weight(0.1f))
@@ -157,11 +170,11 @@ fun LoginContent(
 
 @Composable
 private fun Logo(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Image(
         painterResource(SR.drawable.ic_logo),
-        stringResource(SR.string.gilty_logo),
+        stringResource(SR.string.episode_logo),
         modifier
             .heightIn(64.dp, 210.dp)
             .padding(horizontal = 16.dp)
@@ -171,11 +184,11 @@ private fun Logo(
 @Composable
 private fun TopBar(
     method: String?,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
 ) {
     ActionBar(
         stringResource(R.string.login_external_bar),
-        stringResource(
+        Modifier, stringResource(
             R.string.login_external_bar_details,
             (method ?: "")
         )
@@ -186,7 +199,7 @@ private fun TopBar(
 private fun LoginMethodsButtons(
     modifier: Modifier = Modifier,
     methods: List<LoginMethod>,
-    callback: LoginCallback? = null
+    callback: LoginCallback? = null,
 ) {
     Box(
         modifier
@@ -199,7 +212,8 @@ private fun LoginMethodsButtons(
             exit = fadeOut()
         ) {
             Column(
-                Modifier, Top, CenterHorizontally
+                Modifier, Top,
+                CenterHorizontally
             ) {
                 Text(
                     stringResource(R.string.alternative_separator),
@@ -231,7 +245,7 @@ private val LoginMethod.icon
 private fun LoginMethodButton(
     method: LoginMethod,
     modifier: Modifier = Modifier,
-    onClick: (LoginMethod) -> Unit
+    onClick: (LoginMethod) -> Unit,
 ) {
     Button(
         { onClick(method) },
@@ -248,9 +262,7 @@ private fun LoginMethodButton(
             verticalAlignment = CenterVertically
         ) {
             Image(
-                method.icon,
-                null,
-                Modifier
+                method.icon, (null), Modifier
                     .padding(end = 18.dp)
                     .padding(vertical = 10.dp),
                 colorFilter = if(method.name != "Apple")
@@ -259,7 +271,7 @@ private fun LoginMethodButton(
             Text(
                 stringResource(R.string.login_via, method.name),
                 style = typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = Bold,
                 color = colorScheme.tertiary
             )
         }
@@ -269,14 +281,19 @@ private fun LoginMethodButton(
 @Composable
 private fun ConfirmationPolicy(
     modifier: Modifier = Modifier,
-    callback: LoginCallback? = null
+    callback: LoginCallback? = null,
 ) {
-    val textStyle = SpanStyle(ThemeExtra.colors.policyAgreeColor)
+    val textStyle = SpanStyle(colors.policyAgreeColor)
+    
     val linkStyle = SpanStyle(
         colorScheme.tertiary,
         textDecoration = Underline
     )
-    val typography = typography.labelSmall.copy(fontWeight = SemiBold)
+    
+    val typography = typography
+        .labelSmall
+        .copy(fontWeight = SemiBold)
+    
     val annotatedText = buildAnnotatedString {
         val terms = stringResource(R.string.terms)
         val policy = stringResource(R.string.privacy_police)
@@ -284,19 +301,35 @@ private fun ConfirmationPolicy(
             R.string.privacy_police_agree,
             terms, policy
         )
-        withStyle(textStyle) {
-            append(text)
-        }
+        withStyle(textStyle) { append(text) }
         text.indexOf(terms).let {
             addStyle(linkStyle, it, it + terms.length)
-            addStringAnnotation("terms", "", it, it + terms.length)
+            addStringAnnotation(
+                tag = "terms",
+                annotation = "",
+                start = it,
+                end = it + terms.length
+            )
         }
         text.indexOf(policy).let {
-            addStyle(linkStyle, it, it + policy.length)
-            addStringAnnotation("policy", "", it, it + policy.length)
+            addStyle(
+                linkStyle,
+                start = it,
+                end = it + policy.length
+            )
+            addStringAnnotation(
+                tag = "policy",
+                annotation = "",
+                start = it,
+                end = it + policy.length
+            )
         }
     }
-    ClickableText(annotatedText, modifier.padding(horizontal = 16.dp), typography) {
+    ClickableText(
+        annotatedText,
+        modifier.padding(horizontal = 16.dp),
+        typography
+    ) {
         annotatedText.getStringAnnotations(
             "terms", it, it
         ).firstOrNull()?.let { callback?.termsOfApp() }

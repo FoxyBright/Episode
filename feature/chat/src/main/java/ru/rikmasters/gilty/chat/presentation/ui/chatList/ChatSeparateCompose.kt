@@ -4,69 +4,31 @@ import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayRodName
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
-import java.util.Locale
 
-fun getSortedChats(
-    chats: List<ChatModel>
-): Pair<List<Pair<String, List<ChatModel>>>, List<ChatModel>> {
-    
-    val sortChats = chats.sortedBy {
-        LocalDate.of(it.dateTime).millis()
+fun getSortedChats(chats: List<ChatModel>) = chats
+    .groupBy { it.datetime.take(10) }
+    .map {
+        when {
+            todayControl(it.key) -> "Сегодня"
+            tomorrowControl(it.key) -> "Завтра"
+            else -> getDateString(LocalDate.of(it.key))
+        } to it.value
     }
+
+private fun getDateString(date: LocalDate): String {
+    val weekDay = date.dayOfWeek()
     
-    val lastChats =
-        arrayListOf<ChatModel>()
-    val list =
-        arrayListOf<Pair<String, List<ChatModel>>>()
+    val prefix = if(weekDay.ordinal == 2)
+        "Во" else "В"
     
-    val dateList =
-        arrayListOf<String>()
-    sortChats.forEach {
-        
-        val date = it.dateTime
-            .format(DATE_FORMAT)
-        if(!dateList.contains(date) &&
-            (LocalDate.of(date).isAfter(LOCAL_DATE)
-                    || todayControl(date))
-        )
-            dateList.add(date)
-        if(LocalDate.of(date)
-                .isBefore(LOCAL_DATE)
-        ) lastChats.add(it)
-    }
+    val wdName = weekDay
+        .displayRodName()
+        .lowercase()
     
-    dateList.forEach { date ->
-        val chatList =
-            arrayListOf<ChatModel>()
-        sortChats.forEach { chat ->
-            val meetDate =
-                LocalDate.of(chat.dateTime)
-            
-            if(meetDate.toString() == date)
-                chatList.add(chat)
-        }
-        
-        list.add(
-            Pair(
-                if(todayControl(date)) "Сегодня" else {
-                    val it = LocalDate.of(date)
-                    val dayOfWeek = it.dayOfWeek()
-                    "${
-                        if(dayOfWeek.ordinal == 2)
-                            "Во" else "В"
-                    } ${
-                        dayOfWeek.displayRodName()
-                            .lowercase(Locale.getDefault())
-                    } ${it.day()} ${
-                        Month.of(it.month())
-                            .displayRodName()
-                            .lowercase(Locale.getDefault())
-                    }"
-                },
-                chatList
-            )
-        )
-    }
+    val month = Month
+        .of(date.month())
+        .displayRodName()
+        .lowercase()
     
-    return Pair(list, lastChats)
+    return "$prefix $wdName ${date.day()} $month"
 }

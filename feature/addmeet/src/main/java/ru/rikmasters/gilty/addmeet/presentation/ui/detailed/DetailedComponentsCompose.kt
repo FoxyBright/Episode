@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -9,10 +10,14 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.TagSearch
+import ru.rikmasters.gilty.shared.common.Tags
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.shared.*
 
@@ -25,19 +30,11 @@ fun tags(
     stringResource(R.string.add_meet_detailed_tags_maximum, (3))
 ) {
     Column {
-        TagSearch(
+        Tags(
             state.tagList,
             { callback?.onTagsClick() },
             state.online
-        ) { callback?.onTagDelete(state.tagList[it]) }
-        Text(
-            stringResource(R.string.add_meet_detailed_tags_description),
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
-            colorScheme.onTertiary,
-            style = typography.headlineSmall
-        )
+        ) { callback?.onTagDelete(it) }
     }
 }
 
@@ -45,57 +42,67 @@ fun tags(
 fun description(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
-    Column {
-        Column(Modifier.fillMaxWidth()) {
+) =
+    FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
+        Column {
             GTextField(
                 state.description, {
                     if(it.length <= 120)
                         callback?.onDescriptionChange(it)
                 },
                 Modifier.fillMaxWidth(),
-                shape = shapes.medium,
                 colors = descriptionColors(state.online),
+                shape = shapes.medium,
                 label = if(state.description.isNotEmpty())
                     textFieldLabel(
-                        true,
-                        stringResource(R.string.add_meet_detailed_meet_description_place_holder)
-                    ) else null, placeholder = textFieldLabel(
-                    false,
-                    stringResource(R.string.add_meet_detailed_meet_description_place_holder)
+                        (true),
+                        stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                        labelFont = typography.headlineSmall.copy(
+                            colorScheme.onTertiary
+                        ),
+                    ) else null,
+                placeholder = textFieldLabel(
+                    (false),
+                    stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                    holderFont = typography.bodyMedium
                 ), textStyle = typography.bodyMedium,
+                keyboardOptions = Default.copy(
+                    imeAction = Done,
+                    keyboardType = Text,
+                    capitalization = Sentences
+                ),
                 clear = { callback?.onDescriptionClear() }
             )
             Text(
                 "${state.description.length}/120",
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .padding(top = 4.dp, end = 16.dp),
                 colorScheme.onTertiary,
                 textAlign = TextAlign.End,
                 style = typography.headlineSmall
             )
         }
     }
-}
 
 @Composable
 fun additionally(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) = FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-    Row(Modifier.fillMaxWidth()) {
-        DataTimeCard(
-            state.date, DataTimeType.DATE,
-            state.online, Modifier.weight(1f)
-        ) { callback?.onDateClick() }
-        Spacer(Modifier.width(16.dp))
-        DataTimeCard(
-            state.time, DataTimeType.TIME,
-            state.online, Modifier.weight(1f)
-        ) { callback?.onTimeClick() }
+) =
+    FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
+        Row(Modifier.fillMaxWidth()) {
+            DataTimeCard(
+                state.date, DataTimeType.DATE,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onDateClick() }
+            Spacer(Modifier.width(16.dp))
+            DataTimeCard(
+                state.time, DataTimeType.TIME,
+                state.online, Modifier.weight(1f)
+            ) { callback?.onTimeClick() }
+        }
     }
-}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,7 +141,8 @@ fun MeetPlace(
                         stringResource(R.string.add_meet_detailed_meet_place),
                         Modifier.padding(16.dp),
                         colorScheme.onTertiary,
-                        style = typography.bodyMedium
+                        style = typography.bodyMedium,
+                        fontWeight = W600
                     )
                 }
             }
@@ -143,7 +151,7 @@ fun MeetPlace(
             stringResource(R.string.add_meet_detailed_meet_place_place_holder),
             Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp, start = 16.dp),
+                .padding(top = 4.dp, start = 32.dp),
             colorScheme.onTertiary,
             style = typography.headlineSmall
         )

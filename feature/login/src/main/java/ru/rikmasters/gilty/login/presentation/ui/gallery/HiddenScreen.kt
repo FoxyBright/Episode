@@ -15,10 +15,11 @@ fun HiddenScreen(
     vm: HiddenViewModel,
 ) {
     
-    val nav = get<NavState>()
-    val scope = rememberCoroutineScope()
-    
     val photoList by vm.photoList.collectAsState()
+    val scope = rememberCoroutineScope()
+    val nav = get<NavState>()
+    
+    LaunchedEffect(Unit) { vm.getHidden() }
     
     HiddenContent(HiddenState(photoList), Modifier,
         object: HiddenCallback {
@@ -40,12 +41,11 @@ fun HiddenScreen(
             }
             
             override fun onNext() {
-                nav.navigate(
-                    "profile?hp=${
-                        if(photoList.isEmpty()) ""
-                        else photoList.last()
-                    }"
-                )
+                scope.launch {
+                    vm.onNext()
+                    nav.navigate("profile")
+                }
             }
-        })
+        }
+    )
 }

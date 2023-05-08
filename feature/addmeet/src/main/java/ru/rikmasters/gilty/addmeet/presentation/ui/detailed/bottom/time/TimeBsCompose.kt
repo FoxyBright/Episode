@@ -1,34 +1,24 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.extentions.HOURS_IN_DAY
-import ru.rikmasters.gilty.shared.common.extentions.MINUTES_IN_HOUR
-import ru.rikmasters.gilty.shared.common.extentions.TIME_START
-import ru.rikmasters.gilty.shared.common.extentions.TODAY_LABEL
-import ru.rikmasters.gilty.shared.common.extentions.getDate
-import ru.rikmasters.gilty.shared.common.extentions.getTime
-import ru.rikmasters.gilty.shared.common.extentions.replacer
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ListItemPicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-
-private const val MINUTES_STEP = 5
-private const val HOURS_STEP = 1
 
 @Preview(showBackground = true)
 @Composable
@@ -36,10 +26,9 @@ private fun DateTimeBSPreview() {
     GiltyTheme {
         DateTimeBS(
             DateTimeBSState(
-                TODAY_LABEL, TIME_START,
-                TIME_START, false
-            ),
-            Modifier.padding(16.dp)
+                "${LOCAL_DATE.plusDays(4)}$ZERO_TIME",
+                "14", "30", (false), (true)
+            ), Modifier.padding(16.dp)
         )
     }
 }
@@ -49,6 +38,7 @@ data class DateTimeBSState(
     val hour: String,
     val minute: String,
     val online: Boolean,
+    val isActive: Boolean,
 )
 
 interface DateTimeBSCallback {
@@ -65,26 +55,34 @@ fun DateTimeBS(
     modifier: Modifier = Modifier,
     callback: DateTimeBSCallback? = null,
 ) {
-    Column(
+    Box(
         modifier
             .fillMaxWidth()
+            .fillMaxHeight(0.55f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
+        DateTimePickerContent(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(TopCenter),
+            state, callback
+        )
         Text(
-            "Дата и время встречи",
-            Modifier.padding(bottom = 16.dp),
+            stringResource(R.string.add_meet_detailed_meet_date_episode),
+            Modifier
+                .padding(bottom = 16.dp)
+                .align(TopStart),
             colorScheme.tertiary,
             style = typography.labelLarge
         )
-        DateTimePickerContent(
-            Modifier.fillMaxWidth(),
-            state, callback
-        )
         GradientButton(
-            Modifier.padding(vertical = 28.dp),
+            Modifier
+                .padding(vertical = 28.dp)
+                .align(BottomCenter),
             stringResource(R.string.save_button),
-            online = state.online
+            state.isActive, state.online
         ) { callback?.onSave() }
     }
 }
@@ -96,20 +94,38 @@ private fun DateTimePickerContent(
     callback: DateTimeBSCallback? = null,
 ) {
     Box(
-        modifier.background(colorScheme.background),
-        Alignment.Center
+        modifier.background(
+            colorScheme.background
+        ), Center
     ) {
-        Row {
-            ListItemPicker(state.date, getDate())
-            { callback?.dateChange(it) };ListItemPicker(
-            replacer(state.hour, "$HOURS_IN_DAY"),
-            getTime(0..HOURS_IN_DAY, HOURS_STEP),
-            Modifier, { replacer(it, "$HOURS_IN_DAY") }
-        ) { callback?.hourChange(it) };ListItemPicker(
-            replacer(state.minute, "$MINUTES_IN_HOUR"),
-            getTime(0..MINUTES_IN_HOUR, MINUTES_STEP),
-            Modifier, { replacer(it, "$MINUTES_IN_HOUR") }
-        ) { callback?.minuteChange(it) }
+        Row(Modifier.padding(horizontal = 20.dp)) {
+            ListItemPicker(
+                state.date.ifBlank {
+                    "$LOCAL_DATE$ZERO_TIME"
+                }, getDate(),
+                Modifier.weight(2.5f), {
+                    it.format("E dd MMM")
+                        .replaceFirstChar { c ->
+                            c.uppercase()
+                        }
+                }, doublePlaceHolders = true
+            ) { callback?.dateChange(it) }
+            getTime().let { (hours, minutes) ->
+                ListItemPicker(
+                    state.hour.ifBlank {
+                        hours.last()
+                    }, hours,
+                    Modifier.weight(1f),
+                    doublePlaceHolders = true
+                ) { callback?.hourChange(it) }
+                ListItemPicker(
+                    state.minute.ifBlank {
+                        minutes.last()
+                    }, minutes,
+                    Modifier.weight(1f),
+                    doublePlaceHolders = true
+                ) { callback?.minuteChange(it) }
+            }
         }
     }
 }

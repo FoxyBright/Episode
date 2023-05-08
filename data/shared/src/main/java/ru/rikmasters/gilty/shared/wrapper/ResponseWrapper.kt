@@ -9,22 +9,40 @@ enum class Status {
     SUCCESS,
     
     @JsonAlias("error")
+    @Suppress("unused")
     ERROR
 }
 
 data class ResponseWrapper<T: Any?>(
     val status: Status,
     val data: T,
-    val error: Error? = null
+    val error: Error? = null,
+    val paginator: Paginator? = null,
 ) {
     
+    @Suppress("unused")
+    class Paginator(
+        val total: Int,
+        val perPage: Int,
+        val currentPage: Int,
+        val list_page: Int,
+        val limit: Int,
+        val offset: Int,
+    ) {
+        
+        constructor(): this(
+            (0), (0), (0),
+            (0), (0), (0)
+        )
+    }
+    
     data class Error(
-        val code: String,
-        val message: String,
-        val exception: String,
-        val file: String,
-        val line: Int,
-        val trace: Any?
+        val code: String? = null,
+        val message: String? = null,
+        val exception: String? = null,
+        val file: String? = null,
+        val line: Int? = null,
+        val trace: Any? = null,
     )
     
     val dataChecked: T
@@ -37,16 +55,23 @@ data class ResponseWrapper<T: Any?>(
 
 data class ErrorResponseWrapper(
     val status: Status,
-    val error: Error
+    val error: Error,
 ) {
+    
     data class Error(
         val code: String,
         val message: String,
         val exception: String,
         val file: String,
         val line: Int,
-        val trace: Any?
+        val trace: Any?,
     )
+}
+
+suspend inline fun <reified T> HttpResponse.paginateWrapped(
+): Pair<T, ResponseWrapper.Paginator> where T: Any? {
+    val response = body<ResponseWrapper<T>>()
+    return Pair(response.data, response.paginator!!)
 }
 
 suspend inline fun HttpResponse.errorWrapped() =

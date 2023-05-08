@@ -8,11 +8,12 @@ enum class MeetType {
     
     PERSONAL,
     GROUP,
-    ANONYMOUS;
+    ANONYMOUS,
+    NON_SELECT;
     
     companion object {
         
-        val list = values().toList()
+        val list = values().toList() - NON_SELECT
         fun get(index: Int) = list[index]
     }
     
@@ -22,6 +23,7 @@ enum class MeetType {
                 PERSONAL -> R.string.meeting_personal_type
                 ANONYMOUS -> R.string.meeting_anon_type
                 GROUP -> R.string.meeting_group_type
+                NON_SELECT -> R.string.empty_String
             }
         )
     
@@ -31,6 +33,7 @@ enum class MeetType {
                 PERSONAL -> R.string.meeting_filter_select_meeting_type_personal
                 ANONYMOUS -> R.string.meeting_filter_select_meeting_type_anonymous
                 GROUP -> R.string.meeting_filter_select_meeting_type_grouped
+                NON_SELECT -> R.string.empty_String
             }
         )
 }

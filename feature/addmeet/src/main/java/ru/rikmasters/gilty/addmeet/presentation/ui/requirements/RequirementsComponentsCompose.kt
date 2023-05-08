@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,47 +31,65 @@ fun RequirementsList(
     callback: RequirementsCallback? = null,
 ) {
     Column(modifier) {
+        val memberCount = try {
+            state.memberCount.toInt()
+        } catch(e: Exception) {
+            0
+        }
         val selected = state.selectedMember
-        if(state.memberCount.toInt() > 1
-            || state.meetType != PERSONAL
-        ) {
+        if(state.meetType != PERSONAL) {
             GiltyTab(
                 listOf(
                     stringResource(R.string.requirements_filter_all),
                     stringResource(R.string.requirements_filter_personal)
-                ),
-                state.selectTab,
-                Modifier, state.online,
+                ), state.selectTab, Modifier.padding(bottom = 12.dp),
+                state.online, if(state.memberLimited
+                    && state.memberCount.isNotBlank()
+                    && memberCount > 1
+                ) emptyList() else listOf(1)
             ) { callback?.onTabClick(it) }
             if(state.selectTab == 1) LazyRow(
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
-                items(state.memberCount.toInt()) {
-                    GiltyChip(
+                val count = if(memberCount < 2)
+                    2 else memberCount
+                items(count) {
+                    GChip(
                         Modifier.padding(top = 4.dp, end = 8.dp),
-                        "${it + 1}", (it == selected), state.online
+                        "${it + 1}", (it == selected),
+                        state.online, (false)
                     ) { callback?.onMemberClick(it) }
                 }
             }
         }
-        CardRow(
-            stringResource(R.string.sex), state.gender ?: "",
-            ThemeExtra.shapes.mediumTopRoundedShape,
-            state.online, Modifier.padding(top = 8.dp),
-        ) { callback?.onGenderClick() }
-        Divider(Modifier.padding(start = 16.dp))
-        CardRow(
-            stringResource(R.string.personal_info_age_placeholder),
-            state.age ?: "",
-            ThemeExtra.shapes.zero, state.online
-        ) { callback?.onAgeClick() }
-        Divider(Modifier.padding(start = 16.dp))
-        CardRow(
-            stringResource(R.string.orientation_title),
-            state.orientation ?: "",
-            ThemeExtra.shapes.mediumBottomRoundedShape,
-            state.online
-        ) { callback?.onOrientationClick() }
+        Column(
+            Modifier.background(
+                colorScheme.primaryContainer,
+                shapes.medium
+            )
+        ) {
+            CardRow(
+                stringResource(R.string.sex),
+                (state.gender ?: ""), Modifier,
+                ThemeExtra.shapes.mediumTopRoundedShape,
+                state.online,
+            ) { callback?.onGenderClick() }
+            GDivider(Modifier.padding(start = 16.dp))
+            CardRow(
+                stringResource(R.string.personal_info_age_placeholder),
+                (state.age ?: ""), Modifier,
+                ThemeExtra.shapes.zero, state.online
+            ) { callback?.onAgeClick() }
+            GDivider(Modifier.padding(start = 16.dp))
+            CardRow(
+                stringResource(R.string.orientation_title),
+                (state.orientation ?: ""), Modifier,
+                ThemeExtra.shapes.mediumBottomRoundedShape,
+                state.online
+            ) { callback?.onOrientationClick() }
+        }
     }
 }
 
@@ -83,7 +102,10 @@ fun responds(
 ) = FilterModel(stringResource(R.string.profile_responds_label)) {
     TrackCard(
         stringResource(R.string.add_meet_without_respond_title),
-        stringResource(R.string.add_meet_without_respond_label),
+        stringResource(
+            if(withoutRespond) R.string.add_meet_with_respond_label
+            else R.string.add_meet_without_respond_label
+        ),
         isOnline, withoutRespond, modifier
     ) { onClick?.let { it() } }
 }
@@ -121,37 +143,43 @@ fun memberCountInput(
     memberLimited: Boolean,
     modifier: Modifier = Modifier,
     onMemberLimit: (() -> Unit)? = null,
+    onClear: (() -> Unit)? = null,
     onChange: ((String) -> Unit)? = null,
 ) = FilterModel(stringResource(R.string.requirements_member_count_label)) {
     Column(modifier) {
         TrackCard(
             stringResource(R.string.add_meet_member_limit_title),
-            stringResource(R.string.add_meet_member_limit_label),
-            isOnline, memberLimited
+            stringResource(
+                if(memberLimited) R.string.add_meet_member_limit_label
+                else R.string.add_meet_member_not_limited_label
+            ), isOnline, memberLimited
         ) { onMemberLimit?.let { it() } }
-        GTextField(
+        if(memberLimited) GTextField(
             text, {
                 if(it.matches(Regex("^\\d+\$"))
                     || it.isEmpty()
                 ) onChange?.let { text -> text(onNull(it)) }
-            }, Modifier.fillMaxWidth(), memberLimited,
+            }, Modifier.fillMaxWidth(),
             isError = try {
                 text.toInt() < 2
-            } catch(_: Exception) {
+            } catch(e: Exception) {
                 false
             }, shape = shapes.medium,
             errorBottomText = stringResource(R.string.add_meet_member_limit_error),
             colors = descriptionColors(isOnline),
             label = if(text.isNotEmpty()) textFieldLabel(
-                (true), stringResource(R.string.requirements_member_count_place_holder)
+                (true),
+                stringResource(R.string.requirements_member_count_place_holder)
             ) else null, placeholder = textFieldLabel(
-                (false), stringResource(R.string.requirements_member_count_place_holder)
+                (false),
+                stringResource(R.string.requirements_member_count_place_holder)
             ), textStyle = typography.bodyMedium,
+            singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = NumberPassword
             ), visualTransformation = transformationOf(
                 numberMask(text.length)
-            )
+            ), clear = { onClear?.let { it() } }
         )
     }
 }

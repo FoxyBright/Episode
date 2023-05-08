@@ -15,23 +15,22 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoriesListCard
+import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.getDemoMeetingModel
 import ru.rikmasters.gilty.shared.theme.Gradients.gray
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -42,9 +41,10 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 private fun MeetingCardTodayPreview() {
     GiltyTheme {
         MeetingCard(
-            DemoMeetingModel,
-            Modifier.padding(20.dp),
-            true
+            DemoMeetingModel.copy(
+                datetime = now().toString(),
+                isOnline = true
+            ), Modifier.padding(20.dp)
         )
     }
 }
@@ -54,7 +54,7 @@ private fun MeetingCardTodayPreview() {
 private fun MeetingCardPreview() {
     GiltyTheme {
         MeetingCard(
-            getDemoMeetingModel(condition = FREE),
+            DemoMeetingModel.copy(condition = FREE),
             Modifier.padding(20.dp)
         )
     }
@@ -65,6 +65,7 @@ private fun MeetingCardPreview() {
 private fun MeetingCategoryCardPreview() {
     GiltyTheme {
         MeetingCategoryCard(
+            "",
             DemoMeetingModel,
             Modifier.padding(20.dp),
             old = true
@@ -77,9 +78,11 @@ private fun MeetingCategoryCardPreview() {
 private fun MeetingCategoryCardTodayPreview() {
     GiltyTheme {
         MeetingCategoryCard(
-            getDemoMeetingModel(condition = FREE),
-            Modifier.padding(20.dp),
-            today = true,
+            "userID",
+            DemoMeetingModel.copy(
+                condition = FREE,
+                datetime = now().toString()
+            ), Modifier.padding(20.dp),
             old = false
         ) {}
     }
@@ -90,27 +93,32 @@ private fun MeetingCategoryCardTodayPreview() {
 fun MeetingCard(
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    today: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
+    val today = todayControl(meeting.datetime)
     Card(
         { onClick?.let { it() } },
         modifier, shape = shapes.large,
         colors = cardColors(colors.meetingCardBackBackground)
     ) {
         Text(
-            meeting.title,
-            Modifier
+            meeting.tags.first().title, Modifier
                 .padding(horizontal = 14.dp)
                 .padding(top = 14.dp, bottom = 8.dp),
             colorScheme.tertiary,
             style = typography.bodyMedium,
-            fontWeight = Bold
+            overflow = Ellipsis,
+            fontWeight = Bold,
+            maxLines = 1
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
-                meeting.dateTime,
-                green(), today
+                meeting.datetime,
+                if(meeting.isOnline) green()
+                else listOf(
+                    meeting.category.color,
+                    meeting.category.color
+                ), today
             )
             if(today) CategoriesListCard(
                 Modifier.padding(start = 4.dp),
@@ -122,10 +130,9 @@ fun MeetingCard(
                 .offset(-(26).dp, 10.dp)
                 .width(156.dp)
         ) {
-            AsyncImage(
-                meeting.organizer?.avatar?.id,
-                stringResource(R.string.meeting_avatar),
-                Modifier
+            GCashedImage(
+                meeting.organizer?.avatar
+                    ?.thumbnail?.url, Modifier
                     .clip(CircleShape)
                     .size(135.dp),
                 contentScale = Crop
@@ -149,12 +156,13 @@ fun MeetingCard(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MeetingCategoryCard(
+    userId: String,
     meeting: MeetingModel,
     modifier: Modifier = Modifier,
-    today: Boolean = false,
     old: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
+    val today = todayControl(meeting.datetime)
     val color = meeting.category.color
     Card(
         { onClick?.let { it() } },
@@ -169,12 +177,12 @@ fun MeetingCategoryCard(
             colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = Bold,
-            overflow = TextOverflow.Ellipsis,
+            overflow = Ellipsis,
             maxLines = 1
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
-                meeting.dateTime,
+                meeting.datetime,
                 when {
                     old -> gray()
                     meeting.isOnline -> green()
@@ -188,28 +196,42 @@ fun MeetingCategoryCard(
                 .offset(-(8).dp)
                 .width(156.dp)
         ) {
+            val user = meeting.organizer
+            val hasAvatar = user?.id != null && userId != user.id
             Box(
                 Modifier
                     .background(
-                        linearGradient(
-                            when {
-                                old -> gray()
-                                meeting.isOnline -> listOf(
-                                    colorScheme.secondary,
-                                    colorScheme.secondary
-                                )
-                    
-                                else -> listOf(color, color)
-                            }
-                        ), CircleShape
+                        when {
+                            old -> colorScheme.onTertiary
+                            meeting.isOnline -> colorScheme.secondary
+                            else -> color
+                        }, CircleShape
                     )
                     .size(126.dp), Center
             ) {
-                Text(
+                if(hasAvatar) GCashedImage(
+                    user?.avatar?.thumbnail?.url,
+                    Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    contentScale = Crop
+                )
+                if(old && hasAvatar) Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(
+                            colors.meetingTransparencyShape,
+                            CircleShape
+                        )
+                )
+                if(!hasAvatar) Text(
                     meeting.category.name,
-                    Modifier, White,
+                    Modifier.padding(horizontal = 16.dp), White,
                     style = typography.labelSmall,
-                    fontWeight = SemiBold
+                    textAlign = TextAlign.Center,
+                    fontWeight = SemiBold,
+                    overflow = Ellipsis,
+                    maxLines = 3
                 )
             }
             CategoriesListCard(

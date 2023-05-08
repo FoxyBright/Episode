@@ -5,49 +5,44 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
-import ru.rikmasters.gilty.addmeet.viewmodel.SelectCategory
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 @Composable
 fun CategoriesScreen(vm: CategoryViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
-    
-    val alert by vm.alert.collectAsState()
+    val nav = get<NavState>()
     
     val categories by vm.categories.collectAsState()
     val selected by vm.selected.collectAsState()
+    val online by vm.online.collectAsState()
+    val alert by vm.alert.collectAsState()
     
-    // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
-    var sleep by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { vm.getCategories() }
     
-    LaunchedEffect(Unit) {
-        vm.getCategories()
-        sleep = true
-    }
-    
-    if(sleep) CategoriesContent(
+    CategoriesContent(
         Modifier, CategoriesState(
-            categories, selected, alert
+            categories, selected, online, alert
         ), object: CategoriesCallback {
             
-            override fun onClose() {
-                nav.navigateAbsolute("main/meetings")
+            override fun onCategoryClick(category: CategoryModel) {
+                scope.launch {
+                    vm.selectCategory(category)
+                    nav.navigate("conditions")
+                }
             }
             
             override fun onCloseAlert(state: Boolean) {
                 scope.launch { vm.alertDismiss(state) }
             }
             
-            override fun onCategoryClick(category: CategoryModel) {
+            override fun onClose() {
                 scope.launch {
-                    vm.selectCategory(category)
-                    SelectCategory?.let {
-                        nav.navigate("conditions")
-                    }
+                    vm.clearAddMeet()
+                    nav.clearStackNavigation("main/meetings")
                 }
             }
-        })
+        }
+    )
 }

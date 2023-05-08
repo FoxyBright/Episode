@@ -11,7 +11,9 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 fun lazyItemsShapes(
     index: Int, size: Int,
     radius: Dp = 12.dp,
-) = if(size != 1) when(index) {
+) = if(size == 1)
+    RoundedCornerShape(radius)
+else when(index) {
     0 -> RoundedCornerShape(
         topStart = radius,
         topEnd = radius
@@ -23,14 +25,16 @@ fun lazyItemsShapes(
     )
     
     else -> shapes.zero
-} else RoundedCornerShape(radius)
+}
 
 @Composable
 @Suppress("unused")
 fun lazyRowItemsShapes(
     index: Int, size: Int,
-) = if(size != 1) when(index) {
+) = if(size == 1)
+    MaterialTheme.shapes.medium
+else when(index) {
     0 -> shapes.extraLargeStartRoundedShape
     size - 1 -> shapes.extraLargeEndRoundedShape
     else -> shapes.zero
-} else MaterialTheme.shapes.medium
+}

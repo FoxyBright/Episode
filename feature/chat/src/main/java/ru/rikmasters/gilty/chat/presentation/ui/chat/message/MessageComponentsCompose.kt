@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,20 +39,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.animated.AnimatedImage
-import ru.rikmasters.gilty.shared.R.drawable.ic_sms_delivered
-import ru.rikmasters.gilty.shared.R.drawable.ic_sms_read
-import ru.rikmasters.gilty.shared.R.drawable.ic_write
-import ru.rikmasters.gilty.shared.R.raw.typing_dots
-import ru.rikmasters.gilty.shared.R.string.chats_hidden_photo
+import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.chat.*
-import ru.rikmasters.gilty.shared.model.chat.SystemMessageType.*
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType.*
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
-import ru.rikmasters.gilty.shared.model.meeting.DemoMemberModel
-import ru.rikmasters.gilty.shared.model.profile.EmojiModel
-import ru.rikmasters.gilty.shared.model.profile.badEmoji
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.badEmoji
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -68,7 +65,7 @@ private fun TextMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 (true), Modifier.padding(6.dp),
                 isOnline = true
             )
@@ -102,7 +99,7 @@ private fun AnswerMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 (true), Modifier.padding(6.dp),
                 DemoMessageModel,
                 isOnline = true
@@ -110,7 +107,7 @@ private fun AnswerMessagePreview() {
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoMessageModelLongMessage,
+                DemoLongMessageModel,
                 isOnline = true
             )
         }
@@ -128,12 +125,12 @@ private fun HiddenPhotoMessagePreview() {
         ) {
             HiddenImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (true), (false), shapes.large
             )
             HiddenImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (false), (true), shapes.large
             )
         }
@@ -150,14 +147,13 @@ private fun AnswerImageMessagePreview() {
             )
         ) {
             TextMessage(
-                DemoMessageModelLongMessage,
-                (true), Modifier.padding(6.dp),
-                DemoImageMessage, isOnline = true
+                DemoLongMessageModel, (true), Modifier.padding(6.dp),
+                DemoImageMessageModel, isOnline = true
             )
             TextMessage(
                 DemoMessageModel,
                 (false), Modifier.padding(6.dp),
-                DemoImageMessage, isOnline = true
+                DemoImageMessageModel, isOnline = true
             )
         }
     }
@@ -166,6 +162,7 @@ private fun AnswerImageMessagePreview() {
 @Preview
 @Composable
 private fun ImageMessagePreview() {
+    
     GiltyTheme {
         Column(
             Modifier.background(
@@ -174,13 +171,13 @@ private fun ImageMessagePreview() {
         ) {
             ImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (true), shapes.large,
                 (true)
             )
             ImageMessage(
                 Modifier.padding(6.dp),
-                DemoImageMessage,
+                DemoImageMessageModel,
                 (false), shapes.large,
                 (true)
             )
@@ -197,10 +194,10 @@ private fun SystemMessagePreview() {
                 colorScheme.background
             )
         ) {
-            SystemMessageType.values().forEach {
+            ChatNotificationType.values().forEach {
                 SystemMessage(
-                    ChatNotificationType(
-                        it, DemoMemberModel
+                    ChatNotificationModel(
+                        it, DemoUserModel
                     ), Modifier.padding(6.dp)
                 )
             }
@@ -211,7 +208,7 @@ private fun SystemMessagePreview() {
 @Composable
 fun WritingMessage(
     modifier: Modifier = Modifier,
-    shape: Shape = shapes.large
+    shape: Shape = shapes.large,
 ) {
     Box(
         modifier.background(
@@ -223,14 +220,14 @@ fun WritingMessage(
             .padding(12.dp, 8.dp)
             .size(24.dp)
         if(LocalInspectionMode.current) Image(
-            painterResource(ic_write), (null), mod
-        ) else AnimatedImage(typing_dots, mod)
+            painterResource(R.drawable.ic_write), (null), mod
+        ) else AnimatedImage(R.raw.typing_dots, mod)
     }
 }
 
 @Composable
 fun SystemMessage(
-    notification: ChatNotificationType?,
+    notification: ChatNotificationModel?,
     modifier: Modifier = Modifier,
 ) {
     val bold = typography.labelSmall
@@ -244,7 +241,10 @@ fun SystemMessage(
                 
                 when(notification.type) {
                     CHAT_CREATED -> append(
-                        "Чат создан"
+                        stringResource(
+                            R.string.chats_message_create_chat,
+                            "н"
+                        )
                     )
                     
                     MEMBER_JOIN ->
@@ -252,15 +252,22 @@ fun SystemMessage(
                             emoji = it.emoji
                             withStyle(bold) {
                                 append(
-                                    "${it.username}, ${it.age} "
+                                    "${it.username}, ${
+                                        if(it.age in 18..99)
+                                            it.age
+                                        else ""
+                                    } "
                                 )
                             }
                             appendInlineContent("emoji")
                             append(
-                                " присоединил${
-                                    if(it.gender == FEMALE)
-                                        "aсь" else "ся"
-                                } к встрече"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_join_meet,
+                                        if(it.gender == FEMALE)
+                                            "aсь" else "ся"
+                                    )
+                                }"
                             )
                         }
                     
@@ -274,10 +281,13 @@ fun SystemMessage(
                             }
                             appendInlineContent("emoji")
                             append(
-                                " покинул${
-                                    if(it.gender == FEMALE)
-                                        "а" else ""
-                                }  встречу"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_leave_meet,
+                                        if(it.gender == FEMALE)
+                                            "a" else ""
+                                    )
+                                }"
                             )
                         }
                     
@@ -288,10 +298,13 @@ fun SystemMessage(
                             { append("${it.username}, ${it.age} ") }
                             appendInlineContent("emoji")
                             append(
-                                " сделал${
-                                    if(it.gender == FEMALE)
-                                        "a" else ""
-                                } скриншот!"
+                                " ${
+                                    stringResource(
+                                        R.string.chats_message_make_screenshot,
+                                        if(it.gender == FEMALE)
+                                            "a" else ""
+                                    )
+                                }"
                             )
                         }
                     
@@ -300,14 +313,28 @@ fun SystemMessage(
                             colorScheme.secondary,
                             fontWeight = SemiBold
                         )
-                    ) { append("Трансляция начнется через 30 минут") }
+                    ) { append(stringResource(R.string.chats_message_translation_30)) }
                     
                     TRANSLATION_START_5 -> withStyle(
                         bold.copy(
                             colorScheme.secondary,
                             fontWeight = SemiBold
                         )
-                    ) { append("Трансляция начнется через 5 минут") }
+                    ) { append(stringResource(R.string.chats_message_translation_5)) }
+                    
+                    TRANSLATION_STARTED -> withStyle(
+                        bold.copy(
+                            colorScheme.secondary,
+                            fontWeight = SemiBold
+                        )
+                    ) { append(stringResource(R.string.chats_message_translation_started)) }
+                    
+                    TRANSLATION_COMPLETED -> withStyle(
+                        bold.copy(
+                            colorScheme.secondary,
+                            fontWeight = SemiBold
+                        )
+                    ) { append(stringResource(R.string.chats_message_translation_completed)) }
                 }
             },
             modifier.fillMaxWidth(),
@@ -333,16 +360,16 @@ fun HiddenImageMessage(
     modifier: Modifier = Modifier,
     message: MessageModel,
     sender: Boolean,
-    hide: Boolean,
+    hide: Boolean?,
     shape: Shape = shapes.large,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
         modifier, (true), shape,
         cardColors(Transparent),
     ) {
-        message.attachments?.let {
+        message.message?.attachments?.let {
             Box(
                 Modifier.background(
                     colorScheme.primaryContainer,
@@ -350,12 +377,12 @@ fun HiddenImageMessage(
                 )
             ) {
                 Row(Modifier.padding(12.dp, 8.dp)) {
-                    it.file?.let { img ->
-                        HiddenImage(img, Modifier, hide)
-                        { onClick?.let { it() } }
-                    }
+                    HiddenImage(
+                        it.first().file,
+                        Modifier, (hide == true)
+                    ) { onClick?.let { it() } }
                     Text(
-                        stringResource(chats_hidden_photo),
+                        stringResource(R.string.chats_hidden_photo),
                         Modifier.padding(
                             start = 12.dp,
                             top = 4.dp
@@ -383,28 +410,25 @@ fun ImageMessage(
     sender: Boolean,
     shape: Shape = shapes.large,
     isOnline: Boolean,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         { onClick?.let { it() } },
         modifier, (true), shape,
         cardColors(Transparent),
     ) {
-        Box {
-            message.attachments?.let {
-                it.file?.let { file ->
-                    AsyncImage(
-                        file.id, (null),
-                        Modifier
-                            .size(224.dp)
-                            .background(
-                                colorScheme.onTertiary,
-                                shape
-                            )
-                            .clip(shape),
-                        contentScale = Crop,
-                    )
-                }
+        Box(Modifier.fillMaxHeight(0.5f)) {
+            message.message?.attachments?.let {
+                GCashedImage(
+                    it.first().file?.url, Modifier
+                        .wrapContentSize()
+                        .background(
+                            colorScheme.onTertiary,
+                            shape
+                        )
+                        .clip(shape),
+                    contentScale = FillWidth,
+                )
             }
             Box(
                 Modifier
@@ -461,7 +485,7 @@ fun TextMessage(
     answer: MessageModel? = null,
     shape: Shape = shapes.large,
     isOnline: Boolean,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         modifier.background(
@@ -483,7 +507,7 @@ fun TextMessage(
                                 end = 30.dp
                             )
                             .clickable { onClick?.let { it() } },
-                        sender = sender
+                        isOnline, sender
                     )
                 }; TextWidget(message, sender)
             }
@@ -498,13 +522,14 @@ fun TextMessage(
 }
 
 @Composable
-private fun TextWidget(  // TODO Переписать под TextFlow
+private fun TextWidget(
+    // TODO Переписать под TextFlow
     message: MessageModel,
     sender: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
-        message.text, modifier
+        message.message?.text ?: "", modifier
             .padding(
                 end = if(sender) 50.dp else 36.dp
             ), if(sender) White
@@ -519,7 +544,7 @@ private fun MessageStatus(
     color: Color,
     sender: Boolean,
     messageModel: MessageModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier, Start,
@@ -534,8 +559,8 @@ private fun MessageStatus(
         Icon(
             painterResource(
                 if(messageModel.isRead)
-                    ic_sms_read
-                else ic_sms_delivered
+                    R.drawable.ic_sms_read
+                else R.drawable.ic_sms_delivered
             ), (null), Modifier
                 .padding(start = 2.dp)
                 .size(12.dp), color

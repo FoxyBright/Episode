@@ -25,7 +25,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategories: List<CategoryModel>,
-    val alert: Boolean
+    val alert: Boolean,
 )
 
 interface CategoriesCallback {
@@ -40,14 +40,14 @@ interface CategoriesCallback {
 fun CategoriesContent(
     modifier: Modifier = Modifier,
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     Column(modifier.fillMaxSize()) {
         Column(Modifier.weight(1f)) {
             ClosableActionBar(
                 stringResource(R.string.interested_you),
-                stringResource(R.string.interested_you_details),
-                Modifier, { callback?.onCloseAlert(true) }
+                Modifier, stringResource(R.string.interested_you_details),
+                { callback?.onCloseAlert(true) }
             )
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
@@ -69,19 +69,22 @@ fun CategoriesContent(
             stringResource(R.string.next_button)
         ) { callback?.onNext() }
     }
-    GAlert(state.alert, { callback?.onCloseAlert(false) },
+    val dismiss = { callback?.onCloseAlert(false) }
+    GAlert(
+        state.alert, Modifier, Pair(stringResource(R.string.exit_button))
+        { dismiss(); callback?.onClose() },
+        stringResource(R.string.add_meet_exit_alert_details),
         stringResource(R.string.change_user_categories_alert),
-        Modifier, stringResource(R.string.add_meet_exit_alert_details),
-        success = Pair(stringResource(R.string.exit_button))
-        { callback?.onCloseAlert(false); callback?.onClose() },
-        cancel = Pair(stringResource(R.string.cancel_button))
-        { callback?.onCloseAlert(false) })
+        { dismiss() },
+        Pair(stringResource(R.string.cancel_button))
+        { dismiss() }
+    )
 }
 
 @Composable
 private fun BubblesForPreview(
     state: CategoriesState,
-    callback: CategoriesCallback? = null
+    callback: CategoriesCallback? = null,
 ) {
     LazyRow(
         Modifier

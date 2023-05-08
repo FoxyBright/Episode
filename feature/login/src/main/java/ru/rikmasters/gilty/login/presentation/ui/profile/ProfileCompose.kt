@@ -28,7 +28,7 @@ private fun ProfilePreview() {
         ProfileContent(
             ProfileState(
                 DemoProfileModel
-            )
+            ), (true)
         )
     }
 }
@@ -36,6 +36,7 @@ private fun ProfilePreview() {
 @Composable
 fun ProfileContent(
     state: ProfileState,
+    isActive: Boolean,
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null,
 ) {
@@ -67,7 +68,8 @@ fun ProfileContent(
                 .align(BottomCenter)
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 46.dp),
-            stringResource(R.string.next_button)
+            stringResource(R.string.next_button),
+            isActive
         ) { callback?.onNext() }
     }
 }

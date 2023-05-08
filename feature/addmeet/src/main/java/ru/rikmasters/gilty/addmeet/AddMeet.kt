@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.addmeet
 
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.scopedOf
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.addmeet.presentation.ui.category.CategoriesScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.complete.CompleteScreen
@@ -11,10 +11,11 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.RequirementsScre
 import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
-import ru.rikmasters.gilty.auth.manager.MeetingManager
-import ru.rikmasters.gilty.auth.meetings.MeetingWebSource
+import ru.rikmasters.gilty.bottomsheet.viewmodel.MapBsViewModel
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.meetings.MeetingsData
+import ru.rikmasters.gilty.profile.ProfileData
 
 object AddMeet: FeatureDefinition() {
     
@@ -49,37 +50,23 @@ object AddMeet: FeatureDefinition() {
     
     override fun Module.koin() {
         
-        singleOf(::MeetingWebSource)
-        singleOf(::MeetingManager)
+        singleOf(::CategoryViewModel)
+        singleOf(::ConditionViewModel)
+    
+        singleOf(::DetailedViewModel)
+        factoryOf(::DurationBsViewModel)
+        factoryOf(::MapBsViewModel)
+        factoryOf(::TimeBsViewModel)
         
-        scope<CategoryViewModel> {
-            scopedOf(::CategoryViewModel)
-        }
-        
-        scope<ConditionViewModel> {
-            scopedOf(::ConditionViewModel)
-        }
-        
-        scope<DetailedViewModel> {
-            scopedOf(::DetailedViewModel)
-            scopedOf(::DurationBsViewModel)
-            scopedOf(::MapBsViewModel)
-            scopedOf(::TimeBsViewModel)
-        }
-        
-        scope<TagsViewModel> {
-            scopedOf(::TagsViewModel)
-        }
-        
-        scope<RequirementsViewModel> {
-            scopedOf(::RequirementsViewModel)
-            scopedOf(::GenderBsViewModel)
-            scopedOf(::OrientationBsViewModel)
-            scopedOf(::AgeBsViewModel)
-        }
-        
-        scope<CompleteViewModel> {
-            scopedOf(::CompleteViewModel)
-        }
+        factoryOf(::TagsViewModel)
+    
+        singleOf(::RequirementsViewModel)
+        factoryOf(::GenderBsViewModel)
+        factoryOf(::OrientationBsViewModel)
+        factoryOf(::AgeBsViewModel)
+
+        singleOf(::CompleteViewModel)
     }
+    
+    override fun include() = setOf(MeetingsData, ProfileData)
 }

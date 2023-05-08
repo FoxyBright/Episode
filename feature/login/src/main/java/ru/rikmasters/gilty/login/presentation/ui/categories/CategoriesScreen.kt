@@ -11,15 +11,13 @@ import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 @Composable
 fun CategoriesScreen(vm: CategoryViewModel) {
     
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
+    val nav = get<NavState>()
     
-    val selected by vm.selected.collectAsState()
     val categories by vm.categories.collectAsState()
+    val selected by vm.selected.collectAsState()
     
-    LaunchedEffect(Unit) {
-        vm.getCategories()
-    }
+    LaunchedEffect(Unit) { vm.getCategories() }
     
     CategoriesContent(
         Modifier, CategoriesState(
@@ -40,5 +38,6 @@ fun CategoriesScreen(vm: CategoryViewModel) {
                     nav.navigate("permissions")
                 }
             }
-        })
+        }
+    )
 }

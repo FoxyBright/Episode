@@ -9,9 +9,17 @@ compose()
 dependencies {
     androidBase()
     compose()
-    implementation(project(":shared"))
-    implementation(project(":feature:complaints")) // TODO КОСТЫЛЬ
+    
+    implementation(project(":feature:bottomsheet"))
+    implementation(project(":feature:animated"))
     implementation(project(":feature:bubbles"))
     implementation(project(":feature:profile"))
-    implementation(project(":feature:animated"))
+    
+    implementation(project(":domain:paginator"))
+    
+    implementation(project(":data:meetings"))
+    implementation(project(":data:profile"))
+    implementation(project(":data:chats"))
+    
+    implementation(project(":shared"))
 }

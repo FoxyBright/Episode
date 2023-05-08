@@ -5,8 +5,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.data.example.repository.ExampleRepository
 
-class ExampleViewModel: ViewModel(),
-    LoadingTrait {
+class ExampleViewModel: ViewModel(), LoadingTrait {
     
     private val repository by inject<ExampleRepository>()
     

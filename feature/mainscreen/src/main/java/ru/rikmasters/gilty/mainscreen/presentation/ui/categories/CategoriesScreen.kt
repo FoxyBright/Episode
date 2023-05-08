@@ -1,54 +1,56 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.categories
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 
 @Composable
-fun CategoriesScreen(
-    categoryFilters: (
-        List<CategoryModel>,
-        List<Pair<CategoryModel, String>>
-    ) -> Unit
-) {
-    val allCategories = listOf(DemoCategoryModel)
-    val stateList =
-        remember { mutableStateListOf<Boolean>() }
-    val categories =
-        remember { mutableStateListOf<CategoryModel>() }
-    val subCategories =
-        remember { mutableStateListOf<Pair<CategoryModel, String>>() }
-    repeat(allCategories.size) { stateList.add(false) }
+fun CategoriesScreen(vm: FiltersBsViewModel, alpha:Float) {
+    
+    val scope = rememberCoroutineScope()
+    
+    val selected by vm.selectedAdditionally.collectAsState()
+    val categories by vm.mainVm.categories.collectAsState()
+    val states by vm.additionallyStates.collectAsState()
+    
+    LaunchedEffect(Unit) {
+        vm.fullAdditionallySelect()
+    }
+    
     CategoryList(
         CategoryListState(
-            allCategories, stateList, subCategories
-        ), Modifier.padding(16.dp),
-        object : CategoryListCallback {
+            categories, selected, states, alpha
+        ), Modifier, object: CategoryListCallback {
+            
             override fun onBack() {
-                categoryFilters(listOf(), listOf())
+                scope.launch { vm.navigate(0) }
             }
-    
-            override fun onCategoryClick(index: Int, it: Boolean) {
-                stateList[index] = !it
+            
+            override fun onCategoryClick(
+                index: Int, category: CategoryModel,
+            ) {
+                scope.launch {
+                    category.children?.let {
+                        vm.changeAdditionallyStates(index)
+                    } ?: run { vm.selectAdditionally(category) }
+                }
             }
-
-            override fun onSubSelect(category: CategoryModel, sub: String?) {
-                if (sub.isNullOrBlank()) categories.add(category)
-                else subCategories.add(Pair(category, sub))
+            
+            override fun onSubClick(category: CategoryModel) {
+                scope.launch { vm.selectAdditionally(category) }
             }
-
-            override fun onDone() {
-                categoryFilters(categories, subCategories)
+            
+            override fun onComplete() {
+                scope.launch {
+                    vm.onAddComplete()
+                    vm.navigate(0)
+                }
             }
-
+            
             override fun onClear() {
-                repeat(allCategories.size) { stateList[it] = false }
-                subCategories.clear(); categories.clear()
+                scope.launch { vm.clearAdditionally() }
             }
         })
 }

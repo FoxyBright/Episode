@@ -1,14 +1,15 @@
 package ru.rikmasters.gilty.shared.model.chat
 
-import ru.rikmasters.gilty.shared.model.meeting.MemberModel
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
-enum class SystemMessageType {
-    CHAT_CREATED, MEMBER_JOIN, MEMBER_LEAVE,
-    MEMBER_SCREENSHOT, TRANSLATION_START_30,
-    TRANSLATION_START_5
-}
+data class ChatNotificationModel(
+    val type: ChatNotificationType,
+    val member: UserModel?,
+)
 
-data class ChatNotificationType(
-    val type: SystemMessageType,
-    val member: MemberModel?
+val DemoChatNotificationModel = ChatNotificationModel(
+    ChatNotificationType.MEMBER_SCREENSHOT,
+    DemoUserModel
 )

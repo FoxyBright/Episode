@@ -14,9 +14,8 @@ import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.login.presentation.ui.login.country.CountryBs
-import ru.rikmasters.gilty.login.viewmodel.CountryBsViewModel
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
-import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -82,13 +81,11 @@ fun LoginScreen(vm: LoginViewModel) {
         }
         
         override fun privatePolicy() {
-            val toast = context.resources.getString(R.string.login_policy_toast)
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            openInWeb(context, "https://www.google.ru")
         }
         
         override fun termsOfApp() {
-            val toast = context.resources.getString(R.string.login_terms_toast)
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            openInWeb(context, "https://www.google.ru")
         }
         
         override fun changeCountry() {
@@ -103,8 +100,12 @@ fun LoginScreen(vm: LoginViewModel) {
         
         override fun onNext() {
             scope.launch {
-                vm.sendCode()
-                vm.getSendCode()?.let {
+                vm.sendCode()?.let {
+                    Toast.makeText(
+                        context, it,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } ?: vm.getSendCode()?.let {
                     nav.navigate("registration/code")
                 }
             }

@@ -5,11 +5,9 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmObject
 import ru.rikmasters.gilty.core.data.source.Source
-import ru.rikmasters.gilty.core.log.log
 import kotlin.reflect.KClass
 
 
-// TODO транзакции (как внутренние, так и внешние)
 abstract class RealmSourceVariant(
     manager: RealmManager
 ): Source {
