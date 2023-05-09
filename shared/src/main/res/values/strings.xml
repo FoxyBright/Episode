@@ -268,7 +268,7 @@
     <string name="complaints_cheater_fraud_label">Мошенничество</string>
     <string name="complaints_cheater_deception_label">Обман</string>
     <string name="complaints_cheater_delusion_label">Введение в заблуждение</string>
-    <string name="complaints_send_placeholder">Опишите вашу причину жалобы</string>
+    <string name="complaints_send_placeholder">Опишите причину жалобы</string>
     <string name="complaints_send_answer">Отлично, ваша жалоба отправлена!</string>
     <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
     <string name="complaints_button">Отправить жалобу</string>
