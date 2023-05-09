@@ -103,9 +103,8 @@ class CodeViewModel(
         } else _code.emit("")
     }
     
-    suspend fun onOtpAuthentication(code: String) {
-        authManager.onOtpAuthentication(code)
-    }
+    suspend fun onOtpAuthentication(code: String)
+        = authManager.onOtpAuthentication(code)
     
     suspend fun profileCompleted(): Boolean {
         return regManager.profileCompleted()
