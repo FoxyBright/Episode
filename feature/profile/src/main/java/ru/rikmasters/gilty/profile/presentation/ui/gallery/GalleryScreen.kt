@@ -88,9 +88,9 @@ fun GalleryScreen(
                     scope.launch { vm.menuDismiss(state) }
                 }
                 
-                override fun onKebabClick() {
-                    scope.launch { vm.kebab() }
-                }
+//                override fun onKebabClick() {
+//                    scope.launch { vm.kebab() }
+//                }
                 
                 override fun onAttach() {
                     scope.launch { vm.attach() }

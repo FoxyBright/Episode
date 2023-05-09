@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.personal
+package ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.age
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,13 +15,22 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ListItemPicker
 
+data class AgeBsState(
+    val range: IntRange,
+    val age: Int,
+)
+
+interface AgeBsCallback {
+    
+    fun onAgeChange(age: Int)
+    fun onSave()
+}
+
 @Composable
-fun AgeBottomSheetContent(
-    value: Int?,
-    range: IntRange,
-    onValueChange: (Int) -> Unit,
+fun AgeBsContent(
+    state: AgeBsState,
     modifier: Modifier = Modifier,
-    onSave: () -> Unit,
+    callback: AgeBsCallback? = null,
 ) {
     Box(
         modifier
@@ -38,11 +47,11 @@ fun AgeBottomSheetContent(
                 .fillMaxHeight(0.8f)
         ) {
             ListItemPicker(
-                value = value ?: range.first,
-                list = range.toList(),
+                value = state.age,
+                list = state.range.toList(),
                 modifier = Modifier,
                 label = { if(it == 17) noMatter else "$it" },
-            ) { onValueChange(it) }
+            ) { callback?.onAgeChange(it) }
         }
         Text(
             stringResource(R.string.personal_info_age_placeholder),
@@ -54,6 +63,6 @@ fun AgeBottomSheetContent(
                 .align(BottomCenter)
                 .padding(bottom = 32.dp),
             stringResource(R.string.save_button),
-        ) { onSave() }
+        ) { callback?.onSave() }
     }
 }

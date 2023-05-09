@@ -41,7 +41,7 @@ interface PersonalCallback {
 
 data class PersonalState(
     val age: Int? = null,
-    val selectGender: Int? = null
+    val selectGender: Int? = null,
 )
 
 @Composable
@@ -71,9 +71,12 @@ fun PersonalContent(
                 shape = shapes.large,
                 colors = cardColors(colorScheme.primaryContainer)
             ) {
+                val age = state.age?.let {
+                    if(it in 18..99)
+                        "$it" else stringResource(R.string.condition_no_matter)
+                } ?: stringResource(R.string.personal_info_age_placeholder)
                 Text(
-                    "${state.age ?: stringResource(R.string.personal_info_age_placeholder)}",
-                    Modifier.padding(16.dp),
+                    age, Modifier.padding(16.dp),
                     if(state.age == null)
                         colorScheme.onTertiary
                     else colorScheme.tertiary,
