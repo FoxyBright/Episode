@@ -51,29 +51,55 @@ class TranslationWebSource : KtorSource() {
             }
         }
 
-    suspend fun getMessages(translationId: String): List<TranslationMessage>? =
-        get("http://$HOST$PREFIX_URL/translations/$translationId/messages")?.let {
+    suspend fun getMessages(
+        translationId: String,
+        page: Int?,
+        perPage: Int?,
+    ): List<TranslationMessage>? =
+        get("http://$HOST$PREFIX_URL/translations/$translationId/messages") {
+            url {
+                page?.let { query("page" to it.toString()) }
+                perPage?.let { query("per_page" to it.toString()) }
+            }
+        }?.let {
             if (it.status == OK) {
                 it.wrapped<List<TranslationMessage>>()
-            } else null
+            } else {
+                null
+            }
         }
 
-    suspend fun getConnectedUsers(translationId: String, query: String, page: Int): List<TranslationMessageAuthor>? =
-        get("http://$HOST$PREFIX_URL/translations/$translationId/connected")?.let {
+    suspend fun getConnectedUsers(
+        translationId: String,
+        query: String,
+        page: Int?,
+        perPage: Int?
+    ): List<TranslationMessageAuthor>? =
+        get("http://$HOST$PREFIX_URL/translations/$translationId/connected") {
+            url {
+                query("query" to query)
+                page?.let { query("page" to it.toString()) }
+                perPage?.let { query("per_page" to it.toString()) }
+            }
+        }?.let {
             if (it.status == OK) {
                 it.wrapped<List<TranslationMessageAuthor>>()
-            } else null
+            } else {
+                null
+            }
         }
 
     suspend fun extendTranslation(translationId: String, duration: Long): TranslationInfo? =
-        post("http://$HOST$PREFIX_URL/translations/$translationId/extension"){
+        post("http://$HOST$PREFIX_URL/translations/$translationId/extension") {
             url {
                 query("duration" to duration.toString())
             }
         }?.let {
             if (it.status == OK) {
                 it.wrapped<TranslationInfo>()
-            } else null
+            } else {
+                null
+            }
         }
 
     suspend fun kickUser(translationId: String, userId: String) {
@@ -87,5 +113,4 @@ class TranslationWebSource : KtorSource() {
     suspend fun ping(translationId: String) {
         post("http://$HOST$PREFIX_URL/translations/$translationId/ping")
     }
-
 }
