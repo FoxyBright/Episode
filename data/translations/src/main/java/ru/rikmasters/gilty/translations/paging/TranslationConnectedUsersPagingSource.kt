@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.translations.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.translations.TranslationWebSource
-import ru.rikmasters.gilty.translations.models.TranslationMessageAuthor
 
 class TranslationConnectedUsersPagingSource(
     private val webSource: TranslationWebSource,

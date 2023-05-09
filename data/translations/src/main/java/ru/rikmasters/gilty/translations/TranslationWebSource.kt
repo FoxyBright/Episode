@@ -5,17 +5,16 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.shared.common.extentions.toInt
 import ru.rikmasters.gilty.shared.wrapper.wrapped
-import ru.rikmasters.gilty.translations.models.TranslationInfo
-import ru.rikmasters.gilty.translations.models.TranslationMessage
-import ru.rikmasters.gilty.translations.models.TranslationMessageAuthor
-import ru.rikmasters.gilty.translations.models.TranslationSignalType
+import ru.rikmasters.gilty.shared.models.translations.TranslationInfoDTO
+import ru.rikmasters.gilty.shared.models.translations.TranslationMessageDTO
+import ru.rikmasters.gilty.shared.models.enumeration.TranslationSignalTypeDTO
 
 class TranslationWebSource : KtorSource() {
 
-    suspend fun getTranslationInfo(translationId: String): TranslationInfo? =
+    suspend fun getTranslationInfo(translationId: String): TranslationInfoDTO? =
         get("http://$HOST$PREFIX_URL/meetings/$translationId/translation")?.let {
             if (it.status == OK) {
-                it.wrapped<TranslationInfo>()
+                it.wrapped<TranslationInfoDTO>()
             } else {
                 null
             }
@@ -27,7 +26,7 @@ class TranslationWebSource : KtorSource() {
 
     suspend fun sendSignal(
         translationId: String,
-        signalType: TranslationSignalType,
+        signalType: TranslationSignalTypeDTO,
         value: Boolean,
     ) {
         post("http://$HOST$PREFIX_URL/translations/$translationId/signal") {
@@ -38,14 +37,14 @@ class TranslationWebSource : KtorSource() {
         }
     }
 
-    suspend fun sendMessage(translationId: String, text: String): TranslationMessage? =
+    suspend fun sendMessage(translationId: String, text: String): TranslationMessageDTO? =
         post("http://$HOST$PREFIX_URL/translations/$translationId/message") {
             url {
                 query("text" to text)
             }
         }?.let {
             if (it.status == OK) {
-                it.wrapped<TranslationMessage>()
+                it.wrapped<TranslationMessageDTO>()
             } else {
                 null
             }
@@ -55,7 +54,7 @@ class TranslationWebSource : KtorSource() {
         translationId: String,
         page: Int?,
         perPage: Int?,
-    ): List<TranslationMessage>? =
+    ): List<TranslationMessageDTO>? =
         get("http://$HOST$PREFIX_URL/translations/$translationId/messages") {
             url {
                 page?.let { query("page" to it.toString()) }
@@ -63,7 +62,7 @@ class TranslationWebSource : KtorSource() {
             }
         }?.let {
             if (it.status == OK) {
-                it.wrapped<List<TranslationMessage>>()
+                it.wrapped<List<TranslationMessageDTO>>()
             } else {
                 null
             }
@@ -89,14 +88,14 @@ class TranslationWebSource : KtorSource() {
             }
         }
 
-    suspend fun extendTranslation(translationId: String, duration: Long): TranslationInfo? =
+    suspend fun extendTranslation(translationId: String, duration: Long): TranslationInfoDTO? =
         post("http://$HOST$PREFIX_URL/translations/$translationId/extension") {
             url {
                 query("duration" to duration.toString())
             }
         }?.let {
             if (it.status == OK) {
-                it.wrapped<TranslationInfo>()
+                it.wrapped<TranslationInfoDTO>()
             } else {
                 null
             }
