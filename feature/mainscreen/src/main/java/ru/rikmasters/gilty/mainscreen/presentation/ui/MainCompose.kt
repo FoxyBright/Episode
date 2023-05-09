@@ -274,9 +274,10 @@ private fun Filters(
     BottomSheetScaffold(
         sheetContent = {
             Filters(
-                state.bsState.bottomSheetState
-                    .isCollapsed, alpha,
-                state.vmScope
+                (state.bsState
+                    .bottomSheetState
+                    .offset.value > screenHeight / 2),
+                alpha, state.vmScope
             )
         }, scaffoldState = state.bsState,
         sheetShape = shapes.bigTopShapes,

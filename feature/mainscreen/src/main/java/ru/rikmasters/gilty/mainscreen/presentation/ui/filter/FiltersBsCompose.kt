@@ -3,9 +3,7 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
@@ -90,13 +88,19 @@ fun MeetingFilterBottom(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null,
 ) {
+    val mod = Modifier
+        .alpha(state.alpha)
+        .let {
+            if(state.alpha <= 0.05f)
+                if(state.alpha in 0.05f..0.02f)
+                    it.fillMaxHeight(state.alpha)
+                else it.height(16.dp)
+            else it
+        }
     Scaffold(
-        modifier, topBar = {
-            TopBar(
-                state, callback,
-                Modifier.alpha(state.alpha)
-            )
-        }, bottomBar = {
+        modifier = modifier,
+        topBar = { TopBar(state, callback, mod) },
+        bottomBar = {
             Buttons(
                 find, state.hasFilters,
                 Modifier, { callback?.onFilter() }
@@ -148,7 +152,7 @@ private fun Content(
             .background(colorScheme.primaryContainer)
     )
     LazyColumn(modifier.fillMaxSize()) {
-        items(list) {
+        itemsIndexed(list) { i, it ->
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -156,7 +160,8 @@ private fun Content(
             ) {
                 Text(
                     it.name, Modifier.padding(
-                        top = 28.dp,
+                        top = if(i == 0) 0.dp
+                        else 28.dp,
                         bottom = 18.dp
                     ), colorScheme.tertiary,
                     style = typography.labelLarge
@@ -243,7 +248,8 @@ private fun filterList(
         }
     )
     if(state.today) filters.add(
-        (2), FilterModel(stringResource(R.string.meeting_filter_distance)) {
+        (2),
+        FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
                 state.distance,
                 state.distanceState,
