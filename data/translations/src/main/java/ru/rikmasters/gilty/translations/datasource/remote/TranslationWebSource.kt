@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translations
+package ru.rikmasters.gilty.translations.datasource.remote
 
 import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource

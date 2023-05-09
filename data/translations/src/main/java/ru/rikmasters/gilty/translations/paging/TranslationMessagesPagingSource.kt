@@ -2,7 +2,7 @@ package ru.rikmasters.gilty.translations.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import ru.rikmasters.gilty.translations.TranslationWebSource
+import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
 import ru.rikmasters.gilty.shared.models.translations.TranslationMessageDTO
 
 class TranslationMessagesPagingSource(
