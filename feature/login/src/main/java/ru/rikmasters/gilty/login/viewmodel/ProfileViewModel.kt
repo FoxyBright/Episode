@@ -50,7 +50,8 @@ class ProfileViewModel: ViewModel() {
     }
     
     suspend fun descriptionChange(text: String) {
-        _description.emit(text)
+        if(text.length <= 120)
+            _description.emit(text)
     }
     
     suspend fun onDescriptionSave() {
