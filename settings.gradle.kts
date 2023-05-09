@@ -2,6 +2,9 @@
 
 import java.net.URI
 
+include(":data:translations")
+
+
 include(":feature:translation")
 
 
