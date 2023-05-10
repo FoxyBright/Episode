@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.core.app.ui
+package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,11 +15,10 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.rikmasters.gilty.core.R
+import ru.rikmasters.gilty.shared.R
 
 @Preview
 @Composable
@@ -62,11 +61,9 @@ fun ErrorConnection() {
                     stringResource(R.string.bad_connection),
                     Modifier
                         .weight(1f)
-                        .padding(start = 10.dp),
-                    style = typography.labelSmall.copy(
-                        color = White, fontSize = 15.sp,
-                        fontWeight = W500,
-                    ),
+                        .padding(start = 10.dp), White,
+                    fontSize = 15.sp,
+                    style = typography.labelSmall,
                 )
             }
         }
