@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R.string.*
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -283,7 +283,7 @@ private fun Writing(
                 Modifier.padding(start = 6.dp)
             else
                 Modifier.offset((-16).dp)
-            GCashedImage(
+            GCachedImage(
                 it.url, mod
                     .size(24.dp)
                     .clip(CircleShape),

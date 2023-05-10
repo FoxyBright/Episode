@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.common.CachedImageType.FILE
 import ru.rikmasters.gilty.shared.common.CachedImageType.URL
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.shared.CheckBox
 
 enum class GalleryImageType { MULTIPLE, SINGLE }
@@ -31,7 +31,7 @@ fun GalleryImage(
                 callback?.onImageClick(image)
             }
     ) {
-        GCashedImage(
+        GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop,
             type = if(isWeb) URL else FILE

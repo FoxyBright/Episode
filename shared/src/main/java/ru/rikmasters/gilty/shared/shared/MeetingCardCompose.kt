@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.common.CategoriesListCard
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.now
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.FREE
@@ -130,7 +130,7 @@ fun MeetingCard(
                 .offset(-(26).dp, 10.dp)
                 .width(156.dp)
         ) {
-            GCashedImage(
+            GCachedImage(
                 meeting.organizer?.avatar
                     ?.thumbnail?.url, Modifier
                     .clip(CircleShape)
@@ -209,7 +209,7 @@ fun MeetingCategoryCard(
                     )
                     .size(126.dp), Center
             ) {
-                if(hasAvatar) GCashedImage(
+                if(hasAvatar) GCachedImage(
                     user?.avatar?.thumbnail?.url,
                     Modifier
                         .fillMaxSize()

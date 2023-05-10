@@ -35,7 +35,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.PARTICI
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.VIEWER
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.*
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.Gradients.green
@@ -286,7 +286,7 @@ private fun Information(
     state: ChatAppBarState,
 ) {
     Row(modifier, verticalAlignment = CenterVertically) {
-        GCashedImage(
+        GCachedImage(
             state.avatar?.thumbnail?.url,
             Modifier
                 .size(32.dp)

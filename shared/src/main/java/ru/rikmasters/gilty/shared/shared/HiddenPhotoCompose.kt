@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_close
 import ru.rikmasters.gilty.shared.R.drawable.ic_lock_open
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -65,7 +65,7 @@ fun HiddenImage(
             Modifier
                 .background(linearGradient(red()))
                 .fillMaxSize()
-        ) else GCashedImage(
+        ) else GCachedImage(
             image?.thumbnail?.url, Modifier
                 .background(colorScheme.onTertiary)
                 .fillMaxSize(),

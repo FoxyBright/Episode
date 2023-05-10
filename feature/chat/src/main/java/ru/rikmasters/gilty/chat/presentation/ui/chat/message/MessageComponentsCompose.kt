@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.format
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
@@ -419,7 +419,7 @@ fun ImageMessage(
     ) {
         Box(Modifier.fillMaxHeight(0.5f)) {
             message.message?.attachments?.let {
-                GCashedImage(
+                GCachedImage(
                     it.first().file?.url, Modifier
                         .wrapContentSize()
                         .background(

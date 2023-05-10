@@ -226,9 +226,7 @@ fun EmptyCard(
                 Card(
                     Modifier,
                     shapes.large,
-                    cardColors(
-                        colorScheme.primaryContainer
-                    ),
+                    cardColors(colorScheme.primaryContainer),
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(
@@ -338,7 +336,7 @@ private fun EmptyCard(
                 .offset(y = 24.dp)
         )
         EmptyBottom(
-            Modifier.fillMaxHeight(0.28f),
+            Modifier,
             hasFilters,
             { onRepeatClick?.let { it() } }
         ) { onMoreClick?.let { it() } }
@@ -390,7 +388,7 @@ private fun MeetTop(
     avatar: AvatarModel?,
     modifier: Modifier,
 ) {
-    GCashedImage(
+    GCachedImage(
         avatar?.thumbnail?.url,
         modifier
             .fillMaxSize()
@@ -481,9 +479,7 @@ private fun EmptyBottom(
             )
         ) {
             Column(
-                Modifier
-                    .fillMaxHeight()
-                    .padding(16.dp),
+                Modifier.padding(16.dp),
                 Arrangement.SpaceBetween
             ) {
                 Text(

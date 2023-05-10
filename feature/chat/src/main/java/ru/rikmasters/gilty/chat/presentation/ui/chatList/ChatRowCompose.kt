@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -332,7 +332,7 @@ private fun Avatar(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
-        GCashedImage(
+        GCachedImage(
             avatar?.thumbnail?.url, Modifier
                 .padding(start = 4.dp)
                 .size(52.dp)
