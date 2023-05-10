@@ -23,225 +23,233 @@ import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.models.Thumbnail
 import ru.rikmasters.gilty.shared.models.User
+import ru.rikmasters.gilty.shared.socket.SocketData
+import ru.rikmasters.gilty.shared.socket.SocketResponse
 import java.io.IOException
 import java.net.SocketException
 
 class WebSocketHandler(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
-): KtorSource() {
-    
+) : KtorSource() {
+
     private val socketURL =
         "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
-    
+
     private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
     private val socketId = MutableStateFlow<String?>(null)
     private val chatId = MutableStateFlow<String?>(null)
-    
+
     private suspend fun subscribe(
         channel: String,
         complition: (suspend (Boolean) -> Unit)? = null,
     ) {
         data class Res(val auth: String)
         post(
-            "http://$HOST/broadcasting/auth"
+            "http://$HOST/broadcasting/auth",
         ) {
             setBody(
                 mapOf(
                     "socket_id" to socketId.value,
-                    "channel_name" to channel
-                )
+                    "channel_name" to channel,
+                ),
             )
         }?.let { response ->
             complition?.let { it(response.status.isSuccess()) }
             send(
                 data = mapOf(
                     "auth" to response.body<Res>().auth,
-                    "channel" to channel
+                    "channel" to channel,
                 ),
-                event = "pusher:subscribe"
+                event = "pusher:subscribe",
             )
         }
     }
-    
+
     suspend fun connectToChat(id: String) {
         disconnectToChat()
         subscribe("private-chats.$id") {
-            if(it) chatId.emit(id)
+            if (it) chatId.emit(id)
         }
     }
-    
+
     private suspend fun disconnectToChat() {
         chatId.value?.let {
             send(
                 data = mapOf("channel" to "private=chats.$it"),
-                event = "pusher:unsubscribe"
+                event = "pusher:unsubscribe",
             )
         }
     }
-    
+
     private suspend fun handle(
         response: SocketResponse,
     ) {
         val event = SocketEvents from response.event
         logV(event?.name.toString())
-        when(event) {
+        when (event) {
             CONNECTION_ESTABLISHED -> {
-                
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
-                
+
                 subscribe("private-user.${_userId.value}")
             }
-            
+
             SUBSCRIPTION_SUCCEEDED -> {
                 logV("$response")
             }
-            
+
             PONG -> inPing = false
-            
+
             CHATS_UPDATED, CHATS_DELETED -> {
                 answer.emit(
                     Pair(
-                        if(event == CHATS_DELETED)
+                        if (event == CHATS_DELETED) {
                             CHAT_DELETED
-                        else UPDATED_CHATS,
-                        if(event == CHATS_DELETED)
+                        } else {
+                            UPDATED_CHATS
+                        },
+                        if (event == CHATS_DELETED) {
                             mapper.readValue<ShortMessageWs>(
-                                response.data
+                                response.data,
                             ).id
-                        else mapper.readValue<Chat>(
-                            response.data
-                        )
-                    )
+                        } else {
+                            mapper.readValue<Chat>(
+                                response.data,
+                            )
+                        },
+                    ),
                 )
                 chatRepository.chatUpdate(answer.value)
             }
-            
+
             MESSAGE_UPDATE -> {
                 answer.emit(
                     Pair(
                         UPDATE_MESSAGE,
                         mapper.readValue<ChatStatus>(
-                            response.data
-                        ).unreadCount
-                    )
+                            response.data,
+                        ).unreadCount,
+                    ),
                 )
             }
-            
+
             CHAT_COMPLETED -> {
                 answer.emit(
-                    Pair(COMPLETED_CHAT, null)
+                    Pair(COMPLETED_CHAT, null),
                 )
             }
-            
+
             MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED -> {
                 answer.emit(
                     Pair(
-                        when(event) {
+                        when (event) {
                             MESSAGE_SENT -> NEW_MESSAGE
                             MESSAGE_READ -> READ_MESSAGE
                             else -> DELETE_MESSAGE
                         },
-                        if(event == MESSAGE_SENT)
+                        if (event == MESSAGE_SENT) {
                             mapper.readValue<MessageWs>(response.data)
                                 .map(chatId.value)
-                        else
+                        } else {
                             mapper.readValue<ShortMessageWs>(response.data).id
-                    )
+                        },
+                    ),
                 )
                 logD("INFO MyMessage $response")
                 messageRepository.messageUpdate(answer.value)
             }
-            
+
             MESSAGE_TYPING -> {
                 mapper.readValue<User>(response.data).let { user ->
-                    if(user.id == messageRepository.getUser()) return
-                    else messageRepository.writersUpdate(
-                        UserWs(
-                            (user.id ?: ""),
-                            (user.avatar?.thumbnail ?: Thumbnail())
+                    if (user.id == messageRepository.getUser()) {
+                        return
+                    } else {
+                        messageRepository.writersUpdate(
+                            UserWs(
+                                (user.id ?: ""),
+                                (user.avatar?.thumbnail ?: Thumbnail()),
+                            ),
                         )
-                    )
+                    }
                 }
                 logD("$response")
             }
-            
+
             else -> {}
         }
     }
-    
+
     private suspend fun send(data: Map<String, String>, event: String) {
         mySession.value?.send(
             mapper.writeValueAsString(
                 mapOf(
                     "data" to data,
-                    "event" to event
-                )
-            )
+                    "event" to event,
+                ),
+            ),
         )
     }
-    
+
     private var inPing: Boolean = false
-    
+
     private suspend fun doPing(session: DefaultClientWebSocketSession) {
-        if(inPing) throw IOException("Соединение прервано: не получен PONG.")
-        
+        if (inPing) throw IOException("Соединение прервано: не получен PONG.")
+
         val message = mapper.writeValueAsBytes(
-            mapOf("event" to "pusher:ping")
+            mapOf("event" to "pusher:ping"),
         )
         session.send(
-            Frame.Text(String(message))
+            Frame.Text(String(message)),
         )
         inPing = true
     }
-    
+
     private val mySession =
         MutableStateFlow<DefaultClientWebSocketSession?>(null)
     private val _userId = MutableStateFlow("")
     private var sessionHandlerJob: Job? = null
-    
+
     fun disconnect() {
         sessionHandlerJob?.cancel()
     }
-    
+
     suspend fun connect(userId: String) {
         try {
             connection(userId)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
             disconnect()
             try {
                 connection(userId)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 logE("Bad reconnection")
                 logE("$e")
             }
         }
     }
-    
+
     private suspend fun connection(userId: String) = withContext(IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
             val session = wsSession(HOST, 6001, socketURL)
             try {
                 launch {
-                    while(true) {
+                    while (true) {
                         delay(20_000)
                         doPing(session)
                     }
                 }
                 mySession.emit(session)
-                while(true) {
-                    
+                while (true) {
                     val response = session.incoming.receive()
                     logV("Frame: ${String(response.data)}")
-                    
+
                     val socketResponse = mapper
                         .readValue<SocketResponse>(response.data)
                     handle(socketResponse)
                 }
-            } catch(e: SocketException) {
+            } catch (e: SocketException) {
                 e.stackTraceToString()
             } finally {
                 logV("Closing session...")

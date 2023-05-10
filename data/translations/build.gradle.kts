@@ -12,6 +12,6 @@ dependencies {
     dataBase()
 
     implementation(project(":data:shared"))
-
+    implementation(project(":data:meetings"))
     implementation(project(":shared"))
 }

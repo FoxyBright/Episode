@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chats.models.ws
+package ru.rikmasters.gilty.shared.socket
 
 import com.fasterxml.jackson.annotation.JsonAlias
 

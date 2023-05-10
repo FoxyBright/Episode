@@ -10,5 +10,10 @@ enum class TranslationSignalTypeDTO {
             TranslationSignalTypeModel.CAMERA -> CAMERA
             TranslationSignalTypeModel.MICROPHONE -> MICROPHONE
         }
+
+        fun map(dto: TranslationSignalTypeDTO) = when (dto) {
+            MICROPHONE -> TranslationSignalTypeModel.MICROPHONE
+            CAMERA -> TranslationSignalTypeModel.CAMERA
+        }
     }
 }
