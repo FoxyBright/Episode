@@ -33,6 +33,9 @@ data class User(
     )
 }
 
+/**
+ * [FullUserDTO] - модель пользователя с [group]
+ */
 data class FullUserDTO(
     val id: String? = null,
     val gender: String? = null,

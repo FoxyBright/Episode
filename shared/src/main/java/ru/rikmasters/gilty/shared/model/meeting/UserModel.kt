@@ -31,6 +31,9 @@ data class UserModel(
     )
 }
 
+/**
+ * [FullUserModel] - модель пользователя с [group]
+ */
 data class FullUserModel(
     val id: String?,
     val gender: GenderType?,
