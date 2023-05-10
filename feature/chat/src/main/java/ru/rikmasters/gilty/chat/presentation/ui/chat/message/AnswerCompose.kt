@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -98,7 +98,7 @@ fun AnswerContent(
         )
         val attach = message.message?.attachments
         if(!attach.isNullOrEmpty()) {
-            GCashedImage(
+            GCachedImage(
                 attach.last().file?.thumbnail?.url,
                 Modifier
                     .padding(start = 8.dp)

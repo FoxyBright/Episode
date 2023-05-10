@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.MeetingStates
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -117,7 +117,7 @@ private fun MeetingCard(
 ) {
     Box(modifier) {
         Box {
-            GCashedImage(
+            GCachedImage(
                 meeting.organizer?.avatar
                     ?.thumbnail?.url, Modifier
                     .clip(shapes.large)

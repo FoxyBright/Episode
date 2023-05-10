@@ -3,47 +3,81 @@
 package ru.rikmasters.gilty.shared.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Unspecified
+import ru.rikmasters.gilty.shared.theme.Colors.AlmostDark
+import ru.rikmasters.gilty.shared.theme.Colors.AlmostRed
+import ru.rikmasters.gilty.shared.theme.Colors.Ash
+import ru.rikmasters.gilty.shared.theme.Colors.Black
+import ru.rikmasters.gilty.shared.theme.Colors.BlackerWhite
+import ru.rikmasters.gilty.shared.theme.Colors.Blue
+import ru.rikmasters.gilty.shared.theme.Colors.Border
+import ru.rikmasters.gilty.shared.theme.Colors.Cyan
+import ru.rikmasters.gilty.shared.theme.Colors.DarkBlue
+import ru.rikmasters.gilty.shared.theme.Colors.DarkCyan
+import ru.rikmasters.gilty.shared.theme.Colors.DarkOrange
+import ru.rikmasters.gilty.shared.theme.Colors.DarkPurple
+import ru.rikmasters.gilty.shared.theme.Colors.DarkRed
+import ru.rikmasters.gilty.shared.theme.Colors.DarkShadow
+import ru.rikmasters.gilty.shared.theme.Colors.DarkYellow
+import ru.rikmasters.gilty.shared.theme.Colors.Gray
+import ru.rikmasters.gilty.shared.theme.Colors.Lead
+import ru.rikmasters.gilty.shared.theme.Colors.LightGray
+import ru.rikmasters.gilty.shared.theme.Colors.LightGreen
+import ru.rikmasters.gilty.shared.theme.Colors.LightPink
+import ru.rikmasters.gilty.shared.theme.Colors.NickelGray
+import ru.rikmasters.gilty.shared.theme.Colors.Orange
+import ru.rikmasters.gilty.shared.theme.Colors.Pinky
+import ru.rikmasters.gilty.shared.theme.Colors.PreDark
+import ru.rikmasters.gilty.shared.theme.Colors.Purple
+import ru.rikmasters.gilty.shared.theme.Colors.Red
+import ru.rikmasters.gilty.shared.theme.Colors.RottenPlum
+import ru.rikmasters.gilty.shared.theme.Colors.Silver
+import ru.rikmasters.gilty.shared.theme.Colors.SuperDark
+import ru.rikmasters.gilty.shared.theme.Colors.White
+import ru.rikmasters.gilty.shared.theme.Colors.WhiteShadow
+import ru.rikmasters.gilty.shared.theme.Colors.Yellow
+import ru.rikmasters.gilty.shared.theme.Colors.Zircon
+import ru.rikmasters.gilty.shared.theme.Colors.halfTransparentlyGray
+import ru.rikmasters.gilty.shared.theme.Colors.meetingCardBackBackgroundNight
 
 data class ExtraColors(
-    val searchCardBackground: Color = Color.Unspecified,
-    val grayButton: Color = Color.Unspecified,
-    val elementsBack: Color = Color.Unspecified,
-    val chipGray: Color = Color.Unspecified,
-    val policyAgreeColor: Color = Color.Unspecified,
-    val borderColor: Color = Color.Unspecified,
-    val mainTrackCheckBox: Color = Color.Unspecified,
-    val secondaryTrackCheckBox: Color = Color.Unspecified,
-    val meetingCardBackBackground: Color = Color.Unspecified,
-    val lockColors: Color = Color.Unspecified,
-    val lockColorsBackground: Color = Color.Unspecified,
-    val navBarActiveBackground: Color = Color.Unspecified,
-    val navBarActive: Color = Color.Unspecified,
-    val navBarInactive: Color = Color.Unspecified,
-    val navBarAddButton: Color = Color.Unspecified,
-    val chatBackground: Color = Color.Unspecified,
-    val commentBackground: Color = Color.Unspecified,
-    val priceTextFieldText: Color = Color.Unspecified,
-    val tabActive: Color = Color.Unspecified,
-    val tabActiveOnline: Color = Color.Unspecified,
-    val tabInactive: Color = Color.Unspecified,
-    val chatBack: Color = Color.Unspecified,
-    val meetButtonColors: Color = Color.Unspecified,
-    val meetCardShadow: Color = Color.Unspecified,
-    val meetCloseCircleColor: Color = Color.Unspecified,
-    val meetCloseCrossColor: Color = Color.Unspecified,
-    val meetCardPlaceHolder: Color = Color.Unspecified,
-    val notificationCloud: Color = Color.Unspecified,
-    val meetingTransparencyShape: Color = Color.Unspecified,
+    val searchCardBackground: Color = Unspecified,
+    val grayButton: Color = Unspecified,
+    val elementsBack: Color = Unspecified,
+    val chipGray: Color = Unspecified,
+    val policyAgreeColor: Color = Unspecified,
+    val borderColor: Color = Unspecified,
+    val mainTrackCheckBox: Color = Unspecified,
+    val secondaryTrackCheckBox: Color = Unspecified,
+    val meetingCardBackBackground: Color = Unspecified,
+    val navBarActiveBackground: Color = Unspecified,
+    val navBarActive: Color = Unspecified,
+    val navBarInactive: Color = Unspecified,
+    val navBarAddButton: Color = Unspecified,
+    val chatBackground: Color = Unspecified,
+    val commentBackground: Color = Unspecified,
+    val priceTextFieldText: Color = Unspecified,
+    val tabActive: Color = Unspecified,
+    val tabActiveOnline: Color = Unspecified,
+    val tabInactive: Color = Unspecified,
+    val chatBack: Color = Unspecified,
+    val meetButtonColors: Color = Unspecified,
+    val meetCardShadow: Color = Unspecified,
+    val meetCloseCircleColor: Color = Unspecified,
+    val meetCloseCrossColor: Color = Unspecified,
+    val meetCardPlaceHolder: Color = Unspecified,
+    val notificationCloud: Color = Unspecified,
+    val meetingTransparencyShape: Color = Unspecified,
     
     // Categories Colors
-    val sport: Color = Color.Unspecified,
-    val business: Color = Color.Unspecified,
-    val travel: Color = Color.Unspecified,
-    val masterClasses: Color = Color.Unspecified,
-    val entertainment: Color = Color.Unspecified,
-    val erotic: Color = Color.Unspecified,
-    val party: Color = Color.Unspecified,
-    val art: Color = Color.Unspecified,
+    val sport: Color = Unspecified,
+    val business: Color = Unspecified,
+    val travel: Color = Unspecified,
+    val masterClasses: Color = Unspecified,
+    val entertainment: Color = Unspecified,
+    val erotic: Color = Unspecified,
+    val party: Color = Unspecified,
+    val art: Color = Unspecified,
     // Add new color in scheme = Color.Unspecified
 )
 
@@ -55,45 +89,43 @@ data class ExtraColors(
     )
 )
 val LightExtraColors = ExtraColors(
-    elementsBack = Colors.White,
-    chipGray = Colors.Gray,
-    grayButton = Colors.Gray,
-    searchCardBackground = Colors.LightGray,
-    policyAgreeColor = Colors.Silver,
-    mainTrackCheckBox = Colors.Ash,
-    secondaryTrackCheckBox = Colors.Border,
-    borderColor = Colors.White,
-    lockColors = Colors.White,
-    lockColorsBackground = Colors.lockColorsBackgroundDay,
-    meetingCardBackBackground = Colors.White,
-    navBarActiveBackground = Colors.LightPink,
-    navBarActive = Colors.RottenPlum,
-    navBarInactive = Colors.Silver,
-    navBarAddButton = Colors.AlmostDark,
-    chatBackground = Colors.Pinky,
-    commentBackground = Colors.RottenPlum,
-    priceTextFieldText = Colors.AlmostRed,
-    tabActive = Colors.GentlePinky,
-    tabInactive = Colors.LightGray,
-    tabActiveOnline = Colors.LightGreen,
-    chatBack = Colors.BlackerWhite,
-    meetButtonColors = Colors.DoubleAddWhite,
-    meetCardShadow = Colors.WhiteShadow,
-    meetCloseCircleColor = Colors.White,
-    meetCloseCrossColor = Colors.RatGray,
-    meetCardPlaceHolder = Colors.NickelGray,
-    notificationCloud = Colors.Gray,
-    meetingTransparencyShape = Colors.halfTransparentlyGray,
+    elementsBack = White,
+    chipGray = Gray,
+    grayButton = Gray,
+    searchCardBackground = LightGray,
+    policyAgreeColor = Silver,
+    mainTrackCheckBox = Ash,
+    secondaryTrackCheckBox = Border,
+    borderColor = White,
+    meetingCardBackBackground = White,
+    navBarActiveBackground = LightPink,
+    navBarActive = RottenPlum,
+    navBarInactive = Silver,
+    navBarAddButton = AlmostDark,
+    chatBackground = Pinky,
+    commentBackground = RottenPlum,
+    priceTextFieldText = AlmostRed,
+    tabActive = LightPink,
+    tabInactive = LightGray,
+    tabActiveOnline = LightGreen,
+    chatBack = BlackerWhite,
+    meetButtonColors = Gray,
+    meetCardShadow = WhiteShadow,
+    meetCloseCircleColor = White,
+    meetCloseCrossColor = AlmostDark,
+    meetCardPlaceHolder = NickelGray,
+    notificationCloud = Gray,
+    meetingTransparencyShape = halfTransparentlyGray,
     
     // Categories Colors
-    sport = Colors.Orange,
-    business = Colors.Blue,
-    travel = Colors.Cyan,
-    masterClasses = Colors.Yellow,
-    entertainment = Colors.AlmostRed,
-    erotic = Colors.Red,
-    party = Colors.Purple,
-    art = Colors.Orange,
+    sport = Orange,
+    business = Blue,
+    travel = Cyan,
+    masterClasses = Yellow,
+    entertainment = AlmostRed,
+    erotic = Red,
+    party = Purple,
+    art = Orange,
     // Add colors in scheme from Colors-file
 )
 
@@ -105,44 +137,42 @@ val LightExtraColors = ExtraColors(
     )
 )
 val DarkExtraColors = ExtraColors(
-    elementsBack = Colors.PreDark,
-    chipGray = Colors.Gray,
-    grayButton = Colors.Gray,
-    searchCardBackground = Colors.SuperDark,
-    policyAgreeColor = Colors.Silver,
-    mainTrackCheckBox = Colors.Border,
-    secondaryTrackCheckBox = Colors.Ash,
-    borderColor = Colors.meetingCardBackBackgroundNight,
-    lockColors = Colors.lockColors,
-    lockColorsBackground = Colors.lockColorsBackgroundNight,
-    meetingCardBackBackground = Colors.meetingCardBackBackgroundNight,
-    navBarActiveBackground = Colors.LightPink,
-    navBarActive = Colors.White,
-    navBarInactive = Colors.Zircon,
-    navBarAddButton = Colors.White,
-    chatBackground = Colors.RottenPlum,
-    commentBackground = Colors.RottenPlum,
-    priceTextFieldText = Colors.White,
-    tabActive = Colors.RudePinky,
-    tabInactive = Colors.Black,
-    tabActiveOnline = Colors.LightGreen,
-    chatBack = Colors.Black,
-    meetButtonColors = Colors.Lead,
-    meetCardShadow = Colors.DarkShadow,
-    meetCloseCircleColor = Colors.RatGray,
-    meetCloseCrossColor = Colors.White,
-    meetCardPlaceHolder = Colors.NickelDarkGray,
-    notificationCloud = Colors.NickelDarkGray,
-    meetingTransparencyShape = Colors.halfTransparentlyGray,
+    elementsBack = PreDark,
+    chipGray = Gray,
+    grayButton = Gray,
+    searchCardBackground = SuperDark,
+    policyAgreeColor = Silver,
+    mainTrackCheckBox = Border,
+    secondaryTrackCheckBox = Ash,
+    borderColor = meetingCardBackBackgroundNight,
+    meetingCardBackBackground = meetingCardBackBackgroundNight,
+    navBarActiveBackground = LightPink,
+    navBarActive = White,
+    navBarInactive = Zircon,
+    navBarAddButton = White,
+    chatBackground = RottenPlum,
+    commentBackground = RottenPlum,
+    priceTextFieldText = White,
+    tabActive = LightPink,
+    tabInactive = Black,
+    tabActiveOnline = LightGreen,
+    chatBack = Black,
+    meetButtonColors = Lead,
+    meetCardShadow = DarkShadow,
+    meetCloseCircleColor = AlmostDark,
+    meetCloseCrossColor = RottenPlum,
+    meetCardPlaceHolder = Gray,
+    notificationCloud = Gray,
+    meetingTransparencyShape = halfTransparentlyGray,
     
     // Categories Colors
-    sport = Colors.DarkOrange,
-    business = Colors.DarkBlue,
-    travel = Colors.DarkCyan,
-    masterClasses = Colors.DarkYellow,
-    entertainment = Colors.AlmostRed,
-    erotic = Colors.DarkRed,
-    party = Colors.DarkPurple,
-    art = Colors.DarkOrange,
+    sport = DarkOrange,
+    business = DarkBlue,
+    travel = DarkCyan,
+    masterClasses = DarkYellow,
+    entertainment = AlmostRed,
+    erotic = DarkRed,
+    party = DarkPurple,
+    art = DarkOrange,
     // Add colors in scheme from Colors-file
 )

@@ -66,13 +66,18 @@ fun GradientButton(
     icon: Int? = null,
     onClick: () -> Unit,
 ) {
-    val inverse = if(online) listOf(
-        colorScheme.inverseSurface,
-        colorScheme.inverseSurface
-    ) else listOf(
-        colorScheme.inversePrimary,
-        colorScheme.inversePrimary
-    )
+    val color = when {
+        enabled && online -> green()
+        enabled && !online -> red()
+        !enabled && online -> listOf(
+            colorScheme.inverseSurface,
+            colorScheme.inverseSurface
+        )
+        else -> listOf(
+            colorScheme.inversePrimary,
+            colorScheme.inversePrimary
+        )
+    }
     Card(
         onClick, modifier.fillMaxWidth(),
         enabled, shape, cardColors(
@@ -84,16 +89,13 @@ fun GradientButton(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    if(online) linearGradient(
-                        if(enabled) green()
-                        else inverse
-                    )
-                    else linearGradient(
-                        if(enabled) red()
-                        else inverse
-                    ), shape
+                    linearGradient(color),
+                    shape
                 )
-                .padding(vertical = smallText?.let { 8.dp } ?: 16.dp), Center
+                .padding(
+                    vertical = smallText
+                        ?.let { 8.dp } ?: 16.dp
+                ), Center
         ) {
             Row(Modifier, Start, CenterVertically) {
                 icon?.let {
@@ -103,11 +105,21 @@ fun GradientButton(
                         Modifier.padding(end = 6.dp)
                     )
                 }
-                Column(Modifier, Top, CenterHorizontally) {
-                    Text(text, style = typography.bodyLarge.copy(White))
-                    smallText?.let {
-                        Text(it, style = typography.headlineSmall.copy(White))
-                    }
+                Column(
+                    Modifier, Top,
+                    CenterHorizontally
+                ) {
+                    Text(
+                        text, style = typography
+                            .bodyLarge.copy(White)
+                    )
+                    smallText
+                        ?.let {
+                            Text(
+                                it, style = typography
+                                    .headlineSmall.copy(White)
+                            )
+                        }
                 }
             }
         }

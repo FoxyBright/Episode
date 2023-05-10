@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import ru.rikmasters.gilty.shared.common.CachedImageType.STORE
 import ru.rikmasters.gilty.shared.common.CachedImageType.URL
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 
 @Composable
@@ -21,7 +21,7 @@ fun GEmojiImage(
     colorFilter: ColorFilter? = null,
 ) {
     emoji?.let {
-        GCashedImage(
+        GCachedImage(
             url = it.path,
             modifier = modifier,
             alignment = alignment,

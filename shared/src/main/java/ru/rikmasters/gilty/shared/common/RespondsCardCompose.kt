@@ -70,7 +70,7 @@ fun Responds(
                 CenterVertically
             ) {
                 image?.let {
-                    GCashedImage(
+                    GCachedImage(
                         it, Modifier
                             .size(40.dp)
                             .clip(CircleShape),

@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -12,18 +13,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
-import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
 import kotlin.math.abs
@@ -75,60 +79,65 @@ fun <T> ListItemPicker(
         }
     }
     val coercedAnimatedOffset = animatedOffset.value % halfHeightPx
+    val intOffset = coercedAnimatedOffset.roundToInt()
     val indexOfElement = getItemIndexForOffset(
         list, value, animatedOffset.value, halfHeightPx
     )
     LaunchedEffect(indexOfElement) { vibrate(context) }
     Layout({
+        GradientPortal(halfHeight, doublePlaceHolders, (true))
         GDivider(Modifier.fillMaxWidth(), dividersColor)
         Box(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontalMargin, verticalMargin)
-                .offset {
-                    IntOffset((0), coercedAnimatedOffset.roundToInt())
-                }
+                .offset { IntOffset((0), intOffset) }
         ) {
+            val fontWeight = (500 to abs(intOffset))
+                .let { (min, max) ->
+                    val weight = if(max > 0)
+                        minOf(min + max, 600) else min
+                    FontWeight(weight)
+                }
             val lModifier = Modifier.align(align)
-            if(doublePlaceHolders && indexOfElement > 1) Label(
-                label(list.elementAt(indexOfElement - 2)),
-                lModifier.offset(y = -(halfHeight * 2)),
-                textStyle.copy(fontWeight = W500), (0.1f),
-                (coercedAnimatedOffset / halfHeightPx)
+            if(indexOfElement > 1) Label(
+                text = label(list.elementAt(indexOfElement - 2)),
+                modifier = lModifier.offset(y = -(halfHeight * 2)),
+                textStyle = textStyle.copy(fontWeight = W500),
+                minAlpha = 0.1f, maxAlpha = 0.1f
             )
             if(indexOfElement > 0) Label(
-                label(list.elementAt(indexOfElement - 1)),
-                lModifier.offset(y = -halfHeight),
-                textStyle.copy(
-                    fontWeight = if(doublePlaceHolders)
-                        W600 else W500
-                ), (0.2f),
-                (coercedAnimatedOffset / (halfHeightPx / 2))
+                text = label(list.elementAt(indexOfElement - 1)),
+                modifier = lModifier.offset(y = -halfHeight),
+                textStyle = textStyle.copy(fontWeight = fontWeight),
+                minAlpha = 0.2f,
+                maxAlpha = (coercedAnimatedOffset / (halfHeightPx / 2))
             )
             Label(
-                label(list.elementAt(indexOfElement)),
-                lModifier, textStyle.copy(fontWeight = W700), (0.3f),
-                (1 - abs(coercedAnimatedOffset) / halfHeightPx)
+                text = label(list.elementAt(indexOfElement)),
+                modifier = lModifier,
+                textStyle = textStyle.copy(fontWeight = W700),
+                minAlpha = 0.3f,
+                maxAlpha = (1 - abs(coercedAnimatedOffset) / halfHeightPx)
             )
             if(indexOfElement < list.count() - 1)
                 Label(
-                    label(list.elementAt(indexOfElement + 1)),
-                    lModifier.offset(y = halfHeight),
-                    textStyle.copy(
-                        fontWeight = if(doublePlaceHolders)
-                            W600 else W500
-                    ), (0.2f),
-                    (-coercedAnimatedOffset / (halfHeightPx / 2))
+                    text = label(list.elementAt(indexOfElement + 1)),
+                    modifier = lModifier.offset(y = halfHeight),
+                    textStyle = textStyle.copy(fontWeight = fontWeight),
+                    minAlpha = 0.2f,
+                    maxAlpha = (-coercedAnimatedOffset / (halfHeightPx / 2))
                 )
-            if(doublePlaceHolders && indexOfElement < list.count() - 2)
+            if(indexOfElement < list.count() - 2)
                 Label(
-                    label(list.elementAt(indexOfElement + 2)),
-                    lModifier.offset(y = halfHeight * 2),
-                    textStyle.copy(fontWeight = W500), (0.1f),
-                    (-coercedAnimatedOffset / halfHeightPx)
+                    text = label(list.elementAt(indexOfElement + 2)),
+                    modifier = lModifier.offset(y = halfHeight * 2),
+                    textStyle = textStyle.copy(fontWeight = W500),
+                    minAlpha = 0.1f, maxAlpha = 0.1f
                 )
         }
         GDivider(Modifier.fillMaxWidth(), dividersColor)
+        GradientPortal(halfHeight, doublePlaceHolders)
     }, modifier
         .draggable(
             rememberDraggableState { deltaY ->
@@ -147,19 +156,44 @@ fun <T> ListItemPicker(
         )
         .padding(0.dp, (height / 3 + verticalMargin * 2))
     ) { measurables, constraints ->
-        measurables.map { it.measure(constraints) }.let { list ->
-            layout(
-                list.drop(1).first().width,
-                list.sumOf { it.height }
-            ) {
-                var y = 0
-                list.forEach {
-                    it.placeRelative((0), y)
-                    y += it.height
+        measurables
+            .map { it.measure(constraints) }
+            .let { list ->
+                layout(
+                    list.drop(1).first().width,
+                    list.sumOf { it.height }
+                ) {
+                    var y = 0
+                    list.forEach {
+                        it.placeRelative((0), y)
+                        y += it.height
+                    }
                 }
             }
-        }
     }
+}
+
+@Composable
+private fun GradientPortal(
+    elementHeight: Dp,
+    state: Boolean,
+    revers: Boolean = false,
+    color: Color = colorScheme.background,
+) {
+    val colors = listOf(color, color, Transparent)
+        .let { if(!revers) it.reversed() else it }
+    val offset = elementHeight
+        .let { if(state) it else it / 3 }
+        .let { if(revers) it * -1 else it }
+    val height = elementHeight * 3
+    Box(
+        Modifier
+            .zIndex(1f)
+            .fillMaxWidth()
+            .height(height)
+            .offset(0.dp, offset)
+            .background(verticalGradient(colors)),
+    )
 }
 
 @Composable
@@ -171,9 +205,12 @@ private fun Label(
     maxAlpha: Float = 1f,
 ) {
     Text(
-        text, modifier.alpha(
+        text,
+        modifier.alpha(
             maxOf(minAlpha, maxAlpha)
-        ), style = textStyle
+        ),
+        style = textStyle,
+        maxLines = 1,
     )
 }
 

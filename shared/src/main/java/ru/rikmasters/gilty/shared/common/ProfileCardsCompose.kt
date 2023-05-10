@@ -114,7 +114,7 @@ fun HiddenContent(
             .background(colorScheme.primaryContainer)
             .clickable { onCardClick() }, BottomCenter
     ) {
-        GCashedImage(
+        GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop
         )
@@ -210,7 +210,7 @@ private fun Avatar(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
-        GCashedImage(
+        GCachedImage(
             image?.thumbnail?.url,
             Modifier.fillMaxSize(),
             contentScale = Crop,
