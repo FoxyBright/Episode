@@ -16,7 +16,7 @@ import ru.rikmasters.gilty.translations.datasource.paging.TranslationMessagesPag
 import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
 
 class TranslationRepository(
-    private val remoteSource: TranslationWebSource
+    private val remoteSource: TranslationWebSource,
 ) {
     suspend fun getTranslationInfo(translationId: String): DataStateTest<TranslationInfoModel> =
         coroutinesState {
@@ -90,32 +90,32 @@ class TranslationRepository(
 
     suspend fun extendTranslation(
         translationId: String,
-        duration: Long
+        duration: Long,
     ): DataStateTest<TranslationInfoModel> =
         coroutinesState {
             remoteSource.extendTranslation(
                 translationId = translationId,
-                duration = duration
+                duration = duration,
             ).map()
         }
 
     suspend fun kickUser(
         translationId: String,
-        userId: String
+        userId: String,
     ): DataStateTest<Unit> =
         coroutinesState {
             remoteSource.kickUser(
                 translationId = translationId,
-                userId = userId
+                userId = userId,
             )
         }
 
     suspend fun ping(
-        translationId: String
+        translationId: String,
     ): DataStateTest<Unit> =
         coroutinesState {
             remoteSource.ping(
-                translationId = translationId
+                translationId = translationId,
             )
         }
 }
