@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.model
 
-// TODO: временно создан тест класс, дублирующий DataState, в будущем перенести класс DataState в shared модуль
+// TODO: временно создан тест класс, дублирующий DataState, в будущем перенести класс DataState в shared модуль, error изменен
 sealed class DataStateTest<out T : Any> {
 
     data class Success<out T : Any>(
@@ -17,8 +17,7 @@ sealed class DataStateTest<out T : Any> {
     }
 
     data class Error<out T : Any>(
-        val exception: Exception = Exception("Unknown"),
-        val isExpected: Boolean = exception.message == "Unknown",
+        val cause: ExceptionCause,
     ) : DataStateTest<T>()
 
     val isSuccess: Boolean
@@ -33,16 +32,12 @@ sealed class DataStateTest<out T : Any> {
     inline fun <E : Any?> on(
         success: (T) -> E,
         loading: (Loading.Type) -> E,
-        error: (Exception) -> E,
+        error: (ExceptionCause) -> E,
     ): E {
         return when (this) {
             is Success -> success(data)
             is Loading -> loading(type)
-            is Error -> if (isExpected) {
-                error(exception)
-            } else {
-                throw exception
-            }
+            is Error -> error(cause)
         }
     }
 
@@ -61,13 +56,9 @@ sealed class DataStateTest<out T : Any> {
     ): E? = if (this is Loading) block(type) else null
 
     inline fun <E : Any?> onError(
-        block: (Exception) -> E,
+        block: (ExceptionCause) -> E,
     ): E? = if (this is Error) {
-        if (isExpected) {
-            block(exception)
-        } else {
-            throw exception
-        }
+        block(cause)
     } else {
         null
     }

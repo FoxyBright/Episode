@@ -27,21 +27,21 @@ import ru.rikmasters.gilty.core.data.source.WebSource
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.MINUTES
 
-open class KtorSource: WebSource() {
-    
+open class KtorSource : WebSource() {
+
     private val webSocketPingInterval = 20_000L
-    
+
     private val baseClient by lazy {
         HttpClient(OkHttp) {
-            
+
             expectSuccess = true
-            
+
             engine {
                 config { writeTimeout(5, MINUTES) }
                 preconfigured = OkHttpClient.Builder()
                     .pingInterval(
                         webSocketPingInterval,
-                        MILLISECONDS
+                        MILLISECONDS,
                     )
                     .retryOnConnectionFailure(true)
                     .build()
@@ -64,7 +64,7 @@ open class KtorSource: WebSource() {
             defaultRequest {
                 contentType(Json)
                 getLocales(
-                    getSystem().configuration
+                    getSystem().configuration,
                 )[0]?.language?.let {
                     headers { append("Accept-Language", it) }
                 }
@@ -78,82 +78,113 @@ open class KtorSource: WebSource() {
             }
         }
     }
-    
+
     val unauthorizedClient by lazy {
         baseClient.config {}
     }
-    
+
     private var client = getClientWithTokens()
-    
+
     private fun updateClientToken() {
         client = getClientWithTokens()
     }
-    
+
     suspend fun wsSession(
-        host: String, port: Int, path: String,
+        host: String,
+        port: Int,
+        path: String,
     ) = unauthorizedClient.webSocketSession(
-        host = host, port = port, path = path
+        host = host,
+        port = port,
+        path = path,
     )
-    
+
     suspend fun unauthorizedGet(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { unauthorizedClient.get(url, block) }
-    
+
     suspend fun unauthorizedPost(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { unauthorizedClient.post(url, block) }
-    
+
     private suspend fun <T> handler(
         block: suspend () -> T,
     ) = try {
         updateClientToken(); block()
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         logE("KTOR RESULT EXCEPTION: $e")
         null
     }
-    
+
     suspend fun get(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.get(url, block) }
-    
+
+    suspend fun tryGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.get(url, block)
+
     suspend fun post(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.post(url, block) }
-    
+
+    suspend fun tryPost(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.post(url, block)
+
     suspend fun postFormData(
         url: String,
         formData: List<PartData>,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler {
         client.submitFormWithBinaryData(
-            url, formData, block
+            url,
+            formData,
+            block,
         )
     }
-    
+
     suspend fun patch(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.patch(url, block) }
-    
+
+    suspend fun tryPatch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.patch(url, block)
+
     suspend fun delete(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.delete(url, block) }
-    
+
+    suspend fun tryDelete(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.delete(url, block)
+
     suspend fun put(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ) = handler { client.put(url, block) }
-    
+
+    suspend fun tryPut(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.put(url, block)
+
     fun closeClient() {
         unauthorizedClient.close()
         client.close()
     }
-    
+
     private fun getClientWithTokens(): HttpClient {
         return baseClient.config {
             install(Auth) {
@@ -168,7 +199,7 @@ open class KtorSource: WebSource() {
             }
         }
     }
-    
+
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
