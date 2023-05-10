@@ -89,7 +89,7 @@ class MainActivity: ComponentActivity() {
                 }
             )
             
-            GiltyTheme{ if(!errorState) ErrorConnection() }
+            GiltyTheme{ if(errorState) ErrorConnection() }
             
             corScope.launch {
                 while(true) {
