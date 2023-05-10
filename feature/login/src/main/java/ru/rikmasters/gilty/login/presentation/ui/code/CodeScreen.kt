@@ -43,8 +43,8 @@ fun CodeScreen(vm: CodeViewModel) {
                         
                         vm.onOtpAuthentication(vm.code.value)
                         vm.linkExternalToken()
-                        
-                        if(vm.profileCompleted())
+
+                         if(vm.profileCompleted())
                             nav.navigateAbsolute("main/meetings")
                         else
                             nav.navigate("profile")

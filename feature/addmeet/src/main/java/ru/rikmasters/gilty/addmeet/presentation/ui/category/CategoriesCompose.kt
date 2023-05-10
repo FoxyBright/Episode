@@ -27,6 +27,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
+    val subcategoryList: List<CategoryModel>,
     val selectCategory: CategoryModel?,
     val online: Boolean,
     val alert: Boolean = false,
@@ -71,7 +72,7 @@ fun CategoriesContent(
         if(LocalInspectionMode.current)
             BubblesForPreview(state, callback)
         else Bubbles(
-            state.categoryList,
+            if(state.selectCategory == null) state.categoryList else state.subcategoryList.filter { it.parentId == state.selectCategory.id },
             CATEGORY_ELEMENT_SIZE.dp,
             Modifier
                 .padding(it)
@@ -130,6 +131,7 @@ private fun CategoriesPreview() {
             CategoriesContent(
                 Modifier,
                 CategoriesState(
+                    listOf(DemoCategoryModel),
                     listOf(DemoCategoryModel),
                     DemoCategoryModel, (false)
                 )
