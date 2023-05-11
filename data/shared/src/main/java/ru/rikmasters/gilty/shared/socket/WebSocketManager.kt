@@ -18,7 +18,7 @@ import ru.rikmasters.gilty.data.shared.BuildConfig
 import java.io.IOException
 import java.net.SocketException
 
-abstract class WebSocketManager() : KtorSource() {
+abstract class WebSocketManager : KtorSource() {
 
     private val socketURL =
         "/app/local?protocol=7&client=js&version=7.2.0&flash=false"

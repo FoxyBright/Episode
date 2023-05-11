@@ -3,14 +3,15 @@ package ru.rikmasters.gilty.translations.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import ru.rikmasters.gilty.core.viewmodel.Strategy
+import kotlinx.coroutines.withContext
+import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
-import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.shared.models.enumeration.TranslationSignalTypeDTO
 import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.translations.datasource.paging.TranslationConnectedUsersPagingSource
@@ -20,14 +21,20 @@ import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
 
 class TranslationRepository(
     private val remoteSource: TranslationWebSource,
-    private val webSocket: TranslationWebSocket
-): CoroutineController() {
-    suspend fun connectWebSockets(userId: String) = single(Strategy.JOIN) {
-        webSocket.connect(userId = userId)
+    private val webSocket: TranslationWebSocket,
+) : CoroutineController() {
+    suspend fun connectToTranslation(translationId: String) {
+        withContext(Dispatchers.IO) {
+            webSocket.connectToTranslation(
+                id = translationId,
+            )
+        }
     }
 
-    suspend fun disconnectWebSocket() {
-        webSocket.disconnect()
+    suspend fun disconnectFromTranslation() {
+        withContext(Dispatchers.IO) {
+            webSocket.disconnectFromTranslation()
+        }
     }
 
     suspend fun getTranslationInfo(translationId: String): DataStateTest<TranslationInfoModel> =

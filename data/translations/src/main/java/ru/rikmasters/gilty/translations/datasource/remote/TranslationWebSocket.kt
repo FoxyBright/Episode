@@ -115,7 +115,7 @@ class TranslationWebSocket : WebSocketManager() {
         }
     }
 
-    private suspend fun disconnectFromTranslation() {
+    suspend fun disconnectFromTranslation() {
         translationId.value?.let {
             send(
                 data = mapOf("channel" to "private-translation.$it.$_userId"),
@@ -131,7 +131,7 @@ class TranslationWebSocket : WebSocketManager() {
         }
     }
 
-    private suspend fun disconnectFromTranslationChat() {
+    suspend fun disconnectFromTranslationChat() {
         translationId.value?.let {
             send(
                 data = mapOf("channel" to "private-translation.${it}_chat"),
