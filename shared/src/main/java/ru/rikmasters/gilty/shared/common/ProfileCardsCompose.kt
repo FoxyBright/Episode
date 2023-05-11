@@ -35,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.rikmasters.gilty.core.R.drawable.ic_information
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
@@ -225,14 +224,13 @@ private fun Avatar(
                 CenterHorizontally
             ) {
                 Image(
-                    painterResource(ic_information),
+                    painterResource(R.drawable.ic_information),
                     (null), Modifier.size(40.dp)
                 )
                 Text(
                     stringResource(R.string.profile_blocked_photo),
                     Modifier.padding(top = 16.dp),
                     style = typography.bodyMedium,
-                    textAlign = TextAlign.Center,
                     color = White
                 )
             }

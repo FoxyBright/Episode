@@ -8,12 +8,15 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
+import androidx.compose.ui.text.font.FontWeight.Companion.Normal
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 
 private val baseFontFamily = FontFamily(
-    Font(R.font.gilroy_regular),
+    Font(R.font.gilroy_regular, Normal),
     Font(R.font.gilroy_medium, Medium),
+    Font(R.font.gilroy_semibold, SemiBold),
     Font(R.font.gilroy_bold, Bold)
 )
 
