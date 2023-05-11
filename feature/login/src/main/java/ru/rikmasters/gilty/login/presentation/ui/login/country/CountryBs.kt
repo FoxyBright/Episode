@@ -40,7 +40,10 @@ fun CountryBs(vm: CountryBsViewModel) {
                 }
                 
                 override fun onSearchStateChange() {
-                    searchState = !searchState
+                    scope.launch {
+                        vm.changeQuery("")
+                        searchState = !searchState
+                    }
                 }
             }
         )

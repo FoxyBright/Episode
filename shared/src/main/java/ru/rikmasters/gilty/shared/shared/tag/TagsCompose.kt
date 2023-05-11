@@ -108,15 +108,21 @@ fun TagsContent(
                 bottom = if(state.add)
                     0.dp else 20.dp
             ), topBar = {
-            TagSearch(
+            GSearchBar(
                 state.search,
                 Modifier.padding(
                     top = 28.dp,
                     bottom = 4.dp
                 ),
+                stringResource(
+                    if(state.add) R.string.meeting_filter_add_tag_text_holder
+                    else R.string.search_placeholder
+                ),
                 state.isOnline, state.add,
                 { callback?.onBack() },
                 { callback?.onSearchChange(it) },
+                errorActive = true,
+                errorText = stringResource(R.string.bad_tag_error)
             ) { callback?.onCreateTag(it) }
         }, bottomBar = {
             if(state.selected.isNotEmpty())
