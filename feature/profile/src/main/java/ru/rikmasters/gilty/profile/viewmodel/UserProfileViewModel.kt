@@ -153,12 +153,14 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun changeDescription(text: String) {
-        _description.emit(text)
-        _profile.emit(
-            profile.value?.copy(
-                aboutMe = description.value
+        if(text.length <= 120) {
+            _description.emit(text)
+            _profile.emit(
+                profile.value?.copy(
+                    aboutMe = description.value
+                )
             )
-        )
+        }
     }
     
     suspend fun updateDescription() {
