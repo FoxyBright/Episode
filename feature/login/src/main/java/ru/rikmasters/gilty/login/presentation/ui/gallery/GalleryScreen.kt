@@ -45,6 +45,7 @@ fun GalleryScreen(
     val filters by vm.filters.collectAsState()
     
     LaunchedEffect(permission.hasPermission) {
+        permission.launchPermissionRequest()
         if(permission.hasPermission) {
             vm.updateImages()
             asm.bottomSheet.collapse()
