@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":feature:gallery"))
     implementation(project(":feature:login"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:translation"))
     
     implementation(project(":domain:paginator"))
     implementation(project(":domain"))
@@ -61,6 +62,7 @@ dependencies {
     implementation(project(":data:realm"))
     implementation(project(":data:auth"))
     implementation(project(":data:ktor"))
+    implementation(project(":data:translations"))
     
     implementation(project(":example"))
     implementation(project(":shared"))

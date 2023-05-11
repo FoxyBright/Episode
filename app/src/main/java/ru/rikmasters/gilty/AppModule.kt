@@ -27,6 +27,7 @@ object AppModule: FeatureDefinition() {
             // Feature
             Notifications, Main,
             AddMeet, Profile, Login, Chat,
+            Translation,
             // Data
             Ktor, Auth, ChatData, Realm,
             MeetingsData, NotificationsData,
