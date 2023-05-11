@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.FixedScale
-import com.example.animated.AnimatedImage
+import ru.rikmasters.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.BlurBox
 

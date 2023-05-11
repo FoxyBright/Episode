@@ -39,7 +39,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.animated.AnimatedImage
+import ru.rikmasters.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.format

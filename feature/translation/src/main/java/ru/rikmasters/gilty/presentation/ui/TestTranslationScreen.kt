@@ -1,6 +1,5 @@
-package com.example.translation.presentation.ui
+package ru.rikmasters.gilty.presentation.ui
 
-import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,20 +15,35 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.view.OpenGlView
-import ru.rikmasters.gilty.feature.translation.R
 
 @Composable
 fun TestTranslationScreen() {
+    var camera: RtmpCamera2? = null
     var streamState by remember { mutableStateOf(StreamState.STOP) }
+
+    fun startBroadCast(rtmpUrl: String) {
+        camera?.let {
+            if (!it.isStreaming) {
+                if (it.prepareAudio() && it.prepareVideo()) {
+                    streamState = StreamState.PLAY
+                    it.startStream(rtmpUrl)
+                } else {
+                    streamState = StreamState.STOP
+                }
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = {
-                val view = LayoutInflater.from(
-                    it,
-                ).inflate(R.layout.open_gl_view, (null), false)
-                    .findViewById<OpenGlView>(R.id.openGlView)
+                val view = OpenGlView(it)
+                view.keepScreenOn = true
+                view.isKeepAspectRatio = true
+                view
+            },
+            update = {
                 val connectionChecker = object : ConnectCheckerRtmp {
                     override fun onAuthErrorRtmp() {}
                     override fun onAuthSuccessRtmp() {}
@@ -38,16 +52,19 @@ fun TestTranslationScreen() {
                     override fun onConnectionSuccessRtmp() {
                         streamState = StreamState.PLAY
                     }
+
                     override fun onDisconnectRtmp() {
                         streamState = StreamState.STOP
                     }
+
                     override fun onNewBitrateRtmp(bitrate: Long) {}
                 }
-                val rtmpCamera = RtmpCamera2(view, connectionChecker)
+                camera = RtmpCamera2(it, connectionChecker)
                 val surfaceHolderCallback = object : SurfaceHolder.Callback {
                     override fun surfaceCreated(holder: SurfaceHolder) {
-                        rtmpCamera.startPreview()
+                        camera?.startPreview()
                     }
+
                     override fun surfaceChanged(
                         holder: SurfaceHolder,
                         format: Int,
@@ -55,17 +72,19 @@ fun TestTranslationScreen() {
                         height: Int,
                     ) {
                     }
+
                     override fun surfaceDestroyed(holder: SurfaceHolder) {
-                        rtmpCamera.stopPreview()
+                        camera?.stopPreview()
                     }
                 }
-                view.holder.addCallback(surfaceHolderCallback)
-
-                view
+                it.holder.addCallback(surfaceHolderCallback)
             },
         )
         Button(
             onClick = {
+                startBroadCast(
+                    rtmpUrl = //TODO: url
+                )
             },
         ) {
             Text(

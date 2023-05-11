@@ -1,4 +1,4 @@
-package com.example.animated
+package ru.rikmasters.animated
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
