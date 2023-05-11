@@ -40,14 +40,18 @@ fun CodeScreen(vm: CodeViewModel) {
                     vm.onCodeChange(index, text)
                     
                     if(vm.code.value.length == vm.codeLength.value) try {
-                        
-                        vm.onOtpAuthentication(vm.code.value)
-                        vm.linkExternalToken()
-                        
-                        if(vm.profileCompleted())
-                            nav.navigateAbsolute("main/meetings")
-                        else
-                            nav.navigate("profile")
+
+                        if(vm.onOtpAuthentication(vm.code.value)) {
+
+                            vm.linkExternalToken()
+
+                            if (vm.profileCompleted())
+                                nav.navigateAbsolute("main/meetings")
+                            else
+                                nav.navigate("profile")
+                        }else {
+                            badCode()
+                        }
                     } catch(e: Exception) {
                         e.stackTraceToString()
                         badCode()
@@ -59,6 +63,7 @@ fun CodeScreen(vm: CodeViewModel) {
                 scope.launch {
                     asm.keyboard.hide()
                     vm.onBlur(true)
+                    vm.onCodeClear()
                 }
             }
             
