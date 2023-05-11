@@ -126,7 +126,7 @@ private fun BadCode(
             Modifier
                 .fillMaxSize()
                 .align(Center),
-            Top, CenterHorizontally
+            Arrangement.Center, CenterHorizontally
         ) {
             GEmojiImage(
                 badEmoji,
