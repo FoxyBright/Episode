@@ -54,21 +54,22 @@ class ProfileViewModel: ViewModel() {
     
     suspend fun usernameChange(text: String) {
         _username.emit(text)
+        onUsernameSave()
     }
     
     suspend fun descriptionChange(text: String) {
         _description.emit(text)
+        onDescriptionSave()
     }
     
     suspend fun onDescriptionSave() {
         regManager.userUpdateData(
-            description.value
+            aboutMe = description.value
         )
     }
-    
     suspend fun onUsernameSave() {
         regManager.userUpdateData(
-            username.value
+            username = username.value
         )
     }
 }
