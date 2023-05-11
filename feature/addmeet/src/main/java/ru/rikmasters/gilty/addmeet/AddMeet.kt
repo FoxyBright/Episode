@@ -8,6 +8,7 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.complete.CompleteScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ConditionsScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.DetailedScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.RequirementsScreen
+import ru.rikmasters.gilty.addmeet.presentation.ui.subcategory.SubcategoriesScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
@@ -24,6 +25,10 @@ object AddMeet: FeatureDefinition() {
             
             screen<CategoryViewModel>("category") { vm, _ ->
                 CategoriesScreen(vm)
+            }
+
+            screen<SubcategoryViewModel>("subcategory") {vm, _ ->
+                SubcategoriesScreen(vm)
             }
             
             screen<ConditionViewModel>("conditions") { vm, _ ->
@@ -51,6 +56,7 @@ object AddMeet: FeatureDefinition() {
     override fun Module.koin() {
         
         singleOf(::CategoryViewModel)
+        singleOf(::SubcategoryViewModel)
         singleOf(::ConditionViewModel)
     
         singleOf(::DetailedViewModel)

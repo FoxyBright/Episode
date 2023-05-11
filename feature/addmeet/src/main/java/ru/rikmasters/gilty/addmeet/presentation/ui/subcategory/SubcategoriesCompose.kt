@@ -1,11 +1,16 @@
-package ru.rikmasters.gilty.addmeet.presentation.ui.category
+package ru.rikmasters.gilty.addmeet.presentation.ui.subcategory
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,26 +30,27 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
 import ru.rikmasters.gilty.shared.shared.ClosableActionBar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-data class CategoriesState(
-    val categoryList: List<CategoryModel>,
+data class SubcategoriesState(
+    val subcategoryList: List<CategoryModel>,
     val selectCategory: CategoryModel?,
     val online: Boolean,
     val alert: Boolean = false,
 )
 
-interface CategoriesCallback {
-    
+interface SubcategoriesCallback {
+
     fun onCategoryClick(category: CategoryModel)
     fun onClose()
     fun onCloseAlert(state: Boolean)
+    fun onBack()
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun CategoriesContent(
+fun SubcategoriesContent(
     modifier: Modifier = Modifier,
-    state: CategoriesState,
-    callback: CategoriesCallback? = null,
+    state: SubcategoriesState,
+    callback: SubcategoriesCallback? = null,
 ) {
     Scaffold(
         modifier,
@@ -52,8 +58,10 @@ fun CategoriesContent(
             ClosableActionBar(
                 stringResource(R.string.add_meet_create_title),
                 Modifier,
-                stringResource(R.string.add_meet_create_description),
-                { callback?.onCloseAlert(true) }
+                stringResource(R.string.add_meet_create_correct_description),
+                { callback?.onCloseAlert(true) }, {
+                    callback?.onBack()
+                }
             )
         },
         bottomBar = {
@@ -62,16 +70,17 @@ fun CategoriesContent(
                     .fillMaxWidth()
                     .padding(bottom = 48.dp)
                     .padding(horizontal = 16.dp),
-                color = if(state.online)
-                    colorScheme.secondary
-                else colorScheme.primary
+                color = if (state.online)
+                    MaterialTheme.colorScheme.secondary
+                else MaterialTheme.colorScheme.primary
             )
         }
     ) {
-        if(LocalInspectionMode.current)
+        if (LocalInspectionMode.current)
             BubblesForPreview(state, callback)
-        else Bubbles(
-            state.categoryList,
+        else
+            Bubbles(
+                state.subcategoryList,
                 CATEGORY_ELEMENT_SIZE.dp,
                 Modifier
                     .padding(it)
@@ -91,24 +100,24 @@ fun CategoriesContent(
 
 @Composable
 private fun BubblesForPreview(
-    state: CategoriesState,
-    callback: CategoriesCallback? = null,
+    state: SubcategoriesState,
+    callback: SubcategoriesCallback? = null,
 ) {
     LazyRow(
         Modifier
             .height((CATEGORY_ELEMENT_SIZE * 4).dp)
             .padding(top = 50.dp)
     ) {
-        itemsIndexed(state.categoryList.chunked(3))
+        itemsIndexed(state.subcategoryList.chunked(3))
         { index, item ->
             Box(Modifier.fillMaxHeight()) {
                 Column(
                     Modifier.align(
-                        if(index % 3 != 0) Alignment.TopCenter
+                        if (index % 3 != 0) Alignment.TopCenter
                         else Alignment.BottomCenter
                     )
                 ) {
-                    for(element in item) CategoryItem(
+                    for (element in item) CategoryItem(
                         element.name, element.emoji, element.color,
                         (element == state.selectCategory)
                     ) { callback?.onCategoryClick(element) }
@@ -120,16 +129,16 @@ private fun BubblesForPreview(
 
 @Preview
 @Composable
-private fun CategoriesPreview() {
+private fun SubcategoriesPreview() {
     GiltyTheme {
         Box(
             Modifier.background(
-                colorScheme.background
+                MaterialTheme.colorScheme.background
             )
         ) {
-            CategoriesContent(
+            SubcategoriesContent(
                 Modifier,
-                CategoriesState(
+                SubcategoriesState(
                     listOf(DemoCategoryModel),
                     DemoCategoryModel, (false)
                 )
