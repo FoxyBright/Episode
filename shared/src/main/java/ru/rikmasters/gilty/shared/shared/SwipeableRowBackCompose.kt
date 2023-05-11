@@ -30,7 +30,7 @@ private fun SwipeableRowBackPreview(){
 @Composable
 fun SwipeableRowBack(modifier: Modifier = Modifier) {
     Column(
-        modifier.padding(8.dp),
+        modifier.padding(6.dp),
         Top, CenterHorizontally
     ) {
         Icon(
