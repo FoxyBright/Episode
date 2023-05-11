@@ -26,7 +26,7 @@ class TranslationRepository(
     suspend fun connectToTranslation(translationId: String) {
         withContext(Dispatchers.IO) {
             webSocket.connectToTranslation(
-                id = translationId,
+                id = translationId
             )
         }
     }
@@ -34,6 +34,20 @@ class TranslationRepository(
     suspend fun disconnectFromTranslation() {
         withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslation()
+        }
+    }
+
+    suspend fun connectToTranslationChat(translationId: String) {
+        withContext(Dispatchers.IO) {
+            webSocket.connectToTranslationChat(
+                id = translationId
+            )
+        }
+    }
+
+    suspend fun disconnectFromTranslationChat() {
+        withContext(Dispatchers.IO) {
+            webSocket.disconnectFromTranslationChat()
         }
     }
 
