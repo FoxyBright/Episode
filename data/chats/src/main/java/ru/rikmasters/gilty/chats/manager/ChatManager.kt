@@ -13,7 +13,7 @@ import ru.rikmasters.gilty.chats.models.chat.mapDTO
 import ru.rikmasters.gilty.chats.paging.ChatListPagingSource
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
-import ru.rikmasters.gilty.chats.source.websocket.WebSocketHandler
+import ru.rikmasters.gilty.chats.source.websocket.ChatWebSocket
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
@@ -21,7 +21,7 @@ import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 
 class ChatManager(
     private val store: ChatRepository,
-    private val webSocket: WebSocketHandler,
+    private val webSocket: ChatWebSocket,
     private val webSource: ChatWebSource,
 ): CoroutineController() {
     

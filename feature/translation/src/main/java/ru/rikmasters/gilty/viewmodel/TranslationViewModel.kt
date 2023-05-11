@@ -1,4 +1,14 @@
 package ru.rikmasters.gilty.viewmodel
 
-class TranslationViewModel {
+import org.koin.core.component.inject
+import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.translations.repository.TranslationRepository
+
+class TranslationViewModel : ViewModel() {
+
+    private val translationRepository: TranslationRepository by inject()
+
+    init {
+        translationRepository.connectWebSockets()
+    }
 }
