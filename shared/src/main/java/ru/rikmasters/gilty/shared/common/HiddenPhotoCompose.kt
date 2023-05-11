@@ -154,7 +154,7 @@ private fun LazyItem(
             .clickable { onSelect(image) },
         TopEnd
     ) {
-        GCashedImage(
+        GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop,
         )

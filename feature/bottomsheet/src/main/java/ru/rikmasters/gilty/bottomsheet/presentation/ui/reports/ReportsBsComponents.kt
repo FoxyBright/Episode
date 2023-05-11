@@ -164,7 +164,7 @@ fun ComplainElements(
             title,
             Modifier
                 .offset(x = -(12).dp)
-                .padding(bottom = 26.dp),
+                .padding(bottom = 12.dp),
             distanceBetween = 8.dp,
             description = description
         ) { onBack?.let { it() } }
@@ -214,7 +214,7 @@ private fun ComplainItem(
             Modifier
                 .fillMaxWidth()
                 .height(Max)
-                .padding(16.dp, 20.dp),
+                .padding(16.dp),
             SpaceBetween, CenterVertically
         ) {
             Text(

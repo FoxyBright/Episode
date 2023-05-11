@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.login.viewmodel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
@@ -10,6 +11,7 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 class ProfileViewModel: ViewModel() {
     
     private val regManager by inject<RegistrationManager>()
+    private val authManager by inject<AuthManager>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -43,6 +45,11 @@ class ProfileViewModel: ViewModel() {
         _profile.emit(profile)
         _username.emit(profile.username ?: "")
         _description.emit(profile.aboutMe ?: "")
+    }
+    
+    suspend fun clearLoginData() {
+        regManager.clearProfile()
+        authManager.logout()
     }
     
     suspend fun usernameChange(text: String) {

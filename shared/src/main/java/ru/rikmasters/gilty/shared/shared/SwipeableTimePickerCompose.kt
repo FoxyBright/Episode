@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
@@ -43,31 +42,33 @@ fun ScrollTimePicker(
     onHourChange: (String) -> Unit,
     onMinuteChange: (String) -> Unit,
 ) {
-    Row(
-        modifier,
-        Arrangement.Center,
-        Alignment.CenterVertically
+    Box(
+        modifier.background(
+            colorScheme.background
+        ), Alignment.Center
     ) {
-        val style = typography.labelLarge.copy(
-            colorScheme.tertiary,
-            textAlign = Center,
-            fontSize = 25.sp
-        )
-        ListItemPicker(
-            timeReplacer(hours, HOURS_END),
-            getTimesList(0..HOURS_END.toInt()),
-            Modifier.width(Max),
-            { timeReplacer(it, HOURS_END) },
-            colorScheme.outline, style
-        ) { onHourChange(it) }
-        Spacer(Modifier.width(16.dp))
-        ListItemPicker(
-            timeReplacer(minutes, MINUTES_END),
-            getTimesList(0..MINUTES_END.toInt()),
-            Modifier.width(Max),
-            { timeReplacer(it, MINUTES_END) },
-            colorScheme.outline, style
-        ) { onMinuteChange(it) }
+        Row(Modifier.fillMaxWidth(0.5f)) {
+            val style = typography.labelLarge.copy(
+                colorScheme.tertiary,
+                textAlign = Center,
+                fontSize = 25.sp
+            )
+            ListItemPicker(
+                timeReplacer(hours, HOURS_END),
+                getTimesList(0..HOURS_END.toInt()),
+                Modifier.weight(1f),
+                { timeReplacer(it, HOURS_END) },
+                colorScheme.outline, style
+            ) { onHourChange(it) }
+            Spacer(Modifier.width(16.dp))
+            ListItemPicker(
+                timeReplacer(minutes, MINUTES_END),
+                getTimesList(0..MINUTES_END.toInt()),
+                Modifier.weight(1f),
+                { timeReplacer(it, MINUTES_END) },
+                colorScheme.outline, style
+            ) { onMinuteChange(it) }
+        }
     }
 }
 

@@ -21,10 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.core.R.drawable
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.R.drawable
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
@@ -206,7 +206,7 @@ private fun TextNotification(
                         .padding(top = 6.dp),
                     Start, CenterVertically
                 ) {
-                    GCashedImage(
+                    GCachedImage(
                         user?.avatar?.thumbnail?.url, Modifier
                             .padding(end = 16.dp)
                             .clip(CircleShape)

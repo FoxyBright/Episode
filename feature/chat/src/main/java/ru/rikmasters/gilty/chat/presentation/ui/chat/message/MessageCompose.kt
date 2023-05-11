@@ -26,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R.drawable.ic_reply
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.chat.AttachmentType
@@ -146,7 +146,7 @@ private fun Content(
         if(!state.sender &&
             message.type != NOTIFICATION
             && state.avatar
-        ) GCashedImage(
+        ) GCachedImage(
             message.message?.author?.avatar
                 ?.thumbnail?.url,
             Modifier

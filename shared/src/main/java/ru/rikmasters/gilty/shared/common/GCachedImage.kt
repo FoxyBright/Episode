@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -16,10 +17,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.FilterQuality.Companion.High
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy.DISABLED
 import coil.request.CachePolicy.ENABLED
 import coil.request.ImageRequest
 import coil.size.Size.Companion.ORIGINAL
@@ -35,11 +38,11 @@ enum class CachedImageType {
 }
 
 @Composable
-fun GCashedImage(
+fun GCachedImage(
     url: String?,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit,
-    alignment: Alignment = Alignment.Center,
+    contentScale: ContentScale = Fit,
+    alignment: Alignment = Center,
     alpha: Float = DefaultAlpha,
     contentDescription: String? = null,
     colorFilter: ColorFilter? = null,
@@ -57,13 +60,10 @@ fun GCashedImage(
                 .data(url)
                 .size(ORIGINAL)
                 .networkCachePolicy(ENABLED)
-                .diskCachePolicy(ENABLED)
+                .diskCachePolicy(DISABLED)
                 .memoryCachePolicy(ENABLED)
                 .allowHardware(false)
-            key?.let {
-                builder.memoryCacheKey(key)
-                builder.diskCacheKey(key)
-            }
+            key?.let { builder.memoryCacheKey(key) }
             builder.build()
         }
     }
