@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
-import ru.rikmasters.gilty.shared.models.translations.TranslationSignalDTO
+import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
 import ru.rikmasters.gilty.shared.socket.SocketData
 import ru.rikmasters.gilty.shared.socket.SocketResponse
 import ru.rikmasters.gilty.shared.socket.WebSocketManager
@@ -44,10 +44,10 @@ class TranslationWebSocket : WebSocketManager() {
             }
 
             TranslationsSocketEvents.SIGNAL -> {
-                val signalDTO = mapper.readValue<TranslationSignalDTO>(response.data)
+                val signal = mapper.readValue<TranslationSignalModel>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.SignalReceived(
-                        signal = signalDTO,
+                        signal = signal,
                     ),
                 )
             }

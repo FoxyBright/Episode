@@ -12,14 +12,16 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.event.TranslationEvent
 import ru.rikmasters.gilty.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.model.TranslationUiState
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
+import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
 class TranslationViewModel : ViewModel() {
 
     private val translationRepository: TranslationRepository by inject()
 
-    private val pinging = MutableStateFlow(false)
+    private val connected = MutableStateFlow(false)
 
     private val translationInfo = MutableStateFlow<TranslationInfoModel?>(null)
 
@@ -29,14 +31,53 @@ class TranslationViewModel : ViewModel() {
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
 
     init {
+        // Pinging while connected
         coroutineScope.launch {
-            pinging.collectLatest { isPinging ->
+            connected.collectLatest { connected ->
                 translationInfo.value?.let { translation ->
-                    while (isPinging) {
+                    while (connected) {
                         translationRepository.ping(
                             translationId = translation.id
                         )
                         delay(8000)
+                    }
+                }
+            }
+        }
+        // Collect sockets while connected
+        coroutineScope.launch {
+            connected.collectLatest { connected ->
+                translationRepository.webSocketFlow.collectLatest { socketAnswers ->
+                    when(socketAnswers) {
+                        is TranslationCallbackEvents.SignalReceived -> {
+                            when(socketAnswers.signal.signal) {
+                                TranslationSignalTypeModel.MICROPHONE -> {
+                                    _translationUiState.update {
+                                        it.copy(
+                                            translationInfo = it.translationInfo?.copy(
+                                                microphone = socketAnswers.signal.value
+                                            )
+                                        )
+                                    }
+                                }
+                                TranslationSignalTypeModel.CAMERA -> {
+                                    _translationUiState.update {
+                                        it.copy(
+                                            translationInfo = it.translationInfo?.copy(
+                                                camera = socketAnswers.signal.value
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        TranslationCallbackEvents.TranslationCompleted -> {}
+                        TranslationCallbackEvents.TranslationExpired -> {}
+                        is TranslationCallbackEvents.TranslationExtended -> {}
+                        TranslationCallbackEvents.TranslationStarted -> {}
+                        is TranslationCallbackEvents.UserConnected -> {}
+                        is TranslationCallbackEvents.UserDisconnected -> {}
+                        is TranslationCallbackEvents.UserKicked -> {}
                     }
                 }
             }
@@ -121,11 +162,11 @@ class TranslationViewModel : ViewModel() {
     }
 
     private fun startPinging() {
-        pinging.value = true
+        connected.value = true
     }
 
     private fun stopPinging() {
-        pinging.value = false
+        connected.value = false
     }
 
 }

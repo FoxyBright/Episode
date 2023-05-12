@@ -23,6 +23,8 @@ class TranslationRepository(
     private val remoteSource: TranslationWebSource,
     private val webSocket: TranslationWebSocket,
 ) : CoroutineController() {
+
+    val webSocketFlow = webSocket.answer
     suspend fun connectToTranslation(translationId: String) {
         withContext(Dispatchers.IO) {
             webSocket.connectToTranslation(
