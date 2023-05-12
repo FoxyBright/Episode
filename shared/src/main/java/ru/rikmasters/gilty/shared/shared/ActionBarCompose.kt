@@ -71,7 +71,7 @@ fun ActionBar(
             Text(
                 it, Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, start = 16.dp),
+                    .padding(top = 12.dp, start = 16.dp),
                 style = typography.labelSmall,
                 color = colorScheme.onTertiary
             )
