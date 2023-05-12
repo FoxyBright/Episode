@@ -22,7 +22,8 @@ import ru.rikmasters.gilty.viewmodel.TranslationViewModel
 
 @Composable
 fun TestTranslationScreen(
-    vm: TranslationViewModel
+    vm: TranslationViewModel,
+    translationId: String
 ) {
     val translationScreenState by vm.translationUiState.collectAsState()
 

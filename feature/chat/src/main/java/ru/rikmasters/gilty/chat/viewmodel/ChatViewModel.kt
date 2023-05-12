@@ -247,6 +247,7 @@ class ChatViewModel: ViewModel() {
     } ?: MEET
     
     suspend fun toTranslation() {
+
         makeToast("Трансляции пока что не доступны на Android-версии Gilty")
     }
     
