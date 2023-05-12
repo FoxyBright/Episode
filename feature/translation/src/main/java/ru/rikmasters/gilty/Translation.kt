@@ -4,12 +4,17 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.presentation.ui.TestTranslationScreen
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import ru.rikmasters.gilty.viewmodel.TranslationViewModel
 
 object Translation : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-
+        nested("translations","main") {
+            screen<TranslationViewModel>("main") { vm, _ ->
+                TestTranslationScreen(vm = vm)
+            }
+        }
     }
 
     override fun Module.koin() {
