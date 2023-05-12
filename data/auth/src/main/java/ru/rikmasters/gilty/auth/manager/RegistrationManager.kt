@@ -19,7 +19,7 @@ class RegistrationManager(
         profileStore.checkCompletable()
     }
     
-    suspend fun clearProfile(){
+    suspend fun clearProfile() {
         profileStore.deleteProfile()
     }
     
@@ -48,7 +48,11 @@ class RegistrationManager(
     
     suspend fun deleteHidden(files: List<String>) {
         withContext(IO) {
-            files.forEach { profileStore.deleteHidden(it) }
+            files.forEach {
+                profileStore.deleteHidden(
+                    it.substring("thumbnails/", "?")
+                )
+            }
         }
     }
     
@@ -78,3 +82,8 @@ class RegistrationManager(
         }
     }
 }
+
+private fun String.substring(
+    after: String, before: String,
+) = this.substringAfter(after)
+    .substringBefore(before)

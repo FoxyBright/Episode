@@ -42,7 +42,7 @@ fun HiddenScreen(
             
             override fun onNext() {
                 scope.launch {
-                    vm.onNext()
+//                    vm.onNext() TODO СДЕЛАТЬ НОРМАЛЬНЫЙ МЕХАНИЗМ ДОБАВЛЕНИЯ И УДАЛЕНИЯ СКРЫТЫХ
                     nav.navigate("profile")
                 }
             }

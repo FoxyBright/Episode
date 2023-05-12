@@ -21,13 +21,20 @@ class ProfileViewModel: ViewModel() {
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
-    val distanceDebounced = username
+    val usernameDebounced = username
         .debounce(250)
         .onEach {
-            _occupied.emit(
-                if(username.value == profile.value?.username) false
-                else regManager.isNameOccupied(username.value)
-            )
+            val isUserName = username.value ==
+                    profile.value?.username
+            val isOccupied = if(isUserName) false
+            else {
+                try{
+                    regManager.isNameOccupied(username.value)
+                } catch(_:Exception){
+                    true
+                }
+            }
+            _occupied.emit(isOccupied)
         }
         .state(
             _username.value,
@@ -69,6 +76,7 @@ class ProfileViewModel: ViewModel() {
             aboutMe = description.value
         )
     }
+    
     suspend fun onUsernameSave() {
         regManager.userUpdateData(
             username = username.value

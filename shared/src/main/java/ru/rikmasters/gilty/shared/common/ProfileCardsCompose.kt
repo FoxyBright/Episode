@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -96,7 +94,7 @@ private fun ProfileStatisticContentPreview() {
 
 @Composable
 fun HiddenContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     image: String?,
     profileType: ProfileType,
     lockState: Boolean,
@@ -111,27 +109,29 @@ fun HiddenContent(
             .fillMaxWidth()
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
-            .clickable { onCardClick() }, BottomCenter
+            .clickable { onCardClick() },
+        BottomCenter
     ) {
         GCachedImage(
-            image, Modifier.fillMaxSize(),
+            url = image,
+            modifier = Modifier.fillMaxSize(),
             contentScale = Crop
+        )
+        if(profileType != USERPROFILE) Lock(
+            modifier = Modifier
+                .align(TopStart)
+                .padding(8.dp),
+            state = lockState
         )
         val emptyImage = image.isNullOrBlank()
                 || image.contains("null")
-        if(profileType != USERPROFILE) Lock(
-            Modifier
-                .align(TopStart)
-                .padding(8.dp),
-            lockState
-        )
         CreateProfileCardRow(
-            stringResource(R.string.profile_hidden_photo),
-            when(profileType) {
+            text = stringResource(R.string.profile_hidden_photo),
+            profileType = when(profileType) {
                 ORGANIZER, ANONYMOUS_ORGANIZER -> USERPROFILE
-                CREATE -> CREATE
                 USERPROFILE -> if(emptyImage)
                     CREATE else USERPROFILE
+                CREATE -> CREATE
             }
         )
     }
@@ -160,6 +160,7 @@ private fun Lock(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileImageContent(
     modifier: Modifier,
@@ -167,37 +168,55 @@ fun ProfileImageContent(
     type: ProfileType,
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
+    isError: Boolean = false,
     onClick: () -> Unit,
 ) {
-    Box(
-        modifier
+    Card(
+        onClick = onClick,
+        modifier = modifier
             .height(
                 if(type == CREATE)
                     200.dp else 254.dp
             )
-            .fillMaxWidth(0.45f)
-            .clip(shapes.large)
-            .background(colorScheme.primaryContainer)
-            .clickable { onClick() }, BottomCenter
+            .fillMaxWidth(0.45f),
+        enabled = true,
+        shape = shapes.large,
+        colors = cardColors(
+            containerColor = colorScheme
+                .primaryContainer
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if(isError)
+                colorScheme.primary
+            else colorScheme.primaryContainer
+        )
     ) {
-        Avatar(image, type)
-        when(type) {
-            CREATE -> {
-                CreateProfileCardRow(
-                    stringResource(R.string.profile_user_photo),
-                    type
-                )
+        Column {
+            Box {
+                Avatar(image, type)
+                when(type) {
+                    USERPROFILE, ANONYMOUS_ORGANIZER -> Unit
+                    
+                    CREATE -> {
+                        CreateProfileCardRow(
+                            text = stringResource(R.string.profile_user_photo),
+                            modifier = Modifier.align(BottomCenter),
+                            isError = isError,
+                            profileType = type
+                        )
+                    }
+                    
+                    ORGANIZER -> {
+                        CreateProfileCardRow(
+                            text = stringResource(R.string.profile_organizer_observe),
+                            modifier = Modifier.align(BottomCenter),
+                            profileType = type,
+                            observeState = observeState,
+                        ) { onObserveChange(it) }
+                    }
+                }
             }
-            
-            ORGANIZER -> {
-                CreateProfileCardRow(
-                    stringResource(R.string.profile_organizer_observe),
-                    type,
-                    observeState,
-                ) { onObserveChange(it) }
-            }
-            
-            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
         }
     }
 }
@@ -241,24 +260,29 @@ private fun Avatar(
 @Composable
 private fun CreateProfileCardRow(
     text: String,
+    modifier: Modifier = Modifier,
     profileType: ProfileType,
     observeState: Boolean = false,
+    isError: Boolean = false,
     onClick: ((Boolean) -> Unit)? = null,
 ) {
     Row(
-        Modifier
+        modifier
             .padding(horizontal = 8.dp)
             .padding(bottom = 8.dp),
         Arrangement.Center, CenterVertically
     ) {
         if(profileType != ORGANIZER)
             Text(
-                text,
-                Modifier
+                text = text,
+                modifier = Modifier
                     .weight(1f)
                     .padding(end = 4.dp),
-                if(profileType != CREATE) White
-                else colorScheme.onTertiary,
+                color = when {
+                    isError -> colorScheme.primary
+                    profileType == CREATE -> colorScheme.onTertiary
+                    else -> White
+                },
                 style = if(profileType == CREATE)
                     typography.headlineSmall
                 else typography.bodyMedium,
@@ -293,7 +317,7 @@ private fun CreateProfileCardRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileStatisticContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     rating: String,
     observers: Int,
     observed: Int,

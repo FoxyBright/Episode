@@ -64,6 +64,7 @@ fun GradientButton(
     shape: CornerBasedShape = shapes.extraLarge,
     smallText: String? = null,
     icon: Int? = null,
+    onDisabledClick: () -> Unit = {},
     onClick: () -> Unit,
 ) {
     val color = when {
@@ -79,8 +80,11 @@ fun GradientButton(
         )
     }
     Card(
-        onClick, modifier.fillMaxWidth(),
-        enabled, shape, cardColors(
+        onClick = if(enabled) onClick
+        else onDisabledClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        colors = cardColors(
             containerColor = Transparent,
             disabledContainerColor = Transparent,
         )

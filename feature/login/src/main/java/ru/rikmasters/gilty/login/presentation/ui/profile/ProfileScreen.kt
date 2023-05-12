@@ -21,7 +21,30 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
     
-    LaunchedEffect(Unit) { vm.getProfile() }
+    var errorAvatar by remember { mutableStateOf(false) }
+    val longUserNameError = username.length > 20
+    val shortUserNameError = username.length in 1 until 4
+    val regexError = username.contains(
+        Regex("[^A-Za-z\\d]")
+    )
+    
+    
+    var errorText by remember(username) {
+        mutableStateOf(
+            when {
+                regexError -> "Имя пользователя содержит недопустимые символы"
+                longUserNameError -> "Превышен лимит в 20 символов"
+                shortUserNameError -> "Введите минимум 4 символа"
+                occupied -> "Имя пользователя занято"
+                else -> ""
+            }
+        )
+    }
+    
+    LaunchedEffect(Unit) {
+        vm.getProfile()
+        errorText = ""
+    }
     
     val profileState = ProfileState(
         ProfileModel().copy(
@@ -29,7 +52,8 @@ fun ProfileScreen(vm: ProfileViewModel) {
             hidden = profile?.hidden,
             avatar = profile?.avatar,
             aboutMe = description,
-        ), occupiedName = occupied
+        ), errorText = errorText,
+        isError = errorAvatar
     )
     
     val isActive = username.isNotBlank()
@@ -39,9 +63,16 @@ fun ProfileScreen(vm: ProfileViewModel) {
     ProfileContent(
         profileState, isActive, Modifier,
         object: ProfileCallback {
+            override fun onDisabledButtonClick() {
+                errorAvatar = profile?.avatar?.thumbnail?.url == null
+                errorText = if(errorAvatar || username.isBlank())
+                    "Обязательное поле" else ""
+            }
             
             override fun profileImage() {
-                nav.navigateAbsolute("registration/gallery?multi=false")
+                nav.navigateAbsolute(
+                    "registration/gallery?multi=false"
+                )
             }
             
             override fun hiddenImages() {
@@ -49,7 +80,10 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun onDescriptionChange(text: String) {
-                scope.launch { vm.descriptionChange(text) }
+                scope.launch {
+                    vm.descriptionChange(text)
+                    errorAvatar = false
+                }
             }
             
             override fun onSaveDescription() {

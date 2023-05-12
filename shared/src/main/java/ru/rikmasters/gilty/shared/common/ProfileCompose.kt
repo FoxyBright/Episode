@@ -89,14 +89,16 @@ data class ProfileState(
     val profile: ProfileModel?,
     val profileType: ProfileType = CREATE,
     var observeState: Boolean = false,
-    val occupiedName: Boolean = false,
-    val lockState: Boolean = false
+    val lockState: Boolean = false,
+    val isError: Boolean = false,
+    val errorText: String = "",
 )
 
 interface ProfileCallback {
     
     fun onBack() {}
     fun onNext() {}
+    fun onDisabledButtonClick() {}
     fun profileImage() {}
     fun hiddenImages() {}
     fun onNameChange(text: String) {}
@@ -120,26 +122,23 @@ fun Profile(
     
     Column(modifier) {
         TopBar(
-            (profile?.username ?: ""),
-            (profile?.age ?: -1),
-            state.profileType, Modifier,
-            { callback?.onSaveUserName() }
+            userName = (profile?.username ?: ""),
+            userAge = (profile?.age ?: -1),
+            profileType = state.profileType,
+            onSaveUsername = { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
-        if(state.occupiedName)
-            Text(
-                stringResource(R.string.profile_user_name_is_occupied),
-                Modifier
-                    .padding(bottom = 6.dp)
-                    .offset(y = -(10).dp),
-                colorScheme.primary,
-                style = typography.titleSmall
-            )
+        ErrorLabel(state.errorText)
         Row {
             ProfileImageContent(
-                Modifier.weight(1f), profile?.avatar,
-                state.profileType, state.observeState,
-                { bool -> onChange?.let { it(bool) } },
-                { callback?.profileImage() })
+                modifier = Modifier.weight(1f),
+                image = profile?.avatar,
+                type = state.profileType,
+                observeState = state.observeState,
+                onObserveChange = { bool ->
+                    onChange?.let { it(bool) }
+                },
+                isError = state.isError
+            ) { callback?.profileImage() }
             Spacer(
                 Modifier.width(
                     if(state.profileType == CREATE)
@@ -148,50 +147,71 @@ fun Profile(
             )
             Column(Modifier.weight(1f)) {
                 ProfileStatisticContent(
-                    Modifier, rating,
-                    (profile?.countWatchers ?: 0),
-                    (profile?.countWatching ?: 0),
-                    state.profileType,
-                    profile?.rating?.emoji
+                    rating = rating,
+                    observers = profile?.countWatchers ?: 0,
+                    observed = profile?.countWatching ?: 0,
+                    profileType = state.profileType,
+                    emoji = profile?.rating?.emoji
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
-                        if(state.profileType == CREATE)
+                        if((state.profileType == CREATE))
                             14.dp else 18.dp
                     )
                 )
                 HiddenContent(
-                    Modifier, hidden,
-                    state.profileType,
-                    state.lockState
+                    image = hidden,
+                    profileType = state.profileType,
+                    lockState = state.lockState
                 ) { callback?.hiddenImages() }
             }
         }
-        when(state.profileType) {
-            CREATE, USERPROFILE -> AboutMe(state, callback)
-            ORGANIZER, ANONYMOUS_ORGANIZER ->
-                if((profile?.aboutMe ?: "").isNotBlank())
-                    AboutMe(state, callback)
-        }
+        AboutMe(
+            text = state.profile?.aboutMe,
+            type = state.profileType,
+            callback = callback
+        )
     }
 }
 
 @Composable
 private fun AboutMe(
-    state: ProfileState,
+    text: String?,
+    type: ProfileType,
     callback: ProfileCallback?,
 ) {
-    Description(
-        (state.profile?.aboutMe ?: ""),
-        state.profileType, Modifier.padding(top = 20.dp),
-        { callback?.onSaveDescription() }
+    @Composable
+    fun description() = Description(
+        text = text ?: "",
+        profileType = type,
+        modifier = Modifier.padding(top = 20.dp),
+        onSaveDescription = {
+            callback?.onSaveDescription()
+        }
     ) { callback?.onDescriptionChange(it) }
+    
+    when(type) {
+        CREATE, USERPROFILE -> description()
+        ORGANIZER, ANONYMOUS_ORGANIZER ->
+            if(!text.isNullOrBlank())
+                description()
+    }
+}
+
+@Composable
+private fun ErrorLabel(errorText: String) {
+    Text(
+        text = errorText,
+        modifier = Modifier.offset(y = -(10).dp),
+        color = colorScheme.primary,
+        style = typography.titleSmall
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    text: String,
+    userName: String,
     userAge: Int,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
@@ -204,8 +224,9 @@ private fun TopBar(
         profileType != ORGANIZER
         && profileType != ANONYMOUS_ORGANIZER
     ) TextField(
-        text, onTextChange,
-        modifier
+        value = userName,
+        onValueChange = onTextChange,
+        modifier = modifier
             .offset((-16).dp)
             .fillMaxWidth()
             .onFocusChanged { focus = it.isFocused },
@@ -214,15 +235,16 @@ private fun TopBar(
         placeholder = {
             Row(Modifier, Center, CenterVertically) {
                 Text(
-                    stringResource(R.string.user_name),
-                    Modifier.padding(end = 8.dp),
-                    colorScheme.onTertiary,
+                    text = stringResource(R.string.user_name),
+                    modifier = Modifier.padding(end = 8.dp),
+                    color = colorScheme.onTertiary,
                     style = typography.headlineLarge
                 )
                 Icon(
-                    painterResource(R.drawable.ic_edit),
-                    (null), Modifier.padding(top = 4.dp),
-                    colorScheme.onTertiary
+                    painter = painterResource(R.drawable.ic_edit),
+                    contentDescription = null,
+                    modifier = Modifier.padding(top = 4.dp),
+                    tint = colorScheme.onTertiary
                 )
             }
         },
@@ -231,14 +253,16 @@ private fun TopBar(
             onSaveUsername()
         },
         keyboardOptions = Default.copy(
-            imeAction = Done, keyboardType = Text,
+            imeAction = Done,
+            keyboardType = Text,
             capitalization = Sentences
-        ), singleLine = true,
+        ),
+        singleLine = true,
         visualTransformation = transformationOf(
-            CharArray(text.length) { '#' }
-                .concatToString(), if(
-                userAge in 18..99 && !focus
-            ) ", $userAge" else ""
+            mask = CharArray(userName.length) { '#' }
+                .concatToString(),
+            endChar = if(userAge in 18..99 && !focus)
+                ", $userAge" else ""
         )
     )
 }
@@ -253,14 +277,17 @@ private fun Description(
 ) {
     val focusManager =
         LocalFocusManager.current
+    
     Column(modifier) {
         Text(
-            stringResource(R.string.profile_about_me),
-            Modifier, colorScheme.tertiary,
+            text = stringResource(R.string.profile_about_me),
+            color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         GTextField(
-            text, { onTextChange(it) }, Modifier
+            value = text,
+            onValueChange = { onTextChange(it) },
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
             textOffset = true,
@@ -272,13 +299,14 @@ private fun Description(
                 focusManager.clearFocus()
                 onSaveDescription()
             }, keyboardOptions = Default.copy(
-                imeAction = Done, keyboardType = Text,
+                imeAction = Done,
+                keyboardType = Text,
                 capitalization = Sentences
             ), placeholder = textFieldLabel(
-                (false), stringResource(R.string.about_me_placeholder),
-                holderFont = typography.bodyMedium.copy(
-                    colorScheme.onTertiary,
-                )
+                label = false,
+                text = stringResource(R.string.about_me_placeholder),
+                holderFont = typography.bodyMedium
+                    .copy(colorScheme.onTertiary)
             )
         )
     }
