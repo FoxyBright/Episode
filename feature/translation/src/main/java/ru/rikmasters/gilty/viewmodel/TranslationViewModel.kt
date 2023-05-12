@@ -1,13 +1,15 @@
 package ru.rikmasters.gilty.viewmodel
 
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.event.TranslationEvent
+import ru.rikmasters.gilty.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
@@ -18,6 +20,9 @@ class TranslationViewModel : ViewModel() {
     private val pinging = MutableStateFlow(false)
 
     private val translationInfo = MutableStateFlow<TranslationInfoModel?>(null)
+
+    private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
+    val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
 
     init {
         coroutineScope.launch {
