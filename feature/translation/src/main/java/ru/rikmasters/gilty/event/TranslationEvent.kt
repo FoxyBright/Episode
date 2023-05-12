@@ -1,8 +1,10 @@
 package ru.rikmasters.gilty.event
 
 sealed interface TranslationEvent {
-    data class ConnectToTranslation(val translationId: String): TranslationEvent
-    data class DisconnectFromTranslation(val translationId: String): TranslationEvent
-    data class ConnectToTranslationChat(val translationId: String): TranslationEvent
-    data class DisconnectFromTranslationChat(val translationId: String): TranslationEvent
+
+    data class EnterScreen(val translationId: String) : TranslationEvent
+    object ConnectToTranslation : TranslationEvent
+    object DisconnectFromTranslation : TranslationEvent
+    object ConnectToTranslationChat : TranslationEvent
+    object DisconnectFromTranslationChat : TranslationEvent
 }

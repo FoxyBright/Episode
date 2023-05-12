@@ -36,30 +36,45 @@ class TranslationViewModel : ViewModel() {
 
     fun onEvent(event: TranslationEvent) {
         when(event) {
-            is TranslationEvent.ConnectToTranslation -> {
+            is TranslationEvent.EnterScreen -> {
                 coroutineScope.launch {
-                    translationRepository.connectToTranslation(
-                        translationId = event.translationId
-                    )
-                    startPinging()
-                }
-            }
-            is TranslationEvent.ConnectToTranslationChat -> {
-                coroutineScope.launch {
-                    translationRepository.connectToTranslationChat(
+                    translationRepository.getTranslationInfo(
                         translationId = event.translationId
                     )
                 }
             }
-            is TranslationEvent.DisconnectFromTranslation -> {
+            TranslationEvent.ConnectToTranslation -> {
                 coroutineScope.launch {
-                    translationRepository.disconnectFromTranslation()
-                    stopPinging()
+                    translationInfo.value?.let { translation ->
+                        translationRepository.connectToTranslation(
+                            translationId = translation.id
+                        )
+                        startPinging()
+                    }
                 }
             }
-            is TranslationEvent.DisconnectFromTranslationChat -> {
+            TranslationEvent.ConnectToTranslationChat -> {
                 coroutineScope.launch {
-                    translationRepository.disconnectFromTranslationChat()
+                    translationInfo.value?.let { translation ->
+                        translationRepository.connectToTranslationChat(
+                            translationId = translation.id
+                        )
+                    }
+                }
+            }
+            TranslationEvent.DisconnectFromTranslation -> {
+                coroutineScope.launch {
+                    translationInfo.value?.let {
+                        translationRepository.disconnectFromTranslation()
+                        stopPinging()
+                    }
+                }
+            }
+            TranslationEvent.DisconnectFromTranslationChat -> {
+                coroutineScope.launch {
+                    translationInfo.value?.let {
+                        translationRepository.disconnectFromTranslationChat()
+                    }
                 }
             }
         }
