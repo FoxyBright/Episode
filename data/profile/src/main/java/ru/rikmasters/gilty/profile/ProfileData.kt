@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.profile.models.ProfileCategories
 import ru.rikmasters.gilty.profile.models.ProfileMeets
 import ru.rikmasters.gilty.profile.repository.ProfileStore
 import ru.rikmasters.gilty.shared.models.Avatar
+import ru.rikmasters.gilty.shared.models.AvatarAmount
 
 object ProfileData: DataDefinition() {
     
@@ -16,6 +17,7 @@ object ProfileData: DataDefinition() {
         entity<ProfileCategories>()
         entity<ProfileMeets>()
         entity<Avatar>()
+        entity<AvatarAmount>()
     }
     
     override fun Module.koin() {

@@ -104,13 +104,15 @@ class ProfileWebSource: KtorSource() {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
     }
     
-    suspend fun getFiles(albumId: String) = get(
+    suspend fun getFiles(albumId: String): Pair<List<Avatar>,Int> = get(
         "http://$HOST$PREFIX_URL/albums/$albumId/files"
     )?.let {
-        if(it.status == OK)
-            it.wrapped<List<Avatar>>()
+        if(it.status == OK) {
+            val amount = it.paginateWrapped<List<Avatar>>()
+            Pair(amount.first,amount.second.total)
+        }
         else null
-    } ?: emptyList()
+    } ?: (Pair(emptyList(),0))
     
     suspend fun addHidden(albumId: String, files: List<File>) =
         postFormData(

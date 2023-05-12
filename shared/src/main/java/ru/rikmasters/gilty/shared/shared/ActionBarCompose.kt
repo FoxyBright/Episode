@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ fun ActionBar(
     title: String,
     modifier: Modifier = Modifier,
     details: String? = null,
+    extra:String?=null,
     onBack: (() -> Unit)? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
@@ -48,14 +50,23 @@ fun ActionBar(
                 )
             }
         }
-        Text(
-            title,
-            Modifier
-                .padding(start = 16.dp)
-                .fillMaxWidth(),
-            style = typography.titleLarge,
-            color = colorScheme.tertiary
-        )
+        Row(Modifier.padding(start = 16.dp),
+            verticalAlignment = Alignment.Bottom){
+            Text(
+                title,
+                Modifier,
+                style = typography.titleLarge,
+                color = colorScheme.tertiary
+            )
+            extra?.let {
+                Text(
+                    text = extra,
+                    Modifier.padding(start = 4.dp),
+                    colorScheme.onTertiary,
+                    style = typography.bodyMedium
+                )
+            }
+        }
         details?.let {
             Text(
                 it, Modifier
