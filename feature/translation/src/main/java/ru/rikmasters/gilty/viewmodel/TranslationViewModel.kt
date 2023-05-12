@@ -5,11 +5,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.event.TranslationEvent
 import ru.rikmasters.gilty.event.TranslationOneTimeEvent
+import ru.rikmasters.gilty.model.TranslationUiState
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
@@ -20,6 +22,8 @@ class TranslationViewModel : ViewModel() {
     private val pinging = MutableStateFlow(false)
 
     private val translationInfo = MutableStateFlow<TranslationInfoModel?>(null)
+
+    private val _translationUiState = MutableStateFlow(TranslationUiState())
 
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
@@ -45,6 +49,37 @@ class TranslationViewModel : ViewModel() {
                 coroutineScope.launch {
                     translationRepository.getTranslationInfo(
                         translationId = event.translationId
+                    ).on(
+                        loading = {
+                            _translationUiState.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                        },
+                        success = { translation ->
+                            _translationUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    translationInfo = translation
+                                )
+                            }
+                        },
+                        error = { cause ->
+                            cause.serverMessage?.let {
+                                _oneTimeEvent.send(
+                                    TranslationOneTimeEvent.ErrorHappened(
+                                        errorMessage = it
+                                    )
+                                )
+                            } ?: cause.defaultMessage?.let {
+                                _oneTimeEvent.send(
+                                    TranslationOneTimeEvent.ErrorHappened(
+                                        errorMessage = it
+                                    )
+                                )
+                            }
+                        }
                     )
                 }
             }
