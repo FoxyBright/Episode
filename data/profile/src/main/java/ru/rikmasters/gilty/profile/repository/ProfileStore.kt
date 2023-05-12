@@ -23,6 +23,7 @@ import ru.rikmasters.gilty.shared.model.notification.RespondModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Avatar
+import ru.rikmasters.gilty.shared.models.AvatarAmount
 import ru.rikmasters.gilty.shared.models.Profile
 import ru.rikmasters.gilty.shared.models.meets.Category
 import java.io.File
@@ -101,9 +102,9 @@ class ProfileStore(
         forceWeb: Boolean,
     ): List<AvatarModel> {
         val profile = uploadProfile(false)
-        
+
         fun List<Avatar>.map() = this.map { it.map() }
-        
+
         if(!forceWeb) primarySource
             .findAll<Avatar>()
             .filter {
@@ -114,14 +115,15 @@ class ProfileStore(
                     return it.map()
                 }
             }
-        
         primarySource.deleteAll<Avatar>()
+        primarySource.deleteAll<AvatarAmount>()
         val list = webSource.getFiles(
             profile.albumPrivate?.id ?: ""
         )
-        primarySource.saveAll(list)
-        
-        return list.map()
+        primarySource.saveAll(list.first)
+        primarySource.save(AvatarAmount(list.second))
+
+        return list.first.map()
     }
     
     suspend fun updateProfile(
@@ -256,4 +258,7 @@ class ProfileStore(
         
         return updateUserCategories()
     }
+
+    suspend fun getHiddenPhotosAmount() = primarySource.find<AvatarAmount>()?.amount?:0
+
 }

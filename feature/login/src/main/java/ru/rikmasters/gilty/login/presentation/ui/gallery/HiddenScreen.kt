@@ -16,12 +16,13 @@ fun HiddenScreen(
 ) {
     
     val photoList by vm.photoList.collectAsState()
+    val photosAmount by vm.photosAmount.collectAsState()
     val scope = rememberCoroutineScope()
     val nav = get<NavState>()
     
     LaunchedEffect(Unit) { vm.getHidden() }
     
-    HiddenContent(HiddenState(photoList), Modifier,
+    HiddenContent(HiddenState(photoList, photosAmount), Modifier,
         object: HiddenCallback {
             
             override fun onSelectImage(image: String) {

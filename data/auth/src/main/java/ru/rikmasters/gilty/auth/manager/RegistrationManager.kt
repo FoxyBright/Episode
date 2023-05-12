@@ -32,8 +32,8 @@ class RegistrationManager(
     }
     
     suspend fun getHidden(albumId: String) = withContext(IO) {
-        profileWebSource.getFiles(albumId)
-            .map { it.thumbnail?.url ?: "" }
+        val response = profileWebSource.getFiles(albumId)
+        Pair(response.first.map { it.map().thumbnail.url },response.second)
     }
     
     suspend fun setAvatar(file: File, points: List<Float>) {
