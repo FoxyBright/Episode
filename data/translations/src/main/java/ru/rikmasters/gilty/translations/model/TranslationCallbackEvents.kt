@@ -9,7 +9,7 @@ sealed interface TranslationCallbackEvents {
     object TranslationExpired : TranslationCallbackEvents
     data class SignalReceived(val signal: TranslationSignalModel) : TranslationCallbackEvents
     data class TranslationExtended(val completedAt: LocalDateTime, val duration: Int) : TranslationCallbackEvents
-    data class UserConnected(val user: String) : TranslationCallbackEvents
-    data class UserDisconnected(val user: String) : TranslationCallbackEvents
-    data class UserKicked(val user: String) : TranslationCallbackEvents
+    data class UserConnected(val user: String, val count: Int) : TranslationCallbackEvents
+    data class UserDisconnected(val user: String, val count: Int) : TranslationCallbackEvents
+    data class UserKicked(val user: String, val count: Int) : TranslationCallbackEvents
 }

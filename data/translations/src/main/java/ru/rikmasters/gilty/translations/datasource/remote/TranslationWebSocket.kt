@@ -69,30 +69,33 @@ class TranslationWebSocket : WebSocketManager() {
             }
 
             TranslationsSocketEvents.USER_CONNECTED -> {
-                data class User(val user: String)
+                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserConnected(
                         user = user.user,
+                        count = user.count.toInt()
                     ),
                 )
             }
 
             TranslationsSocketEvents.USER_DISCONNECTED -> {
-                data class User(val user: String)
+                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserDisconnected(
                         user = user.user,
+                        count = user.count.toInt()
                     ),
                 )
             }
             TranslationsSocketEvents.USER_KICKED -> {
-                data class User(val user: String)
+                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserKicked(
                         user = user.user,
+                        count = user.count.toInt()
                     ),
                 )
             }

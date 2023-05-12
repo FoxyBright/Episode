@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.event.TranslationEvent
 import ru.rikmasters.gilty.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.model.TranslationUiState
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
@@ -47,37 +48,99 @@ class TranslationViewModel : ViewModel() {
         // Collect sockets while connected
         coroutineScope.launch {
             connected.collectLatest { connected ->
-                translationRepository.webSocketFlow.collectLatest { socketAnswers ->
-                    when(socketAnswers) {
-                        is TranslationCallbackEvents.SignalReceived -> {
-                            when(socketAnswers.signal.signal) {
-                                TranslationSignalTypeModel.MICROPHONE -> {
-                                    _translationUiState.update {
-                                        it.copy(
-                                            translationInfo = it.translationInfo?.copy(
-                                                microphone = socketAnswers.signal.value
+                if (connected) {
+                    translationRepository.webSocketFlow.collectLatest { socketAnswers ->
+                        when(socketAnswers) {
+                            is TranslationCallbackEvents.SignalReceived -> {
+                                when(socketAnswers.signal.signal) {
+                                    TranslationSignalTypeModel.MICROPHONE -> {
+                                        _translationUiState.update {
+                                            it.copy(
+                                                isLoading = false,
+                                                translationInfo = it.translationInfo?.copy(
+                                                    microphone = socketAnswers.signal.value
+                                                )
                                             )
-                                        )
+                                        }
                                     }
-                                }
-                                TranslationSignalTypeModel.CAMERA -> {
-                                    _translationUiState.update {
-                                        it.copy(
-                                            translationInfo = it.translationInfo?.copy(
-                                                camera = socketAnswers.signal.value
+                                    TranslationSignalTypeModel.CAMERA -> {
+                                        _translationUiState.update {
+                                            it.copy(
+                                                isLoading = false,
+                                                translationInfo = it.translationInfo?.copy(
+                                                    camera = socketAnswers.signal.value
+                                                )
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             }
+                            TranslationCallbackEvents.TranslationCompleted -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        translationInfo = it.translationInfo?.copy(
+                                            status = TranslationStatusModel.COMPLETED
+                                        )
+                                    )
+                                }
+                            }
+                            TranslationCallbackEvents.TranslationExpired -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        translationInfo = it.translationInfo?.copy(
+                                            status = TranslationStatusModel.EXPIRED
+                                        )
+                                    )
+                                }
+                            }
+                            is TranslationCallbackEvents.TranslationExtended -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        translationInfo = it.translationInfo?.copy(
+                                            status = TranslationStatusModel.ACTIVE,
+                                            completedAt = socketAnswers.completedAt
+                                        )
+                                    )
+                                }
+                            }
+                            TranslationCallbackEvents.TranslationStarted -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        translationInfo = it.translationInfo?.copy(
+                                            status = TranslationStatusModel.ACTIVE
+                                        )
+                                    )
+                                }
+                            }
+                            is TranslationCallbackEvents.UserConnected -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        membersCount = socketAnswers.count
+                                    )
+                                }
+                            }
+                            is TranslationCallbackEvents.UserDisconnected -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        membersCount = socketAnswers.count
+                                    )
+                                }
+                            }
+                            is TranslationCallbackEvents.UserKicked -> {
+                                _translationUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        membersCount = socketAnswers.count
+                                    )
+                                }
+                            }
                         }
-                        TranslationCallbackEvents.TranslationCompleted -> {}
-                        TranslationCallbackEvents.TranslationExpired -> {}
-                        is TranslationCallbackEvents.TranslationExtended -> {}
-                        TranslationCallbackEvents.TranslationStarted -> {}
-                        is TranslationCallbackEvents.UserConnected -> {}
-                        is TranslationCallbackEvents.UserDisconnected -> {}
-                        is TranslationCallbackEvents.UserKicked -> {}
                     }
                 }
             }
