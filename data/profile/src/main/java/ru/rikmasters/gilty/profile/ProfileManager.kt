@@ -50,8 +50,9 @@ class ProfileManager(
     suspend fun getPhotos(
         albumId: String,
     ) = withContext(IO) {
-        if(albumId.isNotBlank()) web.getFiles(albumId)
-            .map { it.map() } else emptyList()
+        if(albumId.isNotBlank()) {
+            web.getFiles(albumId)
+        } else Pair(emptyList(),0)
     }
     
     fun getPhotosPaging(albumId: String) =
@@ -64,7 +65,9 @@ class ProfileManager(
     }
     
     fun getHiddenPhotos() = store.getUserHiddenPaging()
-    
+
+    suspend fun getHiddenPhotosAmount() = store.getHiddenPhotosAmount()
+
     suspend fun getProfileHiddens(
         forceWeb: Boolean,
     ) = withContext(IO) {

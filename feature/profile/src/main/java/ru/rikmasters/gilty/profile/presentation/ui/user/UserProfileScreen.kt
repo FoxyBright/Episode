@@ -13,10 +13,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
-import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenBsViewModel
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -101,11 +98,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun hiddenImages() {
                 scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<HiddenBsViewModel>(vm.scope) {
-                            HiddenBsScreen(it)
-                        }
-                    }
+                    nav.navigate("hidden")
                 }
             }
             

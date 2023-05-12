@@ -38,7 +38,8 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
-    <string name="profile_hidden_photo_label">Доступ к фото будет доступен при Вашем/nразрешении</string>
+    <string name="profile_hidden_photo_amount">%s фото</string>
+    <string name="profile_hidden_photo_label">Другие пользователи не видят фотографии\nбез вашего согласия</string>
     <string name="profile_observers">Наблюдатели</string>
     <string name="profile_observers_in_profile">Наблюдают</string>
     <string name="profile_observe">Наблюдает</string>
@@ -380,5 +381,17 @@
     <string name="meets_push_channel_descriptions">Создаваемые episode и обновление их статусов у пользователя и наблюдаемых</string>
     <string name="chats_push_channel_name">Уведомления от чатов</string>
     <string name="chats_push_channel_descriptions">Входящие сообщения и трансляции</string>
-
+    <!-- Months -->
+    <string name="month_january_name">Январь</string>
+    <string name="month_february_name">Февраль</string>
+    <string name="month_march_name">Март</string>
+    <string name="month_april_name">Апрель</string>
+    <string name="month_may_name">Май</string>
+    <string name="month_june_name">Июнь</string>
+    <string name="month_july_name">Июль</string>
+    <string name="month_august_name">Август</string>
+    <string name="month_september_name">Сентябрь</string>
+    <string name="month_october_name">Октябрь</string>
+    <string name="month_november_name">Ноябрь</string>
+    <string name="month_december_name">Декабрь</string>
 </resources>
