@@ -9,7 +9,7 @@ import ru.rikmasters.gilty.viewmodel.TranslationViewModel
 
 object Translation : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        TODO("Not yet implemented")
+
     }
 
     override fun Module.koin() {

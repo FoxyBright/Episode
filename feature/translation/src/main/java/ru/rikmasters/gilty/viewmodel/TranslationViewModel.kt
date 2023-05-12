@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.viewmodel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -27,6 +28,7 @@ class TranslationViewModel : ViewModel() {
     private val translationInfo = MutableStateFlow<TranslationInfoModel?>(null)
 
     private val _translationUiState = MutableStateFlow(TranslationUiState())
+    val translationUiState = _translationUiState.asStateFlow()
 
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
