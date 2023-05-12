@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
@@ -222,6 +224,22 @@ private fun Notifications(
     modifier: Modifier = Modifier,
     callback: NotificationsCallback?,
 ) {
+    @Composable
+    fun getMonthName(monthNumber:Int) = when(monthNumber){
+            1->R.string.month_january_name
+            2->R.string.month_february_name
+            3->R.string.month_march_name
+            4->R.string.month_april_name
+            5->R.string.month_may_name
+            6->R.string.month_june_name
+            7->R.string.month_july_name
+            8->R.string.month_august_name
+            9->R.string.month_september_name
+            10->R.string.month_october_name
+            11->R.string.month_november_name
+            12->R.string.month_december_name
+            else->R.string.month_december_name
+        }
     val notifications = state.notifications
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
@@ -298,21 +316,36 @@ private fun Notifications(
                         }
                     
                     if(restItems.isNotEmpty()) {
-                        item {
-                            Label(
-                                R.string.notification_earlier_label,
-                                hasResponds,
-                                (restItems.first() == firstItem)
-                            )
-                        }
-                        itemsIndexed(state.notifications) { count, item ->
+                        itemsIndexed(state.notifications) { index, item ->
                             item?.let { not ->
                                 if(earlierWeekControl(not.date)) {
-                                    ElementNot(
-                                        count - todayItems.size - weekItems.size,
-                                        restItems.size, not,
-                                        state.ratings, callback
-                                    )
+                                    // First Element
+                                    if(index == todayItems.size + weekItems.size + 1){
+                                        Label(
+                                            getMonthName(monthNumber = getMonth(item.date)),
+                                            hasResponds,
+                                            if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (true)
+                                        )
+                                        ElementNot(
+                                            0,//index - todayItems.size - weekItems.size - restItems.filter { isAfter(it.date,item.date) }.size,
+                                            restItems.filter { getMonth(it.date) == getMonth(item.date) }.size, not,
+                                            state.ratings, callback
+                                        )
+                                    }else if(index - 1 >= 0) {// other elemnets
+                                        if(getMonth(item.date) != getMonth(state.notifications.itemSnapshotList[index - 1]?.date?:"")){
+                                            Label(
+                                                getMonthName(monthNumber = getMonth(item.date)),
+                                                hasResponds,
+                                                if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (false)
+                                            )
+                                        }
+                                        ElementNot(
+                                            index - todayItems.size - weekItems.size - restItems.filter
+                                            { isAfter(it.date,item.date) && getMonth(it.date) != getMonth(item.date) }.size,
+                                            restItems.filter { getMonth(it.date) == getMonth(item.date) }.size, not,
+                                            state.ratings, callback
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -358,6 +391,9 @@ private fun ElementNot(
     ratings: List<RatingModel>,
     callback: NotificationsCallback? = null,
 ) {
+    LaunchedEffect(false){
+        Log.d("Hello", "index: $index size: $size")
+    }
     (item to rememberDragRowState())
         .let { (not, row) ->
             NotificationItem(
