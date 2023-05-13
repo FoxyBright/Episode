@@ -73,7 +73,9 @@ fun DependencyHandlerScope.firebase() = implementation(
 )
 
 fun DependencyHandlerScope.accompanist() = implementation(
-    "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc"
+    "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc",
+    "com.google.accompanist:accompanist-pager:0.28.0",
+    "com.google.accompanist:accompanist-pager-indicators:0.28.0"
 )
 
 const val accompanistPermissionsVer = "0.20.3"
