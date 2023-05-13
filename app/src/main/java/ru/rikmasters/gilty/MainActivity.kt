@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import com.google.firebase.messaging.FirebaseMessaging
+import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -52,7 +53,9 @@ class MainActivity: ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+        MapKitFactory.getInstance().onStart()
+        MapKitFactory.initialize(this)
+
         CoroutineScope(IO).launch {
             inject<MeetingManager>()
                 .value.clearAddMeet()
