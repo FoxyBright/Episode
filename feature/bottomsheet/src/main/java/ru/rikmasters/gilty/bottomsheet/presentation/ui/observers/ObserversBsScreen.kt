@@ -27,7 +27,8 @@ fun ObserversBs(
     val observersTab by vm.observersSelectTab.collectAsState()
     val observed = vm.observables.collectAsLazyPagingItems()
     val observers = vm.observers.collectAsLazyPagingItems()
-    val search by vm.search.collectAsState()
+    val searchObserved by vm.searchObserved.collectAsState()
+    val searchObservers by vm.searchObservers.collectAsState()
     val counters by vm.counters.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -44,13 +45,18 @@ fun ObserversBs(
             observed,
             unsubList,
             observersTab,
-            search,
-            counters
+            searchObserved,
+            searchObservers,
+            counters,
+            scope,
         ),
         Modifier.padding(top = 28.dp),
         object : ObserversListCallback {
-            override fun onSearchTextChange(text: String) {
-                scope.launch { vm.searchChange(text) }
+            override fun onSearchObservedTextChange(text: String) {
+                scope.launch { vm.searchObservedChange(text) }
+            }
+            override fun onSearchObserversTextChange(text: String) {
+                scope.launch { vm.searchObserversChange(text) }
             }
 
             override fun onButtonClick(
