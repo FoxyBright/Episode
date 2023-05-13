@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -225,7 +226,15 @@ fun GiltyTab(
                 GiltyTabElement(
                     tabs[tab], Modifier.weight(1f),
                     (isSelected == tab), online,
-                    !unEnabled.contains(tab)
+                    !unEnabled.contains(tab),
+                    backgroundColor =  animateColorAsState(
+                        if(!unEnabled.contains(tab)) colorScheme.background
+                        else if((isSelected == tab)) if(online)
+                            colors.tabActiveOnline
+                        else colors.tabActive
+                        else colors.tabInactive,
+                        tween(400)
+                    ).value,
                 ) { onClick?.let { it(tab) } }
                 if(tab < tabs.size - 1) Box(
                     Modifier
@@ -239,35 +248,33 @@ fun GiltyTab(
 }
 
 @Composable
-private fun GiltyTabElement(
+fun GiltyTabElement(
     text: String,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     online: Boolean,
     enabled: Boolean,
+    backgroundColor: Color = Transparent,
     onClick: () -> Unit,
 ) {
     Box(
         modifier
-            .background(
-                animateColorAsState(
-                    if(!enabled) colorScheme.background
-                    else if(isSelected) if(online)
-                        colors.tabActiveOnline
-                    else colors.tabActive
-                    else colors.tabInactive,
-                    tween(400)
-                ).value
-            )
-            .clickable { if(enabled) onClick() },
+            .background(backgroundColor)
+            .clickable { onClick() },
     ) {
         Text(
             text,
             Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            if(enabled) colorScheme.tertiary
-            else colorScheme.onTertiary,
+            color = animateColorAsState(
+                targetValue = if (isSelected) {
+                    colorScheme.tertiary
+                } else {
+                    colorScheme.tertiary
+                },
+                animationSpec = tween(easing = LinearEasing),
+            ).value,
             style = typography.labelSmall,
             textAlign = TextAlign.Center,
             fontWeight = Bold

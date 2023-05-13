@@ -1,25 +1,43 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.responds
 
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.FULL
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.SHORT
@@ -31,11 +49,13 @@ import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPh
 import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.EmptyScreen
-import ru.rikmasters.gilty.shared.shared.GiltyTab
+import ru.rikmasters.gilty.shared.shared.GiltyTabElement
 import ru.rikmasters.gilty.shared.shared.PagingLoader
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 enum class RespondsBsType { MEET, FULL, SHORT }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RespondsList(
     type: RespondsBsType,
@@ -48,8 +68,15 @@ fun RespondsList(
     viewerImages: List<AvatarModel?> = emptyList(),
     viewerSelectImage: AvatarModel? = null,
     viewerMenuState: Boolean = false,
+    scope:CoroutineScope,
     callback: RespondsListCallback? = null,
 ) {
+    val pagerState: PagerState = rememberPagerState(initialPage = 0)
+    val indicator = @Composable { tabPositions: List<androidx.compose.material3.TabPosition> ->
+        CustomIndicator(tabPositions, pagerState)
+    }
+
+
     Column(
         modifier
             .fillMaxSize()
@@ -60,44 +87,72 @@ fun RespondsList(
             type,
             Modifier.padding(
                 top = 28.dp,
-                bottom = if(type == FULL) {
+                bottom = if (type == FULL) {
                     16.dp
                 } else 8.dp
             )
         ) { callback?.onBack() }
-        when(type) {
+        when (type) {
             MEET -> MeetResponds(
                 Modifier.padding(vertical = 8.dp),
                 responds,
                 callback
             )
-            
+
             FULL -> {
-                GiltyTab(
+                TabRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(CircleShape)
+                        .border(0.5.dp, colorScheme.scrim, CircleShape),
+                    contentColor = Color.White,
+                    selectedTabIndex = pagerState.currentPage,
+                    indicator = indicator,
+                    containerColor = Color.Transparent
+                ) {
                     listOf(
                         stringResource(R.string.profile_sent_responds),
                         stringResource(R.string.profile_received_responds)
-                    ), selectTab, Modifier.padding(
-                        bottom = if(selectTab == 0) {
-                            8.dp
-                        } else 0.dp
-                    )
-                ) { callback?.onTabChange(it) }
-                
-                if(selectTab == 0) {
-                    SentResponds(
+                    ).forEachIndexed { index, title ->
+                        GiltyTabElement(
+                            title,
+                            Modifier
+                                .weight(1f)
+                                .zIndex(2f)
+                                .border(if(pagerState.currentPage == 1) 0.5.dp else 0.dp, colorScheme.scrim,
+                                    RoundedCornerShape(0.dp)
+                                ),
+                            (pagerState.currentPage == index), false,
+                            !listOf(
+                                stringResource(R.string.profile_sent_responds),
+                                stringResource(R.string.profile_received_responds)
+                            ).contains(title)
+                        ) {
+                            scope.launch {  pagerState.animateScrollToPage(index) }
+                        }
+                    }
+                }
+
+                HorizontalPager(
+                    state = pagerState,
+                    count = 2
+                ) { selectTab: Int ->
+                    if (selectTab == 0) {
+                        SentResponds(
+                            Modifier.padding(vertical = 8.dp),
+                            meetResponds,
+                            callback
+                        )
+                    } else ReceivedResponds(
                         Modifier.padding(vertical = 8.dp),
                         meetResponds,
+                        respondsStates,
                         callback
                     )
-                } else ReceivedResponds(
-                    Modifier.padding(vertical = 8.dp),
-                    meetResponds,
-                    respondsStates,
-                    callback
-                )
+                }
+
             }
-            
+
             SHORT -> ReceivedResponds(
                 Modifier.padding(vertical = 8.dp),
                 meetResponds,
@@ -106,7 +161,7 @@ fun RespondsList(
             )
         }
     }
-    if(photoViewState) PhotoView(
+    if (photoViewState) PhotoView(
         images = viewerImages,
         selected = viewerSelectImage,
         menuState = viewerMenuState,
@@ -129,10 +184,11 @@ private fun SentResponds(
         responds.loadState.refresh is LoadState.Loading -> {
             PagingLoader(responds.loadState)
         }
+
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if(itemCount != 0) {
+                if (itemCount != 0) {
                     responds.itemSnapshotList.items.forEach {
                         sentRespond(
                             it.tags.joinToString(separator = ", ") { t -> t.title },
@@ -142,7 +198,7 @@ private fun SentResponds(
                             callback
                         )
                     }
-                    if(responds.loadState.append is LoadState.Loading) {
+                    if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
@@ -155,7 +211,7 @@ private fun SentResponds(
                                 )
                         )
                     }
-                } else if(responds.loadState.refresh is LoadState.NotLoading) {
+                } else if (responds.loadState.refresh is LoadState.NotLoading) {
                     item {
                         Box(modifier = Modifier.fillParentMaxSize()) {
                             EmptyScreen(
@@ -184,10 +240,11 @@ private fun MeetResponds(
         responds.loadState.refresh is LoadState.Loading -> {
             PagingLoader(responds.loadState)
         }
+
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if(itemCount != 0) {
+                if (itemCount != 0) {
                     items(responds) {
                         it?.let {
                             ReceivedRespond(
@@ -198,7 +255,7 @@ private fun MeetResponds(
                             )
                         }
                     }
-                    if(responds.loadState.append is LoadState.Loading) {
+                    if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
@@ -212,7 +269,7 @@ private fun MeetResponds(
                         )
                     }
                 } else {
-                    if(responds.loadState.refresh is LoadState.NotLoading) {
+                    if (responds.loadState.refresh is LoadState.NotLoading) {
                         item {
                             Box(modifier = Modifier.fillParentMaxSize()) {
                                 EmptyScreen(
@@ -260,7 +317,7 @@ private fun TopBar(
             Start,
             CenterVertically
         ) {
-            if(type == MEET) IconButton(
+            if (type == MEET) IconButton(
                 { onBack() },
                 Modifier.padding(end = 16.dp)
             ) {
@@ -281,4 +338,53 @@ private fun TopBar(
             )
         }
     }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CustomIndicator(
+    tabPositions: List<androidx.compose.material3.TabPosition>,
+    pagerState: PagerState
+) {
+    val transition = updateTransition(pagerState.currentPage, label = "")
+    val indicatorStart by transition.animateDp(
+        transitionSpec = {
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 50f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 1000f)
+            }
+        }, label = ""
+    ) {
+        tabPositions[it].left
+    }
+
+    val indicatorEnd by transition.animateDp(
+        transitionSpec = {
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 1000f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 50f)
+            }
+        }, label = ""
+    ) {
+        tabPositions[it].right
+    }
+
+    Box(
+        Modifier
+            .offset(x = indicatorStart)
+            .wrapContentSize(align = Alignment.BottomStart)
+            .width(indicatorEnd - indicatorStart)
+            .fillMaxSize()
+            .background(
+                color = colors.tabActive,
+                if (pagerState.currentPage == 0) RoundedCornerShape(
+                    topStart = 50.dp,
+                    bottomStart = 50.dp
+                ) else RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp)
+            )
+            .zIndex(1f)
+    )
+
 }
