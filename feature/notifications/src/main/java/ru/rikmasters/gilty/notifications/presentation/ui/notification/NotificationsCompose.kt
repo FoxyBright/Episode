@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -9,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
@@ -391,9 +389,6 @@ private fun ElementNot(
     ratings: List<RatingModel>,
     callback: NotificationsCallback? = null,
 ) {
-    LaunchedEffect(false){
-        Log.d("Hello", "index: $index size: $size")
-    }
     (item to rememberDragRowState())
         .let { (not, row) ->
             NotificationItem(
