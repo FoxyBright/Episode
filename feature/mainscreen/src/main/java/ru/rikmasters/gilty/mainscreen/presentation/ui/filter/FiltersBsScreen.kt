@@ -91,7 +91,8 @@ fun FiltersBs(
                 }
                 
                 override fun onAllCategoryClick() {
-                    scope.launch { vm.navigate(1) }
+                    if(!isCollapsed)
+                        scope.launch { vm.navigate(1) }
                 }
                 
                 override fun onFilterClick() {
