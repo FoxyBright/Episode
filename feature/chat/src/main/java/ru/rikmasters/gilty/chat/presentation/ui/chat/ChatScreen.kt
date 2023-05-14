@@ -184,6 +184,7 @@ fun ChatScreen(
                     override fun onPinnedBarButtonClick() {
                         scope.launch {
                             if(type == TRANSLATION) {
+                                nav.navigateAbsolute("translations/main")
                                 vm.toTranslation()
                             } else {
                                 vm.completeChat(chat)

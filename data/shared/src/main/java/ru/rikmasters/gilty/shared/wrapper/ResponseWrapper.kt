@@ -12,7 +12,10 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import ru.rikmasters.gilty.shared.model.DataStateTest
+import ru.rikmasters.gilty.shared.model.ExceptionCause
 import java.net.UnknownHostException
 
 enum class Status {

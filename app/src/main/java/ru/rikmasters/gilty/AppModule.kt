@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.notification.NotificationsData
 import ru.rikmasters.gilty.notifications.Notifications
 import ru.rikmasters.gilty.profile.Profile
 import ru.rikmasters.gilty.profile.ProfileData
+import ru.rikmasters.gilty.translation.Translation
 
 object AppModule: FeatureDefinition() {
     
@@ -27,6 +28,7 @@ object AppModule: FeatureDefinition() {
             // Feature
             Notifications, Main,
             AddMeet, Profile, Login, Chat,
+            Translation,
             // Data
             Ktor, Auth, ChatData, Realm,
             MeetingsData, NotificationsData,

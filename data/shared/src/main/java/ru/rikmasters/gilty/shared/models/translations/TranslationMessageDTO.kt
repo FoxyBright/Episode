@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.models.translations
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
 import ru.rikmasters.gilty.shared.models.FullUserDTO
 
 data class TranslationMessageDTO(

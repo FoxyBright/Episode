@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.shared.models.enumeration
 
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
+
 enum class TranslationStatusDTO {
     INACTIVE, ACTIVE, EXPIRED, COMPLETED;
 

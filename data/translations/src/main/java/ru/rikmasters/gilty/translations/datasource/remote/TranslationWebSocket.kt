@@ -1,5 +1,19 @@
 package ru.rikmasters.gilty.translations.datasource.remote
 
+import android.util.Log
+import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
+import ru.rikmasters.gilty.shared.models.socket.SocketData
+import ru.rikmasters.gilty.shared.models.socket.SocketResponse
+import ru.rikmasters.gilty.shared.socket.WebSocketManager
+import ru.rikmasters.gilty.shared.socket.mapper
+import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
+import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
+
 class TranslationWebSocket : WebSocketManager() {
 
     override suspend fun handleResponse(response: SocketResponse) {

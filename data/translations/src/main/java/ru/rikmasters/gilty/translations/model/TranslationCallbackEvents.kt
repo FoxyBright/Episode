@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translations.model
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
 
 sealed interface TranslationCallbackEvents {
     object TranslationStarted : TranslationCallbackEvents

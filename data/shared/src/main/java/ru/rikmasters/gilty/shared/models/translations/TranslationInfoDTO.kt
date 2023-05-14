@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.models.translations
 
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.shared.models.enumeration.TranslationStatusDTO
 
 data class TranslationInfoDTO(
@@ -26,14 +27,14 @@ data class TranslationInfoDTO(
     fun map() = TranslationInfoModel(
         id = id,
         userId = userId,
-        startedAt = LocalDateTime.Companion.of(startedAt),
+        startedAt = LocalDateTime.of(startedAt),
         camera = camera,
         microphone = microphone,
         status = status.map(),
-        beginAt = LocalDateTime.Companion.of(beginAt),
-        completedAt = LocalDateTime.Companion.of(completedAt),
-        isStreaming = LocalDateTime.Companion.of(isStreaming),
-        wasStreaming = LocalDateTime.Companion.of(wasStreaming),
+        beginAt = LocalDateTime.of(beginAt),
+        completedAt = LocalDateTime.of(completedAt),
+        isStreaming = LocalDateTime.of(isStreaming),
+        wasStreaming = LocalDateTime.of(wasStreaming),
         thumbnailHost = thumbnailHost,
         thumbnail = thumbnail,
         webrtcHost = webrtcHost,

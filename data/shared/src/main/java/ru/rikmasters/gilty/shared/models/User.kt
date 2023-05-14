@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.models
 
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
+import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.models.enumeration.UserGroupTypeDTO
 

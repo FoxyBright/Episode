@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.models.enumeration
 
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 enum class UserGroupTypeDTO {
     DEFAULT, PREMIUM, TEAM, ORIGINAL, PARTNER;
 

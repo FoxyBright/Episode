@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.shared.models.enumeration
 
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
+
 enum class TranslationSignalTypeDTO {
     CAMERA, MICROPHONE;
 

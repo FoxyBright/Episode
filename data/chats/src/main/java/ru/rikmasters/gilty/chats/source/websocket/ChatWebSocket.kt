@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.shared.models.Thumbnail
 import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
+import ru.rikmasters.gilty.shared.socket.WebSocketManager
 
 class ChatWebSocket(
     private val chatRepository: ChatRepository,
