@@ -1,8 +1,19 @@
 package ru.rikmasters.gilty.shared.wrapper
 
+import androidx.paging.PagingSource
 import com.fasterxml.jackson.annotation.JsonAlias
 import io.ktor.client.call.body
+import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.statement.HttpResponse
+import io.ktor.utils.io.errors.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import java.net.UnknownHostException
 
 enum class Status {
     @JsonAlias("success")
@@ -79,3 +90,170 @@ suspend inline fun HttpResponse.errorWrapped() =
 
 suspend inline fun <reified T> HttpResponse.wrapped(): T
         where T: Any? = body<ResponseWrapper<T>>().dataChecked
+
+
+/**
+ * [coroutinesState] превращает запрос в DataState (suspend)
+ */
+suspend fun <T : Any> coroutinesState(
+    block: suspend () -> T,
+) = try {
+    withContext(Dispatchers.IO) {
+        DataStateTest.Success(
+            data = block(),
+        )
+    }
+} catch (e: IOException) {
+    DataStateTest.Error(
+        cause = ExceptionCause.IO,
+    )
+} catch (e: SocketTimeoutException) {
+    DataStateTest.Error(
+        cause = ExceptionCause.SocketTimeout,
+    )
+} catch (e: UnknownHostException) {
+    DataStateTest.Error(
+        cause = ExceptionCause.UnknownHost,
+    )
+} catch (e: ResponseException) {
+    when (e) {
+        is RedirectResponseException -> {
+            DataStateTest.Error(
+                cause = ExceptionCause.RedirectResponse,
+            )
+        }
+        is ClientRequestException -> {
+            DataStateTest.Error(
+                cause = ExceptionCause.ClientRequest,
+            )
+        }
+        is ServerResponseException -> {
+            DataStateTest.Error(
+                cause = ExceptionCause.ServerResponse,
+            )
+        }
+        else -> {
+            DataStateTest.Error(
+                cause = ExceptionCause.UnknownException,
+            )
+        }
+    }
+} catch (e: Exception) {
+    DataStateTest.Error(
+        cause = ExceptionCause.UnknownException,
+    )
+}
+
+/**
+ * [flowState] превращает запрос в DataState (flow)
+ */
+fun <T : Any> flowState(
+    block: suspend () -> T,
+) = flow {
+    emit(DataStateTest.Loading())
+    val response = try {
+        DataStateTest.Success(
+            data = block(),
+        )
+    } catch (e: IOException) {
+        DataStateTest.Error(
+            cause = ExceptionCause.IO,
+        )
+    } catch (e: SocketTimeoutException) {
+        DataStateTest.Error(
+            cause = ExceptionCause.SocketTimeout,
+        )
+    } catch (e: UnknownHostException) {
+        DataStateTest.Error(
+            cause = ExceptionCause.UnknownHost,
+        )
+    } catch (e: ResponseException) {
+        when (e) {
+            is RedirectResponseException -> {
+                DataStateTest.Error(
+                    cause = ExceptionCause.RedirectResponse,
+                )
+            }
+            is ClientRequestException -> {
+                DataStateTest.Error(
+                    cause = ExceptionCause.ClientRequest,
+                )
+            }
+            is ServerResponseException -> {
+                DataStateTest.Error(
+                    cause = ExceptionCause.ServerResponse,
+                )
+            }
+            else -> {
+                DataStateTest.Error(
+                    cause = ExceptionCause.UnknownException,
+                )
+            }
+        }
+    } catch (e: Exception) {
+        DataStateTest.Error(
+            cause = ExceptionCause.UnknownException,
+        )
+    }
+    emit(response)
+}.flowOn(Dispatchers.IO)
+
+// TODO: Заменять Exception() на Exception(нужное в UI сообщение) в случае необходимости
+/**
+ * [paginateState] превращает запрос в LoadResult
+ */
+suspend fun <T : Any> paginateState(
+    block: suspend () -> List<T>,
+    loadSize: Int,
+    page: Int,
+) = try {
+    withContext(Dispatchers.IO) {
+        val result = block()
+        val nextKey = if (result.size < loadSize) null else page + 1
+        val prevKey = if (page == 1) null else page - 1
+        PagingSource.LoadResult.Page(
+            data = block(),
+            prevKey = prevKey,
+            nextKey = nextKey,
+        )
+    }
+} catch (e: IOException) {
+    PagingSource.LoadResult.Error(
+        throwable = Exception(),
+    )
+} catch (e: SocketTimeoutException) {
+    PagingSource.LoadResult.Error(
+        throwable = Exception(),
+    )
+} catch (e: UnknownHostException) {
+    PagingSource.LoadResult.Error(
+        throwable = Exception(),
+    )
+} catch (e: ResponseException) {
+    when (e) {
+        is RedirectResponseException -> {
+            PagingSource.LoadResult.Error(
+                throwable = Exception(),
+            )
+        }
+        is ClientRequestException -> {
+            PagingSource.LoadResult.Error(
+                throwable = Exception(),
+            )
+        }
+        is ServerResponseException -> {
+            PagingSource.LoadResult.Error(
+                throwable = Exception(),
+            )
+        }
+        else -> {
+            PagingSource.LoadResult.Error(
+                throwable = Exception(),
+            )
+        }
+    }
+} catch (e: Exception) {
+    PagingSource.LoadResult.Error(
+        throwable = Exception(),
+    )
+}

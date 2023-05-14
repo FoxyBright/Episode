@@ -172,4 +172,42 @@ open class KtorSource: WebSource() {
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
+
+
+
+
+
+
+
+
+
+
+    // ТЕСТ
+    suspend fun tryGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.get(url, block)
+
+    suspend fun tryPost(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.post(url, block)
+
+    suspend fun tryPatch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.patch(url, block)
+
+    suspend fun tryDelete(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.delete(url, block)
+
+    suspend fun tryPut(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.put(url, block)
+
+
+
 }

@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":data:realm"))
     implementation(project(":data:auth"))
     implementation(project(":data:ktor"))
+    implementation(project(":data:translations"))
     
     implementation(project(":example"))
     implementation(project(":shared"))
