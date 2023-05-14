@@ -154,7 +154,11 @@ fun MainContent(
                     || state.bsState.bottomSheetState.isExpanded
                 ) alpha else 1f
             )
-        ) { callback?.onNavBarSelect(it) }
+        ) {
+            if(!(state.bsState.bottomSheetState.isAnimationRunning
+                || state.bsState.bottomSheetState.isExpanded))
+                callback?.onNavBarSelect(it)
+        }
     }
     GAlert(
         state.alert,
