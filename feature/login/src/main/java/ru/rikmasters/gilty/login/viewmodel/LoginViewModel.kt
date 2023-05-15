@@ -61,12 +61,17 @@ class LoginViewModel(
         val dial = country.value.clearPhoneDial
         val length = text.length
         
-        _phone.emit(
-            if(length >= phone.value.length &&
-                !text.startsWith(dial)
-            ) dial.substring(0, length)
-            else text
-        )
+        val newPhone = if(
+            length >= phone.value.length &&
+            !text.startsWith(dial)
+        ) try {
+            dial.substring(0, length)
+        } catch(_: Exception) {
+            text
+        }
+        else text
+        
+        _phone.emit(newPhone)
     }
     
     suspend fun clearPhone() {

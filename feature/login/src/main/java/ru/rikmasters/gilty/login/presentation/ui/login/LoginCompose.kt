@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -277,9 +278,12 @@ private fun ExternalLabel(method: LoginMethod) {
         Text(
             stringResource(R.string.login_via, method.name),
             Modifier.padding(vertical = 17.dp),
-            style = typography.bodyMedium,
-            fontWeight = Bold,
-            color = colorScheme.tertiary
+            style = typography.bodyMedium.copy(
+                colorScheme.tertiary,
+                with(LocalDensity.current) {
+                    16.dp.toSp()
+                }, Bold,
+            ),
         )
     }
 }

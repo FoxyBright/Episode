@@ -1,11 +1,16 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.Orientation.Vertical
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
@@ -27,6 +32,7 @@ private fun ProfilePreview() {
     GiltyTheme { ProfileContent(ProfileState(DemoProfileModel), (true)) }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileContent(
     state: ProfileState,
@@ -34,29 +40,38 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null,
 ) {
-    Box(modifier) {
-        Column {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
             ActionBar(
                 title = stringResource(R.string.create_profile_title)
             ) { callback?.onBack() }
-            Card(
-                modifier = Modifier
-                    .offset(y = 24.dp)
-                    .padding(horizontal = 32.dp)
-                    .fillMaxSize(),
-                shape = RoundedCornerShape(30.dp),
-                colors = cardColors(colorScheme.background),
-                border = BorderStroke(6.dp, colorScheme.primaryContainer)
-            ) {
-                Profile(
-                    state, Modifier
-                        .fillMaxHeight(0.8f)
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 50.dp),
-                    callback
-                )
-            }
+        },
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(top = it.calculateTopPadding())
+                .offset(y = 24.dp)
+                .padding(horizontal = 32.dp)
+                .fillMaxSize(),
+            shape = RoundedCornerShape(30.dp),
+            colors = cardColors(colorScheme.background),
+            border = BorderStroke(6.dp, colorScheme.primaryContainer)
+        ) {
+            Profile(
+                state, Modifier
+                    .scrollable(
+                        rememberScrollState(),
+                        Vertical
+                    )
+                    .fillMaxHeight(0.8f)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 50.dp),
+                callback
+            )
         }
+    }
+    Box(Modifier.fillMaxSize()) {
         GradientButton(
             modifier = Modifier
                 .align(BottomCenter)

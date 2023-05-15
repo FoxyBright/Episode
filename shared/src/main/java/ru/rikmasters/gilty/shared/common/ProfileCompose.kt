@@ -1,26 +1,32 @@
 package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
+import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
@@ -171,6 +177,7 @@ fun Profile(
             type = state.profileType,
             callback = callback
         )
+        Spacer(Modifier.height(20.dp))
     }
 }
 
@@ -267,6 +274,7 @@ private fun TopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Description(
     text: String,
@@ -275,39 +283,73 @@ private fun Description(
     onSaveDescription: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
-    val focusManager =
-        LocalFocusManager.current
+    val focusManager = LocalFocusManager.current
+    val style = if(profileType == CREATE)
+        typography.headlineSmall
+    else typography.bodyMedium
     
     Column(modifier) {
         Text(
             text = stringResource(R.string.profile_about_me),
             color = colorScheme.tertiary,
-            style = typography.labelLarge
-        )
-        GTextField(
-            value = text,
-            onValueChange = { onTextChange(it) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            textOffset = true,
-            readOnly = (profileType == ORGANIZER
-                    || profileType == ANONYMOUS_ORGANIZER),
-            shape = shapes.large, colors = textFieldColors(),
-            textStyle = typography.bodyMedium,
-            keyboardActions = KeyboardActions {
-                focusManager.clearFocus()
-                onSaveDescription()
-            }, keyboardOptions = Default.copy(
-                imeAction = Done,
-                keyboardType = Text,
-                capitalization = Sentences
-            ), placeholder = textFieldLabel(
-                label = false,
-                text = stringResource(R.string.about_me_placeholder),
-                holderFont = typography.bodyMedium
-                    .copy(colorScheme.onTertiary)
+            style = typography.labelLarge.copy(
+                fontSize = if(profileType == CREATE) 17.sp else 20.sp
             )
         )
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .background(
+                    color = colorScheme.primaryContainer,
+                    shape = shapes.large
+                )
+        ) {
+            BasicTextField(
+                value = text,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = if(profileType == CREATE)
+                            12.dp else 14.dp,
+                        horizontal = if(profileType == CREATE)
+                            16.dp else 14.dp,
+                    ),
+                onValueChange = { if(it.length <= 120) onTextChange(it) },
+                readOnly = when(profileType) {
+                    ORGANIZER, ANONYMOUS_ORGANIZER -> true
+                    else -> false
+                },
+                textStyle = style,
+                keyboardActions = KeyboardActions {
+                    focusManager.clearFocus()
+                    onSaveDescription()
+                }, keyboardOptions = Default.copy(
+                    imeAction = Done,
+                    keyboardType = Text,
+                    capitalization = Sentences
+                ),
+                cursorBrush = SolidColor(colorScheme.primary)
+            ) { innerTextField ->
+                TextFieldDecorationBox(
+                    value = text,
+                    visualTransformation = None,
+                    innerTextField = innerTextField,
+                    contentPadding = PaddingValues(vertical = 2.dp),
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.about_me_placeholder),
+                            color = colorScheme.onTertiary,
+                            style = style.copy(colorScheme.onTertiary)
+                        )
+                    },
+                    shape = shapes.large,
+                    singleLine = true,
+                    enabled = true,
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }, colors = textFieldColors()
+                )
+            }
+        }
     }
 }

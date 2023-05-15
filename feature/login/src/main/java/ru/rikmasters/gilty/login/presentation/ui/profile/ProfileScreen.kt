@@ -1,15 +1,25 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.annotation.SuppressLint
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
+import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileScreen(vm: ProfileViewModel) {
     
@@ -46,12 +56,22 @@ fun ProfileScreen(vm: ProfileViewModel) {
         errorText = ""
     }
     
+    val permission = rememberPermissionState(
+        if(SDK_INT < TIRAMISU)
+            READ_EXTERNAL_STORAGE
+        else READ_MEDIA_IMAGES
+    )
+    
     val profileState = ProfileState(
         ProfileModel().copy(
             username = username,
             hidden = profile?.hidden,
             avatar = profile?.avatar,
             aboutMe = description,
+            rating = RatingModel(
+                average = "4.9",
+                emoji = getEmoji("HEART_EYES")
+            )
         ), errorText = errorText,
         isError = errorAvatar
     )
@@ -69,14 +89,24 @@ fun ProfileScreen(vm: ProfileViewModel) {
                     "Обязательное поле" else ""
             }
             
+            @SuppressLint("SuspiciousIndentation")
             override fun profileImage() {
-                nav.navigateAbsolute(
-                    "registration/gallery?multi=false"
-                )
+                if(permission.hasPermission)
+                    nav.navigateAbsolute(
+                        "registration/gallery?multi=false"
+                    )
+                else scope.launch {
+                    if(permission.shouldShowRationale)
+                        permission.launchPermissionRequest()
+                }
             }
             
             override fun hiddenImages() {
-                nav.navigate("hidden")
+                if(permission.hasPermission)
+                    nav.navigate("hidden")
+                else scope.launch {
+                    permission.launchPermissionRequest()
+                }
             }
             
             override fun onDescriptionChange(text: String) {

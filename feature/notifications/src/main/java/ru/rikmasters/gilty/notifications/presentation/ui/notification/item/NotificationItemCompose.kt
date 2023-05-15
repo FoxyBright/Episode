@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,13 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -194,16 +187,16 @@ private fun TextNotification(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    var isBackgroundVisible by remember{
+    var isBackgroundVisible by remember {
         mutableStateOf(false)
     }
-
+    
     LaunchedEffect(key1 = rowState.offset.targetValue.x, block = {
         isBackgroundVisible = rowState.offset.targetValue.x != 0.0f
     })
-
+    
     SwipeableContainer(shape, modifier, isBackgroundVisible) {
-
+        
         Row(
             Modifier.swipeableRow(
                 rowState, LocalContext.current
@@ -249,7 +242,7 @@ private fun TextNotification(
 private fun SwipeableContainer(
     shape: Shape,
     modifier: Modifier,
-    isVisible:Boolean = true,
+    isVisible: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -261,7 +254,11 @@ private fun SwipeableContainer(
         Box(
             Modifier
                 .fillMaxWidth()
-                .background(if(isVisible) colorScheme.primary else Color.Transparent, shape)
+                .background(
+                    if(isVisible) colorScheme.primary
+                    else Color.Transparent,
+                    shape
+                )
         ) {
             SwipeableRowBack(Modifier.align(CenterEnd))
             content.invoke()

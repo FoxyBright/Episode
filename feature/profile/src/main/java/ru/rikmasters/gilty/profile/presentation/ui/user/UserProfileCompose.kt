@@ -209,7 +209,7 @@ private fun Content(
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
                 Modifier
-                    .padding(top = 28.dp)
+                    .padding(top = 10.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
                 style = typography.labelLarge

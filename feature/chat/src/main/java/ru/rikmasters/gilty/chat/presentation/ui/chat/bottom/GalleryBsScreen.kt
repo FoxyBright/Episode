@@ -5,7 +5,6 @@ import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -23,57 +22,54 @@ import ru.rikmasters.gilty.shared.R
 fun GalleryBs(
     vm: GalleryViewModel,
     isOnline: Boolean,
-    chatId: String
+    chatId: String,
 ) {
     val permission = rememberPermissionState(
-        if (SDK_INT < TIRAMISU) {
+        if(SDK_INT < TIRAMISU) {
             READ_EXTERNAL_STORAGE
         } else READ_MEDIA_IMAGES
     )
-
+    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
-
+    
     val selected by vm.selected.collectAsState()
     val images by vm.images.collectAsState()
-
+    
     LaunchedEffect(Unit) {
         permission.launchPermissionRequest()
         vm.clearSelect()
     }
-
+    
     LaunchedEffect(permission.hasPermission) {
-        if (permission.hasPermission) vm.getImages()
+        if(permission.hasPermission) vm.getImages()
     }
-
-    if (!permission.hasPermission) StoragePermissionBs {
+    
+    if(permission.hasPermission) StoragePermissionBs {
         scope.launch { permission.launchPermissionRequest() }
-    } else {
-        GalleryBsContent(
-            GalleryState(
-                MULTIPLE,
-                images,
-                selected,
-                (false),
-                (null),
-                isOnline,
-                stringResource(R.string.send_button),
-                selected.isNotEmpty()
-            ),
-            Modifier,
-            object : GalleryCallback {
-
-                override fun onAttach() {
-                    scope.launch {
-                        asm.bottomSheet.collapse()
-                        vm.sendImages(chatId)
-                    }
-                }
-
-                override fun onImageClick(image: String) {
-                    scope.launch { vm.selectImage(image) }
+    } else GalleryBsContent(
+        state = GalleryState(
+            type = MULTIPLE,
+            images = images,
+            selectedImages = selected,
+            menuState = false,
+            menuItems = null,
+            isOnline = isOnline,
+            buttonLabel = stringResource(R.string.send_button),
+            buttonEnabled = selected.isNotEmpty()
+        ),
+        callback = object: GalleryCallback {
+            
+            override fun onAttach() {
+                scope.launch {
+                    asm.bottomSheet.collapse()
+                    vm.sendImages(chatId)
                 }
             }
-        )
-    }
+            
+            override fun onImageClick(image: String) {
+                scope.launch { vm.selectImage(image) }
+            }
+        }
+    )
 }

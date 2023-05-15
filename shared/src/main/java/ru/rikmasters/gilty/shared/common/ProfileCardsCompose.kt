@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -32,8 +33,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -377,9 +378,13 @@ private fun RatingText(
     profileType: ProfileType,
     modifier: Modifier = Modifier,
 ) {
-    val style = if(profileType == CREATE)
-        ThemeExtra.typography.RatingSmallText
-    else ThemeExtra.typography.RatingText
+    
+    val style = ThemeExtra
+        .typography.RatingText.copy(
+            fontSize = if(profileType == CREATE)
+                38.dp.toSp()
+            else 42.dp.toSp()
+        )
     val string = text.ifBlank { "0.0" }
     Text(
         buildAnnotatedString {
@@ -389,7 +394,7 @@ private fun RatingText(
             withStyle(
                 style.copy(
                     fontSize = if(profileType == CREATE)
-                        38.sp else 42.sp
+                        35.dp.toSp() else 45.dp.toSp()
                 ).toSpanStyle()
             ) { append('.') }
             withStyle(style.toSpanStyle()) {
@@ -408,24 +413,32 @@ private fun Observe(
     profileType: ProfileType,
     text: String, count: Int,
 ) {
+    val style = with(LocalDensity.current) {
+        typography.headlineSmall.copy(
+            fontSize = if(profileType == CREATE)
+                12.dp.toSp()
+            else 14.dp.toSp()
+        ) to typography.displaySmall.copy(
+            fontSize = if(profileType == CREATE)
+                8.dp.toSp()
+            else 10.dp.toSp()
+        )
+    }
+    
     Column(
         modifier, Top, CenterHorizontally
     ) {
         Text(
             digitalConverter(count),
             Modifier, colorScheme.tertiary,
-            style = if(profileType == CREATE)
-                typography.headlineSmall
-            else typography.labelSmall,
+            style = style.first,
             fontWeight = SemiBold,
             textAlign = TextAlign.Center,
         )
         Text(
             text, Modifier,
             colorScheme.tertiary,
-            style = if(profileType == CREATE)
-                typography.displaySmall
-            else typography.titleSmall,
+            style = style.second,
             textAlign = TextAlign.Center
         )
     }
