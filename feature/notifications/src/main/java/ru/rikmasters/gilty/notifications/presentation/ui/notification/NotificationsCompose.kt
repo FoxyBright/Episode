@@ -318,18 +318,18 @@ private fun Notifications(
                             item?.let { not ->
                                 if(earlierWeekControl(not.date)) {
                                     // First Element
-                                    if(index == todayItems.size + weekItems.size + 1){
+                                    if(index == todayItems.size + weekItems.size){
                                         Label(
                                             getMonthName(monthNumber = getMonth(item.date)),
                                             hasResponds,
                                             if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (true)
                                         )
                                         ElementNot(
-                                            0,//index - todayItems.size - weekItems.size - restItems.filter { isAfter(it.date,item.date) }.size,
+                                            0,
                                             restItems.filter { getMonth(it.date) == getMonth(item.date) }.size, not,
                                             state.ratings, callback
                                         )
-                                    }else if(index - 1 >= 0) {// other elemnets
+                                    }else if(index - 1 >= 0) { // other elemnets
                                         if(getMonth(item.date) != getMonth(state.notifications.itemSnapshotList[index - 1]?.date?:"")){
                                             Label(
                                                 getMonthName(monthNumber = getMonth(item.date)),
