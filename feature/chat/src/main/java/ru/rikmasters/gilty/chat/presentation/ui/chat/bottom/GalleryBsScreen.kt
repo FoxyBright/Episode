@@ -37,7 +37,10 @@ fun GalleryBs(
     val selected by vm.selected.collectAsState()
     val images by vm.images.collectAsState()
 
-    LaunchedEffect(Unit) { vm.clearSelect() }
+    LaunchedEffect(Unit) {
+        permission.launchPermissionRequest()
+        vm.clearSelect()
+    }
 
     LaunchedEffect(permission.hasPermission) {
         if (permission.hasPermission) vm.getImages()
