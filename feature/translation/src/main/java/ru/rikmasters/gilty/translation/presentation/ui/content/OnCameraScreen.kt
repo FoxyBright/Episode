@@ -22,7 +22,6 @@ fun OnScreenContent(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .background(color = Color.Transparent)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.SpaceBetween

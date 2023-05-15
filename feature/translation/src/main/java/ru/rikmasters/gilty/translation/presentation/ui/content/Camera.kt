@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,10 +23,6 @@ fun Camera(
             view.keepScreenOn = true
             view.isKeepAspectRatio = true
             view.setAspectRatioMode(AspectRatioMode.Fill)
-            view.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
             val surfaceHolderCallback = object : SurfaceHolder.Callback {
                 override fun surfaceCreated(holder: SurfaceHolder) {}
                 override fun surfaceChanged(
@@ -45,7 +40,6 @@ fun Camera(
             }
             view.holder.addCallback(surfaceHolderCallback)
             initCamera(view)
-            Log.d("TEST","INITED")
             view
         },
         update = {}

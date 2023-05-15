@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +42,9 @@ fun TopActions(
     onCloseClicked: () -> Unit,
     translationUiState: TranslationUiState
 ) {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         if (translationStatus == TranslationStatus.PREVIEW) {
             Spacer(modifier = Modifier.height(12.dp))
             Surface(
@@ -78,6 +81,7 @@ fun TopActions(
             ) {
                 Row {
                     translationUiState.meetingModel?.let {
+                        Log.d("TEST","meeetModel $it")
                         GCashedImage(
                             url = it.organizer.thumbnail?.url,
                             modifier = Modifier

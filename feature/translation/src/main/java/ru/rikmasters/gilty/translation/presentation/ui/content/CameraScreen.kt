@@ -1,7 +1,5 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -14,6 +12,7 @@ import ru.rikmasters.gilty.translation.model.TranslationUiState
 
 @Composable
 fun CameraScreen(
+    modifier: Modifier,
     translationUiState: TranslationUiState,
     translationStatus: TranslationStatus,
     initCamera: (OpenGlView) -> Unit,
@@ -24,7 +23,7 @@ fun CameraScreen(
     stopStreamPreview: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         shape = if (translationStatus == TranslationStatus.PREVIEW) {
             RoundedCornerShape(
                 topEnd = 14.dp,
@@ -35,22 +34,18 @@ fun CameraScreen(
         },
         color = Color.Transparent
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Camera(
-                startPreview = startStreamPreview,
-                stopPreview = stopStreamPreview,
-                initCamera = initCamera
-            )
-            OnScreenContent(
-                translationStatus = translationStatus,
-                translationUiState = translationUiState,
-                startBroadCast = startBroadCast,
-                onCloseClicked = onCloseClicked,
-                changeFacing = changeFacing
-            )
-        }
+        Camera(
+            startPreview = startStreamPreview,
+            stopPreview = stopStreamPreview,
+            initCamera = initCamera
+        )
+        OnScreenContent(
+            translationStatus = translationStatus,
+            translationUiState = translationUiState,
+            startBroadCast = startBroadCast,
+            onCloseClicked = onCloseClicked,
+            changeFacing = changeFacing
+        )
     }
 }
 

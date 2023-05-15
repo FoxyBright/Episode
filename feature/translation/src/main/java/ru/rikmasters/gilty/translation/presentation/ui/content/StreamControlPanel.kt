@@ -2,9 +2,13 @@ package ru.rikmasters.gilty.translation.presentation.ui.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,14 +23,14 @@ import ru.rikmasters.gilty.translation.model.TranslationUiState
 
 @Composable
 fun StreamControlPanel(
+    modifier: Modifier,
     changeFacing: () -> Unit,
     onCameraClicked: () -> Unit,
     onMicrophoneClicked: () -> Unit,
     translationUiState: TranslationUiState
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(
                 Brush.linearGradient(Gradients.gray())
             )
