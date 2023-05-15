@@ -14,11 +14,11 @@ fun rememberLazyListScrollState(
     key: String,
 ) = SaveMap[key].let { state ->
     val listState = rememberLazyListState(
-        if((state?.first ?: 0) - 1 < 0) 0 else (state?.first ?: 0) - 1,
+        (state?.first ?: 0),
         (state?.second ?: 0)
     )
     LaunchedEffect(key1 = false, block = {
-        listState.animateScrollToItem(if((state?.first ?: 0) - 1 < 0) 0 else (state?.first ?: 0) - 1)
+        listState.animateScrollToItem((state?.first ?: 0))
         listState.animateScrollBy((state?.second ?: 0).toFloat())
     })
     listState
