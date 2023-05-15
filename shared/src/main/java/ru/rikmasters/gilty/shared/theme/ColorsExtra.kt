@@ -37,6 +37,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.White
 import ru.rikmasters.gilty.shared.theme.Colors.WhiteShadow
 import ru.rikmasters.gilty.shared.theme.Colors.Yellow
 import ru.rikmasters.gilty.shared.theme.Colors.Zircon
+import ru.rikmasters.gilty.shared.theme.Colors.gripGrayDark
 import ru.rikmasters.gilty.shared.theme.Colors.halfTransparentlyGray
 import ru.rikmasters.gilty.shared.theme.Colors.meetingCardBackBackgroundNight
 
@@ -68,6 +69,7 @@ data class ExtraColors(
     val meetCardPlaceHolder: Color = Unspecified,
     val notificationCloud: Color = Unspecified,
     val meetingTransparencyShape: Color = Unspecified,
+    val gripColor: Color = Unspecified,
     
     // Categories Colors
     val sport: Color = Unspecified,
@@ -116,6 +118,7 @@ val LightExtraColors = ExtraColors(
     meetCardPlaceHolder = NickelGray,
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
+    gripColor = Ash,
     
     // Categories Colors
     sport = Orange,
@@ -164,6 +167,7 @@ val DarkExtraColors = ExtraColors(
     meetCardPlaceHolder = Gray,
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
+    gripColor = gripGrayDark,
     
     // Categories Colors
     sport = DarkOrange,

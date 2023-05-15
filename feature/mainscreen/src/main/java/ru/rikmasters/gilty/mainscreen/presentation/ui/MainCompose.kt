@@ -48,6 +48,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.shared.bottomsheet.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
 @Preview
@@ -343,7 +344,7 @@ private fun Grip(
         Box(
             Modifier
                 .background(
-                    colorScheme.scrim,
+                    colors.gripColor,
                     CircleShape
                 )
                 .size(40.dp, 5.dp)

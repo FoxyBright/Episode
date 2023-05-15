@@ -23,6 +23,7 @@ import com.yandex.mapkit.MapKit
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 
 data class YandexMapState(
@@ -137,7 +138,7 @@ private fun Bottom(
 @Composable
 private fun Grip(
     modifier: Modifier = Modifier,
-    color: Color = colorScheme.outline,
+    color: Color = colors.gripColor,
 ) {
     Box(
         modifier

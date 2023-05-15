@@ -93,6 +93,7 @@ object Colors {
     val WhiteShadow = Color(0xFFF7F7F7)
     val NickelGray = Color(0xFFE0E0E0)
     val halfTransparentlyGray = Color(0x80C4C4C4)
+    val gripGrayDark = Color(0xFF767373)
     // Add new colors
 }
 

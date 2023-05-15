@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,10 +81,16 @@ class BottomSheetState(
         MutableStateFlow(COLLAPSED)
     val current = _current.asStateFlow()
     
+    val colors: @Composable () -> Color = {
+        if(isSystemInDarkTheme())
+            Color(0xFF767373)
+        else Color(0xFFC9C5CA)
+    }
+    
     var gripLightColor: @Composable () -> Color
-            by mutableStateOf({ colorScheme.outlineVariant })
+            by mutableStateOf(colors)
     var gripDarkColor: @Composable () -> Color
-            by mutableStateOf({ colorScheme.outline })
+            by mutableStateOf(colors)
     var scrim: @Composable () -> Color
             by mutableStateOf({ colorScheme.scrim })
 }
