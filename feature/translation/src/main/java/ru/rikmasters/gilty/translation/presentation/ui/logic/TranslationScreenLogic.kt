@@ -87,8 +87,6 @@ fun TestTranslationScreen(
         }
     }
 
-
-
     TranslationScreen(
         translationStatus = translationScreenState.translationStatus?: TranslationStatus.PREVIEW,
         onCloseClicked = {

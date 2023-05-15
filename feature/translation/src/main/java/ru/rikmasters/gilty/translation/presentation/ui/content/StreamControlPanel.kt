@@ -2,23 +2,20 @@ package ru.rikmasters.gilty.translation.presentation.ui.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.theme.Gradients
+import ru.rikmasters.gilty.shared.theme.Gradients.blackTranslation
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 
 @Composable
@@ -32,7 +29,7 @@ fun StreamControlPanel(
     Row(
         modifier = modifier
             .background(
-                Brush.linearGradient(Gradients.gray())
+                linearGradient(blackTranslation())
             )
             .padding(
                 bottom = 40.dp,
@@ -49,7 +46,7 @@ fun StreamControlPanel(
                     else painterResource(id = R.drawable.ic_video_inactive)
                 } ?: painterResource(id = R.drawable.ic_video_active),
                 contentDescription = "turn on/off camera",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = ThemeExtra.colors.white
             )
         }
         IconButton(onClick = onMicrophoneClicked) {
@@ -59,14 +56,14 @@ fun StreamControlPanel(
                     else painterResource(id = R.drawable.ic_micro_inactive)
                 } ?: painterResource(id = R.drawable.ic_micro_active),
                 contentDescription = "turn on/off microphone",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = ThemeExtra.colors.white
             )
         }
         IconButton(onClick = changeFacing) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_refresh),
                 contentDescription = "change camera",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = ThemeExtra.colors.white
             )
         }
     }

@@ -56,7 +56,8 @@ data class ExtraColors(
     val mainNightGreen: Color = Color.Unspecified,
     val mainDayGreen: Color = Color.Unspecified,
     val mainNotActiveGreen: Color = Color.Unspecified,
-    val textField: Color = Color.Unspecified
+    val textField: Color = Color.Unspecified,
+    val preDarkColor: Color = Color.Unspecified
 
 )
 
@@ -118,7 +119,8 @@ val LightExtraColors = ExtraColors(
     mainNightGreen = Colors.mainGreen,
     mainDayGreen = Colors.mainGreen,
     mainNotActiveGreen = Colors.greenInactive,
-    textField = Colors.textField
+    textField = Colors.textField,
+    preDarkColor = Colors.PreDark
 )
 
 @Deprecated(
@@ -180,5 +182,7 @@ val DarkExtraColors = ExtraColors(
     mainNightGreen = Colors.mainGreen,
     mainDayGreen = Colors.mainGreen,
     mainNotActiveGreen = Colors.greenInactive,
-    textField = Colors.textField
+    textField = Colors.textField,
+    preDarkColor = Colors.PreDark
+
 )

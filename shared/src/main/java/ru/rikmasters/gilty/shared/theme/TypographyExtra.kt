@@ -8,6 +8,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight.*
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.theme.Colors.FireRed
@@ -17,6 +18,9 @@ data class ExtraTypography(
     val CodeText: TextStyle = baseTextStyle,
     val RatingText: TextStyle = baseTextStyle,
     val RatingSmallText: TextStyle = baseTextStyle,
+    val TranslationTitlePreview: TextStyle = baseTextStyle,
+    val TranslationSmallButton: TextStyle = baseTextStyle,
+    val TranslationAuthorName: TextStyle = baseTextStyle
     // Add new fonts in scheme = baseTextStyle
 )
 
@@ -54,5 +58,17 @@ val DefaultExtraTypography = ExtraTypography(
         lineHeight = 38.sp,
         textAlign = TextAlign.Center
     ),
+
+    TranslationTitlePreview = baseTextStyle.copy(
+        fontSize = 20.sp,
+        fontWeight = Bold,
+        lineHeight = 23.sp
+    ),
+
+    TranslationSmallButton = baseTextStyle.copy(
+        fontSize = 14.sp,
+        fontWeight = SemiBold,
+        lineHeight = 17.sp
+    )
     // Add fonts in scheme
 )
