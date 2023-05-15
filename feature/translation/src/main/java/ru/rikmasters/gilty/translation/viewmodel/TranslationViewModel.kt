@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
+import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
@@ -53,9 +54,9 @@ class TranslationViewModel : ViewModel() {
             connected.collectLatest { connected ->
                 if (connected) {
                     translationRepository.webSocketFlow.collectLatest { socketAnswers ->
-                        when(socketAnswers) {
+                        when (socketAnswers) {
                             is TranslationCallbackEvents.SignalReceived -> {
-                                when(socketAnswers.signal.signal) {
+                                when (socketAnswers.signal.signal) {
                                     TranslationSignalTypeModel.MICROPHONE -> {
                                         _translationUiState.update {
                                             it.copy(
@@ -66,6 +67,7 @@ class TranslationViewModel : ViewModel() {
                                             )
                                         }
                                     }
+
                                     TranslationSignalTypeModel.CAMERA -> {
                                         _translationUiState.update {
                                             it.copy(
@@ -78,6 +80,7 @@ class TranslationViewModel : ViewModel() {
                                     }
                                 }
                             }
+
                             TranslationCallbackEvents.TranslationCompleted -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -88,6 +91,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             TranslationCallbackEvents.TranslationExpired -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -98,6 +102,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             is TranslationCallbackEvents.TranslationExtended -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -109,6 +114,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             TranslationCallbackEvents.TranslationStarted -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -119,6 +125,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             is TranslationCallbackEvents.UserConnected -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -127,6 +134,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             is TranslationCallbackEvents.UserDisconnected -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -135,6 +143,7 @@ class TranslationViewModel : ViewModel() {
                                     )
                                 }
                             }
+
                             is TranslationCallbackEvents.UserKicked -> {
                                 _translationUiState.update {
                                     it.copy(
@@ -151,14 +160,14 @@ class TranslationViewModel : ViewModel() {
     }
 
     fun onEvent(event: TranslationEvent) {
-        when(event) {
+        when (event) {
             is TranslationEvent.EnterScreen -> {
                 coroutineScope.launch {
                     translationRepository.getTranslationInfo(
                         translationId = event.translationId
                     ).on(
                         loading = {
-                            Log.d("TEST","Loading")
+                            Log.d("TEST", "Loading")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = true
@@ -166,7 +175,7 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         success = { translation ->
-                            Log.d("TEST","Success $translation")
+                            Log.d("TEST", "Success $translation")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -175,7 +184,7 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         error = { cause ->
-                            Log.d("TEST","Error $cause")
+                            Log.d("TEST", "Error $cause")
                             cause.serverMessage?.let {
                                 _oneTimeEvent.send(
                                     TranslationOneTimeEvent.ErrorHappened(
@@ -193,6 +202,7 @@ class TranslationViewModel : ViewModel() {
                     )
                 }
             }
+
             TranslationEvent.ConnectToTranslation -> {
                 coroutineScope.launch {
                     translationInfo.value?.let { translation ->
@@ -203,6 +213,7 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
+
             TranslationEvent.ConnectToTranslationChat -> {
                 coroutineScope.launch {
                     translationInfo.value?.let { translation ->
@@ -212,6 +223,7 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
+
             TranslationEvent.DisconnectFromTranslation -> {
                 coroutineScope.launch {
                     translationInfo.value?.let {
@@ -220,11 +232,20 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
+
             TranslationEvent.DisconnectFromTranslationChat -> {
                 coroutineScope.launch {
                     translationInfo.value?.let {
                         translationRepository.disconnectFromTranslationChat()
                     }
+                }
+            }
+
+            TranslationEvent.ChangeFacing -> {
+                _translationUiState.update {
+                    it.copy(
+                        selectedCamera = if (it.selectedCamera == Facing.BACK) Facing.FRONT else Facing.BACK
+                    )
                 }
             }
         }
