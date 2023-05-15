@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
+import android.content.Context.MODE_PRIVATE
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +18,6 @@ import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenP
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.common.ProfileState
-import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
@@ -24,7 +26,9 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 @Composable
 fun UserProfileScreen(vm: UserProfileViewModel) {
     
-    val listState = rememberLazyListScrollState("profile")
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = 0
+    )
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
@@ -51,8 +55,15 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             unreadMessages, ACTIVE
         )
     }
-    
+    val prefs by lazy {
+        context.getSharedPreferences("prefs", MODE_PRIVATE)
+    }
+
     LaunchedEffect(Unit) {
+        val index = prefs.getInt("scroll_position", 0)
+        val offset = prefs.getInt("scroll_offset", 0).toFloat()
+        listState.animateScrollToItem(if(index - 1 < 0) 0 else index)
+        listState.animateScrollBy(offset)
         vm.setUserDate()
         context.listenPreference(
             key = "unread_messages",
