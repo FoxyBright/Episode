@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
+import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -157,6 +158,7 @@ class TranslationViewModel : ViewModel() {
                         translationId = event.translationId
                     ).on(
                         loading = {
+                            Log.d("TEST","Loading")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = true
@@ -164,6 +166,7 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         success = { translation ->
+                            Log.d("TEST","Success $translation")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -172,6 +175,7 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         error = { cause ->
+                            Log.d("TEST","Error $cause")
                             cause.serverMessage?.let {
                                 _oneTimeEvent.send(
                                     TranslationOneTimeEvent.ErrorHappened(

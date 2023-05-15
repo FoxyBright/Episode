@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.view.OpenGlView
+import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
 
 @Composable
@@ -25,10 +27,35 @@ fun TestTranslationScreen(
     vm: TranslationViewModel,
     translationId: String
 ) {
+    LaunchedEffect(Unit) {
+        vm.onEvent(
+            TranslationEvent.EnterScreen(
+                translationId = translationId
+            )
+        )
+    }
+
     val translationScreenState by vm.translationUiState.collectAsState()
 
-    var camera: RtmpCamera2? = null
+    var camera by remember { mutableStateOf<RtmpCamera2?>( null ) }
+
     var streamState by remember { mutableStateOf(StreamState.STOP) }
+
+    val connectionChecker = object : ConnectCheckerRtmp {
+        override fun onAuthErrorRtmp() {}
+        override fun onAuthSuccessRtmp() {}
+        override fun onConnectionFailedRtmp(reason: String) {}
+        override fun onConnectionStartedRtmp(rtmpUrl: String) {}
+        override fun onConnectionSuccessRtmp() {
+            streamState = StreamState.PLAY
+        }
+
+        override fun onDisconnectRtmp() {
+            streamState = StreamState.STOP
+        }
+
+        override fun onNewBitrateRtmp(bitrate: Long) {}
+    }
 
     fun startBroadCast(rtmpUrl: String) {
         camera?.let {
@@ -39,6 +66,8 @@ fun TestTranslationScreen(
                 } else {
                     streamState = StreamState.STOP
                 }
+            } else {
+                it.stopStream()
             }
         }
     }
@@ -50,28 +79,9 @@ fun TestTranslationScreen(
                 val view = OpenGlView(it)
                 view.keepScreenOn = true
                 view.isKeepAspectRatio = true
-                view
-            },
-            update = {
-                val connectionChecker = object : ConnectCheckerRtmp {
-                    override fun onAuthErrorRtmp() {}
-                    override fun onAuthSuccessRtmp() {}
-                    override fun onConnectionFailedRtmp(reason: String) {}
-                    override fun onConnectionStartedRtmp(rtmpUrl: String) {}
-                    override fun onConnectionSuccessRtmp() {
-                        streamState = StreamState.PLAY
-                    }
-
-                    override fun onDisconnectRtmp() {
-                        streamState = StreamState.STOP
-                    }
-
-                    override fun onNewBitrateRtmp(bitrate: Long) {}
-                }
-                camera = RtmpCamera2(it, connectionChecker)
                 val surfaceHolderCallback = object : SurfaceHolder.Callback {
                     override fun surfaceCreated(holder: SurfaceHolder) {
-                        camera?.startPreview()
+
                     }
 
                     override fun surfaceChanged(
@@ -80,13 +90,21 @@ fun TestTranslationScreen(
                         width: Int,
                         height: Int,
                     ) {
+                        camera?.startPreview()
                     }
 
                     override fun surfaceDestroyed(holder: SurfaceHolder) {
                         camera?.stopPreview()
                     }
                 }
-                it.holder.addCallback(surfaceHolderCallback)
+                view.holder.addCallback(surfaceHolderCallback)
+                camera = RtmpCamera2(view, connectionChecker)
+                Log.d("TEST","Camerewegwgew $camera")
+                view
+            },
+            update = {
+                Log.d("TEST","UPDATED $it")
+
             },
         )
         Button(

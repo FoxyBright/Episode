@@ -1,6 +1,11 @@
 package ru.rikmasters.gilty.translations.datasource.paging
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
+import ru.rikmasters.gilty.shared.models.translations.TranslationMessageDTO
+import ru.rikmasters.gilty.shared.wrapper.paginateState
+import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
 
 class TranslationMessagesPagingSource(
     private val webSource: TranslationWebSource,

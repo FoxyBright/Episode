@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.socket
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.request.setBody

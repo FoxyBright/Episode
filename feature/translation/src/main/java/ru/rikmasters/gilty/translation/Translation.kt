@@ -14,7 +14,7 @@ object Translation : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
         nested("translations","main") {
             screen<TranslationViewModel>(
-                route = "main",
+                route = "main?id={id}",
                 arguments = listOf(
                     navArgument("id"){
                         type = NavType.StringType; defaultValue = ""

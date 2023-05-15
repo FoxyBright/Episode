@@ -14,6 +14,7 @@ import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
 
+data class User(val user: String, val count: String)
 class TranslationWebSocket : WebSocketManager() {
 
     override suspend fun handleResponse(response: SocketResponse) {
@@ -69,7 +70,6 @@ class TranslationWebSocket : WebSocketManager() {
             }
 
             TranslationsSocketEvents.USER_CONNECTED -> {
-                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserConnected(
@@ -80,7 +80,6 @@ class TranslationWebSocket : WebSocketManager() {
             }
 
             TranslationsSocketEvents.USER_DISCONNECTED -> {
-                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserDisconnected(
@@ -90,7 +89,6 @@ class TranslationWebSocket : WebSocketManager() {
                 )
             }
             TranslationsSocketEvents.USER_KICKED -> {
-                data class User(val user: String, val count: String)
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserKicked(

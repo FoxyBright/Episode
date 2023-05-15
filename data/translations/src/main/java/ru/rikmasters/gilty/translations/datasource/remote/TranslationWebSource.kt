@@ -1,9 +1,21 @@
 package ru.rikmasters.gilty.translations.datasource.remote
 
+import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.ktor.util.extension.query
+import ru.rikmasters.gilty.shared.models.FullUserDTO
+import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
+import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.common.extentions.toInt
+import ru.rikmasters.gilty.shared.models.enumeration.TranslationSignalTypeDTO
+import ru.rikmasters.gilty.shared.models.translations.TranslationInfoDTO
+import ru.rikmasters.gilty.shared.models.translations.TranslationMessageDTO
+import ru.rikmasters.gilty.shared.wrapper.wrapped
+import ru.rikmasters.gilty.shared.wrapper.wrappedTest
+
 class TranslationWebSource : KtorSource() {
 
-    suspend fun getTranslationInfo(translationId: String): TranslationInfoDTO =
-        tryGet("http://$HOST$PREFIX_URL/meetings/$translationId/translation").wrapped()
+    suspend fun getTranslationInfo(translationId: String) =
+        tryGet("http://$HOST$PREFIX_URL/meetings/$translationId/translation").wrappedTest<TranslationInfoDTO>()
 
     suspend fun endTranslation(translationId: String) =
         tryPost("http://$HOST$PREFIX_URL/translations/$translationId/complete")

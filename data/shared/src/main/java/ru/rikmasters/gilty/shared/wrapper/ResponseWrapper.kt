@@ -27,6 +27,40 @@ enum class Status {
     ERROR
 }
 
+data class ResponseWrapperTest<T: Any?>(
+    val status: Status ? = null,
+    val data: T,
+    val error: Error? = null,
+    val paginator: Paginator? = null,
+) {
+
+    @Suppress("unused")
+    class Paginator(
+        val total: Int,
+        val perPage: Int,
+        val currentPage: Int,
+        val list_page: Int,
+        val limit: Int,
+        val offset: Int,
+    ) {
+
+        constructor(): this(
+            (0), (0), (0),
+            (0), (0), (0)
+        )
+    }
+
+    data class Error(
+        val code: String? = null,
+        val message: String? = null,
+        val exception: String? = null,
+        val file: String? = null,
+        val line: Int? = null,
+        val trace: Any? = null,
+    )
+}
+
+
 data class ResponseWrapper<T: Any?>(
     val status: Status,
     val data: T,
@@ -90,6 +124,10 @@ suspend inline fun <reified T> HttpResponse.paginateWrapped(
 
 suspend inline fun HttpResponse.errorWrapped() =
     body<ErrorResponseWrapper>()
+
+// По неизвестным причинам не приходит status
+suspend inline fun <reified T> HttpResponse.wrappedTest(): T
+        where T: Any? = body<ResponseWrapperTest<T>>().data
 
 suspend inline fun <reified T> HttpResponse.wrapped(): T
         where T: Any? = body<ResponseWrapper<T>>().dataChecked

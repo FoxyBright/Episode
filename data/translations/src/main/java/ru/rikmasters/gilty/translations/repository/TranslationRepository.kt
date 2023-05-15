@@ -55,9 +55,10 @@ class TranslationRepository(
 
     suspend fun getTranslationInfo(translationId: String): DataStateTest<TranslationInfoModel> =
         coroutinesState {
-            remoteSource.getTranslationInfo(
+            val gh = remoteSource.getTranslationInfo(
                 translationId = translationId,
-            ).map()
+            )
+            gh.map()
         }
 
     suspend fun endTranslation(translationId: String): DataStateTest<Unit> =

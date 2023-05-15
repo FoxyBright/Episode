@@ -20,6 +20,7 @@ import ru.rikmasters.gilty.notifications.Notifications
 import ru.rikmasters.gilty.profile.Profile
 import ru.rikmasters.gilty.profile.ProfileData
 import ru.rikmasters.gilty.translation.Translation
+import ru.rikmasters.gilty.translations.TranslationData
 
 object AppModule: FeatureDefinition() {
     
@@ -32,7 +33,7 @@ object AppModule: FeatureDefinition() {
             // Data
             Ktor, Auth, ChatData, Realm,
             MeetingsData, NotificationsData,
-            ProfileData, ReportsData,
+            ProfileData, ReportsData,TranslationData,
             // Example
             ExampleModule,
         )
