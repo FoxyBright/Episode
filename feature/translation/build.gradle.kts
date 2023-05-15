@@ -11,5 +11,6 @@ dependencies {
     compose()
 
     implementation(project(":shared"))
+    implementation(project(":data:meetings"))
     implementation(project(":data:translations"))
 }

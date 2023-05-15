@@ -8,6 +8,7 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
@@ -162,6 +163,11 @@ class MeetingWebSource: KtorSource() {
                 it.wrapped<DetailedMeetResponse>().map()
             else null
         }
+
+    // TODO: По мере возможности заменить используемый сейчас метод выше этим методом
+    suspend fun getDetailedMeetTest(
+        meet: String
+    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meet").wrapped<DetailedMeetResponse>()
     
     suspend fun getMeetMembers(
         meet: String,

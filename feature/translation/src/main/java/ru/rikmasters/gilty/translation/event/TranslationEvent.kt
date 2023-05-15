@@ -7,4 +7,6 @@ sealed interface TranslationEvent {
     object ConnectToTranslationChat : TranslationEvent
     object DisconnectFromTranslationChat : TranslationEvent
     object ChangeFacing : TranslationEvent
+    object StartStreaming : TranslationEvent
+    object StopStreaming : TranslationEvent
 }

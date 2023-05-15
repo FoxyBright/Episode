@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
-import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,12 +10,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
+import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
@@ -24,6 +25,7 @@ import ru.rikmasters.gilty.translations.repository.TranslationRepository
 class TranslationViewModel : ViewModel() {
 
     private val translationRepository: TranslationRepository by inject()
+    private val meetingRepository: MeetingManager by inject()
 
     private val connected = MutableStateFlow(false)
 
@@ -167,7 +169,6 @@ class TranslationViewModel : ViewModel() {
                         translationId = event.translationId
                     ).on(
                         loading = {
-                            Log.d("TEST", "Loading")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = true
@@ -175,7 +176,6 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         success = { translation ->
-                            Log.d("TEST", "Success $translation")
                             _translationUiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -184,7 +184,40 @@ class TranslationViewModel : ViewModel() {
                             }
                         },
                         error = { cause ->
-                            Log.d("TEST", "Error $cause")
+                            cause.serverMessage?.let {
+                                _oneTimeEvent.send(
+                                    TranslationOneTimeEvent.ErrorHappened(
+                                        errorMessage = it
+                                    )
+                                )
+                            } ?: cause.defaultMessage?.let {
+                                _oneTimeEvent.send(
+                                    TranslationOneTimeEvent.ErrorHappened(
+                                        errorMessage = it
+                                    )
+                                )
+                            }
+                        }
+                    )
+                    meetingRepository.getDetailedMeetTest(
+                        meetId = event.translationId
+                    ).on(
+                        loading = {
+                            _translationUiState.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                        },
+                        success = { meetingModel ->
+                            _translationUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    meetingModel = meetingModel
+                                )
+                            }
+                        },
+                        error = { cause ->
                             cause.serverMessage?.let {
                                 _oneTimeEvent.send(
                                     TranslationOneTimeEvent.ErrorHappened(
@@ -245,6 +278,22 @@ class TranslationViewModel : ViewModel() {
                 _translationUiState.update {
                     it.copy(
                         selectedCamera = if (it.selectedCamera == Facing.BACK) Facing.FRONT else Facing.BACK
+                    )
+                }
+            }
+
+            TranslationEvent.StartStreaming -> {
+                _translationUiState.update {
+                    it.copy(
+                        translationStatus = TranslationStatus.STREAM
+                    )
+                }
+            }
+
+            TranslationEvent.StopStreaming -> {
+                _translationUiState.update {
+                    it.copy(
+                        translationStatus = TranslationStatus.PREVIEW
                     )
                 }
             }
