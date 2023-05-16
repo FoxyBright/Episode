@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -14,6 +15,8 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.gallery.checkStoragePermission
+import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileState
@@ -23,11 +26,12 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val listState = rememberLazyListScrollState("profile")
-    
+    val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
@@ -190,7 +194,9 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                             vm.changePhotoViewState(true)
                         }
                     }
-                    else -> nav.navigate("gallery?multi=false")
+                    else -> context.checkStoragePermission(
+                        storagePermissions, scope, asm,
+                    ) { nav.navigate("gallery?multi=false") }
                 }
             }
             

@@ -1,13 +1,8 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.viewmodel.GalleryViewModel
@@ -24,12 +19,6 @@ fun GalleryBs(
     isOnline: Boolean,
     chatId: String,
 ) {
-    val permission = rememberPermissionState(
-        if(SDK_INT < TIRAMISU) {
-            READ_EXTERNAL_STORAGE
-        } else READ_MEDIA_IMAGES
-    )
-    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
@@ -37,17 +26,11 @@ fun GalleryBs(
     val images by vm.images.collectAsState()
     
     LaunchedEffect(Unit) {
-        permission.launchPermissionRequest()
         vm.clearSelect()
+        vm.getImages()
     }
     
-    LaunchedEffect(permission.hasPermission) {
-        if(permission.hasPermission) vm.getImages()
-    }
-    
-    if(permission.hasPermission) StoragePermissionBs {
-        scope.launch { permission.launchPermissionRequest() }
-    } else GalleryBsContent(
+    GalleryBsContent(
         state = GalleryState(
             type = MULTIPLE,
             images = images,

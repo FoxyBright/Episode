@@ -50,7 +50,7 @@ private fun ChatPreview() {
         ChatContent(
             state = ChatState(
                 ChatAppBarState(
-                    name = "Название встречи",
+                    name = "",
                     avatar = DemoAvatarModel,
                     memberCount = 10,
                     chatType = TRANSLATION,
@@ -61,21 +61,19 @@ private fun ChatPreview() {
                 ),
                 answer = DemoMessageModel,
                 meet = DemoMeetingModel,
-                messageText = "Вводимое сообщение",
+                messageText = "",
                 messageList = pagingPreview(DemoMessageModelList),
-                userId = "id",
+                userId = "",
                 alert = false,
                 meetAlert = false,
                 kebabMenuState = false,
                 messageMenuState = false,
                 imageMenuState = false,
                 listState = LazyListState(),
-                unReadCount = 10,
-                writingUsers = listOf(Pair("id", DemoThumbnailModel))
+                unreadCount = 10,
+                writingUsers = listOf(Pair("", DemoThumbnailModel))
             ),
-            modifier = Modifier.background(
-                colorScheme.background
-            )
+            modifier = Modifier.background(colorScheme.background)
         )
     }
 }
@@ -93,7 +91,7 @@ data class ChatState(
     val messageMenuState: Boolean,
     val imageMenuState: Boolean,
     val listState: LazyListState,
-    val unReadCount: Int,
+    val unreadCount: Int,
     val writingUsers: List<Pair<String, ThumbnailModel>>,
     
     val photoViewState: Boolean = false,
@@ -157,7 +155,7 @@ fun ChatContent(
         floatingActionButton = {
             ChatFloatingButton(
                 state.listState,
-                state.unReadCount,
+                state.unreadCount,
                 state.meet.isOnline,
                 Modifier,
                 { callback?.onListDown() }

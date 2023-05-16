@@ -1,18 +1,17 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.annotation.SuppressLint
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.*
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.gallery.checkStoragePermission
+import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileCallback
@@ -25,7 +24,10 @@ import ru.rikmasters.gilty.shared.model.profile.RatingModel
 @Composable
 fun ProfileScreen(vm: ProfileViewModel) {
     
+    val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
+    val context = LocalContext.current
     val nav = get<NavState>()
     
     val description by vm.description.collectAsState()
@@ -64,12 +66,6 @@ fun ProfileScreen(vm: ProfileViewModel) {
         errorText = ""
     }
     
-    val permission = rememberPermissionState(
-        if(SDK_INT < TIRAMISU)
-            READ_EXTERNAL_STORAGE
-        else READ_MEDIA_IMAGES
-    )
-    
     val profileState = ProfileState(
         ProfileModel().copy(
             username = username,
@@ -103,22 +99,17 @@ fun ProfileScreen(vm: ProfileViewModel) {
             
             @SuppressLint("SuspiciousIndentation")
             override fun profileImage() {
-                if(permission.hasPermission)
+                context.checkStoragePermission(
+                    storagePermissions, scope, asm,
+                ) {
                     nav.navigateAbsolute(
                         "registration/gallery?multi=false"
                     )
-                else scope.launch {
-                    if(permission.shouldShowRationale)
-                        permission.launchPermissionRequest()
                 }
             }
             
             override fun hiddenImages() {
-                if(permission.hasPermission)
-                    nav.navigate("hidden")
-                else scope.launch {
-                    permission.launchPermissionRequest()
-                }
+                nav.navigate("hidden")
             }
             
             override fun onDescriptionChange(text: String) {
