@@ -60,7 +60,7 @@ class ChatManager(
     }
     
     // отключение от веб сокетов
-    fun disconnect() {
+    fun disconnectWebSocket() {
         webSocket.disconnect()
     }
     
@@ -76,7 +76,7 @@ class ChatManager(
     }
     
     // подключение к веб сокетам
-    suspend fun connect(userId: String) = single(JOIN) {
+    suspend fun connectWebSocket(userId: String) = single(JOIN) {
         webSocket.connect(userId)
     }
     

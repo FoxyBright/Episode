@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translations.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -7,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.core.common.CoroutineController
+import ru.rikmasters.gilty.core.viewmodel.Strategy
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
@@ -18,13 +20,19 @@ import ru.rikmasters.gilty.translations.datasource.paging.TranslationConnectedUs
 import ru.rikmasters.gilty.translations.datasource.paging.TranslationMessagesPagingSource
 import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSocket
 import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
-
 class TranslationRepository(
     private val remoteSource: TranslationWebSource,
-    private val webSocket: TranslationWebSocket,
+    private val webSocket: TranslationWebSocket
 ) : CoroutineController() {
 
     val webSocketFlow = webSocket.answer
+
+    fun disconnectWebSocket() {
+        webSocket.disconnect()
+    }
+    suspend fun connectWebSocket(userId: String) {
+        webSocket.connect(userId)
+    }
     suspend fun connectToTranslation(translationId: String) {
         withContext(Dispatchers.IO) {
             webSocket.connectToTranslation(
@@ -55,10 +63,9 @@ class TranslationRepository(
 
     suspend fun getTranslationInfo(translationId: String): DataStateTest<TranslationInfoModel> =
         coroutinesState {
-            val gh = remoteSource.getTranslationInfo(
-                translationId = translationId,
-            )
-            gh.map()
+            remoteSource.getTranslationInfo(
+                translationId = translationId
+            ).map()
         }
 
     suspend fun endTranslation(translationId: String): DataStateTest<Unit> =
@@ -148,10 +155,13 @@ class TranslationRepository(
 
     suspend fun ping(
         translationId: String,
-    ): DataStateTest<Unit> =
-        coroutinesState {
+    ): DataStateTest<Unit> {
+        Log.d("WebSoc","PINGGGGEDDD")
+        return coroutinesState {
             remoteSource.ping(
                 translationId = translationId,
             )
         }
+    }
+
 }

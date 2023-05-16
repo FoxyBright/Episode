@@ -9,13 +9,17 @@ import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
-import ru.rikmasters.gilty.shared.socket.WebSocketManager
+import ru.rikmasters.gilty.shared.socket.WebSocket
 import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
 
 data class User(val user: String, val count: String)
-class TranslationWebSocket : WebSocketManager() {
+class TranslationWebSocket : WebSocket() {
+
+    override val port: Int = 6002
+
+    override val pingInterval: Long = 10_000
 
     override suspend fun handleResponse(response: SocketResponse) {
         val event = TranslationsSocketEvents from response.event
@@ -24,6 +28,7 @@ class TranslationWebSocket : WebSocketManager() {
             TranslationsSocketEvents.PONG -> inPing = false
             TranslationsSocketEvents.PING -> {}
             TranslationsSocketEvents.CONNECTION_ESTABLISHED -> {
+                val socketID = mapper.readValue<SocketData>(response.data).socket_id
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
                 subscribe("private-translation.${translationId.value}")
             }

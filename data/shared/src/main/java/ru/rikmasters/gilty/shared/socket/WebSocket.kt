@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.socket
 
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -15,28 +16,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.shared.models.socket.Res
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import java.io.IOException
 import java.net.SocketException
 
-abstract class WebSocketManager : KtorSource() {
+abstract class WebSocket : KtorSource() {
 
-    private val socketURL =
-        "/app/local?protocol=7&client=js&version=7.2.0&flash=false"
+    private val socketUrl = "app/local?protocol=7&amp;client=js&amp;version=7.2.0&amp;flash=false"
+
     val socketId = MutableStateFlow<String?>(null)
-    private val mySession =
-        MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val _userId = MutableStateFlow("")
-    private var sessionHandlerJob: Job? = null
     var inPing: Boolean = false
 
-    abstract suspend fun handleResponse(response: SocketResponse)
+    abstract val port: Int
+    abstract val pingInterval: Long
 
+    private val _session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+
+    private var sessionHandlerJob: Job? = null
+
+    abstract suspend fun handleResponse(response: SocketResponse)
     suspend fun subscribe(
         channel: String,
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
-        data class Res(val auth: String)
+        try {
+            tryPost("http://${BuildConfig.HOST}/broadcasting/auth")
+        } catch (e: Exception) {
+            Log.d("WebSoc","Exceptionnnnnnnnn in channel $channel")
+        }
         post(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
@@ -59,7 +68,7 @@ abstract class WebSocketManager : KtorSource() {
     }
 
     suspend fun send(data: Map<String, String>, event: String) {
-        mySession.value?.send(
+        _session.value?.send(
             mapper.writeValueAsString(
                 mapOf(
                     "data" to data,
@@ -104,15 +113,15 @@ abstract class WebSocketManager : KtorSource() {
     private suspend fun connection(userId: String) = withContext(Dispatchers.IO) {
         _userId.emit(userId)
         sessionHandlerJob = launch {
-            val session = wsSession(BuildConfig.HOST, 6001, socketURL)
+            val session = wsSession(BuildConfig.HOST, port, socketUrl)
             try {
                 launch {
                     while (true) {
-                        delay(20_000)
+                        delay(pingInterval)
                         doPing(session)
                     }
                 }
-                mySession.emit(session)
+                _session.emit(session)
                 while (true) {
                     val response = session.incoming.receive()
                     logV("Frame: ${String(response.data)}")

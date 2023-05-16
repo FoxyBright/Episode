@@ -1,8 +1,7 @@
 package ru.rikmasters.gilty.chats.source.websocket
 
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.websocket.send
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.rikmasters.gilty.chats.models.chat.Chat
 import ru.rikmasters.gilty.chats.models.ws.*
@@ -17,20 +16,25 @@ import ru.rikmasters.gilty.shared.models.Thumbnail
 import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
-import ru.rikmasters.gilty.shared.socket.WebSocketManager
+import ru.rikmasters.gilty.shared.socket.WebSocket
 
 class ChatWebSocket(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
-) : WebSocketManager() {
+) : WebSocket() {
+
+    override val port: Int = 6001
+    override val pingInterval: Long = 20_000L
 
     override suspend fun handleResponse(response: SocketResponse) {
         val event = SocketEvents from response.event
         logV(event?.name.toString())
         when (event) {
             CONNECTION_ESTABLISHED -> {
+                val socketID = mapper.readValue<SocketData>(response.data).socket_id
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
-
+                Log.d("WebSoc","socketID chat $socketID")
+                Log.d("WebSoc","transId user ${_userId.value}")
                 subscribe("private-user.${_userId.value}")
             }
 
