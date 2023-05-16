@@ -7,12 +7,14 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
@@ -31,21 +33,27 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
     
+    val regexError = username.contains(Regex("[^A-Za-z\\d]"))
+    val shortUserNameError = username.length in 1 until 4
     var errorAvatar by remember { mutableStateOf(false) }
     val longUserNameError = username.length > 20
-    val shortUserNameError = username.length in 1 until 4
-    val regexError = username.contains(
-        Regex("[^A-Za-z\\d]")
-    )
     
+    val regexString =
+        stringResource(R.string.profile_username_error_regex)
+    val longUsernameString =
+        stringResource(R.string.profile_long_username)
+    val shortUsernameString =
+        stringResource(R.string.profile_short_username)
+    val usernameOccupiedString =
+        stringResource(R.string.profile_user_name_is_occupied)
     
-    var errorText by remember(username) {
+    var errorText by remember(username, occupied) {
         mutableStateOf(
             when {
-                regexError -> "Имя пользователя содержит недопустимые символы"
-                longUserNameError -> "Превышен лимит в 20 символов"
-                shortUserNameError -> "Введите минимум 4 символа"
-                occupied -> "Имя пользователя занято"
+                regexError -> regexString
+                longUserNameError -> longUsernameString
+                shortUserNameError -> shortUsernameString
+                occupied -> usernameOccupiedString
                 else -> ""
             }
         )
@@ -77,16 +85,20 @@ fun ProfileScreen(vm: ProfileViewModel) {
     )
     
     val isActive = username.isNotBlank()
-            && !occupied && !profile?.avatar
+            && !occupied
+            && !errorAvatar
+            && errorText.isBlank()
+            && !profile?.avatar
         ?.thumbnail?.url.isNullOrBlank()
     
     ProfileContent(
         profileState, isActive, Modifier,
         object: ProfileCallback {
+            
             override fun onDisabledButtonClick() {
                 errorAvatar = profile?.avatar?.thumbnail?.url == null
-                errorText = if(errorAvatar || username.isBlank())
-                    "Обязательное поле" else ""
+                if(errorAvatar || username.isBlank())
+                    errorText = "Обязательное поле"
             }
             
             @SuppressLint("SuspiciousIndentation")
@@ -136,7 +148,10 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun onNext() {
-                nav.navigate("personal")
+                scope.launch {
+                    vm.checkOnNext()
+                    nav.navigate("personal")
+                }
             }
         }
     )

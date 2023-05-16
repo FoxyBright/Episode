@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -14,6 +15,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -25,7 +27,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val listState = rememberLazyListScrollState("profile")
-
+    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
@@ -36,6 +38,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val photoAlertState by vm.photoAlertState.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val profile by vm.profile.collectAsState()
+    val username by vm.username.collectAsState()
     val occupied by vm.occupied.collectAsState()
     val history by vm.history.collectAsState()
     val menuState by vm.menu.collectAsState()
@@ -52,16 +55,36 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             unreadMessages, ACTIVE
         )
     }
-
+    
+    val regexError = username.contains(Regex("[^A-Za-z\\d]"))
+    val shortUserNameError = username.length in 1 until 4
+    val longUserNameError = username.length > 20
+    
+    val regexString =
+        stringResource(R.string.profile_username_error_regex)
+    val longUsernameString =
+        stringResource(R.string.profile_long_username)
+    val shortUsernameString =
+        stringResource(R.string.profile_short_username)
+    val usernameOccupiedString =
+        stringResource(R.string.profile_user_name_is_occupied)
+    
+    val errorText by remember(username, occupied) {
+        mutableStateOf(
+            when {
+                regexError -> regexString
+                longUserNameError -> longUsernameString
+                shortUserNameError -> shortUsernameString
+                occupied -> usernameOccupiedString
+                else -> ""
+            }
+        )
+    }
+    
     LaunchedEffect(Unit) {
         vm.setUserDate()
-        context.listenPreference(
-            key = "unread_messages",
-            defValue = 0
-        ) {
-            scope.launch {
-                vm.setUnreadMessages(it > 0)
-            }
+        context.listenPreference("unread_messages", 0) {
+            scope.launch { vm.setUnreadMessages(it > 0) }
         }
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{
@@ -71,10 +94,26 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     ProfileContent(
         UserProfileState(
-            ProfileState(profile, USERPROFILE, (false), occupied),
-            meets, meetsHistory, lastRespond, history,
-            navBar, alert, menuState, listState, photoAlertState,
-            photoViewState, viewerImages, viewerSelectImage,
+            profileState = ProfileState(
+                profile = profile?.copy(
+                    username = username
+                ),
+                profileType = USERPROFILE,
+                observeState = false,
+                errorText = errorText
+            ),
+            currentMeetings = meets,
+            meetingsHistory = meetsHistory,
+            lastRespond = lastRespond,
+            historyState = history,
+            stateList = navBar,
+            alert = alert,
+            menuState = menuState,
+            listState = listState,
+            photoAlertState = photoAlertState,
+            photoViewState = photoViewState,
+            viewerImages = viewerImages,
+            viewerSelectImage = viewerSelectImage,
         ), Modifier, object: UserProfileCallback {
             
             override fun onPhotoViewDismiss(state: Boolean) {

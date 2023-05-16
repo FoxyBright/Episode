@@ -33,7 +33,10 @@ class RegistrationManager(
     
     suspend fun getHidden(albumId: String) = withContext(IO) {
         val response = profileWebSource.getFiles(albumId)
-        Pair(response.first.map { it.map().thumbnail.url },response.second)
+        Pair(
+            response.first.map { it.map().thumbnail.url },
+            response.second
+        )
     }
     
     suspend fun setAvatar(file: File, points: List<Float>) {
@@ -62,11 +65,10 @@ class RegistrationManager(
         }
     }
     
-    suspend fun isNameOccupied(
-        name: String,
-    ) = withContext(IO) {
-        profileWebSource.checkUserName(name)
-    }
+    suspend fun isNameOccupied(name: String) =
+        withContext(IO) {
+            profileWebSource.checkUserName(name)
+        }
     
     suspend fun userUpdateData(
         username: String? = null,

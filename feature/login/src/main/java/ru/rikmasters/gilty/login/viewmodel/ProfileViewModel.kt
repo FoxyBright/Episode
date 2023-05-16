@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.login.viewmodel
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
@@ -23,23 +24,13 @@ class ProfileViewModel: ViewModel() {
     @OptIn(FlowPreview::class)
     val usernameDebounced = username
         .debounce(250)
-        .onEach {
-            val isUserName = username.value ==
-                    profile.value?.username
-            val isOccupied = if(isUserName) false
-            else {
-                try{
-                    regManager.isNameOccupied(username.value)
-                } catch(_:Exception){
-                    true
-                }
-            }
-            _occupied.emit(isOccupied)
+        .onEach { name ->
+            _occupied.emit(
+                if(name == profile.value?.username) false
+                else regManager.isNameOccupied(name)
+            )
         }
-        .state(
-            _username.value,
-            SharingStarted.Eagerly
-        )
+        .state(_username.value, Eagerly)
     
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
@@ -61,14 +52,11 @@ class ProfileViewModel: ViewModel() {
     
     suspend fun usernameChange(text: String) {
         _username.emit(text)
-        onUsernameSave()
     }
     
     suspend fun descriptionChange(text: String) {
-        if(text.length <= 120) {
+        if(text.length <= 120)
             _description.emit(text)
-            onDescriptionSave()
-        }
     }
     
     suspend fun onDescriptionSave() {
@@ -81,5 +69,14 @@ class ProfileViewModel: ViewModel() {
         regManager.userUpdateData(
             username = username.value
         )
+    }
+    
+    suspend fun checkOnNext() {
+        regManager
+            .getProfile(true)
+            .let {
+                if(it.username.isNullOrBlank())
+                    onUsernameSave()
+            }
     }
 }

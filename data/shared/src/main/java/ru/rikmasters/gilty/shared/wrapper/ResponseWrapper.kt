@@ -14,7 +14,7 @@ enum class Status {
 }
 
 data class ResponseWrapper<T: Any?>(
-    val status: Status,
+    val status: Status = Status.SUCCESS,
     val data: T,
     val error: Error? = null,
     val paginator: Paginator? = null,
@@ -54,17 +54,17 @@ data class ResponseWrapper<T: Any?>(
 }
 
 data class ErrorResponseWrapper(
-    val status: Status,
+    val status: String,
     val error: Error,
 ) {
     
     data class Error(
-        val code: String,
-        val message: String,
-        val exception: String,
-        val file: String,
-        val line: Int,
-        val trace: Any?,
+        val code: String = "",
+        val message: String = "",
+        val exception: String = "",
+        val file: String = "",
+        val line: Int = 0,
+        val trace: Any? = null,
     )
 }
 

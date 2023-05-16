@@ -166,4 +166,12 @@ open class KtorSource: WebSource() {
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
+    
+    private val unExpectClient =
+        client.config { expectSuccess = false }
+    
+    suspend fun unExpectGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.get(url, block)
 }

@@ -6,8 +6,10 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -43,9 +45,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
     
-    private val _username = MutableStateFlow<String?>(null)
-    private val username = _username.asStateFlow()
-    
     @OptIn(ExperimentalCoroutinesApi::class)
     val meetsTest by lazy {
         refresh.flatMapLatest {
@@ -62,21 +61,20 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val refresh = MutableStateFlow(false)
     
+    private val _username = MutableStateFlow("")
+    val username = _username.asStateFlow()
+    
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val usernameDebounced = username
         .debounce(250)
-        .onEach {
-            it?.let { name ->
-                _occupied.emit(
-                    regManager.isNameOccupied(name)
-                            && profileManager
-                        .getProfile(false)
-                        .username != name
-                )
-            }
+        .onEach { name ->
+            _occupied.emit(
+                if(name == profile.value?.username) false
+                else regManager.isNameOccupied(name).log()
+            )
         }
-        .state(_username.value, SharingStarted.Eagerly)
+        .state(_username.value, Eagerly)
     
     private val _photoViewState = MutableStateFlow(false)
     val photoViewState = _photoViewState.asStateFlow()
@@ -106,11 +104,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun changeUsername(name: String) {
         _username.emit(name)
-        _profile.emit(
-            profile.value?.copy(
-                username = username.value
-            )
-        )
     }
     
     private val _alert = MutableStateFlow(false)

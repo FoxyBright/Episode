@@ -22,6 +22,7 @@ import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
 import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper.Paginator
+import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 import java.io.File
@@ -104,15 +105,14 @@ class ProfileWebSource: KtorSource() {
         delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
     }
     
-    suspend fun getFiles(albumId: String): Pair<List<Avatar>,Int> = get(
+    suspend fun getFiles(albumId: String): Pair<List<Avatar>, Int> = get(
         "http://$HOST$PREFIX_URL/albums/$albumId/files"
     )?.let {
         if(it.status == OK) {
             val amount = it.paginateWrapped<List<Avatar>>()
-            Pair(amount.first,amount.second.total)
-        }
-        else null
-    } ?: (Pair(emptyList(),0))
+            Pair(amount.first, amount.second.total)
+        } else null
+    } ?: (Pair(emptyList(), 0))
     
     suspend fun addHidden(albumId: String, files: List<File>) =
         postFormData(
@@ -165,10 +165,14 @@ class ProfileWebSource: KtorSource() {
         )
     }
     
-    suspend fun checkUserName(username: String) = get(
+    suspend fun checkUserName(username: String) = unExpectGet(
         "http://$HOST$PREFIX_URL/profile/checkname"
     ) { url { query("username" to username) } }
-        ?.let { it.status.value == 400 } ?: false
+        .let {
+            if(it.status == OK) false
+            else it.errorWrapped().error.message ==
+                    "errors.user.username.exists"
+        }
     
     suspend fun setUserData(
         username: String?,
