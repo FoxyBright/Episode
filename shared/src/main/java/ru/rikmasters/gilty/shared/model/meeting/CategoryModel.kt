@@ -50,5 +50,10 @@ val DemoCategoryModelList = listOf(
     DemoCategoryModel,
     DemoCategoryModel,
     DemoCategoryModel,
-    DemoCategoryModel
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel,
+    DemoCategoryModel,
 )

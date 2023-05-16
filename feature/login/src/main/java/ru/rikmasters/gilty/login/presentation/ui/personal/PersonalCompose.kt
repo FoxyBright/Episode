@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.Companion.shortGenderList
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -61,7 +61,7 @@ fun PersonalContent(
                     .padding(top = 24.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             Card(
                 { callback?.onAgeClick() }, Modifier
@@ -90,7 +90,7 @@ fun PersonalContent(
                     .padding(top = 24.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             Card(
                 Modifier
@@ -99,16 +99,15 @@ fun PersonalContent(
                 shapes.large,
                 cardColors(colorScheme.primaryContainer)
             ) {
-                val sexList = GenderType.values().toList()
                 LazyRow(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    items(sexList.size) {
+                    items(shortGenderList.size) {
                         GChip(
                             Modifier.padding(end = 12.dp),
-                            sexList[it].value,
+                            shortGenderList[it].value,
                             (state.gender == it)
                         ) { callback?.onGenderChange(it) }
                     }

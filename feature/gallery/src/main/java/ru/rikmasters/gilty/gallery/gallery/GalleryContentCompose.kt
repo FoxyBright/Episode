@@ -94,8 +94,8 @@ fun GalleryGrid(
     ) {
         itemsIndexed(
             items = images,
-            key = { i, _ -> i },
-            contentType = { i, _ -> i }
+            key = { i, it -> "$i$it" },
+            contentType = { i, it -> "$i$it" }
         ) { _, image ->
             GalleryImage(
                 image = image,

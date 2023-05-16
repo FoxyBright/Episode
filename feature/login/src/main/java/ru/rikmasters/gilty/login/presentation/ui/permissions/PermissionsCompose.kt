@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,7 +42,7 @@ fun PermissionsContentPreview() {
 
 data class PermissionsState(
     val geopositionState: Boolean = false,
-    val notificationState: Boolean = false
+    val notificationState: Boolean = false,
 )
 
 interface PermissionsCallback {
@@ -56,7 +57,7 @@ interface PermissionsCallback {
 fun PermissionsContent(
     state: PermissionsState,
     modifier: Modifier = Modifier,
-    callback: PermissionsCallback? = null
+    callback: PermissionsCallback? = null,
 ) {
     Box(modifier.fillMaxSize()) {
         Column {
@@ -71,12 +72,15 @@ fun PermissionsContent(
                     .padding(bottom = 12.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             Column(
                 Modifier
                     .padding(horizontal = 16.dp)
-                    .background(colorScheme.background)
+                    .background(
+                        colorScheme.primaryContainer,
+                        shapes.medium
+                    )
             ) {
                 PermItem(
                     stringResource(R.string.permission_geoposition_label),
@@ -122,7 +126,7 @@ private fun PermItem(
     name: String,
     index: Int,
     state: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         { onClick() }, Modifier, (true),

@@ -92,7 +92,7 @@ fun StoragePermissionBs(
     Column(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.6f)
+            .fillMaxHeight(0.55f)
             .padding(16.dp),
         SpaceBetween
     ) {
@@ -107,7 +107,7 @@ fun StoragePermissionBs(
             Icon(
                 painter = painterResource(R.drawable.ic_image_box),
                 contentDescription = null,
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(60.dp),
                 tint = colorScheme.primary
             )
             Text(

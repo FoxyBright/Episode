@@ -291,9 +291,9 @@ private fun Description(
     Column(modifier) {
         Text(
             text = stringResource(R.string.profile_about_me),
-            color = colorScheme.tertiary,
             style = typography.labelLarge.copy(
-                fontSize = if(profileType == CREATE) 17.sp else 20.sp
+                colorScheme.tertiary,
+                if(profileType == CREATE) 17.sp else 20.sp
             )
         )
         Box(
@@ -319,7 +319,7 @@ private fun Description(
                     ORGANIZER, ANONYMOUS_ORGANIZER -> true
                     else -> false
                 },
-                textStyle = style,
+                textStyle = style.copy(colorScheme.tertiary),
                 keyboardActions = KeyboardActions {
                     focusManager.clearFocus()
                     onSaveDescription()

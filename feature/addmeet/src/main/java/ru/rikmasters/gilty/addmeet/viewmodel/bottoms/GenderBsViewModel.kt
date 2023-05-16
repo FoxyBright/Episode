@@ -38,7 +38,7 @@ class GenderBsViewModel(
 
     suspend fun getGenders() {
         val genders =
-            GenderType.fullList.map { it.value }
+            GenderType.fullGenderList.map { it.value }
         _genders.emit(genders)
     }
     
