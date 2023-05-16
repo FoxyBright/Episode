@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
+import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,6 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
-import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
@@ -29,8 +29,6 @@ class TranslationViewModel : ViewModel() {
 
     private val connected = MutableStateFlow(false)
 
-    private val translationInfo = MutableStateFlow<TranslationInfoModel?>(null)
-
     private val _translationUiState = MutableStateFlow(TranslationUiState())
     val translationUiState = _translationUiState.asStateFlow()
 
@@ -41,7 +39,7 @@ class TranslationViewModel : ViewModel() {
         // Pinging while connected
         coroutineScope.launch {
             connected.collectLatest { connected ->
-                translationInfo.value?.let { translation ->
+                _translationUiState.value.translationInfo?.let { translation ->
                     while (connected) {
                         translationRepository.ping(
                             translationId = translation.id
@@ -56,6 +54,7 @@ class TranslationViewModel : ViewModel() {
             connected.collectLatest { connected ->
                 if (connected) {
                     translationRepository.webSocketFlow.collectLatest { socketAnswers ->
+                        Log.d("TEST", "COLLECTING WEB SOCKETS")
                         when (socketAnswers) {
                             is TranslationCallbackEvents.SignalReceived -> {
                                 when (socketAnswers.signal.signal) {
@@ -164,89 +163,11 @@ class TranslationViewModel : ViewModel() {
     fun onEvent(event: TranslationEvent) {
         when (event) {
             is TranslationEvent.EnterScreen -> {
-                coroutineScope.launch {
-                    translationRepository.getTranslationInfo(
-                        translationId = event.translationId
-                    ).on(
-                        loading = {
-                            _translationUiState.update {
-                                it.copy(
-                                    isLoading = true
-                                )
-                            }
-                        },
-                        success = { translation ->
-                            _translationUiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    translationInfo = translation
-                                )
-                            }
-                        },
-                        error = { cause ->
-                            cause.serverMessage?.let {
-                                _oneTimeEvent.send(
-                                    TranslationOneTimeEvent.ErrorHappened(
-                                        errorMessage = it
-                                    )
-                                )
-                            } ?: cause.defaultMessage?.let {
-                                _oneTimeEvent.send(
-                                    TranslationOneTimeEvent.ErrorHappened(
-                                        errorMessage = it
-                                    )
-                                )
-                            }
-                        }
-                    )
-                    meetingRepository.getDetailedMeetTest(
-                        meetId = event.translationId
-                    ).on(
-                        loading = {
-                            _translationUiState.update {
-                                it.copy(
-                                    isLoading = true
-                                )
-                            }
-                        },
-                        success = { meetingModel ->
-                            _translationUiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    meetingModel = meetingModel
-                                )
-                            }
-                        },
-                        error = { cause ->
-                            cause.serverMessage?.let {
-                                _oneTimeEvent.send(
-                                    TranslationOneTimeEvent.ErrorHappened(
-                                        errorMessage = it
-                                    )
-                                )
-                            } ?: cause.defaultMessage?.let {
-                                _oneTimeEvent.send(
-                                    TranslationOneTimeEvent.ErrorHappened(
-                                        errorMessage = it
-                                    )
-                                )
-                            }
-                        }
-                    )
-                }
+                getScreenInfo(
+                    meetingId = event.meetingId
+                )
             }
-
-            TranslationEvent.ConnectToTranslation -> {
-                coroutineScope.launch {
-                    translationInfo.value?.let { translation ->
-                        translationRepository.connectToTranslation(
-                            translationId = translation.id
-                        )
-                        startPinging()
-                    }
-                }
-            }
-
+            /*
             TranslationEvent.ConnectToTranslationChat -> {
                 coroutineScope.launch {
                     translationInfo.value?.let { translation ->
@@ -256,16 +177,6 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
-
-            TranslationEvent.DisconnectFromTranslation -> {
-                coroutineScope.launch {
-                    translationInfo.value?.let {
-                        translationRepository.disconnectFromTranslation()
-                        stopPinging()
-                    }
-                }
-            }
-
             TranslationEvent.DisconnectFromTranslationChat -> {
                 coroutineScope.launch {
                     translationInfo.value?.let {
@@ -273,7 +184,7 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
-
+             */
             TranslationEvent.ChangeFacing -> {
                 _translationUiState.update {
                     it.copy(
@@ -288,6 +199,14 @@ class TranslationViewModel : ViewModel() {
                         translationStatus = TranslationStatus.STREAM
                     )
                 }
+                coroutineScope.launch {
+                    _translationUiState.value.translationInfo?.let { translation ->
+                        translationRepository.connectToTranslation(
+                            translationId = translation.id
+                        )
+                        startPinging()
+                    }
+                }
             }
 
             TranslationEvent.StopStreaming -> {
@@ -295,6 +214,33 @@ class TranslationViewModel : ViewModel() {
                     it.copy(
                         translationStatus = TranslationStatus.PREVIEW
                     )
+                }
+                coroutineScope.launch {
+                    translationRepository.disconnectFromTranslation()
+                    stopPinging()
+                }
+            }
+
+            TranslationEvent.ChangeMicrophoneState -> {
+                _translationUiState.value.translationInfo?.let { translation ->
+                    coroutineScope.launch {
+                        translationRepository.sendSignal(
+                            translationId = translation.id,
+                            signalType = TranslationSignalTypeModel.MICROPHONE,
+                            value = translation.microphone?.let { !it } ?: true
+                        )
+                    }
+                }
+            }
+            TranslationEvent.ChangeVideoState -> {
+                _translationUiState.value.translationInfo?.let { translation ->
+                    coroutineScope.launch {
+                        translationRepository.sendSignal(
+                            translationId = translation.id,
+                            signalType = TranslationSignalTypeModel.CAMERA,
+                            value = translation.camera?.let { !it } ?: true
+                        )
+                    }
                 }
             }
         }
@@ -306,6 +252,79 @@ class TranslationViewModel : ViewModel() {
 
     private fun stopPinging() {
         connected.value = false
+    }
+
+    private fun getScreenInfo(meetingId: String) {
+        coroutineScope.launch {
+            translationRepository.getTranslationInfo(
+                translationId = meetingId
+            ).on(
+                loading = {
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
+                },
+                success = { translation ->
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            translationInfo = translation
+                        )
+                    }
+                },
+                error = { cause ->
+                    cause.serverMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    } ?: cause.defaultMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    }
+                }
+            )
+            meetingRepository.getDetailedMeetTest(
+                meetId = meetingId
+            ).on(
+                loading = {
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
+                },
+                success = { meetingModel ->
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            meetingModel = meetingModel
+                        )
+                    }
+                },
+                error = { cause ->
+                    cause.serverMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    } ?: cause.defaultMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    }
+                }
+            )
+        }
     }
 
 }

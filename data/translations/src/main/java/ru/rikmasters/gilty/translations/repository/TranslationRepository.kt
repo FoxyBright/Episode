@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.core.common.CoroutineController
 import ru.rikmasters.gilty.core.viewmodel.Strategy
+import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
@@ -30,7 +31,8 @@ class TranslationRepository(
     fun disconnectWebSocket() {
         webSocket.disconnect()
     }
-    suspend fun connectWebSocket(userId: String) {
+    suspend fun connectWebSocket(userId: String, translationId: String) {
+        webSocket.updateTranslationId(translationId)
         webSocket.connect(userId)
     }
     suspend fun connectToTranslation(translationId: String) {

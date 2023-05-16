@@ -41,11 +41,7 @@ abstract class WebSocket : KtorSource() {
         channel: String,
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
-        try {
-            tryPost("http://${BuildConfig.HOST}/broadcasting/auth")
-        } catch (e: Exception) {
-            Log.d("WebSoc","Exceptionnnnnnnnn in channel $channel")
-        }
+        Log.d("TranslationWeb","Subscribing CHANNEL $channel")
         post(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
@@ -119,6 +115,7 @@ abstract class WebSocket : KtorSource() {
                     while (true) {
                         delay(pingInterval)
                         doPing(session)
+                        Log.d("WebSoc","PINGING WITH $port")
                     }
                 }
                 _session.emit(session)

@@ -21,6 +21,10 @@ class TranslationWebSocket : WebSocket() {
 
     override val pingInterval: Long = 10_000
 
+    fun updateTranslationId(translationId: String) {
+        _translationId.value = translationId
+    }
+
     override suspend fun handleResponse(response: SocketResponse) {
         val event = TranslationsSocketEvents from response.event
         logV(event?.name.toString())
@@ -28,9 +32,8 @@ class TranslationWebSocket : WebSocket() {
             TranslationsSocketEvents.PONG -> inPing = false
             TranslationsSocketEvents.PING -> {}
             TranslationsSocketEvents.CONNECTION_ESTABLISHED -> {
-                val socketID = mapper.readValue<SocketData>(response.data).socket_id
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
-                subscribe("private-translation.${translationId.value}")
+                subscribe("private-translation.${_translationId.value}")
             }
 
             TranslationsSocketEvents.SUBSCRIPTION_SUCCEEDED -> {
@@ -109,22 +112,23 @@ class TranslationWebSocket : WebSocket() {
         }
     }
 
-    private val translationId = MutableStateFlow<String?>(null)
+    private val _translationId = MutableStateFlow<String?>(null)
 
     private val _answer = Channel<TranslationCallbackEvents>()
     val answer = _answer.receiveAsFlow()
 
     suspend fun connectToTranslation(id: String) {
         disconnectFromTranslation()
-        subscribe("private-translation.$id.$_userId") {
-            if (it) translationId.emit(id)
+        Log.d("TranslationWeb","CONNECT TRY WITH USERID ${_userId.value} TRRRID $id")
+        subscribe("private-translation.$id.${_userId.value}") {
+            if (it) _translationId.emit(id)
         }
     }
 
     suspend fun disconnectFromTranslation() {
-        translationId.value?.let {
+        _translationId.value?.let {
             send(
-                data = mapOf("channel" to "private-translation.$it.$_userId"),
+                data = mapOf("channel" to "private-translation.$it.${_userId.value}"),
                 event = TranslationsSocketEvents.UNSUBSCRIBE.value,
             )
         }
@@ -133,12 +137,12 @@ class TranslationWebSocket : WebSocket() {
     suspend fun connectToTranslationChat(id: String) {
         disconnectFromTranslationChat()
         subscribe("private-translation.${id}_chat") {
-            if (it) translationId.emit(id)
+            if (it) _translationId.emit(id)
         }
     }
 
     suspend fun disconnectFromTranslationChat() {
-        translationId.value?.let {
+        _translationId.value?.let {
             send(
                 data = mapOf("channel" to "private-translation.${it}_chat"),
                 event = TranslationsSocketEvents.UNSUBSCRIBE.value,

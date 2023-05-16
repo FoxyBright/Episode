@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -8,10 +7,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import com.pedro.encoder.input.gl.render.filters.BlurFilterRender
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
+import kotlinx.coroutines.flow.collectLatest
 import ru.rikmasters.gilty.translation.event.TranslationEvent
+import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.presentation.ui.content.TranslationScreen
@@ -22,17 +27,27 @@ fun TestTranslationScreen(
     vm: TranslationViewModel,
     translationId: String
 ) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
     LaunchedEffect(Unit) {
         vm.onEvent(
             TranslationEvent.EnterScreen(
-                translationId = translationId
+                meetingId = translationId
             )
         )
     }
 
-    val translationScreenState by vm.translationUiState.collectAsState()
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            vm.oneTimeEvent.collectLatest { event ->
+                when(event) {
+                    is TranslationOneTimeEvent.ErrorHappened -> TODO()
+                }
+            }
+        }
+    }
 
-    Log.d("TEST","STate ${translationScreenState.translationStatus}")
+    val translationScreenState by vm.translationUiState.collectAsState()
 
     var camera by remember { mutableStateOf<RtmpCamera2?>(null) }
 
@@ -42,6 +57,34 @@ fun TestTranslationScreen(
             || translationScreenState.selectedCamera == Facing.BACK && it.cameraFacing != CameraHelper.Facing.BACK
         ) {
             it.switchCamera()
+        }
+    }
+
+    LaunchedEffect(translationScreenState.translationInfo?.microphone) {
+        camera?.let { camera ->
+            translationScreenState.translationInfo?.microphone?.let { enabled ->
+                if (enabled) {
+                    camera.enableAudio()
+                } else {
+                    camera.disableAudio()
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(translationScreenState.translationInfo?.camera) {
+        camera?.let { camera ->
+            translationScreenState.translationInfo?.camera?.let { enabled ->
+                if (enabled) {
+                    camera.glInterface.unMuteVideo()
+                    camera.glInterface.clearFilters()
+                    camera.resumeRecord()
+                } else {
+                    camera.glInterface.muteVideo()
+                    camera.glInterface.addFilter(BlurFilterRender())
+                    camera.pauseRecord()
+                }
+            }
         }
     }
 
@@ -61,6 +104,7 @@ fun TestTranslationScreen(
                     vm.onEvent(TranslationEvent.StartStreaming)
                 } else {
                     streamState = StreamState.STOP
+                    vm.onEvent(TranslationEvent.StopStreaming)
                 }
             } else {
                 it.stopStream()
@@ -97,17 +141,15 @@ fun TestTranslationScreen(
             vm.onEvent(TranslationEvent.ChangeFacing)
         },
         onCameraClicked = {
-
+            vm.onEvent(TranslationEvent.ChangeVideoState)
         },
         onMicrophoneClicked = {
-
+            vm.onEvent(TranslationEvent.ChangeMicrophoneState)
         },
         initCamera = { view ->
-            Log.d("TEST","INITED $view")
             camera = RtmpCamera2(view, connectionChecker)
         },
         startStreamPreview = {
-            Log.d("TEST","Start Preview")
             camera?.startPreview()
         },
         stopStreamPreview = {
