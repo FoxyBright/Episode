@@ -41,7 +41,7 @@ interface PersonalCallback {
 
 data class PersonalState(
     val age: Int? = null,
-    val selectGender: Int? = null,
+    val gender: Int? = null,
 )
 
 @Composable
@@ -109,7 +109,7 @@ fun PersonalContent(
                         GChip(
                             Modifier.padding(end = 12.dp),
                             sexList[it].value,
-                            (state.selectGender == it)
+                            (state.gender == it)
                         ) { callback?.onGenderChange(it) }
                     }
                 }
@@ -120,7 +120,8 @@ fun PersonalContent(
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(BottomCenter),
-            stringResource(R.string.next_button), (true)
+            stringResource(R.string.next_button),
+            (state.age != null && state.gender != null)
         ) { callback?.onNext() }
     }
 }

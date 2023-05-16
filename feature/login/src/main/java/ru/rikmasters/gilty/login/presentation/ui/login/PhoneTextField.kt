@@ -101,7 +101,12 @@ fun PhoneTextField(
             focusManager.clearFocus()
         },
         visualTransformation = transform,
-        clear = if(focused) onClear else null,
+        clear = if(
+            focused && value.length != country
+                .clearPhoneDial.length
+            
+            
+        ) onClear else null,
         singleLine = true,
         containerColor = Transparent
     )

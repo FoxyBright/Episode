@@ -7,17 +7,14 @@ import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 
-var UserAge: Int? = null
-var UserGender: GenderType? = null
-
 class PersonalViewModel: ViewModel() {
     
     private val regManager by inject<RegistrationManager>()
     
-    private val _age = MutableStateFlow(18)
+    private val _age = MutableStateFlow<Int?>(null)
     val age = _age.asStateFlow()
     
-    private val _gender = MutableStateFlow(0)
+    private val _gender = MutableStateFlow<Int?>(null)
     val gender = _gender.asStateFlow()
     
     suspend fun setGender(index: Int) = singleLoading {
