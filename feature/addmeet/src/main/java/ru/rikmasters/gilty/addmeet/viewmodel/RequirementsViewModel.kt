@@ -61,8 +61,8 @@ class RequirementsViewModel: ViewModel() {
     private val _memberCount = MutableStateFlow("")
     val memberCount = _memberCount.asStateFlow()
     
-    private val _tabs = MutableStateFlow(0)
-    val tabs = _tabs.asStateFlow()
+    private val _selectedTab = MutableStateFlow(0)
+    val selectedTab = _selectedTab.asStateFlow()
     
     private val _selectMember = MutableStateFlow(0)
     val selectMember = _selectMember.asStateFlow()
@@ -138,7 +138,7 @@ class RequirementsViewModel: ViewModel() {
     }
     
     suspend fun changeTab(tab: Int) {
-        _tabs.emit(tab)
+        _selectedTab.emit(tab)
         RequirementsType = tab
     }
     
@@ -212,8 +212,12 @@ class RequirementsViewModel: ViewModel() {
         manager.update(memberCount = text)
         
         if(text.isBlank() || text.toInt() < 2) {
-            _tabs.emit(0)
+            _selectedTab.emit(0)
             _selectMember.emit(0)
+        }
+
+        if(text.isNotBlank() && text.toInt() < _selectMember.value + 1){
+            _selectMember.emit(text.toInt() - 1)
         }
         
         try {

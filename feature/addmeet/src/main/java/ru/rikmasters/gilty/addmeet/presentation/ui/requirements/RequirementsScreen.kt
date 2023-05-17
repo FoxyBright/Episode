@@ -42,7 +42,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     val alert by vm.alert.collectAsState()
     val gender by vm.gender.collectAsState()
     val age by vm.age.collectAsState()
-    val tabs by vm.tabs.collectAsState()
+    val selectedTab by vm.selectedTab.collectAsState()
     
     val meetType by vm.meetType.collectAsState()
     val online by vm.online.collectAsState()
@@ -57,7 +57,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     
     fun checkRequirements(): Boolean {
         requirements.ifEmpty { return true }
-        if(tabs == 0) reqControl(requirements.first())
+        if(selectedTab == 0) reqControl(requirements.first())
         else requirements.forEach {
             if(reqControl(it)) return false
         }
@@ -83,7 +83,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
     RequirementsContent(
         RequirementsState(
             private, count, getGender(gender), age,
-            getOrientation(orientation), tabs,
+            getOrientation(orientation), selectedTab,
             member, alert, meetType, online,
             isActive, withoutRespond, memberLimited
         ), Modifier, object: RequirementsCallback {
