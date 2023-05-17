@@ -8,17 +8,23 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.BitmapFactory.decodeResource
 import android.location.Location
 import android.view.LayoutInflater
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat.checkSelfPermission
@@ -36,7 +42,7 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory.getInstance
 import com.yandex.mapkit.search.SearchManager
-import com.yandex.mapkit.search.SearchManagerType.ONLINE
+import com.yandex.mapkit.search.SearchManagerType.COMBINED
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.Session.SearchListener
 import com.yandex.runtime.Error
@@ -46,6 +52,7 @@ import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.feature.yandexmap.R
 import ru.rikmasters.gilty.shared.R.drawable.*
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
+import kotlin.math.roundToInt
 
 data class MeetPlace(
     val lat: Double?,
@@ -60,6 +67,32 @@ fun MapContent(
     modifier: Modifier = Modifier,
     callback: YandexMapCallback? = null,
 ) {
+    val offsetY: Animatable<Float, AnimationVector1D> =  remember { Animatable(0f) }
+    val currentPointerImage = remember{
+        mutableStateOf(ic_not_selected_pointer)
+    }
+    LaunchedEffect(key1 =  state.isSearching , block = {
+        if(state.isSearching && offsetY.value == 0f){
+            currentPointerImage.value = ic_not_selected_pointer
+            offsetY.animateTo(
+                targetValue = -75f,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    delayMillis = 0
+                )
+            )
+        }else if(!state.isSearching) {
+            offsetY.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    delayMillis = 0
+                )
+            )
+            currentPointerImage.value = ic_selected_pointer
+        }
+    })
+
     Box(modifier) {
         AndroidView(
             { context ->
@@ -70,7 +103,6 @@ fun MapContent(
                     .getProperties(state)
                 
                 properties.map.moveCamera(properties.point)
-                
                 if(!state.categoryName.isNullOrBlank())
                     properties.getPoints(context, properties, callback)
                 else
@@ -95,10 +127,13 @@ fun MapContent(
                 .align(Center)
         ) {
             Image(
-                painterResource(ic_pin),
+                painterResource(currentPointerImage.value),
                 (null), Modifier
                     .size(42.dp)
                     .align(TopCenter)
+                    .offset {
+                        IntOffset(0, offsetY.value.roundToInt())
+                    }
             )
         }
     }
@@ -151,7 +186,8 @@ private fun MapProperties.getPoints(
     callback: YandexMapCallback?,
 ) {
     map.map.addCameraListener { map, position, _, finished ->
-        search(map, position) { points ->
+        callback?.onCameraChange(position.target)
+        search(map, position, callback) { points ->
             val nearest by mutableStateOf(
                 position.target near points.map { it.first }
             )
@@ -175,9 +211,27 @@ private fun MapProperties.getPoints(
 
 private fun MapProperties.search(
     camMap: Map, position: CameraPosition,
+    callback: YandexMapCallback?,
     onUpdate: (List<Pair<Point, Item>>) -> Unit,
 ) {
     val list = mutableListOf<Pair<Point, Item>>()
+
+        searchManager.submit(Point(position.target.latitude, position.target.longitude),
+            null, SearchOptions(), object : SearchListener {
+                override fun onSearchResponse(p0: Response) {
+                    callback?.onMarkerClick(
+                        MeetPlace(
+                            position.target.latitude,
+                            position.target.longitude,
+                            p0.collection.children[0].obj?.descriptionText.toString(),
+                            p0.collection.children[0].obj?.name.toString()
+                        )
+                    )
+                }
+
+                override fun onSearchError(p0: Error) {}
+
+            })
     searchManager.submit(
         searchText, toPolygon(camMap.visibleRegion(position)),
         SearchOptions(), object: SearchListener {
@@ -220,7 +274,7 @@ private fun MapView.getProperties(
         it?.lng ?: 0.0
     )
     MapProperties(
-        searchManager = getInstance().createSearchManager(ONLINE),
+        searchManager = getInstance().createSearchManager(COMBINED),
         obj = this.map.mapObjects,
         searchText = state.categoryName ?: "",
         map = this,
