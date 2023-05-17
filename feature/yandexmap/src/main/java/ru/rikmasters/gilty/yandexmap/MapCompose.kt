@@ -216,7 +216,7 @@ private fun MapProperties.search(
 ) {
     val list = mutableListOf<Pair<Point, Item>>()
 
-        searchManager.submit(Point(position.target.latitude, position.target.longitude),
+    searchManager.submit(Point(position.target.latitude, position.target.longitude),
             null, SearchOptions(), object : SearchListener {
                 override fun onSearchResponse(p0: Response) {
                     callback?.onMarkerClick(
