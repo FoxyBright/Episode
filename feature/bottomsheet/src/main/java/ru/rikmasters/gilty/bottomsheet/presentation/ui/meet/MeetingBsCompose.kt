@@ -169,10 +169,6 @@ fun MeetingBsContent(
     val bsState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(Collapsed)
     )
-    //    val alpha = animateFloatAsState(
-    //            if(bsState.bottomSheetState.isCollapsed)
-    //                0f else 0.5f
-    //        ).value
     BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)

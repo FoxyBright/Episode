@@ -43,17 +43,20 @@ fun OrganizerBs(
     }
     
     val profileState = ProfileState(
-        profile, if(meetState == ANONYMOUS)
+        profile = profile,
+        profileType = if(meetState == ANONYMOUS)
             ANONYMOUS_ORGANIZER else ORGANIZER,
-        observeState, (false),
-        profile.hiddenAccess
+        observeState = observeState,
+        lockState = profile.hiddenAccess,
+        isError = false,
+        errorText = ""
     )
     
     OrganizerContent(
         UserState(
             profileState, meets, backButton,
             menuState, isMyProfile, photoViewState,
-            viewerImages, viewerSelectImage
+            viewerImages, viewerSelectImage,
         ), Modifier, object: OrganizerCallback {
             
             override fun profileImage() {
@@ -63,11 +66,11 @@ fun OrganizerBs(
                     vm.changePhotoViewState(true)
                 }
             }
-        
+            
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
-        
+            
             override fun onMenuItemSelect(point: Int, userId: String?) {
                 nav.navigate("REPORTS?id=$userId&type=$PROFILE")
                 this.onMenuDismiss(false)

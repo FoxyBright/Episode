@@ -71,12 +71,13 @@ fun CategoryItem(
     state: Boolean,
     modifier: Modifier = Modifier,
     iconBottomState: Boolean = true,
-    onClick: ((Boolean) -> Unit)? = null
+    size: Int = CATEGORY_ELEMENT_SIZE,
+    onClick: ((Boolean) -> Unit)? = null,
 ) {
-    Box(modifier.size((CATEGORY_ELEMENT_SIZE).dp)) {
+    Box(modifier.size((size).dp)) {
         Box(
             Modifier
-                .size(CATEGORY_ELEMENT_SIZE.dp)
+                .size(size.dp)
                 .clip(CircleShape)
                 .background(
                     if(state) color
@@ -95,19 +96,13 @@ fun CategoryItem(
         }
         Box(
             Modifier
-                .size((CATEGORY_ELEMENT_SIZE / 3).dp)
+                .size((size / 3).dp)
                 .clip(CircleShape)
                 .background(White)
                 .align(
                     if(iconBottomState)
                         BottomStart else TopEnd
                 ), Center
-        ) {
-            GEmojiImage(
-                icon, Modifier.size(
-                    (CATEGORY_ELEMENT_SIZE / 6).dp
-                )
-            )
-        }
+        ) { GEmojiImage(icon, Modifier.size((size / 6).dp)) }
     }
 }
