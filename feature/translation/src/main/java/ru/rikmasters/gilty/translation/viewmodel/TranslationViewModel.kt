@@ -1,10 +1,14 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,6 +33,34 @@ class TranslationViewModel : ViewModel() {
 
     private val connected = MutableStateFlow(false)
 
+    private val userIsOpened = MutableStateFlow(false)
+
+    private val _usersQuery = MutableStateFlow("")
+    val usersQuery = _usersQuery.asStateFlow()
+
+    // Открыт ли боттом шит, состояние поиска
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val connectedUsers = combine(
+        userIsOpened,
+        _usersQuery
+    ) { isOpened, query ->
+        Pair(isOpened, query)
+    }.flatMapLatest { (isOpened, query) ->
+        // Если открыт ботомшит
+        if (isOpened) {
+            // Если id трансляции существует
+            translationUiState.value.translationInfo?.let { translation ->
+                translationRepository.getConnectedUsers(
+                    translationId = translation.id,
+                    query = query
+                )
+            } ?: flow { }
+        } else {
+            // БотомШит закрыт
+            flow { }
+        }
+    }
+
     private val _translationUiState = MutableStateFlow(TranslationUiState())
     val translationUiState = _translationUiState.asStateFlow()
 
@@ -39,6 +71,7 @@ class TranslationViewModel : ViewModel() {
     val remainTime = _remainTime.asStateFlow()
 
     init {
+        // Timer
         coroutineScope.launch {
             connected.collectLatest { connected ->
                 _translationUiState.value.translationInfo?.let {
@@ -262,6 +295,29 @@ class TranslationViewModel : ViewModel() {
                             signalType = TranslationSignalTypeModel.CAMERA,
                             value = translation.camera?.let { !it } ?: true
                         )
+                    }
+                }
+            }
+
+            is TranslationEvent.UserBottomSheetOpened -> {
+                // Ботом шит участников трансляции
+                userIsOpened.value = event.isOpened
+            }
+
+            is TranslationEvent.UserBottomSheetQueryChanged -> {
+                // Состояние поиска ботом шита участников трансляции
+                _usersQuery.value = event.newQuery
+            }
+
+            is TranslationEvent.KickUser -> {
+                coroutineScope.launch {
+                    _translationUiState.value.translationInfo?.let { translation ->
+                        event.user.id?.let { userId ->
+                            translationRepository.kickUser(
+                                translationId = translation.id,
+                                userId = userId
+                            )
+                        }
                     }
                 }
             }

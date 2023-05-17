@@ -387,5 +387,10 @@
     <string name="translations_start_strean">Начать</string>
     <string name="translations_micro_off_organizer">Вы выключили микрофон</string>
     <string name="translations_members">Участники</string>
+    <string name="translations_members_complain">Пожаловаться</string>
+    <string name="translations_members_delete">Удалить</string>
+    <string name="translations_members_cancel">Отменить</string>
+    <string name="translations_members_delete_title">Удалить участника</string>
+    <string name="translations_members_delete_label">Вы действительно хотите удалить участника?</string>
 
 </resources>
