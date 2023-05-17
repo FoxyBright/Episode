@@ -13,11 +13,7 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
@@ -67,12 +63,13 @@ fun MapContent(
     modifier: Modifier = Modifier,
     callback: YandexMapCallback? = null,
 ) {
-    val offsetY: Animatable<Float, AnimationVector1D> =  remember { Animatable(0f) }
-    val currentPointerImage = remember{
+    val offsetY: Animatable<Float, AnimationVector1D> =
+        remember { Animatable(0f) }
+    val currentPointerImage = remember {
         mutableStateOf(ic_not_selected_pointer)
     }
-    LaunchedEffect(key1 =  state.isSearching , block = {
-        if(state.isSearching && offsetY.value == 0f){
+    LaunchedEffect(key1 = state.isSearching, block = {
+        if(state.isSearching && offsetY.value == 0f) {
             currentPointerImage.value = ic_not_selected_pointer
             offsetY.animateTo(
                 targetValue = -75f,
@@ -81,7 +78,7 @@ fun MapContent(
                     delayMillis = 0
                 )
             )
-        }else if(!state.isSearching) {
+        } else if(!state.isSearching) {
             offsetY.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
@@ -92,7 +89,7 @@ fun MapContent(
             currentPointerImage.value = ic_selected_pointer
         }
     })
-
+    
     Box(modifier) {
         AndroidView(
             { context ->
@@ -108,13 +105,18 @@ fun MapContent(
                 else
                     (properties.obj to properties.point)
                         .let { (obj, it) ->
-                            if(state.location?.hide != false) obj.addMapCircle(it)
+                            if(state.location?.hide != false) obj.addMapCircle(
+                                it
+                            )
                             else obj.addMarker(it, context, ic_location)
                         }
                 
                 context.reqPermissions()
                 
-                state.mapKit.userLocation(properties.map, state.userVisible)
+                state.mapKit.userLocation(
+                    properties.map,
+                    state.userVisible
+                )
                 
                 state.mapKit.onStart()
                 properties.map
@@ -215,23 +217,29 @@ private fun MapProperties.search(
     onUpdate: (List<Pair<Point, Item>>) -> Unit,
 ) {
     val list = mutableListOf<Pair<Point, Item>>()
-
-        searchManager.submit(Point(position.target.latitude, position.target.longitude),
-            null, SearchOptions(), object : SearchListener {
-                override fun onSearchResponse(p0: Response) {
-                    callback?.onMarkerClick(
-                        MeetPlace(
-                            position.target.latitude,
-                            position.target.longitude,
-                            p0.collection.children[0].obj?.descriptionText.toString(),
-                            p0.collection.children[0].obj?.name.toString()
-                        )
+    
+    searchManager.submit(
+        Point(
+            position.target.latitude,
+            position.target.longitude
+        ), null, SearchOptions(), object: SearchListener {
+            override fun onSearchResponse(p0: Response) {
+                callback?.onMarkerClick(
+                    MeetPlace(
+                        lat = position.target.latitude,
+                        lng = position.target.longitude,
+                        place = p0.collection.children[0].obj
+                            ?.descriptionText.toString(),
+                        address = p0.collection.children[0].obj
+                            ?.name.toString()
                     )
-                }
-
-                override fun onSearchError(p0: Error) {}
-
-            })
+                )
+            }
+            
+            override fun onSearchError(p0: Error) {}
+        }
+    )
+    
     searchManager.submit(
         searchText, toPolygon(camMap.visibleRegion(position)),
         SearchOptions(), object: SearchListener {
@@ -274,7 +282,8 @@ private fun MapView.getProperties(
         it?.lng ?: 0.0
     )
     MapProperties(
-        searchManager = getInstance().createSearchManager(COMBINED),
+        searchManager = getInstance()
+            .createSearchManager(COMBINED),
         obj = this.map.mapObjects,
         searchText = state.categoryName ?: "",
         map = this,
@@ -328,16 +337,15 @@ private fun MapObjectCollection.addMapCircle(
 ).let { it.zIndex = 100f }
 
 private fun Context.reqPermissions() {
-    if(checkSelfPermission(
-            (this), ACCESS_FINE_LOCATION
-        ) != PERMISSION_GRANTED
-        && checkSelfPermission(
-            (this), ACCESS_COARSE_LOCATION
-        ) != PERMISSION_GRANTED
-    ) requestPermissions(
-        this as Activity, arrayOf(
-            ACCESS_FINE_LOCATION,
-            ACCESS_COARSE_LOCATION
-        ), (0)
-    )
+    this as Activity
+    val perms =
+        ACCESS_FINE_LOCATION to ACCESS_COARSE_LOCATION
+    
+    perms.let { (fine, coarse) ->
+        if(checkPerm(fine) && checkPerm(coarse))
+            requestPermissions((this), arrayOf(fine, coarse), (0))
+    }
 }
+
+private fun Context.checkPerm(perm: String) =
+    checkSelfPermission((this), perm) == PERMISSION_GRANTED
