@@ -2,64 +2,47 @@ package ru.rikmasters.gilty.gallery.gallery
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.os.Environment.MEDIA_MOUNTED
 import android.os.Environment.getExternalStorageState
 import android.provider.MediaStore.Images.Media.*
 import android.provider.MediaStore.MediaColumns.DATA
 
-class GalleryAdapter {
+object GalleryAdapter {
     
-    companion object {
+    private val uri = EXTERNAL_CONTENT_URI
+    private val protection = arrayOf(
+        DATA, "bucket_display_name"
+    )
+    
+    private fun Context.onCreateLoader() = contentResolver
+        .query(uri, protection, (null), (null), DATE_MODIFIED)
+    
+    @SuppressLint("Range")
+    fun getImages(
+        context: Context,
+        filter: String = "",
+    ): MutableList<String> {
+        val imgList = arrayListOf<String>()
         
-        @SuppressLint("Range")
-        fun getImages(
-            context: Context,
-            filter: String? = null,
-        ): MutableList<String> {
-            // creating variable
-            val imgList: MutableList<String> = ArrayList()
-            // check permissions
-            (if(getExternalStorageState() == MEDIA_MOUNTED) {
-                // get cursor
-                onCreateLoader(context)?.let { cursor ->
-                    // iterating through the list
-                    repeat(cursor.count - 1) { index ->
-                        try {
-                            // moving the cursor
-                            cursor.moveToPosition(index + 1)
-                            // get file path
-                            imgList.add(
-                                cursor.getString(
-                                    cursor.getColumnIndex(DATA)
-                                )
-                            )
-                            // filter image list
-                            filter?.let {
-                                imgList.filter {
-                                    it.contains("/$filter")
-                                }
-                            }
-                        } catch(e: Exception) {
-                            e.stackTraceToString()
-                        }
+        val permission =
+            getExternalStorageState() == MEDIA_MOUNTED
+        
+        if(permission) context
+            .onCreateLoader()
+            ?.let { cursor ->
+                repeat(cursor.count - 1) { i ->
+                    cursor.moveToPosition((i + 1))
+                    cursor.getString(
+                        cursor.getColumnIndex(DATA)
+                    ).let {
+                        if(it.contains("/$filter"))
+                            imgList.add(it)
                     }
-                    cursor.close()
                 }
-            } else emptyList<String>())
-            // result
-            return imgList
-        }
+                
+                cursor.close()
+            }
         
-        private fun onCreateLoader(
-            context: Context,
-            uri: Uri = EXTERNAL_CONTENT_URI,
-            protection: Array<String> = arrayOf(DATA, BUCKET_DISPLAY_NAME),
-            selection: String? = null,
-            selectionArgs: Array<String>? = null,
-            sortOrder: String = DATE_MODIFIED,
-        ) = context.contentResolver.query(
-            uri, protection, selection, selectionArgs, sortOrder
-        )
+        return imgList
     }
 }

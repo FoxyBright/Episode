@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.getImages
 import ru.rikmasters.gilty.shared.shared.compress
-import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.Companion.getImages
 import java.io.File
 
 
@@ -60,10 +60,6 @@ class GalleryViewModel: ViewModel() {
     
     suspend fun menuDismiss(state: Boolean) {
         _menuState.emit(state)
-    }
-    
-    suspend fun kebab() {
-        makeToast("В меню пока пусто")
     }
     
     suspend fun onMenuItemClick(item: String) {
