@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -7,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,13 +17,17 @@ import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import kotlinx.coroutines.flow.collectLatest
+import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.presentation.ui.content.TranslationScreen
+import ru.rikmasters.gilty.translation.presentation.ui.content.UsersBottomSheetContent
 import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestTranslationScreen(
     vm: TranslationViewModel,
@@ -92,6 +98,8 @@ fun TestTranslationScreen(
 
     var streamState by remember { mutableStateOf(StreamState.STOP) }
 
+    val configuration = LocalConfiguration.current
+
     fun stopBroadcast() {
         camera?.stopStream()
         vm.onEvent(TranslationEvent.StopStreaming)
@@ -133,42 +141,55 @@ fun TestTranslationScreen(
         }
     }
 
-    TranslationScreen(
-        translationStatus = translationScreenState.translationStatus?: TranslationStatus.PREVIEW,
-        onCloseClicked = {
-            stopBroadcast()
-        },
-        translationUiState = translationScreenState,
-        changeFacing = {
-            vm.onEvent(TranslationEvent.ChangeFacing)
-        },
-        onCameraClicked = {
-            vm.onEvent(TranslationEvent.ChangeVideoState)
-        },
-        onMicrophoneClicked = {
-            vm.onEvent(TranslationEvent.ChangeMicrophoneState)
-        },
-        initCamera = { view ->
-            camera = RtmpCamera2(view, connectionChecker)
-        },
-        startStreamPreview = {
-            camera?.startPreview()
-        },
-        stopStreamPreview = {
-            camera?.stopPreview()
-        },
-        startStream = {
-            translationScreenState.translationInfo?.let {
-                startBroadCast(
-                    rtmpUrl = it.rtmp
-                )
-            }
-        },
-        remainTime = remainTime,
-        userCount = ,
-        onChatClicked = {},
-        onUsersClicked = {}
-    )
+    BottomSheetScaffold(
+        sheetContent = {
+            UsersBottomSheetContent(
+                configuration = configuration,
+                membersCount = translationScreenState.membersCount ?: 0,
+                onSearch = {},
+                users = //TODO
+                ,
+                onMoreClicked = //TODO
+            )
+        }
+    ) {
+        TranslationScreen(
+            translationStatus = translationScreenState.translationStatus?: TranslationStatus.PREVIEW,
+            onCloseClicked = {
+                stopBroadcast()
+            },
+            translationUiState = translationScreenState,
+            changeFacing = {
+                vm.onEvent(TranslationEvent.ChangeFacing)
+            },
+            onCameraClicked = {
+                vm.onEvent(TranslationEvent.ChangeVideoState)
+            },
+            onMicrophoneClicked = {
+                vm.onEvent(TranslationEvent.ChangeMicrophoneState)
+            },
+            initCamera = { view ->
+                camera = RtmpCamera2(view, connectionChecker)
+            },
+            startStreamPreview = {
+                camera?.startPreview()
+            },
+            stopStreamPreview = {
+                camera?.stopPreview()
+            },
+            startStream = {
+                translationScreenState.translationInfo?.let {
+                    startBroadCast(
+                        rtmpUrl = it.rtmp
+                    )
+                }
+            },
+            remainTime = remainTime,
+            userCount = translationScreenState.membersCount ?: 0,
+            onChatClicked = {},
+            onUsersClicked = {}
+        )
+    }
 }
 
 private enum class StreamState {

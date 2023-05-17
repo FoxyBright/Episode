@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
-import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +21,6 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class TranslationViewModel : ViewModel() {
 
@@ -79,7 +76,6 @@ class TranslationViewModel : ViewModel() {
             connected.collectLatest { connected ->
                 if (connected) {
                     translationRepository.webSocketFlow.collectLatest { socketAnswers ->
-                        Log.d("TEST", "COLLECTING WEB SOCKETS")
                         when (socketAnswers) {
                             is TranslationCallbackEvents.SignalReceived -> {
                                 when (socketAnswers.signal.signal) {
