@@ -17,7 +17,8 @@ fun OnScreenContent(
     translationUiState: TranslationUiState,
     startBroadCast: () -> Unit,
     onCloseClicked: () -> Unit,
-    changeFacing: () -> Unit
+    changeFacing: () -> Unit,
+    remainTime: String
 ) {
     Column(
         modifier = Modifier
@@ -28,7 +29,8 @@ fun OnScreenContent(
         TopActions(
             translationStatus = translationStatus,
             onCloseClicked = onCloseClicked,
-            translationUiState = translationUiState
+            translationUiState = translationUiState,
+            remainTime = remainTime
         )
         if (translationStatus == TranslationStatus.PREVIEW) {
             BottomActions(

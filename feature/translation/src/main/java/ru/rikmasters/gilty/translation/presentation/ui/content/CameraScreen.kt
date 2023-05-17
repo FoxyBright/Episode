@@ -20,7 +20,8 @@ fun CameraScreen(
     onCloseClicked: () -> Unit,
     changeFacing: () -> Unit,
     startStreamPreview: () -> Unit,
-    stopStreamPreview: () -> Unit
+    stopStreamPreview: () -> Unit,
+    remainTime: String
 ) {
     Surface(
         modifier = modifier,
@@ -44,7 +45,8 @@ fun CameraScreen(
             translationUiState = translationUiState,
             startBroadCast = startBroadCast,
             onCloseClicked = onCloseClicked,
-            changeFacing = changeFacing
+            changeFacing = changeFacing,
+            remainTime = remainTime
         )
     }
 }

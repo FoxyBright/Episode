@@ -43,7 +43,8 @@ import ru.rikmasters.gilty.translation.model.TranslationUiState
 fun TopActions(
     translationStatus: TranslationStatus,
     onCloseClicked: () -> Unit,
-    translationUiState: TranslationUiState
+    translationUiState: TranslationUiState,
+    remainTime: String
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -81,7 +82,8 @@ fun TopActions(
             Spacer(modifier = Modifier.height(14.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row {
                     translationUiState.meetingModel?.let {
@@ -118,11 +120,41 @@ fun TopActions(
                         }
                     }
                 }
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(10.dp),
+                        color = ThemeExtra.colors.thirdOpaqueGray
                     ) {
-
+                        Row(
+                            modifier = Modifier.padding(
+                                start = 5.dp,
+                                end = 8.dp,
+                                top = 6.5.dp,
+                                bottom = 6.5.dp
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_timer_clock),
+                                contentDescription = "timer",
+                                tint = ThemeExtra.colors.white
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text =  remainTime,
+                                color = ThemeExtra.colors.white,
+                                style = ThemeExtra.typography.TranslationSmallButton
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    IconButton(onClick = onCloseClicked) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close_translations),
+                            contentDescription = "Close preview",
+                            tint = Color.Unspecified
+                        )
                     }
                 }
             }

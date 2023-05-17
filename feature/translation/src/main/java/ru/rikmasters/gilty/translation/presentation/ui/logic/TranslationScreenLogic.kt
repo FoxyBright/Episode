@@ -49,6 +49,8 @@ fun TestTranslationScreen(
 
     val translationScreenState by vm.translationUiState.collectAsState()
 
+    val remainTime by vm.remainTime.collectAsState()
+
     var camera by remember { mutableStateOf<RtmpCamera2?>(null) }
 
     camera?.let {
@@ -161,7 +163,8 @@ fun TestTranslationScreen(
                     rtmpUrl = it.rtmp
                 )
             }
-        }
+        },
+        remainTime = remainTime
     )
 }
 

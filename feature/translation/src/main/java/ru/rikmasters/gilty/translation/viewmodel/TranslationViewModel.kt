@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
 import ru.rikmasters.gilty.translation.event.TranslationEvent
@@ -21,6 +22,8 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TranslationViewModel : ViewModel() {
 
@@ -35,7 +38,29 @@ class TranslationViewModel : ViewModel() {
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
 
+    private val _remainTime = MutableStateFlow("")
+    val remainTime = _remainTime.asStateFlow()
+
     init {
+        coroutineScope.launch {
+            connected.collectLatest { connected ->
+                _translationUiState.value.translationInfo?.let {
+                    val startTime = it.startedAt
+                    val endTime = it.completedAt
+                    val currentTime = LocalDateTime.now()
+                    startTime?.let {
+                        if (currentTime.isAfter(startTime)) {
+                            var difference = endTime.millis() - currentTime.millis()
+                            while (difference > 0) {
+                                _remainTime.value = LocalDateTime(difference).format("HH:mm:ss")
+                                delay(1000)
+                                difference -= 1000
+                            }
+                        }
+                    }
+                }
+            }
+        }
         // Pinging while connected
         coroutineScope.launch {
             connected.collectLatest { connected ->
@@ -232,6 +257,7 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
+
             TranslationEvent.ChangeVideoState -> {
                 _translationUiState.value.translationInfo?.let { translation ->
                     coroutineScope.launch {
@@ -326,5 +352,4 @@ class TranslationViewModel : ViewModel() {
             )
         }
     }
-
 }

@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,7 +45,8 @@ fun TranslationScreen(
     initCamera: (OpenGlView) -> Unit,
     startStreamPreview: () -> Unit,
     stopStreamPreview: () -> Unit,
-    startStream: () -> Unit
+    startStream: () -> Unit,
+    remainTime: String
 ) {
     Box(
         modifier = Modifier
@@ -58,7 +58,7 @@ fun TranslationScreen(
                 .fillMaxSize()
                 .background(color = ThemeExtra.colors.preDarkColor)
         ) {
-            // TODO: Градиент нормальный
+            // TODO: Сделать нормальный градиент
             CameraScreen(
                 modifier = Modifier
                     .weight(1f)
@@ -70,7 +70,8 @@ fun TranslationScreen(
                 onCloseClicked = onCloseClicked,
                 changeFacing = changeFacing,
                 startStreamPreview = startStreamPreview,
-                stopStreamPreview = stopStreamPreview
+                stopStreamPreview = stopStreamPreview,
+                remainTime = remainTime
             )
             if (translationStatus == TranslationStatus.STREAM) {
                 StreamControlPanel(
