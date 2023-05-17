@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.addmeet.presentation.ui.extentions.onNull
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toInt
 import ru.rikmasters.gilty.shared.common.transform.numberMask
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.PERSONAL
@@ -43,10 +44,12 @@ fun RequirementsList(
                     stringResource(R.string.requirements_filter_all),
                     stringResource(R.string.requirements_filter_personal)
                 ), state.selectTab, Modifier.padding(bottom = 12.dp),
-                state.online, if(state.memberLimited
+                state.online, /*if(state.memberLimited
                     && state.memberCount.isNotBlank()
                     && memberCount > 1
-                ) emptyList() else listOf(1)
+                ) emptyList() else
+                */
+                listOf(1 - (state.selectTab==0).toInt())
             ) { callback?.onTabClick(it) }
             if(state.selectTab == 1) LazyRow(
                 Modifier
