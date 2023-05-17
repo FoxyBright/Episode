@@ -3,6 +3,8 @@ package ru.rikmasters.gilty.translation.presentation.ui.content
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +20,10 @@ fun OnScreenContent(
     startBroadCast: () -> Unit,
     onCloseClicked: () -> Unit,
     changeFacing: () -> Unit,
-    remainTime: String
+    remainTime: String,
+    userCount: Int,
+    onChatClicked: () -> Unit,
+    onUsersClicked: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -26,12 +31,21 @@ fun OnScreenContent(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        TopActions(
-            translationStatus = translationStatus,
-            onCloseClicked = onCloseClicked,
-            translationUiState = translationUiState,
-            remainTime = remainTime
-        )
+        Column {
+            TopActions(
+                translationStatus = translationStatus,
+                onCloseClicked = onCloseClicked,
+                translationUiState = translationUiState,
+                remainTime = remainTime
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+            MiddleActions(
+                usersCount = userCount,
+                onChatCLicked = onChatClicked,
+                onUsersClicked = onUsersClicked
+            )
+        }
+
         if (translationStatus == TranslationStatus.PREVIEW) {
             BottomActions(
                 startBroadCast = startBroadCast,
@@ -41,5 +55,3 @@ fun OnScreenContent(
         }
     }
 }
-
-

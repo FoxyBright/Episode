@@ -164,7 +164,10 @@ fun TestTranslationScreen(
                 )
             }
         },
-        remainTime = remainTime
+        remainTime = remainTime,
+        userCount = ,
+        onChatClicked = {},
+        onUsersClicked = {}
     )
 }
 

@@ -46,7 +46,10 @@ fun TranslationScreen(
     startStreamPreview: () -> Unit,
     stopStreamPreview: () -> Unit,
     startStream: () -> Unit,
-    remainTime: String
+    remainTime: String,
+    userCount: Int,
+    onChatClicked: () -> Unit,
+    onUsersClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -71,7 +74,10 @@ fun TranslationScreen(
                 changeFacing = changeFacing,
                 startStreamPreview = startStreamPreview,
                 stopStreamPreview = stopStreamPreview,
-                remainTime = remainTime
+                remainTime = remainTime,
+                userCount = userCount,
+                onChatClicked = onChatClicked,
+                onUsersClicked = onUsersClicked
             )
             if (translationStatus == TranslationStatus.STREAM) {
                 StreamControlPanel(

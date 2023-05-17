@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -158,6 +161,47 @@ fun TopActions(
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MiddleActions(
+    usersCount: Int,
+    onChatCLicked: () -> Unit,
+    onUsersClicked: () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(onClick = onChatCLicked) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_chat),
+                contentDescription = "Chat",
+                tint = ThemeExtra.colors.white
+            )
+        }
+        BadgedBox(
+            badge = {
+                Badge(
+                    containerColor = ThemeExtra.colors.mainDayGreen,
+                    contentColor = ThemeExtra.colors.white
+                ) {
+                    Text(
+                        text = usersCount.toString(),
+                        style = ThemeExtra.typography.TranslationBadge,
+                        color = ThemeExtra.colors.white
+                    )
+                }
+            },
+            modifier = Modifier.clickable { onUsersClicked() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_profile),
+                contentDescription = "Chat",
+                tint = ThemeExtra.colors.white
+            )
         }
     }
 }

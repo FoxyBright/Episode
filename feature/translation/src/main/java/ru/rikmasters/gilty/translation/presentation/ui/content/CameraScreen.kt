@@ -21,7 +21,10 @@ fun CameraScreen(
     changeFacing: () -> Unit,
     startStreamPreview: () -> Unit,
     stopStreamPreview: () -> Unit,
-    remainTime: String
+    remainTime: String,
+    userCount: Int,
+    onChatClicked: () -> Unit,
+    onUsersClicked: () -> Unit
 ) {
     Surface(
         modifier = modifier,
@@ -46,7 +49,10 @@ fun CameraScreen(
             startBroadCast = startBroadCast,
             onCloseClicked = onCloseClicked,
             changeFacing = changeFacing,
-            remainTime = remainTime
+            remainTime = remainTime,
+            userCount = userCount,
+            onChatClicked = onChatClicked,
+            onUsersClicked = onUsersClicked
         )
     }
 }
