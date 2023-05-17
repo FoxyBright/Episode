@@ -35,13 +35,11 @@ import ru.rikmasters.gilty.shared.model.report.FalseInformation
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.shared.model.report.ReportSubtype
 import ru.rikmasters.gilty.shared.model.report.ReportSubtype.PHOTO_ANOTHER_USER
-import ru.rikmasters.gilty.shared.shared.GDivider
-import ru.rikmasters.gilty.shared.shared.GTextField
-import ru.rikmasters.gilty.shared.shared.RowActionBar
-import ru.rikmasters.gilty.shared.shared.lazyItemsShapes
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-private val list = FalseInformation(MEETING).subTypes
+private val list =
+    FalseInformation(MEETING).subTypes
 
 @Preview
 @Composable
@@ -106,12 +104,13 @@ fun ComplainTextBox(
             colors = complaintsTextFieldColors(),
             clear = onClear,
             keyboardOptions = Default.copy(
-                imeAction = Done, keyboardType = Text,
-                capitalization = Sentences
+                Sentences, (true), Text, Done
             ),
             label = if(text.isNotEmpty())
                 label(true) else null,
-            placeholder = label()
+            placeholder = label(),
+            singleLine = true,
+            maxLines = 1
         )
         BoxLabel(
             "${text.length}/120", Modifier
@@ -191,9 +190,7 @@ fun ComplainElements(
     }
 }
 
-enum class ReportArrowState {
-    ARROW, NONE, CHECK
-}
+enum class ReportArrowState { ARROW, NONE, CHECK }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
