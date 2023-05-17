@@ -11,15 +11,23 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
 import com.yandex.mapkit.MapKit
+import com.yandex.mapkit.geometry.Point
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -33,6 +41,8 @@ data class YandexMapState(
     val address: String? = null,
     val place: String? = null,
     val categoryName: String? = null,
+    val isSearching:Boolean = false,
+    val currentPoint:Point?=null,
 )
 
 interface YandexMapCallback {
@@ -40,6 +50,8 @@ interface YandexMapCallback {
     fun onBack()
     fun getRoute()
     fun onMarkerClick(meetPlace: MeetPlace)
+    fun onIsSearchingChange(value:Boolean)
+    fun onCameraChange(point: Point)
 }
 
 @Composable
@@ -48,18 +60,23 @@ fun YandexMapContent(
     modifier: Modifier = Modifier,
     callback: YandexMapCallback? = null,
 ) {
+    val localDensity = LocalDensity.current
+    var columnHeightDp by remember { mutableStateOf(0.dp) }
+
     Column(modifier.fillMaxSize()) {
         TopBar(Modifier) { callback?.onBack() }
         MapContent(
             state, Modifier
-                .fillMaxHeight(
-                    if(state.location?.hide == true)
-                        0.8f else 0.72f
-                )
-                .offset(y = 24.dp),
+                .fillMaxHeight()
+                .offset(y = 24.dp)
+                .padding(bottom = columnHeightDp),
             callback
         )
-        Bottom(state, Modifier)
+    }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = BottomCenter){
+        Bottom(state, Modifier.onGloballyPositioned { coordinates ->
+            columnHeightDp = with(localDensity) { coordinates.size.height.toDp() }
+        })
         { callback?.getRoute() }
     }
 }

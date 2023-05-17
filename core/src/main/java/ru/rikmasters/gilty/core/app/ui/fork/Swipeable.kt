@@ -89,7 +89,7 @@ open class SwipeableState<T>(
      * use `Modifier.offsetPx`. This includes the resistance by default, if resistance is enabled.
      */
     val offset: State<Float> get() = offsetState
-    
+    val currentScreenName = mutableStateOf("")
     /**
      * The amount by which the [swipeable] has been swiped past its bounds.
      */

@@ -35,7 +35,7 @@ enum class BottomSheetSwipeState { EXPANDED, HALF_EXPANDED, COLLAPSED }
 
 @Stable
 class BottomSheetState(
-    internal val swipeableState: SwipeableState<BottomSheetSwipeState>,
+    val swipeableState: SwipeableState<BottomSheetSwipeState>,
 ) {
     
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
@@ -44,7 +44,7 @@ class BottomSheetState(
     @Suppress("unused")
     suspend fun halfExpand() =
         animateTo(HALF_EXPANDED)
-    
+
     suspend fun collapse() {
         animateTo(COLLAPSED)
     }
@@ -104,7 +104,7 @@ fun BottomSheetLayout(
     content: @Composable () -> Unit,
 ) {
     BoxWithConstraints(modifier) {
-        
+
         val screenHeight = with(LocalDensity.current) {
             this@BoxWithConstraints.maxHeight.toPx()
         }
@@ -128,7 +128,9 @@ fun BottomSheetLayout(
         }
         
         val offset = state.swipeableState.offset.value.roundToInt()
-        
+
+        val screenName = state.swipeableState.currentScreenName.value
+
         val connection =
             remember { state.swipeableState.PreUpPostDownNestedScrollConnection }
         
@@ -139,7 +141,7 @@ fun BottomSheetLayout(
                 Color.Transparent else state.scrim().copy(alpha = 0.5f),
             tween(500), label = ""
         )
-        
+
         content()
         
         if(scrimColor != Color.Transparent)
@@ -163,7 +165,8 @@ fun BottomSheetLayout(
                     anchors,
                     Orientation.Vertical,
                     thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                    resistance = null
+                    resistance = null,
+                    enabled = screenName != "Map"
                 )
                 .nestedScroll(connection)
         

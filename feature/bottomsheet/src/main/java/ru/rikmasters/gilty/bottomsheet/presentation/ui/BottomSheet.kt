@@ -139,6 +139,17 @@ fun BottomSheet(
                 setStringArg("category", ""),
             )
         ) { stack ->
+
+            LaunchedEffect(key1 = Unit, block = {
+                asm.bottomSheet.swipeableState.currentScreenName.value = "Map"
+            })
+
+            DisposableEffect(key1 = Unit, effect = {
+                onDispose {
+                    asm.bottomSheet.swipeableState.currentScreenName.value = ""
+                }
+            })
+
             stack.GetStringArg("location") { location ->
                 stack.GetStringArg("category") { category ->
                     Connector<YandexMapViewModel>(scope) {
