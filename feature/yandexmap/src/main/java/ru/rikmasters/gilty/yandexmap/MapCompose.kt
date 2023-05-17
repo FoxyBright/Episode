@@ -68,7 +68,8 @@ fun MapContent(
     val currentPointerImage = remember {
         mutableStateOf(ic_not_selected_pointer)
     }
-    LaunchedEffect(key1 = state.isSearching, block = {
+    
+    LaunchedEffect(state.isSearching) {
         if(state.isSearching && offsetY.value == 0f) {
             currentPointerImage.value = ic_not_selected_pointer
             offsetY.animateTo(
@@ -88,7 +89,7 @@ fun MapContent(
             )
             currentPointerImage.value = ic_selected_pointer
         }
-    })
+    }
     
     Box(modifier) {
         AndroidView(
@@ -105,9 +106,8 @@ fun MapContent(
                 else
                     (properties.obj to properties.point)
                         .let { (obj, it) ->
-                            if(state.location?.hide != false) obj.addMapCircle(
-                                it
-                            )
+                            if(state.location?.hide != false)
+                                obj.addMapCircle(it)
                             else obj.addMarker(it, context, ic_location)
                         }
                 
@@ -248,9 +248,10 @@ private fun MapProperties.search(
                 obj.clear(); list.clear()
                 
                 res.collection.children.forEach {
-                    it.obj?.geometry?.first()?.point?.let { point ->
-                        list.add(point to it)
-                    }
+                    it.obj?.geometry?.first()
+                        ?.point?.let { point ->
+                            list.add(point to it)
+                        }
                 }
                 
                 onUpdate(list)
@@ -263,12 +264,13 @@ private fun MapProperties.search(
     )
 }
 
-private fun Pair<PlacemarkMapObject, Item>.getMeetPlace() = MeetPlace(
-    lat = first.geometry.latitude,
-    lng = first.geometry.longitude,
-    place = second.obj?.name ?: "",
-    address = second.obj?.descriptionText ?: "",
-)
+private fun Pair<PlacemarkMapObject, Item>.getMeetPlace() =
+    MeetPlace(
+        lat = first.geometry.latitude,
+        lng = first.geometry.longitude,
+        place = second.obj?.name ?: "",
+        address = second.obj?.descriptionText ?: "",
+    )
 
 private fun PlacemarkMapObject.changeIcon(
     icon: Int, context: Context,
@@ -342,7 +344,7 @@ private fun Context.reqPermissions() {
         ACCESS_FINE_LOCATION to ACCESS_COARSE_LOCATION
     
     perms.let { (fine, coarse) ->
-        if(checkPerm(fine) && checkPerm(coarse))
+        if(!checkPerm(fine) && !checkPerm(coarse))
             requestPermissions((this), arrayOf(fine, coarse), (0))
     }
 }
