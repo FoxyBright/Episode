@@ -278,7 +278,7 @@ fun GiltyPagerTab(
                             RoundedCornerShape(0.dp)
                         ),
                     (selectedTabIndex == index), false,
-                    !titles.contains(title)
+                    true
                 ) {
                     onTabClick(index)
                 }
