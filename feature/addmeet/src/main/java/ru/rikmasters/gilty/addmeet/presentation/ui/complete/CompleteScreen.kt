@@ -22,7 +22,8 @@ fun CompleteScreen(vm: CompleteViewModel) {
     
     LaunchedEffect(addMeet) {
         addMeet?.let {
-            vm.addMeet(it)
+            if(!vm.addMeet(it))
+                nav.navigationBack()
         }
     }
     
@@ -32,7 +33,11 @@ fun CompleteScreen(vm: CompleteViewModel) {
                 override fun onShare() {
                     scope.launch { shareMeet(it.id, context) }
                 }
-                
+    
+                override fun onImageRefresh() {
+                    scope.launch { vm.updateUserData() }
+                }
+    
                 override fun onClose() {
                     scope.launch {
                         vm.clearAddMeet()

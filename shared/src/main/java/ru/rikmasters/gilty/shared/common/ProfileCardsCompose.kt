@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -99,6 +98,7 @@ fun HiddenContent(
     image: String?,
     profileType: ProfileType,
     lockState: Boolean,
+    onImageRefresh: () -> Unit = {},
     onCardClick: () -> Unit,
 ) {
     Box(
@@ -117,7 +117,7 @@ fun HiddenContent(
             url = image,
             modifier = Modifier.fillMaxSize(),
             contentScale = Crop
-        )
+        ) { onImageRefresh() }
         if(profileType != USERPROFILE) Lock(
             modifier = Modifier
                 .align(TopStart)
@@ -170,6 +170,7 @@ fun ProfileImageContent(
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
     isError: Boolean = false,
+    onImageRefresh: () -> Unit = {},
     onClick: () -> Unit,
 ) {
     Card(
@@ -195,7 +196,7 @@ fun ProfileImageContent(
     ) {
         Column {
             Box {
-                Avatar(image, type)
+                Avatar(image, type, Modifier, onImageRefresh)
                 when(type) {
                     USERPROFILE, ANONYMOUS_ORGANIZER -> Unit
                     
@@ -227,6 +228,7 @@ private fun Avatar(
     image: AvatarModel?,
     type: ProfileType,
     modifier: Modifier = Modifier,
+    onImageRefresh: () -> Unit,
 ) {
     Box(modifier) {
         GCachedImage(
@@ -234,7 +236,7 @@ private fun Avatar(
             Modifier.fillMaxSize(),
             contentScale = Crop,
             placeholderColor = colorScheme.primaryContainer
-        )
+        ) { onImageRefresh() }
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(
                 Modifier
@@ -413,7 +415,7 @@ private fun Observe(
     profileType: ProfileType,
     text: String, count: Int,
 ) {
-    val style = with(LocalDensity.current) {
+    val style =
         typography.headlineSmall.copy(
             fontSize = if(profileType == CREATE)
                 12.dp.toSp()
@@ -423,7 +425,6 @@ private fun Observe(
                 8.dp.toSp()
             else 10.dp.toSp()
         )
-    }
     
     Column(
         modifier, Top, CenterHorizontally

@@ -54,8 +54,8 @@ data class ResponseWrapper<T: Any?>(
 }
 
 data class ErrorResponseWrapper(
-    val status: String,
-    val error: Error,
+    val status: String = "",
+    val error: Error = Error(),
 ) {
     
     data class Error(

@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -34,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
 import ru.rikmasters.gilty.feature.login.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.ActionBar
@@ -280,9 +280,7 @@ private fun ExternalLabel(method: LoginMethod) {
             Modifier.padding(vertical = 17.dp),
             style = typography.bodyMedium.copy(
                 colorScheme.tertiary,
-                with(LocalDensity.current) {
-                    16.dp.toSp()
-                }, Bold,
+                16.dp.toSp(), Bold,
             ),
         )
     }

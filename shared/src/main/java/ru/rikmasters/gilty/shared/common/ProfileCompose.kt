@@ -113,6 +113,7 @@ interface ProfileCallback {
     fun onSaveDescription() {}
     fun onObserveChange(state: Boolean) {}
     fun onObserveClick() {}
+    fun onProfileImageRefresh() {}
 }
 
 @Composable
@@ -143,7 +144,10 @@ fun Profile(
                 onObserveChange = { bool ->
                     onChange?.let { it(bool) }
                 },
-                isError = state.isError
+                isError = state.isError,
+                onImageRefresh = {
+                    callback?.onProfileImageRefresh()
+                }
             ) { callback?.profileImage() }
             Spacer(
                 Modifier.width(
@@ -168,7 +172,10 @@ fun Profile(
                 HiddenContent(
                     image = hidden,
                     profileType = state.profileType,
-                    lockState = state.lockState
+                    lockState = state.lockState,
+                    onImageRefresh = {
+                        callback?.onProfileImageRefresh()
+                    }
                 ) { callback?.hiddenImages() }
             }
         }

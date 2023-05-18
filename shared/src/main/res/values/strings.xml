@@ -336,7 +336,7 @@
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
     <string name="add_meet_bad_date">"Указанная дата уже не актуальна"</string>
-    <string name="add_meet_created">episode создан</string>
+    <string name="add_meet_created">Episode создан</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>

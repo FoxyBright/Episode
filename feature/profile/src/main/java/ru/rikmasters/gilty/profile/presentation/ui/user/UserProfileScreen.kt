@@ -120,6 +120,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             viewerSelectImage = viewerSelectImage,
         ), Modifier, object: UserProfileCallback {
             
+            override fun onProfileImageRefresh() {
+                scope.launch { vm.updateUserData() }
+            }
+            
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
