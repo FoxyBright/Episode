@@ -138,6 +138,13 @@ class RequirementsViewModel: ViewModel() {
     }
     
     suspend fun changeTab(tab: Int) {
+        val memberCount = try {
+            _memberCount.value.toInt()
+        } catch(e: Exception) {
+            0
+        }
+        if(tab == 1 && !(_limited.value && _memberCount.value.isNotBlank() && memberCount > 1))
+            return
         _selectedTab.emit(tab)
         RequirementsType = tab
     }
@@ -259,5 +266,6 @@ class RequirementsViewModel: ViewModel() {
     suspend fun clearCount() {
         _memberCount.emit("")
         manager.update(memberCount = "")
+        changeTab(0)
     }
 }
