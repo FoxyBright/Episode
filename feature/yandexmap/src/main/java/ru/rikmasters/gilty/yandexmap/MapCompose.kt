@@ -73,9 +73,9 @@ fun MapContent(
         if(state.isSearching && offsetY.value == 0f) {
             currentPointerImage.value = ic_not_selected_pointer
             offsetY.animateTo(
-                targetValue = -75f,
+                targetValue = -45f,
                 animationSpec = tween(
-                    durationMillis = 700,
+                    durationMillis = 300,
                     delayMillis = 0
                 )
             )
@@ -83,7 +83,7 @@ fun MapContent(
             offsetY.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 700,
+                    durationMillis = 300,
                     delayMillis = 0
                 )
             )
