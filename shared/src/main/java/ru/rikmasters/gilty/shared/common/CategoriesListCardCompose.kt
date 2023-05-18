@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -25,9 +26,10 @@ fun CategoriesListCard(
     meeting: MeetingModel,
     border: Boolean = false,
     imageSize: Dp = 16.dp,
+    shape: Shape = shapes.medium
 ) {
     Surface(
-        modifier, shapes.medium,
+        modifier, shape,
         colorScheme.background,
         border = if(border) BorderStroke(
             3.dp, colors.borderColor

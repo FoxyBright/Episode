@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -413,7 +412,7 @@ private fun Observe(
     profileType: ProfileType,
     text: String, count: Int,
 ) {
-    val style = with(LocalDensity.current) {
+    val style =
         typography.headlineSmall.copy(
             fontSize = if(profileType == CREATE)
                 12.dp.toSp()
@@ -423,7 +422,6 @@ private fun Observe(
                 8.dp.toSp()
             else 10.dp.toSp()
         )
-    }
     
     Column(
         modifier, Top, CenterHorizontally

@@ -70,6 +70,7 @@ data class ExtraColors(
     val notificationCloud: Color = Unspecified,
     val meetingTransparencyShape: Color = Unspecified,
     val gripColor: Color = Unspecified,
+    val miniCategoriesBackground: Color = Unspecified,
     
     // Categories Colors
     val sport: Color = Unspecified,
@@ -119,6 +120,7 @@ val LightExtraColors = ExtraColors(
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
     gripColor = Ash,
+    miniCategoriesBackground = LightGray,
     
     // Categories Colors
     sport = Orange,
@@ -168,6 +170,7 @@ val DarkExtraColors = ExtraColors(
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
     gripColor = gripGrayDark,
+    miniCategoriesBackground = Lead,
     
     // Categories Colors
     sport = DarkOrange,

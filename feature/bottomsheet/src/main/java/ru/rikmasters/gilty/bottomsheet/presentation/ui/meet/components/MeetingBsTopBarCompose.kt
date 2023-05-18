@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,9 +33,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
-import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
-import ru.rikmasters.gilty.shared.common.extentions.format
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
@@ -204,7 +201,6 @@ private fun MeetDetails(
     meet: FullMeetingModel,
     modifier: Modifier = Modifier,
 ) {
-    val density = LocalDensity.current
     Column(modifier) {
         Text(
             text = if(todayControl(meet.datetime))
@@ -213,7 +209,7 @@ private fun MeetDetails(
             modifier = Modifier.padding(bottom = 8.dp),
             style = typography.bodyMedium.copy(
                 color = colorScheme.tertiary,
-                fontSize = with(density) { 16.dp.toSp() },
+                fontSize = 16.dp.toSp(),
                 fontWeight = Bold
             ),
         )
@@ -249,7 +245,6 @@ private fun SubLabel(
     color: Color,
     shape: Dp,
 ) {
-    val density = LocalDensity.current
     Box(
         modifier
             .background(
@@ -261,7 +256,7 @@ private fun SubLabel(
             text = text,
             modifier = Modifier.padding(12.dp, 3.dp),
             style = typography.labelSmall.copy(
-                fontSize = with(density) { 14.dp.toSp() },
+                fontSize = 14.dp.toSp(),
                 color = White, fontWeight = Bold,
             )
         )
