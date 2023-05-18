@@ -7,6 +7,7 @@ sealed interface TranslationCallbackEvents {
     object TranslationStarted : TranslationCallbackEvents
     object TranslationCompleted : TranslationCallbackEvents
     object TranslationExpired : TranslationCallbackEvents
+    object MessageReceived : TranslationCallbackEvents
     data class SignalReceived(val signal: TranslationSignalModel) : TranslationCallbackEvents
     data class TranslationExtended(val completedAt: LocalDateTime, val duration: Int) : TranslationCallbackEvents
     data class UserConnected(val user: String, val count: Int) : TranslationCallbackEvents

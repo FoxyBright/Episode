@@ -106,7 +106,9 @@ class TranslationWebSocket : WebSocket() {
                 )
             }
             TranslationsSocketEvents.MESSAGE_SENT -> {
-                Log.d("TESTSOCKETS", response.data)
+                _answer.send(
+                    TranslationCallbackEvents.MessageReceived
+                )
             }
             else -> {}
         }

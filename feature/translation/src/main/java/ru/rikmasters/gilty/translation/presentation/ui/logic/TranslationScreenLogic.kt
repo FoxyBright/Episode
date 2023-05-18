@@ -1,7 +1,10 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
+import android.content.res.Resources.Theme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -22,11 +26,15 @@ import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.rikmasters.gilty.core.app.ui.BottomSheetLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
@@ -68,6 +76,8 @@ fun TestTranslationScreen(
     val translationScreenState by vm.translationUiState.collectAsState()
     // Список подключенных пользователей с пагинацией
     val connectedMembers = vm.connectedUsers.collectAsLazyPagingItems()
+    // Список сообщений в чате с пагинацикй
+    val messages = vm.messages.collectAsLazyPagingItems()
     // Состояние поиска ботом шита участников
     val query by vm.usersQuery.collectAsState()
     // Оставшееся время трансляции
@@ -114,8 +124,13 @@ fun TestTranslationScreen(
     // TODO: Пока непонятно для чего нужно
     var streamState by remember { mutableStateOf(StreamState.STOP) }
 
+
     // Состояние боттом шита
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = BottomSheetState(
+            initialValue = BottomSheetValue.Collapsed
+        )
+    )
 
     // Конфигурация экрана (для определения максимальной/минимальной высоты ботом шита)
     val configuration = LocalConfiguration.current
@@ -167,6 +182,12 @@ fun TestTranslationScreen(
     var isShowDeleteAlert by remember { mutableStateOf(false) }
     var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
 
+    var bottomSheetState by remember {
+        mutableStateOf(
+            ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
+        )
+    }
+
     BottomSheetScaffold(
         sheetContent = {
             UsersBottomSheetContent(
@@ -187,9 +208,25 @@ fun TestTranslationScreen(
                 onDeleteClicked = {
                     currentDeleteUser = it
                     isShowDeleteAlert = true
+                },
+                state = bottomSheetState,
+                messagesList = messages,
+                onSendMessage = { text ->
+                    vm.onEvent(
+                        TranslationEvent.SendMessage(
+                            text = text
+                        )
+                    )
                 }
             )
-        }, scaffoldState = scaffoldState
+        },
+        sheetPeekHeight = 0.dp,
+        scaffoldState = scaffoldState,
+        sheetBackgroundColor = ThemeExtra.colors.blackSeventy,
+        sheetShape = RoundedCornerShape(
+            topStart = 24.dp,
+            topEnd = 24.dp
+        )
     ) {
         Box {
             TranslationScreen(
@@ -226,18 +263,38 @@ fun TestTranslationScreen(
                 },
                 remainTime = remainTime,
                 userCount = translationScreenState.membersCount ?: 0,
-                onChatClicked = {},
+                onChatClicked = {
+                    scope.launch {
+                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
+                        if (scaffoldState.bottomSheetState.isExpanded) {
+                            scaffoldState.bottomSheetState.collapse()
+                            vm.onEvent(
+                                TranslationEvent.ChatBottomSheetOpened(
+                                    isOpened = false
+                                )
+                            )
+                        } else {
+                            scaffoldState.bottomSheetState.expand()
+                            vm.onEvent(
+                                TranslationEvent.ChatBottomSheetOpened(
+                                    isOpened = true
+                                )
+                            )
+                        }
+                    }
+                },
                 onUsersClicked = {
                     scope.launch {
-                        if (scaffoldState.drawerState.isOpen) {
-                            scaffoldState.drawerState.close()
+                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
+                        if (scaffoldState.bottomSheetState.isExpanded) {
+                            scaffoldState.bottomSheetState.collapse()
                             vm.onEvent(
                                 TranslationEvent.UserBottomSheetOpened(
                                     isOpened = false
                                 )
                             )
                         } else {
-                            scaffoldState.drawerState.open()
+                            scaffoldState.bottomSheetState.expand()
                             vm.onEvent(
                                 TranslationEvent.UserBottomSheetOpened(
                                     isOpened = true
@@ -262,7 +319,7 @@ fun TestTranslationScreen(
             label = stringResource(id = R.string.translations_members_delete_label),
             title = stringResource(id = R.string.translations_members_delete_title),
             onDismissRequest = { isShowDeleteAlert = false },
-            cancel =  Pair(stringResource(id = R.string.translations_members_cancel)) {
+            cancel = Pair(stringResource(id = R.string.translations_members_cancel)) {
                 isShowDeleteAlert = false
             }
         )

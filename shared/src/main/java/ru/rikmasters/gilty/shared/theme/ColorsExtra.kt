@@ -58,7 +58,8 @@ data class ExtraColors(
     val mainNotActiveGreen: Color = Color.Unspecified,
     val textField: Color = Color.Unspecified,
     val preDarkColor: Color = Color.Unspecified,
-    val zirkon: Color = Color.Unspecified
+    val zirkon: Color = Color.Unspecified,
+    val messageBar: Color = Color.Unspecified
 
 )
 
@@ -122,7 +123,8 @@ val LightExtraColors = ExtraColors(
     mainNotActiveGreen = Colors.greenInactive,
     textField = Colors.textField,
     preDarkColor = Colors.PreDark,
-    zirkon = Colors.Zircon
+    zirkon = Colors.Zircon,
+    messageBar = Colors.RatGray
 )
 
 @Deprecated(
@@ -186,6 +188,7 @@ val DarkExtraColors = ExtraColors(
     mainNotActiveGreen = Colors.greenInactive,
     textField = Colors.textField,
     preDarkColor = Colors.PreDark,
-    zirkon = Colors.Zircon
+    zirkon = Colors.Zircon,
+    messageBar = Colors.RatGray
 
 )

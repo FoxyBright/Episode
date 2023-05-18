@@ -1,5 +1,7 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
+import android.util.Log
+import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -25,6 +27,9 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TranslationViewModel : ViewModel() {
 
@@ -35,17 +40,48 @@ class TranslationViewModel : ViewModel() {
 
     private val userIsOpened = MutableStateFlow(false)
 
+    private val chatIsOpened = MutableStateFlow(false)
+
+    private val reloadUser = MutableStateFlow(false)
+    private val reloadChat = MutableStateFlow(false)
+
     private val _usersQuery = MutableStateFlow("")
     val usersQuery = _usersQuery.asStateFlow()
 
     // Открыт ли боттом шит, состояние поиска
     @OptIn(ExperimentalCoroutinesApi::class)
+    val messages = combine(
+        chatIsOpened,
+        reloadChat
+    ) { isOpened, reload ->
+        Pair(isOpened,reload)
+    }.flatMapLatest { (isOpened, _) ->
+        Log.d("WebSock","FLATMAPPED")
+        // Если открыт ботомшит
+        if (isOpened) {
+            Log.d("WebSock","iSOPENED")
+            // Если id трансляции существует
+            translationUiState.value.translationInfo?.let { translation ->
+                Log.d("WebSock","Translation $translation")
+                translationRepository.getMessages(
+                    translationId = translation.id
+                )
+            } ?: flow { }
+        } else {
+            // БотомШит закрыт
+            flow { }
+        }
+    }.cachedIn(coroutineScope)
+
+    // Открыт ли боттом шит, состояние поиска
+    @OptIn(ExperimentalCoroutinesApi::class)
     val connectedUsers = combine(
         userIsOpened,
-        _usersQuery
-    ) { isOpened, query ->
-        Pair(isOpened, query)
-    }.flatMapLatest { (isOpened, query) ->
+        _usersQuery,
+        reloadUser
+    ) { isOpened, query, reload ->
+        Triple(isOpened, query, reload)
+    }.flatMapLatest { (isOpened, query, _) ->
         // Если открыт ботомшит
         if (isOpened) {
             // Если id трансляции существует
@@ -59,7 +95,7 @@ class TranslationViewModel : ViewModel() {
             // БотомШит закрыт
             flow { }
         }
-    }
+    }.cachedIn(coroutineScope)
 
     private val _translationUiState = MutableStateFlow(TranslationUiState())
     val translationUiState = _translationUiState.asStateFlow()
@@ -74,17 +110,21 @@ class TranslationViewModel : ViewModel() {
         // Timer
         coroutineScope.launch {
             connected.collectLatest { connected ->
-                _translationUiState.value.translationInfo?.let {
-                    val startTime = it.startedAt
-                    val endTime = it.completedAt
-                    val currentTime = LocalDateTime.now()
-                    startTime?.let {
-                        if (currentTime.isAfter(startTime)) {
-                            var difference = endTime.millis() - currentTime.millis()
-                            while (difference > 0) {
-                                _remainTime.value = LocalDateTime(difference).format("HH:mm:ss")
-                                delay(1000)
-                                difference -= 1000
+                if (connected) {
+                    _translationUiState.value.translationInfo?.let {
+                        val startTime = it.startedAt
+                        val endTime = it.completedAt
+                        val currentTime = LocalDateTime.nowZ()
+                        startTime?.let {
+                            if (currentTime.isAfter(startTime)) {
+                                var difference = endTime.millis() - currentTime.millis()
+                                val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                                val time = Date(difference)
+                                while (difference > 0) {
+                                    _remainTime.value = sdf.format(time)
+                                    delay(1000)
+                                    difference -= 1000
+                                }
                             }
                         }
                     }
@@ -188,6 +228,7 @@ class TranslationViewModel : ViewModel() {
                                         membersCount = socketAnswers.count
                                     )
                                 }
+                                reloadUser.value = !reloadUser.value
                             }
 
                             is TranslationCallbackEvents.UserDisconnected -> {
@@ -197,6 +238,7 @@ class TranslationViewModel : ViewModel() {
                                         membersCount = socketAnswers.count
                                     )
                                 }
+                                reloadUser.value = !reloadUser.value
                             }
 
                             is TranslationCallbackEvents.UserKicked -> {
@@ -206,6 +248,11 @@ class TranslationViewModel : ViewModel() {
                                         membersCount = socketAnswers.count
                                     )
                                 }
+                                reloadUser.value = !reloadUser.value
+                            }
+
+                            TranslationCallbackEvents.MessageReceived -> {
+                                reloadChat.value = !reloadChat.value
                             }
                         }
                     }
@@ -221,24 +268,6 @@ class TranslationViewModel : ViewModel() {
                     meetingId = event.meetingId
                 )
             }
-            /*
-            TranslationEvent.ConnectToTranslationChat -> {
-                coroutineScope.launch {
-                    translationInfo.value?.let { translation ->
-                        translationRepository.connectToTranslationChat(
-                            translationId = translation.id
-                        )
-                    }
-                }
-            }
-            TranslationEvent.DisconnectFromTranslationChat -> {
-                coroutineScope.launch {
-                    translationInfo.value?.let {
-                        translationRepository.disconnectFromTranslationChat()
-                    }
-                }
-            }
-             */
             TranslationEvent.ChangeFacing -> {
                 _translationUiState.update {
                     it.copy(
@@ -318,6 +347,32 @@ class TranslationViewModel : ViewModel() {
                                 userId = userId
                             )
                         }
+                    }
+                }
+            }
+
+            is TranslationEvent.ChatBottomSheetOpened -> {
+                chatIsOpened.value = event.isOpened
+                coroutineScope.launch {
+                    if (event.isOpened) {
+                        _translationUiState.value.translationInfo?.let { translation ->
+                            translationRepository.connectToTranslationChat(
+                                translationId = translation.id
+                            )
+                        }
+                    } else {
+                        translationRepository.disconnectFromTranslationChat()
+                    }
+                }
+            }
+
+            is TranslationEvent.SendMessage -> {
+                coroutineScope.launch {
+                    _translationUiState.value.translationInfo?.let { translation ->
+                        translationRepository.sendMessage(
+                            translationId = translation.id,
+                            text = event.text
+                        )
                     }
                 }
             }

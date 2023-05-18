@@ -38,12 +38,14 @@ fun OnScreenContent(
                 translationUiState = translationUiState,
                 remainTime = remainTime
             )
-            Spacer(modifier = Modifier.height(30.dp))
-            MiddleActions(
-                usersCount = userCount,
-                onChatCLicked = onChatClicked,
-                onUsersClicked = onUsersClicked
-            )
+            Spacer(modifier = Modifier.height(28.dp))
+            if (translationStatus == TranslationStatus.STREAM) {
+                MiddleActions(
+                    usersCount = userCount,
+                    onChatCLicked = onChatClicked,
+                    onUsersClicked = onUsersClicked
+                )
+            }
         }
 
         if (translationStatus == TranslationStatus.PREVIEW) {

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translations.datasource.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
@@ -24,11 +25,13 @@ class TranslationMessagesPagingSource(
 
         return paginateState(
             block = {
-                webSource.getMessages(
+                val messages = webSource.getMessages(
                     translationId = translationId,
                     page = page,
                     perPage = loadSize
                 ).map(TranslationMessageDTO::map)
+                Log.d("WebSock","MEssages $messages")
+                messages
             },
             loadSize = loadSize,
             page = page

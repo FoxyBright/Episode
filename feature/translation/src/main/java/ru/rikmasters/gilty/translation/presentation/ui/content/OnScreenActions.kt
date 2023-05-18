@@ -73,13 +73,14 @@ fun TopActions(
                     color = ThemeExtra.colors.white,
                     style = ThemeExtra.typography.TranslationTitlePreview
                 )
-                IconButton(onClick = onCloseClicked) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_close_translations),
-                        contentDescription = "Close preview",
-                        tint = Color.Unspecified
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close_translations),
+                    contentDescription = "Close preview",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable {
+                        onCloseClicked()
+                    }
+                )
             }
         } else {
             Spacer(modifier = Modifier.height(14.dp))
@@ -100,7 +101,7 @@ fun TopActions(
                         )
                         Spacer(modifier = Modifier.width(11.dp))
                         Column {
-                            Row( verticalAlignment = Alignment.CenterVertically ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = "${it.organizer.username}, ${it.organizer.age}",
                                     color = ThemeExtra.colors.white,
@@ -145,20 +146,21 @@ fun TopActions(
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
-                                text =  remainTime,
+                                text = remainTime,
                                 color = ThemeExtra.colors.white,
                                 style = ThemeExtra.typography.TranslationSmallButton
                             )
                         }
                     }
                     Spacer(modifier = Modifier.width(12.dp))
-                    IconButton(onClick = onCloseClicked) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_close_translations),
-                            contentDescription = "Close preview",
-                            tint = Color.Unspecified
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close_translations),
+                        contentDescription = "Close preview",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.clickable {
+                            onCloseClicked()
+                        }
+                    )
                 }
             }
         }
@@ -173,26 +175,29 @@ fun MiddleActions(
     onUsersClicked: () -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onChatCLicked) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chat),
-                contentDescription = "Chat",
-                tint = ThemeExtra.colors.white
-            )
-        }
+        Icon(
+            painter = painterResource(id = R.drawable.ic_chat),
+            contentDescription = "Chat",
+            tint = ThemeExtra.colors.white,
+            modifier = Modifier.clickable { onChatCLicked() }
+        )
         BadgedBox(
             badge = {
-                Badge(
-                    containerColor = ThemeExtra.colors.mainDayGreen,
-                    contentColor = ThemeExtra.colors.white
-                ) {
-                    Text(
-                        text = usersCount.toString(),
-                        style = ThemeExtra.typography.TranslationBadge,
-                        color = ThemeExtra.colors.white
-                    )
+                if (usersCount > 0) {
+                    Badge(
+                        containerColor = ThemeExtra.colors.mainDayGreen,
+                        contentColor = ThemeExtra.colors.white
+                    ) {
+                        Text(
+                            text = usersCount.toString(),
+                            style = ThemeExtra.typography.TranslationBadge,
+                            color = ThemeExtra.colors.white
+                        )
+                    }
                 }
             },
             modifier = Modifier.clickable { onUsersClicked() }
