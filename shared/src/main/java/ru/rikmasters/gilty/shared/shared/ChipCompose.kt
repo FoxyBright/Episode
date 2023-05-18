@@ -202,7 +202,7 @@ private fun GiltyTab() {
     GiltyTheme {
         GiltyTab(
             listOf("Ко всем", "К каждому", "Ко мне"),
-            0, unEnabled = listOf(2)
+            0, unEnabled = listOf(1, 2)
         )
     }
 }
@@ -210,7 +210,7 @@ private fun GiltyTab() {
 @Composable
 fun GiltyTab(
     tabs: List<String>,
-    isSelected: Int,
+    selectedTab: Int,
     modifier: Modifier = Modifier,
     online: Boolean = false,
     unEnabled: List<Int> = emptyList(),
@@ -229,11 +229,11 @@ fun GiltyTab(
             repeat(tabs.size) { tab ->
                 GiltyTabElement(
                     tabs[tab], Modifier.weight(1f),
-                    (isSelected == tab), online,
+                    (selectedTab == tab), online,
                     !unEnabled.contains(tab),
                     backgroundColor = animateColorAsState(
-                        if (!unEnabled.contains(tab)) colorScheme.background
-                        else if ((isSelected == tab)) if (online)
+                        if (unEnabled.contains(tab)) colorScheme.background
+                        else if ((selectedTab == tab)) if (online)
                             colors.tabActiveOnline
                         else colors.tabActive
                         else colors.tabInactive,
@@ -267,7 +267,7 @@ fun GiltyPagerTab(
         containerColor = Transparent
     ) {
         titles.forEachIndexed { index, title ->
-            Row() {
+            Row {
                 GiltyTabElement(
                     title,
                     Modifier
@@ -309,10 +309,10 @@ fun GiltyTabElement(
                 .fillMaxWidth()
                 .padding(10.dp),
             color = animateColorAsState(
-                targetValue = if (isSelected) {
+                targetValue = if (enabled) {
                     colorScheme.tertiary
                 } else {
-                    colorScheme.tertiary
+                    colorScheme.onTertiary
                 },
                 animationSpec = tween(easing = LinearEasing),
             ).value,

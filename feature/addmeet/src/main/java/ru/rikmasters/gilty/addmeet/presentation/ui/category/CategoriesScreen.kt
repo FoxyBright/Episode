@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
@@ -20,6 +21,10 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val alert by vm.alert.collectAsState()
     
     LaunchedEffect(Unit) { vm.getCategories() }
+
+    BackHandler(!alert) {
+        scope.launch { vm.alertDismiss(true) }
+    }
 
     CategoriesContent(
         Modifier, CategoriesState(
