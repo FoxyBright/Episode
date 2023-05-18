@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.meetings
 
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
@@ -265,7 +266,7 @@ class MeetingWebSource: KtorSource() {
             )
         )
     }.let {
-        if(it.status == OK)
+        if(it.status == Created)
             it.wrapped<DetailedMeetResponse>().id
         else "error" + it.errorWrapped().error.message
     }
