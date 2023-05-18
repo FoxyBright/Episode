@@ -245,6 +245,8 @@
     <string name="chats_message_join_meet">присоединил%s к episode</string>
     <string name="chats_message_leave_meet">покинул%s episode</string>
     <string name="chats_message_make_screenshot">сделал%s скриншот!</string>
+    <string name="chats_sort_label">Сортировка</string>
+    <string name="chats_archive_label">Архив</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>

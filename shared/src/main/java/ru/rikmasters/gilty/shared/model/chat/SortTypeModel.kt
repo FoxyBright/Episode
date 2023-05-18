@@ -6,3 +6,10 @@ enum class SortTypeModel {
     MESSAGE_COUNT,
     NONE,
 }
+
+fun SortTypeModel.getSortName():String = when(this) {
+        SortTypeModel.MEETING_DATE -> "По дате"
+        SortTypeModel.MESSAGE_DATE -> "По сообщению"
+        SortTypeModel.MESSAGE_COUNT -> "По сообщению"
+        else -> "По сообщению"
+    }
