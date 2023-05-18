@@ -29,7 +29,8 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val sortType by vm.sortType.collectAsState()
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
-    
+    val isArchiveOn by vm.isArchiveOn.collectAsState()
+
     val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
@@ -54,7 +55,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
         ChatListState(
             navBar, chats, completed, alert,
             alertState, alertSelected, sortType,
-            listState
+            listState,sortType != SortTypeModel.NONE, isArchiveOn
         ),
         Modifier,
         object: ChatListCallback {
@@ -111,7 +112,15 @@ fun ChatListScreen(vm: ChatListViewModel) {
             override fun onListAlertSelect(index: Int) {
                 scope.launch { vm.alertSelect(index) }
             }
-            
+
+            override fun onSortClick(sortTypeModel: SortTypeModel) {
+                scope.launch { vm.changeSortType(sortTypeModel) }
+            }
+
+            override fun onArchiveClick() {
+                scope.launch { vm.changeIsArchiveOn() }
+            }
+
             override fun onChatClick(chat: ChatModel) {
                 scope.launch { vm.onChatClick(chat.id) }
                 nav.navigate("chat?id=${chat.id}")

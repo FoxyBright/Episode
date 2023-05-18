@@ -61,7 +61,7 @@ fun YandexMapContent(
     callback: YandexMapCallback? = null,
 ) {
     val localDensity = LocalDensity.current
-    var columnHeightDp by remember { mutableStateOf(0.dp) }
+    var bottomHeightDp by remember { mutableStateOf(0.dp) }
 
     Column(modifier.fillMaxSize()) {
         TopBar(Modifier) { callback?.onBack() }
@@ -69,13 +69,13 @@ fun YandexMapContent(
             state, Modifier
                 .fillMaxHeight()
                 .offset(y = 24.dp)
-                .padding(bottom = columnHeightDp),
+                .padding(bottom = bottomHeightDp),
             callback
         )
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = BottomCenter){
         Bottom(state, Modifier.onGloballyPositioned { coordinates ->
-            columnHeightDp = with(localDensity) { coordinates.size.height.toDp() }
+            bottomHeightDp = with(localDensity) { coordinates.size.height.toDp() }
         })
         { callback?.getRoute() }
     }
