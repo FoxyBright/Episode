@@ -93,6 +93,12 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         _viewerImages.emit(list)
     }
     
+    suspend fun updateUserData() {
+        _profile.emit(
+            profileManager.getProfile(true)
+        )
+    }
+    
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }

@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
+import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -250,7 +251,9 @@ class MeetingWebSource: KtorSource() {
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ) = post("http://$HOST$PREFIX_URL/meetings") {
+    ) = unExpectPost(
+        "http://$HOST$PREFIX_URL/meetings"
+    ) {
         setBody(
             MeetingRequest(
                 categoryId, type, isOnline, condition,
@@ -261,9 +264,9 @@ class MeetingWebSource: KtorSource() {
                 requirements, withoutResponds
             )
         )
-    }?.let {
+    }.let {
         if(it.status == OK)
             it.wrapped<DetailedMeetResponse>().id
-        else null
-    } ?: ""
+        else "error" + it.errorWrapped().error.message
+    }
 }

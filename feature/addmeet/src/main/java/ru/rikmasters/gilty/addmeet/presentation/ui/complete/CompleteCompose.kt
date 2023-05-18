@@ -19,12 +19,13 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,8 +63,9 @@ fun CompleteContent() {
 
 interface CompleteCallBack {
     
-    fun onShare() {}
-    fun onClose() {}
+    fun onShare()
+    fun onClose()
+    fun onImageRefresh()
 }
 
 @Composable
@@ -94,7 +96,11 @@ fun CompleteContent(
                 .padding(it)
                 .padding(top = 34.dp)
                 .padding(horizontal = 40.dp)
-        ) { MeetingCard(meeting, Modifier, isOnline) }
+        ) {
+            MeetingCard(meeting, Modifier, isOnline) {
+                callback?.onImageRefresh()
+            }
+        }
     }
 }
 
@@ -129,24 +135,29 @@ private fun Buttons(
 
 @Composable
 private fun MeetingCard(
-    meeting: MeetingModel,
+    meet: MeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean,
+    isOnline: Boolean,
+    onImageRefresh: () -> Unit,
 ) {
     Box(modifier) {
         Box {
             GCachedImage(
-                meeting.organizer?.avatar
-                    ?.thumbnail?.url, Modifier
+                url = meet.organizer?.avatar
+                    ?.thumbnail?.url,
+                modifier = Modifier
                     .clip(shapes.large)
-                    .fillMaxHeight(0.94f),
-                contentScale = ContentScale.Crop
-            )
+                    .fillMaxHeight(0.94f)
+                    .fillMaxWidth()
+                    .align(TopCenter),
+                contentScale = Crop
+            ) { onImageRefresh() }
             MeetBottom(
-                Modifier
+                modifier = Modifier
                     .align(BottomCenter)
-                    .offset(y = 18.dp), meeting,
-                online
+                    .offset(y = 18.dp),
+                meet = meet,
+                isOnline = isOnline
             )
         }
     }

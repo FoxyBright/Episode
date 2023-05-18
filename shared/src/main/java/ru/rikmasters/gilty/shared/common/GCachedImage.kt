@@ -5,9 +5,7 @@ import android.util.Base64
 import android.util.Base64.DEFAULT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -20,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImagePainter.State.Error
 import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy.DISABLED
@@ -48,6 +47,7 @@ fun GCachedImage(
     colorFilter: ColorFilter? = null,
     placeholderColor: Color = Transparent,
     type: CachedImageType = URL,
+    refreshImage: (() -> Unit)? = null,
 ) {
     
     val context = LocalContext.current
@@ -72,6 +72,11 @@ fun GCachedImage(
         builder, filterQuality = High,
         contentScale = contentScale
     )
+    
+    LaunchedEffect(painter.state) {
+        if(painter.state is Error)
+            refreshImage?.let { it() }
+    }
     
     Image(
         painter = url?.let {

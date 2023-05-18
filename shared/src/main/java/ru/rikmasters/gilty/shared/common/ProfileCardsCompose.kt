@@ -98,6 +98,7 @@ fun HiddenContent(
     image: String?,
     profileType: ProfileType,
     lockState: Boolean,
+    onImageRefresh: () -> Unit = {},
     onCardClick: () -> Unit,
 ) {
     Box(
@@ -116,7 +117,7 @@ fun HiddenContent(
             url = image,
             modifier = Modifier.fillMaxSize(),
             contentScale = Crop
-        )
+        ) { onImageRefresh() }
         if(profileType != USERPROFILE) Lock(
             modifier = Modifier
                 .align(TopStart)
@@ -169,6 +170,7 @@ fun ProfileImageContent(
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
     isError: Boolean = false,
+    onImageRefresh: () -> Unit = {},
     onClick: () -> Unit,
 ) {
     Card(
@@ -194,7 +196,7 @@ fun ProfileImageContent(
     ) {
         Column {
             Box {
-                Avatar(image, type)
+                Avatar(image, type, Modifier, onImageRefresh)
                 when(type) {
                     USERPROFILE, ANONYMOUS_ORGANIZER -> Unit
                     
@@ -226,6 +228,7 @@ private fun Avatar(
     image: AvatarModel?,
     type: ProfileType,
     modifier: Modifier = Modifier,
+    onImageRefresh: () -> Unit,
 ) {
     Box(modifier) {
         GCachedImage(
@@ -233,7 +236,7 @@ private fun Avatar(
             Modifier.fillMaxSize(),
             contentScale = Crop,
             placeholderColor = colorScheme.primaryContainer
-        )
+        ) { onImageRefresh() }
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(
                 Modifier
