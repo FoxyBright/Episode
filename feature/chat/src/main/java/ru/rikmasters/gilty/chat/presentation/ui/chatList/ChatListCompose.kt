@@ -61,7 +61,9 @@ private fun ChatListPreview() {
                 ), pagingPreview(DemoChatModelList),
                 (true), (false), LIST, (1),
                 (MEETING_DATE),
-                LazyListState()
+                LazyListState(),
+                false,
+                false
             ),
             Modifier.background(colorScheme.background)
         )
@@ -77,6 +79,8 @@ data class ChatListState(
     val alertSelect: Int,
     val sortType: SortTypeModel,
     val listState: LazyListState,
+    val isSortOn:Boolean,
+    val isArchiveOn:Boolean,
 )
 
 interface ChatListCallback {
@@ -90,6 +94,8 @@ interface ChatListCallback {
     fun onSortTypeChanged(sortType: SortTypeModel)
     fun onListUpdate()
     fun onListAlertSelect(index: Int)
+    fun onSortClick(sortTypeModel: SortTypeModel)
+    fun onArchiveClick()
 }
 
 @Composable
@@ -153,7 +159,7 @@ private fun TopBar(
             colorScheme.tertiary,
             style = typography.titleLarge
         )
-        Image(
+        /*Image(
             painterResource(R.drawable.ic_chat_indicator),
             (null),
             Modifier
@@ -163,7 +169,7 @@ private fun TopBar(
                     (null)
                 ) {
                     onSortTypeChanged(
-                        if(sortType == MEETING_DATE) MESSAGE_DATE
+                        if (sortType == MEETING_DATE) MESSAGE_DATE
                         else MEETING_DATE
                     )
                 },
@@ -171,7 +177,7 @@ private fun TopBar(
                 if(sortType == MESSAGE_DATE) colorScheme.primary
                 else colorScheme.onTertiary
             )
-        )
+        )*/
     }
 }
 
@@ -195,6 +201,16 @@ private fun Content(
             chats.loadState.refresh is LoadState.Error -> Unit
             chats.loadState.append is LoadState.Error -> Unit
             else -> {
+                item{
+                    Row {
+                        GChip(text = "Сортировка", isSelected = state.sortType != SortTypeModel.NONE) {
+                            callback?.onSortClick(MEETING_DATE)
+                        }
+                        GChip(text = "Архив", isSelected = state.isArchiveOn) {
+                            callback?.onArchiveClick()
+                        }
+                    }
+                }
                 if(chats.loadState.refresh is LoadState.Loading)
                     item { PagingLoader(state.chats.loadState) }
                 if(itemCount != 0) {
