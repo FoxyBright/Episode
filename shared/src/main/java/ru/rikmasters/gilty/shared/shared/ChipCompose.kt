@@ -232,7 +232,7 @@ fun GiltyTab(
                     (selectedTab == tab), online,
                     !unEnabled.contains(tab),
                     backgroundColor = animateColorAsState(
-                        if (!unEnabled.contains(tab)) colorScheme.background
+                        if (unEnabled.contains(tab)) colorScheme.background
                         else if ((selectedTab == tab)) if (online)
                             colors.tabActiveOnline
                         else colors.tabActive
@@ -312,7 +312,7 @@ fun GiltyTabElement(
                 targetValue = if (enabled) {
                     colorScheme.tertiary
                 } else {
-                    colorScheme.tertiary
+                    colorScheme.onTertiary
                 },
                 animationSpec = tween(easing = LinearEasing),
             ).value,
