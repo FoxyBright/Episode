@@ -75,7 +75,7 @@ fun MapContent(
             offsetY.animateTo(
                 targetValue = -75f,
                 animationSpec = tween(
-                    durationMillis = 1000,
+                    durationMillis = 700,
                     delayMillis = 0
                 )
             )
@@ -83,11 +83,11 @@ fun MapContent(
             offsetY.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 1000,
+                    durationMillis = 700,
                     delayMillis = 0
                 )
             )
-            currentPointerImage.value = ic_selected_pointer
+            currentPointerImage.value = ic_location
         }
     }
     
