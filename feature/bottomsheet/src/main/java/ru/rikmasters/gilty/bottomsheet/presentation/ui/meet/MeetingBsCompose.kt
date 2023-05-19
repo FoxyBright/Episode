@@ -199,7 +199,8 @@ fun MeetingBsContent(
             }) {
                 MeetContent(
                     state, modifier.padding(
-                        bottom = it.calculateBottomPadding() - 24.dp
+                        bottom = if(it.calculateBottomPadding() - 24.dp >= 0.dp)
+                            it.calculateBottomPadding() - 24.dp else 0.dp
                     ), callback
                 )
             }
