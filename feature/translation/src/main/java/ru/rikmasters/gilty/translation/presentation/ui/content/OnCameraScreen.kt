@@ -23,7 +23,8 @@ fun OnScreenContent(
     remainTime: String,
     userCount: Int,
     onChatClicked: () -> Unit,
-    onUsersClicked: () -> Unit
+    onUsersClicked: () -> Unit,
+    onExtendCLicked: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -47,13 +48,17 @@ fun OnScreenContent(
                 )
             }
         }
-
         if (translationStatus == TranslationStatus.PREVIEW) {
             BottomActions(
                 startBroadCast = startBroadCast,
                 translationUiState = translationUiState,
                 changeFacing = changeFacing
             )
+        }
+        if (translationStatus == TranslationStatus.EXPIRED) {
+            BottomActionsExpired {
+                onExtendCLicked()
+            }
         }
     }
 }

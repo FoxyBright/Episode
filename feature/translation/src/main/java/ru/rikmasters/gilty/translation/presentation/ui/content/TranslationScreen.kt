@@ -49,7 +49,8 @@ fun TranslationScreen(
     remainTime: String,
     userCount: Int,
     onChatClicked: () -> Unit,
-    onUsersClicked: () -> Unit
+    onUsersClicked: () -> Unit,
+    extendClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -77,7 +78,8 @@ fun TranslationScreen(
                 remainTime = remainTime,
                 userCount = userCount,
                 onChatClicked = onChatClicked,
-                onUsersClicked = onUsersClicked
+                onUsersClicked = onUsersClicked,
+                extendClicked = extendClicked
             )
             if (translationStatus == TranslationStatus.STREAM) {
                 StreamControlPanel(
@@ -85,7 +87,8 @@ fun TranslationScreen(
                     changeFacing = changeFacing,
                     onCameraClicked = onCameraClicked,
                     onMicrophoneClicked = onMicrophoneClicked,
-                    translationUiState = translationUiState
+                    microphoneEnabled = translationUiState.translationInfo?.microphone ?: true,
+                    cameraEnabled = translationUiState.translationInfo?.camera ?: true
                 )
             }
         }

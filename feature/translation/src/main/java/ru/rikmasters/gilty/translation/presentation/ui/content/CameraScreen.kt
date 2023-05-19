@@ -24,7 +24,8 @@ fun CameraScreen(
     remainTime: String,
     userCount: Int,
     onChatClicked: () -> Unit,
-    onUsersClicked: () -> Unit
+    onUsersClicked: () -> Unit,
+    extendClicked:() -> Unit
 ) {
     Surface(
         modifier = modifier,
@@ -52,7 +53,8 @@ fun CameraScreen(
             remainTime = remainTime,
             userCount = userCount,
             onChatClicked = onChatClicked,
-            onUsersClicked = onUsersClicked
+            onUsersClicked = onUsersClicked,
+            onExtendCLicked = extendClicked
         )
     }
 }

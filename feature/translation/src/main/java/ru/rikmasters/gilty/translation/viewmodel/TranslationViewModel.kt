@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -27,9 +26,6 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class TranslationViewModel : ViewModel() {
 
@@ -56,13 +52,10 @@ class TranslationViewModel : ViewModel() {
     ) { isOpened, reload ->
         Pair(isOpened,reload)
     }.flatMapLatest { (isOpened, _) ->
-        Log.d("WebSock","FLATMAPPED")
         // Если открыт ботомшит
         if (isOpened) {
-            Log.d("WebSock","iSOPENED")
             // Если id трансляции существует
             translationUiState.value.translationInfo?.let { translation ->
-                Log.d("WebSock","Translation $translation")
                 translationRepository.getMessages(
                     translationId = translation.id
                 )
@@ -113,17 +106,17 @@ class TranslationViewModel : ViewModel() {
                 if (connected) {
                     _translationUiState.value.translationInfo?.let {
                         val startTime = it.startedAt
-                        val endTime = it.completedAt
                         val currentTime = LocalDateTime.nowZ()
                         startTime?.let {
                             if (currentTime.isAfter(startTime)) {
-                                var difference = endTime.millis() - currentTime.millis()
-                                val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-                                val time = Date(difference)
-                                while (difference > 0) {
-                                    _remainTime.value = sdf.format(time)
+                                val difference = currentTime
+                                    .minusHour(currentTime.hour())
+                                    .minusMinute(currentTime.minute())
+                                    .minusSecond(currentTime.second())
+                                while (true) {
+                                    _remainTime.value = difference.format("H:mm:ss")
                                     delay(1000)
-                                    difference -= 1000
+                                    difference.plusSecond(1)
                                 }
                             }
                         }
@@ -182,7 +175,8 @@ class TranslationViewModel : ViewModel() {
                                         isLoading = false,
                                         translationInfo = it.translationInfo?.copy(
                                             status = TranslationStatusModel.COMPLETED
-                                        )
+                                        ),
+                                        translationStatus = TranslationStatus.COMPLETED
                                     )
                                 }
                             }
@@ -193,7 +187,8 @@ class TranslationViewModel : ViewModel() {
                                         isLoading = false,
                                         translationInfo = it.translationInfo?.copy(
                                             status = TranslationStatusModel.EXPIRED
-                                        )
+                                        ),
+                                        translationStatus = TranslationStatus.EXPIRED
                                     )
                                 }
                             }

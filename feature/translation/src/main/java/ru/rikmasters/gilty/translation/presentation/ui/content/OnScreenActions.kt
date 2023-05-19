@@ -18,7 +18,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -294,4 +293,35 @@ fun BottomActions(
         }
         Spacer(modifier = Modifier.height(53.dp))
     }
+}
+
+@Composable
+fun BottomActionsExpired(
+    onExtendCLicked:() -> Unit
+){
+    Surface(
+        modifier = Modifier
+            .clickable {
+                onExtendCLicked()
+            }
+            .fillMaxWidth()
+            .background(
+                linearGradient(green()),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .padding(vertical = 16.dp),
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    linearGradient(green())
+                ),
+            text = stringResource(id = R.string.translations_start_strean),
+            color = ThemeExtra.colors.white,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+    Spacer(modifier = Modifier.height(53.dp))
 }

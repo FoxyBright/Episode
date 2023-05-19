@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,6 +50,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.BackBlur
 import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.common.extentions.simpleVerticalScrollbar
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -73,132 +73,136 @@ fun UsersBottomSheetContent(
     onSendMessage: (String) -> Unit
 ) {
     val scrollState = rememberLazyListState()
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(
-                    min = (configuration.screenHeightDp * 0.66).dp,
-                    max = (configuration.screenHeightDp * 0.33).dp
-                )
-                .wrapContentWidth(unbounded = false)
-                .padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Surface(
-                modifier = Modifier
-                    .height(5.dp)
-                    .width(40.dp)
-                    .align(Alignment.CenterHorizontally),
-                shape = RoundedCornerShape(11.dp),
-                color = ThemeExtra.colors.bottomSheetGray
-            ) {}
-            if (state == BottomSheetState.USERS) {
-                Spacer(modifier = Modifier.height(12.dp))
-            } else {
-                Spacer(modifier = Modifier.height(15.dp))
-            }
+    BackBlur {
+        Box {
             Column(
-                modifier = Modifier.simpleVerticalScrollbar(
-                    state = scrollState,
-                    width = 3.dp
-                )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(
+                        min = (configuration.screenHeightDp * 0.66).dp,
+                        max = (configuration.screenHeightDp * 0.33).dp
+                    )
+                    .wrapContentWidth(unbounded = false)
+                    .padding(horizontal = 16.dp)
             ) {
-                if ((membersCount == 0 && state == BottomSheetState.USERS && membersList?.loadState?.refresh is LoadState.NotLoading)
-                    || (state == BottomSheetState.CHAT && messagesList?.itemCount == 0 && messagesList.loadState.refresh is LoadState.NotLoading)) {
-                    Text(
-                        text = if (state == BottomSheetState.USERS) {
-                            stringResource(id = R.string.translations_members)
-                        } else {
-                            stringResource(id = R.string.translations_chat)
-                        },
-                        style = ThemeExtra.typography.TranslationTitlePreview,
-                        color = ThemeExtra.colors.white,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(53.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.broken_heart),
-                        contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = if (state == BottomSheetState.USERS) {
-                            stringResource(id = R.string.translations_members_no_users)
-                        } else {
-                            stringResource(id = R.string.translations_members_no_messages)
-                        },
-                        color = ThemeExtra.colors.bottomSheetGray,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(84.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    modifier = Modifier
+                        .height(5.dp)
+                        .width(40.dp)
+                        .align(Alignment.CenterHorizontally),
+                    shape = RoundedCornerShape(11.dp),
+                    color = ThemeExtra.colors.bottomSheetGray
+                ) {}
+                if (state == BottomSheetState.USERS) {
+                    Spacer(modifier = Modifier.height(12.dp))
                 } else {
-                    if (state == BottomSheetState.USERS) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.translations_members),
-                                style = ThemeExtra.typography.TranslationTitlePreview,
-                                color = ThemeExtra.colors.white
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = membersCount.toString(),
-                                style = ThemeExtra.typography.TranslationTitlePreview,
-                                color = ThemeExtra.colors.mainNightGreen
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(28.dp))
-                        SearchBar(
-                            onSearchValueChanged = onSearchValueChange,
-                            searchValue = searchValue
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+                Column(
+                    modifier = Modifier.simpleVerticalScrollbar(
+                        state = scrollState,
+                        width = 3.dp
+                    )
+                ) {
+                    if ((membersCount == 0 && state == BottomSheetState.USERS && membersList?.loadState?.refresh is LoadState.NotLoading)
+                        || (state == BottomSheetState.CHAT && messagesList?.itemCount == 0 && messagesList.loadState.refresh is LoadState.NotLoading)) {
+                        Text(
+                            text = if (state == BottomSheetState.USERS) {
+                                stringResource(id = R.string.translations_members)
+                            } else {
+                                stringResource(id = R.string.translations_chat)
+                            },
+                            style = ThemeExtra.typography.TranslationTitlePreview,
+                            color = ThemeExtra.colors.white,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        Spacer(modifier = Modifier.height(28.dp))
-                    }
-                    LazyColumn(
-                        state = scrollState
-                    ) {
+                        Spacer(modifier = Modifier.height(53.dp))
+                        Image(
+                            painter = painterResource(id = R.drawable.broken_heart),
+                            contentDescription = "",
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = if (state == BottomSheetState.USERS) {
+                                stringResource(id = R.string.translations_members_no_users)
+                            } else {
+                                stringResource(id = R.string.translations_members_no_messages)
+                            },
+                            color = ThemeExtra.colors.bottomSheetGray,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(84.dp))
+                    } else {
                         if (state == BottomSheetState.USERS) {
-                            membersList?.let {
-                                items(membersList) { fullUserModel ->
-                                    fullUserModel?.let {
-                                        MemberItem(
-                                            user = it,
-                                            onComplainClicked = { onComplainClicked(it) },
-                                            onDeleteClicked = { onDeleteClicked(it) }
-                                        )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.translations_members),
+                                    style = ThemeExtra.typography.TranslationTitlePreview,
+                                    color = ThemeExtra.colors.white
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = membersCount.toString(),
+                                    style = ThemeExtra.typography.TranslationTitlePreview,
+                                    color = ThemeExtra.colors.mainNightGreen
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(28.dp))
+                            SearchBar(
+                                onSearchValueChanged = onSearchValueChange,
+                                searchValue = searchValue
+                            )
+                            Spacer(modifier = Modifier.height(28.dp))
+                        }
+                        LazyColumn(
+                            state = scrollState
+                        ) {
+                            if (state == BottomSheetState.USERS) {
+                                membersList?.let {
+                                    items(membersList) { fullUserModel ->
+                                        fullUserModel?.let {
+                                            MemberItem(
+                                                user = it,
+                                                onComplainClicked = { onComplainClicked(it) },
+                                                onDeleteClicked = { onDeleteClicked(it) }
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                        } else {
-                            messagesList?.let {
-                                items(messagesList) { messageModel ->
-                                    messageModel?.let {
-                                        MessageItem(
-                                            messageModel = it
-                                        )
+                            } else {
+                                messagesList?.let {
+                                    items(messagesList) { messageModel ->
+                                        messageModel?.let {
+                                            MessageItem(
+                                                messageModel = it
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        if (state == BottomSheetState.CHAT) {
-            CommentPanel(
-                onSendMessage = onSendMessage,
-                modifier = Modifier.align(
-                    Alignment.BottomCenter
-                ).padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp
+            if (state == BottomSheetState.CHAT) {
+                CommentPanel(
+                    onSendMessage = onSendMessage,
+                    modifier = Modifier
+                        .align(
+                            Alignment.BottomCenter
+                        )
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        )
                 )
-            )
+            }
         }
     }
 }
@@ -218,7 +222,8 @@ fun CommentPanel(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(50.dp)
         ) {
             TextField(
@@ -249,10 +254,12 @@ fun CommentPanel(
                 painter = painterResource(id = R.drawable.ic_send_rounded),
                 contentDescription = "send message",
                 tint = Color.Unspecified,
-                modifier = Modifier.clickable {
-                    onSendMessage(messageText)
-                    messageText = ""
-                }.padding(4.dp)
+                modifier = Modifier
+                    .clickable {
+                        onSendMessage(messageText)
+                        messageText = ""
+                    }
+                    .padding(4.dp)
             )
         }
     }

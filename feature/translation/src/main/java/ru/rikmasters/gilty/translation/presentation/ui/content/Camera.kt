@@ -1,15 +1,12 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content
 
 import android.view.SurfaceHolder
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pedro.rtplibrary.view.AspectRatioMode
 import com.pedro.rtplibrary.view.OpenGlView
-
-// DONE REFACTOR
 @Composable
 fun Camera(
     startPreview:() -> Unit,
