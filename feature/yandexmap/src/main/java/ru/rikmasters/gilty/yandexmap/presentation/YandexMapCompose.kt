@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.yandexmap
+package ru.rikmasters.gilty.yandexmap.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,17 +11,11 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
@@ -31,7 +25,10 @@ import com.yandex.mapkit.geometry.Point
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.bottomsheet.*
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
+import ru.rikmasters.gilty.yandexmap.model.MeetPlaceModel
+import ru.rikmasters.gilty.yandexmap.ymap.MapContent
 
 
 data class YandexMapState(
@@ -41,43 +38,49 @@ data class YandexMapState(
     val address: String? = null,
     val place: String? = null,
     val categoryName: String? = null,
-    val isSearching:Boolean = false,
-    val currentPoint:Point?=null,
+    val isSearching: Boolean = false,
+    val currentPoint: Point? = null,
+    val subBsState: BottomSheetScaffoldState
 )
 
 interface YandexMapCallback {
     
     fun onBack()
     fun getRoute()
-    fun onMarkerClick(meetPlace: MeetPlace)
-    fun onIsSearchingChange(value:Boolean)
+    fun onMarkerClick(meetPlaceModel: MeetPlaceModel)
+    fun onIsSearchingChange(value: Boolean)
     fun onCameraChange(point: Point)
+    fun subBsExpandState(state: Boolean)
 }
 
+
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun YandexMapContent(
     state: YandexMapState,
     modifier: Modifier = Modifier,
     callback: YandexMapCallback? = null,
 ) {
-    val localDensity = LocalDensity.current
-    var bottomHeightDp by remember { mutableStateOf(0.dp) }
-
-    Column(modifier.fillMaxSize()) {
-        TopBar(Modifier) { callback?.onBack() }
-        MapContent(
-            state, Modifier
-                .fillMaxHeight()
-                .offset(y = 24.dp)
-                .padding(bottom = bottomHeightDp),
-            callback
-        )
-    }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = BottomCenter){
-        Bottom(state, Modifier.onGloballyPositioned { coordinates ->
-            bottomHeightDp = with(localDensity) { coordinates.size.height.toDp() }
-        })
-        { callback?.getRoute() }
+    BottomSheetScaffold(
+        scaffoldState = state.subBsState,
+        sheetContent = {
+            Bottom(state) {
+                callback?.getRoute()
+            }
+        },
+        sheetBackgroundColor = Transparent,
+        sheetPeekHeight = 80.dp
+    ) {
+        Column(modifier.fillMaxSize()) {
+            TopBar(Modifier) { callback?.onBack() }
+            MapContent(
+                state = state,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .offset(y = 24.dp),
+                callback = callback
+            )
+        }
     }
 }
 
