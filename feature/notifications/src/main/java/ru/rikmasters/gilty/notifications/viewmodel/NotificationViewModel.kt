@@ -64,6 +64,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun blur(state: Boolean) {
         _blur.emit(state)
+        _participantsStates.emit(emptyList())
     }
     
     suspend fun selectNotification(
@@ -71,6 +72,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     ) = singleLoading {
         notification.parent.meeting?.let { meet ->
             changeMeetId(meet.id)
+            refreshMember.emit(!refreshMember.value)
             _selectedNotification.emit(notification)
         }
     }
@@ -108,11 +110,12 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     val selectedNotification = _selectedNotification.asStateFlow()
     
     private val _meetId = MutableStateFlow<String?>(null)
-    
+
+    private val refreshMember = MutableStateFlow<Boolean>(false)
     @OptIn(ExperimentalCoroutinesApi::class)
     val participants by lazy {
-        _meetId.flatMapLatest {
-            it?.let {
+        refreshMember.flatMapLatest {
+            _meetId.value?.let {
                 meetManager.getMeetMembers(
                     meetId = it,
                     excludeMe = true
@@ -139,6 +142,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     ) = singleLoading {
         notificationManger.putRatings(meetId, userId, emoji)
         changeMeetId(meetId)
+        refreshMember.emit(!refreshMember.value)
     }
     
     suspend fun selectParticipants(participant: Int) {
