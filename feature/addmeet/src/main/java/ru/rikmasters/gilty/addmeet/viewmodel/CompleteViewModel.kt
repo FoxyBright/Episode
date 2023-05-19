@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.meeting.AddMeetModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 
 class CompleteViewModel: ViewModel() {
     
@@ -56,6 +57,19 @@ class CompleteViewModel: ViewModel() {
     }
     
     suspend fun clearAddMeet() {
+        AgeFrom = ""
+        AgeTo = ""
+        Gender = null
+        Orientation = null
+        Requirements = arrayListOf(
+            RequirementModel(
+                gender = null,
+                ageMin = 0,
+                ageMax = 0,
+                orientation = null
+            )
+        )
+        RequirementsType = 0
         meetManager.clearAddMeet()
     }
     
