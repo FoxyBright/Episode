@@ -380,7 +380,7 @@ fun SortTypeLabels(
         Box(modifier = Modifier.animateContentSize()) {
             if (state.sortType != NONE) {
                 GChip(
-                    modifier = Modifier.padding(start = sortLabelHeightDp - 16.dp),
+                    modifier = Modifier.padding(start = if(sortLabelHeightDp - 16.dp >= 0.dp) sortLabelHeightDp - 16.dp  else 0.dp),
                     text = state.sortType.getSortName(),
                     isSelected = true,
                     backgroundColor = colorScheme.primary
