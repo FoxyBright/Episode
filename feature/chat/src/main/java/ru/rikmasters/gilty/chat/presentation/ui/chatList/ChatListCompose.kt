@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -122,12 +123,14 @@ fun ChatListContent(
             ) { callback?.onNavBarSelect(it) }
         },
         content = {
-            Box(Modifier.padding(it)) {
-                if(state.chats.loadState.refresh
-                            is LoadState.NotLoading
-                    && state.chats.itemCount == 0
-                ) EmptyChats()
+            Column(Modifier.padding(it)) {
+                SortTypeLabels(Modifier, state, callback)
                 Use<ChatListViewModel>(PullToRefreshTrait) {
+                    if(state.chats.loadState.refresh
+                            is LoadState.NotLoading
+                        && state.chats.itemCount == 0
+                    ) EmptyChats()
+
                     Content(state, Modifier, callback)
                 }
             }
@@ -184,9 +187,6 @@ private fun Content(
             chats.loadState.refresh is LoadState.Error -> Unit
             chats.loadState.append is LoadState.Error -> Unit
             else -> {
-                item{
-                    SortTypeLabels(state, callback)
-                }
                 if(chats.loadState.refresh is LoadState.Loading)
                     item { PagingLoader(state.chats.loadState) }
                 if(itemCount != 0) {
@@ -371,19 +371,21 @@ private fun EmptyChats(
 
 @Composable
 fun SortTypeLabels(
+    modifier: Modifier,
     state:ChatListState,
     callback: ChatListCallback?,
 ) {
     var sortLabelHeightDp by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
-    Row(modifier = Modifier.horizontalScroll(rememberScrollState()).fillMaxWidth()) {
+    Row(modifier = modifier.horizontalScroll(rememberScrollState()).fillMaxWidth()) {
+        Spacer(modifier = Modifier.width(16.dp))
         Box(modifier = Modifier.animateContentSize()) {
             if (state.sortType != NONE) {
                 GChip(
                     modifier = Modifier.padding(start = if(sortLabelHeightDp - 16.dp >= 0.dp) sortLabelHeightDp - 16.dp  else 0.dp),
                     text = state.sortType.getSortName(),
                     isSelected = true,
-                    backgroundColor = colorScheme.primary
+                    backgroundColor = Color.Red
                 ) {}
             }
 

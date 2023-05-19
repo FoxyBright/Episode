@@ -16,7 +16,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 
 @Composable
 fun Element(
-    it: FilterModel,
+    item: FilterModel,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -26,18 +26,18 @@ fun Element(
     ) {
         Text(
             buildAnnotatedString {
-                append("${it.name} ")
+                append("${item.name} ")
                 withStyle(
                     typography.labelSmall.copy(
                         colorScheme.onTertiary,
                         fontWeight = SemiBold
                     ).toSpanStyle()
-                ) { append(it.details ?: "") }
+                ) { append(item.details ?: "") }
             }, Modifier.padding(bottom = 16.dp),
             style = typography.labelLarge.copy(
                 colorScheme.tertiary
             )
         )
-        it.content.invoke()
+        item.content.invoke()
     }
 }

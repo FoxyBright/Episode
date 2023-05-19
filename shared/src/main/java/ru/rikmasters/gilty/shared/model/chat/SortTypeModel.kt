@@ -7,9 +7,10 @@ enum class SortTypeModel {
     NONE,
 }
 
+// TODO change filters names, once backend is ready
 fun SortTypeModel.getSortName():String = when(this) {
-        SortTypeModel.MEETING_DATE -> "По дате"
-        SortTypeModel.MESSAGE_DATE -> "По сообщению"
-        SortTypeModel.MESSAGE_COUNT -> "По сообщению"
-        else -> "По сообщению"
+        SortTypeModel.MEETING_DATE -> "  По дате"
+        SortTypeModel.MESSAGE_DATE -> "  По сообщению"
+        SortTypeModel.MESSAGE_COUNT -> "  По сообщению"
+        else -> "  По сообщению"
     }

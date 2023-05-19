@@ -97,6 +97,10 @@ class RequirementsViewModel: ViewModel() {
                                     null
                                 }
                             )
+                        }?.run {
+                            _age.emit("")
+                            _gender.emit(null)
+                            _orientation.emit(null)
                         }
                         reqList
                     } ?: emptyList()
