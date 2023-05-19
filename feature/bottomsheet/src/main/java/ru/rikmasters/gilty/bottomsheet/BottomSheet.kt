@@ -8,7 +8,7 @@ import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.data.reports.ReportsData
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.profile.ProfileData
-import ru.rikmasters.gilty.yandexmap.YandexMapViewModel
+import ru.rikmasters.gilty.yandexmap.viewmodel.YandexMapViewModel
 
 object BottomSheet: FeatureDefinition() {
     
