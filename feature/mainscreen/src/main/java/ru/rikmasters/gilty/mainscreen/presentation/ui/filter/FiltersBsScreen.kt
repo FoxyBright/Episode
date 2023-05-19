@@ -100,7 +100,8 @@ fun FiltersBs(
                 }
                 
                 override fun onCityClick() {
-                    scope.launch { vm.navigate(3) }
+                    if(!isCollapsed)
+                        scope.launch { vm.navigate(3) }
                 }
                 
                 override fun onDeleteTag(tag: TagModel) {
