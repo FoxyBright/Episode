@@ -1,7 +1,9 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
+import android.content.res.Configuration
 import android.util.Log
 import android.view.SurfaceHolder
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -49,6 +52,8 @@ fun TestTranslationScreen(
     translationId: String
 ) {
     val scope = rememberCoroutineScope()
+
+    var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
 
     LaunchedEffect(Unit) {
         // Начальная инициализация при заходе в экран
@@ -121,7 +126,7 @@ fun TestTranslationScreen(
         }
     }
     var currentOpenGlView by remember { mutableStateOf<OpenGlView?>(null) }
-    var closedFromStream by remember { mutableStateOf(false) }
+    var glViewChanged by remember { mutableStateOf(false) }
 
 
     // Состояние боттом шита
@@ -134,18 +139,35 @@ fun TestTranslationScreen(
     // Конфигурация экрана (для определения максимальной/минимальной высоты ботом шита)
     val configuration = LocalConfiguration.current
 
-    // Остановка стрима
+    LaunchedEffect(key1 = configuration) {
+        snapshotFlow { configuration.orientation }
+            .collect {
+                orientation = it
+            }
+    }
+
+    // Остановка стрима и превью - release GL, оповещение вью модели, конект
     fun stopBroadcast() {
         camera?.let {
             if (it.isStreaming) {
-                camera?.stopStream()
-                camera?.stopPreview()
+                it.stopStream()
+                it.stopPreview()
                 vm.onEvent(TranslationEvent.StopStreaming)
             }
         }
     }
 
-    // Запуск стрима
+    // Остановка превью
+    fun stopPreview() {
+        camera?.let {
+            if (it.isOnPreview) {
+                it.stopPreview()
+            }
+        }
+    }
+
+
+    // Запуск стрима, оповещение вью модели
     fun startBroadCast(rtmpUrl: String) {
         camera?.let {
             if (!it.isStreaming) {
@@ -153,11 +175,23 @@ fun TestTranslationScreen(
                     it.startStream(rtmpUrl)
                     vm.onEvent(TranslationEvent.StartStreaming)
                 } else {
-                    vm.onEvent(TranslationEvent.StopStreaming)
+                    // TODO: обработать случаи когда не удалось подготовить видео или аудио
+                    //vm.onEvent(TranslationEvent.StopStreaming)
                 }
             }
         }
     }
+
+    // Запуск превью
+    fun startPreview() {
+        camera?.let {
+            if (!it.isOnPreview) {
+                it.startPreview()
+            }
+        }
+    }
+
+
 
     // TODO: Непонятно для чего нужен
     val connectionChecker = remember {
@@ -175,26 +209,10 @@ fun TestTranslationScreen(
     val surfaceHolderCallback = remember {
         object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
-                when (translationScreenState.translationStatus) {
-                    TranslationStatus.PREVIEW -> {
-                        currentOpenGlView?.let {
-                            camera?.replaceView(it)
-                        }
-                        if (camera?.isOnPreview == false) {
-                            camera?.startPreview()
-                        }
-                    }
-
-                    TranslationStatus.STREAM -> {
-                        camera?.replaceView(currentOpenGlView)
-                        translationScreenState.translationInfo?.let {
-                            startBroadCast(
-                                rtmpUrl = it.rtmp
-                            )
-                        }
-                    }
-
-                    else -> {}
+                // Change View of Surface
+                if (glViewChanged && currentOpenGlView != null) {
+                    camera?.replaceView(currentOpenGlView)
+                    glViewChanged = false
                 }
             }
 
@@ -204,28 +222,30 @@ fun TestTranslationScreen(
                 width: Int,
                 height: Int
             ) {
+                camera?.let {
+                    when (translationScreenState.translationStatus) {
+                        TranslationStatus.PREVIEW -> {
+                            it.startPreview()
+                        }
+                        TranslationStatus.STREAM -> {
+                            translationScreenState.translationInfo?.let { translation ->
+                                startBroadCast(
+                                    rtmpUrl = translation.rtmp
+                                )
+                            }
+                        }
+                        else -> {}
+                    }
+                }
             }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
-                when (translationScreenState.translationStatus) {
-                    TranslationStatus.PREVIEW -> {
-                        if (closedFromStream) {
-                            stopBroadcast()
-                            closedFromStream = false
-                        } else {
-                            if (camera?.isOnPreview == true) {
-                                camera?.stopPreview()
-                            }
-                        }
+                camera?.let {
+                    if (it.isStreaming) {
+                        stopBroadcast()
+                    } else {
+                        stopPreview()
                     }
-
-                    TranslationStatus.STREAM -> {
-                        if (closedFromStream) {
-                            stopBroadcast()
-                        }
-                    }
-
-                    else -> {}
                 }
             }
         }
@@ -291,10 +311,10 @@ fun TestTranslationScreen(
                     } else {
                         // Экран обновился
                         currentOpenGlView = view
+                        glViewChanged = true
                     }
                 },
                 onCloseClicked = {
-                    closedFromStream = true
                     vm.onEvent(TranslationEvent.ChangeUiToPreview)
                 },
                 changeFacing = {
@@ -358,6 +378,7 @@ fun TestTranslationScreen(
                     }
                 },
                 surfaceHolderCallback = surfaceHolderCallback,
+                orientation = orientation
             )
             GAlert(
                 show = isShowDeleteAlert,

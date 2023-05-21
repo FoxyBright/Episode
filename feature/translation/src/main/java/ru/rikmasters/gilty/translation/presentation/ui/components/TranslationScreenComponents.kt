@@ -46,41 +46,91 @@ import ru.rikmasters.gilty.translation.model.Facing
 @Composable
 fun CameraItem(
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    roundedBackground: Boolean = false
 ) {
-    Icon(
-        painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
-        else painterResource(id = R.drawable.ic_video_inactive),
-        contentDescription = "turn on/off camera",
-        tint = ThemeExtra.colors.white,
-        modifier = Modifier.clickable { onClick() }
-    )
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray
+        ) {
+            Icon(
+                painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
+                else painterResource(id = R.drawable.ic_video_inactive),
+                contentDescription = "turn on/off camera",
+                tint = ThemeExtra.colors.white,
+                modifier = Modifier.clickable { onClick() }
+            )
+        }
+    } else {
+        Icon(
+            painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
+            else painterResource(id = R.drawable.ic_video_inactive),
+            contentDescription = "turn on/off camera",
+            tint = ThemeExtra.colors.white,
+            modifier = Modifier.clickable { onClick() }
+        )
+    }
 }
 
 @Composable
 fun MicrophoneItem(
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    roundedBackground: Boolean = false
 ) {
-    Icon(
-        painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
-        else painterResource(id = R.drawable.ic_micro_inactive),
-        contentDescription = "turn on/off microphone",
-        tint = ThemeExtra.colors.white,
-        modifier = Modifier.clickable { onClick() }
-    )
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray
+        ) {
+            Icon(
+                painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
+                else painterResource(id = R.drawable.ic_micro_inactive),
+                contentDescription = "turn on/off microphone",
+                tint = ThemeExtra.colors.white,
+                modifier = Modifier.clickable { onClick() }
+            )
+        }
+    } else {
+        Icon(
+            painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
+            else painterResource(id = R.drawable.ic_micro_inactive),
+            contentDescription = "turn on/off microphone",
+            tint = ThemeExtra.colors.white,
+            modifier = Modifier.clickable { onClick() }
+        )
+    }
 }
 
 @Composable
 fun ChangeFacingItem(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    roundedBackground: Boolean = false
 ) {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_refresh),
-        contentDescription = "change camera",
-        tint = ThemeExtra.colors.white,
-        modifier = Modifier.clickable { onClick() }
-    )
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_refresh),
+                contentDescription = "change camera",
+                tint = ThemeExtra.colors.white,
+                modifier = Modifier.clickable { onClick() }
+            )
+        }
+    } else {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_refresh),
+            contentDescription = "change camera",
+            tint = ThemeExtra.colors.white,
+            modifier = Modifier.clickable { onClick() }
+        )
+    }
 }
 
 @Composable
