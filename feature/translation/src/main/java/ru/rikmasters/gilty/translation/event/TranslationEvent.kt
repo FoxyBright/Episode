@@ -10,6 +10,8 @@ sealed interface TranslationEvent {
     data class SendMessage(val text: String) : TranslationEvent
     data class KickUser(val user: FullUserModel) : TranslationEvent
     object ChangeFacing : TranslationEvent
+    object ChangeUiToStream : TranslationEvent
+    object ChangeUiToPreview : TranslationEvent
     object StartStreaming : TranslationEvent
     object StopStreaming : TranslationEvent
     object ChangeMicrophoneState : TranslationEvent

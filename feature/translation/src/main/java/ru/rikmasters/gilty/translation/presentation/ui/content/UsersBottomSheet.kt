@@ -73,7 +73,6 @@ fun UsersBottomSheetContent(
     onSendMessage: (String) -> Unit
 ) {
     val scrollState = rememberLazyListState()
-    BackBlur {
         Box {
             Column(
                 modifier = Modifier
@@ -204,7 +203,6 @@ fun UsersBottomSheetContent(
                 )
             }
         }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

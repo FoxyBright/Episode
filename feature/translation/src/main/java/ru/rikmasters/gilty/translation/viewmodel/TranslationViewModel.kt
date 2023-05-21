@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -270,13 +271,22 @@ class TranslationViewModel : ViewModel() {
                     )
                 }
             }
-
-            TranslationEvent.StartStreaming -> {
+            TranslationEvent.ChangeUiToPreview -> {
+                _translationUiState.update {
+                    it.copy(
+                        translationStatus = TranslationStatus.PREVIEW
+                    )
+                }
+                Log.d("TESTFF","UI UPDATED ${_translationUiState.value.translationStatus}")
+            }
+            TranslationEvent.ChangeUiToStream -> {
                 _translationUiState.update {
                     it.copy(
                         translationStatus = TranslationStatus.STREAM
                     )
                 }
+            }
+            TranslationEvent.StartStreaming -> {
                 coroutineScope.launch {
                     _translationUiState.value.translationInfo?.let { translation ->
                         translationRepository.connectToTranslation(
@@ -288,11 +298,6 @@ class TranslationViewModel : ViewModel() {
             }
 
             TranslationEvent.StopStreaming -> {
-                _translationUiState.update {
-                    it.copy(
-                        translationStatus = TranslationStatus.PREVIEW
-                    )
-                }
                 coroutineScope.launch {
                     translationRepository.disconnectFromTranslation()
                     stopPinging()

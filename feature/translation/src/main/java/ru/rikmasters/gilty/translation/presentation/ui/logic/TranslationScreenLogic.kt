@@ -1,10 +1,10 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
-import android.content.res.Resources.Theme
+import android.util.Log
+import android.view.SurfaceHolder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,9 +24,9 @@ import com.pedro.encoder.input.gl.render.filters.BlurFilterRender
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
+import com.pedro.rtplibrary.view.OpenGlView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ru.rikmasters.gilty.core.app.ui.BottomSheetLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.shared.GAlert
@@ -39,7 +39,6 @@ import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
-import ru.rikmasters.gilty.translation.presentation.ui.content.TranslationScreen
 import ru.rikmasters.gilty.translation.presentation.ui.content.UsersBottomSheetContent
 import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
 
@@ -83,6 +82,7 @@ fun TestTranslationScreen(
     // Оставшееся время трансляции
     val remainTime by vm.remainTime.collectAsState()
 
+
     // Камера РТМП клиента
     var camera by remember { mutableStateOf<RtmpCamera2?>(null) }
     // Смена ориентации камеры
@@ -120,9 +120,8 @@ fun TestTranslationScreen(
             }
         }
     }
-
-    // TODO: Пока непонятно для чего нужно
-    var streamState by remember { mutableStateOf(StreamState.STOP) }
+    var currentOpenGlView by remember { mutableStateOf<OpenGlView?>(null) }
+    var closedFromStream by remember { mutableStateOf(false) }
 
 
     // Состояние боттом шита
@@ -137,8 +136,13 @@ fun TestTranslationScreen(
 
     // Остановка стрима
     fun stopBroadcast() {
-        camera?.stopStream()
-        vm.onEvent(TranslationEvent.StopStreaming)
+        camera?.let {
+            if (it.isStreaming) {
+                camera?.stopStream()
+                camera?.stopPreview()
+                vm.onEvent(TranslationEvent.StopStreaming)
+            }
+        }
     }
 
     // Запуск стрима
@@ -146,16 +150,11 @@ fun TestTranslationScreen(
         camera?.let {
             if (!it.isStreaming) {
                 if (it.prepareAudio() && it.prepareVideo()) {
-                    streamState = StreamState.PLAY
                     it.startStream(rtmpUrl)
                     vm.onEvent(TranslationEvent.StartStreaming)
                 } else {
-                    streamState = StreamState.STOP
                     vm.onEvent(TranslationEvent.StopStreaming)
                 }
-            } else {
-                it.stopStream()
-                vm.onEvent(TranslationEvent.StopStreaming)
             }
         }
     }
@@ -167,15 +166,68 @@ fun TestTranslationScreen(
             override fun onAuthSuccessRtmp() {}
             override fun onConnectionFailedRtmp(reason: String) {}
             override fun onConnectionStartedRtmp(rtmpUrl: String) {}
-            override fun onConnectionSuccessRtmp() {
-                streamState = StreamState.PLAY
-            }
-
-            override fun onDisconnectRtmp() {
-                streamState = StreamState.STOP
-            }
-
+            override fun onConnectionSuccessRtmp() {}
+            override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {}
+        }
+    }
+
+    val surfaceHolderCallback = remember {
+        object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                when (translationScreenState.translationStatus) {
+                    TranslationStatus.PREVIEW -> {
+                        currentOpenGlView?.let {
+                            camera?.replaceView(it)
+                        }
+                        if (camera?.isOnPreview == false) {
+                            camera?.startPreview()
+                        }
+                    }
+
+                    TranslationStatus.STREAM -> {
+                        camera?.replaceView(currentOpenGlView)
+                        translationScreenState.translationInfo?.let {
+                            startBroadCast(
+                                rtmpUrl = it.rtmp
+                            )
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                when (translationScreenState.translationStatus) {
+                    TranslationStatus.PREVIEW -> {
+                        if (closedFromStream) {
+                            stopBroadcast()
+                            closedFromStream = false
+                        } else {
+                            if (camera?.isOnPreview == true) {
+                                camera?.stopPreview()
+                            }
+                        }
+                    }
+
+                    TranslationStatus.STREAM -> {
+                        if (closedFromStream) {
+                            stopBroadcast()
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
         }
     }
 
@@ -229,103 +281,106 @@ fun TestTranslationScreen(
         )
     ) {
         Box {
-            TranslationScreen(
+            TranslationStateManager(
                 translationStatus = translationScreenState.translationStatus
                     ?: TranslationStatus.PREVIEW,
-                onCloseClicked = {
-                    stopBroadcast()
+                initializeCamera = { view ->
+                    if (camera == null) {
+                        // Первый заход в экран
+                        camera = RtmpCamera2(view, connectionChecker)
+                    } else {
+                        // Экран обновился
+                        currentOpenGlView = view
+                    }
                 },
-                translationUiState = translationScreenState,
+                onCloseClicked = {
+                    closedFromStream = true
+                    vm.onEvent(TranslationEvent.ChangeUiToPreview)
+                },
                 changeFacing = {
                     vm.onEvent(TranslationEvent.ChangeFacing)
                 },
+                selectedFacing = translationScreenState.selectedCamera ?: Facing.FRONT,
+                startBroadcast = {
+                    vm.onEvent(TranslationEvent.ChangeUiToStream)
+                },
+                meetingModel = translationScreenState.meetingModel,
+                cameraEnabled = translationScreenState.translationInfo?.camera ?: true,
+                microphoneEnabled = translationScreenState.translationInfo?.microphone ?: true,
                 onCameraClicked = {
                     vm.onEvent(TranslationEvent.ChangeVideoState)
                 },
                 onMicrophoneClicked = {
                     vm.onEvent(TranslationEvent.ChangeMicrophoneState)
                 },
-                initCamera = { view ->
-                    camera = RtmpCamera2(view, connectionChecker)
+                remainTime = remainTime,
+                membersCount = translationScreenState.membersCount ?: 0,
+                onChatClicked = {
+                    scope.launch {
+                        bottomSheetState =
+                            ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
+                        if (scaffoldState.bottomSheetState.isExpanded) {
+                            scaffoldState.bottomSheetState.collapse()
+                            vm.onEvent(
+                                TranslationEvent.ChatBottomSheetOpened(
+                                    isOpened = false
+                                )
+                            )
+                        } else {
+                            scaffoldState.bottomSheetState.expand()
+                            vm.onEvent(
+                                TranslationEvent.ChatBottomSheetOpened(
+                                    isOpened = true
+                                )
+                            )
+                        }
+                    }
                 },
-                startStreamPreview = {
-                    camera?.startPreview()
+                onMembersClicked = {
+                    scope.launch {
+                        bottomSheetState =
+                            ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
+                        if (scaffoldState.bottomSheetState.isExpanded) {
+                            scaffoldState.bottomSheetState.collapse()
+                            vm.onEvent(
+                                TranslationEvent.UserBottomSheetOpened(
+                                    isOpened = false
+                                )
+                            )
+                        } else {
+                            scaffoldState.bottomSheetState.expand()
+                            vm.onEvent(
+                                TranslationEvent.UserBottomSheetOpened(
+                                    isOpened = true
+                                )
+                            )
+                        }
+                    }
                 },
-                stopStreamPreview = {
-                    camera?.stopPreview()
-                },
-                startStream = {
-                    translationScreenState.translationInfo?.let {
-                        startBroadCast(
-                            rtmpUrl = it.rtmp
+                surfaceHolderCallback = surfaceHolderCallback,
+            )
+            GAlert(
+                show = isShowDeleteAlert,
+                success = Pair(stringResource(id = R.string.translations_members_delete)) {
+                    currentDeleteUser?.let {
+                        vm.onEvent(
+                            TranslationEvent.KickUser(
+                                user = it
+                            )
                         )
                     }
                 },
-                remainTime = remainTime,
-                userCount = translationScreenState.membersCount ?: 0,
-                onChatClicked = {
-                    scope.launch {
-                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                            vm.onEvent(
-                                TranslationEvent.ChatBottomSheetOpened(
-                                    isOpened = false
-                                )
-                            )
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
-                            vm.onEvent(
-                                TranslationEvent.ChatBottomSheetOpened(
-                                    isOpened = true
-                                )
-                            )
-                        }
-                    }
-                },
-                onUsersClicked = {
-                    scope.launch {
-                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                            vm.onEvent(
-                                TranslationEvent.UserBottomSheetOpened(
-                                    isOpened = false
-                                )
-                            )
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
-                            vm.onEvent(
-                                TranslationEvent.UserBottomSheetOpened(
-                                    isOpened = true
-                                )
-                            )
-                        }
-                    }
+                label = stringResource(id = R.string.translations_members_delete_label),
+                title = stringResource(id = R.string.translations_members_delete_title),
+                onDismissRequest = { isShowDeleteAlert = false },
+                cancel = Pair(stringResource(id = R.string.translations_members_cancel)) {
+                    isShowDeleteAlert = false
                 }
             )
         }
-        GAlert(
-            show = isShowDeleteAlert,
-            success = Pair(stringResource(id = R.string.translations_members_delete)) {
-                currentDeleteUser?.let {
-                    vm.onEvent(
-                        TranslationEvent.KickUser(
-                            user = it
-                        )
-                    )
-                }
-            },
-            label = stringResource(id = R.string.translations_members_delete_label),
-            title = stringResource(id = R.string.translations_members_delete_title),
-            onDismissRequest = { isShowDeleteAlert = false },
-            cancel = Pair(stringResource(id = R.string.translations_members_cancel)) {
-                isShowDeleteAlert = false
-            }
-        )
     }
 }
 
-private enum class StreamState {
-    STOP, PLAY
+private enum class TestStreamState {
+    PREVIEW, STREAM
 }

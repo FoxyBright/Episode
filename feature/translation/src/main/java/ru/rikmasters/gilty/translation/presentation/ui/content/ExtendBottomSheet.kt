@@ -19,8 +19,6 @@ import ru.rikmasters.gilty.shared.shared.ListItemPicker
 @Composable
 fun ExtendBottomSheet(
     value: String,
-    modifier: Modifier = Modifier,
-    online: Boolean,
     onValueChange: ((String) -> Unit)? = null,
     onSave: (() -> Unit)? = null,
 ) {
@@ -50,7 +48,7 @@ fun ExtendBottomSheet(
                 .padding(vertical = 28.dp)
                 .align(Alignment.BottomCenter),
             stringResource(R.string.save_button),
-            online = online
+            online = true
         ) { onSave?.let { it() } }
     }
 }

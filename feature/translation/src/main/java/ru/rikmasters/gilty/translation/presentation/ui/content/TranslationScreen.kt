@@ -34,6 +34,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 
+/*
 @Composable
 fun TranslationScreen(
     translationStatus: TranslationStatus,
@@ -144,3 +145,5 @@ fun TranslationScreen(
         }
     }
 }
+
+ */

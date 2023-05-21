@@ -10,6 +10,7 @@ import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 
+/*
 @Composable
 fun CameraScreen(
     modifier: Modifier,
@@ -59,3 +60,6 @@ fun CameraScreen(
     }
 }
 
+
+
+ */
