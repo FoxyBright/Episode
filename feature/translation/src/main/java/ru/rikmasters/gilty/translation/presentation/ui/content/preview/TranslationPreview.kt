@@ -1,7 +1,9 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content.preview
 
 import android.view.SurfaceHolder
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,49 +38,56 @@ fun TranslationPreview(
     startBroadCast: () -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = ThemeExtra.colors.preDarkColor)
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            shape = RoundedCornerShape(
                 topEnd = 14.dp,
                 topStart = 14.dp
             )
-    ) {
-        CameraView (
-            initCamera = initializeCamera,
-            surfaceHolderCallback = surfaceHolderCallback
-        )
-        Column(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
-            BottomSheetDragItem(modifier = Modifier.align(Alignment.CenterHorizontally))
-            Spacer(modifier = Modifier.height(22.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            CameraView(
+                initCamera = initializeCamera,
+                surfaceHolderCallback = surfaceHolderCallback
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(id = R.string.translations_preview_title),
-                    color = ThemeExtra.colors.white,
-                    style = ThemeExtra.typography.TranslationTitlePreview
+                Spacer(modifier = Modifier.height(12.dp))
+                BottomSheetDragItem(modifier = Modifier.align(Alignment.CenterHorizontally))
+                Spacer(modifier = Modifier.height(22.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.translations_preview_title),
+                        color = ThemeExtra.colors.white,
+                        style = ThemeExtra.typography.TranslationTitlePreview
+                    )
+                    CloseButton { onCloseClicked() }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                CameraOrientationRow(
+                    onChange = changeFacing,
+                    selectedFacing = selectedFacing
                 )
-                CloseButton { onCloseClicked() }
+                Spacer(modifier = Modifier.height(12.dp))
+                GradientButton(
+                    text = stringResource(id = R.string.translations_start_strean),
+                    online = true,
+                    onClick = startBroadCast
+                )
+                Spacer(modifier = Modifier.height(53.dp))
             }
-            Spacer(modifier = Modifier.weight(1f))
-            CameraOrientationRow(
-                onChange = changeFacing,
-                selectedFacing = selectedFacing
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            GradientButton(
-                text = stringResource(id = R.string.translations_start_strean),
-                online = true,
-                onClick = startBroadCast
-            )
-            Spacer(modifier = Modifier.height(53.dp))
         }
     }
 }

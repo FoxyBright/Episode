@@ -33,7 +33,6 @@ import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.presentation.ui.components.CameraItem
 import ru.rikmasters.gilty.translation.presentation.ui.components.CameraView
@@ -61,8 +60,18 @@ fun TranslationActivePortrait(
     changeFacing: () -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(modifier = Modifier.fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        ThemeExtra.colors.preDarkColor,
+                        Color(0xFF070707)
+                    )
+                )
+            )) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,7 +83,8 @@ fun TranslationActivePortrait(
                     surfaceHolderCallback = surfaceHolderCallback
                 )
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -106,20 +116,25 @@ fun TranslationActivePortrait(
                     }
                 }
             }
-            // TODO: Изменить градиент
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        Brush.linearGradient(Gradients.blackTranslation())
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF070707),
+                                ThemeExtra.colors.preDarkColor
+                            ),
+                            startY = 0.7f
+                        )
                     )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            bottom = 40.dp,
-                            top = 24.dp,
+                            bottom = 10.dp,
+                            top = 10.dp,
                             start = 20.dp,
                             end = 20.dp
                         ),
@@ -162,6 +177,7 @@ fun TranslationActivePortrait(
                     )
                 }
             }
+
             !cameraEnabled && microphoneEnabled -> {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -177,6 +193,7 @@ fun TranslationActivePortrait(
                     // TODO: Сделать полоску голоса
                 }
             }
+
             cameraEnabled && !microphoneEnabled -> {
                 Surface(
                     color = ThemeExtra.colors.thirdOpaqueGray,

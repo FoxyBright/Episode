@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.presentation.ui.content
+package ru.rikmasters.gilty.translation.presentation.ui.content.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

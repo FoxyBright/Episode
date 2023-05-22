@@ -1,13 +1,14 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
 import android.content.res.Configuration
-import android.util.Log
 import android.view.SurfaceHolder
-import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pedro.encoder.input.gl.render.filters.BlurFilterRender
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
@@ -42,7 +44,6 @@ import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
-import ru.rikmasters.gilty.translation.presentation.ui.content.UsersBottomSheetContent
 import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +54,23 @@ fun TestTranslationScreen(
 ) {
     val scope = rememberCoroutineScope()
 
+    val systemUiController = rememberSystemUiController()
+    val isInDarkTheme = isSystemInDarkTheme()
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val newBackgroundColor = ThemeExtra.colors.preDarkColor
+
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
+
+    DisposableEffect(Unit) {
+        systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
+        onDispose {
+            if (isInDarkTheme) {
+                systemUiController.setSystemBarsColor(color = backgroundColor, darkIcons = false)
+            } else {
+                systemUiController.setSystemBarsColor(color = backgroundColor, darkIcons = true)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         // Начальная инициализация при заходе в экран
@@ -262,8 +279,17 @@ fun TestTranslationScreen(
 
     BottomSheetScaffold(
         sheetContent = {
-            UsersBottomSheetContent(
+            BottomSheetStateManager(
+                state = bottomSheetState,
                 configuration = configuration,
+                messagesList = messages,
+                onSendMessage = { text ->
+                    vm.onEvent(
+                        TranslationEvent.SendMessage(
+                            text = text
+                        )
+                    )
+                },
                 membersCount = translationScreenState.membersCount ?: 0,
                 searchValue = query,
                 onSearchValueChange = { newQuery ->
@@ -280,15 +306,6 @@ fun TestTranslationScreen(
                 onDeleteClicked = {
                     currentDeleteUser = it
                     isShowDeleteAlert = true
-                },
-                state = bottomSheetState,
-                messagesList = messages,
-                onSendMessage = { text ->
-                    vm.onEvent(
-                        TranslationEvent.SendMessage(
-                            text = text
-                        )
-                    )
                 }
             )
         },
@@ -337,43 +354,86 @@ fun TestTranslationScreen(
                 membersCount = translationScreenState.membersCount ?: 0,
                 onChatClicked = {
                     scope.launch {
-                        bottomSheetState =
-                            ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                            vm.onEvent(
-                                TranslationEvent.ChatBottomSheetOpened(
-                                    isOpened = false
+                        when {
+                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState == ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT -> {
+                                scaffoldState.bottomSheetState.collapse()
+                                vm.onEvent(
+                                    TranslationEvent.ChatBottomSheetOpened(
+                                        isOpened = false
+                                    )
                                 )
-                            )
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
-                            vm.onEvent(
-                                TranslationEvent.ChatBottomSheetOpened(
-                                    isOpened = true
+                            }
+                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState != ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT -> {
+                                scaffoldState.bottomSheetState.collapse()
+                                vm.onEvent(
+                                    TranslationEvent.ChatBottomSheetOpened(
+                                        isOpened = false
+                                    )
                                 )
-                            )
+
+                                bottomSheetState =
+                                    ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
+
+                                scaffoldState.bottomSheetState.expand()
+                                vm.onEvent(
+                                    TranslationEvent.ChatBottomSheetOpened(
+                                        isOpened = true
+                                    )
+                                )
+                            }
+                            !scaffoldState.bottomSheetState.isExpanded -> {
+                                bottomSheetState =
+                                    ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
+                                scaffoldState.bottomSheetState.expand()
+                                vm.onEvent(
+                                    TranslationEvent.ChatBottomSheetOpened(
+                                        isOpened = true
+                                    )
+                                )
+                            }
                         }
                     }
                 },
                 onMembersClicked = {
                     scope.launch {
-                        bottomSheetState =
-                            ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                            vm.onEvent(
-                                TranslationEvent.UserBottomSheetOpened(
-                                    isOpened = false
+
+                        when {
+                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState == ru.rikmasters.gilty.translation.model.BottomSheetState.USERS -> {
+                                scaffoldState.bottomSheetState.collapse()
+                                vm.onEvent(
+                                    TranslationEvent.UserBottomSheetOpened(
+                                        isOpened = false
+                                    )
                                 )
-                            )
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
-                            vm.onEvent(
-                                TranslationEvent.UserBottomSheetOpened(
-                                    isOpened = true
+                            }
+                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState != ru.rikmasters.gilty.translation.model.BottomSheetState.USERS -> {
+                                scaffoldState.bottomSheetState.collapse()
+                                vm.onEvent(
+                                    TranslationEvent.UserBottomSheetOpened(
+                                        isOpened = false
+                                    )
                                 )
-                            )
+
+                                bottomSheetState =
+                                    ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
+
+                                scaffoldState.bottomSheetState.expand()
+                                vm.onEvent(
+                                    TranslationEvent.UserBottomSheetOpened(
+                                        isOpened = true
+                                    )
+                                )
+                            }
+                            !scaffoldState.bottomSheetState.isExpanded -> {
+                                bottomSheetState =
+                                    ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
+                                scaffoldState.bottomSheetState.expand()
+                                vm.onEvent(
+                                    TranslationEvent.UserBottomSheetOpened(
+                                        isOpened = true
+                                    )
+                                )
+                            }
                         }
                     }
                 },

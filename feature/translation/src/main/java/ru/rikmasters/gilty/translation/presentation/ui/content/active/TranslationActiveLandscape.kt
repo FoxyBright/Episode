@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content.active
 
 import android.view.SurfaceHolder
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -76,13 +73,27 @@ fun TranslationActiveLandscape(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 meetingModel?.let {
-                    StreamerItem(meetingModel = meetingModel)
-                    Spacer(modifier = Modifier.weight(1f))
-                    TimerItem(time = remainTime)
-                    Spacer(modifier = Modifier.weight(1f))
-                    CloseButton(onClick = onCloseClicked)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        StreamerItem(meetingModel = meetingModel)
+                    }
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TimerItem(time = remainTime)
+                    }
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        CloseButton(onClick = onCloseClicked)
+                    }
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

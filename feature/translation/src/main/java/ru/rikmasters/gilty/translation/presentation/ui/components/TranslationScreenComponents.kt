@@ -3,8 +3,10 @@ package ru.rikmasters.gilty.translation.presentation.ui.components
 import android.util.Log
 import android.view.SurfaceHolder
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +16,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,16 +44,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.view.AspectRatioMode
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
+import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.model.Facing
 
@@ -49,27 +65,25 @@ fun CameraItem(
     onClick: () -> Unit,
     roundedBackground: Boolean = false
 ) {
-    if (roundedBackground) {
-        Surface(
-            shape = CircleShape,
-            modifier = Modifier.size(46.dp),
-            color = ThemeExtra.colors.thirdOpaqueGray
-        ) {
-            Icon(
-                painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
-                else painterResource(id = R.drawable.ic_video_inactive),
-                contentDescription = "turn on/off camera",
-                tint = ThemeExtra.colors.white,
-                modifier = Modifier.clickable { onClick() }
-            )
+    Box(
+        modifier = Modifier.size(46.dp)
+            .clickable { onClick() }
+    ) {
+        if (roundedBackground) {
+            Surface(
+                shape = CircleShape,
+                modifier = Modifier.size(46.dp),
+                color = ThemeExtra.colors.thirdOpaqueGray
+            ) {}
         }
-    } else {
         Icon(
             painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
             else painterResource(id = R.drawable.ic_video_inactive),
             contentDescription = "turn on/off camera",
             tint = ThemeExtra.colors.white,
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier
+                .clickable { onClick() }
+                .align(Alignment.Center)
         )
     }
 }
@@ -80,27 +94,25 @@ fun MicrophoneItem(
     onClick: () -> Unit,
     roundedBackground: Boolean = false
 ) {
-    if (roundedBackground) {
-        Surface(
-            shape = CircleShape,
-            modifier = Modifier.size(46.dp),
-            color = ThemeExtra.colors.thirdOpaqueGray
-        ) {
-            Icon(
-                painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
-                else painterResource(id = R.drawable.ic_micro_inactive),
-                contentDescription = "turn on/off microphone",
-                tint = ThemeExtra.colors.white,
-                modifier = Modifier.clickable { onClick() }
-            )
+    Box(
+        modifier = Modifier.size(46.dp)
+            .clickable { onClick() }
+    ) {
+        if (roundedBackground) {
+            Surface(
+                shape = CircleShape,
+                modifier = Modifier.size(46.dp),
+                color = ThemeExtra.colors.thirdOpaqueGray
+            ) {}
         }
-    } else {
         Icon(
             painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
             else painterResource(id = R.drawable.ic_micro_inactive),
             contentDescription = "turn on/off microphone",
             tint = ThemeExtra.colors.white,
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier
+                .clickable { onClick() }
+                .align(Alignment.Center)
         )
     }
 }
@@ -110,25 +122,24 @@ fun ChangeFacingItem(
     onClick: () -> Unit,
     roundedBackground: Boolean = false
 ) {
-    if (roundedBackground) {
-        Surface(
-            shape = CircleShape,
-            modifier = Modifier.size(46.dp),
-            color = ThemeExtra.colors.thirdOpaqueGray
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_refresh),
-                contentDescription = "change camera",
-                tint = ThemeExtra.colors.white,
-                modifier = Modifier.clickable { onClick() }
-            )
+    Box(
+        modifier = Modifier.size(46.dp)
+            .clickable { onClick() }
+    ) {
+        if (roundedBackground) {
+            Surface(
+                shape = CircleShape,
+                modifier = Modifier.size(46.dp),
+                color = ThemeExtra.colors.thirdOpaqueGray
+            ) {}
         }
-    } else {
         Icon(
             painter = painterResource(id = R.drawable.ic_refresh),
             contentDescription = "change camera",
             tint = ThemeExtra.colors.white,
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier
+                .clickable { onClick() }
+                .align(Alignment.Center)
         )
     }
 }
@@ -371,4 +382,235 @@ fun BottomSheetDragItem(
         shape = RoundedCornerShape(11.dp),
         color = ThemeExtra.colors.bottomSheetGray
     ) {}
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommentPanel(
+    onSendMessage: (String) -> Unit,
+    modifier: Modifier
+) {
+    var messageText by remember { mutableStateOf("") }
+    Surface(
+        shape = RoundedCornerShape(48.dp),
+        color = ThemeExtra.colors.messageBar,
+        modifier = modifier
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            TextField(
+                value = messageText,
+                onValueChange = {
+                    messageText = it
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = ThemeExtra.colors.white,
+                    containerColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedLabelColor = Color.Transparent,
+                    cursorColor = ThemeExtra.colors.white
+                ),
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.translations_chat_commentary),
+                        color = Color(0xFFCAC4D0),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                singleLine = true
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_send_rounded),
+                contentDescription = "send message",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .clickable {
+                        onSendMessage(messageText)
+                        messageText = ""
+                    }
+                    .padding(4.dp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(
+    onSearchValueChanged: (String) -> Unit,
+    searchValue: String
+) {
+    Surface(
+        color = ThemeExtra.colors.mainCard,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 16.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.magnifier),
+                contentDescription = "search",
+                tint = ThemeExtra.colors.zirkon
+            )
+            Spacer(modifier = Modifier.width(24.dp))
+            TextField(
+                value = searchValue,
+                onValueChange = {
+                    onSearchValueChanged(it)
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = ThemeExtra.colors.white,
+                    containerColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedLabelColor = Color.Transparent,
+                    cursorColor = ThemeExtra.colors.white
+                ),
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.search_placeholder),
+                        color = ThemeExtra.colors.zirkon,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                singleLine = true
+            )
+        }
+    }
+}
+
+@Composable
+fun MemberItem(
+    user: FullUserModel,
+    onComplainClicked: () -> Unit,
+    onDeleteClicked: () -> Unit
+) {
+    var expandedPopUp by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.wrapContentSize()) {
+        Row {
+            GCashedImage(
+                url = user.avatar?.thumbnail?.url,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Row(
+                    modifier = Modifier.padding(
+                        top = 18.dp,
+                        bottom = 18.dp,
+                        end = 18.dp,
+                    ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${user.username}, ${user.age}",
+                        color = ThemeExtra.colors.white,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    user.emoji?.let {
+                        Image(
+                            painter = painterResource(id = EmojiModel.getEmoji(it.type).path.toInt()),
+                            contentDescription = "Emoji"
+                        )
+                    }
+                    IconButton(onClick = { expandedPopUp = true }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_kebab),
+                            contentDescription = "More"
+                        )
+                    }
+                }
+                Divider()
+            }
+        }
+    }
+    DropdownMenu(
+        expanded = expandedPopUp,
+        onDismissRequest = { expandedPopUp = false },
+        modifier = Modifier.background(
+            color = ThemeExtra.colors.mainCard,
+            shape = RoundedCornerShape(14.dp)
+        )
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(id = R.string.translations_members_complain),
+                    color = ThemeExtra.colors.white,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            onClick = onComplainClicked
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(id = R.string.translations_members_delete),
+                    color = ThemeExtra.colors.white,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            onClick = onDeleteClicked
+        )
+    }
+}
+
+@Composable
+fun MessageItem(
+    messageModel: TranslationMessageModel
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        GCashedImage(
+            url = messageModel.author.avatar?.thumbnail?.url,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Row {
+                Text(
+                    text = "${messageModel.author.username}, ${messageModel.author.age}",
+                    color = ThemeExtra.colors.white,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                messageModel.author.emoji?.let {
+                    Image(
+                        painter = painterResource(id = EmojiModel.getEmoji(it.type).path.toInt()),
+                        contentDescription = "Emoji"
+                    )
+                }
+            }
+            Text(
+                text = messageModel.text,
+                color = ThemeExtra.colors.white,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Normal
+                )
+            )
+        }
+    }
 }

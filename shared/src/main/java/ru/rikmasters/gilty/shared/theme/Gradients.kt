@@ -34,7 +34,7 @@ object Gradients {
     fun blackTranslation(): List<Color> {
         return listOf(
             Color(0xFF070707),
-            Color(0x00040404),
+            Color(0x20040404),
         )
     }
 
