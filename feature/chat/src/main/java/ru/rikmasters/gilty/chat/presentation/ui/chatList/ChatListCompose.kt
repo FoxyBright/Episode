@@ -46,7 +46,6 @@ import ru.rikmasters.gilty.shared.model.chat.DemoChatModelList
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MEETING_DATE
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MESSAGE_DATE
-import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.NONE
 import ru.rikmasters.gilty.shared.model.chat.getSortName
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
@@ -84,7 +83,7 @@ data class ChatListState(
     val alertActive: Boolean,
     val alertState: AlertState,
     val alertSelect: Int,
-    val sortType: SortTypeModel,
+    val sortType: SortTypeModel?,
     val listState: LazyListState,
     val isSortOn:Boolean,
     val isArchiveOn:Boolean,
@@ -101,7 +100,7 @@ interface ChatListCallback {
     fun onSortTypeChanged(sortType: SortTypeModel)
     fun onListUpdate()
     fun onListAlertSelect(index: Int)
-    fun onSortClick(sortTypeModel: SortTypeModel)
+    fun onSortClick(sortTypeModel: SortTypeModel?)
     fun onArchiveClick()
 }
 
@@ -183,19 +182,21 @@ private fun Content(
             .padding(horizontal = 16.dp),
         state.listState
     ) {
+        item { Spacer(Modifier.height(12.dp)) }
+
         when {
             chats.loadState.refresh is LoadState.Error -> Unit
             chats.loadState.append is LoadState.Error -> Unit
             else -> {
                 if(chats.loadState.refresh is LoadState.Loading)
-                    item { PagingLoader(state.chats.loadState) }
+                    item { PagingLoader(chats.loadState) }
                 if(itemCount != 0) {
                     getSortedChats(
-                        state.chats.itemSnapshotList.items.filter {
+                        chats.itemSnapshotList.items.filter {
                             it.meetStatus == MeetStatusType.ACTIVE
                         }
                     ).let {
-                        if(it.isNotEmpty() && state.sortType == MEETING_DATE) {
+                        if(it.isNotEmpty() && (state.sortType == MEETING_DATE || state.sortType == null)) {
                             items(it) { (label, list) ->
                                 Label(
                                     label, Modifier.padding(
@@ -212,11 +213,14 @@ private fun Content(
                                     )
                                 }
                             }
+                        }else if(it.isEmpty() && (state.sortType == MEETING_DATE || state.sortType == null)) {
+                            item {
+                                EmptyChats()
+                            }
                         }
                     }
 
-                    val inactiveItems = state
-                        .chats.itemSnapshotList
+                    val inactiveItems = chats.itemSnapshotList
                         .items.filter {
                             it.meetStatus != MeetStatusType.ACTIVE
                         }
@@ -235,8 +239,7 @@ private fun Content(
                         ) { callback?.onEndedClick() }
                     }
 
-                    if(
-                        state.endedState
+                    if(state.endedState
                         || state.sortType == MESSAGE_DATE
                     ) {
                         itemsIndexed(state.chats) { index, item ->
@@ -377,10 +380,12 @@ fun SortTypeLabels(
 ) {
     var sortLabelHeightDp by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
-    Row(modifier = modifier.horizontalScroll(rememberScrollState()).fillMaxWidth()) {
+    Row(modifier = modifier
+        .horizontalScroll(rememberScrollState())
+        .fillMaxWidth()) {
         Spacer(modifier = Modifier.width(16.dp))
         Box(modifier = Modifier.animateContentSize()) {
-            if (state.sortType != NONE) {
+            if (state.sortType != null) {
                 GChip(
                     modifier = Modifier.padding(start = if(sortLabelHeightDp - 16.dp >= 0.dp) sortLabelHeightDp - 16.dp  else 0.dp),
                     text = state.sortType.getSortName(),
@@ -393,7 +398,7 @@ fun SortTypeLabels(
                 sortLabelHeightDp =
                     with(localDensity) { coordinates.size.width.toDp() }
             }, verticalAlignment = CenterVertically) {
-                if (state.sortType != NONE) {
+                if (state.sortType != null) {
                     Image(
                         painterResource(
                             R.drawable.ic_close_sort // TODO: Consider dark theme for icon
@@ -403,26 +408,26 @@ fun SortTypeLabels(
                             .padding(end = 8.dp)
                             .size(26.dp)
                             .clickable {
-                                callback?.onSortClick(NONE)
+                                callback?.onSortClick(null)
                             },
                         //colorFilter = ColorFilter.tint(colorScheme.onPrimaryContainer)
                     )
                 }
                 GChip(
                     text = stringResource(id = R.string.chats_sort_label),
-                    isSelected = state.sortType != NONE
+                    isSelected = state.sortType != null
                 ) {
                     callback?.onSortClick(MEETING_DATE)
                 }
             }
 
         }
-        if (state.sortType != NONE) {
+        if (state.sortType != null) {
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
-                text = (if (state.sortType == MEETING_DATE) SortTypeModel.MESSAGE_COUNT else MEETING_DATE).getSortName()
+                text = (if (state.sortType == MEETING_DATE) SortTypeModel.MESSAGE_DATE else MEETING_DATE).getSortName()
             ) {
-                callback?.onSortClick(if (state.sortType == MEETING_DATE) SortTypeModel.MESSAGE_COUNT else MEETING_DATE)
+                callback?.onSortClick(if (state.sortType == MEETING_DATE) SortTypeModel.MESSAGE_DATE else MEETING_DATE)
             }
         }
         GChip(

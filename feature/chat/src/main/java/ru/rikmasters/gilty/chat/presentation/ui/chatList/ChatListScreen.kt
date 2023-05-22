@@ -55,7 +55,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
         ChatListState(
             navBar, chats, completed, alert,
             alertState, alertSelected, sortType,
-            listState,sortType != SortTypeModel.NONE, isArchiveOn
+            listState,sortType != null, isArchiveOn
         ),
         Modifier,
         object: ChatListCallback {
@@ -113,7 +113,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
                 scope.launch { vm.alertSelect(index) }
             }
 
-            override fun onSortClick(sortTypeModel: SortTypeModel) {
+            override fun onSortClick(sortTypeModel: SortTypeModel?) {
                 scope.launch { vm.changeSortType(sortTypeModel) }
             }
 
