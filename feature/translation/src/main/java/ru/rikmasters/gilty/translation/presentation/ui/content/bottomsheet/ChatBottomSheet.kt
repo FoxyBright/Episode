@@ -6,12 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -31,7 +28,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.BlurBox
 import ru.rikmasters.gilty.shared.common.extentions.simpleVerticalScrollbar
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra

@@ -29,6 +29,7 @@ import com.pedro.encoder.input.gl.render.filters.BlurFilterRender
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
+import com.pedro.rtplibrary.util.BitrateAdapter
 import com.pedro.rtplibrary.view.OpenGlView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -60,6 +61,8 @@ fun TestTranslationScreen(
     val newBackgroundColor = ThemeExtra.colors.preDarkColor
 
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
+
+    var bitrateAdapter by remember { mutableStateOf<BitrateAdapter?>(null) }
 
     DisposableEffect(Unit) {
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
@@ -209,17 +212,22 @@ fun TestTranslationScreen(
     }
 
 
-
-    // TODO: Непонятно для чего нужен
     val connectionChecker = remember {
         object : ConnectCheckerRtmp {
             override fun onAuthErrorRtmp() {}
             override fun onAuthSuccessRtmp() {}
             override fun onConnectionFailedRtmp(reason: String) {}
             override fun onConnectionStartedRtmp(rtmpUrl: String) {}
-            override fun onConnectionSuccessRtmp() {}
+            override fun onConnectionSuccessRtmp() {
+                camera?.let {
+                    bitrateAdapter = BitrateAdapter { bitrate -> it.setVideoBitrateOnFly(bitrate) }
+                    bitrateAdapter?.setMaxBitrate(it.bitrate)
+                }
+            }
             override fun onDisconnectRtmp() {}
-            override fun onNewBitrateRtmp(bitrate: Long) {}
+            override fun onNewBitrateRtmp(bitrate: Long) {
+                bitrateAdapter?.adaptBitrate(bitrate)
+            }
         }
     }
 
