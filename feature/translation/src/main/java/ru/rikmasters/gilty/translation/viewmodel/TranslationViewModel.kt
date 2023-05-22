@@ -33,15 +33,17 @@ class TranslationViewModel : ViewModel() {
     private val translationRepository: TranslationRepository by inject()
     private val meetingRepository: MeetingManager by inject()
 
+    // Идет ли стрим
     private val connected = MutableStateFlow(false)
-
+    // Открыт ли ботомшит с пользователями
     private val userIsOpened = MutableStateFlow(false)
-
+    // Открыт ли чат
     private val chatIsOpened = MutableStateFlow(false)
-
+    // Перезагрузка пользователей ( Когда пришли новые с сокетов )
     private val reloadUser = MutableStateFlow(false)
+    // Перезагрузка сообщений чата ( Когда пришли новые с сокетов )
     private val reloadChat = MutableStateFlow(false)
-
+    // Строка поиска в ботомшите пользователей
     private val _usersQuery = MutableStateFlow("")
     val usersQuery = _usersQuery.asStateFlow()
 
@@ -91,28 +93,30 @@ class TranslationViewModel : ViewModel() {
         }
     }.cachedIn(coroutineScope)
 
+    // Состояние трансляции
     private val _translationUiState = MutableStateFlow(TranslationUiState())
     val translationUiState = _translationUiState.asStateFlow()
-
+    // Канал одноразовых ивентов
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
-
+    // Оставшееся время трансляции для таймера
     private val _remainTime = MutableStateFlow("")
     val remainTime = _remainTime.asStateFlow()
-
+    // Нужно ли красить градиентом таймер
     private val _greenHighlightTimer = MutableStateFlow(false)
-
+    // Стэйт передающийся в UI с делэем в 2 секунды превращается в ""
     private val _addTimer = MutableStateFlow("")
     val addTimer = _addTimer.asStateFlow()
-
+    // Стэйт передающийся в UI с делэем в 2 секунды превращается в false
     private val _highlightTimer = MutableStateFlow(false)
     val highlightTimer = _highlightTimer.asStateFlow()
-
+    // Было ли время трансляции обновлено через кнопку таймера на экране
     private val extendFromTimer = MutableStateFlow(true)
-
+    // Снэкбар возобновления трансляции
+    // TODO: Использовать его
     private val _translationResumedSnackbar = MutableStateFlow(false)
     val translationResumedSnackbar = _translationResumedSnackbar.asStateFlow()
-
+    // Обновить таймер
     private val refreshTimer = MutableStateFlow(false)
 
     init {
@@ -284,7 +288,6 @@ class TranslationViewModel : ViewModel() {
             }
         }
     }
-
     fun onEvent(event: TranslationEvent) {
         when (event) {
             is TranslationEvent.EnterScreen -> {

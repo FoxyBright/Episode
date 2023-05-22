@@ -409,5 +409,6 @@
     <string name="translations_expired_button_continue">Продолжить</string>
     <string name="translations_expired_button_to_chat">Перейти в чат</string>
     <string name="translations_expired_append">Продление трансляции</string>
+    <string name="translations_weak_connection">Слабое соединение</string>
 
 </resources>

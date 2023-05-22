@@ -70,17 +70,16 @@ data class ResponseWrapper<T: Any?>(
     
     @Suppress("unused")
     class Paginator(
+        val type: String,
         val total: Int,
         val perPage: Int,
         val currentPage: Int,
-        val list_page: Int,
-        val limit: Int,
-        val offset: Int,
+        val last_page: Int
     ) {
         
         constructor(): this(
-            (0), (0), (0),
-            (0), (0), (0)
+            (""), (0), (0),
+            (0), (0)
         )
     }
     

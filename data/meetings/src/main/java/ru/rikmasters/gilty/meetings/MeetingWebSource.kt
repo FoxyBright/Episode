@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.meetings
 
 import android.content.res.Resources.getSystem
+import android.util.Log
 import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode.Companion.OK
@@ -182,7 +183,7 @@ class MeetingWebSource: KtorSource() {
         }
     }?.let {
         if(it.status == OK)
-            it.paginateWrapped<List<User>>()
+            it.wrapped<List<User>>()
         else null
     }
     
@@ -272,6 +273,7 @@ class MeetingWebSource: KtorSource() {
             )
         )
     }?.let {
+        Log.d("TEST","ADD MEET RESPONSE ${it.status} WRAPPED ${it.wrapped<DetailedMeetResponse>()}")
         if(it.status == OK)
             it.wrapped<DetailedMeetResponse>().id
         else null

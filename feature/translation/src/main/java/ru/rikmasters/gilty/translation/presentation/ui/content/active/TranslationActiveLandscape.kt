@@ -149,7 +149,8 @@ fun TranslationActiveLandscape(
         }
         Box(
             modifier = if (bsOpened) {
-                Modifier.fillMaxHeight()
+                Modifier
+                    .fillMaxHeight()
                     .width((configuration.screenWidthDp * 0.6).dp)
             } else {
                 Modifier.fillMaxSize()
@@ -157,6 +158,184 @@ fun TranslationActiveLandscape(
             contentAlignment = Alignment.Center
         ) {
             when {
+                connectionStatus == ConnectionStatus.LOW_CONNECTION -> {
+                    if (!cameraEnabled && !microphoneEnabled) {
+                        Column(
+                            modifier = Modifier.fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            GCashedImage(
+                                url = meetingModel?.organizer?.avatar?.thumbnail?.url,
+                                modifier = Modifier
+                                    .size(90.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(
+                                modifier = Modifier.height(8.dp)
+                            )
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_microphone_off_voice),
+                                contentDescription = "Microphone off",
+                                tint = Color.Unspecified
+                            )
+                            Spacer(
+                                modifier = Modifier.height(8.dp)
+                            )
+                            Surface(
+                                color = ThemeExtra.colors.thirdOpaqueGray,
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(
+                                        vertical = 6.dp,
+                                        horizontal = 16.dp
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_weak_connection),
+                                        contentDescription = "Microphone off",
+                                        tint = ThemeExtra.colors.white
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(id = R.string.translations_weak_connection),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = ThemeExtra.colors.white
+                                    )
+                                }
+                            }
+                        }
+                    } else if (!microphoneEnabled) {
+                        Column(
+                            modifier = Modifier.fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Spacer(modifier = Modifier.height(60.dp))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_microphone_off_voice),
+                                    contentDescription = "Microphone off",
+                                    tint = Color.Unspecified
+                                )
+                            }
+                            Surface(
+                                color = ThemeExtra.colors.thirdOpaqueGray,
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(
+                                        vertical = 6.dp,
+                                        horizontal = 16.dp
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_weak_connection),
+                                        contentDescription = "Microphone off",
+                                        tint = ThemeExtra.colors.white
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(id = R.string.translations_weak_connection),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = ThemeExtra.colors.white
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    } else {
+                        Surface(
+                            color = ThemeExtra.colors.thirdOpaqueGray,
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(
+                                    vertical = 6.dp,
+                                    horizontal = 16.dp
+                                )
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_weak_connection),
+                                    contentDescription = "Microphone off",
+                                    tint = ThemeExtra.colors.white
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(id = R.string.translations_weak_connection),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = ThemeExtra.colors.white
+                                )
+                            }
+                        }
+                    }
+                }
+                connectionStatus == ConnectionStatus.RECONNECTING -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_reconnecting),
+                            contentDescription = ""
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_reconnecting),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_reconnecting_wait),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                connectionStatus == ConnectionStatus.NO_CONNECTION -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_no_connection),
+                            contentDescription = ""
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_no_connection),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_no_connection_wait),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = ThemeExtra.colors.mainDayGreen,
+                            modifier = Modifier.clickable { onReconnectCLicked() }
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(
+                                    horizontal = 12.dp,
+                                    vertical = 8.dp
+                                ),
+                                text = stringResource(id = R.string.translations_no_connection_refresh),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = ThemeExtra.colors.white
+                            )
+                        }
+                    }
+                }
                 !cameraEnabled && !microphoneEnabled -> {
                     Column(
                         modifier = Modifier
@@ -219,68 +398,6 @@ fun TranslationActiveLandscape(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(id = R.string.translations_micro_off_organizer),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = ThemeExtra.colors.white
-                            )
-                        }
-                    }
-                }
-                connectionStatus == ConnectionStatus.RECONNECTING -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_reconnecting),
-                            contentDescription = ""
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(id = R.string.translations_reconnecting),
-                            color = ThemeExtra.colors.white,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = stringResource(id = R.string.translations_reconnecting_wait),
-                            color = ThemeExtra.colors.white,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-                connectionStatus == ConnectionStatus.NO_CONNECTION -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_no_connection),
-                            contentDescription = ""
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(id = R.string.translations_no_connection),
-                            color = ThemeExtra.colors.white,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = stringResource(id = R.string.translations_no_connection_wait),
-                            color = ThemeExtra.colors.white,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Surface(
-                            shape = RoundedCornerShape(14.dp),
-                            color = ThemeExtra.colors.mainDayGreen,
-                            modifier = Modifier.clickable { onReconnectCLicked() }
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(
-                                    horizontal = 12.dp,
-                                    vertical = 8.dp
-                                ),
-                                text = stringResource(id = R.string.translations_no_connection_refresh),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = ThemeExtra.colors.white
                             )

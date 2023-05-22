@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.meetings.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.meetings.MeetingWebSource
@@ -21,15 +22,18 @@ class MeetMembersPagingSource(
         val loadSize = params.loadSize
 
         return try {
+            Log.d("TEST","STARTED")
             val members = webSource.getMeetMembers(
                 meet = meet,
                 page = page,
                 perPage = loadSize,
                 excludeMe = excludeMe
             )
-            val nextKey = if ((members?.first?.size ?: 0) < loadSize) null else page + 1
+            Log.d("TEST","members $members")
+            Log.d("TEST","membersMAPPED ${members?.map { it.map() }}")
+            val nextKey = if ((members?.size ?: 0) < loadSize) null else page + 1
             val prevKey = if (page == 1) null else page - 1
-            LoadResult.Page(members?.first?.map { it.map() } ?: emptyList(), prevKey, nextKey)
+            LoadResult.Page(members?.map { it.map() } ?: emptyList(), prevKey, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }

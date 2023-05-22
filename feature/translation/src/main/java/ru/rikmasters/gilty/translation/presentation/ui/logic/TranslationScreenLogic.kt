@@ -65,23 +65,49 @@ fun TestTranslationScreen(
     vm: TranslationViewModel,
     translationId: String
 ) {
+
+    LaunchedEffect(Unit) {
+        // Начальная инициализация при заходе в экран
+        vm.onEvent(
+            TranslationEvent.EnterScreen(
+                meetingId = translationId
+            )
+        )
+    }
+
+    // Утилити
     val scope = rememberCoroutineScope()
-
     val context = LocalContext.current
+    var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
+    val configuration = LocalConfiguration.current
+    LaunchedEffect(key1 = configuration) {
+        snapshotFlow { configuration.orientation }
+            .collect {
+                orientation = it
+            }
+    }
 
+
+    // Состояние экрана
+    val translationScreenState by vm.translationUiState.collectAsState()
+    // Список подключенных пользователей с пагинацией
+    val connectedMembers = vm.connectedUsers.collectAsLazyPagingItems()
+    // Список сообщений в чате с пагинацикй
+    val messages = vm.messages.collectAsLazyPagingItems()
+    // Состояние поиска ботом шита участников
+    val query by vm.usersQuery.collectAsState()
+    // Оставшееся время трансляции
+    val remainTime by vm.remainTime.collectAsState()
+    // Показ на несколько секунд зеленого гардиента на таймере
+    val isShowGradientTimer by vm.highlightTimer.collectAsState()
+    // Показ на несколько секунд добавленного к таймеру времени
+    val appendTimerTime by vm.addTimer.collectAsState()
+
+    // Смена систем баров
     val systemUiController = rememberSystemUiController()
     val isInDarkTheme = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
     val newBackgroundColor = ThemeExtra.colors.preDarkColor
-
-    val isShowGradientTimer by vm.highlightTimer.collectAsState()
-    val appendTimerTime by vm.addTimer.collectAsState()
-
-    var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
-
-    var bitrateAdapter by remember { mutableStateOf<BitrateAdapter?>(null) }
-
-    var reTryRemained by remember { mutableStateOf(10) }
 
     DisposableEffect(Unit) {
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
@@ -94,26 +120,11 @@ fun TestTranslationScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        // Начальная инициализация при заходе в экран
-        vm.onEvent(
-            TranslationEvent.EnterScreen(
-                meetingId = translationId
-            )
-        )
-    }
 
-    // Состояние экрана
-    val translationScreenState by vm.translationUiState.collectAsState()
-    // Список подключенных пользователей с пагинацией
-    val connectedMembers = vm.connectedUsers.collectAsLazyPagingItems()
-    // Список сообщений в чате с пагинацикй
-    val messages = vm.messages.collectAsLazyPagingItems()
-    // Состояние поиска ботом шита участников
-    val query by vm.usersQuery.collectAsState()
-    // Оставшееся время трансляции
-    val remainTime by vm.remainTime.collectAsState()
-
+    // Битрейт адаптер
+    var bitrateAdapter by remember { mutableStateOf<BitrateAdapter?>(null) }
+    // Количество оставшихся попыток переподключения для RTMP клиента
+    var reTryRemained by remember { mutableStateOf(10) }
     // Камера РТМП клиента
     var camera by remember { mutableStateOf<RtmpCamera2?>(null) }
     // Смена ориентации камеры
@@ -122,11 +133,12 @@ fun TestTranslationScreen(
             it.switchCamera()
         }
     }
-
+    // Включение видео
     fun enableVideo() {
         camera?.glInterface?.clearFilters()
     }
 
+    // Выключение видео
     fun disableVideo() {
         scope.launch {
             val imageFilter = ImageObjectFilterRender()
@@ -149,20 +161,21 @@ fun TestTranslationScreen(
         }
     }
 
+    // Блюр видео, для случаев когда thumbnail загрузить не удается и придется блюрить только у стримера
     fun blurVideo() {
         camera?.glInterface?.clearFilters()
         camera?.glInterface?.addFilter(BlurFilterRender())
     }
 
+    // Включение аудио
     fun enableAudio() {
         camera?.enableAudio()
     }
 
+    // Выелючение аудио
     fun disableAudio() {
         camera?.disableAudio()
     }
-
-
     // Логика включения выключения аудио при стриминге
     LaunchedEffect(translationScreenState.translationInfo?.microphone) {
         camera?.let { camera ->
@@ -175,7 +188,6 @@ fun TestTranslationScreen(
             }
         }
     }
-
     // Логика включения выключения видео и блюра
     LaunchedEffect(translationScreenState.translationInfo?.camera) {
         camera?.let {
@@ -188,26 +200,10 @@ fun TestTranslationScreen(
             }
         }
     }
+    // Текущий экземпляр камеры вью
     var currentOpenGlView by remember { mutableStateOf<OpenGlView?>(null) }
+    // Оповещение что вью поменялся
     var glViewChanged by remember { mutableStateOf(false) }
-
-
-    // Состояние боттом шита
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(
-            initialValue = BottomSheetValue.Collapsed
-        )
-    )
-
-    // Конфигурация экрана (для определения максимальной/минимальной высоты ботом шита)
-    val configuration = LocalConfiguration.current
-
-    LaunchedEffect(key1 = configuration) {
-        snapshotFlow { configuration.orientation }
-            .collect {
-                orientation = it
-            }
-    }
 
     // Остановка стрима и превью - release GL, оповещение вью модели, конект
     fun stopBroadcast() {
@@ -228,7 +224,6 @@ fun TestTranslationScreen(
             }
         }
     }
-
 
     // Запуск стрима, оповещение вью модели
     fun startBroadCast(rtmpUrl: String) {
@@ -253,22 +248,6 @@ fun TestTranslationScreen(
             }
         }
     }
-
-    // Коллект одноразовых ивентов
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(Unit) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            vm.oneTimeEvent.collectLatest { event ->
-                when (event) {
-                    is TranslationOneTimeEvent.ErrorHappened -> {}
-                    TranslationOneTimeEvent.Reconnect -> {
-                        camera?.reConnect(1000, null)
-                    }
-                }
-            }
-        }
-    }
-
 
     val connectionChecker = remember {
         object : ConnectCheckerRtmp {
@@ -314,8 +293,14 @@ fun TestTranslationScreen(
             }
 
             override fun onDisconnectRtmp() {}
-
             override fun onNewBitrateRtmp(bitrate: Long) {
+                if (bitrate < 400_000) {
+                    vm.onEvent(
+                        TranslationEvent.UpdateConnectionStatus(
+                            ConnectionStatus.LOW_CONNECTION
+                        )
+                    )
+                }
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
         }
@@ -345,7 +330,10 @@ fun TestTranslationScreen(
 
                         TranslationStatus.STREAM -> {
                             translationScreenState.translationInfo?.let { translation ->
-                                Log.d("TESTG","TRanslation RTMP ${translation.rtmp} ${translation.webrtc}")
+                                Log.d(
+                                    "TESTG",
+                                    "TRanslation RTMP ${translation.rtmp} ${translation.webrtc}"
+                                )
                                 startBroadCast(
                                     rtmpUrl = translation.rtmp
                                 )
@@ -369,16 +357,44 @@ fun TestTranslationScreen(
         }
     }
 
-    var isShowDeleteAlert by remember { mutableStateOf(false) }
-    var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
 
+    // Состояние боттом шита
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = BottomSheetState(
+            initialValue = BottomSheetValue.Collapsed
+        )
+    )
+    // Что открыто в ботом шите
     var bottomSheetState by remember {
         mutableStateOf(
             ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
         )
     }
-
+    // Ботом шит продления трансляции открыт с нажатия на таймер
     var openedFromTimer by remember { mutableStateOf(false) }
+    // Состояние диалога удаления пользователя
+    var isShowDeleteAlert by remember { mutableStateOf(false) }
+    // Текущий удаляемый пользователь
+    var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
+
+
+    // Коллект одноразовых ивентов
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            vm.oneTimeEvent.collectLatest { event ->
+                when (event) {
+                    is TranslationOneTimeEvent.ErrorHappened -> {}
+                    TranslationOneTimeEvent.Reconnect -> {
+                        camera?.reConnect(1000, null)
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
     BottomSheetScaffold(
         sheetContent = {
@@ -489,6 +505,7 @@ fun TestTranslationScreen(
                                     )
                                 )
                             }
+
                             scaffoldState.bottomSheetState.isExpanded && bottomSheetState != ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT -> {
                                 scaffoldState.bottomSheetState.collapse()
                                 vm.onEvent(
@@ -506,6 +523,7 @@ fun TestTranslationScreen(
                                     )
                                 )
                             }
+
                             !scaffoldState.bottomSheetState.isExpanded -> {
                                 bottomSheetState =
                                     ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
@@ -530,6 +548,7 @@ fun TestTranslationScreen(
                                     )
                                 )
                             }
+
                             scaffoldState.bottomSheetState.isExpanded && bottomSheetState != ru.rikmasters.gilty.translation.model.BottomSheetState.USERS -> {
                                 scaffoldState.bottomSheetState.collapse()
                                 vm.onEvent(
@@ -547,6 +566,7 @@ fun TestTranslationScreen(
                                     )
                                 )
                             }
+
                             !scaffoldState.bottomSheetState.isExpanded -> {
                                 bottomSheetState =
                                     ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
@@ -571,14 +591,16 @@ fun TestTranslationScreen(
                 onTurnOnClicked = {
                     openedFromTimer = false
                     scope.launch {
-                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
+                        bottomSheetState =
+                            ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
                         scaffoldState.bottomSheetState.expand()
                     }
                 },
                 onTimerClicked = {
                     openedFromTimer = true
                     scope.launch {
-                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
+                        bottomSheetState =
+                            ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
                         scaffoldState.bottomSheetState.expand()
                     }
                 },
