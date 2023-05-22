@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.translation.presentation.ui.logic
 
 import android.content.res.Configuration
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -344,6 +345,7 @@ fun TestTranslationScreen(
 
                         TranslationStatus.STREAM -> {
                             translationScreenState.translationInfo?.let { translation ->
+                                Log.d("TESTG","TRanslation RTMP ${translation.rtmp} ${translation.webrtc}")
                                 startBroadCast(
                                     rtmpUrl = translation.rtmp
                                 )
@@ -581,7 +583,10 @@ fun TestTranslationScreen(
                     }
                 },
                 isHighlightTimer = isShowGradientTimer,
-                addTimerValue = appendTimerTime
+                addTimerValue = appendTimerTime,
+                onToChatPressed = {
+                    // TODO: Навигация назад
+                }
             )
             GAlert(
                 show = isShowDeleteAlert,

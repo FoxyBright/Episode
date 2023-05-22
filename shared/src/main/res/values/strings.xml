@@ -402,9 +402,12 @@
     <string name="translations_no_connection_wait">Подключитесь к другой сети \nи обновите трансляцию</string>
     <string name="translations_no_connection_refresh">Подключитесь к другой сети \nи обновите трансляцию</string>
     <string name="translations_expired_time">Время трансляции закончилось</string>
+    <string name="translations_completed">Трансляция завершена</string>
+    <string name="translations_completed_text">Позже вы сможете оставить \nэмоции участникам episode</string>
     <string name="translations_expired_time_append">Трансляция приостановлена, \nдля продолжения продлите время</string>
     <string name="translations_expired_button_turn_on">Включить</string>
     <string name="translations_expired_button_continue">Продолжить</string>
+    <string name="translations_expired_button_to_chat">Перейти в чат</string>
     <string name="translations_expired_append">Продление трансляции</string>
 
 </resources>

@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.translation.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.presentation.ui.content.active.TranslationActive
+import ru.rikmasters.gilty.translation.presentation.ui.content.completed.TranslationCompleted
 import ru.rikmasters.gilty.translation.presentation.ui.content.expired.TranslationExpired
 import ru.rikmasters.gilty.translation.presentation.ui.content.preview.TranslationPreview
 
@@ -39,7 +40,8 @@ fun TranslationStateManager(
     onTurnOnClicked: () -> Unit,
     onTimerClicked: () -> Unit,
     isHighlightTimer: Boolean,
-    addTimerValue: String
+    addTimerValue: String,
+    onToChatPressed: () -> Unit
 ) {
     when(translationStatus) {
         TranslationStatus.PREVIEW -> {
@@ -88,7 +90,10 @@ fun TranslationStateManager(
             )
         }
         TranslationStatus.COMPLETED -> {
-
+            TranslationCompleted(
+                thumbnailUrl = thumbnailUrl,
+                onToChatPressed = onToChatPressed
+            )
         }
     }
 }
