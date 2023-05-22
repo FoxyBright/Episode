@@ -5,10 +5,12 @@ import android.view.SurfaceHolder
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,7 +66,10 @@ fun TranslationActiveLandscape(
     bsOpened: Boolean,
     connectionStatus: ConnectionStatus,
     onReconnectCLicked: () -> Unit,
-    configuration: Configuration
+    configuration: Configuration,
+    onTimerClicked: () -> Unit,
+    isHighlightTimer: Boolean,
+    timerAddTime: String
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CameraView(
@@ -92,7 +97,7 @@ fun TranslationActiveLandscape(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        TimerItem(time = remainTime)
+                        TimerItem(time = remainTime, onClick = onTimerClicked, isHighlight = isHighlightTimer, addTimerTime = timerAddTime)
                     }
                     AnimatedVisibility(visible = !bsOpened) {
                         Box(
@@ -144,17 +149,21 @@ fun TranslationActiveLandscape(
         }
         Box(
             modifier = if (bsOpened) {
-                Modifier.width((configuration.screenWidthDp * 0.4).dp)
+                Modifier.fillMaxHeight()
+                    .width((configuration.screenWidthDp * 0.6).dp)
             } else {
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxSize()
             },
             contentAlignment = Alignment.Center
         ) {
             when {
                 !cameraEnabled && !microphoneEnabled -> {
                     Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         GCashedImage(
                             url = meetingModel?.organizer?.avatar?.thumbnail?.url,

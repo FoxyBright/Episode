@@ -11,6 +11,8 @@ sealed interface TranslationEvent {
     data class SendMessage(val text: String) : TranslationEvent
     data class KickUser(val user: FullUserModel) : TranslationEvent
     data class UpdateConnectionStatus(val connectionStatus: ConnectionStatus) : TranslationEvent
+    data class AppendTranslation(val appendMinutes: Int) : TranslationEvent
+    data class AppendFromTimer(val appendMinutes: Int) : TranslationEvent
     object ChangeFacing : TranslationEvent
     object ChangeUiToStream : TranslationEvent
     object ChangeUiToPreview : TranslationEvent

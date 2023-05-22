@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
 import ru.rikmasters.gilty.translation.model.BottomSheetState
 import ru.rikmasters.gilty.translation.presentation.ui.content.bottomsheet.ChatBottomSheet
+import ru.rikmasters.gilty.translation.presentation.ui.content.bottomsheet.ExtendBottomSheet
 import ru.rikmasters.gilty.translation.presentation.ui.content.bottomsheet.MembersBottomSheet
 
 @Composable
@@ -23,7 +24,8 @@ fun BottomSheetStateManager(
     onSearchValueChange: (String) -> Unit,
     membersList: LazyPagingItems<FullUserModel>?,
     onComplainClicked: (FullUserModel) -> Unit,
-    onDeleteClicked: (FullUserModel) -> Unit
+    onDeleteClicked: (FullUserModel) -> Unit,
+    onAppendDurationSave: (Int) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -47,7 +49,11 @@ fun BottomSheetStateManager(
                     onDeleteClicked = onDeleteClicked
                 )
             }
-            BottomSheetState.DURATION -> {}
+            BottomSheetState.DURATION -> {
+                ExtendBottomSheet(
+                    onSave = onAppendDurationSave
+                )
+            }
         }
     }
 }

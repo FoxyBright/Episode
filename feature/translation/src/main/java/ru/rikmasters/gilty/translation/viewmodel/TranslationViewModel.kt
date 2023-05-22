@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -28,9 +27,6 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class TranslationViewModel : ViewModel() {
 
@@ -104,10 +100,30 @@ class TranslationViewModel : ViewModel() {
     private val _remainTime = MutableStateFlow("")
     val remainTime = _remainTime.asStateFlow()
 
+    private val _greenHighlightTimer = MutableStateFlow(false)
+
+    private val _addTimer = MutableStateFlow("")
+    val addTimer = _addTimer.asStateFlow()
+
+    private val _highlightTimer = MutableStateFlow(false)
+    val highlightTimer = _highlightTimer.asStateFlow()
+
+    private val extendFromTimer = MutableStateFlow(true)
+
+    private val _translationResumedSnackbar = MutableStateFlow(false)
+    val translationResumedSnackbar = _translationResumedSnackbar.asStateFlow()
+
+    private val refreshTimer = MutableStateFlow(false)
+
     init {
         // Timer
         coroutineScope.launch {
-            connected.collectLatest { connected ->
+            combine(
+                refreshTimer,
+                connected
+            ) { refreshTimer, connected ->
+                Pair(refreshTimer, connected)
+            }.collectLatest { (_, connected) ->
                 if (connected) {
                     _translationUiState.value.translationInfo?.let {
                         var currTime = LocalDateTime.nowZ()
@@ -116,11 +132,8 @@ class TranslationViewModel : ViewModel() {
                                 currTime, it.completedAt
                             )
                             val hours = (duration / 3600000)
-                            Log.d("TEST","Hours $hours")
                             val minutes = (duration - (hours * 3600000))/60000
-                            Log.d("TEST","Minutes $minutes")
                             val seconds = (duration - (hours * 3600000) - (minutes * 60000))/1000
-                            Log.d("TEST","Seconds $seconds")
                             val hourString = if (hours > 0) "$hours:" else ""
                             _remainTime.value = "$hourString$minutes:$seconds"
                             currTime = LocalDateTime.nowZ()
@@ -209,6 +222,16 @@ class TranslationViewModel : ViewModel() {
                                         )
                                     )
                                 }
+                                if (!extendFromTimer.value) {
+                                    _translationUiState.update {
+                                        it.copy(
+                                            translationStatus = TranslationStatus.PREVIEW
+                                        )
+                                    }
+                                    _greenHighlightTimer.value = true
+                                } else {
+                                    _greenHighlightTimer.value = false
+                                }
                             }
 
                             TranslationCallbackEvents.TranslationStarted -> {
@@ -284,7 +307,6 @@ class TranslationViewModel : ViewModel() {
                         translationStatus = TranslationStatus.PREVIEW
                     )
                 }
-                Log.d("TESTFF", "UI UPDATED ${_translationUiState.value.translationStatus}")
             }
 
             TranslationEvent.ChangeUiToStream -> {
@@ -292,6 +314,17 @@ class TranslationViewModel : ViewModel() {
                     it.copy(
                         translationStatus = TranslationStatus.STREAM
                     )
+                }
+                coroutineScope.launch {
+                    if (_greenHighlightTimer.value) {
+                        _highlightTimer.value = true
+                        _translationResumedSnackbar.value = true
+                        delay(2000)
+                        _highlightTimer.value = false
+                        _translationResumedSnackbar.value = false
+                        refreshTimer.value = !refreshTimer.value
+
+                    }
                 }
             }
 
@@ -400,6 +433,36 @@ class TranslationViewModel : ViewModel() {
                         meetingId = meetId,
                         isReconnect = true
                     )
+                }
+            }
+
+            is TranslationEvent.AppendTranslation -> {
+                _translationUiState.value.translationInfo?.id?.let { translationId ->
+                    coroutineScope.launch {
+                        translationRepository.extendTranslation(
+                            translationId = translationId,
+                            duration = (event.appendMinutes).toLong()
+                        )
+                        extendFromTimer.value = false
+                    }
+                }
+            }
+
+            is TranslationEvent.AppendFromTimer -> {
+                _translationUiState.value.translationInfo?.id?.let { translationId ->
+                    coroutineScope.launch {
+                        translationRepository.extendTranslation(
+                            translationId = translationId,
+                            duration = (event.appendMinutes).toLong()
+                        )
+                        extendFromTimer.value = true
+                        val hour = (event.appendMinutes / 60).takeIf { it > 0 }
+                        val hourString = hour?.let { "$hour:" } ?: ""
+                        val minute = hour?.let { event.appendMinutes - 60 } ?: event.appendMinutes
+                        _addTimer.value = "+ $hourString$minute:00"
+                        delay(3000)
+                        _addTimer.value = ""
+                    }
                 }
             }
         }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -57,6 +57,7 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
+import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.model.Facing
 
@@ -67,7 +68,8 @@ fun CameraItem(
     roundedBackground: Boolean = false
 ) {
     Box(
-        modifier = Modifier.size(46.dp)
+        modifier = Modifier
+            .size(46.dp)
             .clickable { onClick() }
     ) {
         if (roundedBackground) {
@@ -96,7 +98,8 @@ fun MicrophoneItem(
     roundedBackground: Boolean = false
 ) {
     Box(
-        modifier = Modifier.size(46.dp)
+        modifier = Modifier
+            .size(46.dp)
             .clickable { onClick() }
     ) {
         if (roundedBackground) {
@@ -124,7 +127,8 @@ fun ChangeFacingItem(
     roundedBackground: Boolean = false
 ) {
     Box(
-        modifier = Modifier.size(46.dp)
+        modifier = Modifier
+            .size(46.dp)
             .clickable { onClick() }
     ) {
         if (roundedBackground) {
@@ -151,7 +155,8 @@ fun CameraView(
     surfaceHolderCallback: SurfaceHolder.Callback
 ) {
     AndroidView(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(
                 color = ThemeExtra.colors.preDarkColor
             ),
@@ -238,7 +243,7 @@ fun StreamerItem(
     Row (verticalAlignment = Alignment.CenterVertically) {
         AvatarItem(
             src = meetingModel.organizer.avatar?.thumbnail?.url,
-            radius = 41.dp
+            radius = 30.dp
         )
         Spacer(modifier = Modifier.width(11.dp))
         UserNameItem(
@@ -252,13 +257,17 @@ fun StreamerItem(
 
 @Composable
 fun TimerItem(
-    time: String
+    time: String,
+    onClick: () -> Unit,
+    isHighlight: Boolean,
+    addTimerTime: String
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = ThemeExtra.colors.thirdOpaqueGray
+        color = ThemeExtra.colors.thirdOpaqueGray,
+        modifier = Modifier.clickable { onClick() }
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(
                 start = 5.dp,
                 end = 8.dp,
@@ -266,17 +275,34 @@ fun TimerItem(
                 bottom = 6.5.dp
             )
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_timer_clock),
-                contentDescription = "timer",
-                tint = ThemeExtra.colors.white
-            )
-            Spacer(modifier = Modifier.width(3.dp))
-            Text(
-                text = time,
-                color = ThemeExtra.colors.white,
-                style = ThemeExtra.typography.TranslationSmallButton
-            )
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_timer_clock),
+                    contentDescription = "timer",
+                    tint = ThemeExtra.colors.white
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    text = time,
+                    color = ThemeExtra.colors.white,
+                    style = ThemeExtra.typography.TranslationSmallButton,
+                    modifier = if (isHighlight) {
+                        Modifier.background(
+                            Brush.horizontalGradient(Gradients.green())
+                        )
+                    } else Modifier
+                )
+            }
+            if (addTimerTime.isNotBlank()) {
+                Text(
+                    text = addTimerTime,
+                    color = ThemeExtra.colors.mainDayGreen,
+                    style = ThemeExtra.typography.TranslationSmallButton,
+                    modifier = Modifier.background(
+                        Brush.horizontalGradient(Gradients.green())
+                    )
+                )
+            }
         }
     }
 }

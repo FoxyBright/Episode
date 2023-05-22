@@ -26,7 +26,10 @@ fun TranslationActive(
     connectionStatus: ConnectionStatus,
     onReconnectClicked: () -> Unit,
     bsOpened: Boolean,
-    configuration: Configuration
+    configuration: Configuration,
+    onTimerClicked: () -> Unit,
+    isHighlightTimer: Boolean,
+    addTimerValue: String
 ) {
     when(orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> {
@@ -47,7 +50,10 @@ fun TranslationActive(
                 bsOpened = bsOpened,
                 connectionStatus = connectionStatus,
                 onReconnectCLicked = onReconnectClicked,
-                configuration = configuration
+                configuration = configuration,
+                onTimerClicked = onTimerClicked,
+                isHighlightTimer = isHighlightTimer,
+                timerAddTime = addTimerValue
             )
         }
         Configuration.ORIENTATION_PORTRAIT -> {
@@ -66,7 +72,10 @@ fun TranslationActive(
                 changeFacing = changeFacing,
                 surfaceHolderCallback = surfaceHolderCallback,
                 connectionStatus = connectionStatus,
-                onReconnectCLicked = onReconnectClicked
+                onReconnectCLicked = onReconnectClicked,
+                onTimerClicked = onTimerClicked,
+                isHighlightTimer = isHighlightTimer,
+                timerAddTime = addTimerValue
             )
         }
     }

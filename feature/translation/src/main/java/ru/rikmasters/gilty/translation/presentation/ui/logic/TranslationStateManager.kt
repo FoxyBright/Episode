@@ -9,6 +9,7 @@ import ru.rikmasters.gilty.translation.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.presentation.ui.content.active.TranslationActive
+import ru.rikmasters.gilty.translation.presentation.ui.content.expired.TranslationExpired
 import ru.rikmasters.gilty.translation.presentation.ui.content.preview.TranslationPreview
 
 @Composable
@@ -33,7 +34,12 @@ fun TranslationStateManager(
     connectionStatus: ConnectionStatus,
     onReconnectClicked: () -> Unit,
     bsOpened: Boolean,
-    configuration: Configuration
+    configuration: Configuration,
+    thumbnailUrl: String?,
+    onTurnOnClicked: () -> Unit,
+    onTimerClicked: () -> Unit,
+    isHighlightTimer: Boolean,
+    addTimerValue: String
 ) {
     when(translationStatus) {
         TranslationStatus.PREVIEW -> {
@@ -65,9 +71,24 @@ fun TranslationStateManager(
                 connectionStatus = connectionStatus,
                 onReconnectClicked = onReconnectClicked,
                 bsOpened = bsOpened,
-                configuration = configuration
+                configuration = configuration,
+                onTimerClicked = onTimerClicked,
+                isHighlightTimer = isHighlightTimer,
+                addTimerValue = addTimerValue
             )
         }
-        else -> {}
+        TranslationStatus.EXPIRED -> {
+            TranslationExpired(
+                thumbnailUrl = thumbnailUrl,
+                meetingModel = meetingModel,
+                remainTime = remainTime,
+                membersCount = membersCount,
+                onCloseClicked = onCloseClicked,
+                onTurnOnClicked = onTurnOnClicked
+            )
+        }
+        TranslationStatus.COMPLETED -> {
+
+        }
     }
 }

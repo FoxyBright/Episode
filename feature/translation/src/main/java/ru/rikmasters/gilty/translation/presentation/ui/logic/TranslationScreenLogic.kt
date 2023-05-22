@@ -73,6 +73,9 @@ fun TestTranslationScreen(
     val backgroundColor = MaterialTheme.colorScheme.background
     val newBackgroundColor = ThemeExtra.colors.preDarkColor
 
+    val isShowGradientTimer by vm.highlightTimer.collectAsState()
+    val appendTimerTime by vm.addTimer.collectAsState()
+
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
 
     var bitrateAdapter by remember { mutableStateOf<BitrateAdapter?>(null) }
@@ -171,8 +174,8 @@ fun TestTranslationScreen(
             }
         }
     }
+
     // Логика включения выключения видео и блюра
-    // TODO: использовать thumbnail фото при выключении камеры
     LaunchedEffect(translationScreenState.translationInfo?.camera) {
         camera?.let {
             translationScreenState.translationInfo?.camera?.let { enabled ->
@@ -373,6 +376,8 @@ fun TestTranslationScreen(
         )
     }
 
+    var openedFromTimer by remember { mutableStateOf(false) }
+
     BottomSheetScaffold(
         sheetContent = {
             BottomSheetStateManager(
@@ -403,6 +408,22 @@ fun TestTranslationScreen(
                 onDeleteClicked = {
                     currentDeleteUser = it
                     isShowDeleteAlert = true
+                },
+                onAppendDurationSave = { minutes ->
+                    scope.launch {
+                        scaffoldState.bottomSheetState.collapse()
+                        vm.onEvent(
+                            event = if (openedFromTimer) {
+                                TranslationEvent.AppendFromTimer(
+                                    appendMinutes = minutes
+                                )
+                            } else {
+                                TranslationEvent.AppendTranslation(
+                                    appendMinutes = minutes
+                                )
+                            }
+                        )
+                    }
                 }
             )
         },
@@ -543,7 +564,24 @@ fun TestTranslationScreen(
                     ?: ConnectionStatus.SUCCESS,
                 onReconnectClicked = { vm.onEvent(TranslationEvent.Reconnect) },
                 bsOpened = scaffoldState.bottomSheetState.isExpanded,
-                configuration = configuration
+                configuration = configuration,
+                thumbnailUrl = translationScreenState.translationInfo?.thumbnail,
+                onTurnOnClicked = {
+                    openedFromTimer = false
+                    scope.launch {
+                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
+                        scaffoldState.bottomSheetState.expand()
+                    }
+                },
+                onTimerClicked = {
+                    openedFromTimer = true
+                    scope.launch {
+                        bottomSheetState = ru.rikmasters.gilty.translation.model.BottomSheetState.DURATION
+                        scaffoldState.bottomSheetState.expand()
+                    }
+                },
+                isHighlightTimer = isShowGradientTimer,
+                addTimerValue = appendTimerTime
             )
             GAlert(
                 show = isShowDeleteAlert,

@@ -63,7 +63,10 @@ fun TranslationActivePortrait(
     changeFacing: () -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback,
     connectionStatus: ConnectionStatus,
-    onReconnectCLicked: () -> Unit
+    onReconnectCLicked: () -> Unit,
+    onTimerClicked: () -> Unit,
+    isHighlightTimer: Boolean,
+    timerAddTime: String
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -103,7 +106,7 @@ fun TranslationActivePortrait(
                         meetingModel?.let {
                             StreamerItem(meetingModel = meetingModel)
                             Spacer(modifier = Modifier.weight(1f))
-                            TimerItem(time = remainTime)
+                            TimerItem(time = remainTime, onClick = onTimerClicked, isHighlight = isHighlightTimer, addTimerTime = timerAddTime)
                             Spacer(modifier = Modifier.width(12.dp))
                             CloseButton(onClick = onCloseClicked)
                         }

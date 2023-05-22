@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":data:meetings"))
     implementation(project(":data:translations"))
+    implementation(project(":feature:addmeet"))
 }
