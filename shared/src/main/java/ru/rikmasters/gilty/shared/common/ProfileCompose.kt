@@ -1,9 +1,13 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Center
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
@@ -13,10 +17,16 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,6 +41,8 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
+import ru.rikmasters.gilty.shared.model.image.DemoEmojiModel
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.shared.*
@@ -101,7 +113,7 @@ data class ProfileState(
 )
 
 interface ProfileCallback {
-    
+
     fun onBack() {}
     fun onNext() {}
     fun onDisabledButtonClick() {}
@@ -114,6 +126,7 @@ interface ProfileCallback {
     fun onObserveChange(state: Boolean) {}
     fun onObserveClick() {}
     fun onProfileImageRefresh() {}
+    fun onAlbumClick(id:Int) {}
 }
 
 @Composable
@@ -126,16 +139,17 @@ fun Profile(
     val profile = state.profile
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
-    
+
     Column(modifier) {
         TopBar(
+            modifier = Modifier.padding(horizontal = 16.dp),
             userName = (profile?.username ?: ""),
             userAge = (profile?.age ?: -1),
             profileType = state.profileType,
             onSaveUsername = { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
         ErrorLabel(state.errorText)
-        Row {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             ProfileImageContent(
                 modifier = Modifier.weight(1f),
                 image = profile?.avatar,
@@ -151,7 +165,7 @@ fun Profile(
             ) { callback?.profileImage() }
             Spacer(
                 Modifier.width(
-                    if(state.profileType == CREATE)
+                    if (state.profileType == CREATE)
                         14.dp else 16.dp
                 )
             )
@@ -165,7 +179,7 @@ fun Profile(
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
-                        if((state.profileType == CREATE))
+                        if ((state.profileType == CREATE))
                             14.dp else 18.dp
                     )
                 )
@@ -179,7 +193,35 @@ fun Profile(
                 ) { callback?.hiddenImages() }
             }
         }
+        Spacer(Modifier.height(12.dp))
+
+        AlbumPictures(
+            listOf(
+                AlbumPictureWithEmoji(
+                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                    emoji = DemoEmojiModel
+                ),
+                AlbumPictureWithEmoji(
+                    image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
+                    emoji = DemoEmojiModel
+                ),
+                AlbumPictureWithEmoji(
+                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                    emoji = DemoEmojiModel
+                ),
+                AlbumPictureWithEmoji(
+                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                    emoji = DemoEmojiModel
+                ),
+            ),
+            state.profileType,
+            onAlbumClick = { id ->
+                callback?.onAlbumClick(id)
+            }
+        )
+
         AboutMe(
+            modifier = Modifier.padding(horizontal = 16.dp),
             text = state.profile?.aboutMe,
             type = state.profileType,
             callback = callback
@@ -190,6 +232,7 @@ fun Profile(
 
 @Composable
 private fun AboutMe(
+    modifier: Modifier = Modifier,
     text: String?,
     type: ProfileType,
     callback: ProfileCallback?,
@@ -198,16 +241,16 @@ private fun AboutMe(
     fun description() = Description(
         text = text ?: "",
         profileType = type,
-        modifier = Modifier.padding(top = 20.dp),
+        modifier = modifier.padding(top = 20.dp),
         onSaveDescription = {
             callback?.onSaveDescription()
         }
     ) { callback?.onDescriptionChange(it) }
-    
-    when(type) {
+
+    when (type) {
         CREATE, USERPROFILE -> description()
         ORGANIZER, ANONYMOUS_ORGANIZER ->
-            if(!text.isNullOrBlank())
+            if (!text.isNullOrBlank())
                 description()
     }
 }
@@ -234,7 +277,7 @@ private fun TopBar(
 ) {
     val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
-    if(
+    if (
         profileType != ORGANIZER
         && profileType != ANONYMOUS_ORGANIZER
     ) TextField(
@@ -247,7 +290,7 @@ private fun TopBar(
         colors = transparentTextFieldColors(),
         textStyle = typography.headlineLarge,
         placeholder = {
-            Row(Modifier, Center, CenterVertically) {
+            Row(Modifier, Arrangement.Center, CenterVertically) {
                 Text(
                     text = stringResource(R.string.user_name),
                     modifier = Modifier.padding(end = 8.dp),
@@ -275,7 +318,7 @@ private fun TopBar(
         visualTransformation = transformationOf(
             mask = CharArray(userName.length) { '#' }
                 .concatToString(),
-            endChar = if(userAge in 18..99 && !focus)
+            endChar = if (userAge in 18..99 && !focus)
                 ", $userAge" else ""
         )
     )
@@ -291,16 +334,16 @@ private fun Description(
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val style = if(profileType == CREATE)
+    val style = if (profileType == CREATE)
         typography.headlineSmall
     else typography.bodyMedium
-    
+
     Column(modifier) {
         Text(
             text = stringResource(R.string.profile_about_me),
             style = typography.labelLarge.copy(
                 colorScheme.tertiary,
-                if(profileType == CREATE) 17.sp else 20.sp
+                if (profileType == CREATE) 17.sp else 20.sp
             )
         )
         Box(
@@ -316,13 +359,13 @@ private fun Description(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = if(profileType == CREATE)
+                        vertical = if (profileType == CREATE)
                             12.dp else 14.dp,
-                        horizontal = if(profileType == CREATE)
+                        horizontal = if (profileType == CREATE)
                             16.dp else 14.dp,
                     ),
-                onValueChange = { if(it.length <= 120) onTextChange(it) },
-                readOnly = when(profileType) {
+                onValueChange = { if (it.length <= 120) onTextChange(it) },
+                readOnly = when (profileType) {
                     ORGANIZER, ANONYMOUS_ORGANIZER -> true
                     else -> false
                 },
@@ -360,3 +403,95 @@ private fun Description(
         }
     }
 }
+@Composable
+fun AlbumPictures(
+    picturesWithEmojis: List<AlbumPictureWithEmoji>,
+    type: ProfileType,
+    onAlbumClick:(Int)->Unit
+) {
+    val configuration = LocalConfiguration.current
+    val screenWidth by remember {
+        mutableStateOf(configuration.screenWidthDp)
+    }
+
+    @Composable
+    fun album() {
+        LazyRow(modifier = Modifier.fillMaxWidth()) {
+            item {
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+            itemsIndexed(picturesWithEmojis) { index, item ->
+                AlbumPictureItem(
+                    modifier = Modifier
+                        .size((screenWidth / 4).dp)
+                        .clip(
+                            lazyRowAlbumItemsShapes(
+                                index = index,
+                                size = picturesWithEmojis.size
+                            )
+                        ),
+                    albumPictureWithEmoji = item,
+                    onClick = {
+                        onAlbumClick(item.id)
+                    }
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+        }
+    }
+
+    when (type) {
+        CREATE, USERPROFILE -> album()
+        ORGANIZER, ANONYMOUS_ORGANIZER -> {}
+    }
+
+}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun AlbumPictureItem(
+    modifier: Modifier = Modifier,
+    albumPictureWithEmoji: AlbumPictureWithEmoji,
+    onClick:()->Unit
+) {
+    Box(modifier = modifier.combinedClickable(
+        onClick = onClick, // open Another screen,
+        onLongClick = {
+                      // Show descriotion
+        },
+    )) {
+        GCachedImage(
+            modifier = modifier,
+            url = albumPictureWithEmoji.image,
+            contentScale = ContentScale.Crop
+        )
+        EmojiAlbumFloat(
+            modifier = Modifier
+                .size(28.dp)
+                .align(TopStart)
+                .padding(start = 6.dp, top = 6.dp),
+            albumPictureWithEmoji.emoji
+        )
+    }
+}
+@Composable
+fun EmojiAlbumFloat(
+    modifier: Modifier = Modifier,
+    emoji: EmojiModel
+) {
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(Color(0x88000000)),
+        contentAlignment = Alignment.Center
+    ) {
+        GEmojiImage(modifier = Modifier.padding(4.dp), emoji = emoji)
+    }
+
+}
+data class AlbumPictureWithEmoji(
+    val id:Int = 1,
+    val image: String,
+    val emoji: EmojiModel
+)

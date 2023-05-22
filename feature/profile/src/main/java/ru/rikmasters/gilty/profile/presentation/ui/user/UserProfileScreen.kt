@@ -123,7 +123,11 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onProfileImageRefresh() {
                 scope.launch { vm.updateUserData() }
             }
-            
+
+            override fun onAlbumClick(id: Int) {
+                scope.launch { nav.navigate("album") }
+            }
+
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }

@@ -84,8 +84,8 @@ data class UserProfileState(
     val viewerType: PhotoViewType = PHOTO,
 )
 
-interface UserProfileCallback: ProfileCallback {
-    
+interface UserProfileCallback : ProfileCallback {
+
     fun menu(state: Boolean)
     fun onHistoryShow()
     fun onMeetingClick(meet: MeetingModel)
@@ -136,7 +136,7 @@ fun ProfileContent(
             }
         }
     }
-    if(state.photoViewState) PhotoView(
+    if (state.photoViewState) PhotoView(
         images = state.viewerImages,
         selected = state.viewerSelectImage,
         menuState = state.viewerMenuState,
@@ -181,7 +181,6 @@ private fun Content(
             Box(
                 Modifier
                     .padding(top = 80.dp)
-                    .padding(horizontal = 16.dp)
             ) {
                 Profile(
                     state.profileState,
@@ -189,7 +188,7 @@ private fun Content(
                     callback
                 )
                 Box(
-                    Modifier.fillMaxWidth(),
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     Alignment.CenterEnd
                 ) {
                     IconButton(
@@ -206,6 +205,8 @@ private fun Content(
             }
         }
         item(key = 2) {
+        }
+        item(key = 3) {
             Text(
                 stringResource(R.string.profile_actual_meetings_label),
                 Modifier
@@ -215,7 +216,7 @@ private fun Content(
                 style = typography.labelLarge
             )
         }
-        item(key = 3) {
+        item(key = 4) {
             Box(Modifier.padding(16.dp, 12.dp)) {
                 Responds(
                     state.lastRespond.second,
@@ -224,8 +225,8 @@ private fun Content(
             }
         }
         val userId = state.profileState.profile?.id ?: ""
-        if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
-            key = 4
+        if (state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
+            key = 5
         ) {
             LazyRow(
                 state = rememberLazyListScrollState(
@@ -241,15 +242,15 @@ private fun Content(
                 }
             }
         }
-        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
-            item(5) {
+        if (state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
+            item(6) {
                 MeetHistory(
                     userId, state.historyState,
                     state.meetingsHistory,
                     { callback?.onHistoryShow() }
                 ) { callback?.onHistoryClick(it) }
             }
-        item(key = 6) {
+        item(key = 7) {
             Divider(
                 Modifier.fillMaxWidth(),
                 20.dp, Transparent
@@ -283,13 +284,13 @@ private fun MeetHistory(
             style = typography.labelLarge
         )
         Icon(
-            if(!historyState) Filled.KeyboardArrowRight
+            if (!historyState) Filled.KeyboardArrowRight
             else Filled.KeyboardArrowDown,
             (null), Modifier.size(28.dp),
             colorScheme.tertiary
         )
     }
-    if(historyState) LazyRow(
+    if (historyState) LazyRow(
         state = rememberLazyListScrollState(
             "profile_history_meet"
         )
