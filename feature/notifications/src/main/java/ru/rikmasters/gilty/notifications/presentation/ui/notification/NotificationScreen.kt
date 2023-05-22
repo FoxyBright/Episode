@@ -59,7 +59,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
         }
     }
-    
+
     NotificationsContent(
         NotificationsState(
             notifications, lastRespond,
@@ -75,14 +75,16 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             ) {
                 scope.launch {
                     selected?.let {
-                        if(notification.feedback?.ratings == null) {
+                        if(notification.feedback?.ratings == null || !userId.isNullOrBlank()) {
                             vm.emojiClick(
                                 emoji,
                                 notification.parent.meeting?.id ?: "",
-                                userId ?: ""
+                                userId ?: "", notification.parent.meeting?.organizer?.id.equals(userId)
                             )
+                            // Updates ratings
+                            vm.forceRefresh()
+                            vm.forceRefreshMembers()
                         }
-                        vm.forceRefresh()
                     } ?: run {
                         vm.selectNotification(notification)
                         vm.blur(true)

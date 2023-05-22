@@ -15,6 +15,7 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
+import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
@@ -72,7 +73,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     ) = singleLoading {
         notification.parent.meeting?.let { meet ->
             changeMeetId(meet.id)
-            refreshMember.emit(!refreshMember.value)
+            forceRefreshMembers()
             _selectedNotification.emit(notification)
         }
     }
@@ -100,13 +101,12 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         notificationManger.deleteNotifications(
             listOf(notification.id)
         )
+        forceRefresh()
     }
-    
     private val _ratings = MutableStateFlow(emptyList<RatingModel>())
     val ratings = _ratings.asStateFlow()
     
-    private val _selectedNotification =
-        MutableStateFlow<NotificationModel?>(null)
+    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
     val selectedNotification = _selectedNotification.asStateFlow()
     
     private val _meetId = MutableStateFlow<String?>(null)
@@ -139,10 +139,16 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         emoji: EmojiModel,
         meetId: String,
         userId: String,
+        isOrganizer:Boolean,
     ) = singleLoading {
-        notificationManger.putRatings(meetId, userId, emoji)
+        val isSuccessful = notificationManger.putRatings(meetId, userId, emoji)
+        // Adds emoji to notification locally
+        if(isSuccessful && isOrganizer && _selectedNotification.value?.feedback == null){
+            val feedback = _selectedNotification.value?.feedback?.ratings?.toMutableList()?: mutableListOf() //.copy(ratings = ))
+            feedback.add(RatingModel("0.0", emoji))
+            _selectedNotification.emit(_selectedNotification.value?.copy(feedback = _selectedNotification.value?.feedback?.copy(ratings = feedback)?: FeedBackModel(ratings = feedback.toList(), respond = null)))
+        }
         changeMeetId(meetId)
-        refreshMember.emit(!refreshMember.value)
     }
     
     suspend fun selectParticipants(participant: Int) {
@@ -152,5 +158,8 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                 list - participant
             } else list + participant
         )
+    }
+    suspend fun forceRefreshMembers(){
+        refreshMember.emit(!refreshMember.value)
     }
 }
