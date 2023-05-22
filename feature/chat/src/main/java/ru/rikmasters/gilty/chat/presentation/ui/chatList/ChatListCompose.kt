@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -54,6 +53,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -385,7 +385,7 @@ fun SortTypeLabels(
                     modifier = Modifier.padding(start = if(sortLabelHeightDp - 16.dp >= 0.dp) sortLabelHeightDp - 16.dp  else 0.dp),
                     text = state.sortType.getSortName(),
                     isSelected = true,
-                    backgroundColor = Color.Red
+                    backgroundColor = Colors.Red
                 ) {}
             }
 

@@ -177,8 +177,8 @@ fun NotificationsContent(
                     state.participantsStates,
                     (it.feedback?.ratings?.map {
                         it.emoji
-                    } ?: state.ratings.map { it.emoji })
-                ), Modifier
+                    } ?: state.ratings.map { it.emoji }), state.ratings.map { it.emoji }),
+                Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 84.dp)
                     .align(TopCenter),

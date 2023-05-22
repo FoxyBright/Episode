@@ -35,13 +35,11 @@ class NotificationManager(
     suspend fun putRatings(
         meetId: String, userId: String,
         emoji: EmojiModel,
-    ) {
-        withContext(IO) {
+    ): Boolean = withContext(IO) {
             web.putRatings(
                 meetId, userId, emoji.type
             )
         }
-    }
     
     @Suppress("unused")
     // пометка уведомления как прочитанного

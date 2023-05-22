@@ -40,7 +40,7 @@ private fun ObserveNotificationPreview() {
         ObserveNotificationState(
             DemoNotificationMeetingOverModel,
             pagingPreview(DemoUserModelList),
-            listOf(0), EmojiModel.list
+            listOf(0), EmojiModel.list,EmojiModel.list,
         )
     )
 }
@@ -49,7 +49,8 @@ data class ObserveNotificationState(
     val notification: NotificationModel,
     val participants: LazyPagingItems<UserModel>,
     val participantsStates: List<Int>,
-    val emojiList: List<EmojiModel>,
+    val notificationEmojiList: List<EmojiModel>,
+    val emojiList:List<EmojiModel>,
 )
 
 @Composable
@@ -68,7 +69,7 @@ fun ObserveNotification(
                     DragRowState(1f),
                     MaterialTheme.shapes.medium,
                     getDifferenceOfTime(state.notification.date),
-                    state.emojiList
+                    state.notificationEmojiList
                 ), Modifier, callback
             )
         }
