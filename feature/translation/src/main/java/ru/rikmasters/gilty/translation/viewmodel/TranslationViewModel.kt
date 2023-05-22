@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.extentions.Duration
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
@@ -27,6 +28,9 @@ import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.model.TranslationUiState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class TranslationViewModel : ViewModel() {
 
@@ -106,20 +110,21 @@ class TranslationViewModel : ViewModel() {
             connected.collectLatest { connected ->
                 if (connected) {
                     _translationUiState.value.translationInfo?.let {
-                        val startTime = it.startedAt
-                        val currentTime = LocalDateTime.nowZ()
-                        startTime?.let {
-                            if (currentTime.isAfter(startTime)) {
-                                val difference = currentTime
-                                    .minusHour(currentTime.hour())
-                                    .minusMinute(currentTime.minute())
-                                    .minusSecond(currentTime.second())
-                                while (true) {
-                                    _remainTime.value = difference.format("H:mm:ss")
-                                    delay(1000)
-                                    difference.plusSecond(1)
-                                }
-                            }
+                        var currTime = LocalDateTime.nowZ()
+                        while (currTime.isBefore(it.completedAt)) {
+                            val duration = Duration.between(
+                                currTime, it.completedAt
+                            )
+                            val hours = (duration / 3600000)
+                            Log.d("TEST","Hours $hours")
+                            val minutes = (duration - (hours * 3600000))/60000
+                            Log.d("TEST","Minutes $minutes")
+                            val seconds = (duration - (hours * 3600000) - (minutes * 60000))/1000
+                            Log.d("TEST","Seconds $seconds")
+                            val hourString = if (hours > 0) "$hours:" else ""
+                            _remainTime.value = "$hourString$minutes:$seconds"
+                            currTime = LocalDateTime.nowZ()
+                            delay(1000)
                         }
                     }
                 }
