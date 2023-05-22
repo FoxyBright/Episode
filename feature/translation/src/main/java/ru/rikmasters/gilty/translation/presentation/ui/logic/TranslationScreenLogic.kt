@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
 import android.content.res.Configuration
+import android.graphics.drawable.BitmapDrawable
 import android.view.SurfaceHolder
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -17,16 +18,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pedro.encoder.input.gl.render.filters.BlurFilterRender
+import com.pedro.encoder.input.gl.render.filters.`object`.ImageObjectFilterRender
 import com.pedro.encoder.input.video.CameraHelper
+import com.pedro.encoder.utils.gl.TranslateTo
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.util.BitrateAdapter
@@ -43,6 +53,7 @@ import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffold
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.event.TranslationEvent
 import ru.rikmasters.gilty.translation.event.TranslationOneTimeEvent
+import ru.rikmasters.gilty.translation.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
@@ -55,6 +66,8 @@ fun TestTranslationScreen(
 ) {
     val scope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+
     val systemUiController = rememberSystemUiController()
     val isInDarkTheme = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -63,6 +76,8 @@ fun TestTranslationScreen(
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
 
     var bitrateAdapter by remember { mutableStateOf<BitrateAdapter?>(null) }
+
+    var reTryRemained by remember { mutableStateOf(10) }
 
     DisposableEffect(Unit) {
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
@@ -84,18 +99,6 @@ fun TestTranslationScreen(
         )
     }
 
-    // Коллект одноразовых ивентов
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(Unit) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            vm.oneTimeEvent.collectLatest { event ->
-                when (event) {
-                    is TranslationOneTimeEvent.ErrorHappened -> TODO()
-                }
-            }
-        }
-    }
-
     // Состояние экрана
     val translationScreenState by vm.translationUiState.collectAsState()
     // Список подключенных пользователей с пагинацией
@@ -107,7 +110,6 @@ fun TestTranslationScreen(
     // Оставшееся время трансляции
     val remainTime by vm.remainTime.collectAsState()
 
-
     // Камера РТМП клиента
     var camera by remember { mutableStateOf<RtmpCamera2?>(null) }
     // Смена ориентации камеры
@@ -116,14 +118,55 @@ fun TestTranslationScreen(
             it.switchCamera()
         }
     }
+
+    fun enableVideo() {
+        camera?.glInterface?.clearFilters()
+    }
+
+    fun disableVideo() {
+        scope.launch {
+            val imageFilter = ImageObjectFilterRender()
+            val loader = ImageLoader(context)
+            val request = ImageRequest.Builder(context)
+                .data(translationScreenState.translationInfo!!.thumbnail)
+                .allowHardware(false)
+                .build()
+            val result = loader.execute(request)
+            if (result is SuccessResult) {
+                val bitmap = (result.drawable as BitmapDrawable).bitmap
+                imageFilter.setImage(bitmap)
+                imageFilter.setDefaultScale(camera?.streamWidth!!, camera?.streamHeight!!)
+                imageFilter.setPosition(TranslateTo.CENTER)
+                camera?.glInterface?.addFilter(imageFilter)
+                camera?.glInterface?.addFilter(BlurFilterRender())
+            } else {
+                camera?.glInterface?.muteVideo()
+            }
+        }
+    }
+
+    fun blurVideo() {
+        camera?.glInterface?.clearFilters()
+        camera?.glInterface?.addFilter(BlurFilterRender())
+    }
+
+    fun enableAudio() {
+        camera?.enableAudio()
+    }
+
+    fun disableAudio() {
+        camera?.disableAudio()
+    }
+
+
     // Логика включения выключения аудио при стриминге
     LaunchedEffect(translationScreenState.translationInfo?.microphone) {
         camera?.let { camera ->
             translationScreenState.translationInfo?.microphone?.let { enabled ->
                 if (enabled) {
-                    camera.enableAudio()
+                    enableAudio()
                 } else {
-                    camera.disableAudio()
+                    disableAudio()
                 }
             }
         }
@@ -131,16 +174,12 @@ fun TestTranslationScreen(
     // Логика включения выключения видео и блюра
     // TODO: использовать thumbnail фото при выключении камеры
     LaunchedEffect(translationScreenState.translationInfo?.camera) {
-        camera?.let { camera ->
+        camera?.let {
             translationScreenState.translationInfo?.camera?.let { enabled ->
                 if (enabled) {
-                    camera.glInterface.unMuteVideo()
-                    camera.glInterface.clearFilters()
-                    camera.resumeRecord()
+                    enableVideo()
                 } else {
-                    camera.glInterface.muteVideo()
-                    camera.glInterface.addFilter(BlurFilterRender())
-                    camera.pauseRecord()
+                    disableVideo()
                 }
             }
         }
@@ -211,20 +250,67 @@ fun TestTranslationScreen(
         }
     }
 
+    // Коллект одноразовых ивентов
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            vm.oneTimeEvent.collectLatest { event ->
+                when (event) {
+                    is TranslationOneTimeEvent.ErrorHappened -> {}
+                    TranslationOneTimeEvent.Reconnect -> {
+                        camera?.reConnect(1000, null)
+                    }
+                }
+            }
+        }
+    }
+
 
     val connectionChecker = remember {
         object : ConnectCheckerRtmp {
             override fun onAuthErrorRtmp() {}
             override fun onAuthSuccessRtmp() {}
-            override fun onConnectionFailedRtmp(reason: String) {}
+            override fun onConnectionFailedRtmp(reason: String) {
+                camera?.let {
+                    blurVideo()
+                    it.setReTries(8)
+                    it.reTry(1000, "")
+                    if (reTryRemained > 0) {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                connectionStatus = ConnectionStatus.RECONNECTING
+                            )
+                        )
+                        reTryRemained -= 1
+                    } else {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                connectionStatus = ConnectionStatus.NO_CONNECTION
+                            )
+                        )
+                    }
+                }
+            }
+
             override fun onConnectionStartedRtmp(rtmpUrl: String) {}
             override fun onConnectionSuccessRtmp() {
+                if (translationScreenState.translationInfo?.camera == true) {
+                    enableVideo()
+                }
+                reTryRemained = 10
+                vm.onEvent(
+                    TranslationEvent.UpdateConnectionStatus(
+                        connectionStatus = ConnectionStatus.SUCCESS
+                    )
+                )
                 camera?.let {
                     bitrateAdapter = BitrateAdapter { bitrate -> it.setVideoBitrateOnFly(bitrate) }
                     bitrateAdapter?.setMaxBitrate(it.bitrate)
                 }
             }
+
             override fun onDisconnectRtmp() {}
+
             override fun onNewBitrateRtmp(bitrate: Long) {
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
@@ -250,8 +336,9 @@ fun TestTranslationScreen(
                 camera?.let {
                     when (translationScreenState.translationStatus) {
                         TranslationStatus.PREVIEW -> {
-                            it.startPreview()
+                            startPreview()
                         }
+
                         TranslationStatus.STREAM -> {
                             translationScreenState.translationInfo?.let { translation ->
                                 startBroadCast(
@@ -259,6 +346,7 @@ fun TestTranslationScreen(
                                 )
                             }
                         }
+
                         else -> {}
                     }
                 }
@@ -288,6 +376,7 @@ fun TestTranslationScreen(
     BottomSheetScaffold(
         sheetContent = {
             BottomSheetStateManager(
+                modifier = Modifier.align(Alignment.End),
                 state = bottomSheetState,
                 configuration = configuration,
                 messagesList = messages,
@@ -319,11 +408,17 @@ fun TestTranslationScreen(
         },
         sheetPeekHeight = 0.dp,
         scaffoldState = scaffoldState,
-        sheetBackgroundColor = ThemeExtra.colors.blackSeventy,
-        sheetShape = RoundedCornerShape(
-            topStart = 24.dp,
-            topEnd = 24.dp
-        )
+        sheetBackgroundColor = Color.Transparent,
+        sheetShape = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            RoundedCornerShape(
+                topStart = 24.dp
+            )
+        } else {
+            RoundedCornerShape(
+                topStart = 24.dp,
+                topEnd = 24.dp
+            )
+        }
     ) {
         Box {
             TranslationStateManager(
@@ -378,7 +473,6 @@ fun TestTranslationScreen(
                                         isOpened = false
                                     )
                                 )
-
                                 bottomSheetState =
                                     ru.rikmasters.gilty.translation.model.BottomSheetState.CHAT
 
@@ -404,7 +498,6 @@ fun TestTranslationScreen(
                 },
                 onMembersClicked = {
                     scope.launch {
-
                         when {
                             scaffoldState.bottomSheetState.isExpanded && bottomSheetState == ru.rikmasters.gilty.translation.model.BottomSheetState.USERS -> {
                                 scaffoldState.bottomSheetState.collapse()
@@ -421,7 +514,6 @@ fun TestTranslationScreen(
                                         isOpened = false
                                     )
                                 )
-
                                 bottomSheetState =
                                     ru.rikmasters.gilty.translation.model.BottomSheetState.USERS
 
@@ -446,7 +538,12 @@ fun TestTranslationScreen(
                     }
                 },
                 surfaceHolderCallback = surfaceHolderCallback,
-                orientation = orientation
+                orientation = orientation,
+                connectionStatus = translationScreenState.connectionStatus
+                    ?: ConnectionStatus.SUCCESS,
+                onReconnectClicked = { vm.onEvent(TranslationEvent.Reconnect) },
+                bsOpened = scaffoldState.bottomSheetState.isExpanded,
+                configuration = configuration
             )
             GAlert(
                 show = isShowDeleteAlert,
@@ -468,8 +565,4 @@ fun TestTranslationScreen(
             )
         }
     }
-}
-
-private enum class TestStreamState {
-    PREVIEW, STREAM
 }

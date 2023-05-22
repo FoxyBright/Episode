@@ -51,7 +51,7 @@ class TranslationViewModel : ViewModel() {
         chatIsOpened,
         reloadChat
     ) { isOpened, reload ->
-        Pair(isOpened,reload)
+        Pair(isOpened, reload)
     }.flatMapLatest { (isOpened, _) ->
         // Если открыт ботомшит
         if (isOpened) {
@@ -264,6 +264,7 @@ class TranslationViewModel : ViewModel() {
                     meetingId = event.meetingId
                 )
             }
+
             TranslationEvent.ChangeFacing -> {
                 _translationUiState.update {
                     it.copy(
@@ -271,14 +272,16 @@ class TranslationViewModel : ViewModel() {
                     )
                 }
             }
+
             TranslationEvent.ChangeUiToPreview -> {
                 _translationUiState.update {
                     it.copy(
                         translationStatus = TranslationStatus.PREVIEW
                     )
                 }
-                Log.d("TESTFF","UI UPDATED ${_translationUiState.value.translationStatus}")
+                Log.d("TESTFF", "UI UPDATED ${_translationUiState.value.translationStatus}")
             }
+
             TranslationEvent.ChangeUiToStream -> {
                 _translationUiState.update {
                     it.copy(
@@ -286,6 +289,7 @@ class TranslationViewModel : ViewModel() {
                     )
                 }
             }
+
             TranslationEvent.StartStreaming -> {
                 coroutineScope.launch {
                     _translationUiState.value.translationInfo?.let { translation ->
@@ -376,6 +380,23 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             }
+
+            is TranslationEvent.UpdateConnectionStatus -> {
+                _translationUiState.update {
+                    it.copy(
+                        connectionStatus = event.connectionStatus
+                    )
+                }
+            }
+
+            TranslationEvent.Reconnect -> {
+                _translationUiState.value.meetingModel?.id?.let { meetId ->
+                    getScreenInfo(
+                        meetingId = meetId,
+                        isReconnect = true
+                    )
+                }
+            }
         }
     }
 
@@ -387,7 +408,7 @@ class TranslationViewModel : ViewModel() {
         connected.value = false
     }
 
-    private fun getScreenInfo(meetingId: String) {
+    private fun getScreenInfo(meetingId: String, isReconnect: Boolean = false) {
         coroutineScope.launch {
             translationRepository.getTranslationInfo(
                 translationId = meetingId
@@ -405,6 +426,19 @@ class TranslationViewModel : ViewModel() {
                             isLoading = false,
                             translationInfo = translation
                         )
+                    }
+                    if (isReconnect) {
+                        _translationUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                translationInfo = translation
+                            )
+                        }
+                        translationRepository.connectToTranslation(
+                            translationId = translation.id
+                        )
+                        startPinging()
+                        _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
                     }
                 },
                 error = { cause ->

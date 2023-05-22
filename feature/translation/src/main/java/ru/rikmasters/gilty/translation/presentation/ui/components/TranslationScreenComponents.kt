@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -150,7 +151,10 @@ fun CameraView(
     surfaceHolderCallback: SurfaceHolder.Callback
 ) {
     AndroidView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .background(
+                color = ThemeExtra.colors.preDarkColor
+            ),
         factory = {
             val view = OpenGlView(it)
             view.keepScreenOn = true
@@ -233,7 +237,7 @@ fun StreamerItem(
 ) {
     Row (verticalAlignment = Alignment.CenterVertically) {
         AvatarItem(
-            src = meetingModel.organizer.thumbnail?.url,
+            src = meetingModel.organizer.avatar?.thumbnail?.url,
             radius = 41.dp
         )
         Spacer(modifier = Modifier.width(11.dp))
@@ -401,7 +405,6 @@ fun CommentPanel(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .fillMaxWidth()
                 .height(50.dp)
         ) {
             TextField(
@@ -423,21 +426,27 @@ fun CommentPanel(
                     Text(
                         text = stringResource(id = R.string.translations_chat_commentary),
                         color = Color(0xFFCAC4D0),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 },
-                singleLine = true
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Normal
+                )
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_send_rounded),
                 contentDescription = "send message",
                 tint = Color.Unspecified,
                 modifier = Modifier
+                    .weight(1f)
+                    .size(32.dp)
                     .clickable {
                         onSendMessage(messageText)
                         messageText = ""
                     }
-                    .padding(4.dp)
             )
         }
     }

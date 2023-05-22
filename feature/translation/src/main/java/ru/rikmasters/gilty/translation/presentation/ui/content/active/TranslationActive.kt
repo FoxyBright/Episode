@@ -5,6 +5,7 @@ import android.view.SurfaceHolder
 import androidx.compose.runtime.Composable
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.translation.model.ConnectionStatus
 
 @Composable
 fun TranslationActive(
@@ -21,7 +22,11 @@ fun TranslationActive(
     onMicrophoneClicked: () -> Unit,
     changeFacing: () -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback,
-    orientation: Int
+    orientation: Int,
+    connectionStatus: ConnectionStatus,
+    onReconnectClicked: () -> Unit,
+    bsOpened: Boolean,
+    configuration: Configuration
 ) {
     when(orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> {
@@ -38,7 +43,11 @@ fun TranslationActive(
                 onCameraClicked = onCameraClicked,
                 onMicrophoneClicked = onMicrophoneClicked,
                 changeFacing = changeFacing,
-                surfaceHolderCallback = surfaceHolderCallback
+                surfaceHolderCallback = surfaceHolderCallback,
+                bsOpened = bsOpened,
+                connectionStatus = connectionStatus,
+                onReconnectCLicked = onReconnectClicked,
+                configuration = configuration
             )
         }
         Configuration.ORIENTATION_PORTRAIT -> {
@@ -55,7 +64,9 @@ fun TranslationActive(
                 onCameraClicked = onCameraClicked,
                 onMicrophoneClicked = onMicrophoneClicked,
                 changeFacing = changeFacing,
-                surfaceHolderCallback = surfaceHolderCallback
+                surfaceHolderCallback = surfaceHolderCallback,
+                connectionStatus = connectionStatus,
+                onReconnectCLicked = onReconnectClicked
             )
         }
     }

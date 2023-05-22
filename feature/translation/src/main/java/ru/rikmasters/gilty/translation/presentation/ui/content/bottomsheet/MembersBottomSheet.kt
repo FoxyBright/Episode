@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -47,22 +48,39 @@ fun MembersBottomSheet(
 ) {
     val scrollState = rememberLazyListState()
     Box(
-        modifier = Modifier.background(
-            color = ThemeExtra.colors.blackSeventy
-        )
+        modifier = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Modifier
+                .width((configuration.screenWidthDp * 0.4).dp)
+                .fillMaxHeight()
+                .background(
+                    color = ThemeExtra.colors.blackSeventy,
+                    shape = RoundedCornerShape(
+                        topStart = 24.dp
+                    )
+                )
+                .padding(horizontal = 16.dp)
+        } else if (membersCount == 0) {
+            Modifier
+                .fillMaxWidth()
+                .height((configuration.screenHeightDp * 0.375).dp)
+                //.wrapContentWidth(unbounded = false)
+                .background(
+                    color = ThemeExtra.colors.blackSeventy
+                )
+                .padding(horizontal = 16.dp)
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .height((configuration.screenHeightDp * 0.75).dp)
+                //.wrapContentWidth(unbounded = false)
+                .background(
+                    color = ThemeExtra.colors.blackSeventy
+                )
+                .padding(horizontal = 16.dp)
+        }
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(
-                    if (membersCount == 0) {
-                        (configuration.screenHeightDp * 0.375).dp
-                    } else {
-                        (configuration.screenHeightDp * 0.75).dp
-                    }
-                )
-                .wrapContentWidth(unbounded = false)
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.matchParentSize()
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Surface(

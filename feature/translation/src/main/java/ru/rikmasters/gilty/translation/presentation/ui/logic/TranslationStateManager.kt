@@ -1,9 +1,11 @@
 package ru.rikmasters.gilty.translation.presentation.ui.logic
 
+import android.content.res.Configuration
 import android.view.SurfaceHolder
 import androidx.compose.runtime.Composable
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.translation.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.model.Facing
 import ru.rikmasters.gilty.translation.model.TranslationStatus
 import ru.rikmasters.gilty.translation.presentation.ui.content.active.TranslationActive
@@ -27,7 +29,11 @@ fun TranslationStateManager(
     onChatClicked: () -> Unit,
     onMembersClicked: () -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback,
-    orientation: Int
+    orientation: Int,
+    connectionStatus: ConnectionStatus,
+    onReconnectClicked: () -> Unit,
+    bsOpened: Boolean,
+    configuration: Configuration
 ) {
     when(translationStatus) {
         TranslationStatus.PREVIEW -> {
@@ -55,7 +61,11 @@ fun TranslationStateManager(
                 onMicrophoneClicked = onMicrophoneClicked,
                 changeFacing = changeFacing,
                 surfaceHolderCallback = surfaceHolderCallback,
-                orientation = orientation
+                orientation = orientation,
+                connectionStatus = connectionStatus,
+                onReconnectClicked = onReconnectClicked,
+                bsOpened = bsOpened,
+                configuration = configuration
             )
         }
         else -> {}

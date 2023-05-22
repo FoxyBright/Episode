@@ -1,6 +1,10 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content.active
 
+import android.content.res.Configuration
 import android.view.SurfaceHolder
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +35,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCashedImage
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
+import ru.rikmasters.gilty.translation.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.presentation.ui.components.CameraItem
 import ru.rikmasters.gilty.translation.presentation.ui.components.CameraView
 import ru.rikmasters.gilty.translation.presentation.ui.components.ChangeFacingItem
@@ -55,7 +60,11 @@ fun TranslationActiveLandscape(
     onCameraClicked: () -> Unit,
     onMicrophoneClicked: () -> Unit,
     changeFacing: () -> Unit,
-    surfaceHolderCallback: SurfaceHolder.Callback
+    surfaceHolderCallback: SurfaceHolder.Callback,
+    bsOpened: Boolean,
+    connectionStatus: ConnectionStatus,
+    onReconnectCLicked: () -> Unit,
+    configuration: Configuration
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CameraView(
@@ -81,112 +90,192 @@ fun TranslationActiveLandscape(
                     }
                     Box(
                         modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         TimerItem(time = remainTime)
                     }
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        CloseButton(onClick = onCloseClicked)
+                    AnimatedVisibility(visible = !bsOpened) {
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            CloseButton(onClick = onCloseClicked)
+                        }
+                    }
+                    AnimatedVisibility(visible = bsOpened) {
+                        Spacer(modifier = Modifier
+                            .width(29.dp)
+                            .weight(1f))
                     }
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CameraItem(
-                    enabled = cameraEnabled,
-                    onClick = onCameraClicked,
-                    roundedBackground = true
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                MicrophoneItem(
-                    enabled = microphoneEnabled,
-                    onClick = onMicrophoneClicked,
-                    roundedBackground = true
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                ChangeFacingItem(
-                    onClick = changeFacing,
-                    roundedBackground = true
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                ChatItem(onClick = onChatClicked)
-                Spacer(modifier = Modifier.width(40.dp))
-                MembersCountItem(
-                    membersCount = membersCount,
-                    onClick = onMembersClicked
-                )
+            AnimatedVisibility(visible = !bsOpened) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CameraItem(
+                        enabled = cameraEnabled,
+                        onClick = onCameraClicked,
+                        roundedBackground = true
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    MicrophoneItem(
+                        enabled = microphoneEnabled,
+                        onClick = onMicrophoneClicked,
+                        roundedBackground = true
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    ChangeFacingItem(
+                        onClick = changeFacing,
+                        roundedBackground = true
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    ChatItem(onClick = onChatClicked)
+                    Spacer(modifier = Modifier.width(40.dp))
+                    MembersCountItem(
+                        membersCount = membersCount,
+                        onClick = onMembersClicked
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
-        when {
-            !cameraEnabled && !microphoneEnabled -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    GCashedImage(
-                        url = meetingModel?.organizer?.avatar?.thumbnail?.url,
-                        modifier = Modifier
-                            .size(90.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(
-                        modifier = Modifier.height(8.dp)
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_microphone_off_voice),
-                        contentDescription = "Microphone off",
-                        tint = Color.Unspecified
-                    )
-                }
-            }
-
-            !cameraEnabled && microphoneEnabled -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    GCashedImage(
-                        url = meetingModel?.organizer?.avatar?.thumbnail?.url,
-                        modifier = Modifier
-                            .size(90.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    // TODO: Сделать полоску голоса
-                }
-            }
-
-            cameraEnabled && !microphoneEnabled -> {
-                Surface(
-                    color = ThemeExtra.colors.thirdOpaqueGray,
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(
-                            vertical = 6.dp,
-                            horizontal = 16.dp
-                        )
+        Box(
+            modifier = if (bsOpened) {
+                Modifier.width((configuration.screenWidthDp * 0.4).dp)
+            } else {
+                Modifier.fillMaxWidth()
+            },
+            contentAlignment = Alignment.Center
+        ) {
+            when {
+                !cameraEnabled && !microphoneEnabled -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        GCashedImage(
+                            url = meetingModel?.organizer?.avatar?.thumbnail?.url,
+                            modifier = Modifier
+                                .size(90.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_micro_inactive),
+                            painter = painterResource(id = R.drawable.ic_microphone_off_voice),
                             contentDescription = "Microphone off",
-                            tint = ThemeExtra.colors.white
+                            tint = Color.Unspecified
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+
+                !cameraEnabled && microphoneEnabled -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        GCashedImage(
+                            url = meetingModel?.organizer?.avatar?.thumbnail?.url,
+                            modifier = Modifier
+                                .size(90.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        // TODO: Сделать полоску голоса
+                    }
+                }
+
+                cameraEnabled && !microphoneEnabled -> {
+                    Surface(
+                        color = ThemeExtra.colors.thirdOpaqueGray,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.align(Alignment.Center)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(
+                                vertical = 6.dp,
+                                horizontal = 16.dp
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_micro_inactive),
+                                contentDescription = "Microphone off",
+                                tint = ThemeExtra.colors.white
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(id = R.string.translations_micro_off_organizer),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = ThemeExtra.colors.white
+                            )
+                        }
+                    }
+                }
+                connectionStatus == ConnectionStatus.RECONNECTING -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_reconnecting),
+                            contentDescription = ""
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = stringResource(id = R.string.translations_micro_off_organizer),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = ThemeExtra.colors.white
+                            text = stringResource(id = R.string.translations_reconnecting),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_reconnecting_wait),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                connectionStatus == ConnectionStatus.NO_CONNECTION -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_no_connection),
+                            contentDescription = ""
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_no_connection),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(id = R.string.translations_no_connection_wait),
+                            color = ThemeExtra.colors.white,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = ThemeExtra.colors.mainDayGreen,
+                            modifier = Modifier.clickable { onReconnectCLicked() }
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(
+                                    horizontal = 12.dp,
+                                    vertical = 8.dp
+                                ),
+                                text = stringResource(id = R.string.translations_no_connection_refresh),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = ThemeExtra.colors.white
+                            )
+                        }
                     }
                 }
             }

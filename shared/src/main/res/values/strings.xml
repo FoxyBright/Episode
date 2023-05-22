@@ -396,5 +396,10 @@
     <string name="translations_members_delete_label">Вы действительно хотите удалить участника?</string>
     <string name="translations_members_no_users">К вашей трансляции еще \nникто не подключился</string>
     <string name="translations_members_no_messages">В чате нет сообщений</string>
+    <string name="translations_reconnecting">Идет переподключение</string>
+    <string name="translations_reconnecting_wait">Пожалуйста, подождите</string>
+    <string name="translations_no_connection">Нет соединения</string>
+    <string name="translations_no_connection_wait">Подключитесь к другой сети \nи обновите трансляцию</string>
+    <string name="translations_no_connection_refresh">Подключитесь к другой сети \nи обновите трансляцию</string>
 
 </resources>

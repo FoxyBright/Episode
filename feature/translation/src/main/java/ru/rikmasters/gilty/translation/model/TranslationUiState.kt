@@ -9,5 +9,6 @@ data class TranslationUiState(
     val membersCount: Int? = 0,
     val translationStatus: TranslationStatus? = TranslationStatus.PREVIEW,
     val selectedCamera: Facing ?= Facing.FRONT,
-    val meetingModel: FullMeetingModel?= null
+    val meetingModel: FullMeetingModel?= null,
+    val connectionStatus: ConnectionStatus? = ConnectionStatus.SUCCESS
 )
