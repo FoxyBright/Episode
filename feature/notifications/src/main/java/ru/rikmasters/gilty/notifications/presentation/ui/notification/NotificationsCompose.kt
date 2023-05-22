@@ -102,6 +102,7 @@ data class NotificationsState(
     val participantsStates: List<Int>,
     val listState: LazyListState,
     val ratings: List<RatingModel>,
+    val smthError: Boolean = false,
 )
 
 interface NotificationsCallback {
@@ -153,7 +154,9 @@ fun NotificationsContent(
             ) { callback?.onNavBarSelect(it) }
         }
     ) { padding ->
-        Box(Modifier.padding(padding)) {
+        if(state.smthError) ErrorInternetConnection {
+            callback?.onListUpdate()
+        } else Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
                 Notifications(
                     state, Modifier
@@ -177,7 +180,8 @@ fun NotificationsContent(
                     state.participantsStates,
                     (it.feedback?.ratings?.map {
                         it.emoji
-                    } ?: state.ratings.map { it.emoji }), state.ratings.map { it.emoji }),
+                    } ?: state.ratings.map { it.emoji }),
+                    state.ratings.map { it.emoji }),
                 Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 84.dp)
@@ -223,21 +227,22 @@ private fun Notifications(
     callback: NotificationsCallback?,
 ) {
     @Composable
-    fun getMonthName(monthNumber:Int) = when(monthNumber){
-            1->R.string.month_january_name
-            2->R.string.month_february_name
-            3->R.string.month_march_name
-            4->R.string.month_april_name
-            5->R.string.month_may_name
-            6->R.string.month_june_name
-            7->R.string.month_july_name
-            8->R.string.month_august_name
-            9->R.string.month_september_name
-            10->R.string.month_october_name
-            11->R.string.month_november_name
-            12->R.string.month_december_name
-            else->R.string.month_december_name
-        }
+    fun getMonthName(monthNumber: Int) = when(monthNumber) {
+        1 -> R.string.month_january_name
+        2 -> R.string.month_february_name
+        3 -> R.string.month_march_name
+        4 -> R.string.month_april_name
+        5 -> R.string.month_may_name
+        6 -> R.string.month_june_name
+        7 -> R.string.month_july_name
+        8 -> R.string.month_august_name
+        9 -> R.string.month_september_name
+        10 -> R.string.month_october_name
+        11 -> R.string.month_november_name
+        12 -> R.string.month_december_name
+        else -> R.string.month_december_name
+    }
+    
     val notifications = state.notifications
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
@@ -318,29 +323,56 @@ private fun Notifications(
                             item?.let { not ->
                                 if(earlierWeekControl(not.date)) {
                                     // First Element
-                                    if(index == todayItems.size + weekItems.size){
+                                    if(index == todayItems.size + weekItems.size) {
                                         Label(
-                                            getMonthName(monthNumber = getMonth(item.date)),
+                                            getMonthName(
+                                                monthNumber = getMonth(
+                                                    item.date
+                                                )
+                                            ),
                                             hasResponds,
                                             if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (true)
                                         )
                                         ElementNot(
                                             0,
-                                            restItems.filter { getMonth(it.date) == getMonth(item.date) }.size, not,
+                                            restItems.filter {
+                                                getMonth(it.date) == getMonth(
+                                                    item.date
+                                                )
+                                            }.size, not,
                                             state.ratings, callback
                                         )
-                                    }else if(index - 1 >= 0) { // other elemnets
-                                        if(getMonth(item.date) != getMonth(state.notifications.itemSnapshotList[index - 1]?.date?:"")){
+                                    } else if(index - 1 >= 0) { // other elemnets
+                                        if(getMonth(item.date) != getMonth(
+                                                state.notifications.itemSnapshotList[index - 1]?.date
+                                                    ?: ""
+                                            )
+                                        ) {
                                             Label(
-                                                getMonthName(monthNumber = getMonth(item.date)),
+                                                getMonthName(
+                                                    monthNumber = getMonth(
+                                                        item.date
+                                                    )
+                                                ),
                                                 hasResponds,
                                                 if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (false)
                                             )
                                         }
                                         ElementNot(
                                             index - todayItems.size - weekItems.size - restItems.filter
-                                            { isAfter(it.date,item.date) && getMonth(it.date) != getMonth(item.date) }.size,
-                                            restItems.filter { getMonth(it.date) == getMonth(item.date) }.size, not,
+                                            {
+                                                isAfter(
+                                                    it.date,
+                                                    item.date
+                                                ) && getMonth(it.date) != getMonth(
+                                                    item.date
+                                                )
+                                            }.size,
+                                            restItems.filter {
+                                                getMonth(it.date) == getMonth(
+                                                    item.date
+                                                )
+                                            }.size, not,
                                             state.ratings, callback
                                         )
                                     }

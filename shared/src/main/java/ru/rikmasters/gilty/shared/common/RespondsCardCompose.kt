@@ -41,7 +41,7 @@ private fun RespondCardEmptyPreview() {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun Responds(
-    image: String?, size: Int?,
+    image: String?, count: Int?,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.profile_responds_label),
     onClick: (() -> Unit)? = null,
@@ -91,7 +91,7 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
-                size?.let {
+                count?.let {
                     if(it > 0) Box(
                         Modifier
                             .clip(RoundedCornerShape(9.dp))

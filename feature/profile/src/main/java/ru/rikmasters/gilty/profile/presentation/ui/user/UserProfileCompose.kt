@@ -13,7 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,6 +82,7 @@ data class UserProfileState(
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
     val viewerType: PhotoViewType = PHOTO,
+    val smthError: Boolean = false,
 )
 
 interface UserProfileCallback: ProfileCallback {
@@ -94,6 +95,7 @@ interface UserProfileCallback: ProfileCallback {
     fun onNavBarSelect(point: Int)
     fun closeAlert()
     fun closePhotoAlert()
+    fun updateProfile()
     fun onMenuClick(it: Boolean)
     fun onMenuItemClick(point: Int)
     fun onPhotoViewDismiss(state: Boolean)
@@ -110,9 +112,10 @@ fun ProfileContent(
 ) {
     Box {
         GDropMenu(
-            state.menuState,
-            { callback?.onMenuClick(false) },
-            DpOffset(180.dp, 300.dp), listOf(
+            menuState = state.menuState,
+            collapse = { callback?.onMenuClick(false) },
+            offset = DpOffset(180.dp, 300.dp),
+            menuItem = listOf(
                 Pair(stringResource(R.string.profile_menu_watch_photo_button)) {
                     callback?.onMenuItemClick(0)
                 },
@@ -123,14 +126,16 @@ fun ProfileContent(
         )
     }
     Scaffold(
-        modifier,
+        modifier = modifier,
         bottomBar = {
             NavBar(state.stateList) {
                 callback?.onNavBarSelect(it)
             }
         }
     ) {
-        Box(Modifier.padding(it)) {
+        if(state.smthError) ErrorInternetConnection {
+            callback?.updateProfile()
+        } else Box(Modifier.padding(it)) {
             Use<UserProfileViewModel>(PullToRefreshTrait) {
                 Content(state, Modifier, callback)
             }
@@ -146,7 +151,7 @@ fun ProfileContent(
         onBack = { callback?.onPhotoViewDismiss(false) },
     )
     GAlert(
-        state.alert,
+        show = state.alert,
         title = stringResource(R.string.complaints_send_answer),
         onDismissRequest = { callback?.closeAlert() },
         label = stringResource(R.string.complaints_moderate_sen_answer),
@@ -172,10 +177,8 @@ private fun Content(
     callback: UserProfileCallback? = null,
 ) {
     LazyColumn(
-        modifier
-            .fillMaxSize()
-            .background(colorScheme.background),
-        state.listState
+        modifier = modifier.fillMaxSize(),
+        state = state.listState
     ) {
         item(key = 1) {
             Box(
@@ -184,22 +187,18 @@ private fun Content(
                     .padding(horizontal = 16.dp)
             ) {
                 Profile(
-                    state.profileState,
-                    Modifier,
-                    callback
+                    state = state.profileState,
+                    callback = callback
                 )
-                Box(
-                    Modifier.fillMaxWidth(),
-                    Alignment.CenterEnd
-                ) {
+                Box(Modifier.fillMaxWidth(), CenterEnd) {
                     IconButton(
-                        { callback?.menu(true) },
-                        Modifier.padding(top = 8.dp)
+                        onClick = { callback?.menu(true) },
+                        modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Icon(
-                            painterResource(ic_kebab),
-                            (null), Modifier,
-                            colorScheme.tertiary
+                            painter = painterResource(ic_kebab),
+                            contentDescription = null,
+                            tint = colorScheme.tertiary
                         )
                     }
                 }
@@ -207,19 +206,20 @@ private fun Content(
         }
         item(key = 2) {
             Text(
-                stringResource(R.string.profile_actual_meetings_label),
-                Modifier
+                text = stringResource(R.string.profile_actual_meetings_label),
+                modifier = Modifier
                     .padding(top = 10.dp)
                     .padding(horizontal = 16.dp),
-                colorScheme.tertiary,
-                style = typography.labelLarge
+                style = typography.labelLarge.copy(
+                    colorScheme.tertiary
+                )
             )
         }
         item(key = 3) {
             Box(Modifier.padding(16.dp, 12.dp)) {
                 Responds(
-                    state.lastRespond.second,
-                    state.lastRespond.first
+                    image = state.lastRespond.second,
+                    count = state.lastRespond.first
                 ) { callback?.onRespondsClick() }
             }
         }
@@ -235,8 +235,10 @@ private fun Content(
                 item { Spacer(Modifier.width(8.dp)) }
                 items(state.currentMeetings) {
                     MeetingCategoryCard(
-                        userId, it!!,
-                        Modifier.padding(horizontal = 4.dp)
+                        userId = userId,
+                        meeting = it!!,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
                     ) { callback?.onMeetingClick(it) }
                 }
             }
@@ -244,9 +246,10 @@ private fun Content(
         if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
             item(5) {
                 MeetHistory(
-                    userId, state.historyState,
-                    state.meetingsHistory,
-                    { callback?.onHistoryShow() }
+                    userId = userId,
+                    historyState = state.historyState,
+                    historyList = state.meetingsHistory,
+                    openHistory = { callback?.onHistoryShow() }
                 ) { callback?.onHistoryClick(it) }
             }
         item(key = 6) {
@@ -273,20 +276,23 @@ private fun MeetHistory(
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
             .clickable { openHistory() },
-        Start,
-        CenterVertically
+        Start, CenterVertically
     ) {
         Text(
-            stringResource(R.string.profile_meeting_history_label),
-            Modifier.padding(end = 12.dp, bottom = 2.dp),
+            text = stringResource(R.string.profile_meeting_history_label),
+            modifier = Modifier.padding(
+                end = 12.dp, bottom = 2.dp
+            ),
             color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         Icon(
-            if(!historyState) Filled.KeyboardArrowRight
+            imageVector = if(!historyState)
+                Filled.KeyboardArrowRight
             else Filled.KeyboardArrowDown,
-            (null), Modifier.size(28.dp),
-            colorScheme.tertiary
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
+            tint = colorScheme.tertiary
         )
     }
     if(historyState) LazyRow(
@@ -297,8 +303,10 @@ private fun MeetHistory(
         item { Spacer(Modifier.width(8.dp)) }
         items(historyList) {
             MeetingCategoryCard(
-                userId, it!!,
-                Modifier.padding(horizontal = 4.dp),
+                userId = userId,
+                meeting = it!!,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp),
                 old = true
             ) { onSelect(it) }
         }

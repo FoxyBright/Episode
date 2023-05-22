@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -102,6 +102,7 @@ interface MainContentCallback {
         meet: MeetingModel,
         state: SwipeableCardState,
     )
+    fun updateMainScreen()
 }
 
 data class MainContentState(
@@ -115,6 +116,7 @@ data class MainContentState(
     val hasFilters: Boolean,
     val bsState: BottomSheetScaffoldState,
     val vmScope: Scope? = null,
+    val smthError: Boolean = true,
 )
 
 @Composable
@@ -123,52 +125,65 @@ fun MainContent(
     modifier: Modifier = Modifier,
     callback: MainContentCallback? = null,
 ) {
-    val alpha = state.bsState.bottomSheetState
-        .offset.value / 1500
+    val alpha = state.bsState
+        .bottomSheetState.offset.value / 1500
     Filters(state, alpha) {
-        Column(
-            Modifier.background(
-                colorScheme.background
-            )
-        ) {
-            TopBar(
-                state.today, state.selectDate,
-                state.selectTime, Modifier.padding(top = 50.dp),
-                { callback?.onTodayChange(it) }
-            ) { callback?.onTimeFilterClick() }
-            Use<MainViewModel>(LoadingTrait) {
-                Content(
-                    state.grid, state.hasFilters,
-                    state.meetings, modifier
-                        .fillMaxHeight(0.74f)
-                        .padding(horizontal = 16.dp),
-                    callback
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    if(state.smthError) Transparent
+                    else colorScheme.background
                 )
+        ) {
+            if(state.smthError) ErrorInternetConnection {
+                callback?.updateMainScreen()
+            }
+            Column {
+                TopBar(
+                    today = state.today,
+                    selectDate = state.selectDate,
+                    selectTime = state.selectTime,
+                    modifier = Modifier.padding(top = 50.dp),
+                    onTodayChange = { callback?.onTodayChange(it) }
+                ) { callback?.onTimeFilterClick() }
+                Use<MainViewModel>(LoadingTrait) {
+                    if(!state.smthError) Content(
+                        state = state.grid,
+                        hasFilters = state.hasFilters,
+                        meetings = state.meetings,
+                        modifier = modifier
+                            .fillMaxHeight(0.74f)
+                            .padding(horizontal = 16.dp),
+                        callback = callback
+                    )
+                }
             }
         }
     }
     Box(Modifier.fillMaxSize(), BottomCenter) {
+        val animate = state.bsState.bottomSheetState
+            .isAnimationRunning || state.bsState
+            .bottomSheetState.isExpanded
         NavBar(
-            state.navBarStates,
-            Modifier.alpha(
-                if(state.bsState.bottomSheetState.isAnimationRunning
-                    || state.bsState.bottomSheetState.isExpanded
-                ) alpha else 1f
-            )
-        ) {
-            if(!(state.bsState.bottomSheetState.isAnimationRunning
-                || state.bsState.bottomSheetState.isExpanded))
-                callback?.onNavBarSelect(it)
-        }
+            state = state.navBarStates,
+            modifier = Modifier.alpha(if(animate) alpha else 1f)
+        ) { if(!animate) callback?.onNavBarSelect(it) }
     }
     GAlert(
-        state.alert,
-        Modifier,
-        Pair(stringResource(R.string.meeting_close_button))
-        { callback?.onCloseAlert() },
-        stringResource(R.string.complaints_moderate_sen_answer),
-        stringResource(R.string.complaints_send_answer),
-        { callback?.onCloseAlert() }
+        show = state.alert,
+        success = Pair(stringResource(R.string.meeting_close_button)) {
+            callback?.onCloseAlert()
+        },
+        label = stringResource(
+            R.string.complaints_moderate_sen_answer
+        ),
+        title = stringResource(
+            R.string.complaints_send_answer
+        ),
+        onDismissRequest = {
+            callback?.onCloseAlert()
+        }
     )
 }
 
@@ -190,14 +205,12 @@ private fun TopBar(
             Start, Bottom
         ) {
             GiltyString(
-                Modifier,
-                stringResource(R.string.meeting_profile_bottom_today_label),
-                today
+                text = stringResource(R.string.meeting_profile_bottom_today_label),
+                isSelected = today
             ) { onTodayChange(true) }
             GiltyString(
-                Modifier,
-                stringResource(R.string.meeting_profile_bottom_latest_label),
-                !today,
+                text = stringResource(R.string.meeting_profile_bottom_latest_label),
+                isSelected = !today,
             ) { onTodayChange(false) }
         }
         IconButton(onTimeFilterClick) {
@@ -215,14 +228,16 @@ private fun TopBar(
                 R.drawable.ic_calendar
             )
             Image(
-                painterResource(
+                painter = painterResource(
                     when {
                         today && !selectTime -> icons[0]
                         today && selectTime -> icons[1]
                         selectDate -> icons[2]
                         else -> icons[3]
                     }
-                ), (null), Modifier.size(30.dp)
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(30.dp)
             )
         }
     }
@@ -243,15 +258,18 @@ private fun Content(
             onRepeatClick = { callback?.onResetMeets() }
         )
         if(state && meetings.isNotEmpty()) MeetingGridContent(
-            modifier
-                .background(colorScheme.background)
-                .fillMaxSize(), meetings
+            modifier = modifier.fillMaxSize(),
+            meetings = meetings
         ) { callback?.onRespond(it) }
         else MeetingsListContent(
-            meetings.map { it to rememberSwipeableCardState() },
-            modifier.padding(top = 24.dp),
-            { meet, it -> callback?.meetInteraction(LEFT, meet, it) },
-            { meet, it ->
+            states = meetings.map {
+                it to rememberSwipeableCardState()
+            },
+            modifier = modifier.padding(top = 24.dp),
+            notInteresting = { meet, it ->
+                callback?.meetInteraction(LEFT, meet, it)
+            },
+            onSelect = { meet, it ->
                 callback?.onRespond(meet)
                 callback?.meetInteraction(RIGHT, meet, it)
             }

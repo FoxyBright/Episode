@@ -31,7 +31,7 @@ class ChatListPagingSource(
                 perPage = loadSize,
                 sortType = sortType
             )
-            Log.d("TESSST", "chats paginator curPAge${chats.second.currentPage} listPAge${chats.second.list_page} perPGE${chats.second.perPage} offset${chats.second.offset} limit${chats.second.limit} size ${chats.first.size}")
+            Log.d("TESSST", "chats paginator curPAge${chats.second.currentPage} lastPage${chats.second.last_page} perPGE${chats.second.perPage} type${chats.second.type} size ${chats.first.size}")
             val nextKey = if (chats.first.size < loadSize) null else chats.second.currentPage + 1
             Log.d("TESSST", "nextKey $nextKey")
             val prevKey = if (page == 1) null else chats.second.currentPage - 1

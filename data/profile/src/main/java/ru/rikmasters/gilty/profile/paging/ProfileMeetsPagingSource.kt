@@ -28,7 +28,7 @@ class ProfileMeetsPagingSource(
                 perPage = loadSize,
                 type = type
             )
-            Log.d("TEST","meets ${meets.second.currentPage} ${meets.second.perPage} ${meets.second.list_page}")
+            Log.d("TEST","meets ${meets.second.currentPage} ${meets.second.perPage} ${meets.second.last_page}")
             val nextKey = if (meets.first.size < loadSize) null else meets.second.currentPage + 1
             val prevKey = if (page == 1) null else meets.second.currentPage - 1
             LoadResult.Page(meets.first.map { it.map() }, prevKey, nextKey)

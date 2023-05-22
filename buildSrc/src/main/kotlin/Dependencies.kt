@@ -18,6 +18,10 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
     yandexmap()
 }
 
+private fun DependencyHandlerScope.toasty() = implementation(
+    "com.github.GrenderG:Toasty:1.5.2"
+)
+
 private fun DependencyHandlerScope.yandexmap() = implementation(
     "com.yandex.android:maps.mobile:4.3.1-full"
 )

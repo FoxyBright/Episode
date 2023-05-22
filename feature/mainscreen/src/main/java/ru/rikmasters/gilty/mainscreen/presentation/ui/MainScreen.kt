@@ -1,14 +1,16 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -28,6 +30,7 @@ import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun MainScreen(vm: MainViewModel) {
     
@@ -73,10 +76,9 @@ fun MainScreen(vm: MainViewModel) {
         vm.getUnread()
         vm.getMeets()
         vm.getLocation(activity)
-        context.listenPreference(
-            key = "unread_messages",
-            defValue = 0
-        ) { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_messages", 0) {
+            scope.launch { vm.setUnreadMessages(it > 0) }
+        }
     }
     
     val bsState = rememberBottomSheetScaffoldState(
@@ -85,13 +87,40 @@ fun MainScreen(vm: MainViewModel) {
     
     LaunchedEffect(location) { vm.getMeets() }
     
+    var errorState by remember {
+        mutableStateOf(false)
+    }
+    
+    scope.launch {
+        while(true) {
+            delay(500)
+            internetCheck(context).let {
+                if(!it) errorState = true
+            }
+        }
+    }
+    
     MainContent(
-        MainContentState(
-            grid, today, days.isNotEmpty(),
-            time.isNotBlank(), meetings,
-            navBar, alert, hasFilters,
-            bsState, vm.scope,
-        ), Modifier, object: MainContentCallback {
+        state = MainContentState(
+            grid = grid,
+            today = today,
+            selectDate = days.isNotEmpty(),
+            selectTime = time.isNotBlank(),
+            meetings = meetings,
+            navBarStates = navBar,
+            alert = alert,
+            hasFilters = hasFilters,
+            bsState = bsState,
+            vmScope = vm.scope,
+            smthError = errorState
+        ),
+        callback = object: MainContentCallback {
+            override fun updateMainScreen() {
+                errorState = !internetCheck(context)
+                if(!errorState) scope.launch {
+                    vm.resetMeets()
+                }
+            }
             
             override fun onNavBarSelect(point: Int) {
                 if(point == 0) return
