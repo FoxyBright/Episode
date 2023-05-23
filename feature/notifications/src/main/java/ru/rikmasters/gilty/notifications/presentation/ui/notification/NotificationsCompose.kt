@@ -58,6 +58,7 @@ private fun NotificationsContentPreview() {
             NotificationsContent(
                 NotificationsState(
                     pagingPreview(DemoNotificationModelList),
+                    listOf(),
                     Pair((3), ""), listOf(), (false),
                     DemoNotificationMeetingOverModel,
                     pagingPreview(DemoUserModelList),
@@ -81,6 +82,7 @@ private fun NotificationsBlurPreview() {
             NotificationsContent(
                 NotificationsState(
                     pagingPreview(DemoNotificationModelList),
+                    listOf(),
                     Pair((3), ""), listOf(), (true),
                     DemoNotificationMeetingOverModel,
                     pagingPreview(DemoUserModelList),
@@ -94,6 +96,7 @@ private fun NotificationsBlurPreview() {
 
 data class NotificationsState(
     val notifications: LazyPagingItems<NotificationModel>,
+    val splitNotifications: List<Pair<Int, NotificationModel>>,
     val lastRespond: Pair<Int, String>,
     val navBar: List<NavIconState>,
     val blur: Boolean,
@@ -106,14 +109,14 @@ data class NotificationsState(
 )
 
 interface NotificationsCallback {
-    
+
     fun onSwiped(notification: NotificationModel)
     fun onMeetClick(meet: MeetingModel?)
     fun onUserClick(
         user: UserModel?,
         meet: MeetingModel? = null,
     )
-    
+
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -154,7 +157,7 @@ fun NotificationsContent(
             ) { callback?.onNavBarSelect(it) }
         }
     ) { padding ->
-        if(state.smthError) ErrorInternetConnection {
+        if (state.smthError) ErrorInternetConnection {
             callback?.onListUpdate()
         } else Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
@@ -168,7 +171,7 @@ fun NotificationsContent(
         }
     }
     state.activeNotification?.let {
-        if(state.blur) BackBlur(
+        if (state.blur) BackBlur(
             Modifier.clickable {
                 callback?.onBlurClick()
             }, radius = 25
@@ -204,7 +207,7 @@ private fun EmptyNotification(
     ) {
         Image(
             painterResource(
-                if((isSystemInDarkTheme())) {
+                if ((isSystemInDarkTheme())) {
                     R.drawable.notify_dog_dark
                 } else R.drawable.notify_dog_light
             ), (null), Modifier.fillMaxWidth()
@@ -227,7 +230,7 @@ private fun Notifications(
     callback: NotificationsCallback?,
 ) {
     @Composable
-    fun getMonthName(monthNumber: Int) = when(monthNumber) {
+    fun getPeriodName(monthNumber: Int) = when (monthNumber) {
         1 -> R.string.month_january_name
         2 -> R.string.month_february_name
         3 -> R.string.month_march_name
@@ -240,154 +243,86 @@ private fun Notifications(
         10 -> R.string.month_october_name
         11 -> R.string.month_november_name
         12 -> R.string.month_december_name
+        20 -> R.string.meeting_profile_bottom_today_label
+        30 -> R.string.notification_on_this_week_label
+        // 40 -> TODO
         else -> R.string.month_december_name
     }
-    
+
     val notifications = state.notifications
-    if(LocalInspectionMode.current) PreviewLazy()
+    if (LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
-        
+
         val hasResponds = state.lastRespond.first > 0
-        val firstItem by lazy {
-            state.notifications.itemSnapshotList.first()
-        }
-        
+
         when {
             notifications.loadState.refresh is LoadState.Error -> {}
             notifications.loadState.append is LoadState.Error -> {}
             else -> {
-                if(notifications.loadState.refresh is Loading) {
+                if (notifications.loadState.refresh is Loading) {
                     item { PagingLoader(notifications.loadState) }
                 }
-                
+
                 val last = state.lastRespond
-                if(hasResponds) item {
+
+                if (hasResponds) item {
                     Box(Modifier.padding(top = 20.dp)) {
                         Responds(
                             last.second, last.first
                         ) { callback?.onRespondsClick() }
                     }
                 }
-                val itemCount = notifications.itemCount
-                if(itemCount > 0) {
-                    val todayItems =
-                        notifications.itemSnapshotList.items.filter {
-                            todayControl(it.date)
-                        }
-                    
-                    if(todayItems.isNotEmpty()) {
-                        item {
-                            Label(
-                                R.string.meeting_profile_bottom_today_label,
-                                hasResponds,
-                                (todayItems.first() == firstItem)
-                            )
-                        }
-                        itemsIndexed(todayItems) { count, item ->
+
+                val splitNotifications = state.splitNotifications
+                if (notifications.itemCount > 0 && splitNotifications.isNotEmpty()) {
+                    itemsIndexed(state.notifications) { index, item ->
+                        if (splitNotifications.size > index) {
+                            // Displays Labels
+                            if (index == 0)
+                                Label(
+                                    text = getPeriodName(monthNumber = splitNotifications[index].first),
+                                    hasResponds = hasResponds,
+                                    isFirst = getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first) == 0
+                                )
+                            else if (splitNotifications[index - 1].first != splitNotifications[index].first)
+                                Label(
+                                    text = getPeriodName(monthNumber = splitNotifications[index].first),
+                                    hasResponds = hasResponds,
+                                    isFirst = getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first) == 0
+                                )
+                            // Displays actual notification
                             ElementNot(
-                                count, todayItems.size,
-                                item, state.ratings,
+                                getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first), // Checks if prev or next exists
+                                getSize(
+                                    prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first,
+                                    next = if(index + 1 > splitNotifications.size) false else  splitNotifications[index + 1].first == splitNotifications[index].first
+                                ),
+                                splitNotifications[index].second,
+                                state.ratings,
                                 callback
                             )
                         }
                     }
-                    
-                    val weekItems =
-                        notifications.itemSnapshotList.items.filter {
-                            weekControl(it.date) && !todayControl(it.date)
-                        }
-                    
-                    if(weekItems.isNotEmpty()) {
-                        item {
-                            Label(
-                                R.string.notification_on_this_week_label,
-                                hasResponds,
-                                (weekItems.first() == firstItem)
-                            )
-                        }
-                        itemsIndexed(weekItems) { count, item ->
-                            ElementNot(
-                                count, weekItems.size,
-                                item, state.ratings, callback
-                            )
-                        }
-                    }
-                    
-                    val restItems = notifications.itemSnapshotList.items.filter {
-                            earlierWeekControl(it.date)
-                        }
-                    
-                    if(restItems.isNotEmpty()) {
-                        itemsIndexed(state.notifications) { index, item ->
-                            item?.let { not ->
-                                if(earlierWeekControl(not.date)) {
-                                    // First Element
-                                    if(index == todayItems.size + weekItems.size) {
-                                        Label(
-                                            getMonthName(
-                                                monthNumber = getMonth(
-                                                    item.date
-                                                )
-                                            ),
-                                            hasResponds,
-                                            if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (true)
-                                        )
-                                        ElementNot(
-                                            0,
-                                            restItems.filter {
-                                                getMonth(it.date) == getMonth(
-                                                    item.date
-                                                )
-                                            }.size, not,
-                                            state.ratings, callback
-                                        )
-                                    } else if(index - 1 >= 0) { // other elemnets
-                                        if(getMonth(item.date) != getMonth(
-                                                state.notifications.itemSnapshotList[index - 1]?.date
-                                                    ?: ""
-                                            )
-                                        ) {
-                                            Label(
-                                                getMonthName(
-                                                    monthNumber = getMonth(
-                                                        item.date
-                                                    )
-                                                ),
-                                                hasResponds,
-                                                if(weekItems.isNotEmpty()) (weekItems.first() == firstItem) else (false)
-                                            )
-                                        }
-                                        ElementNot(
-                                            index - todayItems.size - weekItems.size - restItems.filter
-                                            {
-                                                isAfter(
-                                                    it.date,
-                                                    item.date
-                                                ) && getMonth(it.date) != getMonth(
-                                                    item.date
-                                                )
-                                            }.size,
-                                            restItems.filter {
-                                                getMonth(it.date) == getMonth(
-                                                    item.date
-                                                )
-                                            }.size, not,
-                                            state.ratings, callback
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    if(notifications.loadState.append is Loading)
+                    if (notifications.loadState.append is Loading)
                         item { PagingLoader(notifications.loadState) }
-                } else if(notifications.loadState.refresh is NotLoading)
+                } else if (notifications.loadState.refresh is NotLoading)
                     item { EmptyNotification() }
             }
         }
         item { Spacer(Modifier.height(20.dp)) }
     }
+}
+fun getSize(prev: Boolean, next: Boolean): Int {
+    if(!prev && !next) return 1
+    if(prev && next) return 3
+    if(prev) return 2
+    if(next) return 2
+    return 0
+}
+
+fun getIndex(prev: Boolean): Int {
+    if (!prev) return 0
+    return 1
 }
 
 @Composable

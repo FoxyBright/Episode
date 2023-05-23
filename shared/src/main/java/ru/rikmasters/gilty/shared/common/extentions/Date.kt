@@ -42,6 +42,10 @@ fun tomorrowControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE
         .plusDays(1)
         .format(FORMAT)
+fun monthControl(date: String) = // TODO not implemented
+    date.format(FORMAT) == LOCAL_DATE
+        .plusDays(1)
+        .format(FORMAT)
 
 fun getDifferenceOfTime(date: String): String {
     val difference = (
@@ -129,31 +133,4 @@ fun getMonth(date:String):Int{
     ).millis()
 
     return LocalDateTime(localDate).month()
-}
-fun dateToMillis(date:String):Long  {
-    val dateList = date.format(FORMAT).split(DASH)
-    val localDate = LocalDate.of(
-        dateList.first().toInt(),
-        dateList[1].toInt(),
-        dateList.last().toInt()
-    ).millis()
-    return localDate
-}
-
-
-fun isAfter(date1:String, date2:String):Boolean{
-    val dateList1 = date1.format(FORMAT).split(DASH)
-    val localDate1 = LocalDate.of(
-        dateList1.first().toInt(),
-        dateList1[1].toInt(),
-        dateList1.last().toInt()
-    ).millis()
-
-    val dateList2 = date2.format(FORMAT).split(DASH)
-    val localDate2 = LocalDate.of(
-        dateList2.first().toInt(),
-        dateList2[1].toInt(),
-        dateList2.last().toInt()
-    ).millis()
-    return localDate1 > localDate2
 }

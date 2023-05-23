@@ -37,6 +37,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val notifications = vm.notifications.collectAsLazyPagingItems()
     val participants = vm.participants.collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
+    val splitNotifications by vm.splitMonthNotifications.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val ratings by vm.ratings.collectAsState()
@@ -64,7 +65,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     }
 
     LaunchedEffect(key1 = notifications.itemSnapshotList.items, block = {
-        val res = vm.splitByMonth(notifications.itemSnapshotList.items)
+        vm.splitByMonthSM(notifications.itemSnapshotList.items)
     })
 
     var errorState by remember {
@@ -83,6 +84,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     NotificationsContent(
         state = NotificationsState(
             notifications = notifications,
+            splitNotifications = splitNotifications,
             lastRespond = lastRespond,
             navBar = navBar,
             blur = blur,
