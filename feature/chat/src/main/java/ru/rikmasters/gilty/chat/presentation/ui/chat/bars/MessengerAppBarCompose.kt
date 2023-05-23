@@ -141,7 +141,8 @@ fun ChatAppBarContent(
 
 enum class PinnedBarType {
     MEET, MEET_FINISHED,
-    TRANSLATION, TRANSLATION_AWAIT
+    TRANSLATION, TRANSLATION_AWAIT,
+    TRANSLATION_ORGANIZER, TRANSLATION_ORGANIZER_AWAIT
 }
 
 @Composable
@@ -226,6 +227,7 @@ private fun PinedButton(
                         MEET_FINISHED -> stringResource(R.string.chats_close_chat_pinned_bar_button)
                         TRANSLATION -> viewString
                         TRANSLATION_AWAIT -> toTranslation ?: viewString
+                        TRANSLATION_ORGANIZER -> stringResource(R.string.chats_translation_organizer_btn_begin)
                         
                         else -> ""
                     }, Modifier.padding(), if(meetType)
@@ -253,6 +255,7 @@ private fun PinedText(
                     MEET_FINISHED -> R.string.chats_meet_ended_pinned_bar_label
                     TRANSLATION_AWAIT -> R.string.chats_translation_await_pinned_bar_label
                     TRANSLATION -> R.string.chats_translation_pinned_bar_label
+                    TRANSLATION_ORGANIZER -> R.string.chats_translation_organizer_pinned_bar_label
                     else -> 0
                 }
             ), style = typography.labelSmall.copy(

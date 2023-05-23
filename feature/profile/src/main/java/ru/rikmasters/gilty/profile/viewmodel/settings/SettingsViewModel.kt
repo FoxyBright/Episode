@@ -87,14 +87,14 @@ class SettingsViewModel: ViewModel() {
     
     suspend fun deleteAccount() = singleLoading {
         profileManager.deleteAccount()
-        chatManager.disconnect()
+        chatManager.disconnectWebSocket()
         authManager.logout()
         makeToast("Ваш аккаунт был удален!")
     }
     
     suspend fun logout() = singleLoading {
         profileManager.clearProfile()
-        chatManager.disconnect()
+        chatManager.disconnectWebSocket()
         authManager.logout()
         makeToast("До новых Meet!")
     }

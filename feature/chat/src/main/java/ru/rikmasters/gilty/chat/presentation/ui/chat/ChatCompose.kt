@@ -161,6 +161,16 @@ fun ChatContent(
                 { callback?.onListDown() }
             ) { callback?.onDownButtonClick() }
         },
+        bottomBar = {
+            ChatBottomBar(
+                state.imageMenuState,
+                state.messageText,
+                state.answer,
+                state.meet.isOnline,
+                Modifier.imePadding(),
+                callback
+            )
+        },
         content = {
             Content(
                 it, state,

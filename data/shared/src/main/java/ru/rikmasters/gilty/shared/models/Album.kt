@@ -12,8 +12,7 @@ data class Album(
 ) {
     
     fun map() = AlbumModel(
-        id, type?.let { valueOf(type) }
-            ?: PRIVATE,
+        id, type?.let { AlbumType.valueOf(it) },
         preview?.map(), hasAccess
     )
 }

@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chats.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.chats.models.chat.SortType
@@ -13,7 +12,6 @@ class ChatListPagingSource(
 ) : PagingSource<Int, ChatModel>() {
     override fun getRefreshKey(state: PagingState<Int, ChatModel>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
-        Log.d("TESSST","anchor $anchorPosition")
         val page = state.closestPageToPosition(anchorPosition) ?: return null
         return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
     }
@@ -22,21 +20,15 @@ class ChatListPagingSource(
         val page: Int = params.key ?: 1
         val loadSize = params.loadSize
 
-        Log.d("TESSST", "page $page")
-        Log.d("TESSST", "loadSize $loadSize")
-
         return try {
             val chats = webSource.getDialogs(
-                page = page,
+                page = 26,
                 perPage = loadSize,
                 sortType = sortType
             )
-            Log.d("TESSST", "chats paginator curPAge${chats.second.currentPage} lastPage${chats.second.last_page} perPGE${chats.second.perPage} type${chats.second.type} size ${chats.first.size}")
-            val nextKey = if (chats.first.size < loadSize) null else chats.second.currentPage + 1
-            Log.d("TESSST", "nextKey $nextKey")
-            val prevKey = if (page == 1) null else chats.second.currentPage - 1
-            Log.d("TESSST", "prevKey $prevKey")
-            LoadResult.Page(chats.first.map { it.map() }, prevKey, nextKey)
+            val nextKey = if (chats.size < loadSize) null else page + 1
+            val prevKey = if (page == 1) null else page - 1
+            LoadResult.Page(chats.map { it.map() }, prevKey, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }

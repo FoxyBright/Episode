@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":data:profile"))
     implementation(project(":data:chats"))
     implementation(project(":data:auth"))
-    
+    implementation(project(":data:translations"))
+
     implementation(project(":shared"))
 }
