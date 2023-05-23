@@ -10,4 +10,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#FFF0F0F0</color>
     <color name="primary">#FFFF2E00</color>
+
+    <color name="normalColor">#353A3E</color>
+
+    <color name="toast_day">#33000000</color>
+    <color name="toast_night">#B31C1C1D</color>
 </resources>

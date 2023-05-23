@@ -175,6 +175,18 @@ open class KtorSource: WebSource() {
         block: HttpRequestBuilder.() -> Unit = {},
     ) = unExpectClient.get(url, block)
     
+    @Suppress("unused")
+    suspend fun unExpectPut(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.put(url, block)
+    
+    @Suppress("unused")
+    suspend fun unExpectPatch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.patch(url, block)
+    
     suspend fun unExpectPost(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
