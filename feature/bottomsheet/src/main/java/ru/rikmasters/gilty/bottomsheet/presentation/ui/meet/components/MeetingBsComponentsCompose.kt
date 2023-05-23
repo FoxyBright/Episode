@@ -224,7 +224,7 @@ fun MeetingBsConditions(
                 colorScheme.tertiary,
                 style = typography.bodyMedium
             )
-            Divider(Modifier.padding(start = 16.dp))
+            GDivider(Modifier.padding(start = 16.dp))
             Row(
                 Modifier.fillMaxWidth(),
                 SpaceBetween, CenterVertically

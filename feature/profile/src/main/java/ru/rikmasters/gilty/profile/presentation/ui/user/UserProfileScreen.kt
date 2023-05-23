@@ -1,11 +1,12 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -13,6 +14,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.OBSERVERS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
@@ -26,6 +28,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun UserProfileScreen(vm: UserProfileViewModel) {
@@ -96,8 +99,21 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
         //        }
     }
     
+    var errorState by remember {
+        mutableStateOf(false)
+    }
+    
+    scope.launch {
+        while(true) {
+            delay(500)
+            internetCheck(context).let {
+                if(!it) errorState = true
+            }
+        }
+    }
+    
     ProfileContent(
-        UserProfileState(
+        state = UserProfileState(
             profileState = ProfileState(
                 profile = profile?.copy(
                     username = username
@@ -118,7 +134,16 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
-        ), Modifier, object: UserProfileCallback {
+            smthError = errorState
+        ),
+        callback = object: UserProfileCallback {
+            
+            override fun updateProfile() {
+                errorState = !internetCheck(context)
+                if(!errorState) scope.launch {
+                    vm.setUserDate(true)
+                }
+            }
             
             override fun onProfileImageRefresh() {
                 scope.launch { vm.updateUserData() }
@@ -195,12 +220,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             
             override fun onMenuItemClick(point: Int) {
                 when(point) {
-                    0 -> {
-                        scope.launch {
-                            vm.setPhotoViewSelected(profile?.avatar)
-                            vm.setPhotoViewImages(listOf(profile?.avatar))
-                            vm.changePhotoViewState(true)
-                        }
+                    0 -> scope.launch {
+                        vm.setPhotoViewSelected(profile?.avatar)
+                        vm.setPhotoViewImages(listOf(profile?.avatar))
+                        vm.changePhotoViewState(true)
                     }
                     else -> context.checkStoragePermission(
                         storagePermissions, scope, asm,

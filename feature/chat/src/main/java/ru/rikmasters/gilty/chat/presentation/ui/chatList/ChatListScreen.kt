@@ -1,14 +1,16 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
+import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
@@ -16,6 +18,7 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
     val listState = rememberLazyListScrollState("chat_list")
@@ -25,12 +28,12 @@ fun ChatListScreen(vm: ChatListViewModel) {
     
     val chats = vm.chats.collectAsLazyPagingItems()
     val alertSelected by vm.alertSelected.collectAsState()
+    val isArchiveOn by vm.isArchiveOn.collectAsState()
     val alertState by vm.alertState.collectAsState()
     val sortType by vm.sortType.collectAsState()
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
-    val isArchiveOn by vm.isArchiveOn.collectAsState()
-
+    
     val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
@@ -41,8 +44,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     
     LaunchedEffect(Unit) {
         context.listenPreference(
-            key = "unread_messages",
-            defValue = 0
+            "unread_messages", 0
         ) {
             scope.launch {
                 vm.setUnreadMessages(it > 0)
@@ -51,15 +53,38 @@ fun ChatListScreen(vm: ChatListViewModel) {
         vm.getUnread()
     }
     
+    var errorState by remember {
+        mutableStateOf(false)
+    }
+    
+    scope.launch {
+        while(true) {
+            delay(500)
+            internetCheck(context).let {
+                if(!it) errorState = true
+            }
+        }
+    }
+    
     ChatListContent(
-        ChatListState(
-            navBar, chats, completed, alert,
-            alertState, alertSelected, sortType,
-            listState,sortType != SortTypeModel.NONE, isArchiveOn
+        state = ChatListState(
+            stateList = navBar,
+            chats = chats,
+            endedState = completed,
+            alertActive = alert,
+            alertState = alertState,
+            alertSelect = alertSelected,
+            sortType = sortType,
+            listState = listState,
+            isSortOn = sortType != null,
+            isArchiveOn = isArchiveOn,
+            smthError = errorState
         ),
-        Modifier,
-        object: ChatListCallback {
-            
+        callback = object: ChatListCallback {
+            override fun onSortClick(sortTypeModel: SortTypeModel?) {
+                scope.launch { vm.changeSortType(sortTypeModel) }
+            }
+    
             override fun onNavBarSelect(point: Int) {
                 if(point == 3) return
                 scope.launch {
@@ -106,21 +131,20 @@ fun ChatListScreen(vm: ChatListViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { vm.forceRefresh() }
+                errorState = !internetCheck(context)
+                if(!errorState) scope.launch {
+                    vm.forceRefresh()
+                }
             }
             
             override fun onListAlertSelect(index: Int) {
                 scope.launch { vm.alertSelect(index) }
             }
-
-            override fun onSortClick(sortTypeModel: SortTypeModel) {
-                scope.launch { vm.changeSortType(sortTypeModel) }
-            }
-
+            
             override fun onArchiveClick() {
                 scope.launch { vm.changeIsArchiveOn() }
             }
-
+            
             override fun onChatClick(chat: ChatModel) {
                 scope.launch { vm.onChatClick(chat.id) }
                 nav.navigate("chat?id=${chat.id}")

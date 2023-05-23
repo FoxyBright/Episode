@@ -400,4 +400,7 @@
     <string name="month_october_name">Октябрь</string>
     <string name="month_november_name">Ноябрь</string>
     <string name="month_december_name">Декабрь</string>
+
+    <string name="update_button_label">Обновить</string>
+    <string name="internet_error_label">Что-то пошло не так</string>
 </resources>

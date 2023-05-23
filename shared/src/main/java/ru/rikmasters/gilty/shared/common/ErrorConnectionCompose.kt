@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
@@ -29,7 +30,11 @@ private fun ErrorPReview() {
 }
 
 @Composable
-fun ErrorConnection() {
+fun ErrorConnection(
+    errorMessage: String = stringResource(
+        R.string.bad_connection
+    ),
+) {
     Box(
         Modifier
             .fillMaxHeight(0.85f)
@@ -41,31 +46,41 @@ fun ErrorConnection() {
             Modifier
                 .fillMaxWidth()
                 .background(
-                    Color(0xCC0E0E0E),
-                    RoundedCornerShape(18.dp)
+                    color = Color(0xCC0E0E0E),
+                    shape = RoundedCornerShape(18.dp)
                 )
         ) {
             Row(
                 Modifier.padding(16.dp),
-                Arrangement.Start,
-                CenterVertically
+                Start, CenterVertically
             ) {
                 val size = with(LocalDensity.current) {
                     28.sp.toDp()
                 }
                 Icon(
-                    painterResource(R.drawable.ic_bad_connection),
-                    (null), Modifier.size(size), White
+                    painter = painterResource(
+                        R.drawable.ic_bad_connection
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(size),
+                    tint = White
                 )
                 Text(
-                    stringResource(R.string.bad_connection),
-                    Modifier
+                    text = errorMessage,
+                    modifier = Modifier
                         .weight(1f)
-                        .padding(start = 10.dp), White,
-                    fontSize = 15.sp,
-                    style = typography.labelSmall,
+                        .padding(start = 10.dp),
+                    style = typography.labelSmall.copy(
+                        White, 15.sp,
+                    ),
                 )
             }
         }
     }
 }
+
+//fun ErrorToast(
+//    text: String,
+//){
+//
+//}
