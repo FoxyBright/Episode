@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.meetings
 
 import android.content.res.Resources.getSystem
+import android.util.Log
 import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode.Companion.OK
@@ -8,6 +9,7 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
@@ -162,6 +164,11 @@ class MeetingWebSource: KtorSource() {
                 it.wrapped<DetailedMeetResponse>().map()
             else null
         }
+
+    // TODO: По мере возможности заменить используемый сейчас метод выше этим методом
+    suspend fun getDetailedMeetTest(
+        meet: String
+    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meet").wrapped<DetailedMeetResponse>()
     
     suspend fun getMeetMembers(
         meet: String,
@@ -176,7 +183,7 @@ class MeetingWebSource: KtorSource() {
         }
     }?.let {
         if(it.status == OK)
-            it.paginateWrapped<List<User>>()
+            it.wrapped<List<User>>()
         else null
     }
     
@@ -266,6 +273,7 @@ class MeetingWebSource: KtorSource() {
             )
         )
     }?.let {
+        Log.d("TEST","ADD MEET RESPONSE ${it.status} WRAPPED ${it.wrapped<DetailedMeetResponse>()}")
         if(it.status == OK)
             it.wrapped<DetailedMeetResponse>().id
         else null

@@ -7,7 +7,7 @@ import java.util.UUID.randomUUID
 
 data class AlbumModel(
     val id: String,
-    val type: AlbumType,
+    val type: AlbumType ?= null,
     val preview: AvatarModel? = null,
     val hasAccess: Boolean,
 ) {

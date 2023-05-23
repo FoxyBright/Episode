@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.REPORTS
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_ORGANIZER
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.GalleryBs
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
 import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
@@ -183,7 +184,8 @@ fun ChatScreen(
                     
                     override fun onPinnedBarButtonClick() {
                         scope.launch {
-                            if(type == TRANSLATION) {
+                            if(type == TRANSLATION || type == TRANSLATION_ORGANIZER) {
+                                nav.navigateAbsolute("translations/main?id=${state.meet.id}")
                                 vm.toTranslation()
                             } else {
                                 vm.completeChat(chat)

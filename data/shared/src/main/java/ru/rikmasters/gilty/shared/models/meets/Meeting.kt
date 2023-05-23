@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.models.User
+import ru.rikmasters.gilty.shared.models.enumeration.UserGroupTypeDTO
 
 data class Tag(
     val id: String? = null,

@@ -201,9 +201,10 @@ fun MeetingBsContent(
                     }
                 }
             }) {
+                // Негативный паддинг ))))))))))
                 MeetContent(
                     state, modifier.padding(
-                        bottom = it.calculateBottomPadding() - 24.dp
+                        bottom = it.calculateBottomPadding() // - 24.dp
                     ), callback
                 )
             }

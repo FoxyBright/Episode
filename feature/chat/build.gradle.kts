@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":data:meetings"))
     implementation(project(":data:profile"))
     implementation(project(":data:chats"))
+    implementation(project(":data:translations"))
     
     implementation(project(":shared"))
 }
