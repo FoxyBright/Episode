@@ -34,7 +34,7 @@ data class ExtraColors(
     val meetCardPlaceHolder: Color = Color.Unspecified,
     val notificationCloud: Color = Color.Unspecified,
     val meetingTransparencyShape: Color = Color.Unspecified,
-    
+
     // Categories Colors
     val sport: Color = Color.Unspecified,
     val business: Color = Color.Unspecified,
@@ -45,6 +45,22 @@ data class ExtraColors(
     val party: Color = Color.Unspecified,
     val art: Color = Color.Unspecified,
     // Add new color in scheme = Color.Unspecified
+
+
+    //Translations Colors (always the same)
+    val white: Color = Color.Unspecified,
+    val thirdOpaqueGray: Color = Color.Unspecified,
+    val bottomSheetGray: Color = Color.Unspecified,
+    val blackSeventy: Color = Color.Unspecified,
+    val mainCard: Color = Color.Unspecified,
+    val mainNightGreen: Color = Color.Unspecified,
+    val mainDayGreen: Color = Color.Unspecified,
+    val mainNotActiveGreen: Color = Color.Unspecified,
+    val textField: Color = Color.Unspecified,
+    val preDarkColor: Color = Color.Unspecified,
+    val zirkon: Color = Color.Unspecified,
+    val messageBar: Color = Color.Unspecified
+
 )
 
 @Deprecated(
@@ -84,7 +100,7 @@ val LightExtraColors = ExtraColors(
     meetCardPlaceHolder = Colors.NickelGray,
     notificationCloud = Colors.Gray,
     meetingTransparencyShape = Colors.halfTransparentlyGray,
-    
+
     // Categories Colors
     sport = Colors.Orange,
     business = Colors.Blue,
@@ -95,6 +111,20 @@ val LightExtraColors = ExtraColors(
     party = Colors.Purple,
     art = Colors.Orange,
     // Add colors in scheme from Colors-file
+
+    //Translations Colors (always the same)
+    white = Colors.White,
+    thirdOpaqueGray = Colors.thirdOpaqueGray,
+    bottomSheetGray = Colors.bottomSheetGray,
+    blackSeventy = Colors.blackSeventy,
+    mainCard = Colors.mainCard,
+    mainNightGreen = Colors.mainGreen,
+    mainDayGreen = Colors.mainGreen,
+    mainNotActiveGreen = Colors.greenInactive,
+    textField = Colors.textField,
+    preDarkColor = Colors.PreDark,
+    zirkon = Colors.Zircon,
+    messageBar = Colors.RatGray
 )
 
 @Deprecated(
@@ -134,7 +164,7 @@ val DarkExtraColors = ExtraColors(
     meetCardPlaceHolder = Colors.NickelDarkGray,
     notificationCloud = Colors.NickelDarkGray,
     meetingTransparencyShape = Colors.halfTransparentlyGray,
-    
+
     // Categories Colors
     sport = Colors.DarkOrange,
     business = Colors.DarkBlue,
@@ -145,4 +175,20 @@ val DarkExtraColors = ExtraColors(
     party = Colors.DarkPurple,
     art = Colors.DarkOrange,
     // Add colors in scheme from Colors-file
+
+
+    //Translations Colors (always the same)
+    white = Colors.White,
+    thirdOpaqueGray = Colors.thirdOpaqueGray,
+    bottomSheetGray = Colors.bottomSheetGray,
+    blackSeventy = Colors.blackSeventy,
+    mainCard = Colors.mainCard,
+    mainNightGreen = Colors.mainGreen,
+    mainDayGreen = Colors.mainGreen,
+    mainNotActiveGreen = Colors.greenInactive,
+    textField = Colors.textField,
+    preDarkColor = Colors.PreDark,
+    zirkon = Colors.Zircon,
+    messageBar = Colors.RatGray
+
 )

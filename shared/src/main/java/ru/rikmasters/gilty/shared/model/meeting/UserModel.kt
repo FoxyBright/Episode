@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.meeting
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.*
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
@@ -59,4 +60,28 @@ val DemoUserModelList = listOf(
     DemoUserModelTwo,
     DemoUserModel,
     DemoUserModelTwo,
+)
+
+
+
+
+
+
+
+
+/**
+ * [FullUserModel] - модель пользователя с [group]
+ */
+data class FullUserModel(
+    val id: String?,
+    val gender: GenderType?,
+    val username: String?,
+    val group: UserGroupTypeModel?,
+    val emoji: EmojiModel?,
+    val avatar: AvatarModel?,
+    val thumbnail: ThumbnailModel?,
+    val age: Int?,
+    val isAnonymous: Boolean?,
+    val isOnline: Boolean?,
+    val meetRating: RatingModel? = null,
 )

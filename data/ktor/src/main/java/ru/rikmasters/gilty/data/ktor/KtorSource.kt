@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.data.ktor
 
 import android.content.res.Resources.getSystem
+import android.util.Log
 import androidx.core.os.ConfigurationCompat.getLocales
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
@@ -110,6 +111,7 @@ open class KtorSource: WebSource() {
     ) = try {
         updateClientToken(); block()
     } catch(e: Exception) {
+        Log.d("TEST","Exception ${e.message} ${e.cause} ${e.localizedMessage}")
         logE("KTOR RESULT EXCEPTION: $e")
         null
     }
@@ -172,4 +174,42 @@ open class KtorSource: WebSource() {
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
+
+
+
+
+
+
+
+
+
+
+    // ТЕСТ
+    suspend fun tryGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.get(url, block)
+
+    suspend fun tryPost(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.post(url, block)
+
+    suspend fun tryPatch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.patch(url, block)
+
+    suspend fun tryDelete(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.delete(url, block)
+
+    suspend fun tryPut(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = client.put(url, block)
+
+
+
 }

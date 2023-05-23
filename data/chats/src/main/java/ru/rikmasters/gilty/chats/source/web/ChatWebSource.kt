@@ -40,8 +40,9 @@ class ChatWebSource: KtorSource() {
             perPage?.let { query("per_page" to "$perPage") }
             query("sort_type" to sortType.stringName)
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<Chat>() to Paginator())
+    }?.let {
+        if(it.status == OK) it.wrapped<List<Chat>>() else null
+    } ?: emptyList()
     
     
     suspend fun markAsReadMessage(
