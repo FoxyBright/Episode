@@ -16,6 +16,7 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
     implementationIf(!excludeCore, project(":core"))
     paging()
     yandexmap()
+    rtmp()
 }
 
 private fun DependencyHandlerScope.yandexmap() = implementation(
@@ -36,6 +37,7 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.ui:ui:$composeVer",
     "io.coil-kt:coil-compose:2.3.0",
+    "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 ) and implementation(
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer",
@@ -47,6 +49,10 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and lottie()
 
 val pagingVer = "3.1.1"
+
+fun DependencyHandlerScope.rtmp() = implementation(
+    "com.github.pedroSG94.rtmp-rtsp-stream-client-java:rtplibrary:2.1.9"
+)
 
 fun DependencyHandlerScope.imageCropper() = implementation(
     "com.github.SmartToolFactory:Compose-Color-Picker-Bundle:1.0.1",

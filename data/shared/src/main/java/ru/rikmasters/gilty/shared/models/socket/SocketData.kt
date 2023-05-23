@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.chats.models.ws
+package ru.rikmasters.gilty.shared.models.socket
 
 data class SocketData(
     

@@ -330,6 +330,8 @@ class LocalDateTime(
     
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis + offset).format(pattern)
+
+
     
     /** Возвращает указанную часть даты **/
     fun year() = dateCallback.year(millis)

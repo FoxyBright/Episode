@@ -95,6 +95,12 @@ object Colors {
     val halfTransparentlyGray = Color(0x80C4C4C4)
     val gripGrayDark = Color(0xFF767373)
     // Add new colors
+
+
+    // Translations
+    val thirdOpaqueGray = Color(0x305E5E5E)
+    val blackSeventy = Color(0x70000000)
+    val textField = Color(0xFF49454F)
 }
 
 @Deprecated(

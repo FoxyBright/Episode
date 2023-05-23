@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.chats.models.ws.UserWs
 import ru.rikmasters.gilty.chats.repository.ChatRepository
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
-import ru.rikmasters.gilty.chats.source.websocket.WebSocketHandler
+import ru.rikmasters.gilty.chats.source.websocket.ChatWebSocket
 import ru.rikmasters.gilty.core.data.entity.builder.EntitiesBuilder
 import ru.rikmasters.gilty.core.module.DataDefinition
 
@@ -24,7 +24,7 @@ object ChatData: DataDefinition() {
     
     override fun Module.koin() {
         singleOf(::MessageRepository)
-        singleOf(::WebSocketHandler)
+        singleOf(::ChatWebSocket)
         singleOf(::ChatRepository)
         singleOf(::MessageManager)
         singleOf(::ChatWebSource)

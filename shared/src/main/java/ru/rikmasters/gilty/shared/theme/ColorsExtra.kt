@@ -40,6 +40,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.Zircon
 import ru.rikmasters.gilty.shared.theme.Colors.gripGrayDark
 import ru.rikmasters.gilty.shared.theme.Colors.halfTransparentlyGray
 import ru.rikmasters.gilty.shared.theme.Colors.meetingCardBackBackgroundNight
+import ru.rikmasters.gilty.shared.theme.Colors.textField
 
 data class ExtraColors(
     val searchCardBackground: Color = Unspecified,
@@ -71,7 +72,6 @@ data class ExtraColors(
     val meetingTransparencyShape: Color = Unspecified,
     val gripColor: Color = Unspecified,
     val miniCategoriesBackground: Color = Unspecified,
-    
     // Categories Colors
     val sport: Color = Unspecified,
     val business: Color = Unspecified,
@@ -82,7 +82,22 @@ data class ExtraColors(
     val party: Color = Unspecified,
     val art: Color = Unspecified,
     // Add new color in scheme = Color.Unspecified
-)
+    
+    
+    //Translations Colors (always the same)
+    val white: Color = Unspecified,
+    val thirdOpaqueGray: Color = Unspecified,
+    val bottomSheetGray: Color = Unspecified,
+    val blackSeventy: Color = Unspecified,
+    val mainCard: Color = Unspecified,
+    val mainNightGreen: Color = Unspecified,
+    val mainDayGreen: Color = Unspecified,
+    val mainNotActiveGreen: Color = Unspecified,
+    val textField: Color = Unspecified,
+    val preDarkColor: Color = Unspecified,
+    val zirkon: Color = Unspecified,
+    val messageBar: Color = Unspecified,
+    )
 
 @Deprecated(
     "Надо использовать тему",
@@ -132,6 +147,20 @@ val LightExtraColors = ExtraColors(
     party = Purple,
     art = Orange,
     // Add colors in scheme from Colors-file
+    
+    //Translations Colors (always the same)
+    white = White,
+    thirdOpaqueGray = Colors.thirdOpaqueGray,
+    bottomSheetGray = Silver,
+    blackSeventy = Colors.blackSeventy,
+    mainCard = AlmostDark,
+    mainNightGreen = Colors.Green,
+    mainDayGreen = Colors.Green,
+    mainNotActiveGreen = Colors.DimGrin,
+    textField = RottenPlum,
+    preDarkColor = PreDark,
+    zirkon = Zircon,
+    messageBar = textField
 )
 
 @Deprecated(
@@ -182,4 +211,20 @@ val DarkExtraColors = ExtraColors(
     party = DarkPurple,
     art = DarkOrange,
     // Add colors in scheme from Colors-file
+    
+    
+    //Translations Colors (always the same)
+    white = White,
+    thirdOpaqueGray = Colors.thirdOpaqueGray,
+    bottomSheetGray = Silver,
+    blackSeventy = Colors.blackSeventy,
+    mainCard = AlmostDark,
+    mainNightGreen = Colors.Green,
+    mainDayGreen = Colors.Green,
+    mainNotActiveGreen = Colors.DimGrin,
+    textField = RottenPlum,
+    preDarkColor = PreDark,
+    zirkon = Zircon,
+    messageBar = textField
+
 )

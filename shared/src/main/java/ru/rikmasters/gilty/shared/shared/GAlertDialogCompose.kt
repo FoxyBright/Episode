@@ -29,6 +29,7 @@ import ru.rikmasters.gilty.shared.R.drawable.ic_radio_inactive
 import ru.rikmasters.gilty.shared.R.string.delete_my_and_other_chat_button
 import ru.rikmasters.gilty.shared.R.string.delete_my_chat_button
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 
 private const val header = "Заголовок"
 private const val label = "Описание"
@@ -162,6 +163,80 @@ fun GAlert(
             }
         },
         containerColor = colorScheme.primaryContainer
+    )
+}
+
+
+@Composable
+fun GAlertT(
+    show: Boolean,
+    modifier: Modifier = Modifier,
+    success: Pair<String, () -> Unit>,
+    label: String? = null,
+    title: String? = null,
+    onDismissRequest: (() -> Unit)? = null,
+    cancel: Pair<String, () -> Unit>? = null,
+    list: List<String>? = null,
+    selected: Int? = null,
+    listItemSelect: ((Int) -> Unit)? = null,
+    accentColors: Color = ThemeExtra.colors.mainDayGreen,
+    content: (@Composable () -> Unit)? = null,
+) {
+    if(show) AlertDialog(
+        onDismissRequest ?: {},
+        confirmButton = {
+            Text(
+                success.first, Modifier
+                    .clickable(
+                        MutableInteractionSource(), (null)
+                    ) { success.second() },
+                accentColors,
+                style = typography.labelSmall,
+                fontWeight = SemiBold
+            )
+        }, modifier,
+        dismissButton = {
+            cancel?.let {
+                Text(
+                    it.first, Modifier
+                        .padding(end = 16.dp)
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { it.second() },
+                    accentColors,
+                    style = typography.labelSmall,
+                    fontWeight = SemiBold
+                )
+            }
+        }, (null), {
+            title?.let {
+                Text(
+                    it, Modifier,
+                    Color.White,
+                    style = typography.displayLarge,
+                    fontWeight = SemiBold
+                )
+            }
+        }, {
+            Column {
+                label?.let {
+                    Text(
+                        it, Modifier.padding(bottom = 16.dp),
+                        Color(0xFF98989F),
+                        style = typography.labelSmall,
+                        fontWeight = SemiBold
+                    )
+                }; content?.invoke()
+                list?.let { items ->
+                    selected?.let {
+                        List(items, it, accentColors) {
+                            listItemSelect?.let { s -> s(it) }
+                        }
+                    }
+                }
+            }
+        },
+        containerColor = ThemeExtra.colors.mainCard
     )
 }
 

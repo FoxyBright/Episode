@@ -34,36 +34,38 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.ErrorConnection
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GLoader
 import ru.rikmasters.gilty.ui.GSnackbar
 
 @ExperimentalMaterial3Api
-class MainActivity: ComponentActivity() {
-    
+class MainActivity : ComponentActivity() {
+
     private val authManager by inject<AuthManager>()
     private val chatManager by inject<ChatManager>()
+    private val translationRepository by inject<TranslationRepository>()
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
     private val context by inject<Context>()
     private val env by inject<Environment>()
-    
+
     private var _intent: Intent? by mutableStateOf(null)
-    
+
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MapKitFactory.getInstance().onStart()
-
+MapKitFactory.getInstance().onStart()
+        
         CoroutineScope(IO).launch {
             inject<MeetingManager>()
                 .value.clearAddMeet()
         }
-        
+
         FireBaseService.sharedPref = getSharedPreferences(
             "sharedPref", MODE_PRIVATE
         )
-        
+
         var token = ""
         FirebaseMessaging
             .getInstance()
@@ -72,15 +74,15 @@ class MainActivity: ComponentActivity() {
                 FireBaseService.token = it
                 token = it
             }
-        
+
         FirebaseMessaging
             .getInstance()
             .subscribeToTopic("all")
-        
+
         setContent {
             var errorState by remember { mutableStateOf(false) }
             val corScope = rememberCoroutineScope()
-            
+
             AppEntrypoint(
                 GiltyTheme,
                 { GBottomSheetBackground(it) },
@@ -90,55 +92,54 @@ class MainActivity: ComponentActivity() {
                     LoadingIndicator(state, offset, trigger)
                 }
             )
-            
-            GiltyTheme{ if(errorState) ErrorConnection() }
-            
+
+            GiltyTheme{ if (errorState) ErrorConnection() }
             corScope.launch {
-                while(true) {
+                while (true) {
                     delay(2000)
                     errorState = !internetCheck(context)
                 }
             }
-            
+
             suspend fun authorize(userId: String) {
                 authManager.savePushToken(token)
-                chatManager.connect(userId)
+                chatManager.connectWebSocket(userId)
             }
-            
+
             LaunchedEffect(Unit) {
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
-                if(internetCheck(context))
+                if (internetCheck(context))
                     profileManager
                         .storageProfile()
                         ?.let { authorize(it.id) }
                         ?: run {
-                            if(
+                            if (
                                 authManager.hasTokens()
                                 && regManager.profileCompleted()
                             ) authorize(regManager.userId())
                         }
             }
-            
+
             val scope = getKoin().createScope<MainActivity>()
             val asm by inject<AppStateModel>()
             val nav by inject<NavState>()
-            
+
             LaunchedEffect(intent) {
-                if(authManager.hasTokens()
+                if (authManager.hasTokens()
                     && regManager.profileCompleted()
                 ) deepLink(scope, asm, intent, nav)
             }
         }
     }
-    
+
     override fun getIntent() = _intent ?: super.getIntent()
         ?.let { _intent = it; _intent!! }
-    
+
     override fun setIntent(newIntent: Intent?) {
         _intent = newIntent
         super.setIntent(newIntent)
     }
-    
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         _intent = intent

@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
+import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
@@ -173,6 +174,13 @@ class MeetingManager(
         meetId: String,
     ) = withContext(IO) {
         web.getDetailedMeet(meetId)
+    }
+
+    // TODO: По мере возможности заменить используемый сейчас метод выше этим методом
+    suspend fun getDetailedMeetTest(
+        meetId: String
+    ) = coroutinesState {
+        web.getDetailedMeetTest(meetId).map()
     }
     
     suspend fun searchTags(
