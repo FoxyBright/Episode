@@ -303,7 +303,7 @@ private fun Notifications(
                             )
                         }
                     }
-                    if (notifications.loadState.append is Loading)
+                    if (notifications.loadState.append is Loading || splitNotifications.size != state.notifications.itemCount)
                         item { PagingLoader(notifications.loadState) }
                 } else if (notifications.loadState.refresh is NotLoading)
                     item { EmptyNotification() }

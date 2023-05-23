@@ -53,6 +53,36 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
         }.value
     )
     val unreadMessages = _unreadMessages.asStateFlow()
+
+    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
+    val ratings = _ratings.asStateFlow()
+
+    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
+    val selectedNotification = _selectedNotification.asStateFlow()
+
+    private val _meetId = MutableStateFlow<String?>(null)
+
+    private val refreshMember = MutableStateFlow<Boolean>(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val participants by lazy {
+        refreshMember.flatMapLatest {
+            _meetId.value?.let {
+                meetManager.getMeetMembers(
+                    meetId = it,
+                    excludeMe = true
+                )
+            } ?: flow { }
+        }
+    }
+
+    private val _participantsStates = MutableStateFlow(emptyList<Int>())
+    val participantsStates = _participantsStates.asStateFlow()
+
+    var currentIndexToSplit = 0
+
+    val splitMonthNotifications = MutableStateFlow(emptyList<Pair<Int,NotificationModel>>())
+
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if (hasUnread) NEW_INACTIVE else INACTIVE)
     }
@@ -109,31 +139,6 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
         forceRefresh()
     }
 
-    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
-    val ratings = _ratings.asStateFlow()
-
-    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
-    val selectedNotification = _selectedNotification.asStateFlow()
-
-    private val _meetId = MutableStateFlow<String?>(null)
-
-    private val refreshMember = MutableStateFlow<Boolean>(false)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val participants by lazy {
-        refreshMember.flatMapLatest {
-            _meetId.value?.let {
-                meetManager.getMeetMembers(
-                    meetId = it,
-                    excludeMe = true
-                )
-            } ?: flow { }
-        }
-    }
-
-    private val _participantsStates = MutableStateFlow(emptyList<Int>())
-    val participantsStates = _participantsStates.asStateFlow()
-
     suspend fun getRatings() = singleLoading {
         _ratings.emit(notificationManger.getRatings())
     }
@@ -177,10 +182,6 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
     suspend fun forceRefreshMembers() {
         refreshMember.emit(!refreshMember.value)
     }
-
-    var currentIndexToSplit = 0
-
-    val splitMonthNotifications = MutableStateFlow(emptyList<Pair<Int,NotificationModel>>())
     suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
         // 20 - today
         // 30 - weekEarlier
