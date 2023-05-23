@@ -123,11 +123,12 @@ fun ChatListContent(
         content = {
             if(!state.smthError) Column(Modifier.padding(it)) {
                 SortTypeLabels(Modifier, state, callback)
+                if(state.chats.loadState.refresh is LoadState.NotLoading
+                    && (state.chats.itemCount == 0 ||
+                            (state.chats.itemSnapshotList.items.any { item -> item.meetStatus != MeetStatusType.ACTIVE }
+                                    && (state.sortType == null || state.sortType == MESSAGE_DATE) ))
+                ) EmptyChats()
                 Use<ChatListViewModel>(PullToRefreshTrait) {
-                    if(state.chats.loadState.refresh
-                                is LoadState.NotLoading
-                        && state.chats.itemCount == 0
-                    ) EmptyChats()
                     Content(state, Modifier, callback)
                 }
             } else ErrorInternetConnection {
@@ -213,10 +214,6 @@ private fun Content(
                                     )
                                 }
                             }
-                        }else if(it.isEmpty() && (state.sortType == MEETING_DATE || state.sortType == null)) {
-                            item {
-                                EmptyChats()
-                            }
                         }
                     }
                     
@@ -241,8 +238,8 @@ private fun Content(
                     }
                     
                     if(
-                        state.endedState
-                        || state.sortType == MESSAGE_DATE
+                        (state.endedState
+                        || state.sortType == MEETING_DATE)
                     ) {
                         itemsIndexed(state.chats) { index, item ->
                             if(item?.meetStatus != MeetStatusType.ACTIVE) {
