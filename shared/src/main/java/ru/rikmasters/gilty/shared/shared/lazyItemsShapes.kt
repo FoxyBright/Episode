@@ -44,7 +44,7 @@ fun lazyRowAlbumItemsShapes(
 ) = if(size == 1)
     RoundedCornerShape(16.0.dp)
 else when(index) {
-    0 -> RoundedCornerShape(topStart = 6.0.dp, bottomStart = 6.0.dp)
-    size - 1 -> RoundedCornerShape(topEnd = 6.0.dp, bottomEnd = 6.0.dp)
+    0 -> RoundedCornerShape(topStart = 16.0.dp, bottomStart = 16.0.dp)
+    size - 1 -> RoundedCornerShape(topEnd = 16.0.dp, bottomEnd = 16.0.dp)
     else -> shapes.zero
 }

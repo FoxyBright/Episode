@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,6 +79,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _photoViewState = MutableStateFlow(false)
     val photoViewState = _photoViewState.asStateFlow()
+
+    private val _activeAlbumId = MutableStateFlow<Int?>(null)
+    val activeAlbumId = _activeAlbumId.asStateFlow()
     
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
@@ -98,7 +102,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             profileManager.getProfile(true)
         )
     }
-    
+    suspend fun changeActiveAlbumId(id:Int?){
+        Log.d("Hello", id.toString())
+        _activeAlbumId.emit(id)
+    }
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
