@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.presentation.ui.components
 
-import android.util.Log
 import android.view.SurfaceHolder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -169,7 +169,6 @@ fun CameraView(
             view
         },
         update = { view ->
-            Log.d("TEST","UPDATED $view")
             initCamera(view)
         }
     )
@@ -240,7 +239,7 @@ private fun UserNameItem(
 fun StreamerItem(
     meetingModel: FullMeetingModel
 ) {
-    Row (verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         AvatarItem(
             src = meetingModel.organizer.avatar?.thumbnail?.url,
             radius = 30.dp
@@ -255,6 +254,7 @@ fun StreamerItem(
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun TimerItem(
     time: String,
@@ -267,7 +267,7 @@ fun TimerItem(
         color = ThemeExtra.colors.thirdOpaqueGray,
         modifier = Modifier.clickable { onClick() }
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(
                 start = 5.dp,
                 end = 8.dp,
@@ -275,33 +275,31 @@ fun TimerItem(
                 bottom = 6.5.dp
             )
         ) {
-            Row {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_timer_clock),
-                    contentDescription = "timer",
-                    tint = ThemeExtra.colors.white
-                )
-                Spacer(modifier = Modifier.width(3.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_timer_clock),
+                contentDescription = "timer",
+                tint = ThemeExtra.colors.white
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            Column {
                 Text(
                     text = time,
                     color = ThemeExtra.colors.white,
-                    style = ThemeExtra.typography.TranslationSmallButton,
-                    modifier = if (isHighlight) {
-                        Modifier.background(
-                            Brush.horizontalGradient(Gradients.green())
-                        )
-                    } else Modifier
+                    style = if (isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
+                        brush = Brush.horizontalGradient(Gradients.green())
+                    ) else
+                        ThemeExtra.typography.TranslationSmallButton
                 )
-            }
-            if (addTimerTime.isNotBlank()) {
-                Text(
-                    text = addTimerTime,
-                    color = ThemeExtra.colors.mainDayGreen,
-                    style = ThemeExtra.typography.TranslationSmallButton,
-                    modifier = Modifier.background(
-                        Brush.horizontalGradient(Gradients.green())
+                if (addTimerTime.isNotBlank()) {
+                    Text(
+                        text = addTimerTime,
+                        color = ThemeExtra.colors.mainDayGreen,
+                        style = if (isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
+                            brush = Brush.horizontalGradient(Gradients.green())
+                        ) else
+                            ThemeExtra.typography.TranslationSmallButton
                     )
-                )
+                }
             }
         }
     }
@@ -309,7 +307,7 @@ fun TimerItem(
 
 
 @Composable
-fun ChatItem( onClick: () -> Unit ) {
+fun ChatItem(onClick: () -> Unit) {
     Icon(
         painter = painterResource(id = R.drawable.ic_chat),
         contentDescription = "Chat",
@@ -332,7 +330,15 @@ fun MembersCountItem(
                     contentColor = ThemeExtra.colors.white
                 ) {
                     Text(
-                        text = membersCount.toString(),
+                        text = if (membersCount >= 1000) {
+                            if (membersCount >= 1000000) {
+                                "${membersCount / 1000000}КK"
+                            } else {
+                                "${membersCount / 1000}К"
+                            }
+                        } else {
+                            membersCount.toString()
+                        },
                         style = ThemeExtra.typography.TranslationBadge,
                         color = ThemeExtra.colors.white
                     )
@@ -469,6 +475,7 @@ fun CommentPanel(
                 modifier = Modifier
                     .weight(1f)
                     .size(32.dp)
+                    .padding(start = 4.dp)
                     .clickable {
                         onSendMessage(messageText)
                         messageText = ""

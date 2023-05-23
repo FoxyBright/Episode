@@ -2,8 +2,8 @@ package ru.rikmasters.gilty.translation.presentation.ui.logic
 
 import android.content.res.Configuration
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import android.view.SurfaceHolder
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,9 +44,11 @@ import com.pedro.rtplibrary.util.BitrateAdapter
 import com.pedro.rtplibrary.view.OpenGlView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
-import ru.rikmasters.gilty.shared.shared.GAlert
+import ru.rikmasters.gilty.shared.shared.GAlertT
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue
@@ -75,6 +77,8 @@ fun TestTranslationScreen(
         )
     }
 
+
+
     // Утилити
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -86,6 +90,7 @@ fun TestTranslationScreen(
                 orientation = it
             }
     }
+    val nav = get<NavState>()
 
 
     // Состояние экрана
@@ -140,6 +145,7 @@ fun TestTranslationScreen(
 
     // Выключение видео
     fun disableVideo() {
+        camera?.glInterface?.addFilter(BlurFilterRender())
         scope.launch {
             val imageFilter = ImageObjectFilterRender()
             val loader = ImageLoader(context)
@@ -154,6 +160,7 @@ fun TestTranslationScreen(
                 imageFilter.setDefaultScale(camera?.streamWidth!!, camera?.streamHeight!!)
                 imageFilter.setPosition(TranslateTo.CENTER)
                 camera?.glInterface?.addFilter(imageFilter)
+                camera?.glInterface?.removeFilter(BlurFilterRender())
                 camera?.glInterface?.addFilter(BlurFilterRender())
             } else {
                 camera?.glInterface?.muteVideo()
@@ -232,9 +239,6 @@ fun TestTranslationScreen(
                 if (it.prepareAudio() && it.prepareVideo()) {
                     it.startStream(rtmpUrl)
                     vm.onEvent(TranslationEvent.StartStreaming)
-                } else {
-                    // TODO: обработать случаи когда не удалось подготовить видео или аудио
-                    //vm.onEvent(TranslationEvent.StopStreaming)
                 }
             }
         }
@@ -294,12 +298,34 @@ fun TestTranslationScreen(
 
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
-                if (bitrate < 400_000) {
-                    vm.onEvent(
-                        TranslationEvent.UpdateConnectionStatus(
-                            ConnectionStatus.LOW_CONNECTION
+                if (translationScreenState.translationInfo?.camera == true) {
+                    if (bitrate < 400000L) {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                ConnectionStatus.LOW_CONNECTION
+                            )
                         )
-                    )
+                    } else {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                ConnectionStatus.SUCCESS
+                            )
+                        )
+                    }
+                } else {
+                    if (bitrate < 50000L) {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                ConnectionStatus.LOW_CONNECTION
+                            )
+                        )
+                    } else {
+                        vm.onEvent(
+                            TranslationEvent.UpdateConnectionStatus(
+                                ConnectionStatus.SUCCESS
+                            )
+                        )
+                    }
                 }
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
@@ -327,19 +353,13 @@ fun TestTranslationScreen(
                         TranslationStatus.PREVIEW -> {
                             startPreview()
                         }
-
                         TranslationStatus.STREAM -> {
                             translationScreenState.translationInfo?.let { translation ->
-                                Log.d(
-                                    "TESTG",
-                                    "TRanslation RTMP ${translation.rtmp} ${translation.webrtc}"
-                                )
                                 startBroadCast(
                                     rtmpUrl = translation.rtmp
                                 )
                             }
                         }
-
                         else -> {}
                     }
                 }
@@ -374,6 +394,9 @@ fun TestTranslationScreen(
     var openedFromTimer by remember { mutableStateOf(false) }
     // Состояние диалога удаления пользователя
     var isShowDeleteAlert by remember { mutableStateOf(false) }
+    // Состояние диалога завершения трансляции
+    var isShowEndTranslationDialog by remember { mutableStateOf(false) }
+
     // Текущий удаляемый пользователь
     var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
 
@@ -393,7 +416,16 @@ fun TestTranslationScreen(
         }
     }
 
-
+    BackHandler {
+        if (
+            translationScreenState.translationStatus == TranslationStatus.STREAM ||
+            translationScreenState.translationStatus == TranslationStatus.EXPIRED
+        ) {
+            isShowEndTranslationDialog = true
+        } else {
+            nav.navigationBack()
+        }
+    }
 
 
     BottomSheetScaffold(
@@ -421,7 +453,7 @@ fun TestTranslationScreen(
                 },
                 membersList = connectedMembers,
                 onComplainClicked = {
-                    //TODO: На экран жалоб
+                    ///TODO: COMPLAIN
                 },
                 onDeleteClicked = {
                     currentDeleteUser = it
@@ -474,7 +506,11 @@ fun TestTranslationScreen(
                     }
                 },
                 onCloseClicked = {
-                    vm.onEvent(TranslationEvent.ChangeUiToPreview)
+                    if (translationScreenState.translationStatus == TranslationStatus.PREVIEW) {
+                        nav.navigationBack()
+                    } else {
+                        isShowEndTranslationDialog = true
+                    }
                 },
                 changeFacing = {
                     vm.onEvent(TranslationEvent.ChangeFacing)
@@ -607,10 +643,10 @@ fun TestTranslationScreen(
                 isHighlightTimer = isShowGradientTimer,
                 addTimerValue = appendTimerTime,
                 onToChatPressed = {
-                    // TODO: Навигация назад
+                    nav.navigationBack()
                 }
             )
-            GAlert(
+            GAlertT(
                 show = isShowDeleteAlert,
                 success = Pair(stringResource(id = R.string.translations_members_delete)) {
                     currentDeleteUser?.let {
@@ -619,6 +655,7 @@ fun TestTranslationScreen(
                                 user = it
                             )
                         )
+                        isShowDeleteAlert = false
                     }
                 },
                 label = stringResource(id = R.string.translations_members_delete_label),
@@ -626,6 +663,20 @@ fun TestTranslationScreen(
                 onDismissRequest = { isShowDeleteAlert = false },
                 cancel = Pair(stringResource(id = R.string.translations_members_cancel)) {
                     isShowDeleteAlert = false
+                }
+            )
+            GAlertT(
+                show = isShowEndTranslationDialog,
+                success = Pair(stringResource(id = R.string.translations_complete_positive)) {
+                    vm.onEvent(TranslationEvent.CompleteTranslation)
+                    isShowEndTranslationDialog = false
+                },
+                label = if (translationScreenState.translationStatus == TranslationStatus.EXPIRED) stringResource(id = R.string.translations_complete_text_b) else
+                    stringResource(id = R.string.translations_complete_text),
+                title = stringResource(id = R.string.translations_complete),
+                onDismissRequest = { isShowEndTranslationDialog = false },
+                cancel = Pair(stringResource(id = R.string.translations_complete_negative)) {
+                    isShowEndTranslationDialog = false
                 }
             )
         }

@@ -124,12 +124,13 @@ class TranslationViewModel : ViewModel() {
         coroutineScope.launch {
             combine(
                 refreshTimer,
-                connected
-            ) { refreshTimer, connected ->
-                Pair(refreshTimer, connected)
-            }.collectLatest { (_, connected) ->
+                connected,
+                _translationUiState
+            ) { refreshTimer, connected, ui ->
+                Triple(refreshTimer, connected, ui)
+            }.collectLatest { (_, connected, ui) ->
                 if (connected) {
-                    _translationUiState.value.translationInfo?.let {
+                    ui.translationInfo?.let {
                         var currTime = LocalDateTime.nowZ()
                         while (currTime.isBefore(it.completedAt)) {
                             val duration = Duration.between(
@@ -139,7 +140,25 @@ class TranslationViewModel : ViewModel() {
                             val minutes = (duration - (hours * 3600000))/60000
                             val seconds = (duration - (hours * 3600000) - (minutes * 60000))/1000
                             val hourString = if (hours > 0) "$hours:" else ""
-                            _remainTime.value = "$hourString$minutes:$seconds"
+                            val minuteString = if (hours > 0) {
+                                if (minutes < 10) {
+                                    "0$minutes"
+                                } else {
+                                    "$minutes"
+                                }
+                            } else {
+                                "$minutes"
+                            }
+                            val secondString = if (minutes > 0) {
+                                if (seconds < 10) {
+                                    "0$seconds"
+                                } else {
+                                    "$seconds"
+                                }
+                            } else {
+                                "$seconds"
+                            }
+                            _remainTime.value = "$hourString$minuteString:$secondString"
                             currTime = LocalDateTime.nowZ()
                             delay(1000)
                         }
@@ -326,7 +345,6 @@ class TranslationViewModel : ViewModel() {
                         _highlightTimer.value = false
                         _translationResumedSnackbar.value = false
                         refreshTimer.value = !refreshTimer.value
-
                     }
                 }
             }
@@ -442,9 +460,9 @@ class TranslationViewModel : ViewModel() {
             is TranslationEvent.AppendTranslation -> {
                 _translationUiState.value.translationInfo?.id?.let { translationId ->
                     coroutineScope.launch {
-                        translationRepository.extendTranslation(
+                        extendTranslation(
                             translationId = translationId,
-                            duration = (event.appendMinutes).toLong()
+                            appendMinutes = (event.appendMinutes).toLong()
                         )
                         extendFromTimer.value = false
                     }
@@ -454,18 +472,34 @@ class TranslationViewModel : ViewModel() {
             is TranslationEvent.AppendFromTimer -> {
                 _translationUiState.value.translationInfo?.id?.let { translationId ->
                     coroutineScope.launch {
-                        translationRepository.extendTranslation(
-                            translationId = translationId,
-                            duration = (event.appendMinutes).toLong()
-                        )
                         extendFromTimer.value = true
                         val hour = (event.appendMinutes / 60).takeIf { it > 0 }
                         val hourString = hour?.let { "$hour:" } ?: ""
                         val minute = hour?.let { event.appendMinutes - 60 } ?: event.appendMinutes
                         _addTimer.value = "+ $hourString$minute:00"
                         delay(3000)
+                        extendTranslation(
+                            translationId = translationId,
+                            appendMinutes = (event.appendMinutes).toLong()
+                        )
                         _addTimer.value = ""
                     }
+                }
+            }
+
+            TranslationEvent.CompleteTranslation -> {
+                _translationUiState.value.translationInfo?.id?.let { translationId ->
+                    stopPinging()
+                    coroutineScope.launch {
+                        translationRepository.endTranslation(
+                            translationId = translationId
+                        )
+                    }
+                }
+                _translationUiState.update {
+                    it.copy(
+                        translationStatus = TranslationStatus.COMPLETED
+                    )
                 }
             }
         }
@@ -477,6 +511,46 @@ class TranslationViewModel : ViewModel() {
 
     private fun stopPinging() {
         connected.value = false
+    }
+
+    private fun extendTranslation(translationId: String, appendMinutes: Long) {
+        coroutineScope.launch {
+            translationRepository.extendTranslation(
+                translationId = translationId,
+                duration = appendMinutes
+            ).on(
+                loading = {
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
+                },
+                success = { translation ->
+                    _translationUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            translationInfo = translation
+                        )
+                    }
+                },
+                error = { cause ->
+                    cause.serverMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    } ?: cause.defaultMessage?.let {
+                        _oneTimeEvent.send(
+                            TranslationOneTimeEvent.ErrorHappened(
+                                errorMessage = it
+                            )
+                        )
+                    }
+                }
+            )
+        }
     }
 
     private fun getScreenInfo(meetingId: String, isReconnect: Boolean = false) {

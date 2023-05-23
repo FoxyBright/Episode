@@ -21,4 +21,5 @@ sealed interface TranslationEvent {
     object ChangeMicrophoneState : TranslationEvent
     object ChangeVideoState : TranslationEvent
     object Reconnect :  TranslationEvent
+    object CompleteTranslation : TranslationEvent
 }

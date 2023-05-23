@@ -134,7 +134,15 @@ fun MembersBottomSheet(
                         Spacer(modifier = Modifier.width(8.dp))
                         if (membersCount > 0) {
                             Text(
-                                text = membersCount.toString(),
+                                text = if (membersCount >= 1000) {
+                                    if (membersCount >= 1000000) {
+                                        "${membersCount/1000000}КK"
+                                    } else {
+                                        "${membersCount/1000}К"
+                                    }
+                                } else {
+                                    membersCount.toString()
+                                },
                                 style = ThemeExtra.typography.TranslationTitlePreview,
                                 color = ThemeExtra.colors.mainNightGreen
                             )

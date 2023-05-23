@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -174,7 +173,9 @@ fun TranslationActivePortrait(
         when {
             connectionStatus == ConnectionStatus.RECONNECTING -> {
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
@@ -198,7 +199,9 @@ fun TranslationActivePortrait(
 
             connectionStatus == ConnectionStatus.NO_CONNECTION -> {
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
@@ -239,11 +242,11 @@ fun TranslationActivePortrait(
             connectionStatus == ConnectionStatus.LOW_CONNECTION -> {
                 if (!cameraEnabled && !microphoneEnabled) {
                     Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(
-                            modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Spacer(modifier = Modifier.height(77.dp))
@@ -265,8 +268,7 @@ fun TranslationActivePortrait(
                         }
                         Surface(
                             color = ThemeExtra.colors.thirdOpaqueGray,
-                            shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(20.dp)
                         ) {
                             Row(
                                 modifier = Modifier.padding(
@@ -287,23 +289,25 @@ fun TranslationActivePortrait(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.height(100.dp))
                     }
                 } else if (!microphoneEnabled) {
                     Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Icon(
-                            modifier = Modifier.weight(1f),
-                            painter = painterResource(id = R.drawable.ic_microphone_off_voice),
-                            contentDescription = "Microphone off",
-                            tint = Color.Unspecified
-                        )
+                        Column {
+                            Spacer(modifier = Modifier.height(100.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_microphone_off_voice),
+                                contentDescription = "Microphone off",
+                                tint = Color.Unspecified
+                            )
+                        }
                         Surface(
                             color = ThemeExtra.colors.thirdOpaqueGray,
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.weight(1f),
                         ) {
                             Row(
                                 modifier = Modifier.padding(
@@ -324,7 +328,7 @@ fun TranslationActivePortrait(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.height(100.dp))
                     }
                 } else {
                     Surface(
@@ -389,7 +393,6 @@ fun TranslationActivePortrait(
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    // TODO: Сделать полоску голоса
                 }
             }
 

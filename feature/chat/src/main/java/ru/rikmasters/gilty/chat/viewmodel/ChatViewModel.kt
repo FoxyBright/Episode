@@ -21,6 +21,7 @@ import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
 class ChatViewModel : ViewModel() {
@@ -55,6 +56,8 @@ class ChatViewModel : ViewModel() {
             }
         }
         .state(_message.value, Eagerly)
+
+    private val _translationInfoModel = MutableStateFlow<TranslationInfoModel?>(null)
 
     private val _answer = MutableStateFlow<MessageModel?>(null)
     val answer = _answer.asStateFlow()
@@ -234,17 +237,27 @@ class ChatViewModel : ViewModel() {
 
         when {
             (now > start) -> {
-                _viewers.emit(
-                    messageManager.getTranslationViewersCount(
-                        chatId
+                _translationInfoModel.value?.id?.let {
+                    _viewers.emit(
+                        messageManager.getTranslationViewersCount(
+                            it
+                        )
                     )
-                )
-                TRANSLATION
+                }
+                if (_meet.value?.organizer?.id == _meet.value?.userId) {
+                    TRANSLATION_ORGANIZER
+                } else {
+                    TRANSLATION
+                }
             }
 
             (start - now) < 1_800_000 -> {
                 _translationTimer.emit(difference)
-                TRANSLATION_AWAIT
+                if (_meet.value?.organizer?.id == _meet.value?.userId) {
+                    TRANSLATION_ORGANIZER_AWAIT
+                } else {
+                    TRANSLATION_AWAIT
+                }
             }
 
             else -> MEET
@@ -252,7 +265,7 @@ class ChatViewModel : ViewModel() {
     } ?: MEET
 
     suspend fun toTranslation() {
-        makeToast("Трансляции пока что не доступны на Android-версии Gilty")
+        //TODO:
     }
 
     fun timerConverter(millis: Long?): String? {
@@ -317,6 +330,7 @@ class ChatViewModel : ViewModel() {
                 translationRepository.getTranslationInfo(
                     translationId = meetId
                 ).onSuccess {
+                    _translationInfoModel.emit(it)
                     translationRepository.connectWebSocket(
                         translationId = it.id,
                         userId = it.userId

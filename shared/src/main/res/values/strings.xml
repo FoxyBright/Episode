@@ -219,6 +219,8 @@
     <string name="chats_empty_hidden_photos">Скрытых фото нет</string>
     <string name="chats_meet_ended_pinned_bar_label">episode завершен</string>
     <string name="chats_translation_pinned_bar_label">Трансляция</string>
+    <string name="chats_translation_organizer_pinned_bar_label">Начините трансляцию</string>
+    <string name="chats_translation_organizer_btn_begin">Начать</string>
     <string name="chats_translation_await_pinned_bar_label">До начала трансляции</string>
     <string name="chats_close_chat_pinned_bar_button">Закрыть чат</string>
     <string name="chats_label">Чаты</string>
@@ -410,5 +412,10 @@
     <string name="translations_expired_button_to_chat">Перейти в чат</string>
     <string name="translations_expired_append">Продление трансляции</string>
     <string name="translations_weak_connection">Слабое соединение</string>
+    <string name="translations_complete">Завершить трансляцию?</string>
+    <string name="translations_complete_text">Вы действительно хотите завершить \nтрансляцию раньше?</string>
+    <string name="translations_complete_text_b">Вы действительно хотите завершить \nтрансляцию?</string>
+    <string name="translations_complete_positive">Завершить</string>
+    <string name="translations_complete_negative">Отменить</string>
 
 </resources>
