@@ -46,6 +46,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -395,7 +396,7 @@ fun SortTypeLabels(
                     ),
                     text = state.sortType.getSortName(),
                     isSelected = true,
-                    backgroundColor = colorScheme.primary
+                    primary = Colors.Red
                 ) {}
             }
             

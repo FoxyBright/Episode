@@ -98,13 +98,12 @@ fun GChip(
     isSelected: Boolean = false,
     isOnline: Boolean = false,
     onlineGradient: Boolean = true,
-    backgroundColor: Color = colorScheme.primary,
+    primary: Color = colorScheme.primary,
+    secondary: Color = colorScheme.secondary,
+    empty: Color = colorScheme.primaryContainer,
+    border: Color = colors.chipGray,
     onClick: () -> Unit,
 ) {
-    val primary = backgroundColor
-    val secondary = colorScheme.secondary
-    val empty = colorScheme.primaryContainer
-    val border = colors.chipGray
     Box(
         modifier = modifier
             .sur(
