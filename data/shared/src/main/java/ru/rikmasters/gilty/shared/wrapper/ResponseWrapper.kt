@@ -27,8 +27,6 @@ enum class Status {
     ERROR
 }
 
-data class ResponseWrapper<T: Any?>(
-    val status: Status = Status.SUCCESS,
 data class ResponseWrapperTest<T: Any?>(
     val status: Status ? = null,
     val data: T,
@@ -60,7 +58,6 @@ data class ResponseWrapperTest<T: Any?>(
         val trace: Any? = null,
     )
 }
-
 
 data class ResponseWrapper<T: Any?>(
     val status: Status,
