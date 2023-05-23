@@ -184,7 +184,6 @@ private fun Content(
             Box(
                 Modifier
                     .padding(top = 80.dp)
-                    .padding(horizontal = 16.dp)
             ) {
                 Profile(
                     state = state.profileState,

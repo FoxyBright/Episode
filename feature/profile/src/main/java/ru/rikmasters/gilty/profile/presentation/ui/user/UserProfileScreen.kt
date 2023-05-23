@@ -50,7 +50,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     val history by vm.history.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
-    
+    val activeAlbumId by vm.activeAlbumId.collectAsState()
+
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewState by vm.photoViewState.collectAsState()
@@ -120,7 +121,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 ),
                 profileType = USERPROFILE,
                 observeState = false,
-                errorText = errorText
+                errorText = errorText,
+                activeAlbumId = activeAlbumId
             ),
             currentMeetings = meets,
             meetingsHistory = meetsHistory,
@@ -134,7 +136,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
-            smthError = errorState
+            smthError = errorState,
         ),
         callback = object: UserProfileCallback {
             
@@ -148,7 +150,15 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onProfileImageRefresh() {
                 scope.launch { vm.updateUserData() }
             }
-            
+
+            override fun onAlbumClick(id: Int) {
+                scope.launch { nav.navigate("album") }
+            }
+
+            override fun onAlbumLongClick(id: Int?) {
+                scope.launch { vm.changeActiveAlbumId(id) }
+            }
+
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }

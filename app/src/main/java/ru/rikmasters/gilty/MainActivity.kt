@@ -54,7 +54,6 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.getInstance().onStart()
-        MapKitFactory.initialize(this)
 
         CoroutineScope(IO).launch {
             inject<MeetingManager>()
