@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.model.meeting.AddMeetModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
 
 class CompleteViewModel: ViewModel() {
     
@@ -33,17 +34,45 @@ class CompleteViewModel: ViewModel() {
         }
     }
     
-    suspend fun addMeet(addMeet: AddMeetModel) {
+    suspend fun updateUserData() {
+        val meet = meet.value?.copy(
+            organizer = getProfile(true)
+        )
+        _meet.emit(meet)
+    }
+    
+    suspend fun addMeet(addMeet: AddMeetModel): Boolean {
         val id = meetManager.addMeet(
             addMeet
         )
-        _meet.emit(meet.value?.copy(id))
+        
+        if(id.contains("error")) {
+            makeToast(id.substringAfter("error"))
+            return false
+        }
+        
+        val meet = meet.value?.copy(id)
+        _meet.emit(meet)
+        return true
     }
     
     suspend fun clearAddMeet() {
+        AgeFrom = ""
+        AgeTo = ""
+        Gender = null
+        Orientation = null
+        Requirements = arrayListOf(
+            RequirementModel(
+                gender = null,
+                ageMin = 0,
+                ageMax = 0,
+                orientation = null
+            )
+        )
+        RequirementsType = 0
         meetManager.clearAddMeet()
     }
     
-    private suspend fun getProfile() = profileManager
-        .getProfile(false).map()
+    private suspend fun getProfile(forceWeb: Boolean = false) =
+        profileManager.getProfile(forceWeb).map()
 }

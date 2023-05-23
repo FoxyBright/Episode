@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.models
 
-import ru.rikmasters.gilty.shared.model.enumeration.AlbumType
+import ru.rikmasters.gilty.shared.model.enumeration.AlbumType.valueOf
 import ru.rikmasters.gilty.shared.model.image.AlbumModel
 
 data class Album(
@@ -11,7 +11,7 @@ data class Album(
 ) {
     
     fun map() = AlbumModel(
-        id, type?.let { AlbumType.valueOf(it) },
+        id, type?.let { valueOf(it) },
         preview?.map(), hasAccess
     )
 }

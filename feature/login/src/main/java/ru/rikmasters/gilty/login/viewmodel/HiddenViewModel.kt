@@ -19,13 +19,16 @@ class HiddenViewModel: ViewModel() {
     val photoList = _photoList.asStateFlow()
     
     private val hiddenList = MutableStateFlow(emptyList<String>())
+
+    private val _photosAmount = MutableStateFlow(0)
+    val photosAmount = _photosAmount.asStateFlow()
     
     suspend fun getHidden() = singleLoading {
         regManager.getProfile().hidden?.let {
-            val list = regManager
-                .getHidden(it.albumId)
-            _photoList.emit(list)
-            hiddenList.emit(list)
+            val response = regManager.getHidden(it.albumId)
+            _photoList.emit(response.first)
+            hiddenList.emit(response.first)
+            _photosAmount.emit(response.second)
         }
     }
     

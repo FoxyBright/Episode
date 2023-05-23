@@ -42,7 +42,8 @@ fun AnimatedImage(
     alignment: Alignment = Center,
     speed: Float = 1f,
     iterations: Int = IterateForever,
-    isPlaying: Boolean = true
+    isPlaying: Boolean = true,
+    onAnimationComplete: (@Composable () -> Unit)? = null,
 ) {
     val compositionResult by
     rememberLottieComposition(
@@ -54,6 +55,11 @@ fun AnimatedImage(
         iterations = iterations,
         speed = speed
     )
+    
+    onAnimationComplete?.let {
+        if(progress == 1f) it()
+    }
+    
     LottieAnimation(
         compositionResult,
         { progress }, modifier,
@@ -72,7 +78,7 @@ fun AnimatedImage(
 fun <T> dynamicProperties(
     property: T,
     value: T,
-    vararg keyPath: String
+    vararg keyPath: String,
 ): LottieDynamicProperties {
     return rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(

@@ -51,6 +51,7 @@ fun RespondsBs(
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
+            scope = scope,
             callback = object: RespondsListCallback {
                 
                 override fun onPhotoViewDismiss(state: Boolean) {

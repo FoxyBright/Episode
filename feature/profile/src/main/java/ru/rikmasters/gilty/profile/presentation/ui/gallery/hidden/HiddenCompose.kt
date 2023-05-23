@@ -15,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
@@ -31,9 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.items
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -43,23 +43,26 @@ interface HiddenBsCallback {
     fun onSelectImage(image: AvatarModel) {}
     fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
+    fun onBack() {}
 }
+
+data class HiddenBsState(
+    val photoList: LazyPagingItems<AvatarModel>,
+    val photoAmount:Int,
+)
 
 @Composable
 fun HiddenBsContent(
-    photoList: LazyPagingItems<AvatarModel>,
+    state:HiddenBsState,
     modifier: Modifier = Modifier,
     callback: HiddenBsCallback? = null,
 ) {
     Column(modifier) {
-        Text(
-            stringResource(R.string.profile_hidden_photo),
-            Modifier
-                .padding(16.dp)
-                .padding(top = 12.dp),
-            colorScheme.tertiary,
-            style = typography.labelLarge
-        )
+        ActionBar(stringResource(R.string.profile_hidden_photo),
+            Modifier.padding(bottom = 20.dp),
+            extra = stringResource(R.string.profile_hidden_photo_amount,state.photoAmount)
+        ) { callback?.onBack() }
+
         LazyVerticalGrid(
             Fixed(3), Modifier
                 .fillMaxSize()
@@ -68,16 +71,16 @@ fun HiddenBsContent(
             horizontalArrangement = spacedBy(4.dp)
         ) {
             when {
-                photoList.loadState.refresh is LoadState.Error -> {}
-                photoList.loadState.append is LoadState.Error -> {}
-                photoList.loadState.refresh is LoadState.Loading -> {
+                state.photoList.loadState.refresh is LoadState.Error -> {}
+                state.photoList.loadState.append is LoadState.Error -> {}
+                state.photoList.loadState.refresh is LoadState.Loading -> {
                     item(span = { GridItemSpan(3) }) {
-                        PagingLoader(photoList.loadState)
+                        PagingLoader(state.photoList.loadState)
                     }
                 }
                 else -> {
                     item { GalleryButton(Modifier.weight(1f), callback) }
-                    items(photoList) { image ->
+                    items(state.photoList) { image ->
                         image?.let { img ->
                             LazyItem(
                                 img.thumbnail.url, Modifier.weight(1f),
@@ -85,9 +88,9 @@ fun HiddenBsContent(
                             ) { callback?.onDeleteImage(img) }
                         }
                     }
-                    if(photoList.loadState.append is LoadState.Loading) {
+                    if(state.photoList.loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(3) }) {
-                            PagingLoader(photoList.loadState)
+                            PagingLoader(state.photoList.loadState)
                         }
                     }
                     
@@ -154,7 +157,7 @@ private fun LazyItem(
             .clickable { onSelect(image) },
         TopEnd
     ) {
-        GCashedImage(
+        GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop
         )

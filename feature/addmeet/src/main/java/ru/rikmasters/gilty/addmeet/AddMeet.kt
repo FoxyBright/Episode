@@ -8,6 +8,7 @@ import ru.rikmasters.gilty.addmeet.presentation.ui.complete.CompleteScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.conditions.ConditionsScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.DetailedScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.RequirementsScreen
+import ru.rikmasters.gilty.addmeet.presentation.ui.subcategory.SubcategoriesScreen
 import ru.rikmasters.gilty.addmeet.presentation.ui.tags.TagsScreen
 import ru.rikmasters.gilty.addmeet.viewmodel.*
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.*
@@ -24,6 +25,10 @@ object AddMeet: FeatureDefinition() {
             
             screen<CategoryViewModel>("category") { vm, _ ->
                 CategoriesScreen(vm)
+            }
+
+            screen<SubcategoryViewModel>("subcategory") {vm, _ ->
+                SubcategoriesScreen(vm)
             }
             
             screen<ConditionViewModel>("conditions") { vm, _ ->
@@ -50,23 +55,31 @@ object AddMeet: FeatureDefinition() {
     
     override fun Module.koin() {
         
-        singleOf(::CategoryViewModel)
+        // category screen
+        singleOf(::SubcategoryViewModel)
         singleOf(::ConditionViewModel)
-    
-        singleOf(::DetailedViewModel)
-        factoryOf(::DurationBsViewModel)
-        factoryOf(::MapBsViewModel)
-        factoryOf(::TimeBsViewModel)
+        singleOf(::CategoryViewModel)
         
+        // detailed screen
+        factoryOf(::DurationBsViewModel)
+        singleOf(::DetailedViewModel)
+        factoryOf(::TimeBsViewModel)
+        factoryOf(::MapBsViewModel)
+        
+        // tags screen
         factoryOf(::TagsViewModel)
-    
+        
+        // requirements screen
+        factoryOf(::OrientationBsViewModel)
         singleOf(::RequirementsViewModel)
         factoryOf(::GenderBsViewModel)
-        factoryOf(::OrientationBsViewModel)
         factoryOf(::AgeBsViewModel)
-
+        
+        // complete screen
         singleOf(::CompleteViewModel)
     }
     
-    override fun include() = setOf(MeetingsData, ProfileData)
+    override fun include() = setOf(
+        MeetingsData, ProfileData
+    )
 }

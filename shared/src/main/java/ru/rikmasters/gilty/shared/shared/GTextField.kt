@@ -169,7 +169,7 @@ fun GTextField(
                         .offset(
                             y = if((maxLines > 1
                                         && !singleLine
-                                        && value.isBlank())
+                                        && value.isNotBlank())
                                 || textOffset
                             ) 4.dp else 0.dp
                         ), enabled, readOnly,

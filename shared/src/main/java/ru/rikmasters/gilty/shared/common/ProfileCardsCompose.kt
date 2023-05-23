@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -34,9 +32,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import ru.rikmasters.gilty.core.R.drawable.ic_information
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -97,10 +94,11 @@ private fun ProfileStatisticContentPreview() {
 
 @Composable
 fun HiddenContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     image: String?,
     profileType: ProfileType,
     lockState: Boolean,
+    onImageRefresh: () -> Unit = {},
     onCardClick: () -> Unit,
 ) {
     Box(
@@ -112,27 +110,29 @@ fun HiddenContent(
             .fillMaxWidth()
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
-            .clickable { onCardClick() }, BottomCenter
+            .clickable { onCardClick() },
+        BottomCenter
     ) {
-        GCashedImage(
-            image, Modifier.fillMaxSize(),
+        GCachedImage(
+            url = image,
+            modifier = Modifier.fillMaxSize(),
             contentScale = Crop
+        ) { onImageRefresh() }
+        if(profileType != USERPROFILE) Lock(
+            modifier = Modifier
+                .align(TopStart)
+                .padding(8.dp),
+            state = lockState
         )
         val emptyImage = image.isNullOrBlank()
                 || image.contains("null")
-        if(profileType == ORGANIZER) Lock(
-            Modifier
-                .align(TopStart)
-                .padding(8.dp),
-            lockState
-        )
         CreateProfileCardRow(
-            stringResource(R.string.profile_hidden_photo),
-            when(profileType) {
+            text = stringResource(R.string.profile_hidden_photo),
+            profileType = when(profileType) {
                 ORGANIZER, ANONYMOUS_ORGANIZER -> USERPROFILE
-                CREATE -> CREATE
                 USERPROFILE -> if(emptyImage)
                     CREATE else USERPROFILE
+                CREATE -> CREATE
             }
         )
     }
@@ -161,6 +161,7 @@ private fun Lock(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileImageContent(
     modifier: Modifier,
@@ -168,37 +169,56 @@ fun ProfileImageContent(
     type: ProfileType,
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
+    isError: Boolean = false,
+    onImageRefresh: () -> Unit = {},
     onClick: () -> Unit,
 ) {
-    Box(
-        modifier
+    Card(
+        onClick = onClick,
+        modifier = modifier
             .height(
                 if(type == CREATE)
                     200.dp else 254.dp
             )
-            .fillMaxWidth(0.45f)
-            .clip(shapes.large)
-            .background(colorScheme.primaryContainer)
-            .clickable { onClick() }, BottomCenter
+            .fillMaxWidth(0.45f),
+        enabled = true,
+        shape = shapes.large,
+        colors = cardColors(
+            containerColor = colorScheme
+                .primaryContainer
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if(isError)
+                colorScheme.primary
+            else colorScheme.primaryContainer
+        )
     ) {
-        Avatar(image, type)
-        when(type) {
-            CREATE -> {
-                CreateProfileCardRow(
-                    stringResource(R.string.profile_user_photo),
-                    type
-                )
+        Column {
+            Box {
+                Avatar(image, type, Modifier, onImageRefresh)
+                when(type) {
+                    USERPROFILE, ANONYMOUS_ORGANIZER -> Unit
+                    
+                    CREATE -> {
+                        CreateProfileCardRow(
+                            text = stringResource(R.string.profile_user_photo),
+                            modifier = Modifier.align(BottomCenter),
+                            isError = isError,
+                            profileType = type
+                        )
+                    }
+                    
+                    ORGANIZER -> {
+                        CreateProfileCardRow(
+                            text = stringResource(R.string.profile_organizer_observe),
+                            modifier = Modifier.align(BottomCenter),
+                            profileType = type,
+                            observeState = observeState,
+                        ) { onObserveChange(it) }
+                    }
+                }
             }
-            
-            ORGANIZER -> {
-                CreateProfileCardRow(
-                    stringResource(R.string.profile_organizer_observe),
-                    type,
-                    observeState,
-                ) { onObserveChange(it) }
-            }
-            
-            USERPROFILE, ANONYMOUS_ORGANIZER -> {}
         }
     }
 }
@@ -208,13 +228,15 @@ private fun Avatar(
     image: AvatarModel?,
     type: ProfileType,
     modifier: Modifier = Modifier,
+    onImageRefresh: () -> Unit,
 ) {
     Box(modifier) {
-        GCashedImage(
+        GCachedImage(
             image?.thumbnail?.url,
             Modifier.fillMaxSize(),
-            contentScale = Crop
-        )
+            contentScale = Crop,
+            placeholderColor = colorScheme.primaryContainer
+        ) { onImageRefresh() }
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(
                 Modifier
@@ -224,14 +246,13 @@ private fun Avatar(
                 CenterHorizontally
             ) {
                 Image(
-                    painterResource(ic_information),
+                    painterResource(R.drawable.ic_information),
                     (null), Modifier.size(40.dp)
                 )
                 Text(
                     stringResource(R.string.profile_blocked_photo),
                     Modifier.padding(top = 16.dp),
                     style = typography.bodyMedium,
-                    textAlign = TextAlign.Center,
                     color = White
                 )
             }
@@ -242,24 +263,29 @@ private fun Avatar(
 @Composable
 private fun CreateProfileCardRow(
     text: String,
+    modifier: Modifier = Modifier,
     profileType: ProfileType,
     observeState: Boolean = false,
+    isError: Boolean = false,
     onClick: ((Boolean) -> Unit)? = null,
 ) {
     Row(
-        Modifier
+        modifier
             .padding(horizontal = 8.dp)
             .padding(bottom = 8.dp),
         Arrangement.Center, CenterVertically
     ) {
         if(profileType != ORGANIZER)
             Text(
-                text,
-                Modifier
+                text = text,
+                modifier = Modifier
                     .weight(1f)
                     .padding(end = 4.dp),
-                if(profileType != CREATE) White
-                else colorScheme.onTertiary,
+                color = when {
+                    isError -> colorScheme.primary
+                    profileType == CREATE -> colorScheme.onTertiary
+                    else -> White
+                },
                 style = if(profileType == CREATE)
                     typography.headlineSmall
                 else typography.bodyMedium,
@@ -294,7 +320,7 @@ private fun CreateProfileCardRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileStatisticContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     rating: String,
     observers: Int,
     observed: Int,
@@ -354,9 +380,13 @@ private fun RatingText(
     profileType: ProfileType,
     modifier: Modifier = Modifier,
 ) {
-    val style = if(profileType == CREATE)
-        ThemeExtra.typography.RatingSmallText
-    else ThemeExtra.typography.RatingText
+    
+    val style = ThemeExtra
+        .typography.RatingText.copy(
+            fontSize = if(profileType == CREATE)
+                38.dp.toSp()
+            else 42.dp.toSp()
+        )
     val string = text.ifBlank { "0.0" }
     Text(
         buildAnnotatedString {
@@ -366,7 +396,7 @@ private fun RatingText(
             withStyle(
                 style.copy(
                     fontSize = if(profileType == CREATE)
-                        38.sp else 42.sp
+                        35.dp.toSp() else 45.dp.toSp()
                 ).toSpanStyle()
             ) { append('.') }
             withStyle(style.toSpanStyle()) {
@@ -385,24 +415,31 @@ private fun Observe(
     profileType: ProfileType,
     text: String, count: Int,
 ) {
+    val style =
+        typography.headlineSmall.copy(
+            fontSize = if(profileType == CREATE)
+                12.dp.toSp()
+            else 14.dp.toSp()
+        ) to typography.displaySmall.copy(
+            fontSize = if(profileType == CREATE)
+                8.dp.toSp()
+            else 10.dp.toSp()
+        )
+    
     Column(
         modifier, Top, CenterHorizontally
     ) {
         Text(
             digitalConverter(count),
             Modifier, colorScheme.tertiary,
-            style = if(profileType == CREATE)
-                typography.headlineSmall
-            else typography.labelSmall,
+            style = style.first,
             fontWeight = SemiBold,
             textAlign = TextAlign.Center,
         )
         Text(
             text, Modifier,
             colorScheme.tertiary,
-            style = if(profileType == CREATE)
-                typography.displaySmall
-            else typography.titleSmall,
+            style = style.second,
             textAlign = TextAlign.Center
         )
     }

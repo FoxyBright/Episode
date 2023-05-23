@@ -16,7 +16,7 @@ fun GenderBs(vm: GenderBsViewModel) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val genders = GenderType.fullList.map { it.value }
+    val genders = GenderType.fullGenderList.map { it.value }
     val selected by vm.selected.collectAsState()
     
     LaunchedEffect(Unit) {

@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import ru.rikmasters.gilty.shared.R.drawable.ic_money
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Composable
@@ -25,9 +26,10 @@ fun CategoriesListCard(
     meeting: MeetingModel,
     border: Boolean = false,
     imageSize: Dp = 16.dp,
+    shape: Shape = shapes.medium
 ) {
     Surface(
-        modifier, shapes.medium,
+        modifier, shape,
         colorScheme.background,
         border = if(border) BorderStroke(
             3.dp, colors.borderColor
@@ -37,15 +39,11 @@ fun CategoriesListCard(
             Modifier, Arrangement.SpaceEvenly,
             Alignment.CenterVertically
         ) {
-            val emoji = meeting.category.emoji
-            Image(
-                if(emoji.type != "URL")
-                    painterResource(emoji.path.toInt())
-                else rememberAsyncImagePainter(emoji.path),
-                (null),
+            GEmojiImage(
+                meeting.category.emoji,
                 Modifier
                     .padding(6.dp)
-                    .size(imageSize),
+                    .size(imageSize)
             )
             if(meeting.condition == MEMBER_PAY) Image(
                 painterResource(ic_money),

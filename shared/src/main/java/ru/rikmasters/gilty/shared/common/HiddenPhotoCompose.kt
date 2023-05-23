@@ -47,7 +47,7 @@ private fun HiddenPhotoPreview() {
             )
         ) {
             HiddenContent(
-                HiddenState(listOf())
+                HiddenState(listOf(),0)
             )
         }
     }
@@ -55,6 +55,7 @@ private fun HiddenPhotoPreview() {
 
 data class HiddenState(
     val photoList: List<String>,
+    val photosAmount:Int,
 )
 
 interface HiddenCallback {
@@ -80,7 +81,8 @@ fun HiddenContent(
         ActionBar(
             stringResource(R.string.profile_hidden_photo),
             Modifier.padding(bottom = 20.dp),
-            stringResource(R.string.profile_hidden_photo_label)
+            stringResource(R.string.profile_hidden_photo_label),
+            extra = stringResource(R.string.profile_hidden_photo_amount, state.photosAmount)
         ) { callback?.onBack() }
         LazyVerticalGrid(
             GridCells.Fixed(3),
@@ -154,7 +156,7 @@ private fun LazyItem(
             .clickable { onSelect(image) },
         TopEnd
     ) {
-        GCashedImage(
+        GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop,
         )

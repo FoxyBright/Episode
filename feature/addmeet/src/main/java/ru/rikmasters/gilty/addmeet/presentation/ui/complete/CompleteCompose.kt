@@ -3,33 +3,49 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.complete
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_shared
-import ru.rikmasters.gilty.shared.common.GCashedImage
-import ru.rikmasters.gilty.shared.common.MeetingStates
+import ru.rikmasters.gilty.shared.common.GCachedImage
+import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.common.extentions.toSp
+import ru.rikmasters.gilty.shared.common.extentions.todayControl
+import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
+import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.flyingDollar
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -38,14 +54,18 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 @Composable
 fun CompleteContent() {
     GiltyTheme {
-        CompleteContent(DemoMeetingModel, (false))
+        CompleteContent(
+            DemoMeetingModel,
+            false
+        )
     }
 }
 
 interface CompleteCallBack {
     
-    fun onShare() {}
-    fun onClose() {}
+    fun onShare()
+    fun onClose()
+    fun onImageRefresh()
 }
 
 @Composable
@@ -75,8 +95,12 @@ fun CompleteContent(
                 .fillMaxSize()
                 .padding(it)
                 .padding(top = 34.dp)
-                .padding(horizontal = 60.dp)
-        ) { MeetingCard(meeting, Modifier, isOnline) }
+                .padding(horizontal = 40.dp)
+        ) {
+            MeetingCard(meeting, Modifier, isOnline) {
+                callback?.onImageRefresh()
+            }
+        }
     }
 }
 
@@ -94,7 +118,7 @@ private fun Buttons(
         GradientButton(
             Modifier
                 .padding(horizontal = 16.dp)
-                .padding(top = 28.dp),
+                .padding(top = 35.dp),
             stringResource(R.string.meeting_shared_button),
             icon = ic_shared, online = online
         ) { onShare() }
@@ -103,7 +127,7 @@ private fun Buttons(
                 .clickable(
                     MutableInteractionSource(), (null)
                 ) { onClose() }
-                .padding(top = 12.dp, bottom = 28.dp),
+                .padding(vertical = 16.dp),
             colorScheme.tertiary, style = typography.bodyLarge
         )
     }
@@ -111,24 +135,29 @@ private fun Buttons(
 
 @Composable
 private fun MeetingCard(
-    meeting: MeetingModel,
+    meet: MeetingModel,
     modifier: Modifier = Modifier,
-    online: Boolean,
+    isOnline: Boolean,
+    onImageRefresh: () -> Unit,
 ) {
     Box(modifier) {
         Box {
-            GCashedImage(
-                meeting.organizer?.avatar
-                    ?.thumbnail?.url, Modifier
+            GCachedImage(
+                url = meet.organizer?.avatar
+                    ?.thumbnail?.url,
+                modifier = Modifier
                     .clip(shapes.large)
-                    .fillMaxHeight(0.94f),
-                contentScale = ContentScale.Crop
-            )
+                    .fillMaxHeight(0.94f)
+                    .fillMaxWidth()
+                    .align(TopCenter),
+                contentScale = Crop
+            ) { onImageRefresh() }
             MeetBottom(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = 18.dp), meeting,
-                online
+                modifier = Modifier
+                    .align(BottomCenter)
+                    .offset(y = 18.dp),
+                meet = meet,
+                isOnline = isOnline
             )
         }
     }
@@ -141,17 +170,116 @@ private fun PhoneContent(
 ) {
     Box(modifier.fillMaxSize(), Center) {
         Image(
-            painterResource(
+            painter = painterResource(
                 if(isSystemInDarkTheme())
                     R.drawable.ic_new_meet_back_dark
                 else R.drawable.ic_new_meet_back
-            ), (null), Modifier.fillMaxSize()
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
         )
         Box(
             Modifier
-                .fillMaxWidth(0.8f)
-                .fillMaxHeight(0.54f)
+                .fillMaxWidth(0.82f)
+                .fillMaxHeight(0.63f)
         ) { content?.invoke() }
+    }
+}
+
+@Composable
+private fun MeetingStates(
+    modifier: Modifier,
+    today: Boolean,
+    iconState: Boolean,
+    meet: MeetingModel,
+) {
+    Box(modifier) {
+        Row(Modifier.align(CenterEnd)) {
+            Column(Modifier, Top, End) {
+                DateTimeCard(
+                    text = meet.datetime,
+                    today = today,
+                    color = if(meet.isOnline)
+                        listOf(
+                            colorScheme.secondary,
+                            colorScheme.secondary
+                        ) else listOf(
+                        meet.category.color,
+                        meet.category.color
+                    )
+                )
+                if(iconState) CategoriesListCard(
+                    modifier = Modifier.padding(
+                        top = 6.dp
+                    ),
+                    meet = meet,
+                )
+            }
+            if(!iconState) CategoriesListCard(
+                modifier = Modifier.padding(
+                    start = 4.dp
+                ),
+                meet = meet
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoriesListCard(
+    modifier: Modifier,
+    meet: MeetingModel,
+) {
+    val dollar = meet
+        .condition == MEMBER_PAY
+    
+    val iconSize = 15.dp
+    val pad = 5.dp
+    
+    Box(
+        modifier.background(
+            color = colors.miniCategoriesBackground,
+            shape = shapes.extraSmall
+        )
+    ) {
+        Row(
+            Modifier.padding(pad),
+            SpaceEvenly, CenterVertically
+        ) {
+            GEmojiImage(
+                emoji = meet.category.emoji,
+                modifier = Modifier
+                    .size(iconSize)
+            )
+            if(dollar) GEmojiImage(
+                emoji = flyingDollar,
+                modifier = Modifier
+                    .padding(start = pad)
+                    .size(iconSize)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DateTimeCard(
+    text: String,
+    today: Boolean,
+    modifier: Modifier = Modifier,
+    color: List<Color>,
+) {
+    Box(
+        modifier.background(
+            brush = linearGradient(color),
+            shape = shapes.extraSmall
+        )
+    ) {
+        Text(
+            text = text.format(if(today) "HH:mm" else "dd MMMM"),
+            modifier = Modifier.padding(9.dp, 6.dp),
+            style = typography.labelSmall
+                .copy(White, 10.dp.toSp(), Bold)
+        )
     }
 }
 
@@ -159,58 +287,78 @@ private fun PhoneContent(
 fun MeetBottom(
     modifier: Modifier,
     meet: MeetingModel,
-    online: Boolean,
+    isOnline: Boolean,
 ) {
+    val today = todayControl(meet.datetime)
+    
+    val iconState = !today &&
+            meet.condition == MEMBER_PAY
+    
     Box(modifier) {
         Image(
-            painterResource(
+            painter = painterResource(
                 if(isSystemInDarkTheme())
                     R.drawable.ic_back_rect_dark
                 else R.drawable.ic_back_rect
-            ), (null), Modifier
+            ),
+            contentDescription = null,
+            modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter),
-            contentScale = ContentScale.FillWidth
+                .padding(start = 8.dp)
+                .align(BottomCenter),
+            contentScale = FillWidth
         )
         Card(
-            Modifier
-                .align(Alignment.BottomCenter)
+            modifier = Modifier
+                .align(BottomCenter)
                 .wrapContentHeight()
-                .offset(y = -(18).dp),
-            shapes.large,
-            cardColors(colorScheme.primaryContainer)
+                .offset(y = -(10).dp),
+            shape = shapes.large,
+            colors = cardColors(colorScheme.primaryContainer)
         ) {
-            Column(Modifier.padding(16.dp)) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    Arrangement.Absolute.SpaceBetween
-                ) {
+            Column(Modifier.padding(10.dp)) {
+                Row(Modifier.fillMaxWidth(), SpaceBetween) {
                     Text(
-                        meet.title, Modifier.weight(1f),
-                        colorScheme.tertiary,
-                        style = typography.labelSmall,
-                        fontWeight = FontWeight.Bold
-                    ); MeetingStates(
-                    Modifier.weight(1f),
-                    meet, true
-                )
+                        text = meet.title,
+                        modifier = Modifier.weight(1f),
+                        style = typography.labelSmall.copy(
+                            color = colorScheme.tertiary,
+                            fontSize = 14.dp.toSp(),
+                            fontWeight = Bold
+                        )
+                    )
+                    MeetingStates(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(
+                                bottom = if(!iconState)
+                                    12.dp else 0.dp
+                            ),
+                        today = today,
+                        iconState = iconState,
+                        meet = meet
+                    )
                 }
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp)
+                        .padding(top = 10.dp)
                 ) {
                     CardButton(
-                        Modifier
-                            .padding(end = 8.dp)
+                        modifier = Modifier
+                            .padding(end = 7.dp)
                             .weight(1f),
-                        stringResource(R.string.not_interesting),
-                        R.drawable.cross, online,
+                        text = stringResource(R.string.not_interesting),
+                        icon = R.drawable.cross,
+                        size = 12.dp,
+                        isOnline = isOnline,
                     )
                     CardButton(
-                        Modifier.weight(1f),
-                        stringResource(R.string.meeting_respond),
-                        R.drawable.ic_heart, online,
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.meeting_respond),
+                        icon = R.drawable.ic_heart,
+                        size = 15.dp,
+                        isOnline = isOnline,
                     )
                 }
             }
@@ -223,29 +371,42 @@ fun CardButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: Int,
-    online: Boolean,
-    betweenDistance: Dp = 2.dp,
+    size: Dp,
+    isOnline: Boolean,
 ) {
-    val color = if(online) colorScheme.secondary
+    val color = if(isOnline)
+        colorScheme.secondary
     else colorScheme.primary
+    
     Box(
         modifier.background(
-            colors.grayButton,
-            shapes.extraLarge
+            color = colors.meetButtonColors,
+            shape = shapes.extraLarge
         ), Center
     ) {
-        Row(
-            Modifier.padding(6.dp),
-            Start, CenterVertically
-        ) {
+        Row(Modifier, Start, CenterVertically) {
             Icon(
-                painterResource(icon), (null),
-                Modifier.size(8.dp), color
+                painter = painterResource(icon),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(
+                        start = 6.dp,
+                        end = 2.dp
+                    )
+                    .size(size),
+                tint = color
             )
             Text(
-                text, Modifier.padding(start = betweenDistance),
-                color, style = typography.titleSmall,
-                maxLines = 1
+                text = text,
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .padding(end = 6.dp),
+                style = typography.titleSmall.copy(
+                    color = color,
+                    fontSize = 10.dp.toSp(),
+                    fontWeight = SemiBold
+                ),
+                maxLines = 1,
             )
         }
     }

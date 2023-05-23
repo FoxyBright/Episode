@@ -2,16 +2,14 @@ package ru.rikmasters.gilty.login
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import org.koin.core.component.inject
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
-import ru.rikmasters.gilty.auth.manager.AuthManager
-import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.app.EntrypointResolver
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
+import ru.rikmasters.gilty.login.presentation.ui.SplashScreen
 import ru.rikmasters.gilty.login.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.login.presentation.ui.code.CodeScreen
 import ru.rikmasters.gilty.login.presentation.ui.gallery.CropperScreen
@@ -29,20 +27,13 @@ import ru.rikmasters.gilty.shared.country.CountryManager
 
 object Login: FeatureDefinition() {
     
-    private val regManager by inject<RegistrationManager>()
-    private val authManager by inject<AuthManager>()
-    
-    private val authEntrypointResolver = EntrypointResolver {
-        regManager.storageProfile()
-            ?.let { "main/meetings" }
-            ?: if(
-                authManager.hasTokens() &&
-                regManager.profileCompleted()
-            ) "main/meetings"
-            else "login"
-    }
+    private val authEntrypointResolver = EntrypointResolver { "splash" }
     
     override fun DeepNavGraphBuilder.navigation() {
+        
+        screen<SplashViewModel>("splash") { vm, _ ->
+            SplashScreen(vm)
+        }
         
         screen<LoginViewModel>("login") { vm, _ ->
             LoginScreen(vm)
@@ -100,6 +91,7 @@ object Login: FeatureDefinition() {
     override fun Module.koin() {
         this@koin.single { authEntrypointResolver }
         singleOf(::GalleryViewModel)
+        singleOf(::SplashViewModel)
         singleOf(::CountryManager)
         
         scope<LoginViewModel> {

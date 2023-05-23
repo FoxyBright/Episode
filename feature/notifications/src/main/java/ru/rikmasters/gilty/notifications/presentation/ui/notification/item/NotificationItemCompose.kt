@@ -9,11 +9,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.platform.LocalContext
@@ -21,10 +22,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.core.R.drawable
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.R.drawable
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
@@ -186,7 +187,16 @@ private fun TextNotification(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    SwipeableContainer(shape, modifier) {
+    var isBackgroundVisible by remember {
+        mutableStateOf(false)
+    }
+    
+    LaunchedEffect(key1 = rowState.offset.targetValue.x, block = {
+        isBackgroundVisible = rowState.offset.targetValue.x != 0.0f
+    })
+    
+    SwipeableContainer(shape, modifier, isBackgroundVisible) {
+        
         Row(
             Modifier.swipeableRow(
                 rowState, LocalContext.current
@@ -206,7 +216,7 @@ private fun TextNotification(
                         .padding(top = 6.dp),
                     Start, CenterVertically
                 ) {
-                    GCashedImage(
+                    GCachedImage(
                         user?.avatar?.thumbnail?.url, Modifier
                             .padding(end = 16.dp)
                             .clip(CircleShape)
@@ -232,6 +242,7 @@ private fun TextNotification(
 private fun SwipeableContainer(
     shape: Shape,
     modifier: Modifier,
+    isVisible: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -243,7 +254,11 @@ private fun SwipeableContainer(
         Box(
             Modifier
                 .fillMaxWidth()
-                .background(colorScheme.primary, shape)
+                .background(
+                    if(isVisible) colorScheme.primary
+                    else Color.Transparent,
+                    shape
+                )
         ) {
             SwipeableRowBack(Modifier.align(CenterEnd))
             content.invoke()

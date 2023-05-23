@@ -25,17 +25,22 @@ private fun DependencyHandlerScope.yandexmap() = implementation(
 
 private const val composeVer = Config.composeUiVer
 private const val materialVer = "1.0.1"
+
+fun DependencyHandlerScope.toasty()=implementation(
+    "com.github.GrenderG:Toasty:1.5.2"
+)
+
 fun DependencyHandlerScope.compose() = implementation(
-    "androidx.compose.material3:material3:$materialVer",
     "androidx.compose.material3:material3-window-size-class:$materialVer",
+    "androidx.compose.material3:material3:$materialVer",
     "androidx.navigation:navigation-compose:2.5.2",
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.ui:ui:$composeVer",
     "io.coil-kt:coil-compose:2.3.0",
     "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 ) and implementation(
-    "androidx.compose.ui:ui-test-manifest:$composeVer",
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
+    "androidx.compose.ui:ui-test-manifest:$composeVer",
     "androidx.compose.ui:ui-tooling:$composeVer",
 ) and accompanist(
 ) and accompanistPermissions(
@@ -50,9 +55,9 @@ fun DependencyHandlerScope.rtmp() = implementation(
 )
 
 fun DependencyHandlerScope.imageCropper() = implementation(
-    "com.github.SmartToolFactory:Compose-Colorful-Sliders:1.1.0",
     "com.github.SmartToolFactory:Compose-Color-Picker-Bundle:1.0.1",
     "com.github.SmartToolFactory:Compose-Extended-Gestures:2.1.0",
+    "com.github.SmartToolFactory:Compose-Colorful-Sliders:1.1.0",
     "com.github.SmartToolFactory:Compose-AnimatedList:0.5.1",
 )
 
@@ -79,7 +84,9 @@ fun DependencyHandlerScope.firebase() = implementation(
 )
 
 fun DependencyHandlerScope.accompanist() = implementation(
-    "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc"
+    "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc",
+    "com.google.accompanist:accompanist-pager-indicators:0.28.0",
+    "com.google.accompanist:accompanist-pager:0.28.0"
 )
 
 const val accompanistPermissionsVer = "0.20.3"

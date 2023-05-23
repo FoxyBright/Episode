@@ -64,11 +64,7 @@ open class KtorSource: WebSource() {
             }
             defaultRequest {
                 contentType(Json)
-                getLocales(
-                    getSystem().configuration
-                )[0]?.language?.let {
-                    headers { append("Accept-Language", it) }
-                }
+                headers { append("Accept-Language", "ru") }
                 host = env[ENV_BASE_URL] ?: ""
             }
             install(HttpTimeout) { socketTimeoutMillis = 15000 }
@@ -174,6 +170,31 @@ open class KtorSource: WebSource() {
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
+    
+    private val unExpectClient =
+        client.config { expectSuccess = false }
+    
+    suspend fun unExpectGet(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.get(url, block)
+    
+    @Suppress("unused")
+    suspend fun unExpectPut(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.put(url, block)
+    
+    @Suppress("unused")
+    suspend fun unExpectPatch(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.patch(url, block)
+    
+    suspend fun unExpectPost(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = unExpectClient.post(url, block)
 
 
 

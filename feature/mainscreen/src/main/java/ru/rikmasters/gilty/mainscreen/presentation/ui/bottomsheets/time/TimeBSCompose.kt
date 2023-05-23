@@ -9,12 +9,14 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Medium
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ScrollTimePicker
@@ -60,42 +62,56 @@ fun TimeBsContent(
     modifier: Modifier = Modifier,
     callback: TimeBSCallback? = null,
 ) {
-    Column(
+    Box(
         modifier
-            .height(350.dp)
+            .fillMaxWidth()
+            .fillMaxHeight(0.55f)
             .padding(16.dp)
-            .padding(top = 12.dp),
-        SpaceBetween
+            .padding(top = 10.dp)
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            SpaceBetween, CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.meeting_meet_time_label),
-                Modifier, colorScheme.tertiary,
-                style = typography.labelLarge,
-            )
-            if(state.selectedTime.isNotBlank()) Text(
-                stringResource(R.string.meeting_filter_clear),
-                Modifier.clickable(
-                    MutableInteractionSource(), (null)
-                ) { callback?.onClear() },
-                colorScheme.primary,
-                style = typography.bodyMedium,
-                fontWeight = Medium
-            )
-        }
         ScrollTimePicker(
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxHeight(0.8f)
+                .align(Alignment.TopCenter),
             state.minutes, state.hours,
             { callback?.onHourChange(it) }
         ) { callback?.onMinuteChange(it) }
+        TopBar(
+            isNotEmpty = state.selectedTime
+                .isNotBlank()
+        ) { callback?.onClear() }
         GradientButton(
             Modifier
-                .padding(horizontal = 16.dp)
+                .align(BottomCenter)
                 .padding(bottom = 32.dp),
-            stringResource(R.string.save_button), (true)
+            stringResource(R.string.save_button),
         ) { callback?.onSave() }
+    }
+}
+
+@Composable
+private fun TopBar(
+    isNotEmpty: Boolean,
+    modifier: Modifier = Modifier,
+    onClear: () -> Unit,
+) {
+    Row(
+        modifier.fillMaxWidth(),
+        SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.meeting_meet_time_label),
+            color = colorScheme.tertiary,
+            style = typography.labelLarge,
+        )
+        if(isNotEmpty) Text(
+            text = stringResource(R.string.meeting_filter_clear),
+            modifier = Modifier.clickable(
+                MutableInteractionSource(), (null)
+            ) { onClear() },
+            style = typography.bodyMedium.copy(
+                colorScheme.primary, 16.sp, SemiBold
+            ),
+        )
     }
 }

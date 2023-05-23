@@ -91,7 +91,8 @@ fun FiltersBs(
                 }
                 
                 override fun onAllCategoryClick() {
-                    scope.launch { vm.navigate(1) }
+                    if(!isCollapsed)
+                        scope.launch { vm.navigate(1) }
                 }
                 
                 override fun onFilterClick() {
@@ -99,7 +100,8 @@ fun FiltersBs(
                 }
                 
                 override fun onCityClick() {
-                    scope.launch { vm.navigate(3) }
+                    if(!isCollapsed)
+                        scope.launch { vm.navigate(3) }
                 }
                 
                 override fun onDeleteTag(tag: TagModel) {

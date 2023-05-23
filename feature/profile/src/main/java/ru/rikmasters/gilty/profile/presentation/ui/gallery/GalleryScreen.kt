@@ -15,6 +15,7 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
+import ru.rikmasters.gilty.gallery.StoragePermissionBs
 import ru.rikmasters.gilty.gallery.gallery.*
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.SINGLE
@@ -47,6 +48,7 @@ fun GalleryScreen(
     val filters by vm.filters.collectAsState()
     
     LaunchedEffect(permission.hasPermission) {
+        permission.launchPermissionRequest()
         if(permission.hasPermission) {
             vm.updateImages()
             asm.bottomSheet.collapse()
@@ -58,6 +60,7 @@ fun GalleryScreen(
             }
         }
     }
+    
     
     Use<GalleryViewModel>(LoadingTrait) {
         GalleryContent(
@@ -86,10 +89,6 @@ fun GalleryScreen(
                 
                 override fun onMenuDismiss(state: Boolean) {
                     scope.launch { vm.menuDismiss(state) }
-                }
-                
-                override fun onKebabClick() {
-                    scope.launch { vm.kebab() }
                 }
                 
                 override fun onAttach() {

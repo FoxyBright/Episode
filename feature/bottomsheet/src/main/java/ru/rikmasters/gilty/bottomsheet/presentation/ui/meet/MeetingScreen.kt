@@ -84,6 +84,7 @@ fun MeetingBs(
                                     "REPORTS?id=$meetId&type=${MEETING.name}"
                                 )
                             }
+                            vm.menuDismiss(false)
                         }
                     }
                     

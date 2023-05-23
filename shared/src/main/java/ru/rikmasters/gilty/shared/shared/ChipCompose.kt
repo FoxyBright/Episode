@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -15,6 +17,8 @@ import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -76,7 +81,7 @@ private fun StringPreview() {
                     Modifier,
                     textList[i], it
                 ) {
-                    for(i1 in 0..list.lastIndex) {
+                    for (i1 in 0..list.lastIndex) {
                         list[i1] = false
                     }
                     list[i] = true
@@ -93,12 +98,12 @@ fun GChip(
     isSelected: Boolean = false,
     isOnline: Boolean = false,
     onlineGradient: Boolean = true,
+    primary: Color = colorScheme.primary,
+    secondary: Color = colorScheme.secondary,
+    empty: Color = colorScheme.primaryContainer,
+    border: Color = colors.chipGray,
     onClick: () -> Unit,
 ) {
-    val primary = colorScheme.primary
-    val secondary = colorScheme.secondary
-    val empty = colorScheme.primaryContainer
-    val border = colors.chipGray
     Box(
         modifier = modifier
             .sur(
@@ -139,7 +144,7 @@ fun GChip(
         ) {
             Text(
                 text, Modifier.padding(16.dp, 6.dp),
-                if(isSelected) White
+                if (isSelected) White
                 else colorScheme.tertiary,
                 fontWeight = SemiBold,
                 style = typography.labelSmall
@@ -155,7 +160,7 @@ private fun Modifier.sur(
 ) = this
     .shadow(0.dp, shape, clip = false)
     .then(
-        if(border != null)
+        if (border != null)
             Modifier.border(border, shape)
         else Modifier
     )
@@ -177,14 +182,14 @@ fun GiltyString(
             ) { onClick() }) {
         Text(
             text, Modifier.padding(
-                end = 10.dp, bottom = if(isSelected)
+                end = 10.dp, bottom = if (isSelected)
                     0.dp else 2.dp
             ), animateColorAsState(
-                if(isSelected) colorScheme.tertiary
+                if (isSelected) colorScheme.tertiary
                 else colorScheme.onTertiary, tween(600)
             ).value, style = typography.titleLarge.copy(
                 fontSize = animateFloatAsState(
-                    if(isSelected) 28f else 18f, tween(200)
+                    if (isSelected) 28f else 18f, tween(200)
                 ).value.sp
             )
         )
@@ -197,7 +202,7 @@ private fun GiltyTab() {
     GiltyTheme {
         GiltyTab(
             listOf("Ко всем", "К каждому", "Ко мне"),
-            0, unEnabled = listOf(2)
+            0, unEnabled = listOf(1, 2)
         )
     }
 }
@@ -205,7 +210,7 @@ private fun GiltyTab() {
 @Composable
 fun GiltyTab(
     tabs: List<String>,
-    isSelected: Int,
+    selectedTab: Int,
     modifier: Modifier = Modifier,
     online: Boolean = false,
     unEnabled: List<Int> = emptyList(),
@@ -224,10 +229,18 @@ fun GiltyTab(
             repeat(tabs.size) { tab ->
                 GiltyTabElement(
                     tabs[tab], Modifier.weight(1f),
-                    (isSelected == tab), online,
-                    !unEnabled.contains(tab)
+                    (selectedTab == tab), online,
+                    !unEnabled.contains(tab),
+                    backgroundColor = animateColorAsState(
+                        if (unEnabled.contains(tab)) colorScheme.background
+                        else if ((selectedTab == tab)) if (online)
+                            colors.tabActiveOnline
+                        else colors.tabActive
+                        else colors.tabInactive,
+                        tween(400)
+                    ).value,
                 ) { onClick?.let { it(tab) } }
-                if(tab < tabs.size - 1) Box(
+                if (tab < tabs.size - 1) Box(
                     Modifier
                         .width(1.dp)
                         .fillMaxHeight()
@@ -239,35 +252,70 @@ fun GiltyTab(
 }
 
 @Composable
-private fun GiltyTabElement(
+fun GiltyPagerTab(
+    modifier: Modifier,
+    selectedTabIndex: Int,
+    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit,
+    titles: List<String>,
+    onTabClick:(Int)->Unit,
+) {
+    TabRow(
+        modifier = modifier,
+        contentColor = White,
+        selectedTabIndex = selectedTabIndex,
+        indicator = indicator,
+        containerColor = Transparent
+    ) {
+        titles.forEachIndexed { index, title ->
+            Row {
+                GiltyTabElement(
+                    title,
+                    Modifier
+                        .weight(1f)
+                        .zIndex(2f)
+                        .border(
+                            if (selectedTabIndex == 1) 0.5.dp else 0.dp, colorScheme.scrim,
+                            RoundedCornerShape(0.dp)
+                        ),
+                    (selectedTabIndex == index), false,
+                    true
+                ) {
+                    onTabClick(index)
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun GiltyTabElement(
     text: String,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     online: Boolean,
     enabled: Boolean,
+    backgroundColor: Color = Transparent,
     onClick: () -> Unit,
 ) {
     Box(
         modifier
-            .background(
-                animateColorAsState(
-                    if(!enabled) colorScheme.background
-                    else if(isSelected) if(online)
-                        colors.tabActiveOnline
-                    else colors.tabActive
-                    else colors.tabInactive,
-                    tween(400)
-                ).value
-            )
-            .clickable { if(enabled) onClick() },
+            .background(backgroundColor)
+            .clickable { onClick() },
     ) {
         Text(
             text,
             Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            if(enabled) colorScheme.tertiary
-            else colorScheme.onTertiary,
+            color = animateColorAsState(
+                targetValue = if (enabled) {
+                    colorScheme.tertiary
+                } else {
+                    colorScheme.onTertiary
+                },
+                animationSpec = tween(easing = LinearEasing),
+            ).value,
             style = typography.labelSmall,
             textAlign = TextAlign.Center,
             fontWeight = Bold

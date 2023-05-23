@@ -20,7 +20,7 @@ import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.gallery.gallery.GalleryCallback
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.items
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.*
@@ -89,7 +89,7 @@ fun HiddenGalleryImage(
                 callback?.onHiddenImageClick(image)
             }
     ) {
-        GCashedImage(
+        GCachedImage(
             image.thumbnail.url,
             Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

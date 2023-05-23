@@ -9,6 +9,12 @@
     <string name="next_button">Далее</string>
     <string name="login_blocked_profile_title">Профиль заблокирован</string>
     <string name="login_blocked_profile_label">Ваш профиль заблокирован\nза нарушение условий использования\nприложения. Узнайте, как можно\nвосстановить аккаунт</string>
+    <string name="bad_connection">Отсутствует подключение к интернету</string>
+
+    <string name="profile_short_username">Введите минимум 4 символа</string>
+    <string name="profile_long_username">Превышен лимит в 20 символов</string>
+    <string name="profile_user_name_is_occupied">Имя пользователя занято</string>
+    <string name="profile_username_error_regex">Имя пользователя содержит недопустимые символы</string>
 
     <string name="login_error_invalid_phone">Набранный номер не существует</string>
     <string name="login_error_nothing_error">Неизвестная ошибка</string>
@@ -37,7 +43,8 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
-    <string name="profile_hidden_photo_label">Доступ к фото будет доступен при Вашем/nразрешении</string>
+    <string name="profile_hidden_photo_amount">%s фото</string>
+    <string name="profile_hidden_photo_label">Другие пользователи не видят фотографии\nбез вашего согласия</string>
     <string name="profile_observers">Наблюдатели</string>
     <string name="profile_observers_in_profile">Наблюдают</string>
     <string name="profile_observe">Наблюдает</string>
@@ -50,7 +57,6 @@
     <string name="profile_meeting_history_label">История</string>
     <string name="profile_menu_settings_button">Настройки</string>
     <string name="profile_menu_watch_photo_button">Смотреть фото</string>
-    <string name="profile_user_name_is_occupied">Имя пользователя занято</string>
     <string name="profile_sent_responds">Отправленные</string>
     <string name="profile_received_responds">Полученные</string>
     <string name="profile_hasnt_sent_responds">Вы еще не оставляли\nотклики</string>
@@ -241,6 +247,8 @@
     <string name="chats_message_join_meet">присоединил%s к episode</string>
     <string name="chats_message_leave_meet">покинул%s episode</string>
     <string name="chats_message_make_screenshot">сделал%s скриншот!</string>
+    <string name="chats_sort_label">Сортировка</string>
+    <string name="chats_archive_label">Архив</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
@@ -270,7 +278,7 @@
     <string name="complaints_cheater_fraud_label">Мошенничество</string>
     <string name="complaints_cheater_deception_label">Обман</string>
     <string name="complaints_cheater_delusion_label">Введение в заблуждение</string>
-    <string name="complaints_send_placeholder">Опишите вашу причину жалобы</string>
+    <string name="complaints_send_placeholder">Опишите причину жалобы</string>
     <string name="complaints_send_answer">Отлично, ваша жалоба отправлена!</string>
     <string name="complaints_moderate_sen_answer">Модераторы скоро рассмотрят\nвашу жалобу</string>
     <string name="complaints_button">Отправить жалобу</string>
@@ -332,7 +340,7 @@
     <string name="add_meet_member_limit_error">Минимум 2 участника</string>
     <string name="add_meet_popular_tags">Популярные теги</string>
     <string name="add_meet_bad_date">"Указанная дата уже не актуальна"</string>
-    <string name="add_meet_created">episode создан</string>
+    <string name="add_meet_created">Episode создан</string>
 
     <!-- Alerts -->
     <string name="change_user_categories_alert">Выйти из режима\nвыбора категорий?</string>
@@ -381,6 +389,19 @@
     <string name="meets_push_channel_descriptions">Создаваемые episode и обновление их статусов у пользователя и наблюдаемых</string>
     <string name="chats_push_channel_name">Уведомления от чатов</string>
     <string name="chats_push_channel_descriptions">Входящие сообщения и трансляции</string>
+    <!-- Months -->
+    <string name="month_january_name">Январь</string>
+    <string name="month_february_name">Февраль</string>
+    <string name="month_march_name">Март</string>
+    <string name="month_april_name">Апрель</string>
+    <string name="month_may_name">Май</string>
+    <string name="month_june_name">Июнь</string>
+    <string name="month_july_name">Июль</string>
+    <string name="month_august_name">Август</string>
+    <string name="month_september_name">Сентябрь</string>
+    <string name="month_october_name">Октябрь</string>
+    <string name="month_november_name">Ноябрь</string>
+    <string name="month_december_name">Декабрь</string>
 
     <!-- Translations -->
     <string name="translations_preview_title">Предпросмотр видео</string>
@@ -418,4 +439,6 @@
     <string name="translations_complete_positive">Завершить</string>
     <string name="translations_complete_negative">Отменить</string>
 
+    <string name="update_button_label">Обновить</string>
+    <string name="internet_error_label">Что-то пошло не так</string>
 </resources>

@@ -4,10 +4,7 @@ import androidx.paging.PagingSource
 import com.fasterxml.jackson.annotation.JsonAlias
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.SocketTimeoutException
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.RedirectResponseException
-import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.*
 import io.ktor.client.statement.HttpResponse
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.Dispatchers
@@ -28,28 +25,27 @@ enum class Status {
 }
 
 data class ResponseWrapperTest<T: Any?>(
-    val status: Status ? = null,
+    val status: Status? = null,
     val data: T,
     val error: Error? = null,
     val paginator: Paginator? = null,
 ) {
-
+    
     @Suppress("unused")
     class Paginator(
+        val type: String,
         val total: Int,
         val perPage: Int,
         val currentPage: Int,
-        val list_page: Int,
-        val limit: Int,
-        val offset: Int,
+        val last_page: Int,
     ) {
-
+        
         constructor(): this(
-            (0), (0), (0),
-            (0), (0), (0)
+            (""), (0), (0),
+            (0), (0)
         )
     }
-
+    
     data class Error(
         val code: String? = null,
         val message: String? = null,
@@ -59,7 +55,6 @@ data class ResponseWrapperTest<T: Any?>(
         val trace: Any? = null,
     )
 }
-
 
 data class ResponseWrapper<T: Any?>(
     val status: Status,
@@ -74,7 +69,7 @@ data class ResponseWrapper<T: Any?>(
         val total: Int,
         val perPage: Int,
         val currentPage: Int,
-        val last_page: Int
+        val last_page: Int,
     ) {
         
         constructor(): this(
@@ -101,17 +96,17 @@ data class ResponseWrapper<T: Any?>(
 }
 
 data class ErrorResponseWrapper(
-    val status: Status,
-    val error: Error,
+    val status: String = "",
+    val error: Error = Error(),
 ) {
     
     data class Error(
-        val code: String,
-        val message: String,
-        val exception: String,
-        val file: String,
-        val line: Int,
-        val trace: Any?,
+        val code: String = "",
+        val message: String = "",
+        val exception: String = "",
+        val file: String = "",
+        val line: Int = 0,
+        val trace: Any? = null,
     )
 }
 
@@ -125,6 +120,7 @@ suspend inline fun HttpResponse.errorWrapped() =
     body<ErrorResponseWrapper>()
 
 // По неизвестным причинам не приходит status
+@Suppress("unused")
 suspend inline fun <reified T> HttpResponse.wrappedTest(): T
         where T: Any? = body<ResponseWrapperTest<T>>().data
 
@@ -135,7 +131,7 @@ suspend inline fun <reified T> HttpResponse.wrapped(): T
 /**
  * [coroutinesState] превращает запрос в DataState (suspend)
  */
-suspend fun <T : Any> coroutinesState(
+suspend fun <T: Any> coroutinesState(
     block: suspend () -> T,
 ) = try {
     withContext(Dispatchers.IO) {
@@ -143,20 +139,20 @@ suspend fun <T : Any> coroutinesState(
             data = block(),
         )
     }
-} catch (e: IOException) {
+} catch(e: IOException) {
     DataStateTest.Error(
         cause = ExceptionCause.IO,
     )
-} catch (e: SocketTimeoutException) {
+} catch(e: SocketTimeoutException) {
     DataStateTest.Error(
         cause = ExceptionCause.SocketTimeout,
     )
-} catch (e: UnknownHostException) {
+} catch(e: UnknownHostException) {
     DataStateTest.Error(
         cause = ExceptionCause.UnknownHost,
     )
-} catch (e: ResponseException) {
-    when (e) {
+} catch(e: ResponseException) {
+    when(e) {
         is RedirectResponseException -> {
             DataStateTest.Error(
                 cause = ExceptionCause.RedirectResponse,
@@ -178,7 +174,7 @@ suspend fun <T : Any> coroutinesState(
             )
         }
     }
-} catch (e: Exception) {
+} catch(e: Exception) {
     DataStateTest.Error(
         cause = ExceptionCause.UnknownException,
     )
@@ -187,7 +183,8 @@ suspend fun <T : Any> coroutinesState(
 /**
  * [flowState] превращает запрос в DataState (flow)
  */
-fun <T : Any> flowState(
+@Suppress("unused")
+fun <T: Any> flowState(
     block: suspend () -> T,
 ) = flow {
     emit(DataStateTest.Loading())
@@ -195,20 +192,20 @@ fun <T : Any> flowState(
         DataStateTest.Success(
             data = block(),
         )
-    } catch (e: IOException) {
+    } catch(e: IOException) {
         DataStateTest.Error(
             cause = ExceptionCause.IO,
         )
-    } catch (e: SocketTimeoutException) {
+    } catch(e: SocketTimeoutException) {
         DataStateTest.Error(
             cause = ExceptionCause.SocketTimeout,
         )
-    } catch (e: UnknownHostException) {
+    } catch(e: UnknownHostException) {
         DataStateTest.Error(
             cause = ExceptionCause.UnknownHost,
         )
-    } catch (e: ResponseException) {
-        when (e) {
+    } catch(e: ResponseException) {
+        when(e) {
             is RedirectResponseException -> {
                 DataStateTest.Error(
                     cause = ExceptionCause.RedirectResponse,
@@ -230,7 +227,7 @@ fun <T : Any> flowState(
                 )
             }
         }
-    } catch (e: Exception) {
+    } catch(e: Exception) {
         DataStateTest.Error(
             cause = ExceptionCause.UnknownException,
         )
@@ -242,35 +239,36 @@ fun <T : Any> flowState(
 /**
  * [paginateState] превращает запрос в LoadResult
  */
-suspend fun <T : Any> paginateState(
+@Suppress("unused")
+suspend fun <T: Any> paginateState(
     block: suspend () -> List<T>,
     loadSize: Int,
     page: Int,
 ) = try {
     withContext(Dispatchers.IO) {
         val result = block()
-        val nextKey = if (result.size < loadSize) null else page + 1
-        val prevKey = if (page == 1) null else page - 1
+        val nextKey = if(result.size < loadSize) null else page + 1
+        val prevKey = if(page == 1) null else page - 1
         PagingSource.LoadResult.Page(
             data = block(),
             prevKey = prevKey,
             nextKey = nextKey,
         )
     }
-} catch (e: IOException) {
+} catch(e: IOException) {
     PagingSource.LoadResult.Error(
         throwable = Exception(),
     )
-} catch (e: SocketTimeoutException) {
+} catch(e: SocketTimeoutException) {
     PagingSource.LoadResult.Error(
         throwable = Exception(),
     )
-} catch (e: UnknownHostException) {
+} catch(e: UnknownHostException) {
     PagingSource.LoadResult.Error(
         throwable = Exception(),
     )
-} catch (e: ResponseException) {
-    when (e) {
+} catch(e: ResponseException) {
+    when(e) {
         is RedirectResponseException -> {
             PagingSource.LoadResult.Error(
                 throwable = Exception(),
@@ -292,7 +290,7 @@ suspend fun <T : Any> paginateState(
             )
         }
     }
-} catch (e: Exception) {
+} catch(e: Exception) {
     PagingSource.LoadResult.Error(
         throwable = Exception(),
     )

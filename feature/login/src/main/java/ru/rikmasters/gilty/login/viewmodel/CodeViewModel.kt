@@ -12,10 +12,8 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.login.LoginErrorMessage
 
 class CodeViewModel(
-    
     private val repository: LoginRepository,
-    
-    ): ViewModel() {
+): ViewModel() {
     
     private val authManager by inject<AuthManager>()
     private val regManager by inject<RegistrationManager>()
@@ -103,9 +101,8 @@ class CodeViewModel(
         } else _code.emit("")
     }
     
-    suspend fun onOtpAuthentication(code: String) {
-        authManager.onOtpAuthentication(code)
-    }
+    suspend fun onOtpAuthentication(code: String)
+        = authManager.onOtpAuthentication(code)
     
     suspend fun profileCompleted(): Boolean {
         return regManager.profileCompleted()

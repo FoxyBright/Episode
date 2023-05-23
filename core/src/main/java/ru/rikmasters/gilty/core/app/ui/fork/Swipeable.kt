@@ -89,7 +89,7 @@ open class SwipeableState<T>(
      * use `Modifier.offsetPx`. This includes the resistance by default, if resistance is enabled.
      */
     val offset: State<Float> get() = offsetState
-    
+    val currentScreenName = mutableStateOf("")
     /**
      * The amount by which the [swipeable] has been swiped past its bounds.
      */
@@ -291,6 +291,7 @@ open class SwipeableState<T>(
      * @param targetValue The new target value to set [currentValue] to.
      */
     @ExperimentalMaterial3Api
+    @Suppress("unused")
     suspend fun snapTo(targetValue: T) {
         latestNonEmptyAnchorsFlow.collect { anchors ->
             val targetOffset = anchors.getOffset(targetValue)
@@ -478,6 +479,7 @@ fun <T: Any> rememberSwipeableState(
  */
 @Composable
 @ExperimentalMaterial3Api
+@Suppress("unused")
 fun <T: Any> rememberSwipeableStateFor(
     value: T,
     onValueChange: (T) -> Unit,
@@ -496,12 +498,11 @@ fun <T: Any> rememberSwipeableStateFor(
             swipeableState.animateTo(value)
         }
     }
-    DisposableEffect(swipeableState.currentValue) {
+    LaunchedEffect(swipeableState.currentValue) {
         if(value != swipeableState.currentValue) {
             onValueChange(swipeableState.currentValue)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
-        onDispose { }
     }
     return swipeableState
 }
@@ -802,6 +803,7 @@ object SwipeableDefaults {
     /**
      * A stiff resistance factor which indicates that swiping isn't available right now.
      */
+    @Suppress("unused")
     const val StiffResistanceFactor = 20f
     
     /**

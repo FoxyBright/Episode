@@ -2,7 +2,9 @@ package ru.rikmasters.gilty.login.viewmodel
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
@@ -10,6 +12,7 @@ import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 class ProfileViewModel: ViewModel() {
     
     private val regManager by inject<RegistrationManager>()
+    private val authManager by inject<AuthManager>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -19,18 +22,15 @@ class ProfileViewModel: ViewModel() {
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
-    val distanceDebounced = username
+    val usernameDebounced = username
         .debounce(250)
-        .onEach {
+        .onEach { name ->
             _occupied.emit(
-                if(username.value == profile.value?.username) false
-                else regManager.isNameOccupied(username.value)
+                if(name == profile.value?.username) false
+                else regManager.isNameOccupied(name)
             )
         }
-        .state(
-            _username.value,
-            SharingStarted.Eagerly
-        )
+        .state(_username.value, Eagerly)
     
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
@@ -45,23 +45,38 @@ class ProfileViewModel: ViewModel() {
         _description.emit(profile.aboutMe ?: "")
     }
     
+    suspend fun clearLoginData() {
+        regManager.clearProfile()
+        authManager.logout()
+    }
+    
     suspend fun usernameChange(text: String) {
         _username.emit(text)
     }
     
     suspend fun descriptionChange(text: String) {
-        _description.emit(text)
+        if(text.length <= 120)
+            _description.emit(text)
     }
     
     suspend fun onDescriptionSave() {
         regManager.userUpdateData(
-            description.value
+            aboutMe = description.value
         )
     }
     
     suspend fun onUsernameSave() {
         regManager.userUpdateData(
-            username.value
+            username = username.value
         )
+    }
+    
+    suspend fun checkOnNext() {
+        regManager
+            .getProfile(true)
+            .let {
+                if(it.username.isNullOrBlank())
+                    onUsernameSave()
+            }
     }
 }

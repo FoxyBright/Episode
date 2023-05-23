@@ -1,9 +1,10 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -11,6 +12,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
@@ -22,6 +24,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun NotificationsScreen(vm: NotificationViewModel) {
     
@@ -60,13 +63,33 @@ fun NotificationsScreen(vm: NotificationViewModel) {
         }
     }
     
+    var errorState by remember {
+        mutableStateOf(false)
+    }
+    
+    scope.launch {
+        while(true) {
+            delay(500)
+            internetCheck(context).let {
+                if(!it) errorState = true
+            }
+        }
+    }
+    
     NotificationsContent(
-        NotificationsState(
-            notifications, lastRespond,
-            navBar, blur, selected,
-            participants, participantsStates,
-            listState, ratings
-        ), Modifier, object: NotificationsCallback {
+        state = NotificationsState(
+            notifications = notifications,
+            lastRespond = lastRespond,
+            navBar = navBar,
+            blur = blur,
+            activeNotification = selected,
+            participants = participants,
+            participantsStates = participantsStates,
+            listState = listState,
+            ratings = ratings,
+            smthError = errorState
+        ),
+        callback = object: NotificationsCallback {
             
             override fun onEmojiClick(
                 notification: NotificationModel,
@@ -75,14 +98,19 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             ) {
                 scope.launch {
                     selected?.let {
-                        if(notification.feedback?.ratings == null) {
+                        if(notification.feedback?.ratings == null || !userId.isNullOrBlank()) {
                             vm.emojiClick(
                                 emoji,
                                 notification.parent.meeting?.id ?: "",
-                                userId ?: ""
+                                userId ?: "",
+                                notification.parent.meeting?.organizer?.id.equals(
+                                    userId
+                                )
                             )
+                            // Updates ratings
+                            vm.forceRefresh()
+                            vm.forceRefreshMembers()
                         }
-                        vm.forceRefresh()
                     } ?: run {
                         vm.selectNotification(notification)
                         vm.blur(true)
@@ -146,7 +174,10 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
             
             override fun onListUpdate() {
-                scope.launch { vm.forceRefresh() }
+                errorState = !internetCheck(context)
+                if(!errorState) scope.launch {
+                    vm.forceRefresh()
+                }
             }
         }
     )

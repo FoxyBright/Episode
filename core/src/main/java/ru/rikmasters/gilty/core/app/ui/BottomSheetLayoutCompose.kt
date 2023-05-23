@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,7 +35,7 @@ enum class BottomSheetSwipeState { EXPANDED, HALF_EXPANDED, COLLAPSED }
 
 @Stable
 class BottomSheetState(
-    internal val swipeableState: SwipeableState<BottomSheetSwipeState>,
+    val swipeableState: SwipeableState<BottomSheetSwipeState>,
 ) {
     
     internal var content: (@Composable () -> Unit)? by mutableStateOf(null)
@@ -43,7 +44,7 @@ class BottomSheetState(
     @Suppress("unused")
     suspend fun halfExpand() =
         animateTo(HALF_EXPANDED)
-    
+
     suspend fun collapse() {
         animateTo(COLLAPSED)
     }
@@ -80,10 +81,16 @@ class BottomSheetState(
         MutableStateFlow(COLLAPSED)
     val current = _current.asStateFlow()
     
+    val colors: @Composable () -> Color = {
+        if(isSystemInDarkTheme())
+            Color(0xFF767373)
+        else Color(0xFFC9C5CA)
+    }
+    
     var gripLightColor: @Composable () -> Color
-            by mutableStateOf({ colorScheme.outlineVariant })
+            by mutableStateOf(colors)
     var gripDarkColor: @Composable () -> Color
-            by mutableStateOf({ colorScheme.outline })
+            by mutableStateOf(colors)
     var scrim: @Composable () -> Color
             by mutableStateOf({ colorScheme.scrim })
 }
@@ -97,7 +104,7 @@ fun BottomSheetLayout(
     content: @Composable () -> Unit,
 ) {
     BoxWithConstraints(modifier) {
-        
+
         val screenHeight = with(LocalDensity.current) {
             this@BoxWithConstraints.maxHeight.toPx()
         }
@@ -121,7 +128,9 @@ fun BottomSheetLayout(
         }
         
         val offset = state.swipeableState.offset.value.roundToInt()
-        
+
+        val screenName = state.swipeableState.currentScreenName.value
+
         val connection =
             remember { state.swipeableState.PreUpPostDownNestedScrollConnection }
         
@@ -132,7 +141,7 @@ fun BottomSheetLayout(
                 Color.Transparent else state.scrim().copy(alpha = 0.5f),
             tween(500), label = ""
         )
-        
+
         content()
         
         if(scrimColor != Color.Transparent)
@@ -156,7 +165,8 @@ fun BottomSheetLayout(
                     anchors,
                     Orientation.Vertical,
                     thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                    resistance = null
+                    resistance = null,
+                    enabled = screenName != "Map"
                 )
                 .nestedScroll(connection)
         

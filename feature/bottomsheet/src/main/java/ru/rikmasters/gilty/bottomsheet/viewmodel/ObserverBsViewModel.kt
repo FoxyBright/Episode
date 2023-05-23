@@ -22,28 +22,45 @@ class ObserverBsViewModel: ViewModel() {
     private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
-    private val _search = MutableStateFlow("")
-    val search = _search.asStateFlow()
+    private val _searchObserved = MutableStateFlow("")
+    val searchObserved = _searchObserved.asStateFlow()
+
+    private val _searchObservers = MutableStateFlow("")
+    val searchObservers = _searchObservers.asStateFlow()
     
     private val _counters = MutableStateFlow(Pair(0, 0))
     val counters = _counters.asStateFlow()
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
-    val searchDebounced = search
+    val searchDebounced = searchObserved
         .debounce(250)
         .onEach {}
-        .state(_search.value, SharingStarted.Eagerly)
+        .state(_searchObserved.value, SharingStarted.Eagerly)
     
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun getObservers(type: ObserversType) = lazy {
-        _search.debounce(250)
-            .flatMapLatest { query ->
-                profileManager.getObservers(
-                    query = query,
-                    type = type
-                )
+        when(type){
+            OBSERVERS->{
+                _searchObserved.debounce(250)
+                    .flatMapLatest { query ->
+                        profileManager.getObservers(
+                            query = query,
+                            type = type
+                        )
+                    }
             }
+            OBSERVABLES->{
+                _searchObservers.debounce(250)
+                    .flatMapLatest { query ->
+                        profileManager.getObservers(
+                            query = query,
+                            type = type
+                        )
+                    }
+            }
+        }
+
     }
     
     val observers by getObservers(OBSERVERS)
@@ -62,11 +79,14 @@ class ObserverBsViewModel: ViewModel() {
     
     suspend fun changeObserversTab(tab: Int) {
         _observersSelectTab.emit(tab)
-        _search.emit("")
+        _searchObserved.emit("")
     }
     
-    suspend fun searchChange(text: String) {
-        _search.emit(text)
+    suspend fun searchObservedChange(text: String) {
+        _searchObserved.emit(text)
+    }
+    suspend fun searchObserversChange(text: String) {
+        _searchObservers.emit(text)
     }
     
     suspend fun unsubscribeMembers() {

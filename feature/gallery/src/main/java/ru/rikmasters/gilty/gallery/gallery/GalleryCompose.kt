@@ -57,8 +57,10 @@ fun GalleryContent(
     }) { paddings ->
         GalleryGrid(
             modifier.padding(top = paddings.calculateTopPadding()),
-            state.images, state.selectedImages,
-            state.type, (false),
+            state.images,
+            state.selectedImages,
+            state.type,
+            (false),
             callback
         )
     }

@@ -9,8 +9,8 @@ enum class GenderType(val value: String) {
     
     companion object {
         
-        val fullList = values().toList()
-        val shortList = values().toList() - NOT_IMPORTANT
-        fun get(index: Int) = fullList[index]
+        val fullGenderList = values().toList()
+        val shortGenderList = values().toList() - NOT_IMPORTANT
+        fun get(index: Int) = fullGenderList[index]
     }
 }

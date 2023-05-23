@@ -5,7 +5,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -16,7 +17,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
-import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModel
+import ru.rikmasters.gilty.shared.model.meeting.DemoCategoryModelList
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -39,26 +40,27 @@ fun CategoriesContent(
     state: CategoriesState,
     callback: CategoriesCallback? = null,
 ) {
-    Column(
-        modifier.fillMaxSize(),
-    ) {
-        Column(
-            Modifier.weight(1f)
-        ) {
+    Column(modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f)) {
             ActionBar(
-                stringResource(R.string.interested_you),
-                Modifier, stringResource(R.string.interested_you_details),
+                title = stringResource(R.string.interested_you),
+                details = stringResource(R.string.interested_you_details),
             ) { callback?.onBack() }
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
             else Bubbles(
-                state.categoryList,
-                CATEGORY_ELEMENT_SIZE.dp,
-                Modifier.padding(top = 8.dp),
+                data = state.categoryList,
+                elementSize = CATEGORY_ELEMENT_SIZE.dp,
+                modifier = Modifier.padding(
+                    top = 30.dp,
+                    bottom = 10.dp
+                ),
             ) { element ->
                 CategoryItem(
-                    element.name, element.emoji, element.color,
-                    state.selectCategories.contains(element), modifier
+                    name = element.name,
+                    icon = element.emoji,
+                    color = element.color,
+                    state = state.selectCategories.contains(element),
                 ) { callback?.onCategoryClick(element) }
             }
         }
@@ -87,8 +89,8 @@ private fun BubblesForPreview(
             Box(Modifier.fillMaxHeight()) {
                 Column(
                     Modifier.align(
-                        if(index % 3 != 0) Alignment.TopCenter
-                        else Alignment.BottomCenter
+                        if(index % 3 != 0) TopCenter
+                        else BottomCenter
                     )
                 ) {
                     for(element in item)
@@ -110,7 +112,7 @@ private fun CategoriesPreview() {
         CategoriesContent(
             Modifier,
             CategoriesState(
-                listOf(DemoCategoryModel),
+                DemoCategoryModelList,
                 emptyList()
             )
         )

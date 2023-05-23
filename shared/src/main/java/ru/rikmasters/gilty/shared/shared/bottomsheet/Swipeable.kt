@@ -481,12 +481,11 @@ internal fun <T : Any> rememberSwipeableStateFor(
             swipeableState.animateTo(value)
         }
     }
-    DisposableEffect(swipeableState.currentValue) {
+    LaunchedEffect(swipeableState.currentValue) {
         if (value != swipeableState.currentValue) {
             onValueChange(swipeableState.currentValue)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
-        onDispose { }
     }
     return swipeableState
 }

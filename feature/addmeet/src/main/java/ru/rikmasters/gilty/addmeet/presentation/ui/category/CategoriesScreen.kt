@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
@@ -15,12 +16,16 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val nav = get<NavState>()
     
     val categories by vm.categories.collectAsState()
-    val selected by vm.selected.collectAsState()
+    val selected by vm.selectedCategory.collectAsState()
     val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
     
     LaunchedEffect(Unit) { vm.getCategories() }
-    
+
+    BackHandler(!alert) {
+        scope.launch { vm.alertDismiss(true) }
+    }
+
     CategoriesContent(
         Modifier, CategoriesState(
             categories, selected, online, alert
@@ -29,14 +34,19 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             override fun onCategoryClick(category: CategoryModel) {
                 scope.launch {
                     vm.selectCategory(category)
-                    nav.navigate("conditions")
+                    if(category.children.isNullOrEmpty()){
+                        nav.navigate("conditions")
+                    }else {
+                        nav.navigate("subcategory")
+                    }
+
                 }
             }
             
             override fun onCloseAlert(state: Boolean) {
                 scope.launch { vm.alertDismiss(state) }
             }
-            
+
             override fun onClose() {
                 scope.launch {
                     vm.clearAddMeet()

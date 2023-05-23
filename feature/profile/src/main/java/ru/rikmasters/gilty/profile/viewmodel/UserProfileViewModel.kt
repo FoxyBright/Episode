@@ -1,13 +1,16 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
+import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -43,9 +46,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
     
-    private val _username = MutableStateFlow<String?>(null)
-    private val username = _username.asStateFlow()
-    
     @OptIn(ExperimentalCoroutinesApi::class)
     val meetsTest by lazy {
         refresh.flatMapLatest {
@@ -62,24 +62,26 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val refresh = MutableStateFlow(false)
     
+    private val _username = MutableStateFlow("")
+    val username = _username.asStateFlow()
+    
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val usernameDebounced = username
         .debounce(250)
-        .onEach {
-            it?.let { name ->
-                _occupied.emit(
-                    regManager.isNameOccupied(name)
-                            && profileManager
-                        .getProfile(false)
-                        .username != name
-                )
-            }
+        .onEach { name ->
+            _occupied.emit(
+                if(name == profile.value?.username) false
+                else regManager.isNameOccupied(name).log()
+            )
         }
-        .state(_username.value, SharingStarted.Eagerly)
+        .state(_username.value, Eagerly)
     
     private val _photoViewState = MutableStateFlow(false)
     val photoViewState = _photoViewState.asStateFlow()
+
+    private val _activeAlbumId = MutableStateFlow<Int?>(null)
+    val activeAlbumId = _activeAlbumId.asStateFlow()
     
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
@@ -95,6 +97,15 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         _viewerImages.emit(list)
     }
     
+    suspend fun updateUserData() {
+        _profile.emit(
+            profileManager.getProfile(true)
+        )
+    }
+    suspend fun changeActiveAlbumId(id:Int?){
+        Log.d("Hello", id.toString())
+        _activeAlbumId.emit(id)
+    }
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
@@ -106,11 +117,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun changeUsername(name: String) {
         _username.emit(name)
-        _profile.emit(
-            profile.value?.copy(
-                username = username.value
-            )
-        )
     }
     
     private val _alert = MutableStateFlow(false)
@@ -153,12 +159,14 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun changeDescription(text: String) {
-        _description.emit(text)
-        _profile.emit(
-            profile.value?.copy(
-                aboutMe = description.value
+        if(text.length <= 120) {
+            _description.emit(text)
+            _profile.emit(
+                profile.value?.copy(
+                    aboutMe = description.value
+                )
             )
-        )
+        }
     }
     
     suspend fun updateDescription() {

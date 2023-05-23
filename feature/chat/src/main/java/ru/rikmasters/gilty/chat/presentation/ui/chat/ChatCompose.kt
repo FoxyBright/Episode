@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R.string.*
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -50,7 +50,7 @@ private fun ChatPreview() {
         ChatContent(
             state = ChatState(
                 ChatAppBarState(
-                    name = "Название встречи",
+                    name = "",
                     avatar = DemoAvatarModel,
                     memberCount = 10,
                     chatType = TRANSLATION,
@@ -61,21 +61,19 @@ private fun ChatPreview() {
                 ),
                 answer = DemoMessageModel,
                 meet = DemoMeetingModel,
-                messageText = "Вводимое сообщение",
+                messageText = "",
                 messageList = pagingPreview(DemoMessageModelList),
-                userId = "id",
+                userId = "",
                 alert = false,
                 meetAlert = false,
                 kebabMenuState = false,
                 messageMenuState = false,
                 imageMenuState = false,
                 listState = LazyListState(),
-                unReadCount = 10,
-                writingUsers = listOf(Pair("id", DemoThumbnailModel))
+                unreadCount = 10,
+                writingUsers = listOf(Pair("", DemoThumbnailModel))
             ),
-            modifier = Modifier.background(
-                colorScheme.background
-            )
+            modifier = Modifier.background(colorScheme.background)
         )
     }
 }
@@ -93,7 +91,7 @@ data class ChatState(
     val messageMenuState: Boolean,
     val imageMenuState: Boolean,
     val listState: LazyListState,
-    val unReadCount: Int,
+    val unreadCount: Int,
     val writingUsers: List<Pair<String, ThumbnailModel>>,
     
     val photoViewState: Boolean = false,
@@ -144,15 +142,6 @@ fun ChatContent(
                 callback
             )
         },
-        floatingActionButton = {
-            ChatFloatingButton(
-                state.listState,
-                state.unReadCount,
-                state.meet.isOnline,
-                Modifier,
-                { callback?.onListDown() }
-            ) { callback?.onDownButtonClick() }
-        },
         bottomBar = {
             ChatBottomBar(
                 state.imageMenuState,
@@ -162,6 +151,15 @@ fun ChatContent(
                 Modifier.imePadding(),
                 callback
             )
+        },
+        floatingActionButton = {
+            ChatFloatingButton(
+                state.listState,
+                state.unreadCount,
+                state.meet.isOnline,
+                Modifier,
+                { callback?.onListDown() }
+            ) { callback?.onDownButtonClick() }
         },
         content = {
             Content(
@@ -225,10 +223,7 @@ private fun Content(
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(
         modifier
-            .padding(top = padding.calculateTopPadding(),
-                bottom = state.answer?.let {
-                    300.dp
-                } ?: 200.dp)
+            .padding(padding)
             .fillMaxSize()
             .background(colors.chatBack),
         state.listState,
@@ -286,7 +281,7 @@ private fun Writing(
                 Modifier.padding(start = 6.dp)
             else
                 Modifier.offset((-16).dp)
-            GCashedImage(
+            GCachedImage(
                 it.url, mod
                     .size(24.dp)
                     .clip(CircleShape),

@@ -10,7 +10,7 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
@@ -28,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.*
@@ -121,26 +122,35 @@ fun SwipeableChatRow(
     onClick: ((ChatModel) -> Unit)? = null,
     onSwiped: ((ChatModel) -> Unit)? = null,
 ) {
+    var isBackgroundVisible by remember {
+        mutableStateOf(false)
+    }
+    
+    LaunchedEffect(state.offset.targetValue.x) {
+        isBackgroundVisible = state.offset
+            .targetValue.x != 0.0f
+    }
+    
     Box(
         modifier
             .fillMaxWidth()
             .background(
-                colorScheme.primary,
-                shape
+                color = if(isBackgroundVisible)
+                    colorScheme.primary
+                else Color.Transparent,
+                shape = shape
             )
     ) {
-        SwipeableRowBack(
-            Modifier.align(CenterEnd)
-        )
+        SwipeableRowBack(Modifier.align(CenterEnd))
         Row(
             Modifier.swipeableRow(
                 state, LocalContext.current
             ) { onSwiped?.let { it(chat) } },
             Center, CenterVertically
         ) {
-            ChatRowContent(
-                Modifier, chat, shape,
-            ) { onClick?.let { it(chat) } }
+            ChatRowContent(Modifier, chat, shape) {
+                onClick?.let { it(chat) }
+            }
         }
     }
 }
@@ -265,7 +275,7 @@ private fun Message(
         )
         BrieflyRow(
             "${user.username}${
-                if (user.age in 18..99) {
+                if(user.age in 18..99) {
                     ", ${user.age}"
                 } else ""
             }",
@@ -332,7 +342,7 @@ private fun Avatar(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
-        GCashedImage(
+        GCachedImage(
             avatar?.thumbnail?.url, Modifier
                 .padding(start = 4.dp)
                 .size(52.dp)

@@ -4,6 +4,7 @@ import android.content.res.Resources.getSystem
 import android.util.Log
 import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
@@ -14,6 +15,7 @@ import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
+import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -24,9 +26,7 @@ class MeetingWebSource: KtorSource() {
         val photoAccess: Boolean,
     )
     
-    private fun getLocale() = getLocales(
-        getSystem().configuration
-    )[0]?.language?.uppercase() ?: "RU"
+    private fun getLocale() = "RU"
     
     suspend fun getCities(
         query: String,
@@ -261,7 +261,9 @@ class MeetingWebSource: KtorSource() {
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ) = post("http://$HOST$PREFIX_URL/meetings") {
+    ) = unExpectPost(
+        "http://$HOST$PREFIX_URL/meetings"
+    ) {
         setBody(
             MeetingRequest(
                 categoryId, type, isOnline, condition,
@@ -272,10 +274,10 @@ class MeetingWebSource: KtorSource() {
                 requirements, withoutResponds
             )
         )
-    }?.let {
+    }.let {
         Log.d("TEST","ADD MEET RESPONSE ${it.status} WRAPPED ${it.wrapped<DetailedMeetResponse>()}")
-        if(it.status == OK)
+        if(it.status == Created)
             it.wrapped<DetailedMeetResponse>().id
-        else null
-    } ?: ""
+        else "error" + it.errorWrapped().error.message
+    }
 }

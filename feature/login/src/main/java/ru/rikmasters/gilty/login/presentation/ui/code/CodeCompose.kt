@@ -11,7 +11,7 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import ru.rikmasters.gilty.shared.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.BackBlur
@@ -110,7 +111,14 @@ fun CodeContent(
             ) { callback?.onCodeSend() }
         }
     }
-    if(state.blur) BadCode { callback?.onBlur() }
+    
+    if(state.blur) {
+        LaunchedEffect(Unit) {
+            delay(2000)
+            callback?.onBlur()
+        }
+        BadCode { callback?.onBlur() }
+    }
 }
 
 @Composable
@@ -126,7 +134,7 @@ private fun BadCode(
             Modifier
                 .fillMaxSize()
                 .align(Center),
-            Top, CenterHorizontally
+            Arrangement.Center, CenterHorizontally
         ) {
             GEmojiImage(
                 badEmoji,

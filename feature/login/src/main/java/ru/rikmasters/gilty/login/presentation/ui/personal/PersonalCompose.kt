@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.GenderType.Companion.shortGenderList
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -41,7 +41,7 @@ interface PersonalCallback {
 
 data class PersonalState(
     val age: Int? = null,
-    val selectGender: Int? = null
+    val gender: Int? = null,
 )
 
 @Composable
@@ -61,7 +61,7 @@ fun PersonalContent(
                     .padding(top = 24.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             Card(
                 { callback?.onAgeClick() }, Modifier
@@ -71,9 +71,12 @@ fun PersonalContent(
                 shape = shapes.large,
                 colors = cardColors(colorScheme.primaryContainer)
             ) {
+                val age = state.age?.let {
+                    if(it in 18..99)
+                        "$it" else stringResource(R.string.condition_no_matter)
+                } ?: stringResource(R.string.personal_info_age_placeholder)
                 Text(
-                    "${state.age ?: stringResource(R.string.personal_info_age_placeholder)}",
-                    Modifier.padding(16.dp),
+                    age, Modifier.padding(16.dp),
                     if(state.age == null)
                         colorScheme.onTertiary
                     else colorScheme.tertiary,
@@ -87,7 +90,7 @@ fun PersonalContent(
                     .padding(top = 24.dp)
                     .padding(horizontal = 16.dp),
                 colorScheme.tertiary,
-                style = typography.titleLarge
+                style = typography.labelLarge
             )
             Card(
                 Modifier
@@ -96,17 +99,16 @@ fun PersonalContent(
                 shapes.large,
                 cardColors(colorScheme.primaryContainer)
             ) {
-                val sexList = GenderType.values().toList()
                 LazyRow(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    items(sexList.size) {
+                    items(shortGenderList.size) {
                         GChip(
                             Modifier.padding(end = 12.dp),
-                            sexList[it].value,
-                            (state.selectGender == it)
+                            shortGenderList[it].value,
+                            (state.gender == it)
                         ) { callback?.onGenderChange(it) }
                     }
                 }
@@ -117,7 +119,8 @@ fun PersonalContent(
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp)
                 .align(BottomCenter),
-            stringResource(R.string.next_button), (true)
+            stringResource(R.string.next_button),
+            (state.age != null && state.gender != null)
         ) { callback?.onNext() }
     }
 }

@@ -9,7 +9,6 @@ import ru.rikmasters.gilty.shared.theme.Colors.AlmostDark
 import ru.rikmasters.gilty.shared.theme.Colors.AlmostRed
 import ru.rikmasters.gilty.shared.theme.Colors.Anthracite
 import ru.rikmasters.gilty.shared.theme.Colors.Ash
-import ru.rikmasters.gilty.shared.theme.Colors.Asphalt
 import ru.rikmasters.gilty.shared.theme.Colors.Black
 import ru.rikmasters.gilty.shared.theme.Colors.DimGrin
 import ru.rikmasters.gilty.shared.theme.Colors.DimRed
@@ -23,7 +22,6 @@ import ru.rikmasters.gilty.shared.theme.Colors.PreDark
 import ru.rikmasters.gilty.shared.theme.Colors.SaladGrin
 import ru.rikmasters.gilty.shared.theme.Colors.Silver
 import ru.rikmasters.gilty.shared.theme.Colors.SuperDark
-import ru.rikmasters.gilty.shared.theme.Colors.Twilight
 import ru.rikmasters.gilty.shared.theme.Colors.White
 import ru.rikmasters.gilty.shared.theme.Colors.YellowGrin
 import ru.rikmasters.gilty.shared.theme.Colors.Zircon
@@ -31,7 +29,8 @@ import ru.rikmasters.gilty.shared.theme.Colors.Zircon
 
 @Deprecated(
     "Надо использовать тему",
-    ReplaceWith("MaterialTheme.colorScheme", "androidx.compose.material3.MaterialTheme")
+    ReplaceWith("MaterialTheme.colorScheme",
+        "androidx.compose.material3.MaterialTheme")
 )
 
 @Suppress("unused")
@@ -39,82 +38,68 @@ object Colors {
     
     /*     UNIVERSAL COLORS    */
     val White = Color(0xFFFFFFFF) // ContainerDay && TextNight
-    val Black = Color(0xFF000000) // ContainerDay && TextNight
-    val AlmostRed = Color(0xFFFF4745) // PrimaryRed
-    val Green = Color(0xFF35C65A) // PrimaryGreen
-    val YellowGrin = Color(0xFFBCF028) // GreenGradient1
-    val SaladGrin = Color(0xFF8DE139) // GreenGradient2
-    val LightGrin = Color(0xFF34C559) // GreenGradient3
-    val DimGrin = Color(0xFF88DB9E) // GreenInactive
-    val OrangeRed = Color(0xFFFF6645) // RedGradient1
-    val FireRed = Color(0xFFDF2B4B) // RedGradient2
-    val DimRed = Color(0xFFFD7C7A) // RedInactive
+    val Black = Color(0xFF000000) // Just Black
+    val AlmostRed = Color(0xFFFF2E00) // PrimaryRed
+    val Green = Color(0xFF09D93E) // PrimaryGreen
+    val YellowGrin = Color(0xFFB9F905) // GreenGradient1
+    val SaladGrin = Color(0xFF91F132) // GreenGradient2
+    val LightGrin = Color(0xFF2DE45C) // GreenGradient3
+    val DimGrin = Color(0xFF66EE89) // GreenInactive
+    val OrangeRed = Color(0xFFFF5E2B) // RedGradient1
+    val FireRed = Color(0xFFFF002D) // RedGradient2
+    val DimRed = Color(0xFFFF6462) // RedInactive
     
     /*     DAY COLORS    */
     val LightGray = Color(0xFFF6F6F6) // BackgroundDay
     val PreDark = Color(0xFF1C1B1F) // TextDay
     val Silver = Color(0xFFAEAAAE) // TextSecondaryDay
     val Anthracite = Color(0xFFDFDFDF) // SeparatorDay
-    val Ash = Color(0xFFC9C5CA) // ArrowDay
+    val Ash = Color(0xFFC9C5CA) // ArrowDay && GrayNight
     
     /*     NIGHT COLORS    */
-    val AlmostDark = Color(0xFF1C1C1D) // ContainerNight
+    val AlmostDark = Color(0xFF1C1C1D) // ContainerNight && TextFieldNight
     val Zircon = Color(0xFF98989F) // TextSecondaryNight
     val Lead = Color(0xFF464649) // SeparatorNight
     val WetAsh = Color(0xFFCAC4D0) // ArrowNight
-    val Asphalt = Color(0xFF767373) // GrayNight
-    val SuperDark = Color(0xFF1B1B1B) // GradientButtonNight
-    val Twilight = Color(0xFF353535) // TextFieldNight
+    val SuperDark = Color(0x1FE3E3E3) // GradientButtonNight
     
     /*     CATEGORY COLORS    */
     //                                       Day
-    val Orange = Color(0xFFFF9500)
-    val Yellow = Color(0xFFFFB800)
-    val Red = Color(0xFFC60000)
-    val Blue = Color(0xFF33A9FE)
-    val Cyan = Color(0xFF00B8F2)
-    val Purple = Color(0xFF6061B8)
+    val Orange = Color(0xFFFF7A00)
+    val Yellow = Color(0xFFFFBA1C)
+    val Red = Color(0xFFE20000)
+    val Blue = Color(0xFF13CCF4)
+    val Cyan = Color(0xFF049FD0)
+    val Purple = Color(0xFF7678DA)
     
     //                                       Night
-    val DarkOrange = Color(0xFFFF9F0A)
-    val DarkYellow = Color(0xFFFFC42C)
-    val DarkRed = Color(0xFFFF0000)
-    val DarkBlue = Color(0xFF2DC2FF)
-    val DarkCyan = Color(0xFF29B2FF)
-    val DarkPurple = Color(0xFF5E5CE6)
+    val DarkOrange = Color(0xFFFD8E28)
+    val DarkYellow = Color(0xFFFFD800)
+    val DarkRed = Color(0xFFF52626)
+    val DarkBlue = Color(0xFF35D9FD)
+    val DarkCyan = Color(0xFF00ADE3)
+    val DarkPurple = Color(0xFF8284EC)
     
     /*     ANOTHER COLORS    */
     val Gray = Color(0xFFE9E9EA)
     val Border = Color(0xFFB0B0B0)
-    val lockColors = Color(0xFF787579)
-    val lockColorsBackgroundDay = Color(0xFFB3B3B3)
     val meetingCardBackBackgroundNight = Color(0xFF303030)
-    val lockColorsBackgroundNight = Color(0xFF222222)
-    val LightPink = Color(0x32FF4745)
+    val LightPink = Color(0x33FF4745)
     val RottenPlum = Color(0xFF49454F)
-    val Pinky = Color(0xFFF6EDEC)
-    val GentlePinky = Color(0xFFF8D3D3)
-    val RudePinky = Color(0xFF330E0E)
-    val AdditionalWhite = Color(0xFFFEFEFE)
-    val DoubleAddWhite = Color(0xFFEFEFEF)
-    val LightGreen = Color(0xFFCFECD7)
+    val Pinky = Color(0xFFFFEDEB)
+    val LightGreen = Color(0x3335C65A)
     val BlackerWhite = Color(0xFFF0F0F0)
     val DarkShadow = Color(0xFF212122)
     val WhiteShadow = Color(0xFFF7F7F7)
-    val RatGray = Color(0xFF49454F)
     val NickelGray = Color(0xFFE0E0E0)
-    val NickelDarkGray = Color(0xFF484649)
     val halfTransparentlyGray = Color(0x80C4C4C4)
+    val gripGrayDark = Color(0xFF767373)
     // Add new colors
 
 
     // Translations
     val thirdOpaqueGray = Color(0x305E5E5E)
-    val bottomSheetGray = Color(0xFFAEAAAE)
     val blackSeventy = Color(0x70000000)
-    val mainCard = Color(0xFF1C1C1D)
-    val mainGreen = Color(0xFF09D93E)
-    val greenInactive = Color(0xFF66EE89)
     val textField = Color(0xFF49454F)
 }
 
@@ -159,7 +144,7 @@ val LightColorScheme = lightColorScheme(
 val DarkColorScheme = darkColorScheme(
     outline = Lead, // separator
     outlineVariant = Ash, // arrow
-    scrim = Asphalt, // gray2
+    scrim = Ash, // gray2
     surface = YellowGrin, // green1
     onSurface = SaladGrin, //green2
     surfaceTint = LightGrin, //green 3
@@ -175,6 +160,6 @@ val DarkColorScheme = darkColorScheme(
     primaryContainer = AlmostDark, // CardBack
     inversePrimary = SuperDark, // darkRedInactive
     inverseSurface = SuperDark, // darkGrinInactive
-    onPrimaryContainer = Twilight // TextBox
+    onPrimaryContainer = AlmostDark // TextBox
     // Add in scheme
 )

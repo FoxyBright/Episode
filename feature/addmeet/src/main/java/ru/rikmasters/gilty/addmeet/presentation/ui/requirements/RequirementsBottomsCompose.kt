@@ -28,7 +28,7 @@ fun GenderPreview() {
     GiltyTheme {
         SelectBottom(
             stringResource(R.string.sex),
-            GenderType.shortList
+            GenderType.shortGenderList
                 .map { it.value },
             (1), false
         )

@@ -169,10 +169,6 @@ fun MeetingBsContent(
     val bsState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(Collapsed)
     )
-    //    val alpha = animateFloatAsState(
-    //            if(bsState.bottomSheetState.isCollapsed)
-    //                0f else 0.5f
-    //        ).value
     BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)
@@ -201,10 +197,10 @@ fun MeetingBsContent(
                     }
                 }
             }) {
-                // Негативный паддинг ))))))))))
                 MeetContent(
                     state, modifier.padding(
-                        bottom = it.calculateBottomPadding() // - 24.dp
+                        bottom = if(it.calculateBottomPadding() >= 0.dp)
+                            it.calculateBottomPadding() - 24.dp else 0.dp
                     ), callback
                 )
             }

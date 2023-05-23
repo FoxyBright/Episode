@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -64,7 +64,7 @@ fun BrieflyRow(
     }
     Row(modifier, Start, CenterVertically) {
         image?.let {
-            GCashedImage(
+            GCachedImage(
                 image, Modifier
                     .padding(end = 12.dp)
                     .size(38.dp)

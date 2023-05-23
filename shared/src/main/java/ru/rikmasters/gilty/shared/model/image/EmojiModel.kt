@@ -30,6 +30,9 @@ data class EmojiModel(
         )
         
         val badEmoji = list[1]
+        
+        val flyingDollar = EmojiModel("FLYING_DOLLAR", "$ic_money")
+        
         fun getEmoji(icon: String) = when(icon) {
             "HEART_EYES" -> list[0]
             "EXPRESSIONLESS" -> list[1]

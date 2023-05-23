@@ -103,7 +103,7 @@ private fun DateTimePickerContent(
                 state.date.ifBlank {
                     "$LOCAL_DATE$ZERO_TIME"
                 }, getDate(),
-                Modifier.weight(2.5f), {
+                Modifier.weight(2.4f), {
                     it.format("E dd MMM")
                         .replaceFirstChar { c ->
                             c.uppercase()

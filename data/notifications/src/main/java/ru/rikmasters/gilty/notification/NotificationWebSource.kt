@@ -17,11 +17,14 @@ import ru.rikmasters.gilty.shared.wrapper.wrapped
 class NotificationWebSource: KtorSource() {
     
     // выставление реакции на встречу или пользователю
-    suspend fun putRatings(meetId: String, userId: String, emoji: String) {
+    suspend fun putRatings(meetId: String, userId: String, emoji: String) :Boolean{
         data class Ratings(val ratings: List<PutRatingRequest>)
         put("http://$HOST$PREFIX_URL/meetings/$meetId/ratings") {
             setBody(Ratings(listOf(PutRatingRequest(userId, emoji))))
+        }?.let {
+            return it.status.value == 200
         }
+        return false
     }
     
     // удаление уведомления

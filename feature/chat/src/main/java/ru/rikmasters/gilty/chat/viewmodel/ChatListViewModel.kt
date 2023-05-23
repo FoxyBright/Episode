@@ -14,7 +14,7 @@ import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
-import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MEETING_DATE
+import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MESSAGE_DATE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 
 class ChatListViewModel: ViewModel(), PullToRefreshTrait {
@@ -38,8 +38,11 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val refresh = MutableStateFlow(false)
     
-    private val _sortType = MutableStateFlow(MEETING_DATE)
+    private val _sortType = MutableStateFlow<SortTypeModel?>(null)
     val sortType = _sortType.asStateFlow()
+
+    private val _isArchiveOn = MutableStateFlow(false)
+    val isArchiveOn = _isArchiveOn.asStateFlow()
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
@@ -68,7 +71,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         combine(refresh, _sortType) { refresh, sort ->
             Pair(refresh, sort)
         }.flatMapLatest {
-            chatManager.getChats(it.second)
+            chatManager.getChats(it.second?:MESSAGE_DATE)
         }.cachedIn(coroutineScope)
     }
     
@@ -80,8 +83,12 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         _alertSelected.emit(index)
     }
     
-    suspend fun changeSortType(sortType: SortTypeModel) {
+    suspend fun changeSortType(sortType: SortTypeModel?) {
         _sortType.emit(sortType)
+    }
+
+    suspend fun changeIsArchiveOn(){
+        _isArchiveOn.emit(!_isArchiveOn.value)
     }
     
     suspend fun deleteChat(

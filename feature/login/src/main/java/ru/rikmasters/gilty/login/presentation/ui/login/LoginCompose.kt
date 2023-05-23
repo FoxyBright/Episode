@@ -7,16 +7,18 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
@@ -31,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.auth.login.*
 import ru.rikmasters.gilty.feature.login.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.country.Country
 import ru.rikmasters.gilty.shared.country.DemoCountry
 import ru.rikmasters.gilty.shared.shared.ActionBar
@@ -129,7 +132,20 @@ fun LoginContent(
             Modifier.weight(1f),
             Top, CenterHorizontally,
         ) {
-            external?.let { Logo(Modifier.weight(1f)) }
+            external?.let {
+                BoxWithConstraints(
+                    Modifier
+                        .fillMaxWidth(0.8f)
+                        .fillMaxHeight(0.3f)
+                        .padding(horizontal = 16.dp),
+                    TopCenter
+                ) {
+                    Image(
+                        painterResource(SR.drawable.ic_logo),
+                        (null), Modifier.padding(top = maxHeight / 2)
+                    )
+                }
+            }
             
             if(external.isNullOrBlank())
                 TopBar(state.method) { callback?.onBack() }
@@ -158,27 +174,15 @@ fun LoginContent(
             }
         }
         external?.let {
-            Spacer(Modifier.weight(0.1f))
             ConfirmationPolicy(
-                Modifier.fillMaxWidth(),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
                 callback
             )
-            Spacer(Modifier.weight(0.1f))
+            Spacer(Modifier.weight(0.05f))
         }
     }
-}
-
-@Composable
-private fun Logo(
-    modifier: Modifier = Modifier,
-) {
-    Image(
-        painterResource(SR.drawable.ic_logo),
-        stringResource(SR.string.episode_logo),
-        modifier
-            .heightIn(64.dp, 210.dp)
-            .padding(horizontal = 16.dp)
-    )
 }
 
 @Composable
@@ -201,11 +205,7 @@ private fun LoginMethodsButtons(
     methods: List<LoginMethod>,
     callback: LoginCallback? = null,
 ) {
-    Box(
-        modifier
-            .height(290.dp)
-            .padding(horizontal = 16.dp)
-    ) {
+    Box(modifier) {
         AnimatedVisibility(
             methods.isNotEmpty(),
             enter = fadeIn(),
@@ -217,11 +217,10 @@ private fun LoginMethodsButtons(
             ) {
                 Text(
                     stringResource(R.string.alternative_separator),
-                    Modifier.padding(top = 20.dp),
+                    Modifier.padding(vertical = 20.dp),
                     style = typography.labelSmall,
                     color = colorScheme.onTertiary
                 )
-                Spacer(Modifier.height(8.dp))
                 methods.forEach {
                     LoginMethodButton(it) { method ->
                         callback?.loginWith(method)
@@ -242,39 +241,48 @@ private val LoginMethod.icon
     )
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun LoginMethodButton(
     method: LoginMethod,
     modifier: Modifier = Modifier,
     onClick: (LoginMethod) -> Unit,
 ) {
-    Button(
-        { onClick(method) },
-        modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp)
+    Card(
+        onClick = { onClick(method) },
+        modifier = modifier
+            .padding(bottom = 12.dp)
             .padding(horizontal = 16.dp),
-        colors = buttonColors(colorScheme.primaryContainer)
+        shape = CircleShape,
+        colors = cardColors(
+            containerColor = colorScheme
+                .primaryContainer,
+        )
     ) {
-        Row(
-            Modifier
-                .padding(start = 8.dp)
-                .fillMaxWidth(3f / 4f),
-            verticalAlignment = CenterVertically
-        ) {
-            Image(
-                method.icon, (null), Modifier
-                    .padding(end = 18.dp)
-                    .padding(vertical = 10.dp),
-                colorFilter = if(method.name != "Apple")
-                    null else tint(colorScheme.tertiary)
-            )
-            Text(
-                stringResource(R.string.login_via, method.name),
-                style = typography.bodyMedium,
-                fontWeight = Bold,
-                color = colorScheme.tertiary
-            )
-        }
+        Box(Modifier.fillMaxWidth(), Center)
+        { ExternalLabel(method) }
+    }
+}
+
+@Composable
+private fun ExternalLabel(method: LoginMethod) {
+    Row(
+        Modifier.fillMaxWidth(0.65f),
+        verticalAlignment = CenterVertically
+    ) {
+        Image(
+            method.icon, (null),
+            Modifier.padding(end = 20.dp),
+            colorFilter = if(method.name != "Apple")
+                null else tint(colorScheme.tertiary)
+        )
+        Text(
+            stringResource(R.string.login_via, method.name),
+            Modifier.padding(vertical = 17.dp),
+            style = typography.bodyMedium.copy(
+                colorScheme.tertiary,
+                16.dp.toSp(), Bold,
+            ),
+        )
     }
 }
 

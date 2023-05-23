@@ -19,21 +19,24 @@ class RegistrationManager(
         profileStore.checkCompletable()
     }
     
-    suspend fun storageProfile() = withContext(IO) {
-        profileStore.storageProfile()?.map()
+    suspend fun clearProfile() {
+        profileStore.deleteProfile()
     }
     
     suspend fun userId() = withContext(IO) {
         profileStore.getProfile(false).id
     }
     
-    suspend fun getProfile() = withContext(IO) {
-        profileStore.getProfile(true)
+    suspend fun getProfile(forceWeb: Boolean = true) = withContext(IO) {
+        profileStore.getProfile(forceWeb)
     }
     
     suspend fun getHidden(albumId: String) = withContext(IO) {
-        profileWebSource.getFiles(albumId)
-            .map { it.thumbnail?.url ?: "" }
+        val response = profileWebSource.getFiles(albumId)
+        Pair(
+            response.first.map { it.map().thumbnail.url },
+            response.second
+        )
     }
     
     suspend fun setAvatar(file: File, points: List<Float>) {
@@ -48,7 +51,11 @@ class RegistrationManager(
     
     suspend fun deleteHidden(files: List<String>) {
         withContext(IO) {
-            files.forEach { profileStore.deleteHidden(it) }
+            files.forEach {
+                profileStore.deleteHidden(
+                    it.substring("thumbnails/", "?")
+                )
+            }
         }
     }
     
@@ -58,11 +65,10 @@ class RegistrationManager(
         }
     }
     
-    suspend fun isNameOccupied(
-        name: String,
-    ) = withContext(IO) {
-        profileWebSource.checkUserName(name)
-    }
+    suspend fun isNameOccupied(name: String) =
+        withContext(IO) {
+            profileWebSource.checkUserName(name)
+        }
     
     suspend fun userUpdateData(
         username: String? = null,
@@ -78,3 +84,8 @@ class RegistrationManager(
         }
     }
 }
+
+private fun String.substring(
+    after: String, before: String,
+) = this.substringAfter(after)
+    .substringBefore(before)

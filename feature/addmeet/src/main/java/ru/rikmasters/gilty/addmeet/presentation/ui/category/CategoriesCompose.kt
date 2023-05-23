@@ -47,18 +47,19 @@ fun CategoriesContent(
     callback: CategoriesCallback? = null,
 ) {
     Scaffold(
-        modifier,
+        modifier = modifier,
         topBar = {
             ClosableActionBar(
-                stringResource(R.string.add_meet_create_title),
-                Modifier,
-                stringResource(R.string.add_meet_create_description),
-                { callback?.onCloseAlert(true) }
+                title = stringResource(R.string.add_meet_create_title),
+                details = stringResource(R.string.add_meet_create_description),
+                onClose = { callback?.onCloseAlert(true) }
             )
         },
         bottomBar = {
             Dashes(
-                (4), (0), Modifier
+                count = 4,
+                active = 0,
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 48.dp)
                     .padding(horizontal = 16.dp),
@@ -71,15 +72,20 @@ fun CategoriesContent(
         if(LocalInspectionMode.current)
             BubblesForPreview(state, callback)
         else Bubbles(
-            state.categoryList,
-            CATEGORY_ELEMENT_SIZE.dp,
-            Modifier
+            data = state.categoryList,
+            elementSize = CATEGORY_ELEMENT_SIZE.dp,
+            modifier = Modifier
                 .padding(it)
-                .padding(top = 8.dp),
+                .padding(
+                    top = 30.dp,
+                    bottom = 10.dp
+                ),
         ) { element ->
             CategoryItem(
-                element.name, element.emoji, element.color,
-                (element == state.selectCategory), modifier
+                name = element.name,
+                icon = element.emoji,
+                color = element.color,
+                state = element == state.selectCategory,
             ) { callback?.onCategoryClick(element) }
         }
     }

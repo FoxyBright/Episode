@@ -29,7 +29,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
@@ -59,7 +59,7 @@ fun MeetReaction(
     val scope = rememberCoroutineScope()
     if(state) Popup {
         Box(modifier.fillMaxSize()) {
-            GCashedImage(
+            GCachedImage(
                 meet.organizer.avatar?.thumbnail?.url,
                 Modifier.fillMaxSize(),
                 contentScale = Crop

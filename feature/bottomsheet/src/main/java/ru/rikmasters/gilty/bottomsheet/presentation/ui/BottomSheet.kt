@@ -28,9 +28,9 @@ import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
-import ru.rikmasters.gilty.yandexmap.MapApps
-import ru.rikmasters.gilty.yandexmap.YandexMapScreen
-import ru.rikmasters.gilty.yandexmap.YandexMapViewModel
+import ru.rikmasters.gilty.yandexmap.presentation.MapAppsBs
+import ru.rikmasters.gilty.yandexmap.presentation.YandexMapScreen
+import ru.rikmasters.gilty.yandexmap.viewmodel.YandexMapViewModel
 
 @Composable
 fun BottomSheet(
@@ -115,7 +115,7 @@ fun BottomSheet(
                         "https://maps.google.com/?daddr=$lat%2C$lng&zoom=18"
                     val yandexMap =
                         "https://maps.yandex.ru/?pt=$lng%2C$lat&z=18"
-                    MapApps(
+                    MapAppsBs(
                         alert, appIndex, Modifier, { state ->
                             if(state) {
                                 openInWeb(
@@ -139,6 +139,17 @@ fun BottomSheet(
                 setStringArg("category", ""),
             )
         ) { stack ->
+
+            LaunchedEffect(key1 = Unit, block = {
+                asm.bottomSheet.swipeableState.currentScreenName.value = "Map"
+            })
+
+            DisposableEffect(key1 = Unit, effect = {
+                onDispose {
+                    asm.bottomSheet.swipeableState.currentScreenName.value = ""
+                }
+            })
+
             stack.GetStringArg("location") { location ->
                 stack.GetStringArg("category") { category ->
                     Connector<YandexMapViewModel>(scope) {

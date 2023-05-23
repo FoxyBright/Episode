@@ -64,51 +64,82 @@ fun GradientButton(
     shape: CornerBasedShape = shapes.extraLarge,
     smallText: String? = null,
     icon: Int? = null,
+    onDisabledClick: () -> Unit = {},
     onClick: () -> Unit,
 ) {
-    val inverse = if(online) listOf(
-        colorScheme.inverseSurface,
-        colorScheme.inverseSurface
-    ) else listOf(
-        colorScheme.inversePrimary,
-        colorScheme.inversePrimary
-    )
-    Card(
-        onClick, modifier.fillMaxWidth(),
-        enabled, shape, cardColors(
-            containerColor = Transparent,
-            disabledContainerColor = Transparent,
+    val color = when {
+        enabled && online -> green()
+        enabled && !online -> red()
+        !enabled && online -> listOf(
+            colorScheme.inverseSurface,
+            colorScheme.inverseSurface
+        )
+        else -> listOf(
+            colorScheme.inversePrimary,
+            colorScheme.inversePrimary
+        )
+    }
+    Box(
+        modifier.background(
+            color = colorScheme.background,
+            shape = shape
         )
     ) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .background(
-                    if(online) linearGradient(
-                        if(enabled) green()
-                        else inverse
-                    )
-                    else linearGradient(
-                        if(enabled) red()
-                        else inverse
-                    ), shape
-                )
-                .padding(vertical = smallText?.let { 8.dp } ?: 16.dp), Center
+        Card(
+            onClick = if(enabled) onClick
+            else onDisabledClick,
+            modifier = Modifier.fillMaxWidth(),
+            shape = shape,
+            colors = cardColors(
+                containerColor = Transparent,
+                disabledContainerColor = Transparent,
+            )
         ) {
-            Row(Modifier, Start, CenterVertically) {
-                icon?.let {
-                    Image(
-                        painterResource(it),
-                        null,
-                        Modifier.padding(end = 6.dp)
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        linearGradient(color),
+                        shape
                     )
-                }
-                Column(Modifier, Top, CenterHorizontally) {
-                    Text(text, style = typography.bodyLarge.copy(White))
-                    smallText?.let {
-                        Text(it, style = typography.headlineSmall.copy(White))
-                    }
-                }
+                    .padding(
+                        vertical = smallText
+                            ?.let { 8.dp } ?: 16.dp
+                    ), Center
+            ) { ButtonText(icon, text, smallText) }
+        }
+    }
+}
+
+@Composable
+private fun ButtonText(
+    icon: Int?,
+    text: String,
+    smallText: String?,
+) {
+    Row(
+        Modifier, Start,
+        CenterVertically
+    ) {
+        icon?.let {
+            Image(
+                painterResource(it), (null),
+                Modifier.padding(end = 6.dp)
+            )
+        }
+        Column(
+            Modifier, Top,
+            CenterHorizontally
+        ) {
+            Text(
+                text, style = typography
+                    .bodyLarge.copy(White)
+            )
+            smallText?.let {
+                Text(
+                    it, style = typography
+                        .headlineSmall.copy(White)
+                )
             }
         }
     }

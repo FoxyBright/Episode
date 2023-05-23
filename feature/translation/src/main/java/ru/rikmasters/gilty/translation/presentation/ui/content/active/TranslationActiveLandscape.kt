@@ -5,24 +5,10 @@ import android.view.SurfaceHolder
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,19 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.model.ConnectionStatus
-import ru.rikmasters.gilty.translation.presentation.ui.components.CameraItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.CameraView
-import ru.rikmasters.gilty.translation.presentation.ui.components.ChangeFacingItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.ChatItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.CloseButton
-import ru.rikmasters.gilty.translation.presentation.ui.components.MembersCountItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.MicrophoneItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.StreamerItem
-import ru.rikmasters.gilty.translation.presentation.ui.components.TimerItem
+import ru.rikmasters.gilty.translation.presentation.ui.components.*
 
 @Composable
 fun TranslationActiveLandscape(
@@ -165,7 +143,7 @@ fun TranslationActiveLandscape(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            GCashedImage(
+                            GCachedImage(
                                 url = meetingModel?.organizer?.avatar?.thumbnail?.url,
                                 modifier = Modifier
                                     .size(90.dp)
@@ -344,7 +322,7 @@ fun TranslationActiveLandscape(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        GCashedImage(
+                        GCachedImage(
                             url = meetingModel?.organizer?.avatar?.thumbnail?.url,
                             modifier = Modifier
                                 .size(90.dp)
@@ -367,7 +345,7 @@ fun TranslationActiveLandscape(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        GCashedImage(
+                        GCachedImage(
                             url = meetingModel?.organizer?.avatar?.thumbnail?.url,
                             modifier = Modifier
                                 .size(90.dp)

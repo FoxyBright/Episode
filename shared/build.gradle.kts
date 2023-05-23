@@ -13,6 +13,7 @@ dependencies {
     compressor()
     dataBase()
     compose()
+    toasty()
     
     implementation("androidx.camera:camera-lifecycle:1.1.0-alpha11")
     implementation("androidx.camera:camera-camera2:1.1.0-alpha11")

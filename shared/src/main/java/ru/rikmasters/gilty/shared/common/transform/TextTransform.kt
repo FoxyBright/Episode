@@ -6,7 +6,11 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlin.math.absoluteValue
 
-fun transformationOf(mask: String, endChar: String = "") =
+fun transformationOf(
+    mask: String,
+    endChar: String = "",
+    firstChar: String = "",
+) =
     object: VisualTransformation {
         override fun filter(text: AnnotatedString): TransformedText {
             var out = ""
@@ -18,7 +22,7 @@ fun transformationOf(mask: String, endChar: String = "") =
                     maskIndex++
                 }; out += char; maskIndex++
             }
-            return TransformedText(AnnotatedString(out + endChar),
+            return TransformedText(AnnotatedString(firstChar + out + endChar),
                 object: OffsetMapping {
                     override fun originalToTransformed(offset: Int): Int {
                         val offsetValue = offset.absoluteValue

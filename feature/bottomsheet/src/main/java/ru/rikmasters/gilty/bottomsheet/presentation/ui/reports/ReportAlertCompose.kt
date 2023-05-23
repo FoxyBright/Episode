@@ -26,6 +26,6 @@ fun ReportAlert(
         modifier = Modifier,
         success = Pair(stringResource(R.string.meeting_close_button)) { onDismiss?.let { it() } },
         label = stringResource(R.string.chat_complaint_moderate),
-        title = "${stringResource(R.string.complaints_send_answer)}?"
+        title = stringResource(R.string.complaints_send_answer)
     )
 }

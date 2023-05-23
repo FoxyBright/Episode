@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.dateCalendar
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
@@ -304,7 +304,7 @@ private fun Avatar(
                 shapes.large
             )
     ) {
-        GCashedImage(
+        GCachedImage(
             avatar, Modifier
                 .fillMaxWidth()
                 .clip(shapes.large)
