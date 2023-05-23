@@ -12,12 +12,16 @@ import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.extentions.dateToMillis
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
+import java.util.Calendar
+import java.util.Date
+
 
 class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
@@ -161,5 +165,25 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     }
     suspend fun forceRefreshMembers(){
         refreshMember.emit(!refreshMember.value)
+    }
+    suspend fun splitByMonth(notifications: List<NotificationModel>): List<List<NotificationModel>?> {
+        val datesByMonth: MutableList<List<NotificationModel>?> = ArrayList()
+        var monthList: MutableList<NotificationModel>? = null
+        var currYear = 0
+        var currMonth = -1
+        val cal: Calendar = Calendar.getInstance()
+        for (notification in notifications) {
+            val date = Date(dateToMillis(notification.date))
+            cal.time = date
+            if (cal.get(Calendar.YEAR) !== currYear || cal.get(Calendar.MONTH) !== currMonth) {
+                monthList = ArrayList()
+                //datesByMonth.add(monthList)
+                datesByMonth.add(monthList)
+                currYear = cal.get(Calendar.YEAR)
+                currMonth = cal.get(Calendar.MONTH)
+            }
+            monthList!!.add(notification)
+        }
+        return datesByMonth
     }
 }

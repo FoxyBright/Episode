@@ -129,8 +129,17 @@ fun getMonth(date:String):Int{
     ).millis()
 
     return LocalDateTime(localDate).month()
-
 }
+fun dateToMillis(date:String):Long  {
+    val dateList = date.format(FORMAT).split(DASH)
+    val localDate = LocalDate.of(
+        dateList.first().toInt(),
+        dateList[1].toInt(),
+        dateList.last().toInt()
+    ).millis()
+    return localDate
+}
+
 
 fun isAfter(date1:String, date2:String):Boolean{
     val dateList1 = date1.format(FORMAT).split(DASH)

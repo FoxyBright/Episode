@@ -62,7 +62,11 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
         }
     }
-    
+
+    LaunchedEffect(key1 = notifications.itemSnapshotList.items, block = {
+        val res = vm.splitByMonth(notifications.itemSnapshotList.items)
+    })
+
     var errorState by remember {
         mutableStateOf(false)
     }
@@ -117,7 +121,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-            
+
             override fun onMeetClick(meet: MeetingModel?) {
                 scope.launch {
                     meet?.let { m ->

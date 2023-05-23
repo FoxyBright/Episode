@@ -313,8 +313,7 @@ private fun Notifications(
                         }
                     }
                     
-                    val restItems =
-                        notifications.itemSnapshotList.items.filter {
+                    val restItems = notifications.itemSnapshotList.items.filter {
                             earlierWeekControl(it.date)
                         }
                     
