@@ -4,38 +4,11 @@ import android.view.SurfaceHolder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.pedro.rtplibrary.view.AspectRatioMode
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.GCashedImage
+import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
@@ -65,14 +38,14 @@ import ru.rikmasters.gilty.translation.model.Facing
 fun CameraItem(
     enabled: Boolean,
     onClick: () -> Unit,
-    roundedBackground: Boolean = false
+    roundedBackground: Boolean = false,
 ) {
     Box(
         modifier = Modifier
             .size(46.dp)
             .clickable { onClick() }
     ) {
-        if (roundedBackground) {
+        if(roundedBackground) {
             Surface(
                 shape = CircleShape,
                 modifier = Modifier.size(46.dp),
@@ -80,7 +53,7 @@ fun CameraItem(
             ) {}
         }
         Icon(
-            painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
+            painter = if(enabled) painterResource(id = R.drawable.ic_video_active)
             else painterResource(id = R.drawable.ic_video_inactive),
             contentDescription = "turn on/off camera",
             tint = ThemeExtra.colors.white,
@@ -95,14 +68,14 @@ fun CameraItem(
 fun MicrophoneItem(
     enabled: Boolean,
     onClick: () -> Unit,
-    roundedBackground: Boolean = false
+    roundedBackground: Boolean = false,
 ) {
     Box(
         modifier = Modifier
             .size(46.dp)
             .clickable { onClick() }
     ) {
-        if (roundedBackground) {
+        if(roundedBackground) {
             Surface(
                 shape = CircleShape,
                 modifier = Modifier.size(46.dp),
@@ -110,7 +83,7 @@ fun MicrophoneItem(
             ) {}
         }
         Icon(
-            painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
+            painter = if(enabled) painterResource(id = R.drawable.ic_micro_active)
             else painterResource(id = R.drawable.ic_micro_inactive),
             contentDescription = "turn on/off microphone",
             tint = ThemeExtra.colors.white,
@@ -124,14 +97,14 @@ fun MicrophoneItem(
 @Composable
 fun ChangeFacingItem(
     onClick: () -> Unit,
-    roundedBackground: Boolean = false
+    roundedBackground: Boolean = false,
 ) {
     Box(
         modifier = Modifier
             .size(46.dp)
             .clickable { onClick() }
     ) {
-        if (roundedBackground) {
+        if(roundedBackground) {
             Surface(
                 shape = CircleShape,
                 modifier = Modifier.size(46.dp),
@@ -152,7 +125,7 @@ fun ChangeFacingItem(
 @Composable
 fun CameraView(
     initCamera: (OpenGlView) -> Unit,
-    surfaceHolderCallback: SurfaceHolder.Callback
+    surfaceHolderCallback: SurfaceHolder.Callback,
 ) {
     AndroidView(
         modifier = Modifier
@@ -176,7 +149,7 @@ fun CameraView(
 
 @Composable
 fun CloseButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Icon(
         painter = painterResource(id = R.drawable.ic_close_translations),
@@ -191,9 +164,9 @@ fun CloseButton(
 @Composable
 fun AvatarItem(
     src: String?,
-    radius: Dp
+    radius: Dp,
 ) {
-    GCashedImage(
+    GCachedImage(
         url = src,
         modifier = Modifier
             .size(radius)
@@ -207,7 +180,7 @@ private fun UserNameItem(
     username: String?,
     age: Int?,
     emoji: EmojiModel?,
-    categoryName: String
+    categoryName: String,
 ) {
     Column {
         Row(
@@ -237,7 +210,7 @@ private fun UserNameItem(
 
 @Composable
 fun StreamerItem(
-    meetingModel: FullMeetingModel
+    meetingModel: FullMeetingModel,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         AvatarItem(
@@ -260,7 +233,7 @@ fun TimerItem(
     time: String,
     onClick: () -> Unit,
     isHighlight: Boolean,
-    addTimerTime: String
+    addTimerTime: String,
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
@@ -285,16 +258,16 @@ fun TimerItem(
                 Text(
                     text = time,
                     color = ThemeExtra.colors.white,
-                    style = if (isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
+                    style = if(isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
                         brush = Brush.horizontalGradient(Gradients.green())
                     ) else
                         ThemeExtra.typography.TranslationSmallButton
                 )
-                if (addTimerTime.isNotBlank()) {
+                if(addTimerTime.isNotBlank()) {
                     Text(
                         text = addTimerTime,
                         color = ThemeExtra.colors.mainDayGreen,
-                        style = if (isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
+                        style = if(isHighlight) ThemeExtra.typography.TranslationSmallButton.copy(
                             brush = Brush.horizontalGradient(Gradients.green())
                         ) else
                             ThemeExtra.typography.TranslationSmallButton
@@ -320,18 +293,18 @@ fun ChatItem(onClick: () -> Unit) {
 @Composable
 fun MembersCountItem(
     membersCount: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     BadgedBox(
         badge = {
-            if (membersCount > 0) {
+            if(membersCount > 0) {
                 Badge(
                     containerColor = ThemeExtra.colors.mainDayGreen,
                     contentColor = ThemeExtra.colors.white
                 ) {
                     Text(
-                        text = if (membersCount >= 1000) {
-                            if (membersCount >= 1000000) {
+                        text = if(membersCount >= 1000) {
+                            if(membersCount >= 1000000) {
                                 "${membersCount / 1000000}КK"
                             } else {
                                 "${membersCount / 1000}К"
@@ -358,7 +331,7 @@ fun MembersCountItem(
 @Composable
 fun CameraOrientationRow(
     onChange: () -> Unit,
-    selectedFacing: Facing
+    selectedFacing: Facing,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -367,7 +340,7 @@ fun CameraOrientationRow(
         Surface(
             modifier = Modifier
                 .clickable { onChange() },
-            color = if (selectedFacing == Facing.FRONT) {
+            color = if(selectedFacing == Facing.FRONT) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent
@@ -387,7 +360,7 @@ fun CameraOrientationRow(
         Surface(
             modifier = Modifier
                 .clickable { onChange() },
-            color = if (selectedFacing == Facing.BACK) {
+            color = if(selectedFacing == Facing.BACK) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent
@@ -409,7 +382,7 @@ fun CameraOrientationRow(
 
 @Composable
 fun BottomSheetDragItem(
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Surface(
         modifier = modifier
@@ -425,7 +398,7 @@ fun BottomSheetDragItem(
 @Composable
 fun CommentPanel(
     onSendMessage: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     var messageText by remember { mutableStateOf("") }
     Surface(
@@ -489,7 +462,7 @@ fun CommentPanel(
 @Composable
 fun SearchBar(
     onSearchValueChanged: (String) -> Unit,
-    searchValue: String
+    searchValue: String,
 ) {
     Surface(
         color = ThemeExtra.colors.mainCard,
@@ -539,12 +512,12 @@ fun SearchBar(
 fun MemberItem(
     user: FullUserModel,
     onComplainClicked: () -> Unit,
-    onDeleteClicked: () -> Unit
+    onDeleteClicked: () -> Unit,
 ) {
     var expandedPopUp by remember { mutableStateOf(false) }
     Box(modifier = Modifier.wrapContentSize()) {
         Row {
-            GCashedImage(
+            GCachedImage(
                 url = user.avatar?.thumbnail?.url,
                 modifier = Modifier
                     .size(40.dp)
@@ -570,7 +543,11 @@ fun MemberItem(
                     Spacer(modifier = Modifier.width(6.dp))
                     user.emoji?.let {
                         Image(
-                            painter = painterResource(id = EmojiModel.getEmoji(it.type).path.toInt()),
+                            painter = painterResource(
+                                id = EmojiModel.getEmoji(
+                                    it.type
+                                ).path.toInt()
+                            ),
                             contentDescription = "Emoji"
                         )
                     }
@@ -618,12 +595,12 @@ fun MemberItem(
 
 @Composable
 fun MessageItem(
-    messageModel: TranslationMessageModel
+    messageModel: TranslationMessageModel,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        GCashedImage(
+        GCachedImage(
             url = messageModel.author.avatar?.thumbnail?.url,
             modifier = Modifier
                 .size(40.dp)
@@ -641,7 +618,11 @@ fun MessageItem(
                 Spacer(modifier = Modifier.width(6.dp))
                 messageModel.author.emoji?.let {
                     Image(
-                        painter = painterResource(id = EmojiModel.getEmoji(it.type).path.toInt()),
+                        painter = painterResource(
+                            id = EmojiModel.getEmoji(
+                                it.type
+                            ).path.toInt()
+                        ),
                         contentDescription = "Emoji"
                     )
                 }

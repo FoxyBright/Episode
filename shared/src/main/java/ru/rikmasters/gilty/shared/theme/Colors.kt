@@ -99,11 +99,7 @@ object Colors {
 
     // Translations
     val thirdOpaqueGray = Color(0x305E5E5E)
-    val bottomSheetGray = Color(0xFFAEAAAE)
     val blackSeventy = Color(0x70000000)
-    val mainCard = Color(0xFF1C1C1D)
-    val mainGreen = Color(0xFF09D93E)
-    val greenInactive = Color(0xFF66EE89)
     val textField = Color(0xFF49454F)
 }
 

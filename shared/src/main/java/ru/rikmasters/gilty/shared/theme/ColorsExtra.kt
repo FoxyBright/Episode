@@ -40,6 +40,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.Zircon
 import ru.rikmasters.gilty.shared.theme.Colors.gripGrayDark
 import ru.rikmasters.gilty.shared.theme.Colors.halfTransparentlyGray
 import ru.rikmasters.gilty.shared.theme.Colors.meetingCardBackBackgroundNight
+import ru.rikmasters.gilty.shared.theme.Colors.textField
 
 data class ExtraColors(
     val searchCardBackground: Color = Unspecified,
@@ -81,23 +82,22 @@ data class ExtraColors(
     val party: Color = Unspecified,
     val art: Color = Unspecified,
     // Add new color in scheme = Color.Unspecified
-
-
+    
+    
     //Translations Colors (always the same)
-    val white: Color = Color.Unspecified,
-    val thirdOpaqueGray: Color = Color.Unspecified,
-    val bottomSheetGray: Color = Color.Unspecified,
-    val blackSeventy: Color = Color.Unspecified,
-    val mainCard: Color = Color.Unspecified,
-    val mainNightGreen: Color = Color.Unspecified,
-    val mainDayGreen: Color = Color.Unspecified,
-    val mainNotActiveGreen: Color = Color.Unspecified,
-    val textField: Color = Color.Unspecified,
-    val preDarkColor: Color = Color.Unspecified,
-    val zirkon: Color = Color.Unspecified,
-    val messageBar: Color = Color.Unspecified
-
-)
+    val white: Color = Unspecified,
+    val thirdOpaqueGray: Color = Unspecified,
+    val bottomSheetGray: Color = Unspecified,
+    val blackSeventy: Color = Unspecified,
+    val mainCard: Color = Unspecified,
+    val mainNightGreen: Color = Unspecified,
+    val mainDayGreen: Color = Unspecified,
+    val mainNotActiveGreen: Color = Unspecified,
+    val textField: Color = Unspecified,
+    val preDarkColor: Color = Unspecified,
+    val zirkon: Color = Unspecified,
+    val messageBar: Color = Unspecified,
+    )
 
 @Deprecated(
     "Надо использовать тему",
@@ -134,7 +134,7 @@ val LightExtraColors = ExtraColors(
     meetCardPlaceHolder = NickelGray,
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
-gripColor = Ash,
+    gripColor = Ash,
     miniCategoriesBackground = LightGray,
     
     // Categories Colors
@@ -147,20 +147,20 @@ gripColor = Ash,
     party = Purple,
     art = Orange,
     // Add colors in scheme from Colors-file
-
+    
     //Translations Colors (always the same)
-    white = Colors.White,
+    white = White,
     thirdOpaqueGray = Colors.thirdOpaqueGray,
-    bottomSheetGray = Colors.bottomSheetGray,
+    bottomSheetGray = Silver,
     blackSeventy = Colors.blackSeventy,
-    mainCard = Colors.mainCard,
-    mainNightGreen = Colors.mainGreen,
-    mainDayGreen = Colors.mainGreen,
-    mainNotActiveGreen = Colors.greenInactive,
-    textField = Colors.textField,
-    preDarkColor = Colors.PreDark,
-    zirkon = Colors.Zircon,
-    messageBar = Colors.RatGray
+    mainCard = AlmostDark,
+    mainNightGreen = Colors.Green,
+    mainDayGreen = Colors.Green,
+    mainNotActiveGreen = Colors.DimGrin,
+    textField = RottenPlum,
+    preDarkColor = PreDark,
+    zirkon = Zircon,
+    messageBar = textField
 )
 
 @Deprecated(
@@ -198,7 +198,7 @@ val DarkExtraColors = ExtraColors(
     meetCardPlaceHolder = Gray,
     notificationCloud = Gray,
     meetingTransparencyShape = halfTransparentlyGray,
-gripColor = gripGrayDark,
+    gripColor = gripGrayDark,
     miniCategoriesBackground = Lead,
     
     // Categories Colors
@@ -211,20 +211,20 @@ gripColor = gripGrayDark,
     party = DarkPurple,
     art = DarkOrange,
     // Add colors in scheme from Colors-file
-
-
+    
+    
     //Translations Colors (always the same)
-    white = Colors.White,
+    white = White,
     thirdOpaqueGray = Colors.thirdOpaqueGray,
-    bottomSheetGray = Colors.bottomSheetGray,
+    bottomSheetGray = Silver,
     blackSeventy = Colors.blackSeventy,
-    mainCard = Colors.mainCard,
-    mainNightGreen = Colors.mainGreen,
-    mainDayGreen = Colors.mainGreen,
-    mainNotActiveGreen = Colors.greenInactive,
-    textField = Colors.textField,
-    preDarkColor = Colors.PreDark,
-    zirkon = Colors.Zircon,
-    messageBar = Colors.RatGray
+    mainCard = AlmostDark,
+    mainNightGreen = Colors.Green,
+    mainDayGreen = Colors.Green,
+    mainNotActiveGreen = Colors.DimGrin,
+    textField = RottenPlum,
+    preDarkColor = PreDark,
+    zirkon = Zircon,
+    messageBar = textField
 
 )
