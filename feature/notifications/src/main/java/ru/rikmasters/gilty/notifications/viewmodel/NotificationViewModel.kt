@@ -13,8 +13,10 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.getMonth
+import ru.rikmasters.gilty.shared.common.extentions.monthControl
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.common.extentions.weekControl
+import ru.rikmasters.gilty.shared.common.extentions.yesterdayControl
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -182,19 +184,28 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
     suspend fun forceRefreshMembers() {
         refreshMember.emit(!refreshMember.value)
     }
-    suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
+    suspend fun splitByMonth(notifications: List<NotificationModel>) {
         // 20 - today
-        // 30 - weekEarlier
-        // 40 - monthEarlier
+        // 30 - yesterday
+        // 40 - this week
+        // 50 - month earlier
         // 1-12 - months
+        if(notifications.size < currentIndexToSplit){
+            currentIndexToSplit = 0
+            splitMonthNotifications.emit(emptyList())
+        }
         val list = splitMonthNotifications.value.toMutableList()
         for (current in currentIndexToSplit until notifications.size) {
             val curDate = notifications[current].date
             if(todayControl(curDate)){
                 list.add(20 to notifications[current])
-            }else if(weekControl(curDate)){
+            }else if(yesterdayControl(curDate)){
                 list.add(30 to notifications[current])
-            } // TODO add 30 days earlier
+            }else if(weekControl(curDate)){
+                list.add(40 to notifications[current])
+            }else if(monthControl(curDate)){
+                list.add(50 to notifications[current])
+            }
             else {
                 list.add(getMonth(curDate) to notifications[current])
             }
