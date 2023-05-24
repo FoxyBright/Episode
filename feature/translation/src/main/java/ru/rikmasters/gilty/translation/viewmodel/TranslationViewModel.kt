@@ -493,14 +493,16 @@ class TranslationViewModel : ViewModel() {
                     coroutineScope.launch {
                         translationRepository.endTranslation(
                             translationId = translationId
-                        )
+                        ).onSuccess {
+                            _translationUiState.update {
+                                it.copy(
+                                    translationStatus = TranslationStatus.COMPLETED
+                                )
+                            }
+                        }
                     }
                 }
-                _translationUiState.update {
-                    it.copy(
-                        translationStatus = TranslationStatus.COMPLETED
-                    )
-                }
+
             }
         }
     }
@@ -564,6 +566,7 @@ class TranslationViewModel : ViewModel() {
                             isLoading = true
                         )
                     }
+
                 },
                 success = { translation ->
                     _translationUiState.update {
@@ -576,7 +579,13 @@ class TranslationViewModel : ViewModel() {
                         _translationUiState.update {
                             it.copy(
                                 isLoading = false,
-                                translationInfo = translation
+                                translationInfo = translation,
+                                translationStatus = when(translation.status) {
+                                    TranslationStatusModel.INACTIVE -> TranslationStatus.PREVIEW
+                                    TranslationStatusModel.ACTIVE -> TranslationStatus.STREAM
+                                    TranslationStatusModel.EXPIRED -> TranslationStatus.EXPIRED
+                                    TranslationStatusModel.COMPLETED -> TranslationStatus.COMPLETED
+                                }
                             )
                         }
                         translationRepository.connectToTranslation(

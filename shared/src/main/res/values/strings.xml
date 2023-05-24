@@ -423,7 +423,7 @@
     <string name="translations_reconnecting_wait">Пожалуйста, подождите</string>
     <string name="translations_no_connection">Нет соединения</string>
     <string name="translations_no_connection_wait">Подключитесь к другой сети \nи обновите трансляцию</string>
-    <string name="translations_no_connection_refresh">Подключитесь к другой сети \nи обновите трансляцию</string>
+    <string name="translations_no_connection_refresh">Обновить</string>
     <string name="translations_expired_time">Время трансляции закончилось</string>
     <string name="translations_completed">Трансляция завершена</string>
     <string name="translations_completed_text">Позже вы сможете оставить \nэмоции участникам episode</string>

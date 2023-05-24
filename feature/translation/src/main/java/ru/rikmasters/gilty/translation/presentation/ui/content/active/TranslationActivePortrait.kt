@@ -45,7 +45,8 @@ fun TranslationActivePortrait(
     onReconnectCLicked: () -> Unit,
     onTimerClicked: () -> Unit,
     isHighlightTimer: Boolean,
-    timerAddTime: String
+    timerAddTime: String,
+    cameraClickEnabled: Boolean
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -137,7 +138,8 @@ fun TranslationActivePortrait(
                 ) {
                     CameraItem(
                         enabled = cameraEnabled,
-                        onClick = onCameraClicked
+                        onClick = onCameraClicked,
+                        clickEnabled = cameraClickEnabled
                     )
                     MicrophoneItem(
                         enabled = microphoneEnabled,

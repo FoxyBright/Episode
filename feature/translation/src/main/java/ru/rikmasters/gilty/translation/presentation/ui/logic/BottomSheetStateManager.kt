@@ -51,7 +51,8 @@ fun BottomSheetStateManager(
             }
             BottomSheetState.DURATION -> {
                 ExtendBottomSheet(
-                    onSave = onAppendDurationSave
+                    onSave = onAppendDurationSave,
+                    configuration = configuration
                 )
             }
         }

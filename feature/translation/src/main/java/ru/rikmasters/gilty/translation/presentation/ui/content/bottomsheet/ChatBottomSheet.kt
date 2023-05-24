@@ -110,6 +110,7 @@ fun ChatBottomSheet(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
+                        Spacer(modifier = Modifier.height(15.dp))
                     }
                 } else {
                     LazyColumn(

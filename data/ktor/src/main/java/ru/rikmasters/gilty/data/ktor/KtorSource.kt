@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.data.ktor
 
-import android.content.res.Resources.getSystem
 import android.util.Log
-import androidx.core.os.ConfigurationCompat.getLocales
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
