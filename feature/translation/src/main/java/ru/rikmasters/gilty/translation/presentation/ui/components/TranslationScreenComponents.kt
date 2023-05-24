@@ -39,6 +39,7 @@ fun CameraItem(
     enabled: Boolean,
     onClick: () -> Unit,
     roundedBackground: Boolean = false,
+    clickEnabled: Boolean
 ) {
     Box(
         modifier = Modifier
@@ -58,7 +59,11 @@ fun CameraItem(
             contentDescription = "turn on/off camera",
             tint = ThemeExtra.colors.white,
             modifier = Modifier
-                .clickable { onClick() }
+                .clickable {
+                    if (clickEnabled) {
+                        onClick()
+                    }
+                }
                 .align(Alignment.Center)
         )
     }

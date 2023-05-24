@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.translation.presentation.ui.logic
 
 import android.content.res.Configuration
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -108,6 +109,8 @@ fun TestTranslationScreen(
     // Показ на несколько секунд добавленного к таймеру времени
     val appendTimerTime by vm.addTimer.collectAsState()
 
+    var cameraClickEnabled by remember { mutableStateOf(true) }
+
     // Смена систем баров
     val systemUiController = rememberSystemUiController()
     val isInDarkTheme = isSystemInDarkTheme()
@@ -147,6 +150,7 @@ fun TestTranslationScreen(
     fun disableVideo() {
         camera?.glInterface?.addFilter(BlurFilterRender())
         scope.launch {
+            cameraClickEnabled = false
             val imageFilter = ImageObjectFilterRender()
             val loader = ImageLoader(context)
             val request = ImageRequest.Builder(context)
@@ -162,8 +166,10 @@ fun TestTranslationScreen(
                 camera?.glInterface?.addFilter(imageFilter)
                 camera?.glInterface?.removeFilter(BlurFilterRender())
                 camera?.glInterface?.addFilter(BlurFilterRender())
+                cameraClickEnabled = true
             } else {
                 camera?.glInterface?.muteVideo()
+                cameraClickEnabled = true
             }
         }
     }
@@ -185,7 +191,7 @@ fun TestTranslationScreen(
     }
     // Логика включения выключения аудио при стриминге
     LaunchedEffect(translationScreenState.translationInfo?.microphone) {
-        camera?.let { camera ->
+        camera?.let {
             translationScreenState.translationInfo?.microphone?.let { enabled ->
                 if (enabled) {
                     enableAudio()
@@ -199,8 +205,10 @@ fun TestTranslationScreen(
     LaunchedEffect(translationScreenState.translationInfo?.camera) {
         camera?.let {
             translationScreenState.translationInfo?.camera?.let { enabled ->
+                cameraClickEnabled = false
                 if (enabled) {
                     enableVideo()
+                    cameraClickEnabled = true
                 } else {
                     disableVideo()
                 }
@@ -644,7 +652,8 @@ fun TestTranslationScreen(
                 addTimerValue = appendTimerTime,
                 onToChatPressed = {
                     nav.navigationBack()
-                }
+                },
+                cameraClickEnabled = cameraClickEnabled
             )
             GAlertT(
                 show = isShowDeleteAlert,

@@ -41,7 +41,8 @@ fun TranslationStateManager(
     onTimerClicked: () -> Unit,
     isHighlightTimer: Boolean,
     addTimerValue: String,
-    onToChatPressed: () -> Unit
+    onToChatPressed: () -> Unit,
+    cameraClickEnabled: Boolean
 ) {
     when(translationStatus) {
         TranslationStatus.PREVIEW -> {
@@ -76,7 +77,8 @@ fun TranslationStateManager(
                 configuration = configuration,
                 onTimerClicked = onTimerClicked,
                 isHighlightTimer = isHighlightTimer,
-                addTimerValue = addTimerValue
+                addTimerValue = addTimerValue,
+                cameraClickEnabled = cameraClickEnabled
             )
         }
         TranslationStatus.EXPIRED -> {

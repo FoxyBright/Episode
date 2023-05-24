@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -230,7 +231,7 @@ class ChatViewModel : ViewModel() {
         val difference = start - now
 
         logD("Data --->>> $date")
-        logD("Data --->>> ${ofZ(it)}")
+        logD("Data --->>> ${ofZ(date)}")
         logD("Data --->>> ${nowZ()}")
         logD("Data --->>> ${ofZ(it).millis() - nowZ().millis()}")
         logD("Data --->>> ${(ofZ(it).millis() - nowZ().millis()) / 3600000}")
@@ -294,6 +295,7 @@ class ChatViewModel : ViewModel() {
             _translationTimer.emit(
                 it.minus(1)
             )
+            Log.d("TEST","TranslationTimer $it")
         }
     }
 

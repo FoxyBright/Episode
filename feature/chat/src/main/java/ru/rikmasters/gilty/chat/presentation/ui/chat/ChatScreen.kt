@@ -23,6 +23,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_ORGANIZER
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_ORGANIZER_AWAIT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.GalleryBs
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
 import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
@@ -41,6 +42,8 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
+import ru.rikmasters.gilty.translation.util.checkMediaPermissions
+import ru.rikmasters.gilty.translation.util.mediaPermissionState
 import java.io.File
 
 @SuppressLint("Recycle")
@@ -54,6 +57,7 @@ fun ChatScreen(
     val cameraPermissions = rememberPermissionState(CAMERA)
     val focusManager = LocalFocusManager.current
     val storagePermissions = permissionState()
+    val mediaPermissions = mediaPermissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
@@ -125,8 +129,8 @@ fun ChatScreen(
         }
     }
     
-    LaunchedEffect(toTranslation) {
-        if(type == TRANSLATION_AWAIT) {
+    LaunchedEffect(Unit) {
+        if(type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) {
             delay(1000)
             vm.timerTick()
         }
@@ -202,8 +206,13 @@ fun ChatScreen(
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
                         if(type == TRANSLATION || type == TRANSLATION_ORGANIZER) {
-                            nav.navigateAbsolute("translations/main?id=${state.meet.id}")
-                            vm.toTranslation()
+                            context.checkMediaPermissions(
+                                mediaPermissions
+                            ) {
+                                nav.navigateAbsolute("translations/main?id=${state.meet.id}")
+                                // TODO: to translation
+                               // vm.toTranslation()
+                            }
                         } else {
                             vm.completeChat(chat)
                             nav.navigate("main")

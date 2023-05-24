@@ -47,7 +47,8 @@ fun TranslationActiveLandscape(
     configuration: Configuration,
     onTimerClicked: () -> Unit,
     isHighlightTimer: Boolean,
-    timerAddTime: String
+    timerAddTime: String,
+    cameraClickEnabled: Boolean
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CameraView(
@@ -101,7 +102,8 @@ fun TranslationActiveLandscape(
                     CameraItem(
                         enabled = cameraEnabled,
                         onClick = onCameraClicked,
-                        roundedBackground = true
+                        roundedBackground = true,
+                        clickEnabled = cameraClickEnabled
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     MicrophoneItem(
@@ -163,8 +165,7 @@ fun TranslationActiveLandscape(
                             )
                             Surface(
                                 color = ThemeExtra.colors.thirdOpaqueGray,
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(20.dp)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(
@@ -189,9 +190,10 @@ fun TranslationActiveLandscape(
                     } else if (!microphoneEnabled) {
                         Column(
                             modifier = Modifier.fillMaxHeight(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column {
                                 Spacer(modifier = Modifier.height(60.dp))
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_microphone_off_voice),
@@ -201,8 +203,7 @@ fun TranslationActiveLandscape(
                             }
                             Surface(
                                 color = ThemeExtra.colors.thirdOpaqueGray,
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(20.dp)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(
@@ -223,7 +224,7 @@ fun TranslationActiveLandscape(
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.height(50.dp))
                         }
                     } else {
                         Surface(

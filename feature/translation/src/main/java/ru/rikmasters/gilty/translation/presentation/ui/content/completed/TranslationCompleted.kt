@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.presentation.ui.content.completed
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,24 +30,27 @@ fun TranslationCompleted(
     thumbnailUrl: String?,
     onToChatPressed: () -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    ThemeExtra.colors.preDarkColor,
-                    Color(0xFF070707)
-                )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                color = ThemeExtra.colors.preDarkColor
             )
-        )) {
+    ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    color = ThemeExtra.colors.preDarkColor
+                )
         ) {
             thumbnailUrl?.let {
                 AsyncImage(
                     model = thumbnailUrl,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.background(
+                        color = ThemeExtra.colors.preDarkColor
+                    )
                 )
             }
             Column(

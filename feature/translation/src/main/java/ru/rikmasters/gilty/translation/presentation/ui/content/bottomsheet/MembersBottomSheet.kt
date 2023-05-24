@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -106,7 +105,9 @@ fun MembersBottomSheet(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Column(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -115,11 +116,14 @@ fun MembersBottomSheet(
                             contentDescription = "",
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
+                        Spacer(modifier = Modifier.height(15.dp))
                         Text(
                             text = stringResource(id = R.string.translations_members_no_users),
                             color = ThemeExtra.colors.bottomSheetGray,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(bottom = 15.dp)
                         )
                     }
                 } else {

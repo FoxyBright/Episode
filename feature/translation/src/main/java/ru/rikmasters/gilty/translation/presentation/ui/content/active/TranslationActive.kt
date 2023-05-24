@@ -29,7 +29,8 @@ fun TranslationActive(
     configuration: Configuration,
     onTimerClicked: () -> Unit,
     isHighlightTimer: Boolean,
-    addTimerValue: String
+    addTimerValue: String,
+    cameraClickEnabled: Boolean
 ) {
     when(orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> {
@@ -53,7 +54,8 @@ fun TranslationActive(
                 configuration = configuration,
                 onTimerClicked = onTimerClicked,
                 isHighlightTimer = isHighlightTimer,
-                timerAddTime = addTimerValue
+                timerAddTime = addTimerValue,
+                cameraClickEnabled = cameraClickEnabled
             )
         }
         Configuration.ORIENTATION_PORTRAIT -> {
@@ -75,7 +77,8 @@ fun TranslationActive(
                 onReconnectCLicked = onReconnectClicked,
                 onTimerClicked = onTimerClicked,
                 isHighlightTimer = isHighlightTimer,
-                timerAddTime = addTimerValue
+                timerAddTime = addTimerValue,
+                cameraClickEnabled = cameraClickEnabled
             )
         }
     }
