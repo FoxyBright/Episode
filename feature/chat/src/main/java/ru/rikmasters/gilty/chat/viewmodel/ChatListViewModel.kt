@@ -68,10 +68,10 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val chats by lazy {
-        combine(refresh, _sortType) { refresh, sort ->
-            Pair(refresh, sort)
+        combine(refresh, _sortType, _isArchiveOn) { refresh, sort, isArchiveOn ->
+            Pair(refresh,Pair(isArchiveOn, sort))
         }.flatMapLatest {
-            chatManager.getChats(it.second?:MESSAGE_DATE)
+            chatManager.getChats(it.second.second?:MESSAGE_DATE, it.second.first)
         }.cachedIn(coroutineScope)
     }
     

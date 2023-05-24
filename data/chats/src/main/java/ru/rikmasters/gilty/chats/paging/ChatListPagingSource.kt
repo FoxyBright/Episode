@@ -8,7 +8,8 @@ import ru.rikmasters.gilty.shared.model.chat.ChatModel
 
 class ChatListPagingSource(
     private val webSource: ChatWebSource,
-    private val sortType: SortType
+    private val sortType: SortType,
+    private val isArchiveOn: Boolean,
 ) : PagingSource<Int, ChatModel>() {
     override fun getRefreshKey(state: PagingState<Int, ChatModel>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
@@ -24,7 +25,8 @@ class ChatListPagingSource(
             val chats = webSource.getDialogs(
                 page = 26,
                 perPage = loadSize,
-                sortType = sortType
+                sortType = sortType,
+                isArchiveOn = isArchiveOn,
             )
             val nextKey = if (chats.size < loadSize) null else page + 1
             val prevKey = if (page == 1) null else page - 1
