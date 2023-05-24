@@ -13,8 +13,10 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.extentions.getMonth
+import ru.rikmasters.gilty.shared.common.extentions.monthControl
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.common.extentions.weekControl
+import ru.rikmasters.gilty.shared.common.extentions.yesterdayControl
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -53,6 +55,36 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
         }.value
     )
     val unreadMessages = _unreadMessages.asStateFlow()
+
+    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
+    val ratings = _ratings.asStateFlow()
+
+    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
+    val selectedNotification = _selectedNotification.asStateFlow()
+
+    private val _meetId = MutableStateFlow<String?>(null)
+
+    private val refreshMember = MutableStateFlow<Boolean>(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val participants by lazy {
+        refreshMember.flatMapLatest {
+            _meetId.value?.let {
+                meetManager.getMeetMembers(
+                    meetId = it,
+                    excludeMe = true
+                )
+            } ?: flow { }
+        }
+    }
+
+    private val _participantsStates = MutableStateFlow(emptyList<Int>())
+    val participantsStates = _participantsStates.asStateFlow()
+
+    var currentIndexToSplit = 0
+
+    val splitMonthNotifications = MutableStateFlow(emptyList<Pair<Int,NotificationModel>>())
+
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if (hasUnread) NEW_INACTIVE else INACTIVE)
     }
@@ -109,31 +141,6 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
         forceRefresh()
     }
 
-    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
-    val ratings = _ratings.asStateFlow()
-
-    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
-    val selectedNotification = _selectedNotification.asStateFlow()
-
-    private val _meetId = MutableStateFlow<String?>(null)
-
-    private val refreshMember = MutableStateFlow<Boolean>(false)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val participants by lazy {
-        refreshMember.flatMapLatest {
-            _meetId.value?.let {
-                meetManager.getMeetMembers(
-                    meetId = it,
-                    excludeMe = true
-                )
-            } ?: flow { }
-        }
-    }
-
-    private val _participantsStates = MutableStateFlow(emptyList<Int>())
-    val participantsStates = _participantsStates.asStateFlow()
-
     suspend fun getRatings() = singleLoading {
         _ratings.emit(notificationManger.getRatings())
     }
@@ -177,23 +184,28 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
     suspend fun forceRefreshMembers() {
         refreshMember.emit(!refreshMember.value)
     }
-
-    var currentIndexToSplit = 0
-
-    val splitMonthNotifications = MutableStateFlow(emptyList<Pair<Int,NotificationModel>>())
-    suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
+    suspend fun splitByMonth(notifications: List<NotificationModel>) {
         // 20 - today
-        // 30 - weekEarlier
-        // 40 - monthEarlier
+        // 30 - yesterday
+        // 40 - this week
+        // 50 - month earlier
         // 1-12 - months
+        if(notifications.size < currentIndexToSplit){
+            currentIndexToSplit = 0
+            splitMonthNotifications.emit(emptyList())
+        }
         val list = splitMonthNotifications.value.toMutableList()
         for (current in currentIndexToSplit until notifications.size) {
             val curDate = notifications[current].date
             if(todayControl(curDate)){
                 list.add(20 to notifications[current])
-            }else if(weekControl(curDate)){
+            }else if(yesterdayControl(curDate)){
                 list.add(30 to notifications[current])
-            } // TODO add 30 days earlier
+            }else if(weekControl(curDate)){
+                list.add(40 to notifications[current])
+            }else if(monthControl(curDate)){
+                list.add(50 to notifications[current])
+            }
             else {
                 list.add(getMonth(curDate) to notifications[current])
             }

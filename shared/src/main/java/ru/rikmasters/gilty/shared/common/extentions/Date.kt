@@ -38,14 +38,50 @@ fun getTime() = arrayListOf<String>().let {
 fun todayControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
 
+fun yesterdayControl(date: String) =
+    (date.format(FORMAT).split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in yesterday().first..yesterday().second
+
 fun tomorrowControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE
         .plusDays(1)
         .format(FORMAT)
-fun monthControl(date: String) = // TODO not implemented
-    date.format(FORMAT) == LOCAL_DATE
-        .plusDays(1)
-        .format(FORMAT)
+
+fun weekControl(
+    date: String,
+) = (date.format(FORMAT)
+    .split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in thisWeek().first..thisWeek().second
+
+//Useless
+fun earlierWeekControl(date: String): Boolean {
+    val dateList = date.format(FORMAT).split(DASH)
+    val localDate = LocalDate.of(
+        dateList.first().toInt(),
+        dateList[1].toInt(),
+        dateList.last().toInt()
+    ).second()
+    return (localDate < thisWeek().first)
+}
+
+fun monthControl(date: String) = (date.format(FORMAT)
+    .split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in thisMonth().first..thisMonth().second
 
 fun getDifferenceOfTime(date: String): String {
     val difference = (
@@ -96,35 +132,22 @@ fun String.time() = this
         )
     }
 
+fun yesterday() = LOCAL_DATE.minusDays(1)
+    .let { it.second() to it.plusDays(1).second() }
 
-fun weekControl(
-    date: String,
-) = (date.format(FORMAT)
-    .split(DASH).let {
-        LocalDate.of(
-            it.first().toInt(),
-            it[1].toInt(),
-            it.last().toInt()
-        ).second()
-    } in thisWeek().first..
-        thisWeek().second)
+fun thisWeek() = LOCAL_DATE.minusDays(1)
+    .let { it.minusDays(7).second() to it.second() }
 
+fun thisMonth() = LOCAL_DATE.minusDays(8)
+    .let { it.minusDays(30).second() to it.second() }
 
-fun earlierWeekControl(date: String): Boolean {
-    val dateList = date.format(FORMAT).split(DASH)
-    val localDate = LocalDate.of(
-        dateList.first().toInt(),
-        dateList[1].toInt(),
-        dateList.last().toInt()
-    ).millis() / 1000
-    return (localDate < thisWeek().first)
-}
-
+/*
 fun thisWeek() = LOCAL_DATE
     .let { it.minusDays(it.dayOfWeek().ordinal) }
     .let { it.second() to it.plusDays(7).second() }
+*/
 
-fun getMonth(date:String):Int{
+fun getMonth(date: String): Int {
     val dateList = date.format(FORMAT).split(DASH)
     val localDate = LocalDate.of(
         dateList.first().toInt(),

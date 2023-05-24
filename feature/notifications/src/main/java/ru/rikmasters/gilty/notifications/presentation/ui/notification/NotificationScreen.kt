@@ -65,7 +65,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     }
 
     LaunchedEffect(key1 = notifications.itemSnapshotList.items, block = {
-        vm.splitByMonthSM(notifications.itemSnapshotList.items)
+        scope.launch { vm.splitByMonth(notifications.itemSnapshotList.items) }
     })
 
     var errorState by remember {
