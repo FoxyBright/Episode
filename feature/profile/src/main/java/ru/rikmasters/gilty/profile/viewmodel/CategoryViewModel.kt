@@ -1,17 +1,21 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
 class CategoryViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
@@ -36,25 +40,60 @@ class CategoryViewModel: ViewModel() {
     }
     
     suspend fun setUserInterest() = singleLoading {
-        meetManager.setUserInterest(selected.value)
-        profileManager.updateUserCategories()
+        meetManager.setUserInterest(selected.value).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+        profileManager.updateUserCategories().on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getInterest() = singleLoading {
-        _selected.emit(
-            profileManager.getUserCategories()
+        profileManager.getUserCategories().on(
+            success = { list ->
+                _selected.emit(list)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
     suspend fun getCategories() = singleLoading {
-        val categories = arrayListOf<CategoryModel>()
-        meetManager.getCategoriesList().forEach { parent ->
-            categories.add(parent)
-            if(!parent.children.isNullOrEmpty())
-                parent.children?.forEach { child ->
-                    categories.add(child)
+        meetManager.getCategoriesList().on(
+            success = {
+                val categories =
+                    arrayListOf<CategoryModel>()
+                it.forEach { parent ->
+                    categories.add(parent)
+                    if(!parent.children.isNullOrEmpty())
+                        parent.children?.forEach { child ->
+                            categories.add(child)
+                        }
                 }
-        }
-        _categories.emit(categories)
+                _categories.emit(categories)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 }

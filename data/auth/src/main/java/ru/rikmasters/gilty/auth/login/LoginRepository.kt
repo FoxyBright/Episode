@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.CLIENT_ID
 import ru.rikmasters.gilty.data.shared.BuildConfig.CLIENT_SECRET
+import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.shared.wrapper.errorWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
@@ -20,7 +21,7 @@ class LoginRepository(
     webSource, primarySource
 ) {
     
-    suspend fun getLoginMethods(state: String): Set<LoginMethod> =
+    suspend fun getLoginMethods(state: String) =
         webSource.unauthorizedGet("/auth/externals") {
             url {
                 query(
@@ -29,10 +30,13 @@ class LoginRepository(
                     "state" to state
                 )
             }
-        }?.wrapped<List<LoginMethodDto>>()
-            ?.map(LoginMethodDto::map)
-            ?.toSet()
-            ?: emptySet()
+        }.let {
+            coroutinesState({it}){
+                it.wrapped<List<LoginMethodDto>>()
+                    .map(LoginMethodDto::map)
+                    .toSet()
+            }
+        }
     
     suspend fun sendCode(phone: String) = withContext(IO) {
         webSource.unauthorizedClient

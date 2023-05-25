@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.dmoral.toasty.Toasty
 import es.dmoral.toasty.Toasty.custom
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.color.toast_day
 import ru.rikmasters.gilty.shared.R.color.toast_night
@@ -102,9 +104,8 @@ fun Context.isDarkTheme() = if(Build.VERSION.SDK_INT >= 29)
 else Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1
 
 @SuppressLint("CheckResult")
-fun errorToast(
-    context: Context,
-    message: String,
+suspend fun Context.errorToast(
+    message: String?,
     @DrawableRes icon: Int = ic_bad_connection,
     @ColorRes dayColor: Int = toast_day,
     @ColorRes nightColor: Int = toast_night,
@@ -112,19 +113,23 @@ fun errorToast(
     hideIcon: Boolean = false,
     hideTint: Boolean = false,
 ) {
-    Toasty.Config
-        .getInstance()
-        ?.let {
-            it.tintIcon(true)
-            it.setTextSize(15)
-            context.textTypeface()?.let { tf ->
-                it.setToastTypeface(tf)
-            }
-        }?.apply()
-    custom(
-        context, message, icon,
-        if(context.isDarkTheme())
-            nightColor else dayColor,
-        duration, !hideIcon, !hideTint
-    ).show()
+    if(message == null) return
+    withContext(Dispatchers.Main) {
+        Toasty.Config
+            .getInstance()
+            ?.let {
+                it.tintIcon(true)
+                it.setTextSize(15)
+                this@errorToast.textTypeface()
+                    ?.let { tf ->
+                        it.setToastTypeface(tf)
+                    }
+            }?.apply()
+        custom(
+            this@errorToast, message, icon,
+            if(this@errorToast.isDarkTheme())
+                nightColor else dayColor,
+            duration, !hideIcon, !hideTint
+        ).show()
+    }
 }

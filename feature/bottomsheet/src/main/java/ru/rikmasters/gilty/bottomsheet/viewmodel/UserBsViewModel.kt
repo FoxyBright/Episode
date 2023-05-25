@@ -1,11 +1,13 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.GROUP
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -16,6 +18,8 @@ class UserBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val profileManager by inject<ProfileManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _meetType = MutableStateFlow(GROUP)
     val meetType = _meetType.asStateFlow()
@@ -69,36 +73,89 @@ class UserBsViewModel: ViewModel() {
     }
     
     suspend fun getUserActualMeets(userId: String) {
-        try {
-            _userActualMeets.emit(
-                meetManager.getUserActualMeets(userId)
-            )
-        } catch(e: Exception) {
-            _meetType.emit(ANONYMOUS)
-        }
+        meetManager.getUserActualMeets(userId).on(
+            success = {
+                try {
+                    _userActualMeets.emit(it)
+                } catch(e: Exception) {
+                    _meetType.emit(ANONYMOUS)
+                }
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun setMeetType(
         meetId: String,
     ) = singleLoading {
-        _meetType.emit(
-            if(meetId != "null")
-                meetManager.getDetailedMeet(
-                    meetId
-                )?.type ?: GROUP
-            else GROUP
+        
+        meetManager.getDetailedMeet(meetId).on(
+            success = {
+                val type = if(meetId != "null")
+                    it.type else GROUP
+                _meetType.emit(type)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
     suspend fun setUser(userId: String) = singleLoading {
-        _profile.emit(profileManager.getUser(userId))
+        profileManager.getUser(userId).on(
+            success = { _profile.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun observeUser(state: Boolean, userId: String) =
         singleLoading {
-            if(state) profileManager.subscribeToUser(userId)
-            else profileManager.unsubscribeFromUser(userId)
-            _observe.emit(profileManager.getUser(userId).isWatching == true)
+            if(state) profileManager
+                .subscribeToUser(userId).on(
+                    success = {},
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
+            else profileManager
+                .unsubscribeFromUser(userId).on(
+                    success = {},
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
+            profileManager.getUser(userId).on(
+                success = {
+                    _observe.emit(
+                        it.isWatching == true
+                    )
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
         }
     
     suspend fun observeUser(state: Boolean?) {

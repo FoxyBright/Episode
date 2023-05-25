@@ -13,44 +13,26 @@ class NotificationManager(
     // получение новой страницы пагинации
     fun getNotifications() = store.getNotifications()
     
-    // удаление уведомления
     suspend fun deleteNotifications(
         notifyIds: List<String>,
         deleteAll: Boolean = false,
-    ) {
-        withContext(IO) {
-            web.deleteNotifications(
-                notifyIds,
-                deleteAll.compareTo(false)
-            )
-        }
+    ) = withContext(IO) {
+        web.deleteNotifications(
+            notifyIds,
+            deleteAll.compareTo(false)
+        )
     }
     
-    // получение списка возможных реакций на встречу или участника
-    suspend fun getRatings() = withContext(IO) {
-        web.getRatings()
-    }
+    suspend fun getRatings() =
+        withContext(IO) { web.getRatings() }
     
     // выставление реакции на встречу или пользователю
     suspend fun putRatings(
-        meetId: String, userId: String,
-        emoji: EmojiModel,
-    ): Boolean = withContext(IO) {
-            web.putRatings(
-                meetId, userId, emoji.type
-            )
-        }
+        meetId: String, userId: String, emoji: EmojiModel,
+    ) = withContext(IO) { web.putRatings(meetId, userId, emoji.type) }
     
     @Suppress("unused")
-    // пометка уведомления как прочитанного
     suspend fun markNotifyAsRead(
-        notifyIds: List<String>,
-        readAll: Boolean = false,
-    ) {
-        withContext(IO) {
-            web.markNotifiesAsRead(
-                notifyIds, readAll
-            )
-        }
-    }
+        notifyIds: List<String>, readAll: Boolean = false,
+    ) = withContext(IO) { web.markNotifiesAsRead(notifyIds, readAll) }
 }

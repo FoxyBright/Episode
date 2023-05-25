@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.data.example.repository
 
 import io.ktor.client.call.body
-import io.ktor.client.request.get
 import kotlinx.coroutines.delay
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.*
@@ -47,6 +46,6 @@ class ExampleRepository(
     // Можно вынести в отдельный класс-наследник KtorSource
     private suspend fun getDoorsWeb() =
         webSource.unauthorizedGet("http://cars.cprogroup.ru/api/rubetek/doors/")
-            ?.body<ResponseWrapper<List<Door>>>()
-            ?.data ?: emptyList()
+            .body<ResponseWrapper<List<Door>>>()
+            .data ?: emptyList()
 }

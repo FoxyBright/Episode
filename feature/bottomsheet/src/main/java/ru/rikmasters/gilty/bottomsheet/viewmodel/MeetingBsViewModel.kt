@@ -12,6 +12,7 @@ import ru.rikmasters.gilty.core.app.checkGPS
 import ru.rikmasters.gilty.core.app.checkLocationPermissions
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 
@@ -19,7 +20,9 @@ class MeetingBsViewModel: ViewModel() {
     
     private val meetManager by inject<MeetingManager>()
     private val context = getKoin().get<Context>()
-    private val _meetId = MutableStateFlow<String?>(null)
+    
+    private val _meetId =
+        MutableStateFlow<String?>(null)
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val membersList by lazy {
@@ -30,25 +33,32 @@ class MeetingBsViewModel: ViewModel() {
         }
     }
     
-    private val _meet = MutableStateFlow<FullMeetingModel?>(null)
+    private val _meet =
+        MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
     
-    private val _lastResponse = MutableStateFlow<Pair<Int, String?>?>(null)
+    private val _lastResponse =
+        MutableStateFlow<Pair<Int, String?>?>(null)
     val lastResponse = _lastResponse.asStateFlow()
     
-    private val _hidden = MutableStateFlow(false)
+    private val _hidden =
+        MutableStateFlow(false)
     val hidden = _hidden.asStateFlow()
     
-    private val _menu = MutableStateFlow(false)
+    private val _menu =
+        MutableStateFlow(false)
     val menu = _menu.asStateFlow()
     
-    private val _meetReaction = MutableStateFlow(false)
+    private val _meetReaction =
+        MutableStateFlow(false)
     val meetReaction = _meetReaction.asStateFlow()
     
-    private val _comment = MutableStateFlow("")
+    private val _comment =
+        MutableStateFlow("")
     val comment = _comment.asStateFlow()
     
-    private val _distance = MutableStateFlow("")
+    private val _distance =
+        MutableStateFlow("")
     val distance = _distance.asStateFlow()
     
     suspend fun meetReactionDisable(state: Boolean) {
@@ -58,18 +68,28 @@ class MeetingBsViewModel: ViewModel() {
     suspend fun getMeet(
         meetId: String,
     ) = singleLoading {
-        _meet.emit(meetManager.getDetailedMeet(meetId))
-        if(meet.value?.memberState == IS_ORGANIZER) {
-            _lastResponse.emit(
-                _meet.value?.responds?.count!! to
-                        _meet.value?.responds?.thumbnail?.url
-            )
-        }
-        if(meet.value?.isOnline != true)
-            meet.value?.let {
-                _distance.emit("")
+        meetManager.getDetailedMeet(meetId).on(
+            success = {
+                _meet.emit(it)
+                if(meet.value?.memberState == IS_ORGANIZER) {
+                    _lastResponse.emit(
+                        _meet.value?.responds?.count!! to
+                                _meet.value?.responds?.thumbnail?.url
+                    )
+                }
+                if(meet.value?.isOnline != true)
+                    meet.value?.let {
+                        _distance.emit("")
+                    }
+                _meetId.value = meetId
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
             }
-        _meetId.value = meetId
+        )
     }
     
     suspend fun changeDistance(distance: String) {
@@ -115,21 +135,46 @@ class MeetingBsViewModel: ViewModel() {
         meetId: String,
     ) = singleLoading {
         meetManager.respondOfMeet(
-            meetId,
-            comment.value.ifBlank { null },
-            hidden.value
+            meetId = meetId,
+            comment = comment.value
+                .ifBlank { null },
+            hidden = hidden.value
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
     suspend fun leaveMeet(
         meetId: String,
     ) = singleLoading {
-        meetManager.leaveMeet(meetId)
+        meetManager.leaveMeet(meetId).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun canceledMeet(
         meetId: String,
     ) = singleLoading {
-        meetManager.cancelMeet(meetId)
+        meetManager.cancelMeet(meetId).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 }

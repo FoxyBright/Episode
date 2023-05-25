@@ -1,11 +1,13 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import androidx.paging.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SENT
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -16,6 +18,8 @@ class RespondsBsViewModel: ViewModel() {
     private val profileManager by inject<ProfileManager>()
     
     private val _meetId = MutableStateFlow<String?>(null)
+    
+    private val context = getKoin().get<Context>()
     
     private val _tabs = MutableStateFlow(0)
     val tabs = _tabs.asStateFlow()
@@ -99,18 +103,42 @@ class RespondsBsViewModel: ViewModel() {
     suspend fun cancelRespond(
         respondId: String,
     ) = singleLoading {
-        profileManager.cancelRespond(respondId)
+        profileManager
+            .cancelRespond(respondId)
+            .on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
     }
     
-    suspend fun deleteRespond(
-        respondId: String,
-    ) = singleLoading {
-        profileManager.deleteRespond(respondId)
-    }
+    suspend fun deleteRespond(respondId: String) =
+        singleLoading {
+            profileManager.deleteRespond(respondId).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
     
-    suspend fun acceptRespond(
-        respondId: String,
-    ) = singleLoading {
-        profileManager.acceptRespond(respondId)
-    }
+    suspend fun acceptRespond(respondId: String) =
+        singleLoading {
+            profileManager.acceptRespond(respondId).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
 }

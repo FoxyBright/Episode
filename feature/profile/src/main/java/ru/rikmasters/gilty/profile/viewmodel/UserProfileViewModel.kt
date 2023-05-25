@@ -17,6 +17,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
 import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -27,6 +28,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -79,7 +82,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _photoViewState = MutableStateFlow(false)
     val photoViewState = _photoViewState.asStateFlow()
-
+    
     private val _activeAlbumId = MutableStateFlow<Int?>(null)
     val activeAlbumId = _activeAlbumId.asStateFlow()
     
@@ -102,10 +105,12 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             profileManager.getProfile(true)
         )
     }
-    suspend fun changeActiveAlbumId(id:Int?){
+    
+    suspend fun changeActiveAlbumId(id: Int?) {
         Log.d("Hello", id.toString())
         _activeAlbumId.emit(id)
     }
+    
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
@@ -113,6 +118,15 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun updateUsername() {
         if(!occupied.value) regManager
             .userUpdateData(username.value)
+            .on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
     }
     
     suspend fun changeUsername(name: String) {
@@ -172,6 +186,14 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun updateDescription() {
         regManager.userUpdateData(
             aboutMe = description.value
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     

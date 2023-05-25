@@ -1,14 +1,11 @@
 package ru.rikmasters.gilty.chats.manager
 
-import android.content.Context
-import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
-import ru.rikmasters.gilty.chats.ChatData.getKoin
 import ru.rikmasters.gilty.chats.models.chat.mapDTO
 import ru.rikmasters.gilty.chats.paging.ChatListPagingSource
 import ru.rikmasters.gilty.chats.repository.ChatRepository
@@ -25,14 +22,8 @@ class ChatManager(
     private val webSource: ChatWebSource,
 ): CoroutineController() {
     
-    suspend fun updateUnreadMessages() {
-        val count = webSource.getChatsStatus()
-        getKoin().get<Context>().getSharedPreferences(
-            "sharedPref", MODE_PRIVATE
-        ).edit()
-            .putInt("unread_messages", count)
-            .apply()
-    }
+    suspend fun updateUnreadMessages() =
+        withContext(IO) { webSource.getChatsStatus() }
     
     fun getChats(
         sortTypeModel: SortTypeModel,
@@ -68,11 +59,9 @@ class ChatManager(
     suspend fun deleteChat(
         chatId: String,
         forAll: Boolean,
-    ) {
-        withContext(IO) {
-            webSource.deleteChat(chatId, forAll)
-            if(!forAll) store.deleteChat(chatId)
-        }
+    ) = withContext(IO) {
+        if(!forAll) store.deleteChat(chatId)
+        webSource.deleteChat(chatId, forAll)
     }
     
     // подключение к веб сокетам
@@ -81,33 +70,17 @@ class ChatManager(
     }
     
     @Suppress("unused")
-    // разблокировать уведомления от чата
-    suspend fun unmuteChatNotifications(chatId: String) {
-        withContext(IO) {
-            webSource.unmuteChatNotifications(
-                chatId
-            )
-        }
-    }
-    
-    @Suppress("unused")
     // заблокировать уведомления от чата
-    suspend fun muteChatNotifications(
-        chatId: String,
-        unmuteAt: String,
-    ) {
+    suspend fun muteChatNotifications(chatId: String, unmuteAt: String) =
         withContext(IO) {
-            webSource.muteChatNotifications(
-                chatId, unmuteAt
-            )
+            webSource.muteChatNotifications(chatId, unmuteAt)
         }
-    }
     
     @Suppress("unused")
-    // получить альбом медиа чата
-    suspend fun getChatAlbum(
-        chatId: String,
-    ) = withContext(IO) {
-        webSource.getChatAlbum(chatId)
-    }
+    suspend fun unmuteChatNotifications(chatId: String) =
+        withContext(IO) { webSource.unmuteChatNotifications(chatId) }
+    
+    @Suppress("unused")
+    suspend fun getChatAlbum(chatId: String) =
+        withContext(IO) { webSource.getChatAlbum(chatId) }
 }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -13,18 +14,21 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVABLES
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType.OBSERVERS
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 
 class ObserverBsViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
     
+    private val context = getKoin().get<Context>()
+    
     private val _observersSelectTab = MutableStateFlow(0)
     val observersSelectTab = _observersSelectTab.asStateFlow()
     
     private val _searchObserved = MutableStateFlow("")
     val searchObserved = _searchObserved.asStateFlow()
-
+    
     private val _searchObservers = MutableStateFlow("")
     val searchObservers = _searchObservers.asStateFlow()
     
@@ -40,8 +44,8 @@ class ObserverBsViewModel: ViewModel() {
     
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun getObservers(type: ObserversType) = lazy {
-        when(type){
-            OBSERVERS->{
+        when(type) {
+            OBSERVERS -> {
                 _searchObserved.debounce(250)
                     .flatMapLatest { query ->
                         profileManager.getObservers(
@@ -50,7 +54,7 @@ class ObserverBsViewModel: ViewModel() {
                         )
                     }
             }
-            OBSERVABLES->{
+            OBSERVABLES -> {
                 _searchObservers.debounce(250)
                     .flatMapLatest { query ->
                         profileManager.getObservers(
@@ -60,7 +64,7 @@ class ObserverBsViewModel: ViewModel() {
                     }
             }
         }
-
+        
     }
     
     val observers by getObservers(OBSERVERS)
@@ -85,6 +89,7 @@ class ObserverBsViewModel: ViewModel() {
     suspend fun searchObservedChange(text: String) {
         _searchObserved.emit(text)
     }
+    
     suspend fun searchObserversChange(text: String) {
         _searchObservers.emit(text)
     }
@@ -92,7 +97,16 @@ class ObserverBsViewModel: ViewModel() {
     suspend fun unsubscribeMembers() {
         unsubscribeMembers.value.forEach {
             it.id?.let { id ->
-                profileManager.unsubscribeFromUser(id)
+                profileManager
+                    .unsubscribeFromUser(id).on(
+                        success = {},
+                        loading = {},
+                        error = { e ->
+                            context.errorToast(
+                                e.serverMessage
+                            )
+                        }
+                    )
             }
         }
         _unsubscribeMembers.emit(emptyList())
@@ -100,17 +114,24 @@ class ObserverBsViewModel: ViewModel() {
     
     suspend fun onSubScribe(member: UserModel, type: SubscribeType) {
         when(type) {
-            SUB, UNSUB -> {
-                val list = unsubscribeMembers.value
-                _unsubscribeMembers.emit(
-                    if(list.contains(member)) list - member
-                    else list + member
-                )
-            }
+            SUB, UNSUB -> unsubscribeMembers
+                .value.let { list ->
+                    _unsubscribeMembers.emit(
+                        if(list.contains(member)) list - member
+                        else list + member
+                    )
+                }
             
-            DELETE -> {
-                profileManager.deleteObserver(member)
-            }
+            DELETE -> profileManager
+                .deleteObserver(member).on(
+                    success = {},
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
         }
     }
 }

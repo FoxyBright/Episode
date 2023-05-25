@@ -1,24 +1,26 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 
-class ParticipantsBsViewModel : ViewModel() {
-
+class ParticipantsBsViewModel: ViewModel() {
+    
     private val meetManager by inject<MeetingManager>()
-
-    private val _meetId = MutableStateFlow<String?>(null)
-
-    private val _meet = MutableStateFlow<FullMeetingModel?>(null)
+    
+    private val context = getKoin().get<Context>()
+    private val _meetId =
+        MutableStateFlow<String?>(null)
+    
+    private val _meet =
+        MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
-
+    
     @OptIn(ExperimentalCoroutinesApi::class)
     val participants by lazy {
         _meetId.flatMapLatest {
@@ -27,9 +29,19 @@ class ParticipantsBsViewModel : ViewModel() {
             } ?: flow { }
         }
     }
-
+    
     suspend fun getMeet(meetId: String) = singleLoading {
-        _meet.emit(meetManager.getDetailedMeet(meetId))
-        _meetId.value = meetId
+        meetManager.getDetailedMeet(meetId).on(
+            success = {
+                _meet.emit(it)
+                _meetId.value = meetId
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 }

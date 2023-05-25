@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.shared.compress
 import java.io.File
 
@@ -19,13 +20,18 @@ class HiddenViewModel: ViewModel() {
     val photoList = _photoList.asStateFlow()
     
     private val hiddenList = MutableStateFlow(emptyList<String>())
-
+    
     private val _photosAmount = MutableStateFlow(0)
     val photosAmount = _photosAmount.asStateFlow()
     
     suspend fun getHidden() = singleLoading {
         regManager.getProfile().hidden?.let {
-            val response = regManager.getHidden(it.albumId)
+            val response = regManager
+                .getHidden(it.albumId).on(
+                    success = { list -> list },
+                    loading = { emptyList<String>() to 0 },
+                    error = { emptyList<String>() to 0 }
+                )
             _photoList.emit(response.first)
             hiddenList.emit(response.first)
             _photosAmount.emit(response.second)
@@ -46,6 +52,14 @@ class HiddenViewModel: ViewModel() {
         regManager.deleteHidden(hiddenList.value)
         regManager.addHidden(photoList.value.map {
             File(it).compress(context)
-        })
+        }).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 }

@@ -8,14 +8,10 @@ import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 import io.ktor.websocket.Frame
 import io.ktor.websocket.send
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import ru.rikmasters.gilty.data.shared.BuildConfig
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.shared.BuildConfig
 import ru.rikmasters.gilty.shared.models.socket.Res
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import java.io.IOException
@@ -26,7 +22,7 @@ abstract class WebSocket : KtorSource() {
     private val socketUrl = "app/local?protocol=7&amp;client=js&amp;version=7.2.0&amp;flash=false"
 
     val socketId = MutableStateFlow<String?>(null)
-    val _userId = MutableStateFlow("")
+    val userId = MutableStateFlow("")
     var inPing: Boolean = false
 
     abstract val port: Int
@@ -42,7 +38,7 @@ abstract class WebSocket : KtorSource() {
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
         Log.d("TranslationWeb","Subscribing CHANNEL $channel")
-        post(
+        tryPost(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
             setBody(
@@ -51,7 +47,7 @@ abstract class WebSocket : KtorSource() {
                     "channel_name" to channel,
                 ),
             )
-        }?.let { response ->
+        }.let { response ->
             completion?.let { it(response.status.isSuccess()) }
             send(
                 data = mapOf(
@@ -107,7 +103,7 @@ abstract class WebSocket : KtorSource() {
     }
 
     private suspend fun connection(userId: String) = withContext(Dispatchers.IO) {
-        _userId.emit(userId)
+        this@WebSocket.userId.emit(userId)
         sessionHandlerJob = launch {
             val session = wsSession(BuildConfig.HOST, port, socketUrl)
             try {

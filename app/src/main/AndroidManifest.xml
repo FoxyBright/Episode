@@ -67,7 +67,7 @@
                 android:name=".MainActivity"
                 android:exported="true"
                 android:launchMode="singleTask"
-                android:theme="@style/Theme.Gilty">
+                android:theme="@style/Theme.SplashAPI">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -121,8 +121,8 @@ class TranslationWebSocket : WebSocket() {
 
     suspend fun connectToTranslation(id: String) {
         disconnectFromTranslation()
-        Log.d("TranslationWeb","CONNECT TRY WITH USERID ${_userId.value} TRRRID $id")
-        subscribe("private-translation.$id.${_userId.value}") {
+        Log.d("TranslationWeb","CONNECT TRY WITH USERID ${userId.value} TRRRID $id")
+        subscribe("private-translation.$id.${userId.value}") {
             if (it) _translationId.emit(id)
         }
     }
@@ -130,7 +130,7 @@ class TranslationWebSocket : WebSocket() {
     suspend fun disconnectFromTranslation() {
         _translationId.value?.let {
             send(
-                data = mapOf("channel" to "private-translation.$it.${_userId.value}"),
+                data = mapOf("channel" to "private-translation.$it.${userId.value}"),
                 event = TranslationsSocketEvents.UNSUBSCRIBE.value,
             )
         }

@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
@@ -78,16 +79,45 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun getUnread() {
-        chatManager.updateUnreadMessages()
+        chatManager.updateUnreadMessages().on(
+            success = {
+                context.getSharedPreferences(
+                    "sharedPref",
+                    ComponentActivity.MODE_PRIVATE
+                ).edit()
+                    .putInt("unread_messages", it)
+                    .apply()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getAllCategories() {
-        _categories.emit(meetManager.getCategoriesList())
+        meetManager.getCategoriesList().on(
+            success = { _categories.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getUserCategories() {
-        _userCategories.emit(
-            profileManager.getUserCategories()
+        profileManager.getUserCategories().on(
+            success = { _userCategories.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -142,7 +172,15 @@ class MainViewModel: ViewModel() {
                 lng = if(today.value) location.value?.second else null
             )
         )
-        _meetings.emit(meetManager.getMeetings(meetFilters.value))
+        meetManager.getMeetings(meetFilters.value).on(
+            success = { _meetings.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun alertDismiss(state: Boolean) {
@@ -150,8 +188,15 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun resetMeets() {
-        meetManager.resetMeets()
-        getMeets()
+        meetManager.resetMeets().on(
+            success = { getMeets() },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun meetInteraction(
@@ -162,7 +207,15 @@ class MainViewModel: ViewModel() {
         state.swipe(direction)
         _meetings.emit(meetings.value - meet)
         if(direction == LEFT)
-            meetManager.notInteresting(meet.id)
+            meetManager.notInteresting(meet.id).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
     }
     
     suspend fun changeGrid() {

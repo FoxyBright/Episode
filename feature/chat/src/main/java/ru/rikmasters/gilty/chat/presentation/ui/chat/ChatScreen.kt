@@ -203,7 +203,6 @@ fun ChatScreen(
                     scope.launch {
                         if(type == TRANSLATION || type == TRANSLATION_ORGANIZER) {
                             nav.navigateAbsolute("translations/main?id=${state.meet.id}")
-                            vm.toTranslation()
                         } else {
                             vm.completeChat(chat)
                             nav.navigate("main")

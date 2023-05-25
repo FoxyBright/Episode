@@ -34,8 +34,8 @@ class ChatWebSocket(
                 val socketID = mapper.readValue<SocketData>(response.data).socket_id
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
                 Log.d("WebSoc","socketID chat $socketID")
-                Log.d("WebSoc","transId user ${_userId.value}")
-                subscribe("private-user.${_userId.value}")
+                Log.d("WebSoc","transId user ${userId.value}")
+                subscribe("private-user.${userId.value}")
             }
 
             SUBSCRIPTION_SUCCEEDED -> {

@@ -5,10 +5,12 @@ import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.profile.ProfileWebSource.ObserversType
 import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.profile.repository.ProfileStore
+import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
+import ru.rikmasters.gilty.shared.models.Avatar
 
 class ProfileManager(
     private val web: ProfileWebSource,
@@ -23,22 +25,16 @@ class ProfileManager(
         store.getUserCategories(false)
     }
     
-    suspend fun updateUserCategories() {
-        withContext(IO) {
-            store.updateUserCategories()
-        }
-    }
+    suspend fun updateUserCategories() =
+        withContext(IO) { store.updateUserCategories() }
     
     fun getObservers(
         query: String,
         type: ObserversType,
     ) = store.getObservers(query, type)
     
-    suspend fun getUser(
-        id: String,
-    ) = withContext(IO) {
-        web.getUser(id)
-    }
+    suspend fun getUser(id: String) =
+        withContext(IO) { web.getUser(id) }
     
     suspend fun clearProfile() {
         withContext(IO) {
@@ -52,7 +48,9 @@ class ProfileManager(
     ) = withContext(IO) {
         if(albumId.isNotBlank()) {
             web.getFiles(albumId)
-        } else Pair(emptyList(),0)
+        } else DataStateTest.Success(
+            emptyList<Avatar>() to 0
+        )
     }
     
     fun getPhotosPaging(albumId: String) =
@@ -65,47 +63,32 @@ class ProfileManager(
     }
     
     fun getHiddenPhotos() = store.getUserHiddenPaging()
-
+    
     suspend fun getHiddenPhotosAmount() = store.getHiddenPhotosAmount()
-
-    suspend fun getProfileHiddens(
-        forceWeb: Boolean,
-    ) = withContext(IO) {
-        store.getUserHidden(forceWeb)
-    }
     
-    suspend fun deleteHidden(imageId: String) {
-        withContext(IO) {
-            store.deleteHidden(imageId)
-            getProfileHiddens(false)
-        }
-    }
+    suspend fun getProfileHiddens(forceWeb: Boolean) =
+        withContext(IO) { store.getUserHidden(forceWeb) }
     
-    suspend fun deleteObserver(
-        member: UserModel,
-    ) {
+    suspend fun deleteHidden(imageId: String) =
         withContext(IO) {
-            web.deleteObserver(member)
+            store.deleteHidden(imageId).let {
+                getProfileHiddens(false)
+                it
+            }
         }
-    }
     
-    suspend fun subscribeToUser(member: String) {
-        withContext(IO) {
-            web.subscribeToUser(member)
-        }
-    }
+    suspend fun deleteObserver(member: UserModel) =
+        withContext(IO) { web.deleteObserver(member) }
+    
+    suspend fun subscribeToUser(member: String) =
+        withContext(IO) { web.subscribeToUser(member) }
     
     fun getUserMeets(
         type: MeetingsType,
     ) = store.getUserMeets(type)
     
-    suspend fun unsubscribeFromUser(
-        member: String,
-    ) {
-        withContext(IO) {
-            web.unsubscribeFromUser(member)
-        }
-    }
+    suspend fun unsubscribeFromUser(member: String) =
+        withContext(IO) { web.unsubscribeFromUser(member) }
     
     suspend fun userUpdateData(
         username: String? = null,
@@ -113,13 +96,11 @@ class ProfileManager(
         age: Int? = null,
         gender: GenderType? = null,
         orientation: OrientationModel? = null,
-    ) {
-        withContext(IO) {
-            store.updateProfile(
-                username, aboutMe,
-                age, gender, orientation
-            )
-        }
+    ) = withContext(IO) {
+        store.updateProfile(
+            username, aboutMe,
+            age, gender, orientation
+        )
     }
     
     fun getResponds(type: RespondType) =
@@ -128,13 +109,8 @@ class ProfileManager(
     fun getMeetResponds(meetId: String) =
         store.getMeetResponds(meetId)
     
-    suspend fun deleteRespond(
-        respondId: String,
-    ) {
-        withContext(IO) {
-            web.deleteRespond(respondId)
-        }
-    }
+    suspend fun deleteRespond(respondId: String) =
+        withContext(IO) { web.deleteRespond(respondId) }
     
     suspend fun getNotificationResponds() =
         withContext(IO) {
@@ -143,24 +119,17 @@ class ProfileManager(
     
     suspend fun acceptRespond(
         respondId: String,
-    ) {
-        withContext(IO) {
-            web.acceptRespond(respondId)
-        }
-    }
+    ) = withContext(IO) { web.acceptRespond(respondId) }
     
     suspend fun cancelRespond(
         respondId: String,
-    ) {
-        withContext(IO) {
-            web.cancelRespond(respondId)
-        }
+    ) = withContext(IO) {
+        web.cancelRespond(respondId)
     }
     
-    suspend fun deleteAccount() {
-        withContext(IO) {
-            web.deleteAccount()
-            clearProfile()
+    suspend fun deleteAccount() = withContext(IO) {
+        web.deleteAccount().let {
+            clearProfile(); it
         }
     }
 }

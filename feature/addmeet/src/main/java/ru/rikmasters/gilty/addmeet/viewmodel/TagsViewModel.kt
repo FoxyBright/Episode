@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -7,12 +8,15 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
 class TagsViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
+    
+    private val context = getKoin().get<Context>()
     
     val addMeet by lazy { manager.addMeetFlow }
     
@@ -45,19 +49,54 @@ class TagsViewModel: ViewModel() {
     }
     
     suspend fun searchChange(text: String) {
-        _search.emit(text)
-        _tags.emit(manager.searchTags(text))
+        
+        manager.searchTags(text).on(
+            success = {
+                _search.emit(text)
+                _tags.emit(it)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun searchClear() {
-        _search.emit("")
-        _tags.emit(manager.searchTags(""))
+        manager.searchTags("").on(
+            success = {
+                _search.emit("")
+                _tags.emit(it)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getPopular() {
-        _popular.emit(Tags + manager.getPopularTags(
+        manager.getPopularTags(
             listOf(category.value?.id)
-        ).filter { !Tags.contains(it) })
+        ).on(
+            success = { tags ->
+                _popular.emit(
+                    Tags + tags.filter {
+                        !Tags.contains(it)
+                    }
+                )
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun selectTag(tag: TagModel) {
@@ -71,6 +110,7 @@ class TagsViewModel: ViewModel() {
         )
     }
     
+    @Suppress("unused")
     suspend fun addToPopular(tag: TagModel) {
         _popular.emit(popular.value + tag)
     }

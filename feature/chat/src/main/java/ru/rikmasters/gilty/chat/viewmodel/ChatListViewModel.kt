@@ -12,6 +12,7 @@ import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MESSAGE_DATE
@@ -21,6 +22,8 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val meetManager by inject<MeetingManager>()
     private val chatManager by inject<ChatManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _completed = MutableStateFlow(false)
     val completed = _completed.asStateFlow()
@@ -40,7 +43,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _sortType = MutableStateFlow<SortTypeModel?>(null)
     val sortType = _sortType.asStateFlow()
-
+    
     private val _isArchiveOn = MutableStateFlow(false)
     val isArchiveOn = _isArchiveOn.asStateFlow()
     
@@ -59,7 +62,22 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun getUnread() {
-        chatManager.updateUnreadMessages()
+        chatManager.updateUnreadMessages().on(
+            success = {
+                context.getSharedPreferences(
+                    "sharedPref",
+                    MODE_PRIVATE
+                ).edit()
+                    .putInt("unread_messages", it)
+                    .apply()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun onChatClick(chatId: String) {
@@ -71,7 +89,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         combine(refresh, _sortType) { refresh, sort ->
             Pair(refresh, sort)
         }.flatMapLatest {
-            chatManager.getChats(it.second?:MESSAGE_DATE)
+            chatManager.getChats(it.second ?: MESSAGE_DATE)
         }.cachedIn(coroutineScope)
     }
     
@@ -86,8 +104,8 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun changeSortType(sortType: SortTypeModel?) {
         _sortType.emit(sortType)
     }
-
-    suspend fun changeIsArchiveOn(){
+    
+    suspend fun changeIsArchiveOn() {
         _isArchiveOn.emit(!_isArchiveOn.value)
     }
     
@@ -95,11 +113,22 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
         forAll: Boolean,
     ) = singleLoading {
         chatToDelete.value?.let {
-            chatManager.deleteChat(it.id, forAll)
+            chatManager
+                .deleteChat(it.id, forAll)
+                .on(
+                    success = {
+                        alertSelect(0)
+                        changeAlertState(LIST)
+                        dismissAlert(false)
+                    },
+                    loading = {},
+                    error = { e ->
+                        context.errorToast(
+                            e.serverMessage
+                        )
+                    }
+                )
         }
-        alertSelect(0)
-        changeAlertState(LIST)
-        dismissAlert(false)
     }
     
     suspend fun navBarNavigate(

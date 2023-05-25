@@ -1,22 +1,15 @@
 package ru.rikmasters.gilty.meetings
 
-import android.content.res.Resources.getSystem
-import android.util.Log
-import androidx.core.os.ConfigurationCompat.getLocales
 import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode.Companion.Created
-import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
-import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
-import ru.rikmasters.gilty.shared.wrapper.errorWrapped
-import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
+import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingWebSource: KtorSource() {
@@ -35,7 +28,7 @@ class MeetingWebSource: KtorSource() {
         lat: Double?,
         lng: Double?,
         subjectId: String?,
-    ) = get("http://$HOST$PREFIX_URL/location/cities") {
+    ) = tryGet("http://$HOST$PREFIX_URL/location/cities") {
         url {
             if(query.isNotBlank()) query("query" to query)
             page?.let { query("page" to "$it") }
@@ -45,40 +38,43 @@ class MeetingWebSource: KtorSource() {
             query("country" to getLocale())
             subjectId?.let { query("subject_id" to it) }
         }
-    }?.let { res ->
-        if(res.status == OK)
-            res.wrapped<List<City>>()
+    }.let {
+        coroutinesState({ it }) {
+            it.wrapped<List<City>>()
                 .map { it.map() }
-        else null
-    } ?: emptyList()
-    
-    suspend fun setUserInterest(meets: List<String>) {
-        patch("http://$HOST$PREFIX_URL/profile/categories") {
-            url { meets.forEach { query("category_ids[]" to it) } }
         }
     }
     
-    suspend fun notInteresting(meetId: String) {
-        patch("http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting")
-    }
+    suspend fun setUserInterest(meets: List<String>) =
+        tryPatch("http://$HOST$PREFIX_URL/profile/categories") {
+            url {
+                meets.forEach {
+                    query("category_ids[]" to it)
+                }
+            }
+        }.let { coroutinesState({ it }) {} }
     
-    suspend fun resetMeets() {
-        post("http://$HOST$PREFIX_URL/meetings/reset")
-    }
+    suspend fun notInteresting(meetId: String) =
+        tryPatch(
+            "http://$HOST$PREFIX_URL/meetings/$meetId/markAsNotInteresting"
+        ).let { coroutinesState({ it }) {} }
+    
+    suspend fun resetMeets() =
+        tryPost("http://$HOST$PREFIX_URL/meetings/reset")
+            .let { coroutinesState({ it }) {} }
     
     suspend fun respondOfMeet(
         meetId: String,
         comment: String?,
         hidden: Boolean,
-    ) {
-        post("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
-            setBody(Respond(comment, hidden))
-        }
-    }
+    ) = tryPost(
+        "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
+    ) { setBody(Respond(comment, hidden)) }
+        .let { coroutinesState({ it }) {} }
     
-    suspend fun leaveMeet(meetId: String) {
-        patch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
-    }
+    suspend fun leaveMeet(meetId: String) =
+        tryPatch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")
+            .let { coroutinesState({ it }) {} }
     
     suspend fun getMeetsList(
         count: Boolean,
@@ -95,7 +91,7 @@ class MeetingWebSource: KtorSource() {
         dates: List<String>? = null,
         time: String? = null,
         city: Int? = null,
-    ) = get(
+    ) = tryGet(
         "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
     ) {
         url {
@@ -142,106 +138,101 @@ class MeetingWebSource: KtorSource() {
         }
     }
     
-    suspend fun cancelMeet(meetId: String) {
-        patch("http://$HOST$PREFIX_URL/meetings/$meetId/cancel")
-    }
+    suspend fun cancelMeet(meetId: String) =
+        tryPatch("http://$HOST$PREFIX_URL/meetings/$meetId/cancel")
+            .let { coroutinesState({ it }) {} }
     
-    suspend fun getUserActualMeets(
-        userId: String,
-    ) = get("http://$HOST$PREFIX_URL/users/$userId/meetings")
-        ?.let { res ->
-            if(res.status == OK)
-                res.wrapped<List<Meeting>>()
-                    .map { it.map() }
-            else null
-        } ?: emptyList()
     
-    suspend fun getDetailedMeet(
-        meet: String,
-    ) = get("http://$HOST$PREFIX_URL/meetings/$meet")
-        ?.let {
-            if(it.status == OK)
-                it.wrapped<DetailedMeetResponse>().map()
-            else null
-        }
-
+    suspend fun getUserActualMeets(userId: String) =
+        tryGet("http://$HOST$PREFIX_URL/users/$userId/meetings")
+            .let {
+                coroutinesState({ it }) {
+                    it.wrapped<List<Meeting>>()
+                        .map { it.map() }
+                }
+            }
+    
+    suspend fun getDetailedMeet(meet: String) =
+        tryGet("http://$HOST$PREFIX_URL/meetings/$meet")
+            .let {
+                coroutinesState({ it }) {
+                    it.wrapped<DetailedMeetResponse>().map()
+                }
+            }
+    
     // TODO: По мере возможности заменить используемый сейчас метод выше этим методом
-    suspend fun getDetailedMeetTest(
-        meet: String
-    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meet").wrapped<DetailedMeetResponse>()
+    suspend fun getDetailedMeetTest(meet: String) =
+        tryGet("http://$HOST$PREFIX_URL/meetings/$meet")
     
     suspend fun getMeetMembers(
         meet: String,
         excludeMe: Int,
         page: Int,
         perPage: Int,
-    ) = get("http://$HOST$PREFIX_URL/meetings/$meet/members") {
+    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meet/members") {
         url {
             query("exclude_me" to "$excludeMe")
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let {
-        if(it.status == OK)
+    }.let {
+        coroutinesState({ it }) {
             it.wrapped<List<User>>()
-        else null
+        }
     }
     
-    suspend fun getOrientations() = get(
-        "http://$HOST$PREFIX_URL/orientations"
-    )?.let {
-        if(it.status == OK)
-            it.wrapped<List<OrientationModel>>()
-        else null
-    } ?: emptyList()
+    suspend fun getOrientations() =
+        tryGet("http://$HOST$PREFIX_URL/orientations")
+            .let {
+                coroutinesState({ it }) {
+                    it.wrapped<List<OrientationModel>>()
+                }
+            }
     
-    suspend fun getLastPlaces() = get(
-        "http://$HOST$PREFIX_URL/meetings/places"
-    )?.let { res ->
-        if(res.status == OK)
-            res.wrapped<List<Location>>()
-                .map { it.map() }
-        else null
-    } ?: emptyList()
+    suspend fun getLastPlaces() =
+        tryGet("http://$HOST$PREFIX_URL/meetings/places")
+            .let {
+                coroutinesState({ it }) {
+                    it.wrapped<List<Location>>()
+                        .map { it.map() }
+                }
+            }
     
-    suspend fun getPopularTags(
-        categoriesId: List<String?>,
-    ) = get("http://$HOST$PREFIX_URL/tags/popular") {
-        url {
-            categoriesId.forEach {
-                query("category_ids[]" to "$it")
+    suspend fun getPopularTags(categoriesId: List<String?>) =
+        tryGet("http://$HOST$PREFIX_URL/tags/popular") {
+            url {
+                categoriesId.forEach {
+                    query("category_ids[]" to "$it")
+                }
+            }
+        }.let {
+            coroutinesState({ it }) {
+                it.wrapped<List<TagModel>>()
             }
         }
-    }?.let {
-        if(it.status == OK)
-            it.wrapped<List<TagModel>>()
-        else null
-    } ?: emptyList()
     
-    suspend fun addNewTag(tag: String) {
-        post("http://$HOST$PREFIX_URL/tags") {
+    suspend fun addNewTag(tag: String) =
+        tryPost("http://$HOST$PREFIX_URL/tags") {
             setBody(Tag(tag))
-        }
-    }
+        }.let { coroutinesState({ it }) {} }
     
     suspend fun searchTags(tag: String) =
-        get("http://$HOST$PREFIX_URL/tags/search") {
+        tryGet("http://$HOST$PREFIX_URL/tags/search") {
             url { query("query" to tag) }
-        }?.let {
-            if(it.status == OK)
+        }.let {
+            coroutinesState({ it }) {
                 it.wrapped<List<TagModel>>()
-            else null
-        } ?: emptyList()
+            }
+        }
     
     suspend fun getCategoriesList() =
-        get("http://$HOST$PREFIX_URL/categories")
-            ?.let { res ->
-                if(res.status == OK)
-                    res.wrapped<List<Category>>()
+        tryGet("http://$HOST$PREFIX_URL/categories")
+            .let {
+                coroutinesState({ it }) {
+                    it.wrapped<List<Category>>()
                         .map { it.map() }
-                else null
-            } ?: emptyList()
-    
+                }
+            }
     
     suspend fun addMeet(
         categoryId: String?,
@@ -261,7 +252,7 @@ class MeetingWebSource: KtorSource() {
         requirementsType: String?,
         requirements: List<Requirement>?,
         withoutResponds: Boolean?,
-    ) = unExpectPost(
+    ) = tryPost(
         "http://$HOST$PREFIX_URL/meetings"
     ) {
         setBody(
@@ -275,9 +266,9 @@ class MeetingWebSource: KtorSource() {
             )
         )
     }.let {
-        Log.d("TEST","ADD MEET RESPONSE ${it.status} WRAPPED ${it.wrapped<DetailedMeetResponse>()}")
-        if(it.status == Created)
-            it.wrapped<DetailedMeetResponse>().id
-        else "error" + it.errorWrapped().error.message
+        coroutinesState(
+            request = { it },
+            expectCode = 201
+        ) { it.wrapped<DetailedMeetResponse>().id }
     }
 }

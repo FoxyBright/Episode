@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.viewmodels.bottoms
 
+import android.content.Context
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
@@ -7,6 +8,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
 import ru.rikmasters.gilty.shared.model.meeting.*
@@ -18,6 +20,8 @@ class FiltersBsViewModel(
     
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _screen = MutableStateFlow(0)
     val screen = _screen.asStateFlow()
@@ -131,10 +135,10 @@ class FiltersBsViewModel(
     }
     
     suspend fun getCities() {
-        _cityList.emit(
-            meetManager.getCities(
-                searchCity.value
-            )
+        meetManager.getCities(searchCity.value).on(
+            success = { _cityList.emit(it) },
+            loading = {},
+            error = {}
         )
     }
     
@@ -229,16 +233,22 @@ class FiltersBsViewModel(
     val hasFilters = mainVm.meetFilters
     
     private suspend fun findMeets() = singleLoading {
-        _results.emit(
-            meetManager.getMeetCount(
-                filtersBuilder().copy(
-                    genders = listOf(
-                        profileManager
-                            .getProfile()
-                            .gender
-                    )
+        meetManager.getMeetCount(
+            filtersBuilder().copy(
+                genders = listOf(
+                    profileManager
+                        .getProfile()
+                        .gender
                 )
             )
+        ).on(
+            success = { _results.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -324,17 +334,34 @@ class FiltersBsViewModel(
         _distance.emit(distance)
     }
     
-    private val _searchResult = MutableStateFlow(emptyList<TagModel>())
+    private val _searchResult =
+        MutableStateFlow(emptyList<TagModel>())
+    
     val searchResult = _searchResult
         .combine(tagSearch.debounce(250)) { _, current ->
-            meetManager.searchTags(current)
+            meetManager.searchTags(current).on(
+                success = { it },
+                loading = { emptyList() },
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                    emptyList()
+                }
+            )
         }.state(_searchResult.value)
     
     suspend fun getPopularTags() {
-        _popularTags.emit(
-            meetManager.getPopularTags(
-                selectedCategories.value.map { it.id }
-            )
+        meetManager.getPopularTags(
+            selectedCategories.value.map { it.id }
+        ).on(
+            success = { _popularTags.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -348,7 +375,9 @@ class FiltersBsViewModel(
     }
     
     suspend fun deleteAdditionallyTag(tag: TagModel) {
-        _additionallyTags.emit(additionallyTags.value - tag)
+        _additionallyTags.emit(
+            additionallyTags.value - tag
+        )
     }
     
     suspend fun selectTag(tag: TagModel) {
