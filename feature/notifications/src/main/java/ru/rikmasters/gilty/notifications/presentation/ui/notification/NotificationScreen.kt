@@ -34,10 +34,10 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val context = LocalContext.current
     val nav = get<NavState>()
     
+    val splitNotifications by vm.splitMonthNotifications.collectAsState()
     val notifications = vm.notifications.collectAsLazyPagingItems()
     val participants = vm.participants.collectAsLazyPagingItems()
     val participantsStates by vm.participantsStates.collectAsState()
-    val splitNotifications by vm.splitMonthNotifications.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val ratings by vm.ratings.collectAsState()
@@ -63,11 +63,17 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             }
         }
     }
-
-    LaunchedEffect(key1 = notifications.itemSnapshotList.items, block = {
-        scope.launch { vm.splitByMonth(notifications.itemSnapshotList.items) }
-    })
-
+    
+    LaunchedEffect(
+        notifications.itemSnapshotList.items
+    ) {
+        scope.launch {
+            vm.splitByMonthSM(
+                notifications.itemSnapshotList.items
+            )
+        }
+    }
+    
     var errorState by remember {
         mutableStateOf(false)
     }
@@ -123,7 +129,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-
+            
             override fun onMeetClick(meet: MeetingModel?) {
                 scope.launch {
                     meet?.let { m ->

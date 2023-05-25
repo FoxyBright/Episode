@@ -13,11 +13,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
-import ru.rikmasters.gilty.shared.common.extentions.getMonth
-import ru.rikmasters.gilty.shared.common.extentions.monthControl
-import ru.rikmasters.gilty.shared.common.extentions.todayControl
-import ru.rikmasters.gilty.shared.common.extentions.weekControl
-import ru.rikmasters.gilty.shared.common.extentions.yesterdayControl
+import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
@@ -59,16 +55,20 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     )
     val unreadMessages = _unreadMessages.asStateFlow()
     
-    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
+    private val _ratings =
+        MutableStateFlow(emptyList<RatingModel>())
     val ratings = _ratings.asStateFlow()
     
     private val _selectedNotification =
         MutableStateFlow<NotificationModel?>(null)
-    val selectedNotification = _selectedNotification.asStateFlow()
+    val selectedNotification =
+        _selectedNotification.asStateFlow()
     
-    private val _meetId = MutableStateFlow<String?>(null)
+    private val _meetId =
+        MutableStateFlow<String?>(null)
     
-    private val refreshMember = MutableStateFlow<Boolean>(false)
+    private val refreshMember =
+        MutableStateFlow(false)
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val participants by lazy {
@@ -85,7 +85,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val _participantsStates = MutableStateFlow(emptyList<Int>())
     val participantsStates = _participantsStates.asStateFlow()
     
-    var currentIndexToSplit = 0
+    private var currentIndexToSplit = 0
     
     val splitMonthNotifications =
         MutableStateFlow(emptyList<Pair<Int, NotificationModel>>())
@@ -153,33 +153,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         )
         forceRefresh()
     }
-    
-    
-    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
-    val ratings = _ratings.asStateFlow()
-    
-    private val _selectedNotification =
-        MutableStateFlow<NotificationModel?>(null)
-    val selectedNotification = _selectedNotification.asStateFlow()
-    
-    private val _meetId = MutableStateFlow<String?>(null)
-    
-    private val refreshMember = MutableStateFlow(false)
-    
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val participants by lazy {
-        refreshMember.flatMapLatest {
-            _meetId.value?.let {
-                meetManager.getMeetMembers(
-                    meetId = it,
-                    excludeMe = true
-                )
-            } ?: flow { }
-        }
-    }
-    
-    private val _participantsStates = MutableStateFlow(emptyList<Int>())
-    val participantsStates = _participantsStates.asStateFlow()
     
     suspend fun getRatings() = singleLoading {
         notificationManger.getRatings().on(
@@ -253,11 +226,6 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     suspend fun forceRefreshMembers() {
         refreshMember.emit(!refreshMember.value)
     }
-    
-    private var currentIndexToSplit = 0
-    
-    val splitMonthNotifications =
-        MutableStateFlow(emptyList<Pair<Int, NotificationModel>>())
     
     suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
         // 20 - today
