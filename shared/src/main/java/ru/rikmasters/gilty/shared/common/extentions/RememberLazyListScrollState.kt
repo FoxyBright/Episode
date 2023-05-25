@@ -1,6 +1,6 @@
 package ru.rikmasters.gilty.shared.common.extentions
 
-import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -13,13 +13,12 @@ private val SaveMap =
 fun rememberLazyListScrollState(
     key: String,
 ) = SaveMap[key].let { state ->
-    val listState = rememberLazyListState(
+    val listState: LazyListState = rememberLazyListState(
         (state?.first ?: 0),
         (state?.second ?: 0)
     )
-    LaunchedEffect(key1 = false, block = {
-        listState.animateScrollToItem((state?.first ?: 0))
-        listState.animateScrollBy((state?.second ?: 0).toFloat())
+    LaunchedEffect(key1 = Unit, block = {
+        listState.animateScrollToItem((state?.first ?: 0),(state?.second ?: 0).toInt())
     })
     listState
 }.let {
@@ -30,4 +29,10 @@ fun rememberLazyListScrollState(
             SaveMap[key] = index to offset
         }
     }; it
+}
+
+suspend fun LazyListState.animateToLastPosition(key:String){
+    SaveMap[key].let { state->
+        this.scrollToItem((state?.first ?: 0),(state?.second ?: 0).toInt())
+    }
 }

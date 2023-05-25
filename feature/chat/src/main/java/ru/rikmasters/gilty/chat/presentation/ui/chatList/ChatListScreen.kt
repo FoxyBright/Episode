@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.extentions.animateToLastPosition
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
@@ -41,6 +42,16 @@ fun ChatListScreen(vm: ChatListViewModel) {
             unreadMessages, INACTIVE
         )
     }
+
+    var isFirstRefresh by remember{ mutableStateOf(true) }
+
+    LaunchedEffect(key1 = chats.itemSnapshotList.items, block = {
+        // Scrolls down to last position if it is needed
+        if(chats.itemSnapshotList.items.isNotEmpty() && isFirstRefresh){
+            listState.animateToLastPosition("chat_list")
+            isFirstRefresh = false
+        }
+    })
     
     LaunchedEffect(Unit) {
         context.listenPreference(
