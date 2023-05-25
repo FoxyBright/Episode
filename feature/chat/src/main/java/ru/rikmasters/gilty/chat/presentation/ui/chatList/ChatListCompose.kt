@@ -124,11 +124,7 @@ fun ChatListContent(
         content = {
             if(!state.smthError) Column(Modifier.padding(it)) {
                 SortTypeLabels(Modifier, state, callback)
-                if(state.chats.loadState.refresh is LoadState.NotLoading
-                    && (state.chats.itemCount == 0 ||
-                            (state.chats.itemSnapshotList.items.any { item -> item.meetStatus != MeetStatusType.ACTIVE }
-                                    && (state.sortType == null || state.sortType == MESSAGE_DATE) ))
-                ) EmptyChats()
+                if(state.chats.loadState.refresh is LoadState.NotLoading && state.chats.itemCount == 0) EmptyChats()
                 Use<ChatListViewModel>(PullToRefreshTrait) {
                     Content(state, Modifier, callback)
                 }
@@ -224,10 +220,7 @@ private fun Content(
                             it.meetStatus != MeetStatusType.ACTIVE
                         }
                     
-                    if(
-                        state.sortType == MEETING_DATE
-                        && inactiveItems.isNotEmpty()
-                    ) item {
+                    if(inactiveItems.isNotEmpty()) item {
                         ActionRow(
                             Modifier.padding(
                                 top = 28.dp,
@@ -238,10 +231,7 @@ private fun Content(
                         ) { callback?.onEndedClick() }
                     }
                     
-                    if(
-                        (state.endedState
-                        || state.sortType == MEETING_DATE)
-                    ) {
+                    if(state.endedState && inactiveItems.isNotEmpty()) {
                         itemsIndexed(state.chats) { index, item ->
                             if(item?.meetStatus != MeetStatusType.ACTIVE) {
                                 val chat =

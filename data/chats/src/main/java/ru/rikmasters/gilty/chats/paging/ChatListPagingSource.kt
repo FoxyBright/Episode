@@ -23,7 +23,7 @@ class ChatListPagingSource(
 
         return try {
             val chats = webSource.getDialogs(
-                page = 26,
+                page = page,
                 perPage = loadSize,
                 sortType = sortType,
                 isArchiveOn = isArchiveOn,
