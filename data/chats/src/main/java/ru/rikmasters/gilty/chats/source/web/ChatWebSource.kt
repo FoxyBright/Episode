@@ -34,11 +34,13 @@ class ChatWebSource: KtorSource() {
         page: Int? = null,
         perPage: Int? = null,
         sortType: SortType = SortType.MEETING_DATE,
+        isArchiveOn: Boolean = false,
     ) = get("http://$HOST$PREFIX_URL/chats") {
         url {
             page?.let { query("page" to "$page") }
             perPage?.let { query("per_page" to "$perPage") }
             query("sort_type" to sortType.stringName)
+            query("archive" to if(isArchiveOn) "1" else "0")
         }
     }?.let {
         if(it.status == OK) it.wrapped<List<Chat>>() else null
