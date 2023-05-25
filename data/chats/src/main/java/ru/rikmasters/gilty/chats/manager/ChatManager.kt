@@ -27,6 +27,7 @@ class ChatManager(
     
     fun getChats(
         sortTypeModel: SortTypeModel,
+        isArchiveOn:Boolean,
     ): Flow<PagingData<ChatModel>> {
         return Pager(
             config = PagingConfig(
@@ -37,7 +38,8 @@ class ChatManager(
             pagingSourceFactory = {
                 ChatListPagingSource(
                     webSource = webSource,
-                    sortType = sortTypeModel.mapDTO()
+                    sortType = sortTypeModel.mapDTO(),
+                    isArchiveOn = isArchiveOn
                 )
             }
         ).flow

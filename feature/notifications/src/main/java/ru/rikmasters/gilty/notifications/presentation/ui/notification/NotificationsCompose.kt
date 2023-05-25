@@ -244,9 +244,10 @@ private fun Notifications(
         11 -> R.string.month_november_name
         12 -> R.string.month_december_name
         20 -> R.string.meeting_profile_bottom_today_label
-        30 -> R.string.notification_on_this_week_label
-        // 40 -> TODO
-        else -> R.string.month_december_name
+        30 -> R.string.meeting_profile_bottom_yesterday_label
+        40 -> R.string.notification_on_this_week_label
+        50 -> R.string.meeting_profile_bottom_30_days_earlier_label
+        else -> R.string.meeting_profile_bottom_latest_label
     }
 
     val notifications = state.notifications
@@ -282,20 +283,35 @@ private fun Notifications(
                                 Label(
                                     text = getPeriodName(monthNumber = splitNotifications[index].first),
                                     hasResponds = hasResponds,
-                                    isFirst = getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first) == 0
+                                    isFirst = getIndex(
+                                        prev = doesPrevExist(
+                                            index,
+                                            splitNotifications
+                                        )
+                                    ) == 0
                                 )
                             else if (splitNotifications[index - 1].first != splitNotifications[index].first)
                                 Label(
                                     text = getPeriodName(monthNumber = splitNotifications[index].first),
                                     hasResponds = hasResponds,
-                                    isFirst = getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first) == 0
+                                    isFirst = getIndex(
+                                        prev = doesPrevExist(
+                                            index,
+                                            splitNotifications
+                                        )
+                                    ) == 0
                                 )
                             // Displays actual notification
                             ElementNot(
-                                getIndex(prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first), // Checks if prev or next exists
+                                getIndex(
+                                    prev = doesPrevExist(
+                                        index,
+                                        splitNotifications
+                                    )
+                                ),
                                 getSize(
-                                    prev = if(index == 0) false else splitNotifications[index - 1].first == splitNotifications[index].first,
-                                    next = if(index + 1 > splitNotifications.size) false else  splitNotifications[index + 1].first == splitNotifications[index].first
+                                    prev = doesPrevExist(index, splitNotifications),
+                                    next = doesNextExist(index, splitNotifications),
                                 ),
                                 splitNotifications[index].second,
                                 state.ratings,
@@ -303,7 +319,7 @@ private fun Notifications(
                             )
                         }
                     }
-                    if (notifications.loadState.append is Loading)
+                    if (notifications.loadState.append is Loading || splitNotifications.size != state.notifications.itemCount)
                         item { PagingLoader(notifications.loadState) }
                 } else if (notifications.loadState.refresh is NotLoading)
                     item { EmptyNotification() }
@@ -312,11 +328,33 @@ private fun Notifications(
         item { Spacer(Modifier.height(20.dp)) }
     }
 }
+
+fun doesPrevExist(index: Int, splitNotifications: List<Pair<Int, NotificationModel>>) =
+    if (index == 0) false
+    else {
+        try {
+            splitNotifications[index - 1].first == splitNotifications[index].first
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+fun doesNextExist(index: Int, splitNotifications: List<Pair<Int, NotificationModel>>) =
+    if (index + 1 > splitNotifications.size) false
+    else {
+        try {
+            splitNotifications[index + 1].first == splitNotifications[index].first
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
 fun getSize(prev: Boolean, next: Boolean): Int {
-    if(!prev && !next) return 1
-    if(prev && next) return 3
-    if(prev) return 2
-    if(next) return 2
+    if (!prev && !next) return 1
+    if (prev && next) return 3
+    if (prev) return 2
+    if (next) return 2
     return 0
 }
 

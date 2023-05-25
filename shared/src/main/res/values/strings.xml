@@ -146,6 +146,8 @@
     <string name="meeting_private_type">Приватный episode</string>
     <string name="meeting_private_and_anon_type">Анонимный, приватный episode</string>
     <string name="meeting_profile_bottom_today_label">Сегодня</string>
+    <string name="meeting_profile_bottom_yesterday_label">Вчера</string>
+    <string name="meeting_profile_bottom_30_days_earlier_label">Предыдущие 30 дней</string>
     <string name="meeting_profile_bottom_latest_label">Потом</string>
     <string name="meeting_avatar">Аватар</string>
     <string name="meeting_members">Участники</string>
