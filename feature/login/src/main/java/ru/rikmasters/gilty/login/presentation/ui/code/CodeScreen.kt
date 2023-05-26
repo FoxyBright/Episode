@@ -46,9 +46,9 @@ fun CodeScreen(vm: CodeViewModel) {
                             vm.linkExternalToken()
 
                             if (vm.profileCompleted())
-                                nav.navigateAbsolute("main/meetings")
+                                nav.clearStackNavigation("main/meetings")
                             else
-                                nav.navigate("profile")
+                                nav.clearStackNavigation("profile")
                         }else {
                             badCode()
                         }
