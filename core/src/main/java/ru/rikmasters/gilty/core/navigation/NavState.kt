@@ -57,9 +57,7 @@ class NavState(
      */
     fun clearStackNavigation(route: String) {
         navController.navigate(route) {
-            popUpTo(0){
-                inclusive = true
-            }
+            popUpTo(0)
         }
     }
     
