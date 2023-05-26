@@ -60,6 +60,11 @@ class NavState(
             popUpTo(0)
         }
     }
+    fun clearStackNavigationAbsolute(route:String){
+        navHostController.navigate(route) {
+            popUpTo(0)
+        }
+    }
     
     /**
      * путь назад по графу

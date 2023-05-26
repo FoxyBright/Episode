@@ -122,7 +122,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 profileType = USERPROFILE,
                 observeState = false,
                 errorText = errorText,
-                activeAlbumId = activeAlbumId
+                activeAlbumId = activeAlbumId,
+                isAlbumVisible = true
             ),
             currentMeetings = meets,
             meetingsHistory = meetsHistory,

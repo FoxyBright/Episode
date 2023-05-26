@@ -114,7 +114,8 @@ data class ProfileState(
     val lockState: Boolean = false,
     val isError: Boolean = false,
     val errorText: String = "",
-    val activeAlbumId: Int? = null
+    val activeAlbumId: Int? = null,
+    val isAlbumVisible:Boolean = false,
 )
 
 interface ProfileCallback {
@@ -200,40 +201,40 @@ fun Profile(
             }
         }
         Spacer(Modifier.height(12.dp))
-
-        AlbumPictures(
-            picturesWithEmojis = listOf(
-                AlbumPictureWithEmoji(
-                    id = 1,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel
+        if(state.isAlbumVisible)
+            AlbumPictures(
+                picturesWithEmojis = listOf(
+                    AlbumPictureWithEmoji(
+                        id = 1,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 2,
+                        image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
+                        emoji = DemoEmojiModel
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 3,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel,
+                        isVisible = false,
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 4,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel
+                    ),
                 ),
-                AlbumPictureWithEmoji(
-                    id = 2,
-                    image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
-                    emoji = DemoEmojiModel
-                ),
-                AlbumPictureWithEmoji(
-                    id = 3,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel,
-                    isVisible = false,
-                ),
-                AlbumPictureWithEmoji(
-                    id = 4,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel
-                ),
-            ),
-            activeAlbumId = state.activeAlbumId,
-            type = state.profileType,
-            onAlbumClick = { id ->
-                callback?.onAlbumClick(id)
-            },
-            onAlbumLongClick = { id ->
-                callback?.onAlbumLongClick(id)
-            }
-        )
+                activeAlbumId = state.activeAlbumId,
+                type = state.profileType,
+                onAlbumClick = { id ->
+                    callback?.onAlbumClick(id)
+                },
+                onAlbumLongClick = { id ->
+                    callback?.onAlbumLongClick(id)
+                }
+            )
 
         AboutMe(
             modifier = Modifier.padding(horizontal = 16.dp),

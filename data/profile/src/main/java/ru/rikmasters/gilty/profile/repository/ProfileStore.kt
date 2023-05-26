@@ -44,7 +44,7 @@ class ProfileStore(
     }
     
     suspend fun checkCompletable() =
-        getProfile(false).isCompleted
+        getProfile(true).isCompleted
     
     private suspend fun uploadProfile(
         forceWeb: Boolean,
