@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat.bars
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +18,11 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.Top
 import androidx.compose.ui.Modifier
@@ -30,6 +38,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.PARTICIPANT
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.WordEndingType.VIEWER
@@ -194,6 +203,27 @@ private fun PinedButton(
     toTranslation: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
+    var isGradientOn by remember{ mutableStateOf(false) }
+    val gradientAnimDuration = 800
+    LaunchedEffect(key1 = Unit, block = {
+        while(true){
+            isGradientOn = !isGradientOn
+            delay(gradientAnimDuration.toLong())
+        }
+    })
+
+    val greenGradientAnim by animateColorAsState(
+        targetValue = if(isGradientOn) colorScheme.surface else colorScheme.surfaceTint,
+        animationSpec = tween(gradientAnimDuration, easing = LinearEasing))
+
+    val greenGradientSecAnim by animateColorAsState(
+        targetValue = if(isGradientOn) colorScheme.onSurface else colorScheme.surface,
+        animationSpec = tween(gradientAnimDuration, easing = LinearEasing))
+
+    val greenGradientThirdAnim by animateColorAsState(
+        targetValue = if(isGradientOn) colorScheme.surfaceTint else colorScheme.onSurface,
+        animationSpec = tween(gradientAnimDuration, easing = LinearEasing))
+
     val viewString = stringResource(R.string.chats_view_translation_button)
     val meetType = type == MEET_FINISHED
     Card(
@@ -208,7 +238,7 @@ private fun PinedButton(
                     if(meetType) listOf(
                         colors.chipGray,
                         colors.chipGray
-                    ) else green()
+                    ) else listOf(greenGradientAnim, greenGradientSecAnim, greenGradientThirdAnim)  //green()
                 ), shapes.large
             )
         ) {
