@@ -126,7 +126,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                     scope.launch {
                         vm.exitAlertDismiss(false)
                         vm.logout()
-                        nav.navigateAbsolute("login")
+                        nav.clearStackNavigation("login")
                     }
                 }
                 
@@ -134,7 +134,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                     scope.launch {
                         vm.deleteAlertDismiss(false)
                         vm.deleteAccount()
-                        nav.navigateAbsolute("login")
+                        nav.clearStackNavigation("login")
                     }
                 }
                 
