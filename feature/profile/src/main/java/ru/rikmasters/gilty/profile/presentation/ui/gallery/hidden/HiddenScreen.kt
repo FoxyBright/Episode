@@ -11,13 +11,14 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenViewModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HiddenBsScreen(vm: HiddenViewModel) {
-    
+
     val photoList = vm.images.collectAsLazyPagingItems()
     val photoAmount = vm.photosAmount.collectAsState()
     val storagePermissions = permissionState()
@@ -25,26 +26,39 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-    
-    
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val photoViewType by vm.viewerType.collectAsState()
+    val photoViewState by vm.viewerState.collectAsState()
+
+
     LaunchedEffect(Unit) {
         vm.uploadPhotoList()
         vm.getHiddenPhotosAmount()
     }
 
     HiddenBsContent(
-        HiddenBsState(photoList,photoAmount.value), Modifier, object : HiddenBsCallback {
-            
+        HiddenBsState(
+            photoList,
+            photoAmount.value,
+            photoViewState,
+            viewerImages,
+            viewerSelectImage,
+            false,
+            photoViewType
+        ), Modifier, object : HiddenBsCallback {
+
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
-                    asm.bottomSheet.collapse()
-                    nav.navigate("avatar?type=0&image=${image.url}")
+                    vm.changePhotoViewType(PhotoViewType.PHOTO)
+                    vm.setPhotoViewSelected(image)
+                    vm.setPhotoViewImages(photoList.itemSnapshotList.items)
+                    vm.changePhotoViewState(true)
                 }
             }
 
             override fun openGallery() {
                 scope.launch {
-                    asm.bottomSheet.collapse()
                     context.checkStoragePermission(
                         storagePermissions, scope, asm,
                     ) { nav.navigate("gallery?multi=true") }
@@ -57,6 +71,10 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
 
             override fun onBack() {
                 nav.navigationBack()
+            }
+
+            override fun onPhotoViewDismiss(state: Boolean) {
+                scope.launch { vm.changePhotoViewState(state) }
             }
         }
     )

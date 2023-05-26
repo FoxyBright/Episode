@@ -34,7 +34,7 @@ fun ActionBar(
     title: String,
     modifier: Modifier = Modifier,
     details: String? = null,
-    extra:String?=null,
+    extra:String? = null,
     onBack: (() -> Unit)? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
@@ -61,9 +61,9 @@ fun ActionBar(
             extra?.let {
                 Text(
                     text = extra,
-                    Modifier.padding(start = 4.dp),
+                    Modifier.padding(start = 4.dp, bottom = 2.dp),
                     colorScheme.onTertiary,
-                    style = typography.bodyMedium
+                    style = typography.bodyLarge
                 )
             }
         }
