@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import androidx.compose.animation.animateContentSize
@@ -25,7 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.LoadState.NotLoading
 import androidx.paging.compose.*
+import ru.rikmasters.gilty.chat.presentation.ui.ChatListPlaceholder
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.ChatDeleteAlert
@@ -33,7 +37,6 @@ import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.empty_chat_zaglushka
 import ru.rikmasters.gilty.shared.R.string.chats_ended_chats_label
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
@@ -46,7 +49,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.shared.*
-import ru.rikmasters.gilty.shared.theme.Colors
+import ru.rikmasters.gilty.shared.theme.Colors.Red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -124,7 +127,11 @@ fun ChatListContent(
         content = {
             if(!state.smthError) Column(Modifier.padding(it)) {
                 SortTypeLabels(Modifier, state, callback)
-                if(state.chats.loadState.refresh is LoadState.NotLoading && state.chats.itemCount == 0) EmptyChats()
+                
+                if(state.chats.loadState.refresh is NotLoading
+                    && state.chats.itemCount == 0
+                ) ChatListPlaceholder(Modifier.offset(y = -(50).dp))
+                
                 Use<ChatListViewModel>(PullToRefreshTrait) {
                     Content(state, Modifier, callback)
                 }
@@ -172,7 +179,6 @@ private fun Content(
 ) {
     val chats = state.chats
     val itemCount = chats.itemCount
-    
     if(LocalInspectionMode.current)
         PreviewLazy() else LazyColumn(
         modifier = modifier
@@ -181,7 +187,6 @@ private fun Content(
         state = state.listState
     ) {
         item { Spacer(Modifier.height(12.dp)) }
-
         when {
             chats.loadState.refresh is LoadState.Error -> Unit
             chats.loadState.append is LoadState.Error -> Unit
@@ -194,22 +199,24 @@ private fun Content(
                             it.meetStatus == MeetStatusType.ACTIVE
                         }
                     ).let {
-                        if(it.isNotEmpty() && (state.sortType == MEETING_DATE || state.sortType == null)) {
-                            items(it) { (label, list) ->
-                                Label(
-                                    label, Modifier.padding(
-                                        top = 28.dp,
-                                        bottom = 18.dp
-                                    )
+                        if(
+                            it.isNotEmpty()
+                            && (state.sortType == MEETING_DATE
+                                    || state.sortType == null)
+                        ) items(it) { (label, list) ->
+                            Label(
+                                label, Modifier.padding(
+                                    top = 28.dp,
+                                    bottom = 18.dp
                                 )
-                                list.map { chatModel ->
-                                    chatModel to rememberDragRowState()
-                                }.forEachIndexed { index, chat ->
-                                    ElementChat(
-                                        chat.first, index, list.size,
-                                        chat.second, callback
-                                    )
-                                }
+                            )
+                            list.map { chatModel ->
+                                chatModel to rememberDragRowState()
+                            }.forEachIndexed { index, chat ->
+                                ElementChat(
+                                    chat.first, index, list.size,
+                                    chat.second, callback
+                                )
                             }
                         }
                     }
@@ -349,20 +356,6 @@ private fun Label(
 )
 
 @Composable
-private fun EmptyChats(
-    // TODO Сделать скрин с плавающим баблом
-    modifier: Modifier = Modifier,
-) {
-    Image(
-        painterResource(
-            empty_chat_zaglushka
-        ),
-        (null),
-        modifier.fillMaxSize()
-    )
-}
-
-@Composable
 fun SortTypeLabels(
     modifier: Modifier,
     state: ChatListState,
@@ -377,30 +370,30 @@ fun SortTypeLabels(
     ) {
         Spacer(modifier = Modifier.width(16.dp))
         Box(modifier = Modifier.animateContentSize()) {
-            if (state.sortType != null) {
+            state.sortType?.let {
                 GChip(
                     modifier = Modifier.padding(
                         start = if(sortLabelHeightDp - 16.dp >= 0.dp)
                             sortLabelHeightDp - 16.dp
                         else 0.dp
                     ),
-                    text = state.sortType.getSortName(),
+                    text = it.getSortName(),
                     isSelected = true,
-                    primary = Colors.Red
+                    primary = Red
                 ) {}
             }
-            
             Row(modifier = Modifier.onGloballyPositioned { coordinates ->
                 sortLabelHeightDp =
                     with(localDensity) { coordinates.size.width.toDp() }
             }, verticalAlignment = CenterVertically) {
-                if (state.sortType != null) {
+                if(state.sortType != null) {
                     Image(
-                        painterResource(
-                            R.drawable.ic_close_sort // TODO: Consider dark theme for icon
+                        // TODO: Consider dark theme for icon
+                        painter = painterResource(
+                            R.drawable.ic_close_sort
                         ),
-                        (null),
-                        Modifier
+                        contentDescription = (null),
+                        modifier = Modifier
                             .padding(end = 8.dp)
                             .size(26.dp)
                             .clickable {
@@ -417,12 +410,16 @@ fun SortTypeLabels(
             }
             
         }
-        if (state.sortType != null) {
+        if(state.sortType != null) {
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
-                text = (if (state.sortType == MEETING_DATE) MESSAGE_DATE else MEETING_DATE).getSortName()
+                text = (if(state.sortType == MEETING_DATE)
+                    MESSAGE_DATE else MEETING_DATE).getSortName()
             ) {
-                callback?.onSortClick(if (state.sortType == MEETING_DATE) MESSAGE_DATE else MEETING_DATE)
+                callback?.onSortClick(
+                    if(state.sortType == MEETING_DATE)
+                        MESSAGE_DATE else MEETING_DATE
+                )
             }
         }
         GChip(

@@ -26,7 +26,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val nav = get<NavState>()
-    
+
     val chats = vm.chats.collectAsLazyPagingItems()
     val alertSelected by vm.alertSelected.collectAsState()
     val isArchiveOn by vm.isArchiveOn.collectAsState()

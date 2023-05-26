@@ -23,6 +23,7 @@ class HiddenBsViewModel(
     val selected = _selected.asStateFlow()
 
     suspend fun sendImages(chatId: String) {
+        logD("logiiii selected-> ${selected.value}")
         selected.value.forEach {
             chatVm.onSendMessage(
                 chatId,

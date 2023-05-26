@@ -252,6 +252,10 @@
     <string name="chats_sort_label">Сортировка</string>
     <string name="chats_archive_label">Архив</string>
 
+    <string name="chat_list_placeholder_category_name">Создавай</string>
+    <string name="chat_list_placeholder_create_label">Нет Episodes, нет и чатов</string>
+    <string name="chat_list_placeholder_respond_button_label">Откликайся</string>
+
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
     <string name="action_bar_button_back">Кнопка назад</string>

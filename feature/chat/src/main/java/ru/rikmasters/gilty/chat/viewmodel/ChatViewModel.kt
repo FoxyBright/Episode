@@ -362,6 +362,7 @@ class ChatViewModel: ViewModel() {
         photos: List<FileSource>? = null,
         videos: List<FileSource>? = null,
     ) {
+        logD("logiiii send-> $photos")
         coroutineScope.launch {
             changeAnswer(null)
             clearMessage()
