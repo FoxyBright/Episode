@@ -182,8 +182,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                 if(
                     it
                     && isOrganizer
-                    && _selectedNotification.value
-                        ?.feedback == null
+                    && _selectedNotification.value?.feedback == null
                 ) {
                     val feedback =
                         _selectedNotification.value
@@ -202,6 +201,15 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                                 )
                             )
                     )
+                    // Updates list item after putting rating
+                    val splitByMonthList = splitMonthNotifications.value.toMutableList()
+                    val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == _selectedNotification.value?.id }
+                    if(indexOfSelected != -1){
+                        _selectedNotification.value?.let { item->
+                            splitByMonthList[indexOfSelected] = splitByMonthList[indexOfSelected].copy(second = item)
+                        }
+                        splitMonthNotifications.emit(splitByMonthList)
+                    }
                 }
                 changeMeetId(meetId)
             },

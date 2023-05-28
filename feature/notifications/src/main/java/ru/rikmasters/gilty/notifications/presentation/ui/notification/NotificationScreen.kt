@@ -119,8 +119,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                                     userId
                                 )
                             )
-                            // Updates ratings
-                            vm.forceRefresh()
                             vm.forceRefreshMembers()
                         }
                     } ?: run {
