@@ -28,23 +28,32 @@ class RespondsBsViewModel: ViewModel() {
     val groupsStates = _groupsStates.asStateFlow()
     
     // Для случаев когда нет meetId, пагинируются встречи и фото внутри откликов
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val meetResponds by lazy {
-        _tabs.flatMapLatest { tab ->
-            profileManager.getResponds(
-                type = if(tab == 0) SENT
-                else RECEIVED
-            ).map { list ->
-                list.map { meet ->
-                    meet.map {
-                        // Маппит фото внутри модели ответа в pagingData
-                        profileManager.getPhotosPaging(it)
-                    }
+    val sentResponds by lazy {
+        profileManager.getResponds(
+            type = SENT
+        ).map { list ->
+            list.map { meet ->
+                meet.map {
+                    // Маппит фото внутри модели ответа в pagingData
+                    profileManager.getPhotosPaging(it)
                 }
             }
         }
     }
-    
+
+    val receivedResponds by lazy {
+        profileManager.getResponds(
+            type = RECEIVED
+        ).map { list ->
+            list.map { meet ->
+                meet.map {
+                    // Маппит фото внутри модели ответа в pagingData
+                    profileManager.getPhotosPaging(it)
+                }
+            }
+        }
+    }
+
     // Для случаев когда есть meetId, пагинируются отклики и фото внутри них
     @OptIn(ExperimentalCoroutinesApi::class)
     val responds by lazy {

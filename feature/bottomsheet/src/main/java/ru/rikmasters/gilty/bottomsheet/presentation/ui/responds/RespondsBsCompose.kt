@@ -52,7 +52,8 @@ enum class RespondsBsType { MEET, FULL, SHORT }
 fun RespondsList(
     type: RespondsBsType,
     responds: LazyPagingItems<RespondWithPhotos>,
-    meetResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    sentResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    receivedResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
     respondsStates: List<Int>,
     selectTab: Int,
     modifier: Modifier = Modifier,
@@ -114,18 +115,19 @@ fun RespondsList(
 
                 HorizontalPager(
                     state = pagerState,
-                    count = 2
+                    count = 2,
+                    itemSpacing = 12.dp,
                 ) { selectTab: Int ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         if (selectTab == 0) {
                             SentResponds(
                                 Modifier.padding(vertical = 8.dp),
-                                meetResponds,
+                                sentResponds,
                                 callback
                             )
                         } else ReceivedResponds(
                             Modifier.padding(vertical = 8.dp),
-                            meetResponds,
+                            receivedResponds,
                             respondsStates,
                             callback
                         )
@@ -136,7 +138,7 @@ fun RespondsList(
 
             SHORT -> ReceivedResponds(
                 Modifier.padding(vertical = 8.dp),
-                meetResponds,
+                receivedResponds,
                 respondsStates,
                 callback
             )
