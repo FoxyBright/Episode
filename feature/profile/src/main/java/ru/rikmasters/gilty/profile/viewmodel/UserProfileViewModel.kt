@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -107,7 +106,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun changeActiveAlbumId(id: Int?) {
-        Log.d("Hello", id.toString())
         _activeAlbumId.emit(id)
     }
     
