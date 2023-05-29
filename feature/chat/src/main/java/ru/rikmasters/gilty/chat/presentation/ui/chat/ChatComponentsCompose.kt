@@ -24,49 +24,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarContent
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.MessengerBar
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.MessState
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.Message
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.messageShapes
-import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.BottomBarMenu
 import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.MessageMenu
-import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.TopBarMenu
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.MESSAGE
 import ru.rikmasters.gilty.shared.model.enumeration.MessageType.NOTIFICATION
-
-@Composable
-fun ChatTopBar(
-    state: ChatAppBarState,
-    menuState: Boolean,
-    modifier: Modifier = Modifier,
-    callback: ChatCallback?,
-) {
-    ChatAppBarContent(state, modifier, callback)
-    TopBarMenu(menuState,
-        { callback?.onKebabClick() })
-    { callback?.onMenuItemClick(it) }
-}
-
-@Composable
-fun ChatBottomBar(
-    menuState: Boolean,
-    text: String,
-    answer: MessageModel?,
-    isOnline: Boolean,
-    modifier: Modifier = Modifier,
-    callback: ChatCallback?,
-) {
-    BottomBarMenu(menuState,
-        { callback?.onImageMenuDismiss() })
-    { callback?.onImageMenuItemSelect(it) }
-    MessengerBar(text, modifier, answer, isOnline, callback)
-}
 
 @Composable
 fun ChatFloatingButton(

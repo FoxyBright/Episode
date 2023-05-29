@@ -239,7 +239,7 @@
     <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
     <string name="chats_hidden_photo">Фото</string>
     <string name="chats_view_translation_button">Смотреть</string>
-    <string name="chats_gallery_select_photo">Фото или видео</string>
+    <string name="chats_gallery_select_photo">Фото</string>
     <string name="chats_gallery_camera">Камера</string>
     <string name="chats_message_translation_30">трансляция начнется через 30 минут</string>
     <string name="chats_message_translation_5">трансляция начнется через 5 минут</string>
