@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
 import ru.rikmasters.gilty.core.common.CoroutineController
-import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import java.io.File
 
 class MessageManager(
     private val store: MessageRepository,
@@ -90,16 +90,16 @@ class MessageManager(
         repliedId: String?,
         text: String?,
         attachment: List<AvatarModel>?,
-        photos: List<FileSource>?,
-        videos: List<FileSource>?,
-    ) = withContext(IO) {
-        web.sendMessage(
-            chatId = chatId,
-            replyId = repliedId,
-            text = text,
-            photos = photos?.map { it.bytes() },
-            attachments = attachment,
-            videos = videos?.map { it.bytes() }
-        )
+        photos: List<File>?,
+    ) = single {
+        withContext(IO) {
+            web.sendMessage(
+                chatId = chatId,
+                replyId = repliedId,
+                text = text,
+                photos = photos,
+                attachments = attachment,
+            )
+        }
     }
 }

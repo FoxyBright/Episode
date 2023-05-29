@@ -328,9 +328,11 @@ private fun Category(
             Text(
                 text = stringResource(R.string.chat_list_placeholder_category_name),
                 color = White,
-                style = typography.labelSmall,
-                textAlign = TextAlign.Center,
-                fontWeight = Black
+                style = typography.labelSmall.copy(
+                    fontSize = 14.dp.toSp(),
+                    textAlign = TextAlign.Center,
+                    fontWeight = Black
+                ),
             )
         }
         Box(

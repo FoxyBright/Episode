@@ -4,14 +4,14 @@ package ru.rikmasters.gilty.chats.source.web
 
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
+import io.ktor.http.Headers.Companion.build
+import io.ktor.http.HttpHeaders.ContentDisposition
+import io.ktor.http.HttpHeaders.ContentType
 import ru.rikmasters.gilty.chats.models.chat.Chat
 import ru.rikmasters.gilty.chats.models.chat.SortType
 import ru.rikmasters.gilty.chats.models.message.MarkAsReadRequest
 import ru.rikmasters.gilty.chats.models.message.Message
 import ru.rikmasters.gilty.chats.models.ws.ChatStatus
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -22,7 +22,7 @@ import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
-import java.util.UUID
+import java.io.File
 
 class ChatWebSource: KtorSource() {
     
@@ -90,9 +90,8 @@ class ChatWebSource: KtorSource() {
         chatId: String,
         replyId: String? = null,
         text: String? = null,
-        photos: List<ByteArray>? = null,
+        photos: List<File>? = null,
         attachments: List<AvatarModel>? = null,
-        videos: List<ByteArray>? = null,
     ) = tryPostFormData(
         "http://$HOST$PREFIX_URL/chats/$chatId/messages",
         formData {
@@ -118,48 +117,35 @@ class ChatWebSource: KtorSource() {
             }
             
             if(!photos.isNullOrEmpty()) {
-                photos.forEachIndexed { i, it ->
-                    log.d("photo -> $it")
-                    append(("upload[type]"), ("PHOTO"))
+                append(
+                    key = "upload[type]",
+                    value = "PHOTO"
+                )
+                photos.forEach {
                     append(
-                        ("upload[photos][$i]"),
-                        it,
-                        Headers.build {
+                        key = "upload[photos][]",
+                        value = it.readBytes(),
+                        headers = build {
                             append(
-                                HttpHeaders.ContentType,
-                                "image/jpg"
+                                name = ContentType,
+                                value = "image/jpg"
                             )
                             append(
-                                HttpHeaders.ContentDisposition,
-                                "filename=\"$it.jpg\""
-                            )
-                        }
-                    )
-                }
-            }
-            
-            // attached videos from camera or gallery
-            if(!videos.isNullOrEmpty()) {
-                videos.forEach { video ->
-                    append("upload[type]", "VIDEO")
-                    append(
-                        "upload[videos][]",
-                        video,
-                        Headers.build {
-                            append(
-                                HttpHeaders.ContentType,
-                                "video/mp4"
-                            )
-                            append(
-                                HttpHeaders.ContentDisposition,
-                                "filename=\"${UUID.randomUUID()}.mp4\""
+                                name = ContentDisposition,
+                                value = "filename=\"${it.name}.jpg\""
                             )
                         }
                     )
                 }
             }
         }
-    ).let { coroutinesState({ it }) {} }
+    ).let {
+        coroutinesState(
+            request = { it },
+            expectCode = 201,
+            response = {}
+        )
+    }
     
     suspend fun getMessages(
         chatId: String, page: Int?, perPage: Int?,

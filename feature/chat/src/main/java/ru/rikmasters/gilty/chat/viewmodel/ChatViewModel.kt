@@ -2,11 +2,9 @@ package ru.rikmasters.gilty.chat.viewmodel
 
 import android.content.Context
 import androidx.paging.cachedIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
-import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.manager.MessageManager
@@ -15,7 +13,6 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.errorToast
-import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.nowZ
 import ru.rikmasters.gilty.shared.common.extentions.LocalTime.Companion.ofZ
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
@@ -24,7 +21,9 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
+import ru.rikmasters.gilty.shared.shared.compress
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
+import java.io.File
 
 class ChatViewModel: ViewModel() {
     
@@ -359,26 +358,27 @@ class ChatViewModel: ViewModel() {
         replied: String? = null,
         text: String? = null,
         attachment: List<AvatarModel>? = null,
-        photos: List<FileSource>? = null,
-        videos: List<FileSource>? = null,
-    ) {
-        logD("logiiii send-> $photos")
-        coroutineScope.launch {
-            changeAnswer(null)
-            clearMessage()
-            messageManager.sendMessage(
-                chatId, replied, text,
-                attachment, photos, videos
-            ).on(
-                success = {},
-                loading = {},
-                error = {
-                    context.errorToast(
-                        it.serverMessage
-                    )
-                }
-            )
-        }
+        photos: List<File>? = null,
+    ) = singleLoading {
+        changeAnswer(null)
+        clearMessage()
+        messageManager.sendMessage(
+            chatId = chatId,
+            repliedId = replied,
+            text = text,
+            attachment = attachment,
+            photos = photos?.map {
+                it.compress(context)
+            }
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getMeet(meetId: String?) = singleLoading {

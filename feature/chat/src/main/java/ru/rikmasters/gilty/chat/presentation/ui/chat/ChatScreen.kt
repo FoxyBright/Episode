@@ -139,18 +139,22 @@ fun ChatScreen(
     
     val photographer =
         rememberLauncherForActivityResult(TakePicture()) { success ->
-            if(success) context
-                .contentResolver
-                .openInputStream(uri)
-                ?.let {
-                    scope.launch {
-                        vm.onSendMessage(
-                            chatId = chatId,
-                            photos = listOf(InputStreamSource(it))
-                        )
-                        listState.animateScrollToItem(0)
-                    }
+            if(success) uri?.path?.let {
+                scope.launch {
+                    val file = File(context.filesDir, "photo.jpg")
+                    context.contentResolver
+                        .openInputStream(uri)
+                        ?.use { file.writeBytes(it.readBytes()) }
+                    
+
+                    
+                    vm.onSendMessage(
+                        chatId = chatId,
+                        photos = listOf(file)
+                    )
+                    listState.animateScrollToItem(0)
                 }
+            }
         }
     
     val state = meeting?.let { meet ->

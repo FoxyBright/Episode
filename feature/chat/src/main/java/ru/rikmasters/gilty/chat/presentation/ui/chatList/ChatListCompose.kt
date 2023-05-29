@@ -125,17 +125,25 @@ fun ChatListContent(
         },
         containerColor = Transparent,
         content = {
-            if(!state.smthError) Column(Modifier.padding(it)) {
-                SortTypeLabels(Modifier, state, callback)
-                
-                if(state.chats.loadState.refresh is NotLoading
+            val emptyChats = state.chats.loadState.refresh is NotLoading
                     && state.chats.itemCount == 0
-                ) ChatListPlaceholder(Modifier.offset(y = -(50).dp))
-                
-                Use<ChatListViewModel>(PullToRefreshTrait) {
-                    Content(state, Modifier, callback)
-                }
-            } else ErrorInternetConnection {
+            
+            if(!state.smthError)
+                Column(Modifier.padding(it)) {
+                    if(!emptyChats) SortTypeLabels(
+                        state = state,
+                        callback = callback
+                    )
+                    
+                    if(emptyChats) ChatListPlaceholder(
+                        modifier = Modifier
+                            .offset(y = -(50).dp)
+                    )
+                    
+                    Use<ChatListViewModel>(PullToRefreshTrait) {
+                        Content(state, Modifier, callback)
+                    }
+                } else ErrorInternetConnection {
                 callback?.onListUpdate()
             }
         }
@@ -357,7 +365,7 @@ private fun Label(
 
 @Composable
 fun SortTypeLabels(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     state: ChatListState,
     callback: ChatListCallback?,
 ) {
@@ -426,9 +434,7 @@ fun SortTypeLabels(
             modifier = Modifier.padding(start = 8.dp),
             text = stringResource(id = R.string.chats_archive_label),
             isSelected = state.isArchiveOn
-        ) {
-            callback?.onArchiveClick()
-        }
+        ) { callback?.onArchiveClick() }
     }
 }
 

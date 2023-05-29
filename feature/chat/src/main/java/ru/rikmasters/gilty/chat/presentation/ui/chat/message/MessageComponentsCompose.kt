@@ -420,7 +420,8 @@ fun ImageMessage(
         Box(Modifier.fillMaxHeight(0.5f)) {
             message.message?.attachments?.let {
                 GCachedImage(
-                    it.first().file?.url, Modifier
+                    url = it.first().file?.url,
+                    modifier = Modifier
                         .wrapContentSize()
                         .background(
                             colorScheme.onTertiary,

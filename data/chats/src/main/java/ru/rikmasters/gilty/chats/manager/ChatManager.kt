@@ -27,7 +27,7 @@ class ChatManager(
     
     fun getChats(
         sortTypeModel: SortTypeModel,
-        isArchiveOn:Boolean,
+        isArchiveOn: Boolean,
     ): Flow<PagingData<ChatModel>> {
         return Pager(
             config = PagingConfig(
@@ -67,22 +67,40 @@ class ChatManager(
     }
     
     // подключение к веб сокетам
-    suspend fun connectWebSocket(userId: String) = single(JOIN) {
-        webSocket.connect(userId)
+    suspend fun connectWebSocket(
+        userId: String,
+    ) = single(JOIN) {
+        webSocket.connect(
+            userId = userId
+        )
     }
     
     @Suppress("unused")
     // заблокировать уведомления от чата
-    suspend fun muteChatNotifications(chatId: String, unmuteAt: String) =
-        withContext(IO) {
-            webSource.muteChatNotifications(chatId, unmuteAt)
-        }
+    suspend fun muteChatNotifications(
+        chatId: String, unmuteAt: String,
+    ) = withContext(IO) {
+        webSource.muteChatNotifications(
+            chatId = chatId,
+            unmuteAt = unmuteAt
+        )
+    }
     
     @Suppress("unused")
-    suspend fun unmuteChatNotifications(chatId: String) =
-        withContext(IO) { webSource.unmuteChatNotifications(chatId) }
+    suspend fun unmuteChatNotifications(
+        chatId: String,
+    ) = withContext(IO) {
+        webSource.unmuteChatNotifications(
+            chatId = chatId
+        )
+    }
     
     @Suppress("unused")
-    suspend fun getChatAlbum(chatId: String) =
-        withContext(IO) { webSource.getChatAlbum(chatId) }
+    suspend fun getChatAlbum(
+        chatId: String,
+    ) = withContext(IO) {
+        webSource.getChatAlbum(
+            chatId = chatId
+        )
+    }
 }

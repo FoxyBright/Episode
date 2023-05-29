@@ -30,6 +30,7 @@ import es.dmoral.toasty.Toasty
 import es.dmoral.toasty.Toasty.custom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ru.rikmasters.gilty.data.ktor.Ktor.logD
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.color.toast_day
 import ru.rikmasters.gilty.shared.R.color.toast_night
@@ -113,7 +114,8 @@ suspend fun Context.errorToast(
     hideIcon: Boolean = false,
     hideTint: Boolean = false,
 ) {
-    if(message == null) return
+    logD("ERROR MESSAGE -> $message")
+    if(message.isNullOrBlank()) return
     withContext(Dispatchers.Main) {
         Toasty.Config
             .getInstance()
