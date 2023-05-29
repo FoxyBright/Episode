@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.bubbles
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,15 +78,10 @@ fun <T> Bubbles(
     var width = 0f
     var height = 0f
     val size = LocalDensity.current.run { elementSize.toPx() }
-    var isStartFinished = false
 
     val controller = remember { PhysicsController() }
 
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(key1 = Unit, block = {
-        isStartFinished = false
-    })
 
     if(data.isNotEmpty()) AndroidView(
         modifier = modifier
@@ -111,10 +105,6 @@ fun <T> Bubbles(
                 .setOnBodyCreatedListener(controller)
 
             scope.launch {
-                layout.physics.setGravityX(4.0f)
-            }
-
-            scope.launch {
                 layoutMutex.lock()
 
                 val rowHeight = size * (1f + ROW_SPACE_FACTOR)
@@ -124,7 +114,7 @@ fun <T> Bubbles(
                 val columns = (data.size.toFloat() / rows).ceilToInt()
                 val columnWidth = size * (1f + COLUMN_SPACE_FACTOR + COLUMN_OFFSET_FACTOR * rows)
                 val actualWidth = columnWidth * columns
-                val middleWidth = width / 2
+                val middleWidth = width / 2 - 100
                 log.v("Width: $width Height: $height")
                 log.v("Actual width: $actualWidth")
                 log.v("Size: ${data.size} Rows: $rows Columns: $columns")
@@ -134,59 +124,33 @@ fun <T> Bubbles(
 
                 layout.createElements(data, factory, size, rows, (actualWidth - width) / 2)
 
-                while (true){
-
-                    for (i in 0 until layout.childCount) {
-                        val view = layout.getChildAt(i)
-                        if(view.id == data.size / 2 && !isStartFinished){ // Middle Item
-                            // Method 2 - second time not working - closest
-                            if(view.x - middleWidth in (-400.0..0.0)){
-                                    layout.physics.setGravityX(-7f)
-                                    delay(500L)
-                                layout.physics.setGravityX(7f)
-                                layout.physics.setGravityX(0f)
-                                    isStartFinished = true
-                            }
-
-                            // Method 3 - Plays around
-                            /*while((view.x - middleWidth) !in (-100.0 .. 100.0)){
-                                if(view.x > middleWidth){
-                                    layout.physics.setGravityX(-4f)
-                                }
-                                else {
-                                    layout.physics.setGravityX(4f)
-                                }
-                                delay(200L)
-                            }
-                            if((view.x - middleWidth) in (-100.0 .. 100.0)){
-                                layout.physics.setGravityX(0f)
-                            }*/
-
-                            // Method 1 - Not stable
-                            /*if(view.x - middleWidth in (-240.0)..(-200.0)){
-                                layout.physics.setGravityX(2f)
-                            }else if (view.x - middleWidth in (160.0)..(240.0)){
-                                layout.physics.setGravityX(-2f)
-                            }else if(view.x - middleWidth in (-200.0)..(160.0)){
-                                layout.physics.setGravityX(-8f)
-                                delay(50L)
-                                layout.physics.setGravityX(0f)
-                            }*/
-                        }
-
-                        Log.d("Bubbles coordinates", "viewId: ${view.id} x: ${view.x} y: ${view.y} middle: $middleWidth")
-
+                while (true) { // Stops Elements when middle on in the middle
+                    val view = layout.findViewById<View>(data.size / 2)
+                    if(middleWidth - 200 <= view.x) {
+                        layout.physics.isPhysicsEnabled = false
+                        delay(16L)
+                        layout.physics.isPhysicsEnabled = true
+                        view.visibility = View.INVISIBLE
+                        delay(1L)
+                        view.visibility = View.VISIBLE
+                        if(data.size <= 5)
+                            layout.physics.setGravityX(-2f)
+                        else layout.physics.setGravityX(-14f)
+                        delay(350L)
+                        layout.physics.setGravityX(0f)
+                        break
                     }
-                    delay(400L)
+                    if(data.size <= 5)
+                        layout.physics.setGravityX(2f)
+                    else layout.physics.setGravityX(7f)
+                    delay(50L)
                 }
             }
-
             return@AndroidView layout
         },
         update = {}
     )
 }
-
 private fun PhysicsFrameLayout.createBounds(width: Float, height: Float, actualWidth: Float) {
 
     val overflow = max(0f, actualWidth - width)
@@ -259,7 +223,6 @@ private fun <T> createBubbleView(
             factory(element)
         }
     }
-
     Physics.setPhysicsConfig(this, bubbleConfig())
 }
 
@@ -272,13 +235,13 @@ private fun Physics.globalConfig() {
 private fun bubbleConfig() = PhysicsConfig(
     shape = Shape.CIRCLE,
     fixtureDef = FixtureDef().apply {
-        friction = 0.2f // 0.2f
-        restitution = 0.2f // 0.2f
-        density = 0.2f // 0.2f
+        friction = 0.2f
+        restitution = 0.2f
+        density = 0.2f
     },
     bodyDef = BodyDef().apply {
         type = BodyType.DYNAMIC
         fixedRotation = true
-        linearDamping = 0.6f // 0.6f
+        linearDamping = 0.6f
     }
 )
