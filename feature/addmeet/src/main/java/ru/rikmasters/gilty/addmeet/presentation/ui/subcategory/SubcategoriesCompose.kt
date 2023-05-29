@@ -94,7 +94,7 @@ fun SubcategoriesContent(
                 CATEGORY_ELEMENT_SIZE.dp,
                 Modifier
                     .padding(it)
-                    .padding(top = 8.dp),
+                    .padding(top = 18.dp),
             ) { element ->
                 CategoryItem(
                     element.name, element.emoji, element.color,

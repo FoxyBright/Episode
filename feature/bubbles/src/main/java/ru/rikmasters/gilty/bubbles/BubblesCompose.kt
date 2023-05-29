@@ -125,14 +125,15 @@ fun <T> Bubbles(
                 layout.createElements(data, factory, size, rows, (actualWidth - width) / 2)
 
                 while (true) { // Stops Elements when middle on in the middle
-                    val view = layout.findViewById<View>(data.size / 2)
-                    if(middleWidth - 200 <= view.x) {
+                    val viewFirst = layout.findViewById<View>(0)
+                    val viewSecond = layout.findViewById<View>(data.size - 1)
+                    if(middleWidth - 200 <= (viewSecond.x + viewFirst.x) / 2) {
                         layout.physics.isPhysicsEnabled = false
                         delay(16L)
                         layout.physics.isPhysicsEnabled = true
-                        view.visibility = View.INVISIBLE
+                        viewFirst.visibility = View.INVISIBLE
                         delay(1L)
-                        view.visibility = View.VISIBLE
+                        viewFirst.visibility = View.VISIBLE
                         if(data.size <= 5)
                             layout.physics.setGravityX(-2f)
                         else layout.physics.setGravityX(-14f)
