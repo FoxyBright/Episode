@@ -81,10 +81,6 @@ class CategoryViewModel: ViewModel() {
                     arrayListOf<CategoryModel>()
                 it.forEach { parent ->
                     categories.add(parent)
-                    if(!parent.children.isNullOrEmpty())
-                        parent.children?.forEach { child ->
-                            categories.add(child)
-                        }
                 }
                 _categories.emit(categories)
             },
