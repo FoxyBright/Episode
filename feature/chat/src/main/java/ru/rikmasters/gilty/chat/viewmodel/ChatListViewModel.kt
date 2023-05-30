@@ -49,16 +49,33 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
-            val count = getKoin().get<Context>()
-                .getSharedPreferences(
-                    "sharedPref", MODE_PRIVATE
-                ).getInt("unread_messages", 0)
+            val count = context.getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
+            ).getInt("unread_messages", 0)
             if(count > 0) NEW_ACTIVE else ACTIVE
         }.value
     )
     val unreadMessages = _unreadMessages.asStateFlow()
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_ACTIVE else ACTIVE)
+    }
+    
+    private val _unreadNotifications =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadNotifications =
+        _unreadNotifications.asStateFlow()
+    
+    suspend fun setUnreadNotifications(hasUnread: Boolean) {
+        _unreadNotifications.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
     }
     
     suspend fun getUnread() {
@@ -68,7 +85,14 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
                     "sharedPref",
                     MODE_PRIVATE
                 ).edit()
-                    .putInt("unread_messages", it)
+                    .putInt(
+                        "unread_messages",
+                        it.unreadCount
+                    )
+                    .putInt(
+                        "unread_notification",
+                        it.notificationsUnread
+                    )
                     .apply()
             },
             loading = {},
@@ -86,10 +110,17 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val chats by lazy {
-        combine(refresh, _sortType, _isArchiveOn) { refresh, sort, isArchiveOn ->
-            Pair(refresh,Pair(isArchiveOn, sort))
+        combine(
+            refresh,
+            _sortType,
+            _isArchiveOn
+        ) { refresh, sort, isArchiveOn ->
+            Pair(refresh, Pair(isArchiveOn, sort))
         }.flatMapLatest {
-            chatManager.getChats(it.second .second?: MESSAGE_DATE, it.second.first)
+            chatManager.getChats(
+                it.second.second ?: MESSAGE_DATE,
+                it.second.first
+            )
         }.cachedIn(coroutineScope)
     }
     

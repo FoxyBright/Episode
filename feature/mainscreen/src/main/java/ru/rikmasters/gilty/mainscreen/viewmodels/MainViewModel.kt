@@ -3,7 +3,7 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,8 +66,8 @@ class MainViewModel: ViewModel() {
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
-            val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+            val count = context.getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
@@ -75,17 +75,43 @@ class MainViewModel: ViewModel() {
     val unreadMessages = _unreadMessages.asStateFlow()
     
     suspend fun setUnreadMessages(hasUnread: Boolean) {
-        _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
+        _unreadMessages.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
+    }
+    
+    private val _unreadNotifications =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadNotifications =
+        _unreadNotifications.asStateFlow()
+    
+    suspend fun setUnreadNotifications(hasUnread: Boolean) {
+        _unreadNotifications.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
     }
     
     suspend fun getUnread() {
         chatManager.updateUnreadMessages().on(
             success = {
                 context.getSharedPreferences(
-                    "sharedPref",
-                    ComponentActivity.MODE_PRIVATE
+                    "sharedPref", MODE_PRIVATE
                 ).edit()
-                    .putInt("unread_messages", it)
+                    .putInt(
+                        "unread_messages",
+                        it.unreadCount
+                    )
+                    .putInt(
+                        "unread_notification",
+                        it.notificationsUnread
+                    )
                     .apply()
             },
             loading = {},

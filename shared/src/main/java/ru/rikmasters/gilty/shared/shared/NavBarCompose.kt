@@ -48,7 +48,7 @@ fun NavBar(
     ) {
         state.forEachIndexed { i, state ->
             Item(
-                when(i) {
+                icon = when(i) {
                     0 -> if(isSystemInDarkTheme()) {
                         if(state == ACTIVE)
                             R.drawable.ic_home_active_dark
@@ -58,7 +58,7 @@ fun NavBar(
                             R.drawable.ic_home_active
                         else R.drawable.ic_home
                     }
-                    
+    
                     1 -> if(isSystemInDarkTheme()) when(state) {
                         ACTIVE -> R.drawable.ic_notification_active_dark
                         INACTIVE -> R.drawable.ic_notification_dark
@@ -70,7 +70,7 @@ fun NavBar(
                         NEW_INACTIVE -> R.drawable.ic_notification_indicator
                         NEW_ACTIVE -> R.drawable.ic_notification_indicator_active
                     }
-                    
+    
                     3 -> if(isSystemInDarkTheme()) when(state) {
                         ACTIVE -> R.drawable.ic_chat_active_dark
                         INACTIVE -> R.drawable.ic_chat_dark
@@ -82,7 +82,7 @@ fun NavBar(
                         NEW_INACTIVE -> R.drawable.ic_chat_indicator
                         NEW_ACTIVE -> R.drawable.ic_chat_indicator_active
                     }
-                    
+    
                     4 -> if(isSystemInDarkTheme()) {
                         if(state == ACTIVE)
                             R.drawable.ic_profile_active_dark
@@ -92,11 +92,13 @@ fun NavBar(
                             R.drawable.ic_profile_active
                         else R.drawable.ic_profile
                     }
-                    
+    
                     else -> R.drawable.ic_add
-                }, state, (i == 2)
+                },
+                state = state,
+                add = (i == 2),
+                onClick = { onClick(i) }
             )
-            { onClick(i) }
         }
     }
 }
@@ -110,14 +112,17 @@ private fun Item(
     onClick: () -> Unit,
 ) {
     if(add) Image(
-        painterResource(
+        painter = painterResource(
             if(isSystemInDarkTheme())
                 R.drawable.ic_add_button_day
             else R.drawable.ic_add_button
-        ), (null),
-        Modifier.clickable { onClick() }
+        ),
+        contentDescription = null,
+        modifier = Modifier
+            .clickable { onClick() }
     ) else Card(
-        onClick, shape = CircleShape,
+        onClick = onClick,
+        shape = CircleShape,
         colors = cardColors(
             when(state) {
                 ACTIVE, NEW_ACTIVE ->
@@ -127,9 +132,9 @@ private fun Item(
         )
     ) {
         Image(
-            painterResource(icon),
-            (null),
-            Modifier
+            painter = painterResource(icon),
+            contentDescription = null,
+            modifier = Modifier
                 .padding(20.dp, 4.dp)
                 .size(24.dp),
         )

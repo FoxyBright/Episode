@@ -40,6 +40,7 @@ fun MainScreen(vm: MainViewModel) {
     val activity = getActivity()
     val nav = get<NavState>()
     
+    val unreadNotifications by vm.unreadNotifications.collectAsState()
     val unreadMessages by vm.unreadMessages.collectAsState()
     val location by vm.location.collectAsState()
     val meetings by vm.meetings.collectAsState()
@@ -51,8 +52,8 @@ fun MainScreen(vm: MainViewModel) {
     
     val navBar = remember {
         mutableListOf(
-            ACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, INACTIVE
+            ACTIVE, unreadNotifications,
+            INACTIVE, unreadMessages, INACTIVE
         )
     }
     
@@ -75,9 +76,10 @@ fun MainScreen(vm: MainViewModel) {
         vm.getUnread()
         vm.getMeets()
         vm.getLocation(activity)
-        context.listenPreference("unread_messages", 0) {
-            scope.launch { vm.setUnreadMessages(it > 0) }
-        }
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotifications(it > 0) } }
     }
     
     val bsState = rememberBottomSheetScaffoldState(

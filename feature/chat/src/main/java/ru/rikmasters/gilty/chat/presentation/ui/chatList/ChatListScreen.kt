@@ -22,45 +22,47 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
+    
     val listState = rememberLazyListScrollState("chat_list")
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val nav = get<NavState>()
-
+    
+    val unreadNotifications by vm.unreadNotifications.collectAsState()
     val chats = vm.chats.collectAsLazyPagingItems()
+    val unreadMessages by vm.unreadMessages.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()
     val isArchiveOn by vm.isArchiveOn.collectAsState()
-    val alertState by vm.alertState.collectAsState()
     val sortType by vm.sortType.collectAsState()
+    val alertState by vm.alertState.collectAsState()
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
-            INACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, INACTIVE
+            INACTIVE, unreadNotifications,
+            INACTIVE, unreadMessages, INACTIVE
         )
     }
-
-    var isFirstRefresh by remember{ mutableStateOf(true) }
-
-    LaunchedEffect(key1 = chats.itemSnapshotList.items, block = {
+    
+    var isFirstRefresh by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(chats.itemSnapshotList.items) {
         // Scrolls down to last position if it is needed
-        if(chats.itemSnapshotList.items.isNotEmpty() && isFirstRefresh){
+        if(
+            chats.itemSnapshotList.items.isNotEmpty()
+            && isFirstRefresh
+        ) {
             listState.animateToLastPosition("chat_list")
             isFirstRefresh = false
         }
-    })
+    }
     
     LaunchedEffect(Unit) {
-        context.listenPreference(
-            "unread_messages", 0
-        ) {
-            scope.launch {
-                vm.setUnreadMessages(it > 0)
-            }
-        }
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotifications(it > 0) } }
         vm.getUnread()
     }
     
@@ -95,7 +97,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
             override fun onSortClick(sortTypeModel: SortTypeModel?) {
                 scope.launch { vm.changeSortType(sortTypeModel) }
             }
-    
+            
             override fun onNavBarSelect(point: Int) {
                 if(point == 3) return
                 scope.launch {

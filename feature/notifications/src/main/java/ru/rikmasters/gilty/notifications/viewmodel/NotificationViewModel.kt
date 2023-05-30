@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -21,12 +22,12 @@ import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.model.profile.RatingModel
 
-
 class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     private val notificationManger by inject<NotificationManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    private val chatManager by inject<ChatManager>()
     
     private val context = getKoin().get<Context>()
     
@@ -55,6 +56,24 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     )
     val unreadMessages = _unreadMessages.asStateFlow()
     
+    private val _unreadNotifications =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", ComponentActivity.MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadNotifications =
+        _unreadNotifications.asStateFlow()
+    
+    suspend fun setUnreadNotifications(hasUnread: Boolean) {
+        _unreadNotifications.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
+    }
+    
     private val _ratings =
         MutableStateFlow(emptyList<RatingModel>())
     val ratings = _ratings.asStateFlow()
@@ -82,13 +101,40 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         }
     }
     
-    private val _participantsStates = MutableStateFlow(emptyList<Int>())
-    val participantsStates = _participantsStates.asStateFlow()
+    private val _participantsStates =
+        MutableStateFlow(emptyList<Int>())
+    val participantsStates =
+        _participantsStates.asStateFlow()
     
     private var currentIndexToSplit = 0
     
     val splitMonthNotifications =
         MutableStateFlow(emptyList<Pair<Int, NotificationModel>>())
+    
+    suspend fun getUnread() {
+        chatManager.updateUnreadMessages().on(
+            success = {
+                context.getSharedPreferences(
+                    "sharedPref", ComponentActivity.MODE_PRIVATE
+                ).edit()
+                    .putInt(
+                        "unread_messages",
+                        it.unreadCount
+                    )
+                    .putInt(
+                        "unread_notification",
+                        it.notificationsUnread
+                    )
+                    .apply()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
     
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)

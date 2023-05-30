@@ -45,6 +45,7 @@ class MainActivity: ComponentActivity() {
     
     private val authManager by inject<AuthManager>()
     private val chatManager by inject<ChatManager>()
+    
     @Suppress("unused")
     private val translationRepository by inject<TranslationRepository>()
     private val regManager by inject<RegistrationManager>()
@@ -84,15 +85,24 @@ class MainActivity: ComponentActivity() {
             .subscribeToTopic("all")
         
         setContent {
-            var errorState by remember { mutableStateOf(false) }
+            var errorState by remember {
+                mutableStateOf(false)
+            }
             val corScope = rememberCoroutineScope()
             
             AppEntrypoint(
-                GiltyTheme,
-                { GBottomSheetBackground(it) },
-                { GSnackbar(it) },
-                { isLoading, content -> GLoader(isLoading, content) },
-                { state, offset, trigger ->
+                theme = GiltyTheme,
+                bottomSheetBackground = {
+                    GBottomSheetBackground(it)
+                },
+                snackbar = { GSnackbar(it) },
+                loader = { isLoading, content ->
+                    GLoader(
+                        isLoading = isLoading,
+                        content = content
+                    )
+                },
+                indicator = { state, offset, trigger ->
                     LoadingIndicator(state, offset, trigger)
                 }
             )

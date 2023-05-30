@@ -72,14 +72,9 @@ class ChatWebSource: KtorSource() {
         tryPost("http://$HOST$PREFIX_URL/chats/$chatId/unmute")
             .let { coroutinesState({ it }) {} }
     
-    suspend fun getChatsStatus() =
-        tryGet("http://$HOST$PREFIX_URL/chats/status")
-            .let {
-                coroutinesState({ it }) {
-                    it.wrapped<ChatStatus>()
-                        .unreadCount
-                }
-            }
+    suspend fun getChatsStatus() = tryGet(
+        "http://$HOST$PREFIX_URL/chats/status"
+    ).let { coroutinesState({ it }) { it.wrapped<ChatStatus>() } }
     
     suspend fun muteChatNotifications(chatId: String, unmuteAt: String) =
         tryPost("http://$HOST$PREFIX_URL/chats/$chatId/mute")
