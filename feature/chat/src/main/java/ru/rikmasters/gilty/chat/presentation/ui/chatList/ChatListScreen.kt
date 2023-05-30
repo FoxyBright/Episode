@@ -37,7 +37,8 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val alertState by vm.alertState.collectAsState()
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
-    
+    val chatsCount by vm.chatsCount.collectAsState()
+
     val navBar = remember {
         mutableListOf(
             INACTIVE, unreadNotifications,
@@ -91,7 +92,8 @@ fun ChatListScreen(vm: ChatListViewModel) {
             listState = listState,
             isSortOn = sortType != null,
             isArchiveOn = isArchiveOn,
-            smthError = errorState
+            smthError = errorState,
+            chatsCount = chatsCount
         ),
         callback = object: ChatListCallback {
             override fun onSortClick(sortTypeModel: SortTypeModel?) {
