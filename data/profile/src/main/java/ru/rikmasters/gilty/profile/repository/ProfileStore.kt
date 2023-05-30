@@ -53,16 +53,14 @@ class ProfileStore(
             primarySource.find<Profile>()
                 ?.let { return it }
         
-        val profile = webSource.getUserData().on(
+        return webSource.getUserData().on(
             success = { it },
             loading = { Profile() },
             error = { Profile() }
-        )
-        
-        primarySource.deleteAll<Profile>()
-        primarySource.save(profile)
-        
-        return profile
+        ).also {
+            primarySource.deleteAll<Profile>()
+            primarySource.save(it)
+        }
     }
     
     suspend fun storageProfile() =

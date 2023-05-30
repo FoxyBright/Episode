@@ -11,7 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 
 /**
  * Composable that positions and displays [Image]s based on count as one element,
@@ -60,7 +63,7 @@ fun GridImageLayout(
                 Box(Modifier, Center) {
                     Text(
                         text = "+${size - 3}",
-                        fontSize = 20.sp
+                        fontSize = 20.dp.toSp()
                     )
                 }
             }

@@ -24,9 +24,9 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.CustomText.*
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
@@ -377,7 +377,7 @@ fun NotificationText(
     LinkedText(
         message, modifier, mapOf(
             "emoji" to InlineTextContent(
-                Placeholder(18.sp, 18.sp, TextCenter)
+                Placeholder(18.dp.toSp(), 18.dp.toSp(), TextCenter)
             ) {
                 organizer?.emoji?.let {
                     GEmojiImage(it, Modifier.size(18.dp))

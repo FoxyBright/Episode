@@ -113,9 +113,9 @@ class CodeViewModel(
     suspend fun onOtpAuthentication(code: String) =
         authManager.onOtpAuthentication(code)
     
-    suspend fun profileCompleted(): Boolean {
-        return regManager.profileCompleted()
-    }
+    suspend fun profileCompleted() =
+        regManager.profileCompleted()
+    
     
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)

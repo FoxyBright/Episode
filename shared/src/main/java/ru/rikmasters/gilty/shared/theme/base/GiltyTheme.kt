@@ -2,36 +2,22 @@
 
 package ru.rikmasters.gilty.shared.theme.base
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import ru.rikmasters.gilty.core.app.AppTheme
-import ru.rikmasters.gilty.shared.theme.DarkColorScheme
-import ru.rikmasters.gilty.shared.theme.DarkExtraColors
-import ru.rikmasters.gilty.shared.theme.DefaultExtraShapes
-import ru.rikmasters.gilty.shared.theme.DefaultExtraTypography
-import ru.rikmasters.gilty.shared.theme.ExtraColors
-import ru.rikmasters.gilty.shared.theme.ExtraShapes
-import ru.rikmasters.gilty.shared.theme.ExtraTypography
-import ru.rikmasters.gilty.shared.theme.LightColorScheme
-import ru.rikmasters.gilty.shared.theme.LightExtraColors
-import ru.rikmasters.gilty.shared.theme.Ripple
-import ru.rikmasters.gilty.shared.theme.Shapes
+import ru.rikmasters.gilty.shared.theme.*
 import ru.rikmasters.gilty.shared.theme.Typography
 
 object GiltyTheme : AppTheme {
+    @SuppressLint("ComposableNaming")
     @Composable
     override fun apply(
         darkMode: Boolean,
@@ -50,16 +36,14 @@ fun GiltyTheme(
     val (colorScheme, extraColors) = resolveColors(
         LocalContext.current, darkMode, dynamicColor,
     )
-
     CompositionLocalProvider(
         LocalExtraColors provides extraColors,
-        LocalExtraTypography provides DefaultExtraTypography,
+        LocalExtraTypography provides DefaultExtraTypography(),
         LocalExtraShapes provides DefaultExtraShapes,
     ) {
-
         MaterialTheme(
             colorScheme.switch(),
-            Shapes, Typography,
+            Shapes, Typography(),
         ) {
             CompositionLocalProvider(
                 LocalOverscrollConfiguration provides null,

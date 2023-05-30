@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.ScrollTimePicker
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -110,7 +110,9 @@ private fun TopBar(
                 MutableInteractionSource(), (null)
             ) { onClear() },
             style = typography.bodyMedium.copy(
-                colorScheme.primary, 16.sp, SemiBold
+                color = colorScheme.primary,
+                fontSize = 16.dp.toSp(),
+                fontWeight = SemiBold
             ),
         )
     }

@@ -6,11 +6,10 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -44,7 +44,13 @@ fun ProfileContent(
         modifier = modifier,
         topBar = {
             ActionBar(
-                title = stringResource(R.string.create_profile_title)
+                title = stringResource(
+                    R.string.create_profile_title
+                ),
+                titleStyle = typography
+                    .titleLarge.copy(
+                        fontSize = 28.dp.toSp()
+                    )
             ) { callback?.onBack() }
         },
     ) {
@@ -56,18 +62,21 @@ fun ProfileContent(
                 .fillMaxSize(),
             shape = RoundedCornerShape(30.dp),
             colors = cardColors(colorScheme.background),
-            border = BorderStroke(6.dp, colorScheme.primaryContainer)
+            border = BorderStroke(
+                width = 6.dp,
+                color = colorScheme.primaryContainer
+            )
         ) {
             Profile(
-                state, Modifier
+                state = state,
+                modifier = Modifier
                     .scrollable(
                         rememberScrollState(),
                         Vertical
                     )
                     .fillMaxHeight(0.8f)
-                    .padding(horizontal = 16.dp)
                     .padding(top = 50.dp),
-                callback
+                callback = callback
             )
         }
     }

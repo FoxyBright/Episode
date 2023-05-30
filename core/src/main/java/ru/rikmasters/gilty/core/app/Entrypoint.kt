@@ -42,7 +42,8 @@ fun AppEntrypoint(
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     val snackbarHostState = remember { SnackbarHostState() }
-    val bottomSheetSwipeableState = rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
+    val bottomSheetSwipeableState =
+        rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
     val keyboardController = rememberKeyboardController()
     
     val asm = remember {
@@ -62,10 +63,7 @@ fun AppEntrypoint(
     }
     
     val navState = remember(startDestination) {
-        NavState(
-            navController,
-            startDestination
-        )
+        NavState(navController, startDestination)
     }
     
     val env: Environment = get()

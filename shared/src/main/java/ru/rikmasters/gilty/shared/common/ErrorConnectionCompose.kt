@@ -20,12 +20,10 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import es.dmoral.toasty.Toasty
 import es.dmoral.toasty.Toasty.custom
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +33,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.color.toast_day
 import ru.rikmasters.gilty.shared.R.color.toast_night
 import ru.rikmasters.gilty.shared.R.drawable.ic_bad_connection
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 
 @Preview
 @Composable
@@ -69,9 +68,7 @@ fun ErrorConnection(
                 Modifier.padding(16.dp),
                 Start, CenterVertically
             ) {
-                val size = with(LocalDensity.current) {
-                    28.sp.toDp()
-                }
+                val size = 28.dp
                 Icon(
                     painter = painterResource(
                         ic_bad_connection
@@ -86,7 +83,7 @@ fun ErrorConnection(
                         .weight(1f)
                         .padding(start = 10.dp),
                     style = typography.labelSmall.copy(
-                        White, 15.sp,
+                        White, 15.dp.toSp(),
                     ),
                 )
             }

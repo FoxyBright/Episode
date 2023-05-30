@@ -28,8 +28,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.meeting.DemoLocationModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
@@ -173,7 +173,7 @@ private fun Search(
             Start, CenterVertically
         ) {
             val style = typography.bodyMedium.copy(
-                fontSize = 17.sp,
+                fontSize = 17.dp.toSp(),
                 fontWeight = Bold
             )
             Icon(

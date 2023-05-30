@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.gallery.cropper.model.CropOutline
 import ru.rikmasters.gilty.gallery.cropper.model.CropPath
 import ru.rikmasters.gilty.gallery.cropper.model.CropShape
 import ru.rikmasters.gilty.gallery.cropper.util.scale
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 
 @Composable
 @Suppress("unused")
@@ -41,10 +41,10 @@ fun CropFrameDisplayCard(
     outlineColor: Color,
     editButtonBackgroundColor: Color = MaterialTheme.colorScheme.tertiary,
     editButtonContentColor: Color = MaterialTheme.colorScheme.onTertiary,
-    fontSize: TextUnit = 12.sp,
+    fontSize: TextUnit = 12.dp.toSp(),
     title: String,
     cropOutline: CropOutline,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
 
     Box(
@@ -86,20 +86,24 @@ fun CropFrameDisplayCard(
                                     )
                                 scaleX = iconScale
                                 scaleY = iconScale
-
-                                val translation = this.density.run { 12.dp.toPx() }
+        
+                                val translation =
+                                    this.density.run { 12.dp.toPx() }
                                 translationX = translation
                                 translationY = -translation
                                 clip = true
                                 shape = CircleShape
-
+        
                                 this.density
                             }
                             .clickable {
                                 onClick()
                             }
                             .padding(8.dp)
-                            .background(editButtonBackgroundColor, CircleShape)
+                            .background(
+                                editButtonBackgroundColor,
+                                CircleShape
+                            )
                             .size(20.dp)
                             .padding(4.dp),
                         imageVector = Icons.Default.Edit,

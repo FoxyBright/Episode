@@ -41,16 +41,14 @@ fun CodeScreen(vm: CodeViewModel) {
                     
                     if(vm.code.value.length == vm.codeLength.value) try {
                         if(vm.onOtpAuthentication(vm.code.value)) {
-
+                            
                             vm.linkExternalToken()
-
-                            if (vm.profileCompleted())
+                            
+                            if(vm.profileCompleted())
                                 nav.clearStackNavigationAbsolute("main/meetings")
                             else
                                 nav.navigate("profile")
-                        } else {
-                            badCode()
-                        }
+                        } else badCode()
                     } catch(e: Exception) {
                         e.stackTraceToString()
                         badCode()

@@ -1,7 +1,9 @@
+
 @file:Suppress("DEPRECATION")
 
 package ru.rikmasters.gilty.shared.theme
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color.*
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -11,7 +13,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.theme.Colors.FireRed
 import ru.rikmasters.gilty.shared.theme.Colors.OrangeRed
 
@@ -39,45 +42,47 @@ private val GrBrush =
         "ru.ringmasters.gilty.presentation.ui.theme.base.ThemeExtra"
     )
 )
-val DefaultExtraTypography = ExtraTypography(
-    RatingText = baseTextStyle.copy(
-        brush = GrBrush,
-        fontSize = 46.sp,
-        fontWeight = Bold,
-        lineHeight = 56.sp
-    ),
-    
-    RatingSmallText = baseTextStyle.copy(
-        brush = GrBrush,
-        fontSize = 38.sp,
-        fontWeight = Bold,
-        lineHeight = 45.sp
-    ),
-    
-    CodeText = baseTextStyle.copy(
-        fontSize = 22.sp,
-        fontWeight = Bold,
-        lineHeight = 38.sp,
-        textAlign = TextAlign.Center
-    ),
-
-    TranslationTitlePreview = baseTextStyle.copy(
-        fontSize = 20.sp,
-        fontWeight = Bold,
-        lineHeight = 23.sp
-    ),
-
-    TranslationSmallButton = baseTextStyle.copy(
-        fontSize = 14.sp,
-        fontWeight = SemiBold,
-        lineHeight = 17.sp
-    ),
-
-    TranslationBadge = baseTextStyle.copy(
-        fontSize = 11.sp,
-        fontWeight = Normal,
-        lineHeight = 16.sp
+val DefaultExtraTypography = @Composable {
+    ExtraTypography(
+        RatingText = baseTextStyle.copy(
+            brush = GrBrush,
+            fontSize = 46.dp.toSp(),
+            fontWeight = Bold,
+            lineHeight = 56.dp.toSp()
+        ),
+        
+        RatingSmallText = baseTextStyle.copy(
+            brush = GrBrush,
+            fontSize = 38.dp.toSp(),
+            fontWeight = Bold,
+            lineHeight = 45.dp.toSp()
+        ),
+        
+        CodeText = baseTextStyle.copy(
+            fontSize = 22.dp.toSp(),
+            fontWeight = Bold,
+            lineHeight = 38.dp.toSp(),
+            textAlign = TextAlign.Center
+        ),
+        
+        TranslationTitlePreview = baseTextStyle.copy(
+            fontSize = 20.dp.toSp(),
+            fontWeight = Bold,
+            lineHeight = 23.dp.toSp()
+        ),
+        
+        TranslationSmallButton = baseTextStyle.copy(
+            fontSize = 14.dp.toSp(),
+            fontWeight = SemiBold,
+            lineHeight = 17.dp.toSp()
+        ),
+        
+        TranslationBadge = baseTextStyle.copy(
+            fontSize = 11.dp.toSp(),
+            fontWeight = Normal,
+            lineHeight = 16.dp.toSp()
+        )
+        
+        // Add fonts in scheme
     )
-
-    // Add fonts in scheme
-)
+}

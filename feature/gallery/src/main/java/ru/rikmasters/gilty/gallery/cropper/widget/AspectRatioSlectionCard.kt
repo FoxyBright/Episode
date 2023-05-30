@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.gallery.cropper.model.CropAspectRatio
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 
 @Composable
 @Suppress("unused")
@@ -25,7 +25,7 @@ fun AspectRatioSelectionCard(
     contentColor: Color = MaterialTheme.colorScheme.surface,
     color: Color,
     cropAspectRatio: CropAspectRatio,
-    onClick: ((List<Int>) -> Unit)? = null
+    onClick: ((List<Int>) -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -35,33 +35,40 @@ fun AspectRatioSelectionCard(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             val density = LocalDensity.current
             val layoutDirection = LocalLayoutDirection.current
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-                .aspectRatio(1f)
-                .drawWithCache {
-
-                    val outline = cropAspectRatio.shape.createOutline(
-                        size = size, layoutDirection = layoutDirection, density = density
-                    )
-
-                    val width = size.width
-                    val height = size.height
-                    val outlineWidth = outline.bounds.width
-                    val outlineHeight = outline.bounds.height
-
-                    onDrawWithContent {
-
-                        translate(
-                            left = (width - outlineWidth) / 2, top = (height - outlineHeight) / 2
-                        ) {
-                            drawOutline(
-                                outline = outline, color = color, style = Stroke(3.dp.toPx())
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+                    .aspectRatio(1f)
+                    .drawWithCache {
+        
+                        val outline = cropAspectRatio
+                            .shape.createOutline(
+                                size = size,
+                                layoutDirection = layoutDirection,
+                                density = density
                             )
+        
+                        val width = size.width
+                        val height = size.height
+                        val outlineWidth = outline.bounds.width
+                        val outlineHeight = outline.bounds.height
+        
+                        onDrawWithContent {
+            
+                            translate(
+                                left = (width - outlineWidth) / 2,
+                                top = (height - outlineHeight) / 2
+                            ) {
+                                drawOutline(
+                                    outline = outline,
+                                    color = color,
+                                    style = Stroke(3.dp.toPx())
+                                )
+                            }
+                            drawContent()
                         }
-                        drawContent()
-                    }
-                },
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 GridImageLayout(
@@ -72,8 +79,12 @@ fun AspectRatioSelectionCard(
                     onClick = onClick
                 )
             }
-            if (cropAspectRatio.title.isNotEmpty()) {
-                Text(text = cropAspectRatio.title, color = color, fontSize = 14.sp)
+            if(cropAspectRatio.title.isNotEmpty()) {
+                Text(
+                    text = cropAspectRatio.title,
+                    color = color,
+                    fontSize = 14.dp.toSp()
+                )
             }
         }
     }

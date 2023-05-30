@@ -17,10 +17,10 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarMonth.Companion.weekDays
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.DayType.*
 import ru.rikmasters.gilty.shared.common.extentions.LocalDate
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 
 @Composable
 fun Month(
@@ -81,7 +81,7 @@ private fun Day(
                     CHECKED -> White
                 }, style = typography.bodyMedium.copy(
                     fontSize = if(type == WEEKDAY)
-                        13.sp else 16.sp,
+                        13.dp.toSp() else 16.dp.toSp(),
                     fontWeight = SemiBold,
                     textAlign = Center
                 )
