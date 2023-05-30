@@ -15,10 +15,7 @@ import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
-import ru.rikmasters.gilty.profile.viewmodel.AlbumDetailsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.CategoryViewModel
-import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
-import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
+import ru.rikmasters.gilty.profile.viewmodel.*
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
@@ -32,10 +29,13 @@ object Profile: FeatureDefinition() {
             screen<UserProfileViewModel>("main") { vm, _ ->
                 UserProfileScreen(vm)
             }
-
-            screen<AlbumDetailsViewModel>("album?id={albumId}", listOf(navArgument("albumId"){
-                type = NavType.IntType; defaultValue = 0
-            })){ vm, stack->
+            
+            screen<AlbumDetailsViewModel>(
+                route = "album?id={albumId}",
+                arguments = listOf(navArgument("albumId") {
+                    type = NavType.IntType; defaultValue = 0
+                })
+            ) { vm, stack ->
                 stack.arguments?.getInt("albumId")?.let {
                     AlbumDetailsScreen(vm, it)
                 }
@@ -46,7 +46,8 @@ object Profile: FeatureDefinition() {
             }
             
             screen<GalleryViewModel>(
-                "cropper?image={image}", listOf(navArgument("image") {
+                route = "cropper?image={image}",
+                arguments = listOf(navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 })
             ) { vm, stack ->
@@ -68,8 +69,8 @@ object Profile: FeatureDefinition() {
             screen<CategoryViewModel>("categories") { vm, _ ->
                 CategoriesScreen(vm)
             }
-
-            screen<HiddenViewModel>("hidden"){ vm, _->
+            
+            screen<HiddenViewModel>("hidden") { vm, _ ->
                 HiddenBsScreen(vm = vm)
             }
         }
