@@ -89,6 +89,8 @@ class MapBsViewModel: ViewModel(), SuggestListener {
     
     suspend fun changeSearch(text: String) {
         _search.emit(text)
+        if(text.isEmpty())
+            _last.emit(emptyList())
     }
     
     suspend fun getLastPlaces() {
