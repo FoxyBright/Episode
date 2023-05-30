@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -28,15 +29,24 @@ fun Month(
     selected: List<String>,
     onItemSelect: (String) -> Unit,
 ) {
-    val days = remember { daysCompositor(date) }
-    Column(Modifier.fillMaxWidth(), SpaceBetween, CenterHorizontally) {
+    Column(
+        Modifier.padding(horizontal = 8.dp),
+        SpaceBetween, CenterHorizontally
+    ) {
         ItemRow(weekDays) { Day(it.day, WEEKDAY) }
-        days.forEach { row ->
+        remember { daysCompositor(date) }.forEach { row ->
             ItemRow(row) {
                 val dateString = it.map()
+                val inactive = LocalDate
+                    .of(dateString)
+                    .isBefore(LocalDate.now())
                 Day(
-                    it.day, if(selected.contains(dateString))
-                        CHECKED else NORMAL
+                    label = it.day,
+                    type = when {
+                        inactive -> INACTIVE
+                        selected.contains(dateString) -> CHECKED
+                        else -> NORMAL
+                    }
                 ) { onItemSelect(dateString) }
             }
         }
@@ -47,7 +57,10 @@ fun Month(
 private fun ItemRow(
     list: List<CalendarMonth>,
     item: @Composable (CalendarMonth) -> Unit,
-) = Row(Modifier, SpaceBetween, Alignment.CenterVertically) {
+) = Row(
+    Modifier.fillMaxWidth(),
+    SpaceBetween, CenterVertically
+) {
     list.forEach { cd ->
         cd.day?.let { item(cd) }
             ?: Day((""), INACTIVE)
@@ -59,32 +72,41 @@ private enum class DayType { INACTIVE, NORMAL, CHECKED, WEEKDAY }
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun Day(
-    label: String?, type: DayType,
+    label: String?,
+    type: DayType,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
     Card(
-        { onClick?.let { it() } },
-        modifier, (type != INACTIVE),
-        CircleShape, cardColors(
-            if(type == CHECKED)
-                colorScheme.primary
-            else Transparent,
+        onClick = { onClick?.let { it() } },
+        modifier = modifier,
+        enabled = (type != INACTIVE),
+        shape = CircleShape,
+        colors = cardColors(
+            containerColor = if(type == CHECKED)
+                colorScheme.primary else Transparent,
             disabledContainerColor = Transparent
         )
     ) {
-        Box(Modifier.size(32.dp), Alignment.Center) {
+        Box(
+            Modifier.size(32.dp),
+            Alignment.Center
+        ) {
             Text(
-                label ?: "", Modifier, when(type) {
+                text = label ?: "",
+                modifier = Modifier,
+                color = when(type) {
                     INACTIVE, WEEKDAY -> colorScheme.onTertiary
                     NORMAL -> colorScheme.tertiary
                     CHECKED -> White
-                }, style = typography.bodyMedium.copy(
-                    fontSize = if(type == WEEKDAY)
-                        13.dp.toSp() else 16.dp.toSp(),
-                    fontWeight = SemiBold,
-                    textAlign = Center
-                )
+                },
+                style = typography
+                    .bodyMedium.copy(
+                        fontSize = if(type == WEEKDAY)
+                            13.dp.toSp() else 16.dp.toSp(),
+                        fontWeight = SemiBold,
+                        textAlign = Center
+                    )
             )
         }
     }

@@ -40,16 +40,15 @@ fun MainScreen(vm: MainViewModel) {
     val activity = getActivity()
     val nav = get<NavState>()
     
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val location by vm.location.collectAsState()
     val meetings by vm.meetings.collectAsState()
     val days by vm.days.collectAsState()
-    val alert by vm.alert.collectAsState()
     val today by vm.today.collectAsState()
+    val alert by vm.alert.collectAsState()
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
     
-    val location by vm.location.collectAsState()
-    
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
             ACTIVE, INACTIVE, INACTIVE,

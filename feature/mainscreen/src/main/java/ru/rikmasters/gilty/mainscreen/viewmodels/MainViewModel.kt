@@ -153,9 +153,11 @@ class MainViewModel: ViewModel() {
             .lastLocation
             .addOnSuccessListener {
                 coroutineScope.launch {
-                    location.emit(it?.let {
-                        it.latitude to it.longitude
-                    })
+                    location.emit(
+                        it?.let {
+                            it.latitude to it.longitude
+                        }
+                    )
                 }
             }
     }
@@ -166,8 +168,11 @@ class MainViewModel: ViewModel() {
                 group = get(today.value.compareTo(false)),
                 dates = days.value.ifEmpty { null },
                 time = time.value.ifBlank { null },
-                radius = if(today.value)
-                    meetFilters.value.radius else null,
+                radius = if(
+                    today.value
+                    && location.value?.first != null
+                    && location.value?.second != null
+                ) meetFilters.value.radius else null,
                 lat = if(today.value) location.value?.first else null,
                 lng = if(today.value) location.value?.second else null
             )
