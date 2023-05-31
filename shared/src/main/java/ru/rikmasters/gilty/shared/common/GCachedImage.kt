@@ -21,19 +21,18 @@ import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImagePainter.State.Error
 import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy.DISABLED
 import coil.request.CachePolicy.ENABLED
 import coil.request.ImageRequest
 import coil.size.Size.Companion.ORIGINAL
 import org.json.JSONObject
 import ru.rikmasters.gilty.shared.common.CachedImageType.FILE
-import ru.rikmasters.gilty.shared.common.CachedImageType.STORE
-import ru.rikmasters.gilty.shared.common.CachedImageType.URL
+import ru.rikmasters.gilty.shared.common.CachedImageType.RESOURCE
+import ru.rikmasters.gilty.shared.common.CachedImageType.WEB
 import java.io.File
 import kotlin.text.Charsets.UTF_8
 
 enum class CachedImageType {
-    URL, FILE, STORE
+    WEB, FILE, RESOURCE
 }
 
 @Composable
@@ -46,7 +45,7 @@ fun GCachedImage(
     contentDescription: String? = null,
     colorFilter: ColorFilter? = null,
     placeholderColor: Color = Transparent,
-    type: CachedImageType = URL,
+    type: CachedImageType = WEB,
     refreshImage: (() -> Unit)? = null,
 ) {
     
@@ -60,10 +59,13 @@ fun GCachedImage(
                 .data(url)
                 .size(ORIGINAL)
                 .networkCachePolicy(ENABLED)
-                .diskCachePolicy(DISABLED)
+                .diskCachePolicy(ENABLED)
                 .memoryCachePolicy(ENABLED)
                 .allowHardware(false)
-            key?.let { builder.memoryCacheKey(key) }
+            key?.let {
+                builder.memoryCacheKey(key)
+                builder.diskCacheKey(key)
+            }
             builder.build()
         }
     }
@@ -81,9 +83,9 @@ fun GCachedImage(
     Image(
         painter = url?.let {
             when(type) {
-                URL -> painter
+                WEB -> painter
                 FILE -> rememberAsyncImagePainter(File(it))
-                STORE -> painterResource(it.toInt())
+                RESOURCE -> painterResource(it.toInt())
             }
         } ?: rememberAsyncImagePainter(""),
         contentDescription = contentDescription,

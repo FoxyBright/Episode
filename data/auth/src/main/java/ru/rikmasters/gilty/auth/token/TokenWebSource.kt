@@ -17,14 +17,14 @@ class TokenWebSource: KtorSource() {
     }
     
     suspend fun savePushToken(token: String, type: PushType) =
-        tryPost("http://$HOST$PREFIX_URL/utils/device") {
+        post("http://$HOST$PREFIX_URL/utils/device") {
             setBody(SavePushTokenRequest(("ANDROID"), type.name, token))
-        }.let { coroutinesState({ it }) {} }
+        }
     
     suspend fun deletePushToken(token: String, type: PushType) =
-        tryDelete("http://$HOST$PREFIX_URL/utils/device") {
+        delete("http://$HOST$PREFIX_URL/utils/device") {
             url { query("device_id" to token, "type" to type.name) }
-        }.let { coroutinesState({ it }) {} }
+        }
     
     suspend fun linkExternal(token: String) =
         tryPost("http://$HOST$PREFIX_URL/auth/externals/link") {

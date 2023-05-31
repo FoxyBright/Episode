@@ -123,6 +123,20 @@ open class KtorSource: WebSource() {
     private val unExpectClient =
         client.config { expectSuccess = false }
     
+    suspend fun delete(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = updateClientToken().let {
+        client.delete(url, block)
+    }
+    
+    suspend fun post(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = updateClientToken().let {
+        client.post(url, block)
+    }
+    
     suspend fun tryGet(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
@@ -160,7 +174,6 @@ open class KtorSource: WebSource() {
     ) = updateClientToken().let {
         unExpectClient.delete(url, block)
     }
-    
     suspend fun tryPut(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
