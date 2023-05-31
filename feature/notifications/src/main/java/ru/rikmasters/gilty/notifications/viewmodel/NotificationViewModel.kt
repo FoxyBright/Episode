@@ -189,7 +189,10 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         notificationManger.deleteNotifications(
             listOf(notification.id)
         ).on(
-            success = {},
+            success = {
+                // deletes item locally after success
+                deleteLocalNotifications(notification)
+            },
             loading = {},
             error = {
                 context.errorToast(
@@ -197,7 +200,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                 )
             }
         )
-        forceRefresh()
+
     }
     
     suspend fun getRatings() = singleLoading {
@@ -227,35 +230,29 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
             success = {
                 if(
                     it
-                    && isOrganizer
+                    //&& isOrganizer
                     && _selectedNotification.value?.feedback == null
                 ) {
-                    val feedback =
-                        _selectedNotification.value
-                            ?.feedback?.ratings?.toMutableList()
-                            ?: mutableListOf()
-                    feedback.add(RatingModel("0.0", emoji))
-                    _selectedNotification.emit(
-                        _selectedNotification
-                            .value?.copy(
-                                feedback = _selectedNotification
-                                    .value?.feedback?.copy(
-                                        ratings = feedback
-                                    ) ?: FeedBackModel(
-                                    ratings = feedback.toList(),
-                                    respond = null
+                        val feedback =
+                            _selectedNotification.value
+                                ?.feedback?.ratings?.toMutableList()
+                                ?: mutableListOf()
+                        feedback.add(RatingModel("0.0", emoji))
+                        _selectedNotification.emit(
+                            _selectedNotification
+                                .value?.copy(
+                                    feedback = _selectedNotification
+                                        .value?.feedback?.copy(
+                                            ratings = feedback
+                                        ) ?: FeedBackModel(
+                                        ratings = feedback.toList(),
+                                        respond = null
+                                    )
                                 )
-                            )
-                    )
+                        )
+
                     // Updates list item after putting rating
-                    val splitByMonthList = splitMonthNotifications.value.toMutableList()
-                    val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == _selectedNotification.value?.id }
-                    if(indexOfSelected != -1){
-                        _selectedNotification.value?.let { item->
-                            splitByMonthList[indexOfSelected] = splitByMonthList[indexOfSelected].copy(second = item)
-                        }
-                        splitMonthNotifications.emit(splitByMonthList)
-                    }
+                    updateLocalNotifications(_selectedNotification.value)
                 }
                 changeMeetId(meetId)
             },
@@ -266,6 +263,25 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                 )
             }
         )
+    }
+
+    private suspend fun updateLocalNotifications(notification:NotificationModel?){
+        val splitByMonthList = splitMonthNotifications.value.toMutableList()
+        val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == notification?.id }
+        if(indexOfSelected != -1){
+            notification?.let { item ->
+                splitByMonthList[indexOfSelected] = splitByMonthList[indexOfSelected].copy(second = item)
+            }
+            splitMonthNotifications.emit(splitByMonthList)
+        }
+    }
+    private suspend fun deleteLocalNotifications(notification:NotificationModel?){
+        val splitByMonthList = splitMonthNotifications.value.toMutableList()
+        val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == notification?.id }
+        if(indexOfSelected != -1){
+            splitByMonthList.removeAt(indexOfSelected)
+            splitMonthNotifications.emit(splitByMonthList)
+        }
     }
     
     suspend fun selectParticipants(participant: Int) {
