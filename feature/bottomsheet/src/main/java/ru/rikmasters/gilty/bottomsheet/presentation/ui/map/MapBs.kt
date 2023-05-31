@@ -56,7 +56,7 @@ fun MapBs(
             }
             
             override fun onBack() {
-                nav.popBackStack()
+                scope.launch { vm.changeSearch("") }
             }
         }
     )

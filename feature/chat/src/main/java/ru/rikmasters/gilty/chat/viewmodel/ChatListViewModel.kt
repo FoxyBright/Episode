@@ -46,6 +46,9 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _isArchiveOn = MutableStateFlow(false)
     val isArchiveOn = _isArchiveOn.asStateFlow()
+
+    private val _chatsCount = MutableStateFlow(0)
+    val chatsCount = _chatsCount.asStateFlow()
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
@@ -94,6 +97,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
                         it.notificationsUnread
                     )
                     .apply()
+                _chatsCount.emit(it.chatsCount?:0)
             },
             loading = {},
             error = {
@@ -134,6 +138,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun changeSortType(sortType: SortTypeModel?) {
         _sortType.emit(sortType)
+        _isArchiveOn.emit(false)
     }
     
     suspend fun changeIsArchiveOn() {

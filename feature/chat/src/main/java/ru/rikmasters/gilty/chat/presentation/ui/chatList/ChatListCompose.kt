@@ -70,7 +70,8 @@ private fun ChatListPreview() {
                 sortType = MEETING_DATE,
                 listState = LazyListState(),
                 isSortOn = false,
-                isArchiveOn = false
+                isArchiveOn = false,
+                chatsCount = 4,
             ),
             modifier = Modifier.background(
                 colorScheme.background
@@ -91,6 +92,7 @@ data class ChatListState(
     val isSortOn: Boolean,
     val isArchiveOn: Boolean,
     val smthError: Boolean = false,
+    val chatsCount:Int,
 )
 
 interface ChatListCallback {
@@ -125,21 +127,8 @@ fun ChatListContent(
         },
         containerColor = Transparent,
         content = {
-            val emptyChats = state.chats.loadState.refresh is NotLoading
-                    && state.chats.itemCount == 0
-            
             if(!state.smthError)
                 Column(Modifier.padding(it)) {
-                    if(!emptyChats) SortTypeLabels(
-                        state = state,
-                        callback = callback
-                    )
-                    
-                    if(emptyChats) ChatListPlaceholder(
-                        modifier = Modifier
-                            .offset(y = -(50).dp)
-                    )
-                    
                     Use<ChatListViewModel>(PullToRefreshTrait) {
                         Content(state, Modifier, callback)
                     }
@@ -201,6 +190,21 @@ private fun Content(
             else -> {
                 if(chats.loadState.refresh is LoadState.Loading)
                     item { PagingLoader(chats.loadState) }
+                item {
+                    SortTypeLabels(
+                        state = state,
+                        callback = callback
+                    )
+                }
+                item {
+                    val emptyChats = state.chats.loadState.refresh is NotLoading
+                            && state.chatsCount == 0
+
+                    if(emptyChats) ChatListPlaceholder(
+                        modifier = Modifier
+                            .padding(top = 32.dp)
+                    )
+                }
                 if(itemCount != 0) {
                     getSortedChats(
                         chats.itemSnapshotList.items.filter {
@@ -418,7 +422,7 @@ fun SortTypeLabels(
             }
             
         }
-        if(state.sortType != null) {
+        if(state.sortType != null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
                 text = (if(state.sortType == MEETING_DATE)
@@ -429,12 +433,13 @@ fun SortTypeLabels(
                         MESSAGE_DATE else MEETING_DATE
                 )
             }
-        }
-        GChip(
-            modifier = Modifier.padding(start = 8.dp),
-            text = stringResource(id = R.string.chats_archive_label),
-            isSelected = state.isArchiveOn
-        ) { callback?.onArchiveClick() }
+
+        if(state.sortType == null)
+            GChip(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(id = R.string.chats_archive_label),
+                isSelected = state.isArchiveOn
+            ) { callback?.onArchiveClick() }
     }
 }
 

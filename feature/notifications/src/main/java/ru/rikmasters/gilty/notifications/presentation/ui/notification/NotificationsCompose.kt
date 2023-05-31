@@ -223,6 +223,7 @@ private fun EmptyNotification(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Notifications(
     state: NotificationsState,
@@ -315,6 +316,7 @@ private fun Notifications(
                                 ),
                                 splitNotifications[index].second,
                                 state.ratings,
+                                Modifier.animateItemPlacement(),
                                 callback
                             )
                         }
@@ -380,7 +382,8 @@ private fun PreviewLazy() {
         ) { it, not ->
             ElementNot(
                 it, (2), not,
-                DemoRatingModelList
+                DemoRatingModelList,
+                Modifier,
             )
         }
     }
@@ -391,6 +394,7 @@ private fun ElementNot(
     index: Int, size: Int,
     item: NotificationModel,
     ratings: List<RatingModel>,
+    modifier: Modifier,
     callback: NotificationsCallback? = null,
 ) {
     (item to rememberDragRowState())
@@ -401,7 +405,7 @@ private fun ElementNot(
                     getDifferenceOfTime(not.date),
                     (not.feedback?.ratings?.map { it.emoji }
                         ?: ratings.map { it.emoji })
-                ), Modifier, callback
+                ), modifier, callback
             )
         }
 }
