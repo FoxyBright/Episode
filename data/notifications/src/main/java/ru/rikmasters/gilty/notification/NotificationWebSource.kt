@@ -36,7 +36,8 @@ class NotificationWebSource: KtorSource() {
     }.let { coroutinesState({ it }) {} }
     
     suspend fun markNotifiesAsRead(
-        notifyIds: List<String>, readAll: Boolean,
+        notifyIds: List<String>,
+        readAll: Boolean,
     ) = tryPost("http://$HOST$PREFIX_URL/notifications/markAsRead") {
         MarkAsReadRequest(notifyIds, readAll)
     }.let { coroutinesState({ it }) {} }

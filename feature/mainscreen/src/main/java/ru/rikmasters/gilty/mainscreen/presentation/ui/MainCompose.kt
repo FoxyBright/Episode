@@ -1,7 +1,12 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -24,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
@@ -102,6 +108,7 @@ interface MainContentCallback {
         meet: MeetingModel,
         state: SwipeableCardState,
     )
+    
     fun updateMainScreen()
 }
 
@@ -132,13 +139,15 @@ fun MainContent(
             Modifier
                 .fillMaxSize()
                 .background(
-                    if(state.smthError) Transparent
-                    else colorScheme.background
+                    //                    if(state.smthError)
+                    //                        Transparent
+                    //                    else
+                    colorScheme.background
                 )
         ) {
-            if(state.smthError) ErrorInternetConnection {
-                callback?.updateMainScreen()
-            }
+            //            if(state.smthError) ErrorInternetConnection {
+            //                callback?.updateMainScreen()
+            //            }
             Column {
                 TopBar(
                     today = state.today,
@@ -148,7 +157,8 @@ fun MainContent(
                     onTodayChange = { callback?.onTodayChange(it) }
                 ) { callback?.onTimeFilterClick() }
                 Use<MainViewModel>(LoadingTrait) {
-                    if(!state.smthError) Content(
+                    //                    if(!state.smthError)
+                    Content(
                         state = state.grid,
                         hasFilters = state.hasFilters,
                         meetings = state.meetings,
@@ -204,14 +214,9 @@ private fun TopBar(
             Modifier.padding(horizontal = 16.dp),
             Start, Bottom
         ) {
-            GiltyString(
-                text = stringResource(R.string.meeting_profile_bottom_today_label),
-                isSelected = today
-            ) { onTodayChange(true) }
-            GiltyString(
-                text = stringResource(R.string.meeting_profile_bottom_latest_label),
-                isSelected = !today,
-            ) { onTodayChange(false) }
+            TodayToggle(today, Modifier) {
+                onTodayChange(it)
+            }
         }
         IconButton(onTimeFilterClick) {
             val icons = if(isSystemInDarkTheme())
@@ -240,6 +245,97 @@ private fun TopBar(
                 modifier = Modifier.size(30.dp)
             )
         }
+    }
+}
+
+@Composable
+@SuppressLint("CoroutineCreationDuringComposition")
+private fun TodayToggle(
+    today: Boolean,
+    modifier: Modifier,
+    onTodayChange: (Boolean) -> Unit,
+) {
+    val tween = 300
+    val todayColor = animateColorAsState(
+        targetValue = if(today) colorScheme.tertiary
+        else colorScheme.onTertiary,
+        animationSpec = tween(tween)
+    ).value
+    val afterColor = animateColorAsState(
+        targetValue = if(today) colorScheme.onTertiary
+        else colorScheme.tertiary,
+        animationSpec = tween(tween)
+    ).value
+    var todayWeight by remember {
+        mutableStateOf(110.dp)
+    }
+    var afterWeight by remember {
+        mutableStateOf(52.dp)
+    }
+    
+    LaunchedEffect(today) {
+        launch {
+            listOf(72f, 110f)
+                .let { if(today) it else it.reversed() }
+                .let {
+                    animate(
+                        it.first(), it.last(),
+                        animationSpec = tween(tween)
+                    ) { value, _ ->
+                        todayWeight = value.toInt().dp
+                    }
+                }
+        }
+        launch {
+            listOf(79f, 52f)
+                .let { if(today) it else it.reversed() }
+                .let {
+                    animate(
+                        it.first(), it.last(),
+                        animationSpec = tween(tween)
+                    ) { value, _ ->
+                        afterWeight = value.toInt().dp
+                    }
+                }
+        }
+    }
+    
+    Row(modifier, Start, Bottom) {
+        Icon(
+            painter = painterResource(
+                R.drawable.ic_today_title_max
+            ),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .width(todayWeight)
+                .offset()
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { onTodayChange(true) },
+            tint = todayColor
+        )
+        Icon(
+            painter = painterResource(
+                R.drawable.ic_after_title_max
+            ),
+            modifier = Modifier
+                .width(afterWeight)
+                .offset(
+                    y = animateDpAsState(
+                        if(today) -(3).dp
+                        else 0.dp,
+                        tween(tween)
+                    ).value
+                )
+                .clickable(
+                    MutableInteractionSource(),
+                    (null)
+                ) { onTodayChange(false) },
+            contentDescription = null,
+            tint = afterColor
+        )
     }
 }
 

@@ -42,25 +42,25 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val meetsHistory = vm.historyMeetsTest.collectAsLazyPagingItems()
     val meets = vm.meetsTest.collectAsLazyPagingItems()
+    val unreadNotification by vm.unreadNotification.collectAsState()
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val unreadMessages by vm.unreadMessages.collectAsState()
     val photoAlertState by vm.photoAlertState.collectAsState()
+    val photoViewState by vm.photoViewState.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
+    val activeAlbumId by vm.activeAlbumId.collectAsState()
     val profile by vm.profile.collectAsState()
-    val username by vm.username.collectAsState()
     val occupied by vm.occupied.collectAsState()
+    val username by vm.username.collectAsState()
     val history by vm.history.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
-    val activeAlbumId by vm.activeAlbumId.collectAsState()
-
-    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
-    val viewerImages by vm.viewerImages.collectAsState()
-    val photoViewState by vm.photoViewState.collectAsState()
     
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
-            INACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, ACTIVE
+            INACTIVE, unreadNotification,
+            INACTIVE, unreadMessages, ACTIVE
         )
     }
     
@@ -91,9 +91,10 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     LaunchedEffect(Unit) {
         vm.setUserDate()
-        context.listenPreference("unread_messages", 0) {
-            scope.launch { vm.setUnreadMessages(it > 0) }
-        }
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotification(it > 0) } }
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{
         //            vm.photoAlertDismiss(true)
@@ -151,15 +152,15 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onProfileImageRefresh() {
                 scope.launch { vm.updateUserData() }
             }
-
+            
             override fun onAlbumClick(id: Int) {
                 scope.launch { nav.navigate("album") }
             }
-
+            
             override fun onAlbumLongClick(id: Int?) {
                 scope.launch { vm.changeActiveAlbumId(id) }
             }
-
+            
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }

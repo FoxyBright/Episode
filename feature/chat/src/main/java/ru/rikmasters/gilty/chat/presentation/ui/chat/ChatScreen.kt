@@ -100,21 +100,18 @@ fun ChatScreen(
     val imeExpandOffset = WindowInsets.ime
         .getBottom(LocalDensity.current)
     LaunchedEffect(imeExpandOffset) {
-        if(imeExpandOffset > 0)
-            asm.keyboard.setSoftInputMode(Nothing)
+        if(imeExpandOffset > 0) asm.keyboard
+            .setSoftInputMode(Nothing)
     }
     
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
-        
         if(unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
         } catch(_: Exception) {
             listState.scrollToItem(messages.itemCount)
         }
-        
-        // TODO реализовать прочтение при просмотре конкретного сообщения
         vm.markAsReadMessage(chatId, all = true)
     }
     
@@ -145,9 +142,6 @@ fun ChatScreen(
                     context.contentResolver
                         .openInputStream(uri)
                         ?.use { file.writeBytes(it.readBytes()) }
-                    
-
-                    
                     vm.onSendMessage(
                         chatId = chatId,
                         photos = listOf(file)

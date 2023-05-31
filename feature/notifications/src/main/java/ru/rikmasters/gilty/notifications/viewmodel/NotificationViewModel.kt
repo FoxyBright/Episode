@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,8 +15,7 @@ import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.common.extentions.*
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
@@ -49,7 +48,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val _unreadMessages = MutableStateFlow(
         lazy {
             val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
@@ -60,9 +59,9 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         MutableStateFlow(
             lazy {
                 val count = context.getSharedPreferences(
-                    "sharedPref", ComponentActivity.MODE_PRIVATE
+                    "sharedPref", MODE_PRIVATE
                 ).getInt("unread_notification", 0)
-                if(count > 0) NEW_INACTIVE else INACTIVE
+                if(count > 0) NEW_ACTIVE else ACTIVE
             }.value
         )
     val unreadNotifications =
@@ -112,10 +111,21 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         MutableStateFlow(emptyList<Pair<Int, NotificationModel>>())
     
     suspend fun getUnread() {
+        notificationManger.markNotifyAsRead(
+            readAll = true
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
         chatManager.updateUnreadMessages().on(
             success = {
                 context.getSharedPreferences(
-                    "sharedPref", ComponentActivity.MODE_PRIVATE
+                    "sharedPref", MODE_PRIVATE
                 ).edit()
                     .putInt(
                         "unread_messages",
@@ -248,11 +258,19 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
                             )
                     )
                     // Updates list item after putting rating
-                    val splitByMonthList = splitMonthNotifications.value.toMutableList()
-                    val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == _selectedNotification.value?.id }
-                    if(indexOfSelected != -1){
-                        _selectedNotification.value?.let { item->
-                            splitByMonthList[indexOfSelected] = splitByMonthList[indexOfSelected].copy(second = item)
+                    val splitByMonthList =
+                        splitMonthNotifications.value.toMutableList()
+                    val indexOfSelected =
+                        splitByMonthList.indexOfFirst { item ->
+                            item.second.id ==
+                                    _selectedNotification.value?.id
+                        }
+                    if(indexOfSelected != -1) {
+                        _selectedNotification.value?.let { item ->
+                            splitByMonthList[indexOfSelected] =
+                                splitByMonthList[indexOfSelected].copy(
+                                    second = item
+                                )
                         }
                         splitMonthNotifications.emit(splitByMonthList)
                     }
@@ -291,7 +309,8 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
             currentIndexToSplit = 0
             splitMonthNotifications.emit(emptyList())
         }
-        val list = splitMonthNotifications.value.toMutableList()
+        val list =
+            splitMonthNotifications.value.toMutableList()
         for(current in currentIndexToSplit until notifications.size) {
             val curDate = notifications[current].date
             if(todayControl(curDate)) {

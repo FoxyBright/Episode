@@ -10,7 +10,6 @@ class NotificationManager(
     private val web: NotificationWebSource,
 ): CoroutineController() {
     
-    // получение новой страницы пагинации
     fun getNotifications() = store.getNotifications()
     
     suspend fun deleteNotifications(
@@ -26,13 +25,25 @@ class NotificationManager(
     suspend fun getRatings() =
         withContext(IO) { web.getRatings() }
     
-    // выставление реакции на встречу или пользователю
     suspend fun putRatings(
-        meetId: String, userId: String, emoji: EmojiModel,
-    ) = withContext(IO) { web.putRatings(meetId, userId, emoji.type) }
+        meetId: String,
+        userId: String,
+        emoji: EmojiModel,
+    ) = withContext(IO) {
+        web.putRatings(
+            meetId = meetId,
+            userId = userId,
+            emoji = emoji.type
+        )
+    }
     
-    @Suppress("unused")
     suspend fun markNotifyAsRead(
-        notifyIds: List<String>, readAll: Boolean = false,
-    ) = withContext(IO) { web.markNotifiesAsRead(notifyIds, readAll) }
+        notifyIds: List<String> = emptyList(),
+        readAll: Boolean = false,
+    ) = withContext(IO) {
+        web.markNotifiesAsRead(
+            notifyIds = notifyIds,
+            readAll = readAll
+        )
+    }
 }

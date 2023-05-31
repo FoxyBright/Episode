@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -140,8 +140,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
-            val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+            val count = context.getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
@@ -149,6 +149,26 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     val unreadMessages = _unreadMessages.asStateFlow()
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
+    }
+    
+    private val _unreadNotification =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    
+    val unreadNotification =
+        _unreadNotification.asStateFlow()
+    
+    suspend fun setUnreadNotification(hasUnread: Boolean) {
+        _unreadNotification.emit(
+            if(hasUnread) NEW_INACTIVE
+            else INACTIVE
+        )
     }
     
     suspend fun photoAlertDismiss(state: Boolean) {

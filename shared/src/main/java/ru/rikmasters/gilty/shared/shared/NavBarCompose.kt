@@ -49,16 +49,15 @@ fun NavBar(
         state.forEachIndexed { i, state ->
             Item(
                 icon = when(i) {
-                    0 -> if(isSystemInDarkTheme()) {
+                    0 -> if(isSystemInDarkTheme())
                         if(state == ACTIVE)
                             R.drawable.ic_home_active_dark
                         else R.drawable.ic_home_dark
-                    } else {
+                    else
                         if(state == ACTIVE)
                             R.drawable.ic_home_active
                         else R.drawable.ic_home
-                    }
-    
+                    
                     1 -> if(isSystemInDarkTheme()) when(state) {
                         ACTIVE -> R.drawable.ic_notification_active_dark
                         INACTIVE -> R.drawable.ic_notification_dark
@@ -70,7 +69,7 @@ fun NavBar(
                         NEW_INACTIVE -> R.drawable.ic_notification_indicator
                         NEW_ACTIVE -> R.drawable.ic_notification_indicator_active
                     }
-    
+                    
                     3 -> if(isSystemInDarkTheme()) when(state) {
                         ACTIVE -> R.drawable.ic_chat_active_dark
                         INACTIVE -> R.drawable.ic_chat_dark
@@ -82,7 +81,7 @@ fun NavBar(
                         NEW_INACTIVE -> R.drawable.ic_chat_indicator
                         NEW_ACTIVE -> R.drawable.ic_chat_indicator_active
                     }
-    
+                    
                     4 -> if(isSystemInDarkTheme()) {
                         if(state == ACTIVE)
                             R.drawable.ic_profile_active_dark
@@ -92,7 +91,7 @@ fun NavBar(
                             R.drawable.ic_profile_active
                         else R.drawable.ic_profile
                     }
-    
+                    
                     else -> R.drawable.ic_add
                 },
                 state = state,
