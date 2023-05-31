@@ -228,11 +228,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         
         notificationManger.putRatings(meetId, userId, emoji).on(
             success = {
-                if(
-                    it
-                    //&& isOrganizer
-                    && _selectedNotification.value?.feedback == null
-                ) {
+                if(it) {
                         val feedback =
                             _selectedNotification.value
                                 ?.feedback?.ratings?.toMutableList()
