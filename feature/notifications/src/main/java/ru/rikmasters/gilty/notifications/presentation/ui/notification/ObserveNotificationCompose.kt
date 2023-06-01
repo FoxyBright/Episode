@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +9,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -40,7 +40,7 @@ private fun ObserveNotificationPreview() {
         ObserveNotificationState(
             DemoNotificationMeetingOverModel,
             pagingPreview(DemoUserModelList),
-            listOf(0), EmojiModel.list,EmojiModel.list,
+            listOf(0), EmojiModel.list, EmojiModel.list,
         )
     )
 }
@@ -50,7 +50,7 @@ data class ObserveNotificationState(
     val participants: LazyPagingItems<UserModel>,
     val participantsStates: List<Int>,
     val notificationEmojiList: List<EmojiModel>,
-    val emojiList:List<EmojiModel>,
+    val emojiList: List<EmojiModel>,
 )
 
 @Composable
@@ -67,7 +67,7 @@ fun ObserveNotification(
                 NotificationItemState(
                     state.notification,
                     DragRowState(1f),
-                    MaterialTheme.shapes.medium,
+                    shapes.medium,
                     getDifferenceOfTime(state.notification.date),
                     state.notificationEmojiList
                 ), Modifier, callback
@@ -78,28 +78,28 @@ fun ObserveNotification(
             Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp)
-                .background(
-                    colorScheme.primaryContainer,
-                    MaterialTheme.shapes.large
-                )
         ) {
             when {
                 state.participants.loadState.refresh is LoadState.Error -> {}
                 state.participants.loadState.append is LoadState.Error -> {}
                 state.participants.loadState.refresh is LoadState.Loading -> {
-                    item {
-                        PagingLoader(state.participants.loadState)
-                    }
+                    item { PagingLoader(state.participants.loadState) }
                 }
                 else -> {
                     itemsIndexed(state.participants) { index, participant ->
                         participant?.let {
                             Participant(
-                                index, participant, itemCount,
-                                state.participantsStates.contains(index),
-                                participant.meetRating?.emoji,
-                                state.emojiList,
-                                { part -> callback?.onParticipantClick(part) }
+                                index = index,
+                                member = participant,
+                                size = itemCount,
+                                unwrap = state.participantsStates
+                                    .contains(index),
+                                memberEmoji = participant
+                                    .meetRating?.emoji,
+                                emojiList = state.emojiList,
+                                onClick = { part ->
+                                    callback?.onParticipantClick(part)
+                                }
                             ) { emoji ->
                                 participant.id?.let {
                                     callback?.onEmojiClick(
@@ -111,19 +111,24 @@ fun ObserveNotification(
                         }
                     }
                     if(state.participants.loadState.append is LoadState.Loading) {
-                        item {
-                            PagingLoader(state.participants.loadState)
-                        }
+                        item { PagingLoader(state.participants.loadState) }
                     }
+                    item {
+                        if(itemCount != 0) Text(
+                            text = stringResource(
+                                R.string.notification_send_emotion
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 6.dp, start = 16.dp),
+                            color = colorScheme.onTertiary,
+                            style = typography.labelSmall
+                        )
+                    }
+                    itemSpacer(20.dp)
                 }
             }
         }
-        if(itemCount != 0) Text(
-            stringResource(R.string.notification_send_emotion),
-            Modifier.padding(top = 6.dp, start = 16.dp),
-            colorScheme.onTertiary,
-            style = typography.labelSmall
-        )
     }
 }
 
@@ -140,10 +145,11 @@ private fun Participant(
     onEmojiClick: ((EmojiModel) -> Unit)? = null,
 ) {
     Card(
-        { onClick?.let { it(index) } },
-        Modifier.fillMaxWidth(),
-        (true), lazyItemsShapes(index, size, 14.dp),
-        cardColors(colorScheme.primaryContainer)
+        onClick = { onClick?.let { it(index) } },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = true,
+        shape = lazyItemsShapes(index, size, 14.dp),
+        colors = cardColors(colorScheme.primaryContainer)
     ) {
         Column(Modifier.padding(bottom = 12.dp)) {
             Row(
@@ -155,38 +161,45 @@ private fun Participant(
                 CenterVertically
             ) {
                 BrieflyRow(
-                    "${member.username}${
-                        if (member.age in 18..99) {
+                    text = "${member.username}${
+                        if(member.age in 18..99) {
                             ", ${member.age}"
                         } else ""
                     }",
-                    Modifier,
-                    member.avatar?.thumbnail?.url,
-                    member.emoji
+                    modifier = Modifier,
+                    image = member.avatar?.thumbnail?.url,
+                    emoji = member.emoji
                 )
                 memberEmoji?.let {
                     GEmojiImage(
-                        memberEmoji,
-                        Modifier.size(24.dp)
+                        emoji = memberEmoji,
+                        modifier = Modifier.size(24.dp)
                     )
                 } ?: run {
                     Icon(
-                        if(unwrap) Filled.KeyboardArrowDown
+                        imageVector = if(unwrap)
+                            Filled.KeyboardArrowDown
                         else Filled.KeyboardArrowRight,
-                        (null), Modifier.size(28.dp),
-                        colorScheme.onTertiary
+                        contentDescription = (null),
+                        modifier = Modifier.size(28.dp),
+                        tint = colorScheme.onTertiary
                     )
                 }
             }
-            if(unwrap && memberEmoji == null) EmojiRow(
-                emojiList,
-                Modifier.padding(
-                    start = 60.dp,
-                    end = 20.dp
-                )
-            ) { emoji -> onEmojiClick?.let { it(emoji) } }
+            if(unwrap && memberEmoji == null)
+                EmojiRow(
+                    emojiList = emojiList,
+                    modifier = Modifier.padding(
+                        start = 60.dp,
+                        end = 20.dp
+                    )
+                ) { emoji -> onEmojiClick?.let { it(emoji) } }
         }
-    }; if(index < size - 1) {
-        GDivider(Modifier.padding(start = 60.dp))
+    }; if(index < size - 1) Row {
+        GDivider(
+            modifier = Modifier.width(60.dp),
+            color = colorScheme.primaryContainer
+        )
+        GDivider(Modifier.weight(1f))
     }
 }
