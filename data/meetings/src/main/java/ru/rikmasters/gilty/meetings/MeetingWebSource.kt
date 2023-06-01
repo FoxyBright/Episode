@@ -94,7 +94,7 @@ class MeetingWebSource: KtorSource() {
         dates: List<String>? = null,
         time: String? = null,
         city: Int? = null,
-        perPage:Int = 15
+        perPage: Int = 15,
     ) = tryGet(
         "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
     ) {
@@ -144,7 +144,8 @@ class MeetingWebSource: KtorSource() {
         }
     }.let {
         coroutinesState({ it }) {
-            val wrappedResponse = it.paginateWrapped<List<MainMeetResponse>>()
+            val wrappedResponse =
+                it.paginateWrapped<List<MainMeetResponse>>()
             wrappedResponse.first.map { it.map() } to wrappedResponse.second.total
         }
     }
@@ -180,17 +181,15 @@ class MeetingWebSource: KtorSource() {
         excludeMe: Int,
         page: Int,
         perPage: Int,
-    ): DataStateTest<List<User>> = tryGet("http://$HOST$PREFIX_URL/meetings/$meet/members") {
+    ): DataStateTest<List<User>> = tryGet(
+        "http://$HOST$PREFIX_URL/meetings/$meet/members"
+    ) {
         url {
             query("exclude_me" to "$excludeMe")
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }.let {
-        coroutinesState({ it }) {
-            it.wrapped<List<User>>()
-        }
-    }
+    }.let { coroutinesState({ it }) { it.wrapped() } }
     
     suspend fun getOrientations() =
         tryGet("http://$HOST$PREFIX_URL/orientations")

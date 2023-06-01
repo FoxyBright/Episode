@@ -22,6 +22,7 @@ import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson
 import okhttp3.OkHttpClient
 import ru.rikmasters.gilty.core.data.source.WebSource
+import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -61,7 +62,12 @@ open class KtorSource: WebSource() {
             }
             defaultRequest {
                 contentType(Json)
-                headers { append("Accept-Language", "ru") }
+                headers {
+                    append(
+                        name = "Accept-Language",
+                        value = getDefault().language
+                    )
+                }
                 host = env[ENV_BASE_URL] ?: ""
             }
             install(HttpTimeout) { socketTimeoutMillis = 15000 }
@@ -174,6 +180,7 @@ open class KtorSource: WebSource() {
     ) = updateClientToken().let {
         unExpectClient.delete(url, block)
     }
+    
     suspend fun tryPut(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
