@@ -64,7 +64,7 @@ fun MainContentPreview() {
         MainContent(
             MainContentState(
                 (false), (false), (false), (false),
-                DemoMeetingList, listOf(
+                (DemoMeetingList), listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
                 ), (false), (false),
@@ -81,7 +81,7 @@ fun GridMainContentPreview() {
         MainContent(
             MainContentState(
                 (true), (true), (false), (false),
-                DemoMeetingList,
+                (DemoMeetingList),
                 listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
@@ -324,7 +324,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if(today) -(3).dp
+                        if (today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -358,8 +358,8 @@ private fun Content(
             meetings = meetings
         ) { callback?.onRespond(it) }
         else MeetingsListContent(
-            states = meetings.map {
-                it to rememberSwipeableCardState()
+            states = meetings.map { item ->
+                item to rememberSwipeableCardState()
             },
             modifier = modifier.padding(top = 24.dp),
             notInteresting = { meet, it ->

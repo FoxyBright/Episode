@@ -97,7 +97,7 @@ class ChatListViewModel: ViewModel(), PullToRefreshTrait {
                         it.notificationsUnread
                     )
                     .apply()
-                _chatsCount.emit(it.chatsCount?:0)
+                _chatsCount.emit(it.chatsCount?:1) // TODO change 1 to 0 when backend will be ready
             },
             loading = {},
             error = {

@@ -31,7 +31,7 @@ private fun TodayMeetingGridPreview() {
         ) {
             MeetingGridContent(
                 Modifier.padding(16.dp),
-                DemoMeetingList
+                (DemoMeetingList)
             )
         }
     }
@@ -48,9 +48,11 @@ fun MeetingGridContent(
         verticalArrangement = spacedBy(16.dp),
         horizontalArrangement = spacedBy(16.dp)
     ) {
-        items(meetings) { meet ->
-            MeetingCard(meeting = meet)
-            { onClick?.let { it(meet) } }
+        items(meetings) { meet: MeetingModel? ->
+            meet?.let {
+                MeetingCard(meeting = meet)
+                { onClick?.let { it(meet) } }
+            }
         }
         items(2) {
             Divider(

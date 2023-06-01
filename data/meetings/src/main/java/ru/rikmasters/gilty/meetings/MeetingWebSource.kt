@@ -5,11 +5,13 @@ import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
+import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
 import ru.rikmasters.gilty.shared.wrapper.coroutinesState
+import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingWebSource: KtorSource() {
@@ -77,6 +79,7 @@ class MeetingWebSource: KtorSource() {
             .let { coroutinesState({ it }) {} }
     
     suspend fun getMeetsList(
+        page: Int,
         count: Boolean,
         group: String,
         categories: List<String>? = null,
@@ -91,10 +94,13 @@ class MeetingWebSource: KtorSource() {
         dates: List<String>? = null,
         time: String? = null,
         city: Int? = null,
+        perPage:Int = 15
     ) = tryGet(
         "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
     ) {
         url {
+            query("page" to "$page")
+            query("per_page" to "$perPage")
             query("group" to group)
             categories?.let { list ->
                 list.forEach {
@@ -136,6 +142,11 @@ class MeetingWebSource: KtorSource() {
             city?.let { query("city_id" to "$it") }
             query("country" to getLocale())
         }
+    }.let {
+        coroutinesState({ it }) {
+            val wrappedResponse = it.paginateWrapped<List<MainMeetResponse>>()
+            wrappedResponse.first.map { it.map() } to wrappedResponse.second.total
+        }
     }
     
     suspend fun cancelMeet(meetId: String) =
@@ -169,7 +180,7 @@ class MeetingWebSource: KtorSource() {
         excludeMe: Int,
         page: Int,
         perPage: Int,
-    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meet/members") {
+    ): DataStateTest<List<User>> = tryGet("http://$HOST$PREFIX_URL/meetings/$meet/members") {
         url {
             query("exclude_me" to "$excludeMe")
             query("page" to "$page")

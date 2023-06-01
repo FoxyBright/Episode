@@ -154,7 +154,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun onAlbumClick(id: Int) {
-                scope.launch { nav.navigate("album") }
+                scope.launch { nav.navigate("album?id=${id}") }
             }
             
             override fun onAlbumLongClick(id: Int?) {
