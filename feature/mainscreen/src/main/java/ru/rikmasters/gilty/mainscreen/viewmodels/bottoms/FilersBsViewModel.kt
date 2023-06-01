@@ -82,11 +82,6 @@ class FiltersBsViewModel(
     val searchCityState =
         _searchCityState.asStateFlow()
     
-    private val _results =
-        MutableStateFlow<Int?>(null)
-    val results =
-        _results.asStateFlow()
-    
     private val _selectedCategories =
         MutableStateFlow(emptyList<CategoryModel>())
     val selectedCategories =
@@ -252,23 +247,7 @@ class FiltersBsViewModel(
     val hasFilters = mainVm.meetFilters
     
     private suspend fun findMeets() = singleLoading {
-        meetManager.getMeetCount(
-            filtersBuilder().copy(
-                genders = listOf(
-                    profileManager
-                        .getProfile()
-                        .gender
-                )
-            )
-        ).on(
-            success = { _results.emit(it) },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
+        mainVm.getPageMeetings(true, true)
     }
     
     private val location = mainVm.location

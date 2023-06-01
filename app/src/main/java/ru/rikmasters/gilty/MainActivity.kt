@@ -33,6 +33,7 @@ import ru.rikmasters.gilty.presentation.model.FireBaseService
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.R.style.Theme_Gilty
 import ru.rikmasters.gilty.shared.common.ErrorConnection
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
@@ -116,8 +117,12 @@ class MainActivity: ComponentActivity() {
             }
             
             suspend fun authorize(userId: String) {
-                authManager.savePushToken(token)
-                chatManager.connectWebSocket(userId)
+                try {
+                    authManager.savePushToken(token)
+                    chatManager.connectWebSocket(userId)
+                }catch (e:Exception){
+                    context.errorToast(message = e.message)
+                }
             }
             
             LaunchedEffect(Unit) {

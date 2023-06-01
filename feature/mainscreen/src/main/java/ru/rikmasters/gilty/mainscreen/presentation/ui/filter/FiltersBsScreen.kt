@@ -31,7 +31,7 @@ fun FiltersBs(
     val isOnline by vm.isOnline.collectAsState()
     val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
-    val results by vm.results.collectAsState()
+    val results by vm.mainVm.results.collectAsState()
     val city by vm.city.collectAsState()
     val screen by vm.screen.collectAsState()
     

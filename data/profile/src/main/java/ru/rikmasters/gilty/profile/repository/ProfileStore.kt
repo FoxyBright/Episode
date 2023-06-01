@@ -40,6 +40,7 @@ class ProfileStore(
         primarySource.deleteAll<Profile>()
         primarySource.deleteAll<ProfileCategories>()
         primarySource.deleteAll<ProfileMeets>()
+        primarySource.deleteAll<AvatarAmount>()
         primarySource.deleteAll<Avatar>()
     }
     
