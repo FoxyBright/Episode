@@ -17,12 +17,7 @@ import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.Top
 import androidx.compose.ui.Modifier
@@ -328,13 +323,13 @@ private fun Information(
         )
         Column {
             Text(
-                state.name,
-                Modifier.padding(start = 12.dp),
-                colorScheme.tertiary,
+                text = state.name,
+                modifier = Modifier.padding(start = 12.dp),
+                color = colorScheme.tertiary,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             )
-            val count = state.memberCount + 1
+            val count = state.memberCount
             Text(
                 "$count ${
                     stringResource(

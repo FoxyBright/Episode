@@ -92,7 +92,7 @@ data class ChatListState(
     val isSortOn: Boolean,
     val isArchiveOn: Boolean,
     val smthError: Boolean = false,
-    val chatsCount:Int,
+    val chatsCount: Int,
 )
 
 interface ChatListCallback {
@@ -197,9 +197,10 @@ private fun Content(
                     )
                 }
                 item {
-                    val emptyChats = state.chats.loadState.refresh is NotLoading
-                            && state.chatsCount == 0
-
+                    val emptyChats =
+                        state.chats.loadState.refresh is NotLoading
+                                && state.chatsCount == 0
+                    
                     if(emptyChats) ChatListPlaceholder(
                         modifier = Modifier
                             .padding(top = 32.dp)
@@ -400,27 +401,27 @@ fun SortTypeLabels(
             }, verticalAlignment = CenterVertically) {
                 if(state.sortType != null) {
                     Image(
-                        // TODO: Consider dark theme for icon
                         painter = painterResource(
-                            R.drawable.ic_close_sort
+                            if(isSystemInDarkTheme())
+                                R.drawable.ic_close_sort_dark
+                            else R.drawable.ic_close_sort
                         ),
-                        contentDescription = (null),
+                        contentDescription = null,
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(26.dp)
                             .clickable {
-                                callback?.onSortClick(null)
+                                callback?.onSortClick(
+                                    null
+                                )
                             },
                     )
                 }
                 GChip(
-                    text = stringResource(id = R.string.chats_sort_label),
+                    text = stringResource(R.string.chats_sort_label),
                     isSelected = state.sortType != null
-                ) {
-                    callback?.onSortClick(MEETING_DATE)
-                }
+                ) { callback?.onSortClick(MEETING_DATE) }
             }
-            
         }
         if(state.sortType != null)
             GChip(
@@ -433,7 +434,7 @@ fun SortTypeLabels(
                         MESSAGE_DATE else MEETING_DATE
                 )
             }
-
+        
         if(state.sortType == null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),

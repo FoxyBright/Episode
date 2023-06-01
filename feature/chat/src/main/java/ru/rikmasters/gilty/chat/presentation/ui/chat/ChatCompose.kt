@@ -58,8 +58,8 @@ private fun ChatPreview() {
                     chatType = TRANSLATION,
                     viewer = null,
                     toTranslation = null,
-                    (true),
-                    (true)
+                    isOnline = true,
+                    isOrganizer = true
                 ),
                 answer = DemoMessageModel,
                 meet = DemoMeetingModel,

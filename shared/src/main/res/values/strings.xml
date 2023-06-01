@@ -302,7 +302,7 @@
     <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
-    <string name="add_meet_conditions_hidden_label">Участники получат доступ к скрытым фото.</string>
+    <string name="add_meet_conditions_hidden_label">Участники получат доступ к скрытым фото</string>
     <string name="add_meet_detailed_meet_duration">Длительность</string>
     <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
     <string name="add_meet_detailed_meet_date">Дата и время</string>

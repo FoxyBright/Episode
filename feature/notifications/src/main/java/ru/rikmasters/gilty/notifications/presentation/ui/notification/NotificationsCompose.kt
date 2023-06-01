@@ -109,14 +109,14 @@ data class NotificationsState(
 )
 
 interface NotificationsCallback {
-
+    
     fun onSwiped(notification: NotificationModel)
     fun onMeetClick(meet: MeetingModel?)
     fun onUserClick(
         user: UserModel?,
         meet: MeetingModel? = null,
     )
-
+    
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -157,7 +157,7 @@ fun NotificationsContent(
             ) { callback?.onNavBarSelect(it) }
         }
     ) { padding ->
-        if (state.smthError) ErrorInternetConnection {
+        if(state.smthError) ErrorInternetConnection {
             callback?.onListUpdate()
         } else Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
@@ -171,7 +171,7 @@ fun NotificationsContent(
         }
     }
     state.activeNotification?.let {
-        if (state.blur) BackBlur(
+        if(state.blur) BackBlur(
             Modifier.clickable {
                 callback?.onBlurClick()
             }, radius = 25
@@ -207,7 +207,7 @@ private fun EmptyNotification(
     ) {
         Image(
             painterResource(
-                if ((isSystemInDarkTheme())) {
+                if((isSystemInDarkTheme())) {
                     R.drawable.notify_dog_dark
                 } else R.drawable.notify_dog_light
             ), (null), Modifier.fillMaxWidth()
@@ -231,7 +231,7 @@ private fun Notifications(
     callback: NotificationsCallback?,
 ) {
     @Composable
-    fun getPeriodName(monthNumber: Int) = when (monthNumber) {
+    fun getPeriodName(monthNumber: Int) = when(monthNumber) {
         1 -> R.string.month_january_name
         2 -> R.string.month_february_name
         3 -> R.string.month_march_name
@@ -250,37 +250,37 @@ private fun Notifications(
         50 -> R.string.meeting_profile_bottom_30_days_earlier_label
         else -> R.string.meeting_profile_bottom_latest_label
     }
-
+    
     val notifications = state.notifications
-    if (LocalInspectionMode.current) PreviewLazy()
+    if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
-
+        
         val hasResponds = state.lastRespond.first > 0
-
+        
         when {
             notifications.loadState.refresh is LoadState.Error -> {}
             notifications.loadState.append is LoadState.Error -> {}
             else -> {
-                if (notifications.loadState.refresh is Loading) {
+                if(notifications.loadState.refresh is Loading) {
                     item { PagingLoader(notifications.loadState) }
                 }
-
+                
                 val last = state.lastRespond
-
-                if (hasResponds) item {
+                
+                if(hasResponds) item {
                     Box(Modifier.padding(top = 20.dp)) {
                         Responds(
                             last.second, last.first
                         ) { callback?.onRespondsClick() }
                     }
                 }
-
+                
                 val splitNotifications = state.splitNotifications
-                if (notifications.itemCount > 0 && splitNotifications.isNotEmpty()) {
+                if(notifications.itemCount > 0 && splitNotifications.isNotEmpty()) {
                     itemsIndexed(state.notifications) { index, item ->
-                        if (splitNotifications.size > index) {
+                        if(splitNotifications.size > index) {
                             // Displays Labels
-                            if (index == 0)
+                            if(index == 0)
                                 Label(
                                     text = getPeriodName(monthNumber = splitNotifications[index].first),
                                     hasResponds = hasResponds,
@@ -291,39 +291,50 @@ private fun Notifications(
                                         )
                                     ) == 0
                                 )
-                            else if (splitNotifications[index - 1].first != splitNotifications[index].first)
-                                Label(
-                                    text = getPeriodName(monthNumber = splitNotifications[index].first),
+                            else if(splitNotifications[index - 1].first
+                                != splitNotifications[index].first
+                            ) Label(
+                                    text = getPeriodName(
+                                        monthNumber = splitNotifications[index].first
+                                    ),
                                     hasResponds = hasResponds,
                                     isFirst = getIndex(
                                         prev = doesPrevExist(
-                                            index,
-                                            splitNotifications
+                                            index = index,
+                                            splitNotifications = splitNotifications
                                         )
                                     ) == 0
                                 )
                             // Displays actual notification
                             ElementNot(
-                                getIndex(
+                                index = getIndex(
                                     prev = doesPrevExist(
                                         index,
                                         splitNotifications
                                     )
                                 ),
-                                getSize(
-                                    prev = doesPrevExist(index, splitNotifications),
-                                    next = doesNextExist(index, splitNotifications),
+                                size = getSize(
+                                    prev = doesPrevExist(
+                                        index,
+                                        splitNotifications
+                                    ),
+                                    next = doesNextExist(
+                                        index,
+                                        splitNotifications
+                                    ),
                                 ),
-                                splitNotifications[index].second,
-                                state.ratings,
-                                Modifier.animateItemPlacement(),
-                                callback
+                                item = splitNotifications[index].second,
+                                ratings = state.ratings,
+                                modifier = Modifier.animateItemPlacement(),
+                                callback = callback
                             )
                         }
                     }
-                    if (notifications.loadState.append is Loading || splitNotifications.size != state.notifications.itemCount)
-                        item { PagingLoader(notifications.loadState) }
-                } else if (notifications.loadState.refresh is NotLoading)
+                    if(notifications.loadState.append is Loading
+                        || splitNotifications.size
+                        != state.notifications.itemCount
+                    ) item { PagingLoader(notifications.loadState) }
+                } else if(notifications.loadState.refresh is NotLoading)
                     item { EmptyNotification() }
             }
         }
@@ -331,37 +342,43 @@ private fun Notifications(
     }
 }
 
-fun doesPrevExist(index: Int, splitNotifications: List<Pair<Int, NotificationModel>>) =
-    if (index == 0) false
+fun doesPrevExist(
+    index: Int,
+    splitNotifications: List<Pair<Int, NotificationModel>>,
+) =
+    if(index == 0) false
     else {
         try {
             splitNotifications[index - 1].first == splitNotifications[index].first
-        } catch (e: Exception) {
+        } catch(e: Exception) {
             false
         }
     }
 
-fun doesNextExist(index: Int, splitNotifications: List<Pair<Int, NotificationModel>>) =
-    if (index + 1 > splitNotifications.size) false
+fun doesNextExist(
+    index: Int,
+    splitNotifications: List<Pair<Int, NotificationModel>>,
+) =
+    if(index + 1 > splitNotifications.size) false
     else {
         try {
             splitNotifications[index + 1].first == splitNotifications[index].first
-        } catch (e: Exception) {
+        } catch(e: Exception) {
             false
         }
     }
 
 
 fun getSize(prev: Boolean, next: Boolean): Int {
-    if (!prev && !next) return 1
-    if (prev && next) return 3
-    if (prev) return 2
-    if (next) return 2
+    if(!prev && !next) return 1
+    if(prev && next) return 3
+    if(prev) return 2
+    if(next) return 2
     return 0
 }
 
 fun getIndex(prev: Boolean): Int {
-    if (!prev) return 0
+    if(!prev) return 0
     return 1
 }
 
@@ -401,9 +418,11 @@ private fun ElementNot(
         .let { (not, row) ->
             NotificationItem(
                 NotificationItemState(
-                    not, row, lazyItemsShapes(index, size),
-                    getDifferenceOfTime(not.date),
-                    (not.feedback?.ratings?.map { it.emoji }
+                    notification = not,
+                    rowState = row,
+                    shape = lazyItemsShapes(index, size),
+                    duration = getDifferenceOfTime(not.date),
+                    emojiList = (not.feedback?.ratings?.map { it.emoji }
                         ?: ratings.map { it.emoji })
                 ), modifier, callback
             )

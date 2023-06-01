@@ -28,14 +28,22 @@ data class Chat(
 ): DomainEntity {
     
     fun map() = ChatModel(
-        id, meetingId, userId,
-        MeetStatusType.valueOf(meetStatus),
-        ChatStatus.valueOf(status),
-        isOnline, translationStartedAt,
-        organizer.map(), organizerOnly,
-        title, lastMessage?.map(),
-        datetime, unreadCount, canMessage,
-        membersCount, ("${of(createdAt)}"),
+        id = id,
+        meetingId = meetingId,
+        userId = userId,
+        meetStatus = MeetStatusType.valueOf(meetStatus),
+        status = ChatStatus.valueOf(status),
+        isOnline = isOnline,
+        translationStartedAt = translationStartedAt,
+        organizer = organizer.map(),
+        organizerOnly = organizerOnly,
+        title = title,
+        lastMessage = lastMessage?.map(),
+        datetime = datetime,
+        unreadCount = unreadCount,
+        canMessage = canMessage,
+        membersCount = membersCount,
+        createdAt = "${of(createdAt)}",
     )
     
     override fun primaryKey() = id
