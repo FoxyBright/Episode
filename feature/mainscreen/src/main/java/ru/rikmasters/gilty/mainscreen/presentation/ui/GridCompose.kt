@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import ru.rikmasters.gilty.shared.common.extentions.items
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.shared.MeetingCard
@@ -31,7 +34,7 @@ private fun TodayMeetingGridPreview() {
         ) {
             MeetingGridContent(
                 Modifier.padding(16.dp),
-                DemoMeetingList
+                pagingPreview(DemoMeetingList)
             )
         }
     }
@@ -40,7 +43,7 @@ private fun TodayMeetingGridPreview() {
 @Composable
 fun MeetingGridContent(
     modifier: Modifier = Modifier,
-    meetings: List<MeetingModel>,
+    meetings: LazyPagingItems<MeetingModel>,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
     LazyVerticalGrid(
@@ -48,9 +51,11 @@ fun MeetingGridContent(
         verticalArrangement = spacedBy(16.dp),
         horizontalArrangement = spacedBy(16.dp)
     ) {
-        items(meetings) { meet ->
-            MeetingCard(meeting = meet)
-            { onClick?.let { it(meet) } }
+        items(meetings) { meet: MeetingModel? ->
+            meet?.let {
+                MeetingCard(meeting = meet)
+                { onClick?.let { it(meet) } }
+            }
         }
         items(2) {
             Divider(

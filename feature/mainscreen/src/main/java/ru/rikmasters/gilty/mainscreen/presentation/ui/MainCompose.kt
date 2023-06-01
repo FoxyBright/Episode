@@ -29,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.ItemSnapshotList
+import androidx.paging.compose.LazyPagingItems
 import kotlinx.coroutines.launch
 import org.koin.core.scope.Scope
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
@@ -42,6 +44,7 @@ import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCard
 import ru.rikmasters.gilty.shared.common.MeetCardType.EMPTY
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.RIGHT
@@ -64,7 +67,7 @@ fun MainContentPreview() {
         MainContent(
             MainContentState(
                 (false), (false), (false), (false),
-                DemoMeetingList, listOf(
+                pagingPreview(DemoMeetingList), listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
                 ), (false), (false),
@@ -81,7 +84,7 @@ fun GridMainContentPreview() {
         MainContent(
             MainContentState(
                 (true), (true), (false), (false),
-                DemoMeetingList,
+                pagingPreview(DemoMeetingList),
                 listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
@@ -117,7 +120,7 @@ data class MainContentState(
     val today: Boolean,
     val selectDate: Boolean,
     val selectTime: Boolean,
-    val meetings: List<MeetingModel>,
+    val meetings: LazyPagingItems<MeetingModel>,
     val navBarStates: List<NavIconState>,
     val alert: Boolean,
     val hasFilters: Boolean,
@@ -324,7 +327,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if(today) -(3).dp
+                        if (today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -343,23 +346,23 @@ private fun TodayToggle(
 private fun Content(
     state: Boolean,
     hasFilters: Boolean,
-    meetings: List<MeetingModel>,
+    meetings: LazyPagingItems<MeetingModel>,
     modifier: Modifier = Modifier,
     callback: MainContentCallback?,
 ) {
     Box {
-        if(meetings.size < 2) MeetCard(
+        if(meetings.itemCount < 2) MeetCard(
             modifier, EMPTY, hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
-        if(state && meetings.isNotEmpty()) MeetingGridContent(
+        if(state && meetings.itemCount != 0) MeetingGridContent(
             modifier = modifier.fillMaxSize(),
             meetings = meetings
         ) { callback?.onRespond(it) }
         else MeetingsListContent(
-            states = meetings.map {
-                it to rememberSwipeableCardState()
+            states = meetings.itemSnapshotList.items.map { item->
+                item to rememberSwipeableCardState()
             },
             modifier = modifier.padding(top = 24.dp),
             notInteresting = { meet, it ->

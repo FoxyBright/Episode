@@ -252,7 +252,7 @@ class FiltersBsViewModel(
     val hasFilters = mainVm.meetFilters
     
     private suspend fun findMeets() = singleLoading {
-        meetManager.getMeetCount(
+        val result = meetManager.getMeetCount(
             filtersBuilder().copy(
                 genders = listOf(
                     profileManager
@@ -260,7 +260,9 @@ class FiltersBsViewModel(
                         .gender
                 )
             )
-        ).on(
+        )
+        _results.emit(result)
+            /*.on(
             success = { _results.emit(it) },
             loading = {},
             error = {
@@ -268,7 +270,7 @@ class FiltersBsViewModel(
                     it.serverMessage
                 )
             }
-        )
+        )*/
     }
     
     private val location = mainVm.location

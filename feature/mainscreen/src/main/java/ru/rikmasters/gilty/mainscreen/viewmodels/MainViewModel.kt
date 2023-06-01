@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import androidx.activity.ComponentActivity.MODE_PRIVATE
+import androidx.paging.cachedIn
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chats.manager.ChatManager
@@ -63,7 +66,18 @@ class MainViewModel: ViewModel() {
     
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
-    
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val meetingsPaging by lazy {
+        meetFilters.flatMapLatest { filter ->
+            meetManager.getMeetingsPaging(
+                filter,
+                false
+            )
+        }.cachedIn(coroutineScope)
+    }
+
+
     private val _unreadMessages = MutableStateFlow(
         lazy {
             val count = context.getSharedPreferences(
@@ -203,7 +217,7 @@ class MainViewModel: ViewModel() {
                 lng = if(today.value) location.value?.second else null
             )
         )
-        meetManager.getMeetings(meetFilters.value).on(
+        /*meetManager.getMeetings(meetFilters.value).on(
             success = { _meetings.emit(it) },
             loading = {},
             error = {
@@ -211,7 +225,7 @@ class MainViewModel: ViewModel() {
                     it.serverMessage
                 )
             }
-        )
+        )*/
     }
     
     suspend fun alertDismiss(state: Boolean) {

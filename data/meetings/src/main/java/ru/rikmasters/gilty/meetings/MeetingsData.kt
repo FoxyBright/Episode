@@ -14,6 +14,7 @@ object MeetingsData: DataDefinition() {
     }
     
     override fun Module.koin() {
+        singleOf(::MeetingRepository)
         singleOf(::MeetingWebSource)
         singleOf(::MeetingManager)
         singleOf(::AddMeetStorage)

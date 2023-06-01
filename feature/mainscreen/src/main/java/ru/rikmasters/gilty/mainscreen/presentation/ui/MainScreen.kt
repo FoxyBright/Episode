@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -43,7 +44,7 @@ fun MainScreen(vm: MainViewModel) {
     val unreadNotifications by vm.unreadNotifications.collectAsState()
     val unreadMessages by vm.unreadMessages.collectAsState()
     val location by vm.location.collectAsState()
-    val meetings by vm.meetings.collectAsState()
+    val meetings = vm.meetingsPaging.collectAsLazyPagingItems()
     val days by vm.days.collectAsState()
     val today by vm.today.collectAsState()
     val alert by vm.alert.collectAsState()

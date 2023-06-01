@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -116,6 +117,7 @@ class MainActivity: ComponentActivity() {
             }
             
             suspend fun authorize(userId: String) {
+                Log.d("Hello DEvice Id", "$userId")
                 authManager.savePushToken(token)
                 chatManager.connectWebSocket(userId)
             }
