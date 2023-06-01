@@ -70,7 +70,6 @@ class MainViewModel: ViewModel() {
     val results = _results.asStateFlow()
     suspend fun getPageMeetings(reset:Boolean, isFiltered:Boolean = _meetFilters.value.isNotNullOrEmpty()){
         if(reset) {
-            _meetings.emit(emptyList())
             _page.emit(1)
         }
         else _page.emit(_page.value + 1)
@@ -80,6 +79,7 @@ class MainViewModel: ViewModel() {
             _page.value,
         ).on(
             success = {
+                if(reset) _meetings.emit(emptyList())
                 val meetings = _meetings.value.toMutableList()
                 meetings.addAll(0, it.first)
                 _meetings.emit(meetings)
