@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +24,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
@@ -49,7 +51,17 @@ fun BottomSheet(
     val nav = rememberNavController()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
-    
+
+    val coroutineScope = rememberCoroutineScope()
+
+    BackHandler {
+        if(asm.bottomSheet.current.value != BottomSheetSwipeState.COLLAPSED){
+            coroutineScope.launch { asm.bottomSheet.collapse() }
+        }else {
+            nav.popBackStack()
+        }
+    }
+
     NavHost(
         nav, when(type) {
             MEET, SHORT_MEET -> "MEET?meet={meet}&detailed={detailed}"
