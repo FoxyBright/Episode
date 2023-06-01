@@ -4,12 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import androidx.activity.ComponentActivity.MODE_PRIVATE
-import androidx.paging.cachedIn
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.chats.manager.ChatManager
@@ -67,16 +64,38 @@ class MainViewModel: ViewModel() {
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val meetingsPaging by lazy {
-        meetFilters.flatMapLatest { filter ->
-            meetManager.getMeetingsPaging(
-                filter,
-                false
-            )
-        }.cachedIn(coroutineScope)
-    }
+    private val _page = MutableStateFlow(1)
 
+    private val _results = MutableStateFlow<Int?>(null)
+    val results = _results.asStateFlow()
+    suspend fun getPageMeetings(reset:Boolean, isFiltered:Boolean = _meetFilters.value.isNotNullOrEmpty()){
+        if(reset) {
+            _meetings.emit(emptyList())
+            _page.emit(1)
+        }
+        else _page.emit(_page.value + 1)
+        meetManager.getMeetingsPaging(
+            meetFilters.value,
+            false,
+            _page.value,
+        ).on(
+            success = {
+                val meetings = _meetings.value.toMutableList()
+                meetings.addAll(0, it.first)
+                _meetings.emit(meetings)
+                if(isFiltered)
+                    _results.emit(it.second)
+                else
+                    _results.emit(0)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
 
     private val _unreadMessages = MutableStateFlow(
         lazy {
@@ -217,6 +236,7 @@ class MainViewModel: ViewModel() {
                 lng = if(today.value) location.value?.second else null
             )
         )
+        getPageMeetings(true)
         /*meetManager.getMeetings(meetFilters.value).on(
             success = { _meetings.emit(it) },
             loading = {},
@@ -253,7 +273,11 @@ class MainViewModel: ViewModel() {
         _meetings.emit(meetings.value - meet)
         if(direction == LEFT)
             meetManager.notInteresting(meet.id).on(
-                success = {},
+                success = {
+                    if(_meetings.value.size <= 4){
+                        getPageMeetings(false)
+                    }
+                },
                 loading = {},
                 error = {
                     context.errorToast(

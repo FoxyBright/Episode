@@ -24,9 +24,9 @@ class MeetingManager(
     private data class MeetCount(val total: Int)
 
     val addMeetFlow = storage.addMeetFlow
-
-    fun getMeetingsPaging(filter: MeetFiltersModel, count: Boolean) = store.getMeetings(MeetFiltersRequest(
-        group = filter.group.value,
+    suspend fun getMeetingsPaging(filter: MeetFiltersModel, count: Boolean, page:Int) =
+        store.getMeetings(
+            MeetFiltersRequest(group = filter.group.value,
         categories = filter.categories,
         tags = filter.tags,
         radius = filter.radius,
@@ -39,7 +39,7 @@ class MeetingManager(
         dates = filter.dates,
         time = filter.time,
         city = filter.city
-    ), count)
+    ), page, count)
 
     suspend fun clearAddMeet() =
         withContext(IO) { storage.clear() }
@@ -110,31 +110,10 @@ class MeetingManager(
         genders = filter.genders?.map { it.name },
         dates = filter.dates,
         time = filter.time,
-        city = filter.city?.id
+        city = filter.city?.id, page = 1, perPage = 1
     )
 
-    suspend fun getMeetings(filter: MeetFiltersModel) =
-        withContext(IO) {
-            getMeetings(
-                filter = MeetFiltersRequest(
-                    group = filter.group.value,
-                    categories = filter.categories,
-                    tags = filter.tags,
-                    radius = filter.radius,
-                    lat = filter.lat,
-                    lng = filter.lng,
-                    meetTypes = filter.meetTypes,
-                    onlyOnline = filter.onlyOnline,
-                    genders = filter.genders,
-                    conditions = filter.conditions,
-                    dates = filter.dates,
-                    time = filter.time,
-                    city = filter.city
-                ),
-                count = false
-            )
-        }
-
+    @Suppress("unused")
     suspend fun getMeetCount(filter: MeetFiltersModel) =
         withContext(IO) {
             getMeetings(
@@ -154,8 +133,8 @@ class MeetingManager(
                     city = filter.city
                 ), count = true
             ).on(success = {
-                it.size
-            }, loading = {0}, error = { 0 })
+                it.second
+            }, loading = { 0 }, error = { 0 })
         }
 
     suspend fun leaveMeet(meetId: String) =

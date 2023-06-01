@@ -1,11 +1,8 @@
 package ru.rikmasters.gilty.meetings
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import ru.rikmasters.gilty.core.data.repository.OfflineFirstRepository
 import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.data.ktor.KtorSource
-import ru.rikmasters.gilty.meetings.paging.MeetingsPagingSource
 import ru.rikmasters.gilty.shared.models.meets.MeetFiltersRequest
 
 class MeetingRepository(
@@ -13,20 +10,25 @@ class MeetingRepository(
     override val webSource: MeetingWebSource,
 ): OfflineFirstRepository<KtorSource, DbSource>(webSource, primarySource) {
 
-    // подгрузка уведомлений по страницам
-    fun getMeetings(
-        filter: MeetFiltersRequest,
-        count: Boolean,
-    ) = Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = false
-            ), pagingSourceFactory = {
-                MeetingsPagingSource(
-                    webSource = webSource,
-                    filter,
-                    count
-                )
-            }
-        ).flow
+    suspend fun getMeetings(
+        filter:MeetFiltersRequest,
+        page:Int,
+        count:Boolean
+    ) = webSource.getMeetsList(
+                page = page,
+                count = count,
+                group = filter.group,
+                categories = filter.categories?.map { it.id },
+                tags = filter.tags?.map { it.title },
+                radius = filter.radius,
+                lat = filter.lat,
+                lng = filter.lng,
+                meetTypes = filter.meetTypes?.map { it.name },
+                onlyOnline = filter.onlyOnline?.compareTo(false),
+                conditions = filter.conditions?.map { it.name },
+                genders = filter.genders?.map { it.name },
+                dates = filter.dates,
+                time = filter.time,
+                city = filter.city?.id
+            )
 }

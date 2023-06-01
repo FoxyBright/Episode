@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.meetings
 
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -80,6 +79,7 @@ class MeetingWebSource: KtorSource() {
             .let { coroutinesState({ it }) {} }
     
     suspend fun getMeetsList(
+        page: Int,
         count: Boolean,
         group: String,
         categories: List<String>? = null,
@@ -94,10 +94,13 @@ class MeetingWebSource: KtorSource() {
         dates: List<String>? = null,
         time: String? = null,
         city: Int? = null,
+        perPage:Int = 15
     ) = tryGet(
         "http://$HOST$PREFIX_URL/meetings${if(count) "/count" else ""}"
     ) {
         url {
+            query("page" to "$page")
+            query("per_page" to "$perPage")
             query("group" to group)
             categories?.let { list ->
                 list.forEach {
@@ -141,7 +144,8 @@ class MeetingWebSource: KtorSource() {
         }
     }.let {
         coroutinesState({ it }) {
-            it.paginateWrapped<List<MainMeetResponse>>().first.map { it.map() }
+            val wrappedResponse = it.paginateWrapped<List<MainMeetResponse>>()
+            wrappedResponse.first.map { it.map() } to wrappedResponse.second.total
         }
     }
     

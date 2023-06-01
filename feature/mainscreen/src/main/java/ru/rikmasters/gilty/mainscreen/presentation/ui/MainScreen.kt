@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -44,7 +43,7 @@ fun MainScreen(vm: MainViewModel) {
     val unreadNotifications by vm.unreadNotifications.collectAsState()
     val unreadMessages by vm.unreadMessages.collectAsState()
     val location by vm.location.collectAsState()
-    val meetings = vm.meetingsPaging.collectAsLazyPagingItems()
+    val meetings by vm.meetings.collectAsState()
     val days by vm.days.collectAsState()
     val today by vm.today.collectAsState()
     val alert by vm.alert.collectAsState()
@@ -70,13 +69,14 @@ fun MainScreen(vm: MainViewModel) {
         if(meetBsState == COLLAPSED)
             vm.resetMeets()
     }
-    
+
     LaunchedEffect(Unit) {
         vm.getAllCategories()
         vm.getUserCategories()
         vm.getUnread()
         vm.getMeets()
         vm.getLocation(activity)
+        vm.getPageMeetings(true)
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }
         context.listenPreference("unread_notification", 0)
