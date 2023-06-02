@@ -76,7 +76,6 @@ fun MainScreen(vm: MainViewModel) {
         vm.getUnread()
         vm.getMeets()
         vm.getLocation(activity)
-        vm.getPageMeetings(true)
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }
         context.listenPreference("unread_notification", 0)
