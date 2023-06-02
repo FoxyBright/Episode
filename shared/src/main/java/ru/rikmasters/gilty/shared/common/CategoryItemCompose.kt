@@ -1,8 +1,10 @@
 package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -91,20 +93,25 @@ fun CategoryItem(
     )
     val animatableSize = animatedSize.value
 
+    val backgroundColor by animateColorAsState(if (state)
+        color else colorScheme.outlineVariant,
+        animationSpec = tween(100, easing = LinearEasing)
+    )
+
     AnimatedVisibility(
         visible = !isAnimating,
         enter = fadeIn(animationSpec = tween(700)),
         exit = fadeOut(animationSpec = tween(700))
     ) {
-        Box(modifier.padding(4.dp).size((animatableSize).dp)) {
+        Box(
+            modifier
+                .padding(4.dp)
+                .size((animatableSize).dp)) {
             Box(
                 Modifier
                     .size(animatableSize.dp)
                     .clip(CircleShape)
-                    .background(
-                        if (state) color
-                        else colorScheme.outlineVariant
-                    )
+                    .background(backgroundColor)
                     .align(BottomCenter)
                     .clickable { onClick?.let { it(!state) } }
                     .animateContentSize(),
