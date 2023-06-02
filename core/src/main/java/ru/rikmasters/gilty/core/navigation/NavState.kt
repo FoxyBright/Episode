@@ -28,13 +28,16 @@ class NavState(
      */
     fun navigate(dest: String) {
         val path = try {
-            navHostController.currentDestination!!.route!!.run {
-                if(contains('/'))
-                    substringBeforeLast('/')
-                else ""
-            }
+            navHostController.currentDestination!!.route!!
+                .run {
+                    if(contains('/'))
+                        substringBeforeLast('/')
+                    else ""
+                }
         } catch(e: RuntimeException) {
-            throw IllegalStateException("Не удалось получить получить текущую позицию", e)
+            throw IllegalStateException(
+                "Не удалось получить получить текущую позицию", e
+            )
         }
         
         navigateAbsolute(path slash dest)
@@ -60,7 +63,8 @@ class NavState(
             popUpTo(0)
         }
     }
-    fun clearStackNavigationAbsolute(route:String){
+    
+    fun clearStackNavigationAbsolute(route: String) {
         navHostController.navigate(route) {
             popUpTo(0)
         }

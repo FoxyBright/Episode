@@ -93,13 +93,12 @@ class UserBsViewModel: ViewModel() {
     suspend fun setMeetType(
         meetId: String,
     ) = singleLoading {
-        
+        if(meetId == "null") {
+            _meetType.emit(GROUP)
+            return@singleLoading
+        }
         meetManager.getDetailedMeet(meetId).on(
-            success = {
-                val type = if(meetId != "null")
-                    it.type else GROUP
-                _meetType.emit(type)
-            },
+            success = { _meetType.emit(it.type) },
             loading = {},
             error = {
                 context.errorToast(

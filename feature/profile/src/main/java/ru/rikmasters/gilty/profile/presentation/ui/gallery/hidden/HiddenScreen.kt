@@ -18,7 +18,7 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HiddenBsScreen(vm: HiddenViewModel) {
-
+    
     val photoList = vm.images.collectAsLazyPagingItems()
     val photoAmount = vm.photosAmount.collectAsState()
     val storagePermissions = permissionState()
@@ -30,13 +30,13 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
-
-
+    
+    
     LaunchedEffect(Unit) {
         vm.uploadPhotoList()
         vm.getHiddenPhotosAmount()
     }
-
+    
     HiddenBsContent(
         HiddenBsState(
             photoList,
@@ -46,8 +46,8 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
             viewerSelectImage,
             false,
             photoViewType
-        ), Modifier, object : HiddenBsCallback {
-
+        ), Modifier, object: HiddenBsCallback {
+            
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     vm.changePhotoViewType(PhotoViewType.PHOTO)
@@ -56,7 +56,7 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
                     vm.changePhotoViewState(true)
                 }
             }
-
+            
             override fun openGallery() {
                 scope.launch {
                     context.checkStoragePermission(
@@ -64,15 +64,15 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
                     ) { nav.navigate("gallery?multi=true") }
                 }
             }
-
+            
             override fun onDeleteImage(image: AvatarModel) {
                 scope.launch { vm.deleteImage(image.id) }
             }
-
+            
             override fun onBack() {
-                nav.navigationBack()
+                nav.navigate("main?update=${true}")
             }
-
+            
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }

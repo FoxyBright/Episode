@@ -49,8 +49,9 @@ fun GiltyTheme(
         LocalExtraShapes provides DefaultExtraShapes,
     ) {
         MaterialTheme(
-            colorScheme.switch(),
-            Shapes, Typography(),
+            colorScheme = colorScheme.switch(),
+            shapes = Shapes,
+            typography = Typography(),
         ) {
             CompositionLocalProvider(
                 LocalOverscrollConfiguration provides null,

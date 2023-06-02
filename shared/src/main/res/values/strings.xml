@@ -182,6 +182,8 @@
     <string name="meeting_maps_alert_title">Открыть приложение</string>
     <string name="meeting_maps_alert_label">«episode» хочет открыть приложение «%s»</string>
     <string name="meeting_maps_alert_open">Открыть</string>
+    <string name="meetings_canceled">Отменено</string>
+    <string name="meetings_finished">Завершено</string>
     <string name="maps_google">Google\nMaps</string>
     <string name="maps_yandex">Yandex\nMaps</string>
 

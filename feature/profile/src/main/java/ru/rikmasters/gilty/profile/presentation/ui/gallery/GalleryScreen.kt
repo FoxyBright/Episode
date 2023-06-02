@@ -92,7 +92,10 @@ fun GalleryScreen(
                 }
                 
                 override fun onAttach() {
-                    scope.launch { vm.attach() }
+                    scope.launch {
+                        vm.attach()
+                        nav.navigationBack()
+                    }
                 }
                 
                 override fun onBack() {

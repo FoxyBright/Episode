@@ -31,7 +31,10 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun UserProfileScreen(vm: UserProfileViewModel) {
+fun UserProfileScreen(
+    vm: UserProfileViewModel,
+    update: Boolean,
+) {
     
     val listState = rememberLazyListScrollState("profile")
     val storagePermissions = permissionState()
@@ -90,7 +93,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     }
     
     LaunchedEffect(Unit) {
-        vm.setUserDate()
+        vm.setUserDate(update)
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }
         context.listenPreference("unread_notification", 0)
@@ -192,7 +195,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     asm.bottomSheet.expand {
                         BottomSheet(
                             vm.scope, OBSERVERS,
-                            username = profile?.username
+                            user = profile?.map()
                         )
                     }
                 }
@@ -227,15 +230,18 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun onMenuItemClick(point: Int) {
-                when(point) {
-                    0 -> scope.launch {
-                        vm.setPhotoViewSelected(profile?.avatar)
-                        vm.setPhotoViewImages(listOf(profile?.avatar))
-                        vm.changePhotoViewState(true)
+                scope.launch {
+                    vm.menuDispose(false)
+                    when(point) {
+                        0 -> {
+                            vm.setPhotoViewSelected(profile?.avatar)
+                            vm.setPhotoViewImages(listOf(profile?.avatar))
+                            vm.changePhotoViewState(true)
+                        }
+                        else -> context.checkStoragePermission(
+                            storagePermissions, scope, asm,
+                        ) { nav.navigate("gallery?multi=false") }
                     }
-                    else -> context.checkStoragePermission(
-                        storagePermissions, scope, asm,
-                    ) { nav.navigate("gallery?multi=false") }
                 }
             }
             

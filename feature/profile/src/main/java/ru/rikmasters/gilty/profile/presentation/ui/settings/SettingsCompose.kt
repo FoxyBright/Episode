@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
@@ -104,8 +104,8 @@ fun SettingsContent(
         item { Buttons(Modifier, callback) }
     }
     GAlert(
-        state.exitAlert, Modifier,
-        Pair(stringResource(R.string.exit_button))
+        show = state.exitAlert,
+        success = Pair(stringResource(R.string.exit_button))
         { callback?.onExitSuccess() },
         onDismissRequest = { callback?.onExitDismiss() },
         title = stringResource(R.string.settings_exit_alert),
@@ -113,8 +113,8 @@ fun SettingsContent(
         { callback?.onExitDismiss() },
     )
     GAlert(
-        state.deleteAlert, Modifier,
-        Pair(stringResource(R.string.meeting_filter_delete_tag_label))
+        show = state.deleteAlert,
+        success = Pair(stringResource(R.string.meeting_filter_delete_tag_label))
         { callback?.onDeleteSuccess() },
         onDismissRequest = { callback?.onDeleteDismiss() },
         title = stringResource(R.string.settings_delete_account_alert),
@@ -130,23 +130,33 @@ private fun Categories(
 ) {
     Column(modifier.fillMaxWidth()) {
         IconButton(
-            { callback?.onBack() },
-            Modifier.padding(top = 32.dp)
+            onClick = { callback?.onBack() },
+            modifier = Modifier.padding(top = 32.dp)
         ) {
             Icon(
-                painterResource(R.drawable.ic_back),
-                (null), Modifier, colorScheme.tertiary
+                painter = painterResource(
+                    R.drawable.ic_back
+                ),
+                contentDescription = null,
+                modifier = Modifier,
+                tint = colorScheme.tertiary
             )
         }
         Text(
-            stringResource(settings_interest_label),
-            Modifier.padding(start = 16.dp, bottom = 16.dp),
-            colorScheme.tertiary,
+            text = stringResource(settings_interest_label),
+            modifier = Modifier.padding(
+                start = 16.dp,
+                bottom = 16.dp
+            ),
+            color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         Image(
-            painterResource(image_categories_settings),
-            (null), Modifier
+            painter = painterResource(
+                image_categories_settings
+            ),
+            contentDescription = null,
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp)
                 .padding(horizontal = 16.dp)
@@ -163,41 +173,51 @@ private fun Information(
     modifier: Modifier = Modifier,
     callback: SettingsCallback? = null,
 ) {
-    Element(FilterModel(stringResource(R.string.personal_info_title)) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .background(
-                    colorScheme.primaryContainer,
-                    shapes.medium
-                )
+    Element(
+        FilterModel(
+            stringResource(R.string.personal_info_title)
         ) {
-            Card(
-                stringResource(R.string.sex),
-                ThemeExtra.shapes.mediumTopRoundedShape,
-                Modifier, state.gender?.value ?: ""
-            ) { callback?.onGenderClick() }
-            GDivider(Modifier.padding(start = 16.dp))
-            Card(
-                stringResource(R.string.personal_info_age_placeholder),
-                ThemeExtra.shapes.zero,
-                Modifier, ageHolder(state.age)
-            ) { callback?.onAgeClick() }
-            GDivider(Modifier.padding(start = 16.dp))
-            Card(
-                stringResource(R.string.orientation_title),
-                ThemeExtra.shapes.zero,
-                Modifier, state.orientation?.name
-            ) { callback?.onOrientationClick() }
-            GDivider(Modifier.padding(start = 16.dp))
-            Card(
-                stringResource(R.string.phone_number),
-                ThemeExtra.shapes.mediumBottomRoundedShape,
-                Modifier, state.phone,
-                arrow = false
-            ) { callback?.onPhoneClick() }
-        }
-    }, modifier.padding(top = 28.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        colorScheme.primaryContainer,
+                        shapes.medium
+                    )
+            ) {
+                Card(
+                    label = stringResource(R.string.sex),
+                    shape = ThemeExtra.shapes
+                        .mediumTopRoundedShape,
+                    modifier = Modifier,
+                    text = state.gender?.value ?: ""
+                ) { callback?.onGenderClick() }
+                GDivider(Modifier.padding(start = 16.dp))
+                Card(
+                    label = stringResource(R.string.personal_info_age_placeholder),
+                    shape = ThemeExtra.shapes.zero,
+                    modifier = Modifier,
+                    text = ageHolder(state.age)
+                ) { callback?.onAgeClick() }
+                GDivider(Modifier.padding(start = 16.dp))
+                Card(
+                    label = stringResource(R.string.orientation_title),
+                    shape = ThemeExtra.shapes.zero,
+                    modifier = Modifier,
+                    text = state.orientation?.name
+                ) { callback?.onOrientationClick() }
+                GDivider(Modifier.padding(start = 16.dp))
+                Card(
+                    label = stringResource(R.string.phone_number),
+                    shape = ThemeExtra.shapes
+                        .mediumBottomRoundedShape,
+                    modifier = Modifier,
+                    text = state.phone,
+                    arrow = false
+                ) { callback?.onPhoneClick() }
+            }
+        }, modifier.padding(top = 28.dp)
+    )
 }
 
 @Composable
@@ -216,25 +236,26 @@ private fun Additionally(
                 )
         ) {
             Card(
-                stringResource(R.string.settings_about_app_label),
-                ThemeExtra.shapes.mediumTopRoundedShape,
-                Modifier, (null)
+                label = stringResource(R.string.settings_about_app_label),
+                shape = ThemeExtra.shapes
+                    .mediumTopRoundedShape,
+                modifier = Modifier,
+                text = null
             ) { callback?.onAboutAppClick() }
             GDivider(Modifier.padding(start = 16.dp))
-            
             // TODO Функциональность смены иконки приложения
             //            Card(
             //                stringResource(R.string.settings_app_icon_label),
             //                ThemeExtra.shapes.zero,
             //                Modifier, (null)
             //            ) { callback?.onIconAppClick() }
-            
-            GDivider(Modifier.padding(start = 16.dp))
+            //            GDivider(Modifier.padding(start = 16.dp))
             CheckBoxCard(
-                stringResource(R.string.notification_screen_name),
-                modifier.fillMaxWidth(),
-                state.notification,
-                ThemeExtra.shapes.mediumBottomRoundedShape
+                label = stringResource(R.string.notification_screen_name),
+                modifier = modifier.fillMaxWidth(),
+                state = state.notification,
+                shape = ThemeExtra.shapes
+                    .mediumBottomRoundedShape
             ) { callback?.onNotificationChange(it) }
         }
     }, modifier.padding(top = 28.dp))
@@ -251,30 +272,40 @@ private fun Card(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick, modifier.fillMaxWidth(),
-        (true), shape,
-        cardColors(colorScheme.primaryContainer)
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth(),
+        enabled = true,
+        shape = shape,
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
         Row(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            SpaceBetween,
-            CenterVertically
+            horizontalArrangement = SpaceBetween,
+            verticalAlignment = CenterVertically
         ) {
             Text(
-                label, Modifier, colorScheme.tertiary,
+                text = label,
+                modifier = Modifier,
+                color = colorScheme.tertiary,
                 style = typography.bodyMedium
             )
             Row(verticalAlignment = CenterVertically) {
                 if(!text.isNullOrBlank()) Text(
-                    text, Modifier, colorScheme.primary,
+                    text = text,
+                    modifier = Modifier,
+                    color = colorScheme.primary,
                     style = typography.bodyMedium,
                 )
                 if(arrow) Icon(
-                    Icons.Filled.KeyboardArrowRight,
-                    (null), Modifier.size(28.dp),
-                    colorScheme.onTertiary
+                    imageVector = Filled.KeyboardArrowRight,
+                    contentDescription = (null),
+                    modifier = Modifier.size(28.dp),
+                    tint = colorScheme.onTertiary
                 )
             }
         }
@@ -300,29 +331,30 @@ private fun Buttons(
     callback: SettingsCallback? = null,
 ) {
     Column(
-        modifier.fillMaxWidth(),
-        Top, CenterHorizontally
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Top,
+        horizontalAlignment = CenterHorizontally
     ) {
         Text(
-            stringResource(R.string.exit_button),
-            Modifier
+            text = stringResource(R.string.exit_button),
+            modifier = Modifier
                 .padding(top = 28.dp, bottom = 16.dp)
                 .clickable(
                     MutableInteractionSource(),
                     (null)
                 ) { callback?.onExit() },
-            colorScheme.primary,
+            color = colorScheme.primary,
             style = typography.bodyLarge
         )
         Text(
-            stringResource(R.string.settings_delete_account_label),
-            Modifier
+            text = stringResource(R.string.settings_delete_account_label),
+            modifier = Modifier
                 .padding(bottom = 28.dp)
                 .clickable(
                     MutableInteractionSource(),
                     (null)
                 ) { callback?.onDelete() },
-            colorScheme.tertiary,
+            color = colorScheme.tertiary,
             style = typography.bodyLarge
         )
     }

@@ -31,9 +31,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.shared.GDropMenu
-import ru.rikmasters.gilty.shared.shared.GKebabButton
-import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -101,9 +99,10 @@ fun OrganizerContent(
         }
         item {
             Profile(
-                state.profileState,
-                Modifier.padding(horizontal = 16.dp),
-                callback
+                state = state.profileState,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+                callback = callback
             ) { callback?.onObserveChange(it) }
         }
         if(state.currentMeetings.isNotEmpty()) {
@@ -112,6 +111,7 @@ fun OrganizerContent(
                 ActualMeetings(state.currentMeetings)
                 { callback?.onMeetingClick(it) }
             }
+            itemSpacer(20.dp)
         }
     }
     if(state.photoViewState) PhotoView(
@@ -128,11 +128,11 @@ fun OrganizerContent(
 @Composable
 private fun MeetLabel() {
     Text(
-        stringResource(R.string.profile_actual_meetings_label),
-        Modifier
+        text = stringResource(R.string.profile_actual_meetings_label),
+        modifier = Modifier
             .padding(top = 28.dp, bottom = 14.dp)
             .padding(horizontal = 16.dp),
-        colorScheme.tertiary,
+        color = colorScheme.tertiary,
         style = typography.titleLarge
     )
 }
@@ -146,10 +146,10 @@ private fun ActualMeetings(
         item { Spacer(Modifier.width(8.dp)) }
         items(meets) {
             MeetingCategoryCard(
-                "",
-                it, Modifier.padding(
-                    horizontal = 4.dp
-                )
+                userId = "",
+                meeting = it,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
             ) { onMeetClick(it) }
         }
     }
@@ -176,18 +176,23 @@ private fun TopBar(
             Start, CenterVertically
         ) {
             if(backButton) IconButton(
-                { onBack() },
-                Modifier.padding(end = 16.dp)
+                onClick = { onBack() },
+                modifier = Modifier
+                    .padding(end = 16.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_back),
-                    stringResource(R.string.action_bar_button_back),
-                    Modifier, colorScheme.tertiary
+                    painter = painterResource(
+                        R.drawable.ic_back
+                    ),
+                    contentDescription = stringResource(
+                        R.string.action_bar_button_back
+                    ),
+                    tint = colorScheme.tertiary
                 )
             }
             Text(
-                username, Modifier,
-                colorScheme.tertiary,
+                text = username,
+                color = colorScheme.tertiary,
                 style = typography.labelLarge,
                 overflow = Ellipsis,
                 maxLines = 1
@@ -195,11 +200,11 @@ private fun TopBar(
         }
         if(!isMyProfile) {
             GDropMenu(
-                menuState,
-                { onKebabClick(false) },
-                menuItem = listOf(Pair(
-                    stringResource(R.string.complaints_title)
-                ) { onMenuItemSelect(0) })
+                menuState = menuState,
+                collapse = { onKebabClick(false) },
+                menuItem = listOf(
+                    stringResource(R.string.complaints_title) to
+                            { onMenuItemSelect(0) })
             )
             GKebabButton { onKebabClick(true) }
         }

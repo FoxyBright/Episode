@@ -115,7 +115,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun updateUsername() {
         if(!occupied.value) regManager
-            .userUpdateData(username.value)
+            .userUpdateData(
+                username = username.value,
+                aboutMe = description.value
+            )
             .on(
                 success = {},
                 loading = {},
@@ -203,6 +206,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun updateDescription() {
         regManager.userUpdateData(
+            username = username.value,
             aboutMe = description.value
         ).on(
             success = {},

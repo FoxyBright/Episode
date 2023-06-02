@@ -10,27 +10,29 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
-/*
 @Preview
 @Composable
 private fun ParticipantsListPreview() {
     GiltyTheme {
         ParticipantsList(
-            DemoFullMeetingModel,
-            DemoUserModelList
+            meet = DemoFullMeetingModel,
+            membersList = pagingPreview(
+                DemoUserModelList
+            )
         )
     }
 }
-
- */
 
 interface ParticipantsListCallback {
     
@@ -39,7 +41,6 @@ interface ParticipantsListCallback {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun ParticipantsList(
     meet: FullMeetingModel,
     membersList: LazyPagingItems<UserModel>,
@@ -55,40 +56,84 @@ fun ParticipantsList(
             if(meet.isOnline) colorScheme.secondary
             else colorScheme.primary
         ) { callback?.onBack() }
-        LazyColumn(
-            Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-                .background(colorScheme.background)
-        ) {
-            when {
-                membersList.loadState.refresh is LoadState.Error -> {}
-                membersList.loadState.append is LoadState.Error -> {}
-                membersList.loadState.refresh is LoadState.Loading -> {}
-                else -> {
-                    itemsIndexed(membersList) { index, member ->
-                        member?.let {
-                            Card(
-                                { callback?.onMemberClick(member) },
-                                Modifier.fillMaxWidth(),
-                                shape = lazyItemsShapes(index, meet.membersCount, 14.dp),
-                                colors = cardColors(colorScheme.primaryContainer)
-                            ) {
-                                BrieflyRow(
-                                    "${member.username}${
-                                        if (member.age in 18..99) {
-                                            ", ${member.age}"
-                                        } else ""
-                                    }",
-                                    Modifier.padding(16.dp),
-                                    member.avatar?.thumbnail?.url
-                                ); if(index < meet.membersCount - 1)
-                                GDivider(Modifier.padding(start = 60.dp))
-                            }
-                        }
-                    }
+        Content(
+            membersList = membersList,
+            membersCount = meet.membersCount,
+        ) { callback?.onMemberClick(it) }
+    }
+}
+
+@Composable
+private fun Content(
+    membersList: LazyPagingItems<UserModel>,
+    membersCount: Int,
+    onMemberClick: (UserModel) -> Unit,
+) {
+    LazyColumn(
+        Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .background(
+                colorScheme.background
+            )
+    ) {
+        val state =
+            membersList.loadState
+        when {
+            state.refresh is
+                    LoadState.Error -> Unit
+            state.append is
+                    LoadState.Error -> Unit
+            state.refresh is
+                    LoadState.Loading -> Unit
+            else -> itemsIndexed(
+                items = membersList
+            ) { index, member ->
+                member?.let {
+                    MemberCard(
+                        index = index,
+                        member = it,
+                        membersCount = membersCount,
+                    ) { onMemberClick(it) }
                 }
             }
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MemberCard(
+    index: Int,
+    member: UserModel,
+    membersCount: Int,
+    onMemberClick: () -> Unit,
+) {
+    val username = "${member.username}${
+        if(member.age in 18..99) {
+            ", ${member.age}"
+        } else ""
+    }"
+    Card(
+        onClick = { onMemberClick() },
+        modifier = Modifier.fillMaxWidth(),
+        shape = lazyItemsShapes(
+            index = index,
+            size = membersCount,
+            radius = 14.dp
+        ),
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
+    ) {
+        BrieflyRow(
+            text = username,
+            modifier = Modifier.padding(16.dp),
+            image = member.avatar?.thumbnail?.url
+        )
+        if(index < membersCount - 1) GDivider(
+            Modifier.padding(start = 60.dp)
+        )
     }
 }

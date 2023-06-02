@@ -26,19 +26,34 @@ object Profile: FeatureDefinition() {
         
         nested("profile", "main") {
             
-            screen<UserProfileViewModel>("main") { vm, _ ->
-                UserProfileScreen(vm)
+            screen<UserProfileViewModel>(
+                route = "main?update={update}",
+                arguments = listOf(
+                    navArgument("update") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    })
+            ) { vm, it ->
+                it.arguments?.getBoolean("update")
+                    ?.let { update ->
+                        UserProfileScreen(vm, update)
+                    }
             }
             
             screen<AlbumDetailsViewModel>(
                 route = "album?id={albumId}",
-                arguments = listOf(navArgument("albumId") {
-                    type = NavType.IntType; defaultValue = 0
-                })
+                arguments = listOf(
+                    navArgument("albumId") {
+                        type = NavType.IntType
+                        defaultValue = 0
+                    }
+                )
             ) { vm, stack ->
-                stack.arguments?.getInt("albumId")?.let {
-                    AlbumDetailsScreen(vm, it)
-                }
+                stack.arguments
+                    ?.getInt("albumId")
+                    ?.let {
+                        AlbumDetailsScreen(vm, it)
+                    }
             }
             
             screen<SettingsViewModel>("settings") { vm, _ ->
@@ -71,24 +86,26 @@ object Profile: FeatureDefinition() {
             }
             
             screen<HiddenViewModel>("hidden") { vm, _ ->
-                HiddenBsScreen(vm = vm)
+                HiddenBsScreen(vm)
             }
         }
     }
     
     override fun Module.koin() {
         singleOf(::OrientationBsViewModel)
-        singleOf(::UserProfileViewModel)
         singleOf(::AlbumDetailsViewModel)
+        singleOf(::UserProfileViewModel)
         singleOf(::ObserverBsViewModel)
         singleOf(::CategoryViewModel)
         singleOf(::SettingsViewModel)
         singleOf(::GenderBsViewModel)
-        singleOf(::HiddenViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
+        singleOf(::HiddenViewModel)
         singleOf(::AgeBsViewModel)
     }
     
-    override fun include() = setOf(ProfileData, Auth)
+    override fun include() = setOf(
+        ProfileData, Auth
+    )
 }

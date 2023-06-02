@@ -50,12 +50,12 @@ private fun MeetingBsTopBarPreview() {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    DemoFullMeetingModel.copy(
+                    meet = DemoFullMeetingModel.copy(
                         type = ANONYMOUS,
                         isPrivate = true,
                         description = "hello"
                     ),
-                    (false),
+                    menuState = false,
                     lastRespond = 4 to "",
                 )
             )
