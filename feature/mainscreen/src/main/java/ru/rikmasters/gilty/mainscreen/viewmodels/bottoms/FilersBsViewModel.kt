@@ -247,7 +247,7 @@ class FiltersBsViewModel(
     val hasFilters = mainVm.meetFilters
     
     private suspend fun findMeets() = singleLoading {
-        mainVm.getPageMeetings(true, true)
+        mainVm.getPageMeetings(true)
     }
     
     private val location = mainVm.location

@@ -68,7 +68,7 @@ class MainViewModel: ViewModel() {
 
     private val _results = MutableStateFlow<Int?>(null)
     val results = _results.asStateFlow()
-    suspend fun getPageMeetings(reset:Boolean, isFiltered:Boolean = _meetFilters.value.isNotNullOrEmpty()){
+    suspend fun getPageMeetings(reset:Boolean){
         if(reset) {
             _page.emit(1)
         }
@@ -83,10 +83,8 @@ class MainViewModel: ViewModel() {
                 val meetings = _meetings.value.toMutableList()
                 meetings.addAll(0, it.first)
                 _meetings.emit(meetings)
-                if(isFiltered)
-                    _results.emit(it.second)
-                else
-                    _results.emit(0)
+                _results.emit(it.second)
+
             },
             loading = {},
             error = {
@@ -285,6 +283,11 @@ class MainViewModel: ViewModel() {
                     )
                 }
             )
+        else {
+            if (_meetings.value.size <= 4) {
+                getPageMeetings(false)
+            }
+        }
     }
     
     suspend fun changeGrid() {

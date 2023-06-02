@@ -69,7 +69,7 @@ fun FiltersBs(
         2 -> TagSearchScreen(vm, alpha)
         3 -> CitiesScreen(vm, alpha)
         else -> MeetingFilterBottom(
-            Modifier, results, FilterListState(
+            Modifier, if(hasFilters) results else 0, FilterListState(
                 today, distanceState, distance,
                 isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
