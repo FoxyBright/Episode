@@ -76,4 +76,8 @@ class NavState(
     fun navigationBack() {
         navController.popBackStack()
     }
+
+    fun clearNavigationOptions(){
+        routeOptions.clear()
+    }
 }

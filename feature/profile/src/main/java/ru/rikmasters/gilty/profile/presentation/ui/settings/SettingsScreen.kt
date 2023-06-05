@@ -129,6 +129,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                         vm.exitAlertDismiss(false)
                         vm.logout()
                         nav.clearStackNavigation("login")
+                        nav.clearNavigationOptions()
                     }
                 }
                 

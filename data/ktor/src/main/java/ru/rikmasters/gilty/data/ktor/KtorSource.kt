@@ -89,6 +89,7 @@ open class KtorSource: WebSource() {
     
     private fun updateClientToken() {
         client = getClientWithTokens()
+        unExpectClient = client.config { expectSuccess = false }
     }
     
     suspend fun wsSession(
@@ -110,6 +111,7 @@ open class KtorSource: WebSource() {
     fun closeClient() {
         unauthorizedClient.close()
         client.close()
+        unExpectClient.close()
     }
     
     private fun getClientWithTokens() =
@@ -126,7 +128,7 @@ open class KtorSource: WebSource() {
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
     
-    private val unExpectClient =
+    private var unExpectClient =
         client.config { expectSuccess = false }
     
     suspend fun delete(
