@@ -105,18 +105,16 @@ fun OrganizerContent(
             item {
                 Profile(
                     state = state.profileState,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp),
                     callback = callback
-                ) { callback?.onObserveChange(it) }
+            ) { callback?.onObserveChange(it) }
+        }
+        if(state.currentMeetings.isNotEmpty()) {
+            item { MeetLabel() }
+            item {
+                ActualMeetings(state.currentMeetings)
+                { callback?.onMeetingClick(it) }
             }
-            if (state.currentMeetings.isNotEmpty()) {
-                item { MeetLabel() }
-                item {
-                    ActualMeetings(state.currentMeetings)
-                    { callback?.onMeetingClick(it) }
-                }
-                itemSpacer(20.dp)
+            itemSpacer(40.dp)
             }
         }
         if (state.photoViewState) PhotoView(

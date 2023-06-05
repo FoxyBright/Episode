@@ -9,26 +9,27 @@ class MeetingRepository(
     override val primarySource: DbSource,
     override val webSource: MeetingWebSource,
 ): OfflineFirstRepository<KtorSource, DbSource>(webSource, primarySource) {
-
+    
     suspend fun getMeetings(
-        filter:MeetFiltersRequest,
-        page:Int,
-        count:Boolean
-    ) = webSource.getMeetsList(
-                page = page,
-                count = count,
-                group = filter.group,
-                categories = filter.categories?.map { it.id },
-                tags = filter.tags?.map { it.title },
-                radius = filter.radius,
-                lat = filter.lat,
-                lng = filter.lng,
-                meetTypes = filter.meetTypes?.map { it.name },
-                onlyOnline = filter.onlyOnline?.compareTo(false),
-                conditions = filter.conditions?.map { it.name },
-                genders = filter.genders?.map { it.name },
-                dates = filter.dates,
-                time = filter.time,
-                city = filter.city?.id
-            )
+        filter: MeetFiltersRequest,
+        page: Int,
+        count: Boolean,
+    ) = webSource
+        .getMeetsList(
+            page = page,
+            count = count,
+            group = filter.group,
+            categories = filter.categories?.map { it.id },
+            tags = filter.tags?.map { it.title },
+            radius = filter.radius,
+            lat = filter.lat,
+            lng = filter.lng,
+            meetTypes = filter.meetTypes?.map { it.name },
+            onlyOnline = filter.onlyOnline?.compareTo(false),
+            conditions = filter.conditions?.map { it.name },
+            genders = filter.genders?.map { it.name },
+            dates = filter.dates,
+            time = filter.time,
+            city = filter.city?.id
+        )
 }

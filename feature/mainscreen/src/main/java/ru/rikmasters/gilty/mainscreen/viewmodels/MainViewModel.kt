@@ -63,16 +63,15 @@ class MainViewModel: ViewModel() {
     
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
-
+    
     private val _page = MutableStateFlow(1)
-
+    
     private val _results = MutableStateFlow<Int?>(null)
     val results = _results.asStateFlow()
-    suspend fun getPageMeetings(reset:Boolean){
+    suspend fun getPageMeetings(reset: Boolean) {
         if(reset) {
             _page.emit(1)
-        }
-        else _page.emit(_page.value + 1)
+        } else _page.emit(_page.value + 1)
         meetManager.getMeetingsPaging(
             meetFilters.value,
             false,
@@ -80,11 +79,12 @@ class MainViewModel: ViewModel() {
         ).on(
             success = {
                 if(reset) _meetings.emit(emptyList())
-                val meetings = _meetings.value.toMutableList()
+                val meetings =
+                    _meetings.value.toMutableList()
                 meetings.addAll(0, it.first)
                 _meetings.emit(meetings)
                 _results.emit(it.second)
-
+                
             },
             loading = {},
             error = {
@@ -94,7 +94,7 @@ class MainViewModel: ViewModel() {
             }
         )
     }
-
+    
     private val _unreadMessages = MutableStateFlow(
         lazy {
             val count = context.getSharedPreferences(
@@ -272,7 +272,7 @@ class MainViewModel: ViewModel() {
         if(direction == LEFT)
             meetManager.notInteresting(meet.id).on(
                 success = {
-                    if(_meetings.value.size <= 4){
+                    if(_meetings.value.size <= 4) {
                         getPageMeetings(false)
                     }
                 },
@@ -284,7 +284,7 @@ class MainViewModel: ViewModel() {
                 }
             )
         else {
-            if (_meetings.value.size <= 4) {
+            if(_meetings.value.size <= 4) {
                 getPageMeetings(false)
             }
         }

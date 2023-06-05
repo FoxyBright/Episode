@@ -1,12 +1,8 @@
 package ru.rikmasters.gilty.addmeet.viewmodel
 
 import android.content.Context
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -23,18 +19,19 @@ class TagsViewModel: ViewModel() {
     
     val addMeet by lazy { manager.addMeetFlow }
     
-    private val _selected = MutableStateFlow(emptyList<TagModel>())
+    private val _selected =
+        MutableStateFlow(emptyList<TagModel>())
     val selected = _selected.asStateFlow()
     
-    private val _popular = MutableStateFlow(emptyList<TagModel>())
+    private val _popular =
+        MutableStateFlow(emptyList<TagModel>())
     val popular = _popular.asStateFlow()
     
-    private val _tags = MutableStateFlow(emptyList<TagModel>())
-    val tags = _tags.asStateFlow()
-    
-    private val _search = MutableStateFlow("")
+    private val _search =
+        MutableStateFlow("")
     val search = _search.asStateFlow()
 
+    @OptIn(FlowPreview::class)
     @Suppress("Unused")
     private val _searchHelper = _search
         .debounce(250)
@@ -53,11 +50,33 @@ class TagsViewModel: ViewModel() {
         }
         .state(_search.value, SharingStarted.Eagerly)
 
-    private val _category = MutableStateFlow<CategoryModel?>(null)
+    private val _category =
+        MutableStateFlow<CategoryModel?>(null)
     val category = _category.asStateFlow()
     
-    private val _online = MutableStateFlow(false)
+    private val _online =
+        MutableStateFlow(false)
     val online = _online.asStateFlow()
+    
+    private val _tags =
+        MutableStateFlow(emptyList<TagModel>())
+    
+    @OptIn(FlowPreview::class)
+    val tags = _search
+        .combine(_search.debounce(250)) { _, current ->
+            if(current.isNotBlank())
+                manager.searchTags(current).on(
+                    success = { it },
+                    loading = { emptyList() },
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                        emptyList()
+                    }
+                )
+            else emptyList()
+        }.state(_tags.value)
     
     init {
         coroutineScope.launch {
@@ -74,18 +93,7 @@ class TagsViewModel: ViewModel() {
     }
     
     suspend fun searchClear() {
-        manager.searchTags("").on(
-            success = {
-                _search.emit("")
-                _tags.emit(it)
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
+        _search.emit("")
     }
     
     suspend fun getPopular() {

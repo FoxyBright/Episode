@@ -65,6 +65,15 @@ class MeetingWebSource: KtorSource() {
         tryPost("http://$HOST$PREFIX_URL/meetings/reset")
             .let { coroutinesState({ it }) {} }
     
+    suspend fun kickMember(
+        meetId: String,
+        userId: String,
+    ) = tryPost("http://$HOST$PREFIX_URL/meetings/$meetId/kick") {
+        url {
+            query("user_id" to userId)
+        }
+    }.let { coroutinesState({ it }) {} }
+    
     suspend fun respondOfMeet(
         meetId: String,
         comment: String?,
@@ -146,7 +155,8 @@ class MeetingWebSource: KtorSource() {
         coroutinesState({ it }) {
             val wrappedResponse =
                 it.paginateWrapped<List<MainMeetResponse>>()
-            wrappedResponse.first.map { it.map() } to wrappedResponse.second.total
+            wrappedResponse.first.map { it.map() } to
+                    wrappedResponse.second.total
         }
     }
     

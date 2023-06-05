@@ -7,7 +7,6 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
@@ -18,7 +17,6 @@ class FiltersBsViewModel(
     val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
-    private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
     
     private val context = getKoin().get<Context>()
@@ -342,16 +340,19 @@ class FiltersBsViewModel(
     
     val searchResult = _searchResult
         .combine(tagSearch.debounce(250)) { _, current ->
-            meetManager.searchTags(current).on(
-                success = { it },
-                loading = { emptyList() },
-                error = {
-                    context.errorToast(
-                        it.serverMessage
+            if(current.isNotBlank())
+                meetManager.searchTags(current)
+                    .on(
+                        success = { it },
+                        loading = { emptyList() },
+                        error = {
+                            context.errorToast(
+                                it.serverMessage
+                            )
+                            emptyList()
+                        }
                     )
-                    emptyList()
-                }
-            )
+            else emptyList()
         }.state(_searchResult.value)
     
     suspend fun getPopularTags() {
@@ -384,7 +385,8 @@ class FiltersBsViewModel(
     }
     
     suspend fun selectTag(tag: TagModel) {
-        val list = additionallyTags.value
+        val list =
+            additionallyTags.value
         _additionallyTags.emit(
             if(list.contains(tag))
                 list - tag

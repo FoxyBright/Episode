@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
@@ -122,7 +123,7 @@ fun HiddenContent(
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
             .clickable { onCardClick() },
-        BottomCenter
+        BottomStart
     ) {
         GCachedImage(
             url = image,
@@ -294,7 +295,7 @@ private fun CreateProfileCardRow(
         modifier
             .padding(horizontal = 8.dp)
             .padding(bottom = 8.dp),
-        Arrangement.Center, CenterVertically
+        Start, CenterVertically
     ) {
         if(profileType != ORGANIZER)
             Text(
@@ -312,7 +313,7 @@ private fun CreateProfileCardRow(
                     fontSize = (if(profileType == CREATE)
                         12 else 16).dp.toSp(),
                     fontWeight = SemiBold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Start
                 )
             )
         when(profileType) {

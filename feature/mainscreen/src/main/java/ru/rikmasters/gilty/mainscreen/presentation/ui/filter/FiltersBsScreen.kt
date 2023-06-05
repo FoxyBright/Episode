@@ -41,7 +41,8 @@ fun FiltersBs(
     ) { vm.clearFilters() }
     
     LaunchedEffect(isCollapsed) {
-        if(isCollapsed) vm.navigate(0)
+        if(isCollapsed)
+            vm.navigate(0)
     }
     
     val hasFilters = vm
@@ -69,13 +70,16 @@ fun FiltersBs(
         2 -> TagSearchScreen(vm, alpha)
         3 -> CitiesScreen(vm, alpha)
         else -> MeetingFilterBottom(
-            Modifier, if(hasFilters) results else 0, FilterListState(
+            modifier = Modifier,
+            find = results,
+            state = FilterListState(
                 today, distanceState, distance,
                 isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
                 categoriesStates, city, hasFilters, alpha
-            ), object: MeetingFilterBottomCallback {
-                
+            ),
+            callback = object: MeetingFilterBottomCallback {
+    
                 override fun onCategoryClick(
                     index: Int, category: CategoryModel,
                 ) {
@@ -85,53 +89,53 @@ fun FiltersBs(
                             ?: run { vm.selectCategory(category) }
                     }
                 }
-                
+    
                 override fun onSubClick(parent: CategoryModel) {
                     scope.launch { vm.selectCategory(parent) }
                 }
-                
+    
                 override fun onAllCategoryClick() {
                     if(!isCollapsed)
                         scope.launch { vm.navigate(1) }
                 }
-                
+    
                 override fun onFilterClick() {
                     scope.launch { vm.navigate(2) }
                 }
-                
+    
                 override fun onCityClick() {
                     if(!isCollapsed)
                         scope.launch { vm.navigate(3) }
                 }
-                
+    
                 override fun onDeleteTag(tag: TagModel) {
                     scope.launch { vm.deleteTag(tag) }
                 }
-                
+    
                 override fun onClear() {
                     scope.launch { vm.clearFilters() }
                 }
-                
+    
                 override fun onDistanceClick() {
                     scope.launch { vm.changeDistanceState() }
                 }
-                
+    
                 override fun onDistanceValueChange(it: Int) {
                     scope.launch { vm.changeDistance(it) }
                 }
-                
+    
                 override fun onOnlyOnlineClick() {
                     scope.launch { vm.changeOnline() }
                 }
-                
+    
                 override fun onMeetingTypeSelect(index: Int) {
                     scope.launch { vm.selectMeetType(index) }
                 }
-                
+    
                 override fun onConditionSelect(index: Int) {
                     scope.launch { vm.selectCondition(index) }
                 }
-                
+    
                 override fun onFilter() {
                     scope.launch {
                         vm.onSave()

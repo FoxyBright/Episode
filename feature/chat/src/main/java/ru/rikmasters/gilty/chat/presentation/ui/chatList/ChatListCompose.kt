@@ -177,105 +177,125 @@ private fun Content(
 ) {
     val chats = state.chats
     val itemCount = state.chatsCount
-
-    if (LocalInspectionMode.current)
+    
+    if(LocalInspectionMode.current)
         PreviewLazy() else {
-            Column(modifier = modifier) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    state = state.listState
-                ) {
-                    item { Spacer(Modifier.height(12.dp)) }
-                    when {
-                        chats.loadState.refresh is LoadState.Error -> Unit
-                        chats.loadState.append is LoadState.Error -> Unit
-                        else -> {
-                            if (chats.loadState.refresh is LoadState.Loading)
-                                item { PagingLoader(chats.loadState) }
-                            item {
-                                SortTypeLabels(
-                                    modifier = Modifier.animateItemPlacement(),
-                                    state = state,
-                                    callback = callback
-                                )
-                            }
-                            if (itemCount != 0) {
-                                getSortedChats(
-                                    chats.itemSnapshotList.items.filter {
-                                        it.meetStatus == MeetStatusType.ACTIVE
-                                    }
-                                ).let {
-                                    if (it.isNotEmpty())
-                                        items(it) { (label, list) ->
+        Column(modifier = modifier) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                state = state.listState
+            ) {
+                item { Spacer(Modifier.height(12.dp)) }
+                when {
+                    chats.loadState.refresh is LoadState.Error -> Unit
+                    chats.loadState.append is LoadState.Error -> Unit
+                    else -> {
+                        if(chats.loadState.refresh is LoadState.Loading)
+                            item { PagingLoader(chats.loadState) }
+                        item {
+                            SortTypeLabels(
+                                modifier = Modifier.animateItemPlacement(),
+                                state = state,
+                                callback = callback
+                            )
+                        }
+                        if(itemCount != 0) {
+                            getSortedChats(
+                                chats.itemSnapshotList.items.filter {
+                                    it.meetStatus == MeetStatusType.ACTIVE
+                                }
+                            ).let {
+                                if(it.isNotEmpty())
+                                    items(it) { (label, list) ->
                                         Label(
-                                            label, Modifier.padding(
-                                                top = 28.dp,
-                                                bottom = 18.dp
-                                            ).padding(horizontal = 16.dp).animateItemPlacement()
+                                            label,
+                                            Modifier
+                                                .padding(
+                                                    top = 28.dp,
+                                                    bottom = 18.dp
+                                                )
+                                                .padding(horizontal = 16.dp)
+                                                .animateItemPlacement()
                                         )
                                         list.map { chatModel ->
                                             chatModel to rememberDragRowState()
                                         }.forEachIndexed { index, chat ->
                                             ElementChat(
-                                                modifier = Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
-                                                chat.first, index, list.size,
-                                                chat.second, callback
-                                            )
-                                        }
-                                    }
-                                }
-
-                                val inactiveItems = state
-                                    .chats.itemSnapshotList
-                                    .items.filter {
-                                        it.meetStatus != MeetStatusType.ACTIVE
-                                    }
-
-                                if (inactiveItems.isNotEmpty()) item {
-                                    ActionRow(
-                                        Modifier.padding(
-                                            top = 28.dp,
-                                            bottom = 18.dp,
-                                            end = 16.dp,
-                                            start = 16.dp
-                                        ),
-                                        state.endedState
-                                    ) { callback?.onEndedClick() }
-                                }
-
-                                if (state.endedState && inactiveItems.isNotEmpty()) {
-                                    val inactiveChatsSize = inactiveItems.size
-                                    itemsIndexed(state.chats) { index, item ->
-                                        if (item?.meetStatus != MeetStatusType.ACTIVE) {
-                                            val chat = (item ?: ChatModel()) to rememberDragRowState()
-                                            val indexCalc = if (
-                                                index + 1 == (state.chats.itemCount - inactiveChatsSize) // TODO change itemCount to chats_count once backend is ready
-                                            ) 0 else index
-                                            ElementChat(
-                                                modifier = Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
-                                                chat.first, indexCalc,
-                                                state.chats.itemCount - (state.chats.itemCount - inactiveChatsSize), chat.second, // TODO change itemCount to chats_count once backend is ready
+                                                modifier = Modifier
+                                                    .padding(
+                                                        horizontal = 16.dp
+                                                    )
+                                                    .animateItemPlacement(),
+                                                chat.first,
+                                                index,
+                                                list.size,
+                                                chat.second,
                                                 callback
                                             )
                                         }
                                     }
-                                }
-                                if (state.chats.loadState.append is LoadState.Loading
-                                    && state.endedState
-                                ) item { PagingLoader(state.chats.loadState) }
                             }
+                            
+                            val inactiveItems = state
+                                .chats.itemSnapshotList
+                                .items.filter {
+                                    it.meetStatus != MeetStatusType.ACTIVE
+                                }
+                            
+                            if(inactiveItems.isNotEmpty()) item {
+                                ActionRow(
+                                    Modifier.padding(
+                                        top = 28.dp,
+                                        bottom = 18.dp,
+                                        end = 16.dp,
+                                        start = 16.dp
+                                    ),
+                                    state.endedState
+                                ) { callback?.onEndedClick() }
+                            }
+                            
+                            if(state.endedState && inactiveItems.isNotEmpty()) {
+                                val inactiveChatsSize = inactiveItems.size
+                                itemsIndexed(state.chats) { index, item ->
+                                    if(item?.meetStatus != MeetStatusType.ACTIVE) {
+                                        val chat =
+                                            (item ?: ChatModel()) to
+                                                    rememberDragRowState()
+                                        val indexCalc = if(
+                                            index + 1 == (state.chats.itemCount
+                                                    - inactiveChatsSize) // TODO change itemCount to chats_count once backend is ready
+                                        ) 0 else index
+                                        ElementChat(
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp)
+                                                .animateItemPlacement(),
+                                            chat = chat.first,
+                                            index = indexCalc,
+                                            size = state.chats.itemCount -
+                                                    (state.chats.itemCount
+                                                            - inactiveChatsSize),
+                                            rowState = chat.second, // TODO change itemCount to chats_count once backend is ready
+                                            callback = callback
+                                        )
+                                    }
+                                }
+                            }
+                            if(state.chats.loadState.append is LoadState.Loading
+                                && state.endedState
+                            ) item { PagingLoader(state.chats.loadState) }
                         }
                     }
-                    item { Spacer(Modifier.height(20.dp)) }
                 }
-                val emptyChats = state.chats.loadState.refresh is NotLoading
-                        && (itemCount == 0 || state.chats.itemCount == 0) // TODO Delete itemcount once backend is ready
-
-                if(emptyChats) ChatListPlaceholder(
-                    modifier = Modifier.padding(bottom = 120.dp)
-                )
+                item { Spacer(Modifier.height(20.dp)) }
             }
+            val emptyChats = state.chats.loadState.refresh is NotLoading
+                    && (itemCount == 0 || state.chats.itemCount == 0) // TODO Delete itemcount once backend is ready
+            
+            if(emptyChats) ChatListPlaceholder(
+                modifier = Modifier.padding(bottom = 120.dp)
+            )
+        }
     }
 }
 
@@ -308,7 +328,7 @@ private fun PreviewLazy() {
 
 @Composable
 private fun ElementChat(
-    modifier:Modifier = Modifier,
+    modifier: Modifier = Modifier,
     chat: ChatModel,
     index: Int, size: Int,
     rowState: DragRowState,
