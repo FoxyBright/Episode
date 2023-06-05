@@ -19,15 +19,17 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable.image_categories_settings
 import ru.rikmasters.gilty.shared.R.string.settings_interest_label
+import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE_SMALL
+import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
@@ -51,7 +53,7 @@ private fun SettingsPreview() {
                     user.age.toString(),
                     user.orientation,
                     user.phone.toString(),
-                    (true), (false), (false)
+                    (true), (false), (false), emptyList()
                 )
             )
         }
@@ -66,6 +68,7 @@ data class SettingsState(
     val notification: Boolean,
     val exitAlert: Boolean,
     val deleteAlert: Boolean,
+    val interests: List<CategoryModel>,
 )
 
 interface SettingsCallback {
@@ -98,7 +101,7 @@ fun SettingsContent(
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        item { Categories(Modifier, callback) }
+        item { Categories(Modifier, state.interests,callback) }
         item { Information(state, Modifier, callback) }
         item { Additionally(state, Modifier, callback) }
         item { Buttons(Modifier, callback) }
@@ -126,6 +129,7 @@ fun SettingsContent(
 @Composable
 private fun Categories(
     modifier: Modifier = Modifier,
+    interests: List<CategoryModel>,
     callback: SettingsCallback? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
@@ -151,19 +155,31 @@ private fun Categories(
             color = colorScheme.tertiary,
             style = typography.labelLarge
         )
-        Image(
-            painter = painterResource(
-                image_categories_settings
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .padding(horizontal = 16.dp)
-                .clip(shapes.large)
-                .clickable { callback?.editCategories() },
-            contentScale = FillWidth
-        )
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .padding(horizontal = 16.dp)
+            .clip(shapes.large)
+            .background(colorScheme.primaryContainer)
+            .clickable { callback?.editCategories() }) {
+            Bubbles(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+                data = interests,
+                elementSize = CATEGORY_ELEMENT_SIZE_SMALL.dp,
+            ) { element ->
+                CategoryItem(
+                    modifier = Modifier,
+                    name = element.name,
+                    icon = element.emoji,
+                    color = element.color,
+                    state = true,
+                ) {
+                    callback?.editCategories()
+                }
+            }
+        }
     }
 }
 

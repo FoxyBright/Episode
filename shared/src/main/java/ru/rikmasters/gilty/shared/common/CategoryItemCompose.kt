@@ -41,6 +41,7 @@ import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 const val CATEGORY_ELEMENT_SIZE = 120
+const val CATEGORY_ELEMENT_SIZE_SMALL = 60
 
 @Composable
 @ExperimentalMaterial3Api

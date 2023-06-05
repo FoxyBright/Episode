@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel.settings
 
 import android.content.Context
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
@@ -11,6 +12,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 
 class SettingsViewModel: ViewModel() {
@@ -46,7 +48,24 @@ class SettingsViewModel: ViewModel() {
     private val _orientations =
         MutableStateFlow<List<OrientationModel>?>(null)
     val orientations = _orientations.asStateFlow()
-    
+
+    private val _selected = MutableStateFlow(emptyList<CategoryModel>())
+    val selected = _selected.asStateFlow()
+    suspend fun getInterest() = singleLoading {
+        _selected.emit(emptyList())
+        delay(20) // TODO Костыль для обновления баблов
+        profileManager.getUserCategories().on(
+            success = { list ->
+                _selected.emit(list)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
     suspend fun changeOrientation(orientation: OrientationModel) =
         singleLoading {
             profileManager.userUpdateData(

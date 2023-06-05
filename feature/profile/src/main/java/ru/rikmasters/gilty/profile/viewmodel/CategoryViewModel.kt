@@ -39,9 +39,21 @@ class CategoryViewModel: ViewModel() {
         )
     }
     
-    suspend fun setUserInterest() = singleLoading {
+    suspend fun setUserInterest(onSuccess:()->Unit) = singleLoading {
         meetManager.setUserInterest(selected.value).on(
-            success = {},
+            success = {
+                profileManager.updateUserCategories().on(
+                    success = {
+                        onSuccess()
+                    },
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
+            },
             loading = {},
             error = {
                 context.errorToast(
@@ -49,15 +61,7 @@ class CategoryViewModel: ViewModel() {
                 )
             }
         )
-        profileManager.updateUserCategories().on(
-            success = {},
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
+
     }
     
     suspend fun getInterest() = singleLoading {
