@@ -306,109 +306,115 @@ private fun MeetContent(
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback?,
 ) {
-    LazyColumn(
+    Column(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
-        item {
-            TopBar(
-                meet = state.meet,
-                backButton = state.backButton,
-                menuState = state.menuState,
-                onBack = { callback?.onBack() },
-                onKebabClick = { callback?.onKebabClick(it) }
-            ) { callback?.onMenuItemClick(it, state.meet.id) }
-        }
-        item {
-            MeetingBsTopBarCompose(
-                modifier = Modifier.padding(
-                    bottom = if(state.detailed)
-                        28.dp else 0.dp
-                ),
-                state = MeetingBsTopBarState(
-                    meet = state.meet,
-                    menuState = state.menuState,
-                    lastRespond = state.lastRespond,
-                    description = state.detailed,
-                    backButton = state.backButton
-                ),
-                callback = callback
-            )
-        }
-        
-        if(state.detailed) {
-            
+        TopBar(
+            meet = state.meet,
+            backButton = state.backButton,
+            menuState = state.menuState,
+            onBack = { callback?.onBack() },
+            onKebabClick = { callback?.onKebabClick(it) }
+        ) { callback?.onMenuItemClick(it, state.meet.id) }
+        LazyColumn(
+            modifier
+                .fillMaxWidth()
+        ) {
             item {
-                Text(
-                    text = stringResource(
-                        R.string.meeting_question_comment_or_assess
-                    ),
-                    modifier = Modifier,
-                    style = typography.labelLarge
-                )
+                Spacer(modifier = Modifier.height(18.dp))
             }
-            
             item {
-                MeetingBsComment(
-                    text = state.comment ?: "",
-                    online = state.meet.isOnline,
-                    onTextChange = { callback?.onCommentChange(it) },
-                    modifier = Modifier.padding(top = 22.dp)
-                ) { callback?.onCommentTextClear() }
-            }
-            
-            item {
-                MeetingBsHidden(
-                    modifier = Modifier.padding(top = 8.dp),
-                    state = state.hidden ?: false,
-                    online = state.meet.isOnline
-                ) { callback?.onHiddenPhotoActive(it) }
-            }
-        } else {
-            item {
-                MeetingBsConditions(
-                    meet = state.meet.map(),
+                MeetingBsTopBarCompose(
                     modifier = Modifier.padding(
-                        top = if(state.meet.description.isNotBlank())
-                            32.dp else 0.dp
-                    )
+                        bottom = if (state.detailed)
+                            28.dp else 0.dp
+                    ),
+                    state = MeetingBsTopBarState(
+                        meet = state.meet,
+                        menuState = state.menuState,
+                        lastRespond = state.lastRespond,
+                        description = state.detailed,
+                        backButton = state.backButton
+                    ),
+                    callback = callback
                 )
             }
-            state.membersList?.let {
+
+            if (state.detailed) {
+
                 item {
-                    MeetingBsParticipants(
-                        meet = state.meet,
-                        membersList = it,
+                    Text(
+                        text = stringResource(
+                            R.string.meeting_question_comment_or_assess
+                        ),
                         modifier = Modifier,
-                        onAllViewClick = {
-                            callback?.onAllMembersClick(
-                                state.meet.id
+                        style = typography.labelLarge
+                    )
+                }
+
+                item {
+                    MeetingBsComment(
+                        text = state.comment ?: "",
+                        online = state.meet.isOnline,
+                        onTextChange = { callback?.onCommentChange(it) },
+                        modifier = Modifier.padding(top = 22.dp)
+                    ) { callback?.onCommentTextClear() }
+                }
+
+                item {
+                    MeetingBsHidden(
+                        modifier = Modifier.padding(top = 8.dp),
+                        state = state.hidden ?: false,
+                        online = state.meet.isOnline
+                    ) { callback?.onHiddenPhotoActive(it) }
+                }
+            } else {
+                item {
+                    MeetingBsConditions(
+                        meet = state.meet.map(),
+                        modifier = Modifier.padding(
+                            top = if (state.meet.description.isNotBlank())
+                                32.dp else 0.dp
+                        )
+                    )
+                }
+                state.membersList?.let {
+                    item {
+                        MeetingBsParticipants(
+                            meet = state.meet,
+                            membersList = it,
+                            modifier = Modifier,
+                            onAllViewClick = {
+                                callback?.onAllMembersClick(
+                                    state.meet.id
+                                )
+                            },
+                            onMemberClick = {
+                                callback?.onMemberClick(it)
+                            }
+                        )
+                    }
+                }
+                if (state.meetDistance != null
+                    && !state.meet.isOnline
+                ) item {
+                    MeetingBsMap(
+                        meet = state.meet,
+                        distance = state.meetDistance,
+                        modifier = Modifier.padding(top = 28.dp),
+                        onClick = {
+                            callback?.onMeetPlaceClick(
+                                state.meet.location
                             )
-                        },
-                        onMemberClick = {
-                            callback?.onMemberClick(it)
                         }
                     )
                 }
             }
-            if(state.meetDistance != null
-                && !state.meet.isOnline
-            ) item {
-                MeetingBsMap(
-                    meet = state.meet,
-                    distance = state.meetDistance,
-                    modifier = Modifier.padding(top = 28.dp),
-                    onClick = {
-                        callback?.onMeetPlaceClick(
-                            state.meet.location
-                        )
-                    }
-                )
-            }
+            itemSpacer(40.dp)
         }
-        itemSpacer(40.dp)
     }
 }
 
@@ -424,7 +430,7 @@ private fun TopBar(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(vertical = 18.dp),
+            .padding(top = 18.dp),
         SpaceBetween, CenterVertically
     ) {
         Row(

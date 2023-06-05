@@ -79,50 +79,56 @@ fun OrganizerContent(
     callback: OrganizerCallback? = null,
 ) {
     val user = state.profileState.profile
-    LazyColumn(
+    Column(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        item {
-            TopBar(
-                "${user?.username}${
-                    if(user?.age in 18..99) {
-                        ", ${user?.age}"
-                    } else ""
-                }",
-                state.backButton, state.menuState,
-                state.isMyProfile,
-                { callback?.onBack() },
-                { callback?.onMenuDismiss(it) },
-            ) { callback?.onMenuItemSelect(it, user?.id) }
-        }
-        item {
-            Profile(
-                state = state.profileState,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp),
-                callback = callback
-            ) { callback?.onObserveChange(it) }
-        }
-        if(state.currentMeetings.isNotEmpty()) {
-            item { MeetLabel() }
+        TopBar(
+            "${user?.username}${
+                if (user?.age in 18..99) {
+                    ", ${user?.age}"
+                } else ""
+            }",
+            state.backButton, state.menuState,
+            state.isMyProfile,
+            { callback?.onBack() },
+            { callback?.onMenuDismiss(it) },
+        ) { callback?.onMenuItemSelect(it, user?.id) }
+        LazyColumn(
+            modifier
+                .fillMaxWidth()
+        ) {
             item {
-                ActualMeetings(state.currentMeetings)
-                { callback?.onMeetingClick(it) }
+                Spacer(modifier = Modifier.height(18.dp))
             }
-            itemSpacer(20.dp)
+            item {
+                Profile(
+                    state = state.profileState,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                    callback = callback
+                ) { callback?.onObserveChange(it) }
+            }
+            if (state.currentMeetings.isNotEmpty()) {
+                item { MeetLabel() }
+                item {
+                    ActualMeetings(state.currentMeetings)
+                    { callback?.onMeetingClick(it) }
+                }
+                itemSpacer(20.dp)
+            }
         }
+        if (state.photoViewState) PhotoView(
+            images = state.viewerImages,
+            selected = state.viewerSelectImage,
+            menuState = state.viewerMenuState,
+            type = PHOTO,
+            onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+            onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+            onBack = { callback?.onPhotoViewDismiss(false) },
+        )
     }
-    if(state.photoViewState) PhotoView(
-        images = state.viewerImages,
-        selected = state.viewerSelectImage,
-        menuState = state.viewerMenuState,
-        type = PHOTO,
-        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
-        onBack = { callback?.onPhotoViewDismiss(false) },
-    )
 }
 
 @Composable
@@ -168,7 +174,8 @@ private fun TopBar(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp, 18.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 18.dp),
         SpaceBetween, CenterVertically
     ) {
         Row(

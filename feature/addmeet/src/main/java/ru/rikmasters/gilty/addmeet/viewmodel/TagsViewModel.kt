@@ -2,8 +2,11 @@ package ru.rikmasters.gilty.addmeet.viewmodel
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -31,7 +34,25 @@ class TagsViewModel: ViewModel() {
     
     private val _search = MutableStateFlow("")
     val search = _search.asStateFlow()
-    
+
+    @Suppress("Unused")
+    private val _searchHelper = _search
+        .debounce(250)
+        .onEach {
+            manager.searchTags(it).on(
+                success = {
+                    _tags.emit(it)
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
+        .state(_search.value, SharingStarted.Eagerly)
+
     private val _category = MutableStateFlow<CategoryModel?>(null)
     val category = _category.asStateFlow()
     
@@ -49,19 +70,7 @@ class TagsViewModel: ViewModel() {
     }
     
     suspend fun searchChange(text: String) {
-        
-        manager.searchTags(text).on(
-            success = {
-                _search.emit(text)
-                _tags.emit(it)
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
+        _search.emit(text)
     }
     
     suspend fun searchClear() {
