@@ -17,7 +17,6 @@ import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenP
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -34,32 +33,39 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val context = LocalContext.current
     val nav = get<NavState>()
     
+    val splitNotifications by vm.splitMonthNotifications.collectAsState()
     val notifications = vm.notifications.collectAsLazyPagingItems()
     val participants = vm.participants.collectAsLazyPagingItems()
+    val unreadNotifications by vm.unreadNotifications.collectAsState()
     val participantsStates by vm.participantsStates.collectAsState()
     val selected by vm.selectedNotification.collectAsState()
+    val unreadMessages by vm.unreadMessages.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
     val ratings by vm.ratings.collectAsState()
     val blur by vm.blur.collectAsState()
     
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
-            INACTIVE, ACTIVE, INACTIVE,
-            unreadMessages, INACTIVE
+            INACTIVE, unreadNotifications,
+            INACTIVE, unreadMessages, INACTIVE
         )
     }
     
     LaunchedEffect(Unit) {
+        vm.getUnread()
         vm.getRatings()
         vm.getLastResponse()
-        context.listenPreference(
-            key = "unread_messages",
-            defValue = 0
-        ) {
-            scope.launch {
-                vm.setUnreadMessages(it > 0)
-            }
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotifications(it > 0) } }
+    }
+    
+    LaunchedEffect(notifications.itemSnapshotList.items) {
+        scope.launch {
+            vm.splitByMonthSM(
+                notifications.itemSnapshotList.items
+            )
         }
     }
     
@@ -79,6 +85,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     NotificationsContent(
         state = NotificationsState(
             notifications = notifications,
+            splitNotifications = splitNotifications,
             lastRespond = lastRespond,
             navBar = navBar,
             blur = blur,
@@ -107,8 +114,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                                     userId
                                 )
                             )
-                            // Updates ratings
-                            vm.forceRefresh()
                             vm.forceRefreshMembers()
                         }
                     } ?: run {

@@ -29,7 +29,7 @@ fun SplashScreen(vm: SplashViewModel) {
         ) {
             LaunchedEffect(screen) {
                 if(screen.isNotBlank())
-                    nav.navigateAbsolute(screen)
+                    nav.clearStackNavigation(screen)
             }
         }
     }

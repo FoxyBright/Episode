@@ -11,14 +11,22 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GPopUpMenu
 import ru.rikmasters.gilty.shared.shared.METRICS
 
+private val density = METRICS.density
+private val displayWidth =
+    METRICS.widthPixels / METRICS.density
+private val displayHeight =
+    METRICS.heightPixels / METRICS.density
+
 @Composable
 fun TopBarMenu(
     state: Boolean,
     onDismiss: () -> Unit,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
 ) {
     GPopUpMenu(
-        state, { onDismiss() }, listOf(
+        menuState = state,
+        collapse = { onDismiss() },
+        items = listOf(
             Triple(
                 stringResource(R.string.exit_from_meet),
                 colorScheme.tertiary
@@ -27,8 +35,10 @@ fun TopBarMenu(
                 stringResource(R.string.meeting_complain),
                 colorScheme.tertiary
             ) { onDismiss(); onSelect(1) }
-        ), Modifier.offset(
-            (METRICS.widthPixels / METRICS.density).dp
+        ),
+        modifier = Modifier.offset(
+            x = (displayWidth / 3).dp,
+            y = 50.dp
         )
     )
 }
@@ -37,10 +47,12 @@ fun TopBarMenu(
 fun BottomBarMenu(
     state: Boolean,
     onDismiss: () -> Unit,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
 ) {
     GPopUpMenu(
-        state, { onDismiss() }, listOf(
+        menuState = state,
+        collapse = { onDismiss() },
+        items = listOf(
             Triple(
                 stringResource(R.string.chats_gallery_select_photo),
                 colorScheme.tertiary
@@ -53,6 +65,10 @@ fun BottomBarMenu(
                 stringResource(R.string.profile_hidden_photo),
                 colorScheme.tertiary
             ) { onDismiss(); onSelect(2) }
+        ),
+        modifier =Modifier.offset(
+            x = 30.dp,
+            y = (displayHeight - 200).dp
         )
     )
 }
@@ -62,9 +78,8 @@ fun MessageMenu(
     state: Boolean,
     offset: Offset,
     onDismiss: () -> Unit,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
 ) {
-    val density = METRICS.density
     GPopUpMenu(
         state, onDismiss, listOf(
             Triple(

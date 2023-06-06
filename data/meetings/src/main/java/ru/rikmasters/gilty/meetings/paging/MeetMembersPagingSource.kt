@@ -1,7 +1,8 @@
 package ru.rikmasters.gilty.meetings.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
+import androidx.paging.PagingSource.LoadResult.Error
+import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.meetings.MeetingWebSource
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -9,33 +10,46 @@ import ru.rikmasters.gilty.shared.model.meeting.UserModel
 class MeetMembersPagingSource(
     private val webSource: MeetingWebSource,
     private val excludeMe: Int,
-    private val meet: String
-) : PagingSource<Int, UserModel>() {
-    override fun getRefreshKey(state: PagingState<Int, UserModel>): Int? {
-        val anchorPosition = state.anchorPosition ?: return null
-        val page = state.closestPageToPosition(anchorPosition) ?: return null
-        return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
+    private val meet: String,
+): PagingSource<Int, UserModel>() {
+    
+    override fun getRefreshKey(
+        state: PagingState<Int, UserModel>,
+    ): Int? {
+        val anchorPosition = state.anchorPosition
+            ?: return null
+        val page =
+            state.closestPageToPosition(anchorPosition)
+                ?: return null
+        return page.prevKey?.plus(1)
+            ?: page.nextKey?.minus(1)
     }
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserModel> {
+    
+    override suspend fun load(
+        params: LoadParams<Int>,
+    ): LoadResult<Int, UserModel> {
         val page: Int = params.key ?: 1
-        val loadSize = params.loadSize
-
         return try {
-            Log.d("TEST","STARTED")
-            val members = webSource.getMeetMembers(
+            webSource.getMeetMembers(
                 meet = meet,
                 page = page,
-                perPage = loadSize,
+                perPage = params.loadSize,
                 excludeMe = excludeMe
-            )
-            Log.d("TEST","members $members")
-            Log.d("TEST","membersMAPPED ${members?.map { it.map() }}")
-            val nextKey = if ((members?.size ?: 0) < loadSize) null else page + 1
-            val prevKey = if (page == 1) null else page - 1
-            LoadResult.Page(members?.map { it.map() } ?: emptyList(), prevKey, nextKey)
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+            ).on(
+                success = { it },
+                loading = { emptyList() },
+                error = { emptyList() }
+            ).let { members ->
+                Page(
+                    data = members.map { it.map() },
+                    prevKey = if(page == 1)
+                        null else page - 1,
+                    nextKey = if((members.size) < params.loadSize)
+                        null else page + 1
+                )
+            }
+        } catch(e: Exception) {
+            Error(e)
         }
     }
 }

@@ -54,10 +54,13 @@ object Login: FeatureDefinition() {
             }
             
             screen<GalleryViewModel>(
-                "gallery?multi={multi}",
-                listOf(navArgument("multi") {
-                    type = NavType.BoolType; defaultValue = false
-                })
+                route = "gallery?multi={multi}",
+                arguments = listOf(
+                    navArgument("multi") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    }
+                )
             ) { vm, stack ->
                 stack.arguments?.getBoolean("multi")?.let {
                     GalleryScreen(vm, it)

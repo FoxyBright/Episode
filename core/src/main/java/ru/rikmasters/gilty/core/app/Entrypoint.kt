@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +17,7 @@ import org.koin.androidx.compose.get
 import org.koin.dsl.module
 import ru.rikmasters.gilty.core.app.ui.BottomSheetLayout
 import ru.rikmasters.gilty.core.app.ui.BottomSheetState
-import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
@@ -42,16 +42,17 @@ fun AppEntrypoint(
     val isSystemInDarkMode = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     val snackbarHostState = remember { SnackbarHostState() }
-    val bottomSheetSwipeableState = rememberSwipeableState(BottomSheetSwipeState.COLLAPSED)
+    val bottomSheetSwipeableState =
+        rememberSwipeableState(COLLAPSED)
     val keyboardController = rememberKeyboardController()
     
     val asm = remember {
         AppStateModel(
-            isSystemInDarkMode,
-            systemUiController,
-            snackbarHostState,
-            BottomSheetState(bottomSheetSwipeableState),
-            keyboardController
+            isSystemInDarkMode = isSystemInDarkMode,
+            systemUi = systemUiController,
+            snackbar = snackbarHostState,
+            bottomSheet = BottomSheetState(bottomSheetSwipeableState),
+            keyboard = keyboardController
         )
     }
     
@@ -62,17 +63,14 @@ fun AppEntrypoint(
     }
     
     val navState = remember(startDestination) {
-        NavState(
-            navController,
-            startDestination
-        )
+        NavState(navController, startDestination)
     }
     
     val env: Environment = get()
     
     theme.apply(
-        asm.darkMode,
-        asm.dynamicColor
+        darkMode = asm.darkMode,
+        dynamicColor = asm.dynamicColor
     ) {
         
         val backgroundColor = colorScheme.background
@@ -83,14 +81,14 @@ fun AppEntrypoint(
         
         Box(
             Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
             BottomSheetLayout(
-                asm.bottomSheet,
-                Modifier,
-                bottomSheetBackground,
+                state = asm.bottomSheet,
+                modifier = Modifier,
+                background = bottomSheetBackground,
             ) {
                 Box(Modifier.background(backgroundColor)) {
                     DeepNavHost(navState) {
@@ -99,9 +97,10 @@ fun AppEntrypoint(
                 }
             }
             SnackbarHost(
-                snackbarHostState,
-                Modifier.align(Alignment.BottomCenter),
-                snackbar
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(BottomCenter),
+                snackbar = snackbar
             )
         }
     }

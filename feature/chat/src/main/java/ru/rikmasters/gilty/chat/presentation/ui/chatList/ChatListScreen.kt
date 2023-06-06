@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.extentions.animateToLastPosition
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel
@@ -21,35 +22,48 @@ import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ChatListScreen(vm: ChatListViewModel) {
+    
     val listState = rememberLazyListScrollState("chat_list")
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val nav = get<NavState>()
     
+    val unreadNotifications by vm.unreadNotifications.collectAsState()
     val chats = vm.chats.collectAsLazyPagingItems()
+    val unreadMessages by vm.unreadMessages.collectAsState()
     val alertSelected by vm.alertSelected.collectAsState()
     val isArchiveOn by vm.isArchiveOn.collectAsState()
-    val alertState by vm.alertState.collectAsState()
     val sortType by vm.sortType.collectAsState()
+    val alertState by vm.alertState.collectAsState()
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
-    
-    val unreadMessages by vm.unreadMessages.collectAsState()
+    val chatsCount by vm.chatsCount.collectAsState()
+
     val navBar = remember {
         mutableListOf(
-            INACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, INACTIVE
+            INACTIVE, unreadNotifications,
+            INACTIVE, unreadMessages, INACTIVE
         )
     }
     
-    LaunchedEffect(Unit) {
-        context.listenPreference(
-            "unread_messages", 0
+    var isFirstRefresh by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(chats.itemSnapshotList.items) {
+        // Scrolls down to last position if it is needed
+        if(
+            chats.itemSnapshotList.items.isNotEmpty()
+            && isFirstRefresh
         ) {
-            scope.launch {
-                vm.setUnreadMessages(it > 0)
-            }
+            listState.animateToLastPosition("chat_list")
+            isFirstRefresh = false
         }
+    }
+    
+    LaunchedEffect(Unit) {
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotifications(it > 0) } }
         vm.getUnread()
     }
     
@@ -78,13 +92,14 @@ fun ChatListScreen(vm: ChatListViewModel) {
             listState = listState,
             isSortOn = sortType != null,
             isArchiveOn = isArchiveOn,
-            smthError = errorState
+            smthError = errorState,
+            chatsCount = chatsCount
         ),
         callback = object: ChatListCallback {
             override fun onSortClick(sortTypeModel: SortTypeModel?) {
                 scope.launch { vm.changeSortType(sortTypeModel) }
             }
-    
+            
             override fun onNavBarSelect(point: Int) {
                 if(point == 3) return
                 scope.launch {

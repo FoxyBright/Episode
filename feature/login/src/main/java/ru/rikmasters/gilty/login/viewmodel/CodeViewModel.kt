@@ -10,6 +10,7 @@ import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.login.LoginErrorMessage
+import ru.rikmasters.gilty.shared.common.errorToast
 
 class CodeViewModel(
     private val repository: LoginRepository,
@@ -66,7 +67,15 @@ class CodeViewModel(
     
     suspend fun linkExternalToken() {
         authManager.getAuth().externalToken?.let {
-            authManager.linkExternal(it)
+            authManager.linkExternal(it).on(
+                success = {},
+                loading = {},
+                error = { e ->
+                    context.errorToast(
+                        e.serverMessage
+                    )
+                }
+            )
         }
     }
     
@@ -101,12 +110,12 @@ class CodeViewModel(
         } else _code.emit("")
     }
     
-    suspend fun onOtpAuthentication(code: String)
-        = authManager.onOtpAuthentication(code)
+    suspend fun onOtpAuthentication(code: String) =
+        authManager.onOtpAuthentication(code)
     
-    suspend fun profileCompleted(): Boolean {
-        return regManager.profileCompleted()
-    }
+    suspend fun profileCompleted() =
+        regManager.profileCompleted()
+    
     
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)

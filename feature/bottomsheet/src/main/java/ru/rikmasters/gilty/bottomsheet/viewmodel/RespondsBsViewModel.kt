@@ -1,11 +1,13 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import androidx.paging.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SENT
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -17,6 +19,8 @@ class RespondsBsViewModel: ViewModel() {
     
     private val _meetId = MutableStateFlow<String?>(null)
     
+    private val context = getKoin().get<Context>()
+    
     private val _tabs = MutableStateFlow(0)
     val tabs = _tabs.asStateFlow()
     
@@ -24,23 +28,32 @@ class RespondsBsViewModel: ViewModel() {
     val groupsStates = _groupsStates.asStateFlow()
     
     // Для случаев когда нет meetId, пагинируются встречи и фото внутри откликов
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val meetResponds by lazy {
-        _tabs.flatMapLatest { tab ->
-            profileManager.getResponds(
-                type = if(tab == 0) SENT
-                else RECEIVED
-            ).map { list ->
-                list.map { meet ->
-                    meet.map {
-                        // Маппит фото внутри модели ответа в pagingData
-                        profileManager.getPhotosPaging(it)
-                    }
+    val sentResponds by lazy {
+        profileManager.getResponds(
+            type = SENT
+        ).map { list ->
+            list.map { meet ->
+                meet.map {
+                    // Маппит фото внутри модели ответа в pagingData
+                    profileManager.getPhotosPaging(it)
                 }
             }
         }
     }
-    
+
+    val receivedResponds by lazy {
+        profileManager.getResponds(
+            type = RECEIVED
+        ).map { list ->
+            list.map { meet ->
+                meet.map {
+                    // Маппит фото внутри модели ответа в pagingData
+                    profileManager.getPhotosPaging(it)
+                }
+            }
+        }
+    }
+
     // Для случаев когда есть meetId, пагинируются отклики и фото внутри них
     @OptIn(ExperimentalCoroutinesApi::class)
     val responds by lazy {
@@ -99,18 +112,42 @@ class RespondsBsViewModel: ViewModel() {
     suspend fun cancelRespond(
         respondId: String,
     ) = singleLoading {
-        profileManager.cancelRespond(respondId)
+        profileManager
+            .cancelRespond(respondId)
+            .on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
     }
     
-    suspend fun deleteRespond(
-        respondId: String,
-    ) = singleLoading {
-        profileManager.deleteRespond(respondId)
-    }
+    suspend fun deleteRespond(respondId: String) =
+        singleLoading {
+            profileManager.deleteRespond(respondId).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
     
-    suspend fun acceptRespond(
-        respondId: String,
-    ) = singleLoading {
-        profileManager.acceptRespond(respondId)
-    }
+    suspend fun acceptRespond(respondId: String) =
+        singleLoading {
+            profileManager.acceptRespond(respondId).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
 }

@@ -78,7 +78,7 @@ fun Category(
                     )
                 }
                 if(!category.children.isNullOrEmpty()) Icon(
-                    Filled.KeyboardArrowRight,
+                    if(states.contains(index)) Filled.KeyboardArrowDown else Filled.KeyboardArrowRight,
                     (null), Modifier.size(28.dp),
                     colorScheme.onTertiary
                 )

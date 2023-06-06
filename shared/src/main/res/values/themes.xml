@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Gilty" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.SplashAPI" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/splashBackgroundDay</item>
+        <item name="android:windowBackground">@drawable/splash_screen_day</item>
+        <item name="colorPrimaryDark">@color/splashBackgroundDay</item>
+    </style>
+
+    <style name="Theme.Gilty" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:statusBarColor">@color/splashBackgroundDay</item>
+        <item name="android:windowBackground">@color/splashBackgroundDay</item>
+        <item name="colorPrimaryDark">@color/splashBackgroundDay</item>
+    </style>
+
 </resources>

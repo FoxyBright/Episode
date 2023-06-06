@@ -3,7 +3,7 @@ package ru.rikmasters.gilty.mainscreen.viewmodels
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.LEFT
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
@@ -63,10 +64,41 @@ class MainViewModel: ViewModel() {
     private val _meetFilters = MutableStateFlow(MeetFiltersModel())
     val meetFilters = _meetFilters.asStateFlow()
     
+    private val _page = MutableStateFlow(1)
+    
+    private val _results = MutableStateFlow<Int?>(null)
+    val results = _results.asStateFlow()
+    suspend fun getPageMeetings(reset: Boolean) {
+        if(reset) {
+            _page.emit(1)
+        } else _page.emit(_page.value + 1)
+        meetManager.getMeetingsPaging(
+            meetFilters.value,
+            false,
+            _page.value,
+        ).on(
+            success = {
+                if(reset) _meetings.emit(emptyList())
+                val meetings =
+                    _meetings.value.toMutableList()
+                meetings.addAll(0, it.first)
+                _meetings.emit(meetings)
+                _results.emit(it.second)
+                
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
+    
     private val _unreadMessages = MutableStateFlow(
         lazy {
-            val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+            val count = context.getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
@@ -74,20 +106,75 @@ class MainViewModel: ViewModel() {
     val unreadMessages = _unreadMessages.asStateFlow()
     
     suspend fun setUnreadMessages(hasUnread: Boolean) {
-        _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
+        _unreadMessages.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
+    }
+    
+    private val _unreadNotifications =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadNotifications =
+        _unreadNotifications.asStateFlow()
+    
+    suspend fun setUnreadNotifications(hasUnread: Boolean) {
+        _unreadNotifications.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
     }
     
     suspend fun getUnread() {
-        chatManager.updateUnreadMessages()
+        chatManager.updateUnreadMessages().on(
+            success = {
+                context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).edit()
+                    .putInt(
+                        "unread_messages",
+                        it.unreadCount
+                    )
+                    .putInt(
+                        "unread_notification",
+                        it.notificationsUnread
+                    )
+                    .apply()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getAllCategories() {
-        _categories.emit(meetManager.getCategoriesList())
+        meetManager.getCategoriesList().on(
+            success = { _categories.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun getUserCategories() {
-        _userCategories.emit(
-            profileManager.getUserCategories()
+        profileManager.getUserCategories().on(
+            success = { _userCategories.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -123,9 +210,11 @@ class MainViewModel: ViewModel() {
             .lastLocation
             .addOnSuccessListener {
                 coroutineScope.launch {
-                    location.emit(it?.let {
-                        it.latitude to it.longitude
-                    })
+                    location.emit(
+                        it?.let {
+                            it.latitude to it.longitude
+                        }
+                    )
                 }
             }
     }
@@ -136,13 +225,25 @@ class MainViewModel: ViewModel() {
                 group = get(today.value.compareTo(false)),
                 dates = days.value.ifEmpty { null },
                 time = time.value.ifBlank { null },
-                radius = if(today.value)
-                    meetFilters.value.radius else null,
+                radius = if(
+                    today.value
+                    && location.value?.first != null
+                    && location.value?.second != null
+                ) meetFilters.value.radius else null,
                 lat = if(today.value) location.value?.first else null,
                 lng = if(today.value) location.value?.second else null
             )
         )
-        _meetings.emit(meetManager.getMeetings(meetFilters.value))
+        getPageMeetings(true)
+        /*meetManager.getMeetings(meetFilters.value).on(
+            success = { _meetings.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )*/
     }
     
     suspend fun alertDismiss(state: Boolean) {
@@ -150,8 +251,15 @@ class MainViewModel: ViewModel() {
     }
     
     suspend fun resetMeets() {
-        meetManager.resetMeets()
-        getMeets()
+        meetManager.resetMeets().on(
+            success = { getMeets() },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun meetInteraction(
@@ -162,7 +270,24 @@ class MainViewModel: ViewModel() {
         state.swipe(direction)
         _meetings.emit(meetings.value - meet)
         if(direction == LEFT)
-            meetManager.notInteresting(meet.id)
+            meetManager.notInteresting(meet.id).on(
+                success = {
+                    if(_meetings.value.size <= 4) {
+                        getPageMeetings(false)
+                    }
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        else {
+            if(_meetings.value.size <= 4) {
+                getPageMeetings(false)
+            }
+        }
     }
     
     suspend fun changeGrid() {

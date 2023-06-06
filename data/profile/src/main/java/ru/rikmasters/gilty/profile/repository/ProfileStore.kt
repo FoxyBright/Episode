@@ -13,6 +13,8 @@ import ru.rikmasters.gilty.profile.models.MeetingsType
 import ru.rikmasters.gilty.profile.models.ProfileCategories
 import ru.rikmasters.gilty.profile.models.ProfileMeets
 import ru.rikmasters.gilty.profile.paging.*
+import ru.rikmasters.gilty.shared.model.DataStateTest
+import ru.rikmasters.gilty.shared.model.DataStateTest.Success
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
@@ -25,7 +27,6 @@ import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.models.Avatar
 import ru.rikmasters.gilty.shared.models.AvatarAmount
 import ru.rikmasters.gilty.shared.models.Profile
-import ru.rikmasters.gilty.shared.models.meets.Category
 import java.io.File
 
 class ProfileStore(
@@ -39,11 +40,12 @@ class ProfileStore(
         primarySource.deleteAll<Profile>()
         primarySource.deleteAll<ProfileCategories>()
         primarySource.deleteAll<ProfileMeets>()
+        primarySource.deleteAll<AvatarAmount>()
         primarySource.deleteAll<Avatar>()
     }
     
     suspend fun checkCompletable() =
-        getProfile(false).isCompleted
+        getProfile(true).isCompleted
     
     private suspend fun uploadProfile(
         forceWeb: Boolean,
@@ -52,11 +54,14 @@ class ProfileStore(
             primarySource.find<Profile>()
                 ?.let { return it }
         
-        val profile = webSource.getUserData()
-        primarySource.deleteAll<Profile>()
-        primarySource.save(profile)
-        
-        return profile
+        return webSource.getUserData().on(
+            success = { it },
+            loading = { Profile() },
+            error = { Profile() }
+        ).also {
+            primarySource.deleteAll<Profile>()
+            primarySource.save(it)
+        }
     }
     
     suspend fun storageProfile() =
@@ -65,46 +70,49 @@ class ProfileStore(
     suspend fun getProfile(forceWeb: Boolean) =
         uploadProfile(forceWeb).map()
     
-    suspend fun deleteHidden(imageId: String) {
-        webSource.deleteHidden(
-            uploadProfile(false)
-                .albumPrivate?.id ?: "",
-            imageId
-        )
-        primarySource.deleteById<Avatar>(imageId)
-    }
-    
-    suspend fun addHidden(files: List<File>) {
-        primarySource.saveAll(
-            webSource.addHidden(
-                uploadProfile(false)
+    suspend fun deleteHidden(imageId: String) =
+        primarySource.deleteById<Avatar>(imageId).let {
+            webSource.deleteHidden(
+                albumId = uploadProfile(false)
                     .albumPrivate?.id ?: "",
-                files
+                imageId = imageId
             )
-        )
-    }
+        }
     
-    fun getUserHiddenPaging() =
-        Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                HiddenPhotosPagingSource(
-                    webSource = webSource,
-                    localSource = primarySource
+    suspend fun addHidden(files: List<File>) =
+        webSource.addHidden(
+            albumId = uploadProfile(false)
+                .albumPrivate?.id ?: "",
+            files = files
+        ).let { list ->
+            primarySource.saveAll(
+                list.on(
+                    success = { it },
+                    loading = { emptyList() },
+                    error = { emptyList() }
                 )
-            }
-        ).flow
+            )
+            list
+        }
+    
+    fun getUserHiddenPaging() = Pager(
+        config = PagingConfig(
+            pageSize = 15,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            HiddenPhotosPagingSource(
+                webSource = webSource,
+                localSource = primarySource
+            )
+        }
+    ).flow
     
     suspend fun getUserHidden(
         forceWeb: Boolean,
-    ): List<AvatarModel> {
+    ): DataStateTest<List<AvatarModel>> {
         val profile = uploadProfile(false)
-
-        fun List<Avatar>.map() = this.map { it.map() }
-
+        
         if(!forceWeb) primarySource
             .findAll<Avatar>()
             .filter {
@@ -112,18 +120,31 @@ class ProfileStore(
                         it.ownerId == profile.id
             }.let {
                 if(it.isNotEmpty()) {
-                    return it.map()
+                    return Success(
+                        it.map { a ->
+                            a.map()
+                        }
+                    )
                 }
             }
+        
+        logD("UPDATE IMAGES")
         primarySource.deleteAll<Avatar>()
         primarySource.deleteAll<AvatarAmount>()
-        val list = webSource.getFiles(
-            profile.albumPrivate?.id ?: ""
+        
+        val request = webSource
+            .getFiles(profile.albumPrivate?.id ?: "")
+        
+        val list = request.on(
+            success = { it },
+            loading = { emptyList<Avatar>() to 0 },
+            error = { emptyList<Avatar>() to 0 }
         )
+        
         primarySource.saveAll(list.first)
         primarySource.save(AvatarAmount(list.second))
-
-        return list.first.map()
+        
+        return Success(list.first.map { it.map() })
     }
     
     suspend fun updateProfile(
@@ -132,14 +153,7 @@ class ProfileStore(
         age: Int? = null,
         gender: GenderType? = null,
         orientation: OrientationModel? = null,
-    ) {
-        webSource.setUserData(
-            username,
-            aboutMe,
-            age,
-            gender,
-            orientation?.id
-        )
+    ): DataStateTest<Unit> {
         primarySource.find<Profile>()?.let {
             primarySource.save(
                 it.copy(
@@ -151,9 +165,11 @@ class ProfileStore(
                 )
             )
         } ?: getProfile(true)
+        return webSource.setUserData(
+            username, aboutMe, age,
+            gender, orientation?.id
+        )
     }
-    
-    private fun List<Category>.map() = this.map { it.map() }
     
     fun getObservers(
         query: String,
@@ -242,23 +258,38 @@ class ProfileStore(
         ).flow
     }
     
-    suspend fun updateUserCategories(): List<CategoryModel> {
+    suspend fun updateUserCategories(): DataStateTest<List<CategoryModel>> {
         primarySource.deleteAll<ProfileCategories>()
-        val list = webSource.getUserCategories()
+        
+        val request =
+            webSource.getUserCategories()
+        
+        val list = request.on(
+            success = { it },
+            loading = { emptyList() },
+            error = { emptyList() }
+        )
+        
         primarySource.save(ProfileCategories(list))
-        return list.map()
+        
+        return Success(list.map { it.map() })
     }
     
     suspend fun getUserCategories(
         forceWeb: Boolean,
-    ): List<CategoryModel> {
+    ): DataStateTest<List<CategoryModel>> {
         if(!forceWeb) primarySource
             .find<ProfileCategories>()
-            ?.let { return it.list.map() }
-        
+            ?.let {
+                return Success(
+                    it.list.map { c ->
+                        c.map()
+                    }
+                )
+            }
         return updateUserCategories()
     }
-
-    suspend fun getHiddenPhotosAmount() = primarySource.find<AvatarAmount>()?.amount?:0
-
+    
+    suspend fun getHiddenPhotosAmount() =
+        primarySource.find<AvatarAmount>()?.amount ?: 0
 }

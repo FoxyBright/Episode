@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
-import ru.rikmasters.gilty.shared.common.CachedImageType.STORE
-import ru.rikmasters.gilty.shared.common.CachedImageType.URL
+import ru.rikmasters.gilty.shared.common.CachedImageType.RESOURCE
+import ru.rikmasters.gilty.shared.common.CachedImageType.WEB
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 
@@ -29,7 +29,7 @@ fun GEmojiImage(
             alpha = alpha,
             colorFilter = colorFilter,
             type = if(it.type != "URL")
-                STORE else URL
+                RESOURCE else WEB
         )
     }
 }

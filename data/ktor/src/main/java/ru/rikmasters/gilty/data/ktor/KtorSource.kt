@@ -23,6 +23,7 @@ import io.ktor.serialization.jackson.JacksonWebsocketContentConverter
 import io.ktor.serialization.jackson.jackson
 import okhttp3.OkHttpClient
 import ru.rikmasters.gilty.core.data.source.WebSource
+import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -62,7 +63,12 @@ open class KtorSource: WebSource() {
             }
             defaultRequest {
                 contentType(Json)
-                headers { append("Accept-Language", "ru") }
+                headers {
+                    append(
+                        name = "Accept-Language",
+                        value = getDefault().language
+                    )
+                }
                 host = env[ENV_BASE_URL] ?: ""
             }
             install(HttpTimeout) { socketTimeoutMillis = 15000 }
@@ -75,13 +81,16 @@ open class KtorSource: WebSource() {
     }
     
     val unauthorizedClient by lazy {
-        baseClient.config {}
+        baseClient.config {
+            expectSuccess = false
+        }
     }
     
     private var client = getClientWithTokens()
     
     private fun updateClientToken() {
         client = getClientWithTokens()
+        unExpectClient = client.config { expectSuccess = false }
     }
     
     suspend fun wsSession(
@@ -93,142 +102,92 @@ open class KtorSource: WebSource() {
     suspend fun unauthorizedGet(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { unauthorizedClient.get(url, block) }
+    ) = unauthorizedClient.get(url, block)
     
     suspend fun unauthorizedPost(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { unauthorizedClient.post(url, block) }
-    
-    private suspend fun <T> handler(
-        block: suspend () -> T,
-    ) = try {
-        updateClientToken(); block()
-    } catch(e: Exception) {
-        Log.d("TEST","Exception ${e.message} ${e.cause} ${e.localizedMessage}")
-        logE("KTOR RESULT EXCEPTION: $e")
-        null
-    }
-    
-    suspend fun get(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { client.get(url, block) }
-    
-    suspend fun post(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { client.post(url, block) }
-    
-    suspend fun postFormData(
-        url: String,
-        formData: List<PartData>,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler {
-        client.submitFormWithBinaryData(
-            url, formData, block
-        )
-    }
-    
-    suspend fun patch(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { client.patch(url, block) }
-    
-    suspend fun delete(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { client.delete(url, block) }
-    
-    suspend fun put(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = handler { client.put(url, block) }
+    ) = unauthorizedClient.post(url, block)
     
     fun closeClient() {
         unauthorizedClient.close()
         client.close()
+        unExpectClient.close()
     }
     
-    private fun getClientWithTokens(): HttpClient {
-        return baseClient.config {
+    private fun getClientWithTokens() =
+        baseClient.config {
             install(Auth) {
                 bearer {
-                    loadTokens {
-                        tokenManager.getTokens()
-                    }
-                    refreshTokens {
-                        tokenManager.refreshTokens()
-                    }
+                    loadTokens { tokenManager.getTokens() }
+                    refreshTokens { tokenManager.refreshTokens() }
                 }
             }
         }
-    }
     
     private val tokenManager
         get() = getKoin().getOrNull<TokenManager>()
             ?: throw IllegalStateException("Не предоставлен TokenManager")
     
-    private val unExpectClient =
+    private var unExpectClient =
         client.config { expectSuccess = false }
     
-    suspend fun unExpectGet(
+    suspend fun delete(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = unExpectClient.get(url, block)
+    ) = updateClientToken().let {
+        client.delete(url, block)
+    }
     
-    @Suppress("unused")
-    suspend fun unExpectPut(
+    suspend fun post(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = unExpectClient.put(url, block)
+    ) = updateClientToken().let {
+        client.post(url, block)
+    }
     
-    @Suppress("unused")
-    suspend fun unExpectPatch(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = unExpectClient.patch(url, block)
-    
-    suspend fun unExpectPost(
-        url: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ) = unExpectClient.post(url, block)
-
-
-
-
-
-
-
-
-
-
-    // ТЕСТ
     suspend fun tryGet(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = client.get(url, block)
-
+    ) = updateClientToken().let {
+        unExpectClient.get(url, block)
+    }
+    
     suspend fun tryPost(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = client.post(url, block)
-
+    ) = updateClientToken().let {
+        unExpectClient.post(url, block)
+    }
+    
+    suspend fun tryPostFormData(
+        url: String,
+        formData: List<PartData>,
+        block: HttpRequestBuilder.() -> Unit = {},
+    ) = updateClientToken().let {
+        unExpectClient.submitFormWithBinaryData(
+            url, formData, block
+        )
+    }
+    
     suspend fun tryPatch(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = client.patch(url, block)
-
+    ) = updateClientToken().let {
+        unExpectClient.patch(url, block)
+    }
+    
     suspend fun tryDelete(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = client.delete(url, block)
-
+    ) = updateClientToken().let {
+        unExpectClient.delete(url, block)
+    }
+    
     suspend fun tryPut(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {},
-    ) = client.put(url, block)
-
-
-
+    ) = updateClientToken().let {
+        unExpectClient.put(url, block)
+    }
 }

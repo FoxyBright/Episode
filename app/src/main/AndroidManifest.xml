@@ -40,7 +40,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Gilty"
+        android:theme="@style/Theme.SplashAPI"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <provider
@@ -68,7 +68,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.Gilty">
+            android:theme="@style/Theme.SplashAPI">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

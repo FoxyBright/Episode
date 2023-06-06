@@ -1,12 +1,13 @@
 package ru.rikmasters.gilty.mainscreen.viewmodels.bottoms
 
+import android.content.Context
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.mainscreen.viewmodels.MainViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.*
 import ru.rikmasters.gilty.shared.model.enumeration.MeetFilterGroupType.Companion.get
 import ru.rikmasters.gilty.shared.model.meeting.*
@@ -16,8 +17,9 @@ class FiltersBsViewModel(
     val mainVm: MainViewModel = MainViewModel(),
 ): ViewModel() {
     
-    private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _screen = MutableStateFlow(0)
     val screen = _screen.asStateFlow()
@@ -78,11 +80,6 @@ class FiltersBsViewModel(
     val searchCityState =
         _searchCityState.asStateFlow()
     
-    private val _results =
-        MutableStateFlow<Int?>(null)
-    val results =
-        _results.asStateFlow()
-    
     private val _selectedCategories =
         MutableStateFlow(emptyList<CategoryModel>())
     val selectedCategories =
@@ -131,10 +128,10 @@ class FiltersBsViewModel(
     }
     
     suspend fun getCities() {
-        _cityList.emit(
-            meetManager.getCities(
-                searchCity.value
-            )
+        meetManager.getCities(searchCity.value).on(
+            success = { _cityList.emit(it) },
+            loading = {},
+            error = {}
         )
     }
     
@@ -183,13 +180,32 @@ class FiltersBsViewModel(
     }
     
     suspend fun selectCategory(category: CategoryModel) {
-        val list = selectedCategories.value
+        var list = selectedCategories.value
         _selectedCategories.emit(
             if(list.contains(category))
                 list - category
             else list + category
         )
-        
+        // Deletes parent without active category
+        list = _selectedCategories.value
+        var hasActiveChildren = false
+        val parent = list.firstOrNull { it.id == category.parentId }
+        parent?.children?.forEach { child ->
+            if(list.contains(child)) {
+                hasActiveChildren = true
+                return@forEach
+            }
+        }
+        if(!hasActiveChildren) {
+            parent?.let {
+                _selectedCategories.emit(
+                    if(list.contains(parent))
+                        list - parent
+                    else list + parent
+                )
+            }
+        }
+        //
         _categories.emit(removeChildren(selectedCategories.value))
         
         onSave()
@@ -229,17 +245,7 @@ class FiltersBsViewModel(
     val hasFilters = mainVm.meetFilters
     
     private suspend fun findMeets() = singleLoading {
-        _results.emit(
-            meetManager.getMeetCount(
-                filtersBuilder().copy(
-                    genders = listOf(
-                        profileManager
-                            .getProfile()
-                            .gender
-                    )
-                )
-            )
-        )
+        mainVm.getPageMeetings(true)
     }
     
     private val location = mainVm.location
@@ -248,10 +254,15 @@ class FiltersBsViewModel(
         group = get(mainVm.today.value.compareTo(false)),
         categories = selectedCategories.value.ifEmpty { null },
         tags = tags.value.ifEmpty { null },
-        radius = if(mainVm.today.value)
-            (distance.value * 1000) else null,
-        lat = if(mainVm.today.value) location.value?.first else null,
-        lng = if(mainVm.today.value) location.value?.second else null,
+        radius = if(
+            mainVm.today.value
+            && location.value?.first != null
+            && location.value?.second != null
+        ) (distance.value * 1000) else null,
+        lat = if(mainVm.today.value)
+            location.value?.first else null,
+        lng = if(mainVm.today.value)
+            location.value?.second else null,
         onlyOnline = isOnline.value,
         meetTypes = if(meetTypes.value.isNotEmpty()) {
             meetTypes.value.map { MeetType.get(it) }
@@ -324,17 +335,37 @@ class FiltersBsViewModel(
         _distance.emit(distance)
     }
     
-    private val _searchResult = MutableStateFlow(emptyList<TagModel>())
+    private val _searchResult =
+        MutableStateFlow(emptyList<TagModel>())
+    
     val searchResult = _searchResult
         .combine(tagSearch.debounce(250)) { _, current ->
-            meetManager.searchTags(current)
+            if(current.isNotBlank())
+                meetManager.searchTags(current)
+                    .on(
+                        success = { it },
+                        loading = { emptyList() },
+                        error = {
+                            context.errorToast(
+                                it.serverMessage
+                            )
+                            emptyList()
+                        }
+                    )
+            else emptyList()
         }.state(_searchResult.value)
     
     suspend fun getPopularTags() {
-        _popularTags.emit(
-            meetManager.getPopularTags(
-                selectedCategories.value.map { it.id }
-            )
+        meetManager.getPopularTags(
+            selectedCategories.value.map { it.id }
+        ).on(
+            success = { _popularTags.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -348,11 +379,14 @@ class FiltersBsViewModel(
     }
     
     suspend fun deleteAdditionallyTag(tag: TagModel) {
-        _additionallyTags.emit(additionallyTags.value - tag)
+        _additionallyTags.emit(
+            additionallyTags.value - tag
+        )
     }
     
     suspend fun selectTag(tag: TagModel) {
-        val list = additionallyTags.value
+        val list =
+            additionallyTags.value
         _additionallyTags.emit(
             if(list.contains(tag))
                 list - tag

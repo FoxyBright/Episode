@@ -25,6 +25,8 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportAlert
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
 import ru.rikmasters.gilty.chat.presentation.ui.chat.message.*
+import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.BottomBarMenu
+import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.TopBarMenu
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
@@ -56,8 +58,8 @@ private fun ChatPreview() {
                     chatType = TRANSLATION,
                     viewer = null,
                     toTranslation = null,
-                    (true),
-                    (true)
+                    isOnline = true,
+                    isOrganizer = true
                 ),
                 answer = DemoMessageModel,
                 meet = DemoMeetingModel,
@@ -133,40 +135,52 @@ fun ChatContent(
     callback: ChatCallback? = null,
 ) {
     Scaffold(
-        modifier,
+        modifier = modifier,
         topBar = {
-            ChatTopBar(
-                state.topState,
-                state.kebabMenuState,
-                Modifier,
-                callback
+            ChatAppBarContent(
+                state = state.topState,
+                modifier = modifier,
+                callback = callback
             )
         },
         bottomBar = {
-            ChatBottomBar(
-                state.imageMenuState,
-                state.messageText,
-                state.answer,
-                state.meet.isOnline,
-                Modifier.imePadding(),
-                callback
+            MessengerBar(
+                text = state.messageText,
+                modifier = Modifier.imePadding(),
+                answer = state.answer,
+                isOnline = state.meet.isOnline,
+                callback = callback
             )
         },
         floatingActionButton = {
             ChatFloatingButton(
-                state.listState,
-                state.unreadCount,
-                state.meet.isOnline,
-                Modifier,
-                { callback?.onListDown() }
-            ) { callback?.onDownButtonClick() }
+                listState = state.listState,
+                unReadCount = state.unreadCount,
+                isOnline = state.meet.isOnline,
+                modifier = Modifier,
+                onListDown = { callback?.onListDown() },
+                onClick = { callback?.onDownButtonClick() }
+            )
         },
         content = {
             Content(
-                it, state,
-                Modifier, callback
+                padding = it,
+                state = state,
+                modifier = Modifier,
+                callback = callback
             )
         }
+    )
+    
+    TopBarMenu(
+        state = state.kebabMenuState,
+        onDismiss = { callback?.onKebabClick() },
+        onSelect = { callback?.onMenuItemClick(it) })
+    
+    BottomBarMenu(
+        state = state.imageMenuState,
+        onDismiss = { callback?.onImageMenuDismiss() },
+        onSelect = { callback?.onImageMenuItemSelect(it) }
     )
     
     if(state.photoViewState) PhotoView(
@@ -183,12 +197,17 @@ fun ChatContent(
     
     GAlert(
         show = state.meetAlert,
-        modifier = Modifier,
-        onDismissRequest = { callback?.onMeetOutAlertDismiss() },
-        success = Pair(stringResource(out_button)) { callback?.onMeetOut() },
+        onDismissRequest = {
+            callback?.onMeetOutAlertDismiss()
+        },
+        success = Pair(stringResource(out_button)) {
+            callback?.onMeetOut()
+        },
         title = (stringResource(exit_from_meet) + "?"),
         label = stringResource(exit_from_meet_label),
-        cancel = Pair(stringResource(cancel_button)) { callback?.onMeetOutAlertDismiss() }
+        cancel = Pair(stringResource(cancel_button)) {
+            callback?.onMeetOutAlertDismiss()
+        }
     )
 }
 
@@ -199,13 +218,16 @@ private fun PreviewLazy() {
     LazyColumn(Modifier.padding(horizontal = 16.dp)) {
         itemsIndexed(list) { index, (mes, row) ->
             ChatMessage(
-                mes, row, (index % 2 != 0), (true),
-                if(index < DemoMessageModelList.size.minus(1)) {
-                    list[index.plus(1)].first
-                } else null,
-                if(index in 1..DemoMessageModelList.size) {
-                    list[index.minus(1)].first
-                } else null
+                message = mes,
+                state = row,
+                sender = (index % 2 != 0),
+                isOnline = true,
+                last = if(
+                    index < DemoMessageModelList.size.minus(1)
+                ) list[index.plus(1)].first else null,
+                next = if(
+                    index in 1..DemoMessageModelList.size
+                ) list[index.minus(1)].first else null
             )
         }
     }
@@ -222,11 +244,11 @@ private fun Content(
     
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(
-        modifier
+        modifier = modifier
             .padding(padding)
             .fillMaxSize()
             .background(colors.chatBack),
-        state.listState,
+        state = state.listState,
         reverseLayout = true
     ) {
         when {

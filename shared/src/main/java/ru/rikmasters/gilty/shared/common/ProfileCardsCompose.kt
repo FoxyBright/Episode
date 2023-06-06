@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
@@ -51,8 +52,10 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 private fun HiddenPhotoContentPreview() {
     GiltyTheme {
         HiddenContent(
-            Modifier.width(160.dp),
-            (null), CREATE, (false)
+            modifier = Modifier.width(160.dp),
+            image = null,
+            profileType = CREATE,
+            lockState = false
         ) {}
     }
 }
@@ -62,10 +65,12 @@ private fun HiddenPhotoContentPreview() {
 private fun ProfileImageContentPreview() {
     GiltyTheme {
         ProfileImageContent(
-            Modifier.width(160.dp),
-            DemoAvatarModel, ORGANIZER,
-            (false),
-            {}) {}
+            modifier = Modifier.width(160.dp),
+            image = DemoAvatarModel,
+            type = ORGANIZER,
+            observeState = false,
+            onObserveChange = {}
+        ) {}
     }
 }
 
@@ -75,18 +80,25 @@ private fun ProfileStatisticContentPreview() {
     GiltyTheme {
         Column {
             ProfileStatisticContent(
-                Modifier
+                modifier = Modifier
                     .padding(12.dp)
                     .width(160.dp),
-                DemoProfileModel.rating.average,
-                (100), (100), USERPROFILE,
-                DemoProfileModel.rating.emoji
+                rating = DemoProfileModel
+                    .rating.average,
+                observers = 100,
+                observed = 100,
+                profileType = USERPROFILE,
+                emoji = DemoProfileModel
+                    .rating.emoji
             )
             ProfileStatisticContent(
-                Modifier
+                modifier = Modifier
                     .padding(12.dp)
                     .width(160.dp),
-                ("0.0"), (0), (0), CREATE
+                rating = "0.0",
+                observers = 0,
+                observed = 0,
+                profileType = CREATE
             )
         }
     }
@@ -111,7 +123,7 @@ fun HiddenContent(
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
             .clickable { onCardClick() },
-        BottomCenter
+        BottomStart
     ) {
         GCachedImage(
             url = image,
@@ -122,7 +134,8 @@ fun HiddenContent(
             modifier = Modifier
                 .align(TopStart)
                 .padding(8.dp),
-            state = lockState
+            state = if(profileType == CREATE)
+                true else lockState
         )
         val emptyImage = image.isNullOrBlank()
                 || image.contains("null")
@@ -232,28 +245,37 @@ private fun Avatar(
 ) {
     Box(modifier) {
         GCachedImage(
-            image?.thumbnail?.url,
-            Modifier.fillMaxSize(),
+            url = image?.thumbnail?.url,
+            modifier = Modifier.fillMaxSize(),
             contentScale = Crop,
             placeholderColor = colorScheme.primaryContainer
         ) { onImageRefresh() }
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.Center),
-                Arrangement.Center,
-                CenterHorizontally
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = CenterHorizontally
             ) {
                 Image(
-                    painterResource(R.drawable.ic_information),
-                    (null), Modifier.size(40.dp)
+                    painter = painterResource(
+                        R.drawable.ic_information
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
                 )
                 Text(
-                    stringResource(R.string.profile_blocked_photo),
-                    Modifier.padding(top = 16.dp),
-                    style = typography.bodyMedium,
-                    color = White
+                    text = stringResource(
+                        R.string.profile_blocked_photo
+                    ),
+                    modifier = Modifier
+                        .padding(top = 16.dp),
+                    style = typography
+                        .bodyMedium.copy(
+                            color = White,
+                            fontSize = 16.dp.toSp()
+                        ),
                 )
             }
         }
@@ -273,7 +295,7 @@ private fun CreateProfileCardRow(
         modifier
             .padding(horizontal = 8.dp)
             .padding(bottom = 8.dp),
-        Arrangement.Center, CenterVertically
+        Start, CenterVertically
     ) {
         if(profileType != ORGANIZER)
             Text(
@@ -281,28 +303,33 @@ private fun CreateProfileCardRow(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 4.dp),
-                color = when {
-                    isError -> colorScheme.primary
-                    profileType == CREATE -> colorScheme.onTertiary
-                    else -> White
-                },
-                style = if(profileType == CREATE)
-                    typography.headlineSmall
-                else typography.bodyMedium,
-                fontWeight = SemiBold,
-                textAlign = TextAlign.Center
+                style = typography.bodyMedium.copy(
+                    color = when {
+                        isError -> colorScheme.primary
+                        profileType == CREATE ->
+                            colorScheme.onTertiary
+                        else -> White
+                    },
+                    fontSize = (if(profileType == CREATE)
+                        12 else 16).dp.toSp(),
+                    fontWeight = SemiBold,
+                    textAlign = TextAlign.Start
+                )
             )
         when(profileType) {
             CREATE -> {
                 Box(
                     Modifier.background(
-                        colorScheme.primary,
-                        CircleShape
+                        color = colorScheme.primary,
+                        shape = CircleShape
                     )
                 ) {
                     Image(
-                        painterResource(R.drawable.ic_image_box),
-                        (null), Modifier
+                        painter = painterResource(
+                            R.drawable.ic_image_box
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
                             .size(22.dp)
                             .padding(4.dp)
                     )
@@ -380,7 +407,6 @@ private fun RatingText(
     profileType: ProfileType,
     modifier: Modifier = Modifier,
 ) {
-    
     val style = ThemeExtra
         .typography.RatingText.copy(
             fontSize = if(profileType == CREATE)
@@ -425,7 +451,6 @@ private fun Observe(
                 8.dp.toSp()
             else 10.dp.toSp()
         )
-    
     Column(
         modifier, Top, CenterHorizontally
     ) {
@@ -496,9 +521,7 @@ private fun Cloud(
                 .padding(horizontal = 2.dp)
                 .size(if(create) 8.dp else 10.dp)
         )
-        MiniCloud(
-            Modifier.padding(bottom = 2.dp),
-        ) {
+        MiniCloud(Modifier.padding(bottom = 2.dp)) {
             val paddings: Pair<Dp, Dp>
             val size: Dp
             if(create) {

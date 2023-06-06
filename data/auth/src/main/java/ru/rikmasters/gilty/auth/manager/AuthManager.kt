@@ -37,12 +37,8 @@ class AuthManager(
     }
     
     @Suppress("unused")
-    suspend fun deletePushToken(
-        token: String,
-        type: PushType = FIREBASE,
-    ) = withContext(IO) {
-        tokenWebSource.deletePushToken(token, type)
-    }
+    suspend fun deletePushToken(token: String, type: PushType = FIREBASE) =
+        withContext(IO) { tokenWebSource.deletePushToken(token, type) }
     
     private suspend fun login(
         tokens: Tokens,
@@ -120,11 +116,8 @@ class AuthManager(
         }.getOrNull()
     }
     
-    suspend fun linkExternal(token: String) {
-        withContext(IO) {
-            tokenWebSource.linkExternal(token)
-        }
-    }
+    suspend fun linkExternal(token: String) =
+        withContext(IO) { tokenWebSource.linkExternal(token) }
     
     suspend fun getTokens() = withContext(IO) {
         primarySource.getTokensOrNull()?.bearer()

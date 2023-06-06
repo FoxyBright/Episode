@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.settings.categories
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -46,8 +47,11 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             
             override fun onNext() {
                 scope.launch {
-                    vm.setUserInterest()
-                    nav.navigationBack()
+                    vm.setUserInterest(onSuccess = {
+                        scope.launch(Dispatchers.Main) {
+                            nav.navigationBack()
+                        }
+                    })
                 }
             }
         })

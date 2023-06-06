@@ -38,10 +38,51 @@ fun getTime() = arrayListOf<String>().let {
 fun todayControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE.format(FORMAT)
 
+fun yesterdayControl(date: String) =
+    (date.format(FORMAT).split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in yesterday().first..yesterday().second
+
 fun tomorrowControl(date: String) =
     date.format(FORMAT) == LOCAL_DATE
         .plusDays(1)
         .format(FORMAT)
+
+fun weekControl(
+    date: String,
+) = (date.format(FORMAT)
+    .split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in thisWeek().first..thisWeek().second
+
+//Useless
+@Suppress("unused")
+fun earlierWeekControl(date: String): Boolean {
+    val dateList = date.format(FORMAT).split(DASH)
+    val localDate = LocalDate.of(
+        dateList.first().toInt(),
+        dateList[1].toInt(),
+        dateList.last().toInt()
+    ).second()
+    return (localDate < thisWeek().first)
+}
+
+fun monthControl(date: String) = (date.format(FORMAT)
+    .split(DASH).let {
+        LocalDate.of(
+            it.first().toInt(),
+            it[1].toInt(),
+            it.last().toInt()
+        ).second()
+    }) in thisMonth().first..thisMonth().second
 
 fun getDifferenceOfTime(date: String): String {
     val difference = (
@@ -51,10 +92,10 @@ fun getDifferenceOfTime(date: String): String {
     return when {
         difference < 60 -> "$difference cек"
         difference in 60..3_599 -> "${difference / 60} мин"
-        difference in 3_600..86_399 -> "${difference / 3_600} час"
-        difference in 86_400..604_799 -> "${difference / 86_400} д"
-        difference in 604_800..2_591_999 -> "${difference / 604_800} нед"
-        difference in 2_592_000..946_079_999 -> "${difference / 2_592_000} мес"
+        difference in 3_600..86_399 -> "${difference / 3_600} ч"
+        difference in 86_400..604_799 -> "${difference / 86_400} дн."
+        difference in 604_800..2_591_999 -> "${difference / 604_800} нед."
+        difference in 2_592_000..946_079_999 -> "${difference / 2_592_000} мес."
         else -> (difference / 946_080_000).let {
             when("$it".last()) {
                 '1' -> "$it год"
@@ -92,35 +133,22 @@ fun String.time() = this
         )
     }
 
+fun yesterday() = LOCAL_DATE.minusDays(1)
+    .let { it.second() to it.plusDays(1).second() }
 
-fun weekControl(
-    date: String,
-) = (date.format(FORMAT)
-    .split(DASH).let {
-        LocalDate.of(
-            it.first().toInt(),
-            it[1].toInt(),
-            it.last().toInt()
-        ).second()
-    } in thisWeek().first..
-        thisWeek().second)
+fun thisWeek() = LOCAL_DATE.minusDays(1)
+    .let { it.minusDays(7).second() to it.second() }
 
+fun thisMonth() = LOCAL_DATE.minusDays(8)
+    .let { it.minusDays(30).second() to it.second() }
 
-fun earlierWeekControl(date: String): Boolean {
-    val dateList = date.format(FORMAT).split(DASH)
-    val localDate = LocalDate.of(
-        dateList.first().toInt(),
-        dateList[1].toInt(),
-        dateList.last().toInt()
-    ).millis() / 1000
-    return (localDate < thisWeek().first)
-}
-
+/*
 fun thisWeek() = LOCAL_DATE
     .let { it.minusDays(it.dayOfWeek().ordinal) }
     .let { it.second() to it.plusDays(7).second() }
+*/
 
-fun getMonth(date:String):Int{
+fun getMonth(date: String): Int {
     val dateList = date.format(FORMAT).split(DASH)
     val localDate = LocalDate.of(
         dateList.first().toInt(),
@@ -129,22 +157,4 @@ fun getMonth(date:String):Int{
     ).millis()
 
     return LocalDateTime(localDate).month()
-
-}
-
-fun isAfter(date1:String, date2:String):Boolean{
-    val dateList1 = date1.format(FORMAT).split(DASH)
-    val localDate1 = LocalDate.of(
-        dateList1.first().toInt(),
-        dateList1[1].toInt(),
-        dateList1.last().toInt()
-    ).millis()
-
-    val dateList2 = date2.format(FORMAT).split(DASH)
-    val localDate2 = LocalDate.of(
-        dateList2.first().toInt(),
-        dateList2[1].toInt(),
-        dateList2.last().toInt()
-    ).millis()
-    return localDate1 > localDate2
 }

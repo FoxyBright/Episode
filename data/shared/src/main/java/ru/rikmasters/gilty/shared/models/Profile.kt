@@ -42,12 +42,18 @@ data class Profile(
 ): DomainEntity {
     
     constructor(): this(
-        randomUUID().toString(),
-        (""), (""), (""),
-        OrientationModel(),
-        (-1), (""), (""), (0.0),
-        Avatar(), (null),
-        Thumbnail()
+        id = randomUUID().toString(),
+        phone = (""),
+        username = (""),
+        gender = (""),
+        orientation = OrientationModel(),
+        age = (-1),
+        aboutMe = (""),
+        emojiType = (""),
+        average = (0.0),
+        avatar = Avatar(),
+        subscriptionExpiredAt = (null),
+        thumbnail = Thumbnail()
     )
     
     fun map() = ProfileModel(
@@ -68,7 +74,7 @@ data class Profile(
         ),
         avatar = avatar?.map(),
         thumbnail = thumbnail?.map(),
-        isCompleted = isCompleted == true,
+        isCompleted = isCompleted ?: false,
         subscriptionExpiredAt = subscriptionExpiredAt,
         respondsCount = responds?.count,
         respondsImage = responds?.thumbnail?.map(),

@@ -26,8 +26,9 @@ fun RespondsBs(
     // Список встреч с пагинацией
     val respondsList = vm.responds.collectAsLazyPagingItems()
     // Список откликов с пагинацией
-    val meetRespondsList = vm.meetResponds.collectAsLazyPagingItems()
-    
+    val sentResponds = vm.sentResponds.collectAsLazyPagingItems()
+    val receivedResponds = vm.receivedResponds.collectAsLazyPagingItems()
+
     val groupsStates by vm.groupsStates.collectAsState()
     val tabs by vm.tabs.collectAsState()
     
@@ -45,7 +46,8 @@ fun RespondsBs(
             type = meetId?.let { MEET }
                 ?: if(full) FULL else SHORT,
             responds = respondsList,
-            meetResponds = meetRespondsList,
+            sentResponds = sentResponds,
+            receivedResponds = receivedResponds,
             respondsStates = groupsStates,
             selectTab = tabs, Modifier,
             photoViewState = photoViewState,

@@ -1,16 +1,20 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.data.reports.ReportsManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.report.*
 import ru.rikmasters.gilty.shared.model.report.Report.Companion.all
 
 class ReportsBsViewModel: ViewModel() {
     
     private val reportsManager by inject<ReportsManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _reports = MutableStateFlow(emptyList<Report>())
     val reports = _reports.asStateFlow()
@@ -67,6 +71,14 @@ class ReportsBsViewModel: ViewModel() {
             objectId = objectId,
             objectType = objectType
         )
-        reportsManager.sendReport(report)
+        reportsManager.sendReport(report).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 }

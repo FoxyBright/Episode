@@ -290,21 +290,27 @@ fun MeetingBsParticipants(
                     style = typography.labelLarge
                 )
                 Image(
-                    painterResource(
+                    painter = painterResource(
                         if(meet.isPrivate)
                             R.drawable.ic_lock_close
                         else R.drawable.ic_lock_open
-                    ), (null), Modifier
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
                         .padding(start = 8.dp),
-                    colorFilter = tint(colorScheme.tertiary)
+                    colorFilter = tint(
+                        colorScheme.tertiary
+                    )
                 )
             }
-            if(meet.membersCount > 3) Text(
-                stringResource(R.string.meeting_watch_all_members_in_meet),
-                Modifier.clickable(
-                    MutableInteractionSource(), (null)
+            Text(
+                text = stringResource(R.string.meeting_watch_all_members_in_meet),
+                modifier = Modifier.clickable(
+                    MutableInteractionSource(),
+                    indication = null
                 ) { onAllViewClick?.let { it() } },
-                if(meet.isOnline) colorScheme.secondary
+                color = if(meet.isOnline)
+                    colorScheme.secondary
                 else colorScheme.primary,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
@@ -327,36 +333,52 @@ fun MeetingBsParticipants(
                             },
                         SpaceBetween, CenterVertically
                     ) {
+                        val username = "${member.username}${
+                            if(member.age in 18..99) {
+                                ", ${member.age}"
+                            } else ""
+                        }"
                         BrieflyRow(
-                            "${member.username}${
-                                if(member.age in 18..99) {
-                                    ", ${member.age}"
-                                } else ""
-                            }",
-                            Modifier.padding(12.dp, 8.dp),
-                            member.avatar?.thumbnail?.url,
-                            member.emoji
+                            text = username,
+                            modifier = Modifier
+                                .padding(12.dp, 8.dp),
+                            image = member.avatar
+                                ?.thumbnail?.url,
+                            emoji = member.emoji
                         )
                         Icon(
-                            Filled.KeyboardArrowRight,
-                            (null),
-                            Modifier
+                            imageVector = Filled
+                                .KeyboardArrowRight,
+                            contentDescription = null,
+                            modifier = Modifier
                                 .padding(end = 16.dp)
                                 .size(28.dp),
-                            colorScheme.onTertiary
+                            tint = colorScheme.onTertiary
                         )
-                    }; if(membersList.itemSnapshotList.items.size > 1 && index <= membersList.itemSnapshotList.items.size - 2)
-                    Divider(Modifier.padding(start = 60.dp))
+                    }
+                    if(membersList
+                            .itemSnapshotList
+                            .items.size.let { size ->
+                                size > 1 && (index == 0
+                                        || (index == 1
+                                        && index < size - 1))
+                            }
+                    ) Divider(Modifier.padding(start = 60.dp))
                 }
         }
     }
     if(meet.type == ANONYMOUS) Text(
-        stringResource(R.string.meeting_anonymous_members_label), Modifier
+        text = stringResource(
+            R.string.meeting_anonymous_members_label
+        ),
+        modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = 14.dp, start = 16.dp,
+                top = 14.dp,
+                start = 16.dp,
                 bottom = 12.dp
-            ), colorScheme.onTertiary,
+            ),
+        color = colorScheme.onTertiary,
         style = typography.headlineSmall
     )
 }
@@ -371,29 +393,39 @@ fun MeetingBsComment(
 ) {
     Column(modifier) {
         GTextField(
-            text, { if(it.length <= 120) onTextChange(it) },
-            Modifier.fillMaxWidth(),
+            value = text,
+            onValueChange = {
+                if(it.length <= 120)
+                    onTextChange(it)
+            },
+            modifier = Modifier.fillMaxWidth(),
             shape = shapes.medium,
             colors = descriptionColors(online),
-            label = if(text.isNotEmpty()) textFieldLabel(
-                (true),
-                stringResource(R.string.meeting_comment_text_holder)
-            ) else null,
+            label = if(text.isNotEmpty())
+                textFieldLabel(
+                    label = true,
+                    text = stringResource(
+                        R.string.meeting_comment_text_holder
+                    )
+                ) else null,
             keyboardOptions = Default.copy(
-                imeAction = Done, keyboardType = Text,
+                imeAction = Done,
+                keyboardType = Text,
                 capitalization = Sentences
             ),
             placeholder = textFieldLabel(
-                (false),
-                stringResource(R.string.meeting_comment_text_holder),
+                label = false,
+                text = stringResource(R.string.meeting_comment_text_holder),
                 holderFont = typography.bodyMedium
-            ), textStyle = typography.bodyMedium,
+            ),
+            textStyle = typography.bodyMedium,
             clear = onTextClear
         )
         BoxLabel(
-            "${text.length}/120",
-            Modifier.padding(top = 4.dp),
-            TextAlign.End
+            text = "${text.length}/120",
+            modifier = Modifier
+                .padding(top = 4.dp),
+            align = TextAlign.End
         )
     }
 }
@@ -407,12 +439,19 @@ fun MeetingBsHidden(
 ) {
     Column(modifier) {
         CheckBoxCard(
-            stringResource(R.string.meeting_open_hidden_photos),
-            Modifier, state, online = online
+            label = stringResource(
+                R.string.meeting_open_hidden_photos
+            ),
+            state = state,
+            online = online
         ) { onChange(it) }
         BoxLabel(
-            stringResource(R.string.meeting_only_organizer_label),
-            Modifier.padding(top = 4.dp, start = 16.dp)
+            text = stringResource(
+                R.string.meeting_only_organizer_label
+            ),
+            modifier = Modifier.padding(
+                top = 4.dp, start = 16.dp
+            )
         )
     }
 }
@@ -424,8 +463,9 @@ fun BoxLabel(
     align: TextAlign = TextAlign.Start,
 ) {
     Text(
-        text, modifier.fillMaxWidth(),
-        colorScheme.onTertiary,
+        text = text,
+        modifier = modifier.fillMaxWidth(),
+        color = colorScheme.onTertiary,
         style = typography.headlineSmall,
         textAlign = align
     )
@@ -434,20 +474,18 @@ fun BoxLabel(
 @Composable
 fun TextButton(
     modifier: Modifier = Modifier,
-    online: Boolean? = null,
     text: String,
     onClick: (() -> Unit)? = null,
 ) {
     Text(
-        text, modifier
+        text = text,
+        modifier = modifier
             .fillMaxWidth()
             .clickable(
-                MutableInteractionSource(), (null)
+                MutableInteractionSource(),
+                indication = null
             ) { onClick?.let { it() } },
-        color = online?.let {
-            if(it) colorScheme.secondary
-            else colorScheme.primary
-        } ?: colorScheme.tertiary,
+        color = colorScheme.tertiary,
         textAlign = TextAlign.Center,
         style = typography.bodyLarge
     )

@@ -82,6 +82,7 @@ object Colors {
     
     /*     ANOTHER COLORS    */
     val Gray = Color(0xFFE9E9EA)
+    val RatGray = Color(0xFF484649)
     val Border = Color(0xFFB0B0B0)
     val meetingCardBackBackgroundNight = Color(0xFF303030)
     val LightPink = Color(0x33FF4745)

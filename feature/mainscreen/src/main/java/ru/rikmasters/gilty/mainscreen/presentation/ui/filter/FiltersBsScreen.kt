@@ -3,8 +3,6 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
@@ -18,7 +16,6 @@ fun FiltersBs(
 ) {
     
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
     
     val selectedCategories by vm.selectedCategories.collectAsState()
     val interest by vm.mainVm.userCategories.collectAsState()
@@ -31,7 +28,7 @@ fun FiltersBs(
     val isOnline by vm.isOnline.collectAsState()
     val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
-    val results by vm.results.collectAsState()
+    val results by vm.mainVm.results.collectAsState()
     val city by vm.city.collectAsState()
     val screen by vm.screen.collectAsState()
     
@@ -41,7 +38,8 @@ fun FiltersBs(
     ) { vm.clearFilters() }
     
     LaunchedEffect(isCollapsed) {
-        if(isCollapsed) vm.navigate(0)
+        if(isCollapsed)
+            vm.navigate(0)
     }
     
     val hasFilters = vm
@@ -69,12 +67,15 @@ fun FiltersBs(
         2 -> TagSearchScreen(vm, alpha)
         3 -> CitiesScreen(vm, alpha)
         else -> MeetingFilterBottom(
-            Modifier, results, FilterListState(
+            modifier = Modifier,
+            find = results,
+            state = FilterListState(
                 today, distanceState, distance,
                 isOnline, meetTypes, selectedCondition, tags,
                 topRow, categories, selectedCategories,
                 categoriesStates, city, hasFilters, alpha
-            ), object: MeetingFilterBottomCallback {
+            ),
+            callback = object: MeetingFilterBottomCallback {
                 
                 override fun onCategoryClick(
                     index: Int, category: CategoryModel,
@@ -133,10 +134,7 @@ fun FiltersBs(
                 }
                 
                 override fun onFilter() {
-                    scope.launch {
-                        vm.onSave()
-                        asm.bottomSheet.collapse()
-                    }
+                    scope.launch { vm.onSave() }
                 }
             }
         )

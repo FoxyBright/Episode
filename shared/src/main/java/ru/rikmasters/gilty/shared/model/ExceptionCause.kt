@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.model
 
-// TODO: Число наследников будет увеличиваться по мере необходимости выделения отдельной ошибки
+// TODO: Число наследников будет увеличиваться
+//  по мере необходимости выделения отдельной ошибки
 /**
  * [ExceptionCause] Причина ошибки.
  * @param[serverMessage] - не null в случаях когда важно показать сообщение ошибки с бэка.
@@ -12,13 +13,48 @@ package ru.rikmasters.gilty.shared.model
  */
 sealed class ExceptionCause(
     val defaultMessage: String? = null,
-    val serverMessage: String? = null
+    val serverMessage: String? = null,
 ) {
-    object IO : ExceptionCause()
-    object SocketTimeout : ExceptionCause()
-    object UnknownHost : ExceptionCause()
-    object RedirectResponse : ExceptionCause()
-    object ClientRequest : ExceptionCause()
-    object ServerResponse : ExceptionCause()
-    object UnknownException : ExceptionCause()
+    
+    data class IO(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class SocketTimeout(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class UnknownHost(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class RedirectResponse(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class ClientRequest(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class ServerResponse(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
+    
+    data class UnknownException(
+        val message: String,
+    ): ExceptionCause(
+        serverMessage = message
+    )
 }

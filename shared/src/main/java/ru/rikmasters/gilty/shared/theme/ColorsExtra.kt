@@ -29,6 +29,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.Orange
 import ru.rikmasters.gilty.shared.theme.Colors.Pinky
 import ru.rikmasters.gilty.shared.theme.Colors.PreDark
 import ru.rikmasters.gilty.shared.theme.Colors.Purple
+import ru.rikmasters.gilty.shared.theme.Colors.RatGray
 import ru.rikmasters.gilty.shared.theme.Colors.Red
 import ru.rikmasters.gilty.shared.theme.Colors.RottenPlum
 import ru.rikmasters.gilty.shared.theme.Colors.Silver
@@ -196,7 +197,7 @@ val DarkExtraColors = ExtraColors(
     meetCloseCircleColor = AlmostDark,
     meetCloseCrossColor = RottenPlum,
     meetCardPlaceHolder = Gray,
-    notificationCloud = Gray,
+    notificationCloud = RatGray,
     meetingTransparencyShape = halfTransparentlyGray,
     gripColor = gripGrayDark,
     miniCategoriesBackground = Lead,

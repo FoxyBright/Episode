@@ -31,9 +31,7 @@ import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.shared.GDropMenu
-import ru.rikmasters.gilty.shared.shared.GKebabButton
-import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -81,29 +79,33 @@ fun OrganizerContent(
     callback: OrganizerCallback? = null,
 ) {
     val user = state.profileState.profile
-    LazyColumn(
+    Column(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        item {
-            TopBar(
-                "${user?.username}${
-                    if(user?.age in 18..99) {
-                        ", ${user?.age}"
-                    } else ""
-                }",
-                state.backButton, state.menuState,
-                state.isMyProfile,
-                { callback?.onBack() },
-                { callback?.onMenuDismiss(it) },
-            ) { callback?.onMenuItemSelect(it, user?.id) }
-        }
-        item {
-            Profile(
-                state.profileState,
-                Modifier.padding(horizontal = 16.dp),
-                callback
+        TopBar(
+            "${user?.username}${
+                if (user?.age in 18..99) {
+                    ", ${user?.age}"
+                } else ""
+            }",
+            state.backButton, state.menuState,
+            state.isMyProfile,
+            { callback?.onBack() },
+            { callback?.onMenuDismiss(it) },
+        ) { callback?.onMenuItemSelect(it, user?.id) }
+        LazyColumn(
+            modifier
+                .fillMaxWidth()
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+            item {
+                Profile(
+                    state = state.profileState,
+                    callback = callback
             ) { callback?.onObserveChange(it) }
         }
         if(state.currentMeetings.isNotEmpty()) {
@@ -112,27 +114,29 @@ fun OrganizerContent(
                 ActualMeetings(state.currentMeetings)
                 { callback?.onMeetingClick(it) }
             }
+            itemSpacer(40.dp)
+            }
         }
+        if (state.photoViewState) PhotoView(
+            images = state.viewerImages,
+            selected = state.viewerSelectImage,
+            menuState = state.viewerMenuState,
+            type = PHOTO,
+            onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+            onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+            onBack = { callback?.onPhotoViewDismiss(false) },
+        )
     }
-    if(state.photoViewState) PhotoView(
-        images = state.viewerImages,
-        selected = state.viewerSelectImage,
-        menuState = state.viewerMenuState,
-        type = PHOTO,
-        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
-        onBack = { callback?.onPhotoViewDismiss(false) },
-    )
 }
 
 @Composable
 private fun MeetLabel() {
     Text(
-        stringResource(R.string.profile_actual_meetings_label),
-        Modifier
+        text = stringResource(R.string.profile_actual_meetings_label),
+        modifier = Modifier
             .padding(top = 28.dp, bottom = 14.dp)
             .padding(horizontal = 16.dp),
-        colorScheme.tertiary,
+        color = colorScheme.tertiary,
         style = typography.titleLarge
     )
 }
@@ -146,10 +150,10 @@ private fun ActualMeetings(
         item { Spacer(Modifier.width(8.dp)) }
         items(meets) {
             MeetingCategoryCard(
-                "",
-                it, Modifier.padding(
-                    horizontal = 4.dp
-                )
+                userId = "",
+                meeting = it,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
             ) { onMeetClick(it) }
         }
     }
@@ -168,7 +172,8 @@ private fun TopBar(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp, 18.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 18.dp),
         SpaceBetween, CenterVertically
     ) {
         Row(
@@ -176,18 +181,23 @@ private fun TopBar(
             Start, CenterVertically
         ) {
             if(backButton) IconButton(
-                { onBack() },
-                Modifier.padding(end = 16.dp)
+                onClick = { onBack() },
+                modifier = Modifier
+                    .padding(end = 16.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_back),
-                    stringResource(R.string.action_bar_button_back),
-                    Modifier, colorScheme.tertiary
+                    painter = painterResource(
+                        R.drawable.ic_back
+                    ),
+                    contentDescription = stringResource(
+                        R.string.action_bar_button_back
+                    ),
+                    tint = colorScheme.tertiary
                 )
             }
             Text(
-                username, Modifier,
-                colorScheme.tertiary,
+                text = username,
+                color = colorScheme.tertiary,
                 style = typography.labelLarge,
                 overflow = Ellipsis,
                 maxLines = 1
@@ -195,11 +205,11 @@ private fun TopBar(
         }
         if(!isMyProfile) {
             GDropMenu(
-                menuState,
-                { onKebabClick(false) },
-                menuItem = listOf(Pair(
-                    stringResource(R.string.complaints_title)
-                ) { onMenuItemSelect(0) })
+                menuState = menuState,
+                collapse = { onKebabClick(false) },
+                menuItem = listOf(
+                    stringResource(R.string.complaints_title) to
+                            { onMenuItemSelect(0) })
             )
             GKebabButton { onKebabClick(true) }
         }

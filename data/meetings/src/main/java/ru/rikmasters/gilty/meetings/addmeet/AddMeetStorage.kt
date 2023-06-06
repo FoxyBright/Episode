@@ -65,9 +65,11 @@ class AddMeetStorage(
                     address = address ?: it.address,
                     isPrivate = isPrivate ?: it.isPrivate,
                     memberCount = memberCount ?: it.memberCount,
-                    requirementsType = requirementsType ?: it.requirementsType,
+                    requirementsType = requirementsType
+                        ?: it.requirementsType,
                     requirements = requirements ?: it.requirements,
-                    withoutResponds = withoutResponds ?: it.withoutResponds,
+                    withoutResponds = withoutResponds
+                        ?: it.withoutResponds,
                     memberLimited = memberLimited ?: it.memberLimited
                 )
             )
@@ -77,8 +79,5 @@ class AddMeetStorage(
     private suspend fun getAddMeet() = primarySource
         .findAll(AddMeet::class)
         .firstOrNull() ?: AddMeet()
-    
-    suspend fun clear() {
-        primarySource.deleteAll(AddMeet::class)
-    }
+    suspend fun clear() = primarySource.deleteAll(AddMeet::class)
 }

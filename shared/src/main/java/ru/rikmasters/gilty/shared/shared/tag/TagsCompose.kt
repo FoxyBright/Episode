@@ -98,43 +98,51 @@ interface TagsCallback {
 @OptIn(ExperimentalMaterial3Api::class)
 fun TagsContent(
     state: TagsState,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     callback: TagsCallback? = null,
 ) {
     Scaffold(
         modifier = modifier
-            .fillMaxSize()
-            .padding(
-                bottom = if(state.add)
-                    0.dp else 20.dp
-            ), topBar = {
+            .fillMaxSize(),
+        topBar = {
             GSearchBar(
-                state.search,
-                Modifier.padding(
-                    top = 28.dp,
-                    bottom = 4.dp
+                value = state.search,
+                modifier = Modifier
+                    .padding(
+                        top = 28.dp,
+                        bottom = 4.dp
+                    ),
+                label = stringResource(
+                    if(state.add)
+                        R.string.meeting_filter_add_tag_text_holder
+                    else
+                        R.string.search_placeholder
                 ),
-                stringResource(
-                    if(state.add) R.string.meeting_filter_add_tag_text_holder
-                    else R.string.search_placeholder
-                ),
-                state.isOnline, state.add,
-                { callback?.onBack() },
-                { callback?.onSearchChange(it) },
+                isOnline = state.isOnline,
+                fullWidth = state.add,
+                onBack = { callback?.onBack() },
+                onTextChange = {
+                    callback?.onSearchChange(it)
+                },
                 errorActive = true,
-                errorText = stringResource(R.string.bad_tag_error)
+                errorText = stringResource(
+                    R.string.bad_tag_error
+                )
             ) { callback?.onCreateTag(it) }
-        }, bottomBar = {
+        },
+        bottomBar = {
             if(state.selected.isNotEmpty())
                 GradientButton(
-                    Modifier
+                    modifier = Modifier
                         .imePadding()
                         .padding(
                             top = 28.dp,
                             bottom = 20.dp
                         )
                         .padding(horizontal = 16.dp),
-                    stringResource(R.string.meeting_filter_complete_button),
+                    text = stringResource(
+                        R.string.meeting_filter_complete_button
+                    ),
                     online = state.isOnline
                 ) { callback?.onComplete() }
         }
@@ -175,29 +183,39 @@ private fun Content(
     else Column(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.88f)
+            .fillMaxHeight(
+                if(state.selected.isEmpty())
+                    1f else 0.88f
+            )
     ) {
         LazyColumn(Modifier.fillMaxWidth()) {
-            if(state.search.isBlank() && state.populars.isNotEmpty()) {
+            if(
+                state.search.isBlank()
+                && state.populars.isNotEmpty()
+            ) {
                 item {
                     PopularTags(
-                        state.populars, Modifier,
-                        state.selected, state.isOnline,
-                        state.category
+                        tags = state.populars,
+                        selected = state.selected,
+                        isOnline = state.isOnline,
+                        category = state.category
                     ) { tag -> callback?.onTagClick(tag) }
                 }
-                if(state.selected.isNotEmpty()) item {
-                    SelectTags(
-                        state.selected,
-                        Modifier.padding(top = 28.dp),
-                        state.isOnline,
-                    ) { callback?.onDeleteTag(it) }
-                }
+                if(state.selected.isNotEmpty())
+                    item {
+                        SelectTags(
+                            state.selected,
+                            Modifier.padding(top = 28.dp),
+                            state.isOnline,
+                        ) { callback?.onDeleteTag(it) }
+                    }
             }
             if(state.search.isNotBlank())
                 itemsIndexed(state.searchResult) { i, item ->
                     AllTagItem(
-                        item, i, state.searchResult.size,
+                        item = item,
+                        index = i,
+                        size = state.searchResult.size,
                     ) { tag -> callback?.onTagClick(tag) }
                 }
             itemSpacer(40.dp)

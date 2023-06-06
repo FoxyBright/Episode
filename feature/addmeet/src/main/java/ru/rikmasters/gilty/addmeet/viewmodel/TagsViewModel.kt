@@ -1,12 +1,13 @@
 package ru.rikmasters.gilty.addmeet.viewmodel
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import android.content.Context
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
 
@@ -14,25 +15,68 @@ class TagsViewModel: ViewModel() {
     
     private val manager by inject<MeetingManager>()
     
+    private val context = getKoin().get<Context>()
+    
     val addMeet by lazy { manager.addMeetFlow }
     
-    private val _selected = MutableStateFlow(emptyList<TagModel>())
+    private val _selected =
+        MutableStateFlow(emptyList<TagModel>())
     val selected = _selected.asStateFlow()
     
-    private val _popular = MutableStateFlow(emptyList<TagModel>())
+    private val _popular =
+        MutableStateFlow(emptyList<TagModel>())
     val popular = _popular.asStateFlow()
     
-    private val _tags = MutableStateFlow(emptyList<TagModel>())
-    val tags = _tags.asStateFlow()
-    
-    private val _search = MutableStateFlow("")
+    private val _search =
+        MutableStateFlow("")
     val search = _search.asStateFlow()
-    
-    private val _category = MutableStateFlow<CategoryModel?>(null)
+
+    @OptIn(FlowPreview::class)
+    @Suppress("Unused")
+    private val _searchHelper = _search
+        .debounce(250)
+        .onEach {
+            manager.searchTags(it).on(
+                success = {
+                    _tags.emit(it)
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
+        .state(_search.value, SharingStarted.Eagerly)
+
+    private val _category =
+        MutableStateFlow<CategoryModel?>(null)
     val category = _category.asStateFlow()
     
-    private val _online = MutableStateFlow(false)
+    private val _online =
+        MutableStateFlow(false)
     val online = _online.asStateFlow()
+    
+    private val _tags =
+        MutableStateFlow(emptyList<TagModel>())
+    
+    @OptIn(FlowPreview::class)
+    val tags = _search
+        .combine(_search.debounce(250)) { _, current ->
+            if(current.isNotBlank())
+                manager.searchTags(current).on(
+                    success = { it },
+                    loading = { emptyList() },
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                        emptyList()
+                    }
+                )
+            else emptyList()
+        }.state(_tags.value)
     
     init {
         coroutineScope.launch {
@@ -46,18 +90,30 @@ class TagsViewModel: ViewModel() {
     
     suspend fun searchChange(text: String) {
         _search.emit(text)
-        _tags.emit(manager.searchTags(text))
     }
     
     suspend fun searchClear() {
         _search.emit("")
-        _tags.emit(manager.searchTags(""))
     }
     
     suspend fun getPopular() {
-        _popular.emit(Tags + manager.getPopularTags(
+        manager.getPopularTags(
             listOf(category.value?.id)
-        ).filter { !Tags.contains(it) })
+        ).on(
+            success = { tags ->
+                _popular.emit(
+                    Tags + tags.filter {
+                        !Tags.contains(it)
+                    }
+                )
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     suspend fun selectTag(tag: TagModel) {
@@ -71,6 +127,7 @@ class TagsViewModel: ViewModel() {
         )
     }
     
+    @Suppress("unused")
     suspend fun addToPopular(tag: TagModel) {
         _popular.emit(popular.value + tag)
     }

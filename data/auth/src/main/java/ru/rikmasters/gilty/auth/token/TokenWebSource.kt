@@ -6,6 +6,7 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.*
+import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 
 class TokenWebSource: KtorSource() {
     
@@ -15,23 +16,20 @@ class TokenWebSource: KtorSource() {
         External("external")
     }
     
-    suspend fun savePushToken(token: String, type: PushType) {
+    suspend fun savePushToken(token: String, type: PushType) =
         post("http://$HOST$PREFIX_URL/utils/device") {
             setBody(SavePushTokenRequest(("ANDROID"), type.name, token))
         }
-    }
     
-    suspend fun deletePushToken(token: String, type: PushType) {
+    suspend fun deletePushToken(token: String, type: PushType) =
         delete("http://$HOST$PREFIX_URL/utils/device") {
             url { query("device_id" to token, "type" to type.name) }
         }
-    }
     
-    suspend fun linkExternal(token: String) {
-        post("http://$HOST$PREFIX_URL/auth/externals/link") {
+    suspend fun linkExternal(token: String) =
+        tryPost("http://$HOST$PREFIX_URL/auth/externals/link") {
             url { query("token" to token) }
-        }
-    }
+        }.let { coroutinesState({ it }) {} }
     
     suspend fun getOauthTokens(
         grantType: GrantType,
@@ -49,7 +47,7 @@ class TokenWebSource: KtorSource() {
                 token, phone, code
             )
         )
-    }?.let {
+    }.let {
         if(it.status == OK)
             it.body<TokensResponse?>()?.domain()
         else null

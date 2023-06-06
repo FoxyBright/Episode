@@ -9,7 +9,7 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
 import ru.rikmasters.gilty.shared.common.CachedImageType.FILE
-import ru.rikmasters.gilty.shared.common.CachedImageType.URL
+import ru.rikmasters.gilty.shared.common.CachedImageType.WEB
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.shared.CheckBox
 
@@ -34,7 +34,7 @@ fun GalleryImage(
         GCachedImage(
             image, Modifier.fillMaxSize(),
             contentScale = Crop,
-            type = if(isWeb) URL else FILE
+            type = if(isWeb) WEB else FILE
         )
         if(type == MULTIPLE) CheckBox(
             (selected ?: false), Modifier

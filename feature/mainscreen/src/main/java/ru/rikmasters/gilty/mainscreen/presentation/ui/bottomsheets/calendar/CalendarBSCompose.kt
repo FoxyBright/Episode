@@ -72,28 +72,35 @@ fun CalendarBsContent(
     modifier: Modifier = Modifier,
     callback: CalendarBSCallback? = null,
 ) {
-    val thisMonth = LOCAL_DATE.atStartOfMounth()
-    val nextMonth = thisMonth.plusMonths(1)
-    val pagerState = rememberPagerState()
+    val thisMonth =
+        LOCAL_DATE.atStartOfMounth()
+    val nextMonth =
+        thisMonth.plusMonths(1)
+    val pagerState =
+        rememberPagerState()
     Column(
-        modifier.padding(top = 28.dp),
-        SpaceBetween
+        modifier = modifier
+            .padding(top = 28.dp),
+        verticalArrangement = SpaceBetween
     ) {
         TopBar(
-            if(pagerState.currentPage == 0)
+            name = if(pagerState.currentPage == 0)
                 thisMonth.monthName()
             else nextMonth.monthName(),
-            state.days.isNotEmpty()
+            clearState = state.days.isNotEmpty()
         ) { callback?.onClear() }
         Calendar(
-            Modifier,
-            pagerState, state.days, thisMonth, nextMonth
+            modifier = Modifier,
+            state = pagerState,
+            selected = state.days,
+            thisMonth = thisMonth,
+            nextMonth = nextMonth
         ) { callback?.onItemSelect(it) }
         GradientButton(
-            Modifier
+            modifier = Modifier
                 .padding(bottom = 54.dp)
                 .padding(horizontal = 16.dp),
-            stringResource(R.string.save_button)
+            text = stringResource(R.string.save_button)
         ) { callback?.onSave() }
     }
 }
@@ -110,12 +117,14 @@ private fun Calendar(
 ) {
     HorizontalPager(
         pageCount = 2,
-        modifier.fillMaxWidth(),
-        state = state
+        modifier = modifier
+            .fillMaxWidth(),
+        state = state,
     ) { page ->
         Month(
-            if(page == 0) thisMonth
-            else nextMonth, selected
+            date = if(page == 0)
+                thisMonth else nextMonth,
+            selected = selected
         ) { onItemSelect(it) }
     }
 }
@@ -131,19 +140,20 @@ private fun TopBar(
         SpaceBetween, CenterVertically
     ) {
         Text(
-            name, Modifier.padding(start = 16.dp),
-            colorScheme.tertiary,
+            text = name,
+            modifier = Modifier.padding(start = 16.dp),
+            color = colorScheme.tertiary,
             style = typography.labelLarge,
         )
         if(clearState) Text(
-            stringResource(R.string.meeting_filter_clear),
-            Modifier
+            text = stringResource(R.string.meeting_filter_clear),
+            modifier = Modifier
                 .padding(end = 16.dp)
                 .clickable(
                     MutableInteractionSource(),
                     (null)
                 ) { onClear() },
-            colorScheme.primary,
+            color = colorScheme.primary,
             style = typography.bodyMedium,
             fontWeight = SemiBold
         )

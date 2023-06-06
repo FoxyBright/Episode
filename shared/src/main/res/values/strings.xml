@@ -146,6 +146,8 @@
     <string name="meeting_private_type">Приватный episode</string>
     <string name="meeting_private_and_anon_type">Анонимный, приватный episode</string>
     <string name="meeting_profile_bottom_today_label">Сегодня</string>
+    <string name="meeting_profile_bottom_yesterday_label">Вчера</string>
+    <string name="meeting_profile_bottom_30_days_earlier_label">Предыдущие 30 дней</string>
     <string name="meeting_profile_bottom_latest_label">Потом</string>
     <string name="meeting_avatar">Аватар</string>
     <string name="meeting_members">Участники</string>
@@ -161,7 +163,7 @@
     <string name="meeting_only_online_meetings_button">Только онлайн episodes</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
     <string name="meeting_respond_title">Отклик отправлен</string>
-    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат episode</string>
+    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат\nepisode</string>
     <string name="meeting_without_respond_title">Мгновенное\nучастие!</string>
     <string name="meeting_without_respond_label">Вы стали участником, теперь вам\nдоступен чат episode</string>
     <string name="meeting_shared_button">Поделиться</string>
@@ -180,6 +182,8 @@
     <string name="meeting_maps_alert_title">Открыть приложение</string>
     <string name="meeting_maps_alert_label">«episode» хочет открыть приложение «%s»</string>
     <string name="meeting_maps_alert_open">Открыть</string>
+    <string name="meetings_canceled">Отменено</string>
+    <string name="meetings_finished">Завершено</string>
     <string name="maps_google">Google\nMaps</string>
     <string name="maps_yandex">Yandex\nMaps</string>
 
@@ -237,7 +241,7 @@
     <string name="chats_delete_answer">Вы действительно хотите\nудалить чат навсегда?</string>
     <string name="chats_hidden_photo">Фото</string>
     <string name="chats_view_translation_button">Смотреть</string>
-    <string name="chats_gallery_select_photo">Фото или видео</string>
+    <string name="chats_gallery_select_photo">Фото</string>
     <string name="chats_gallery_camera">Камера</string>
     <string name="chats_message_translation_30">трансляция начнется через 30 минут</string>
     <string name="chats_message_translation_5">трансляция начнется через 5 минут</string>
@@ -249,6 +253,10 @@
     <string name="chats_message_make_screenshot">сделал%s скриншот!</string>
     <string name="chats_sort_label">Сортировка</string>
     <string name="chats_archive_label">Архив</string>
+
+    <string name="chat_list_placeholder_category_name">Создавай</string>
+    <string name="chat_list_placeholder_create_label">Нет Episodes, нет и чатов</string>
+    <string name="chat_list_placeholder_respond_button_label">Откликайся</string>
 
     <!-- Image Descriptions -->
     <string name="category_icon">Иконка категории</string>
@@ -296,7 +304,7 @@
     <string name="add_meet_restrict_chat_label">В чат сможет писать только организатор.</string>
     <string name="add_meet_conditions_price">Цена</string>
     <string name="add_meet_conditions_price_description">Введите цену в рублях</string>
-    <string name="add_meet_conditions_hidden_label">Участники получат доступ к скрытым фото.</string>
+    <string name="add_meet_conditions_hidden_label">Участники получат доступ к скрытым фото</string>
     <string name="add_meet_detailed_meet_duration">Длительность</string>
     <string name="add_meet_detailed_meet_duration_place_holder">Кол-во времени</string>
     <string name="add_meet_detailed_meet_date">Дата и время</string>

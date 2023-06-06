@@ -15,10 +15,10 @@ plugins {
 }
 
 baseConfig()
+
 compose()
 
 android {
-    
     defaultConfig {
         vectorDrawables {
             useSupportLibrary = true
@@ -32,9 +32,12 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.6")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
+    
     androidBase()
     compose()
-
+    
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
 
     implementation(project(":feature:notifications"))

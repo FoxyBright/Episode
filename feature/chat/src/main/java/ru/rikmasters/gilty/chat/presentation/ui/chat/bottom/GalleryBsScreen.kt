@@ -2,18 +2,17 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat.bottom
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.viewmodel.GalleryViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.gallery.*
-import ru.rikmasters.gilty.gallery.gallery.*
+import ru.rikmasters.gilty.gallery.gallery.GalleryBsContent
+import ru.rikmasters.gilty.gallery.gallery.GalleryCallback
 import ru.rikmasters.gilty.gallery.gallery.GalleryImageType.MULTIPLE
+import ru.rikmasters.gilty.gallery.gallery.GalleryState
 import ru.rikmasters.gilty.shared.R
 
 @Composable
-@OptIn(ExperimentalPermissionsApi::class)
 fun GalleryBs(
     vm: GalleryViewModel,
     isOnline: Boolean,

@@ -38,11 +38,11 @@ import androidx.compose.ui.text.style.TextAlign.Companion.Left
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.animated.AnimatedImage
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.format
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType.*
@@ -343,12 +343,12 @@ fun SystemMessage(
             fontWeight = SemiBold,
             inlineContent = mapOf(
                 "emoji" to InlineTextContent(
-                    Placeholder(16.sp, 16.sp, TextCenter)
-                ) {
-                    emoji?.let {
-                        GEmojiImage(it)
-                    }
-                }
+                    Placeholder(
+                        width = 16.dp.toSp(),
+                        height = 16.dp.toSp(),
+                        placeholderVerticalAlign = TextCenter
+                    )
+                ) { emoji?.let { GEmojiImage(it) } }
             ), textAlign = Center
         )
     }
@@ -420,7 +420,8 @@ fun ImageMessage(
         Box(Modifier.fillMaxHeight(0.5f)) {
             message.message?.attachments?.let {
                 GCachedImage(
-                    it.first().file?.url, Modifier
+                    url = it.first().file?.url,
+                    modifier = Modifier
                         .wrapContentSize()
                         .background(
                             colorScheme.onTertiary,

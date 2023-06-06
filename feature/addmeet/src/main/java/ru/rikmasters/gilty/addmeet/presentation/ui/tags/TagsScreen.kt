@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.tags
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
@@ -27,10 +26,17 @@ fun TagsScreen(vm: TagsViewModel) {
     LaunchedEffect(Unit) { vm.getPopular() }
     
     TagsContent(
-        TagsState(
-            selected, popular, search,
-            tags, online, category, (true), (0f)
-        ), Modifier, object: TagsCallback {
+        state = TagsState(
+            selected = selected,
+            populars = popular,
+            search = search,
+            searchResult = tags,
+            isOnline = online,
+            category = category,
+            add = true,
+            alpha = 0f
+        ),
+        callback = object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {
                 scope.launch {
@@ -45,7 +51,8 @@ fun TagsScreen(vm: TagsViewModel) {
             
             override fun onCreateTag(tagName: String) {
                 scope.launch {
-                    vm.selectTag(TagModel(tagName))
+                    if(tagName.isNotBlank())
+                        vm.selectTag(TagModel(tagName))
                     vm.searchClear()
                 }
             }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,10 +24,12 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 import ru.rikmasters.gilty.yandexmap.presentation.MapAppsBs
 import ru.rikmasters.gilty.yandexmap.presentation.YandexMapScreen
@@ -43,36 +46,60 @@ fun BottomSheet(
     location: LocationModel? = null,
     category: CategoryModel? = null,
     fullResponds: Boolean = false,
-    username: String? = "",
+    user: UserModel? = UserModel(),
 ) {
     
     val nav = rememberNavController()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     
+    val coroutineScope = rememberCoroutineScope()
+    
+    BackHandler {
+        if(asm.bottomSheet.current.value != BottomSheetSwipeState.COLLAPSED) {
+            coroutineScope.launch { asm.bottomSheet.collapse() }
+        } else {
+            nav.popBackStack()
+        }
+    }
+    
     NavHost(
         nav, when(type) {
             MEET, SHORT_MEET -> "MEET?meet={meet}&detailed={detailed}"
+            OBSERVERS -> "OBSERVERS?username={username}&emoji={emoji}"
             MAP -> "MAP?location={location}&category={category}"
             RESPONDS -> "RESPONDS?meet={meet}&full={full}"
             PARTICIPANTS -> "PARTICIPANTS?meet={meet}"
             REPORTS -> "REPORTS?id={id}&type={type}"
             USER -> "USER?user={user}&meet={meet}"
-            OBSERVERS -> "OBSERVERS?user={user}"
             APPS -> "APPS?lat={lat}&lng={lng}"
             LOCATION -> "LOCATION"
         }
     ) {
         
         composable(
-            route = "OBSERVERS?user={user}",
+            route = "OBSERVERS?username={username}&emoji={emoji}",
             arguments = listOf(
-                setStringArg("user", (username ?: ""))
+                setStringArg(
+                    arg = "username",
+                    default = user?.username?.let { name ->
+                        user.age?.let { age ->
+                            "$name, $age"
+                        }
+                    } ?: ""
+                ),
+                setStringArg(
+                    arg = "emoji",
+                    default = user?.emoji
+                        ?.type ?: ""
+                ),
             )
         ) { stack ->
-            stack.GetStringArg("user") { user ->
-                Connector<ObserverBsViewModel>(scope) {
-                    ObserversBs(it, user, nav)
+            stack.GetStringArg("username") { user ->
+                stack.GetStringArg("emoji") { emoji ->
+                    Connector<ObserverBsViewModel>(scope) {
+                        ObserversBs(it, user, emoji, nav)
+                    }
                 }
             }
         }
@@ -119,7 +146,8 @@ fun BottomSheet(
                         alert, appIndex, Modifier, { state ->
                             if(state) {
                                 openInWeb(
-                                    context, if(appIndex == 0) googleMap
+                                    context,
+                                    if(appIndex == 0) googleMap
                                     else yandexMap
                                 )
                                 corScope.launch {
@@ -139,17 +167,19 @@ fun BottomSheet(
                 setStringArg("category", ""),
             )
         ) { stack ->
-
-            LaunchedEffect(key1 = Unit, block = {
-                asm.bottomSheet.swipeableState.currentScreenName.value = "Map"
-            })
-
-            DisposableEffect(key1 = Unit, effect = {
+            
+            LaunchedEffect(Unit) {
+                asm.bottomSheet.swipeableState
+                    .currentScreenName.value = "Map"
+            }
+            
+            DisposableEffect(Unit) {
                 onDispose {
-                    asm.bottomSheet.swipeableState.currentScreenName.value = ""
+                    asm.bottomSheet.swipeableState
+                        .currentScreenName.value = ""
                 }
-            })
-
+            }
+            
             stack.GetStringArg("location") { location ->
                 stack.GetStringArg("category") { category ->
                     Connector<YandexMapViewModel>(scope) {

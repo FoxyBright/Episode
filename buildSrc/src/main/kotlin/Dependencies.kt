@@ -11,6 +11,7 @@ fun DependencyHandlerScope.androidBase(excludeCore: Boolean = false) {
         "androidx.core:core-ktx:1.9.0",
         "androidx.navigation:navigation-fragment-ktx:$navigationVer",
         "androidx.navigation:navigation-ui-ktx:$navigationVer",
+        "androidx.core:core-splashscreen:1.0.0"
     )
     koin()
     implementationIf(!excludeCore, project(":core"))
@@ -26,7 +27,7 @@ private fun DependencyHandlerScope.yandexmap() = implementation(
 private const val composeVer = Config.composeUiVer
 private const val materialVer = "1.0.1"
 
-fun DependencyHandlerScope.toasty()=implementation(
+fun DependencyHandlerScope.toasty() = implementation(
     "com.github.GrenderG:Toasty:1.5.2"
 )
 
@@ -48,7 +49,8 @@ fun DependencyHandlerScope.compose() = implementation(
 ) and swipeRefresher(
 ) and lottie()
 
-val pagingVer = "3.1.1"
+@Suppress("unused")
+const val pagingVer = "3.1.1"
 
 fun DependencyHandlerScope.json() = implementation(
     "com.google.code.gson:gson:2.10.1"
@@ -138,13 +140,16 @@ fun DependencyHandlerScope.ktor() = implementation(
 private infix fun Unit.and(o: Unit) {
 }
 
-private fun DependencyHandler.implementationIf(condition: Boolean, dependencyNotation: Any) {
+private fun DependencyHandler.implementationIf(
+    condition: Boolean,
+    dependencyNotation: Any,
+) {
     if(condition) implementation(dependencyNotation)
 }
 
 private fun DependencyHandler.implementation(vararg dependencyNotations: Any) =
     dependencyNotations.forEach { add("implementation", it) }
 
-
+@Suppress("unused")
 private fun DependencyHandler.debugImplementation(vararg dependencyNotations: Any) =
     dependencyNotations.forEach { add("debugImplementation", it) }

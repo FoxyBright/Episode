@@ -1,14 +1,11 @@
 package ru.rikmasters.gilty.chats.manager
 
-import android.content.Context
-import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
-import ru.rikmasters.gilty.chats.ChatData.getKoin
 import ru.rikmasters.gilty.chats.models.chat.mapDTO
 import ru.rikmasters.gilty.chats.paging.ChatListPagingSource
 import ru.rikmasters.gilty.chats.repository.ChatRepository
@@ -25,17 +22,12 @@ class ChatManager(
     private val webSource: ChatWebSource,
 ): CoroutineController() {
     
-    suspend fun updateUnreadMessages() {
-        val count = webSource.getChatsStatus()
-        getKoin().get<Context>().getSharedPreferences(
-            "sharedPref", MODE_PRIVATE
-        ).edit()
-            .putInt("unread_messages", count)
-            .apply()
-    }
+    suspend fun updateUnreadMessages() =
+        withContext(IO) { webSource.getChatsStatus() }
     
     fun getChats(
         sortTypeModel: SortTypeModel,
+        isArchiveOn: Boolean,
     ): Flow<PagingData<ChatModel>> {
         return Pager(
             config = PagingConfig(
@@ -46,7 +38,8 @@ class ChatManager(
             pagingSourceFactory = {
                 ChatListPagingSource(
                     webSource = webSource,
-                    sortType = sortTypeModel.mapDTO()
+                    sortType = sortTypeModel.mapDTO(),
+                    isArchiveOn = isArchiveOn
                 )
             }
         ).flow
@@ -68,46 +61,46 @@ class ChatManager(
     suspend fun deleteChat(
         chatId: String,
         forAll: Boolean,
-    ) {
-        withContext(IO) {
-            webSource.deleteChat(chatId, forAll)
-            if(!forAll) store.deleteChat(chatId)
-        }
+    ) = withContext(IO) {
+        if(!forAll) store.deleteChat(chatId)
+        webSource.deleteChat(chatId, forAll)
     }
     
     // подключение к веб сокетам
-    suspend fun connectWebSocket(userId: String) = single(JOIN) {
-        webSocket.connect(userId)
-    }
-    
-    @Suppress("unused")
-    // разблокировать уведомления от чата
-    suspend fun unmuteChatNotifications(chatId: String) {
-        withContext(IO) {
-            webSource.unmuteChatNotifications(
-                chatId
-            )
-        }
+    suspend fun connectWebSocket(
+        userId: String,
+    ) = single(JOIN) {
+        webSocket.connect(
+            userId = userId
+        )
     }
     
     @Suppress("unused")
     // заблокировать уведомления от чата
     suspend fun muteChatNotifications(
-        chatId: String,
-        unmuteAt: String,
-    ) {
-        withContext(IO) {
-            webSource.muteChatNotifications(
-                chatId, unmuteAt
-            )
-        }
+        chatId: String, unmuteAt: String,
+    ) = withContext(IO) {
+        webSource.muteChatNotifications(
+            chatId = chatId,
+            unmuteAt = unmuteAt
+        )
     }
     
     @Suppress("unused")
-    // получить альбом медиа чата
+    suspend fun unmuteChatNotifications(
+        chatId: String,
+    ) = withContext(IO) {
+        webSource.unmuteChatNotifications(
+            chatId = chatId
+        )
+    }
+    
+    @Suppress("unused")
     suspend fun getChatAlbum(
         chatId: String,
     ) = withContext(IO) {
-        webSource.getChatAlbum(chatId)
+        webSource.getChatAlbum(
+            chatId = chatId
+        )
     }
 }

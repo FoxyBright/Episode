@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.translations.datasource.remote
 
-import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.Gson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -137,7 +135,7 @@ class TranslationWebSocket : WebSocket() {
 
     suspend fun connectToTranslation(id: String) {
         disconnectFromTranslation()
-        subscribe("private-translation.$id.${_userId.value}") {
+        subscribe("private-translation.$id.${userId.value}") {
             if (it) _translationId.emit(id)
         }
     }
@@ -145,11 +143,11 @@ class TranslationWebSocket : WebSocket() {
     suspend fun disconnectFromTranslation(): DataStateTest<Unit> {
         return _translationId.value?.let {
             trySend(
-                data = mapOf("channel" to "private-translation.$it.${_userId.value}"),
+                data = mapOf("channel" to "private-translation.$it.${userId.value}"),
                 event = TranslationsSocketEvents.UNSUBSCRIBE.value,
             )
         } ?: DataStateTest.Error(
-            cause = ExceptionCause.IO
+            cause = ExceptionCause.IO("null")
         )
     }
 

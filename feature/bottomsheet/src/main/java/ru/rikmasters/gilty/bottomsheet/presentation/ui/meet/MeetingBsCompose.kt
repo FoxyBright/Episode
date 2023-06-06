@@ -27,6 +27,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.pagingPreview
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
@@ -184,31 +185,39 @@ fun MeetingBsContent(
                     .background(colorScheme.background)
                     .alpha(0.5f)
             )
-            Scaffold(bottomBar = {
-                Button(
-                    state.meet.memberState,
-                    state.meet.isOnline,
-                    Modifier.padding(horizontal = 16.dp)
-                ) {
-                    if(state.detailed)
-                        callback?.onRespond(state.meet.id)
-                    else scope.launch {
-                        bsState.bottomSheetState.expand()
+            Scaffold(
+                bottomBar = {
+                    Button(
+                        memberState = state
+                            .meet.memberState,
+                        isOnline = state
+                            .meet.isOnline,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        if(state.detailed)
+                            callback?.onRespond(state.meet.id)
+                        else scope.launch {
+                            bsState.bottomSheetState.expand()
+                        }
                     }
                 }
-            }) {
+            ) {
                 MeetContent(
-                    state, modifier.padding(
+                    state = state,
+                    modifier = modifier.padding(
                         bottom = if(it.calculateBottomPadding() >= 0.dp)
                             it.calculateBottomPadding() - 24.dp else 0.dp
-                    ), callback
+                    ),
+                    callback = callback
                 )
             }
         }
     }
-    MeetReaction(state.meet, state.meetReaction) {
-        callback?.meetReactionDisable()
-    }
+    MeetReaction(
+        meet = state.meet,
+        state = state.meetReaction
+    ) { callback?.meetReactionDisable() }
 }
 
 @Composable
@@ -221,14 +230,18 @@ private fun Button(
     when(memberState) {
         IS_MEMBER, IS_ORGANIZER -> Unit
         RESPOND_SENT -> TextButton(
-            modifier.padding(bottom = 50.dp),
-            isOnline, stringResource(R.string.respond_to_meet)
+            modifier = modifier
+                .padding(bottom = 50.dp),
+            text = stringResource(R.string.respond_to_meet)
         )
         else -> GradientButton(
-            modifier.padding(bottom = 50.dp),
-            stringResource(R.string.meeting_join_button_name),
-            (memberState == UNDER_REQUIREMENTS),
-            isOnline
+            modifier = modifier
+                .padding(bottom = 50.dp),
+            text = stringResource(
+                R.string.meeting_join_button_name
+            ),
+            enabled = memberState == UNDER_REQUIREMENTS,
+            online = isOnline
         ) { onClick() }
     }
 }
@@ -293,87 +306,111 @@ private fun MeetContent(
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback?,
 ) {
-    LazyColumn(
+    Column(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
-        item {
-            TopBar(
-                state.meet,
-                state.backButton,
-                state.menuState,
-                { callback?.onBack() },
-                { callback?.onKebabClick(it) }
-            ) { callback?.onMenuItemClick(it, state.meet.id) }
-        }
-        
-        item {
-            MeetingBsTopBarCompose(
-                Modifier.padding(
-                    bottom = if(state.detailed)
-                        28.dp else 0.dp
-                ), MeetingBsTopBarState(
-                    state.meet,
-                    state.menuState,
-                    state.lastRespond,
-                    description = state.detailed,
-                    backButton = state.backButton
-                ), callback
-            )
-        }
-        
-        if(state.detailed) {
-            
+        TopBar(
+            meet = state.meet,
+            backButton = state.backButton,
+            menuState = state.menuState,
+            onBack = { callback?.onBack() },
+            onKebabClick = { callback?.onKebabClick(it) }
+        ) { callback?.onMenuItemClick(it, state.meet.id) }
+        LazyColumn(
+            modifier
+                .fillMaxWidth()
+        ) {
             item {
-                Text(
-                    stringResource(R.string.meeting_question_comment_or_assess),
-                    Modifier,
-                    style = typography.labelLarge
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+            item {
+                MeetingBsTopBarCompose(
+                    modifier = Modifier.padding(
+                        bottom = if(state.detailed)
+                            28.dp else 0.dp
+                    ),
+                    state = MeetingBsTopBarState(
+                        meet = state.meet,
+                        menuState = state.menuState,
+                        lastRespond = state.lastRespond,
+                        description = state.detailed,
+                        backButton = state.backButton
+                    ),
+                    callback = callback
                 )
             }
             
-            item {
-                MeetingBsComment(
-                    state.comment ?: "",
-                    state.meet.isOnline,
-                    { callback?.onCommentChange(it) },
-                    Modifier.padding(top = 22.dp)
-                ) { callback?.onCommentTextClear() }
-            }
-            
-            item {
-                MeetingBsHidden(
-                    Modifier.padding(top = 8.dp),
-                    state.hidden ?: false,
-                    state.meet.isOnline
-                ) { callback?.onHiddenPhotoActive(it) }
-            }
-        } else {
-            item {
-                MeetingBsConditions(
-                    state.meet.map(),
-                    Modifier.padding(
-                        top = if(state.meet.description.isNotBlank())
-                            32.dp else 0.dp
-                    )
-                )
-            }
-            state.membersList?.let {
+            if(state.detailed) {
+                
                 item {
-                    MeetingBsParticipants(
-                        state.meet, it, Modifier,
-                        { callback?.onAllMembersClick(state.meet.id) }
-                    ) { callback?.onMemberClick(it) }
+                    Text(
+                        text = stringResource(
+                            R.string.meeting_question_comment_or_assess
+                        ),
+                        modifier = Modifier,
+                        style = typography.labelLarge
+                    )
                 }
-            }
-            state.meetDistance?.let {
-                if(!state.meet.isOnline) item {
+                
+                item {
+                    MeetingBsComment(
+                        text = state.comment ?: "",
+                        online = state.meet.isOnline,
+                        onTextChange = { callback?.onCommentChange(it) },
+                        modifier = Modifier.padding(top = 22.dp)
+                    ) { callback?.onCommentTextClear() }
+                }
+                
+                item {
+                    MeetingBsHidden(
+                        modifier = Modifier.padding(top = 8.dp),
+                        state = state.hidden ?: false,
+                        online = state.meet.isOnline
+                    ) { callback?.onHiddenPhotoActive(it) }
+                }
+            } else {
+                item {
+                    MeetingBsConditions(
+                        meet = state.meet.map(),
+                        modifier = Modifier.padding(
+                            top = if(state.meet.description.isNotBlank())
+                                32.dp else 0.dp
+                        )
+                    )
+                }
+                state.membersList?.let {
+                    item {
+                        MeetingBsParticipants(
+                            meet = state.meet,
+                            membersList = it,
+                            modifier = Modifier,
+                            onAllViewClick = {
+                                callback?.onAllMembersClick(
+                                    state.meet.id
+                                )
+                            },
+                            onMemberClick = {
+                                callback?.onMemberClick(it)
+                            }
+                        )
+                    }
+                }
+                if(state.meetDistance != null
+                    && !state.meet.isOnline
+                ) item {
                     MeetingBsMap(
-                        state.meet, it,
-                        Modifier.padding(top = 28.dp)
-                    ) { callback?.onMeetPlaceClick(state.meet.location) }
+                        meet = state.meet,
+                        distance = state.meetDistance,
+                        modifier = Modifier.padding(top = 28.dp),
+                        onClick = {
+                            callback?.onMeetPlaceClick(
+                                state.meet.location
+                            )
+                        }
+                    )
                 }
             }
             itemSpacer(40.dp)
@@ -393,7 +430,7 @@ private fun TopBar(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(vertical = 18.dp),
+            .padding(top = 18.dp),
         SpaceBetween, CenterVertically
     ) {
         Row(
@@ -405,25 +442,41 @@ private fun TopBar(
                 Modifier.padding(end = 16.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_back),
-                    stringResource(R.string.action_bar_button_back),
-                    Modifier,
-                    colorScheme.tertiary
+                    painter = painterResource(R.drawable.ic_back),
+                    contentDescription = stringResource(R.string.action_bar_button_back),
+                    tint = colorScheme.tertiary
                 )
             }
             Text(
-                meet.tags.joinToString(separator = ", ") { it.title },
-                Modifier,
-                colorScheme.tertiary,
+                text = meet.tags
+                    .joinToString(", ")
+                    { it.title },
+                modifier = Modifier.padding(end = 9.dp),
+                color = colorScheme.tertiary,
                 style = typography.labelLarge,
+                overflow = Ellipsis,
+                maxLines = 1
+            )
+            Text(
+                text = stringResource(
+                    when(meet.status) {
+                        MeetStatusType.CANCELED ->
+                            R.string.meetings_finished
+                        MeetStatusType.COMPLETED ->
+                            R.string.meetings_finished
+                        else -> R.string.empty_String
+                    }
+                ),
+                modifier = Modifier,
+                style = typography.labelSmall,
                 overflow = Ellipsis,
                 maxLines = 1
             )
         }
         Menu(
-            menuState,
-            meet,
-            { onKebabClick(false) }
+            menuState = menuState,
+            meet = meet,
+            onDismiss = { onKebabClick(false) }
         ) { onMenuItemSelect(it) }
         GKebabButton { onKebabClick(true) }
     }
@@ -436,32 +489,30 @@ private fun Menu(
     onDismiss: (Boolean) -> Unit,
     onItemSelect: (Int) -> Unit,
 ) {
-    val menuItems = arrayListOf(
-        Pair(stringResource(R.string.meeting_shared_button)) {
-            onItemSelect(
-                0
-            )
-        }
-    )
-    if(meet.memberState == IS_MEMBER) menuItems.add(
-        Pair(stringResource(R.string.exit_from_meet)) { onItemSelect(1) }
-    )
+    val ms = meet.memberState
+    val menuItems =
+        arrayListOf<Pair<String, () -> Unit>>()
+    if(ms == IS_MEMBER || ms == IS_ORGANIZER)
+        menuItems.add(
+            stringResource(R.string.meeting_shared_button) to
+                    { onItemSelect(0) })
+    if(ms == IS_MEMBER)
+        menuItems.add(
+            stringResource(R.string.exit_from_meet) to
+                    { onItemSelect(1) })
     menuItems.add(
-        if(meet.memberState == IS_ORGANIZER) {
-            Pair(stringResource(R.string.meeting_canceled)) {
-                onItemSelect(
-                    2
-                )
-            }
-        } else Pair(stringResource(R.string.meeting_complain)) {
-            onItemSelect(
-                3
-            )
-        }
-    )
+        if(ms == IS_ORGANIZER)
+            stringResource(R.string.meeting_canceled) to
+                    { onItemSelect(2) }
+        else stringResource(R.string.meeting_complain) to
+                { onItemSelect(3) })
+    if(menuState && menuItems.size == 1) {
+        onDismiss(false)
+        menuItems.first().second()
+    }
     GDropMenu(
-        menuState,
-        { onDismiss(false) },
+        menuState = menuState,
+        collapse = { onDismiss(false) },
         menuItem = menuItems.toList()
     )
 }

@@ -7,6 +7,7 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.getImages
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.shared.compress
 import java.io.File
 
@@ -40,7 +41,16 @@ class GalleryViewModel: ViewModel() {
         file: File, list: List<Float>,
     ) = singleLoading {
         regManager.setAvatar(
-            file.compress(context), list
+            file = file.compress(context),
+            points = list
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -71,6 +81,14 @@ class GalleryViewModel: ViewModel() {
         regManager.addHidden(
             selected.value.map {
                 File(it).compress(context)
+            }
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
             }
         )
     }

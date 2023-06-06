@@ -117,8 +117,10 @@ private fun ChatRowOnlinePreview() {
 
 @Composable
 fun SwipeableChatRow(
-    state: DragRowState, chat: ChatModel,
-    shape: Shape, modifier: Modifier = Modifier,
+    state: DragRowState,
+    chat: ChatModel,
+    shape: Shape,
+    modifier: Modifier = Modifier,
     onClick: ((ChatModel) -> Unit)? = null,
     onSwiped: ((ChatModel) -> Unit)? = null,
 ) {

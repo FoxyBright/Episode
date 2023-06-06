@@ -1,35 +1,82 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
+import android.content.Context
+import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 
-class ParticipantsBsViewModel : ViewModel() {
-
+class ParticipantsBsViewModel: ViewModel(), PullToRefreshTrait {
+    
     private val meetManager by inject<MeetingManager>()
-
-    private val _meetId = MutableStateFlow<String?>(null)
-
-    private val _meet = MutableStateFlow<FullMeetingModel?>(null)
+    
+    private val context = getKoin().get<Context>()
+    private val _meetId =
+        MutableStateFlow<String?>(null)
+    
+    private val _meet =
+        MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
-
+    
+    private val refresh = MutableStateFlow(false)
+    
+    override suspend fun forceRefresh() = singleLoading {
+        refresh.value = !refresh.value
+    }
+    
     @OptIn(ExperimentalCoroutinesApi::class)
     val participants by lazy {
-        _meetId.flatMapLatest {
-            it?.let {
-                meetManager.getMeetMembers(it)
-            } ?: flow { }
-        }
+        refresh.flatMapLatest {
+            _meetId.flatMapLatest { meet ->
+                meet?.let {
+                    getMeet(it)
+                    meetManager.getMeetMembers(it)
+                } ?: flow { }
+            }
+        }.cachedIn(coroutineScope)
     }
-
-    suspend fun getMeet(meetId: String) = singleLoading {
-        _meet.emit(meetManager.getDetailedMeet(meetId))
-        _meetId.value = meetId
+    
+    suspend fun getMeet(
+        meetId: String,
+    ) = singleLoading {
+        meetManager.getDetailedMeet(
+            meetId = meetId
+        ).on(
+            success = {
+                _meet.emit(it)
+                _meetId.value = meetId
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
+    
+    suspend fun deleteMember(
+        meetId: String,
+        memberId: String?,
+    ) = singleLoading {
+        memberId?.let { member ->
+            meetManager.kickMember(
+                meetId = meetId,
+                userId = member
+            ).on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
     }
 }

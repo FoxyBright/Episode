@@ -105,7 +105,6 @@ class LocalDate(private var millis: Long) {
     
     fun firstDayOfWeek() = this.atStartOfMounth().dayOfWeek()
     
-    
     /** Приводит вид объекта к определенной форме. Возвращает строку **/
     fun format(pattern: String) = Date(millis).format(pattern)
     

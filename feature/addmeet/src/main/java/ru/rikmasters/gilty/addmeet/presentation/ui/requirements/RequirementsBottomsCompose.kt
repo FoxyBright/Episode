@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import ru.rikmasters.gilty.mainscreen.presentation.ui.main.custom.FlowLayout
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
@@ -58,30 +60,33 @@ fun AgeBottom(
     Box(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
+            .fillMaxHeight(0.55f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
         Text(
-            stringResource(R.string.personal_info_age_placeholder),
-            Modifier
-                .padding(bottom = 16.dp)
-                .align(Alignment.TopStart),
-            colorScheme.tertiary,
+            text = stringResource(R.string.personal_info_age_placeholder),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .zIndex(1f),
+            color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         AgeBottomContent(
-            from, to, Modifier
+            from = from,
+            to = to,
+            modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f)
-                .align(Center),
-            fromChange, toChange
+                .align(TopCenter),
+            fromChange = fromChange,
+            toChange = toChange
         )
         GradientButton(
-            Modifier
+            modifier = Modifier
                 .padding(vertical = 28.dp)
                 .align(BottomCenter),
-            stringResource(R.string.save_button),
+            text = stringResource(R.string.save_button),
             online = online
         ) { onSave?.let { it() } }
     }

@@ -127,56 +127,86 @@ suspend inline fun <reified T> HttpResponse.wrappedTest(): T
 suspend inline fun <reified T> HttpResponse.wrapped(): T
         where T: Any? = body<ResponseWrapper<T>>().dataChecked
 
+private fun String?.errorController(): String {
+    return this ?: "Неизвестная ошибка"
+}
 
 /**
  * [coroutinesState] превращает запрос в DataState (suspend)
  */
 suspend fun <T: Any> coroutinesState(
-    block: suspend () -> T,
+    request: () -> HttpResponse,
+    expectCode: Int = 200,
+    response: suspend () -> T,
 ) = try {
-    withContext(Dispatchers.IO) {
-        DataStateTest.Success(
-            data = block(),
+    request().let {
+        if(it.status.value == expectCode)
+            withContext(Dispatchers.IO) {
+                DataStateTest.Success(
+                    data = response(),
+                )
+            }
+        else DataStateTest.Error(
+            cause = ExceptionCause.UnknownException(
+                message = it.errorWrapped().error
+                    .message.errorController()
+            ),
         )
     }
 } catch(e: IOException) {
     DataStateTest.Error(
-        cause = ExceptionCause.IO,
+        cause = ExceptionCause.IO(
+            message = e.message.errorController()
+        ),
     )
 } catch(e: SocketTimeoutException) {
     DataStateTest.Error(
-        cause = ExceptionCause.SocketTimeout,
+        cause = ExceptionCause.SocketTimeout(
+            message = e.message.errorController()
+        ),
     )
 } catch(e: UnknownHostException) {
     DataStateTest.Error(
-        cause = ExceptionCause.UnknownHost,
+        cause = ExceptionCause.UnknownHost(
+            message = e.message.errorController()
+        ),
     )
 } catch(e: ResponseException) {
     when(e) {
         is RedirectResponseException -> {
             DataStateTest.Error(
-                cause = ExceptionCause.RedirectResponse,
+                cause = ExceptionCause.RedirectResponse(
+                    message = e.message.errorController()
+                ),
             )
         }
         is ClientRequestException -> {
             DataStateTest.Error(
-                cause = ExceptionCause.ClientRequest,
+                cause = ExceptionCause.ClientRequest(
+                    message = e.message.errorController()
+                ),
             )
         }
         is ServerResponseException -> {
             DataStateTest.Error(
-                cause = ExceptionCause.ServerResponse,
+                cause = ExceptionCause.ServerResponse(
+                    message = e.message.errorController()
+                ),
             )
         }
         else -> {
             DataStateTest.Error(
-                cause = ExceptionCause.UnknownException,
+                cause = ExceptionCause.UnknownException(
+                    message = e.message.errorController()
+                ),
             )
         }
     }
 } catch(e: Exception) {
     DataStateTest.Error(
-        cause = ExceptionCause.UnknownException,
+        cause = ExceptionCause.UnknownException(
+            message = e.message.errorController()
+        ),
     )
 }
 
@@ -194,48 +224,66 @@ fun <T: Any> flowState(
         )
     } catch(e: IOException) {
         DataStateTest.Error(
-            cause = ExceptionCause.IO,
+            cause = ExceptionCause.IO(
+                message = e.message.errorController()
+            ),
         )
     } catch(e: SocketTimeoutException) {
         DataStateTest.Error(
-            cause = ExceptionCause.SocketTimeout,
+            cause = ExceptionCause.SocketTimeout(
+                message = e.message.errorController()
+            ),
         )
     } catch(e: UnknownHostException) {
         DataStateTest.Error(
-            cause = ExceptionCause.UnknownHost,
+            cause = ExceptionCause.UnknownHost(
+                message = e.message.errorController()
+            ),
         )
     } catch(e: ResponseException) {
         when(e) {
             is RedirectResponseException -> {
                 DataStateTest.Error(
-                    cause = ExceptionCause.RedirectResponse,
+                    cause = ExceptionCause.RedirectResponse(
+                        message = e.message.errorController()
+                    ),
                 )
             }
             is ClientRequestException -> {
                 DataStateTest.Error(
-                    cause = ExceptionCause.ClientRequest,
+                    cause = ExceptionCause.ClientRequest(
+                        message = e.message.errorController()
+                    ),
                 )
             }
             is ServerResponseException -> {
                 DataStateTest.Error(
-                    cause = ExceptionCause.ServerResponse,
+                    cause = ExceptionCause.ServerResponse(
+                        message = e.message.errorController()
+                    ),
                 )
             }
             else -> {
                 DataStateTest.Error(
-                    cause = ExceptionCause.UnknownException,
+                    cause = ExceptionCause.UnknownException(
+                        message = e.message.errorController()
+                    ),
                 )
             }
         }
     } catch(e: Exception) {
         DataStateTest.Error(
-            cause = ExceptionCause.UnknownException,
+            cause = ExceptionCause.UnknownException(
+                message = e.message.errorController()
+            ),
         )
     }
     emit(response)
 }.flowOn(Dispatchers.IO)
 
-// TODO: Заменять Exception() на Exception(нужное в UI сообщение) в случае необходимости
+// TODO: Заменять Exception()
+//  на Exception(нужное в UI сообщение)
+//  в случае необходимости
 /**
  * [paginateState] превращает запрос в LoadResult
  */

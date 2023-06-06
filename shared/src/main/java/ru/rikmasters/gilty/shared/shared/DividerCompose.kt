@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 fun GDivider(
     modifier: Modifier = Modifier,
     color: Color = if(isSystemInDarkTheme())
-        Color(0xFFDFDFDF)
-    else Color(0xFF464649),
+        Color(0xFF464649)
+    else Color(0xFFDFDFDF),
 ) {
     Divider(modifier, 1.dp, color)
 }

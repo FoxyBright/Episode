@@ -5,7 +5,6 @@ import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -27,6 +26,7 @@ import ru.rikmasters.gilty.shared.R
 fun GalleryScreen(
     vm: GalleryViewModel,
     multiple: Boolean,
+    onBackDest: String,
 ) {
     
     val scope = rememberCoroutineScope()
@@ -61,15 +61,21 @@ fun GalleryScreen(
         }
     }
     
-    
     Use<GalleryViewModel>(LoadingTrait) {
         GalleryContent(
-            GalleryState(
-                type, images, selected, menuState,
-                filters, (false),
-                stringResource(R.string.add_button),
-                selected.isNotEmpty(),
-            ), Modifier, object: GalleryCallback {
+            state = GalleryState(
+                type = type,
+                images = images,
+                selectedImages = selected,
+                menuState = menuState,
+                menuItems = filters,
+                isOnline = false,
+                buttonLabel = stringResource(
+                    R.string.add_button
+                ),
+                buttonEnabled = selected.isNotEmpty(),
+            ),
+            callback = object: GalleryCallback {
                 
                 override fun onImageClick(image: String) {
                     scope.launch {
@@ -92,7 +98,12 @@ fun GalleryScreen(
                 }
                 
                 override fun onAttach() {
-                    scope.launch { vm.attach() }
+                    scope.launch {
+                        vm.attach()
+                        if(onBackDest.isNotBlank())
+                            nav.navigateAbsolute(onBackDest)
+                        else nav.navigationBack()
+                    }
                 }
                 
                 override fun onBack() {

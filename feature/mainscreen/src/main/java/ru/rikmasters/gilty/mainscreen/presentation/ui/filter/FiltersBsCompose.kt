@@ -128,7 +128,7 @@ private fun TopBar(
             .padding(top = 14.dp, bottom = 8.dp)
     ) {
         itemSpacer(16.dp, true)
-        items(state.interest) {
+        items(state.interest.reversed()) {
             GChip(
                 Modifier.padding(end = 8.dp), it.name,
                 state.selectedCategories.contains(it)

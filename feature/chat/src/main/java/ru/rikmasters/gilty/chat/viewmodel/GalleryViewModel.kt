@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.getImages
-import ru.rikmasters.gilty.shared.common.extentions.JavaFileSource
 import java.io.File
 
 class GalleryViewModel(
@@ -29,14 +28,14 @@ class GalleryViewModel(
         _images.emit(getImages(context))
     }
     
-    suspend fun sendImages(chatId: String) {
-        selected.value.map {
-            listOf(JavaFileSource(File(it)))
-        }.forEach {
-            chatVm.onSendMessage(
-                chatId, photos = it
-            )
-        }
+    suspend fun sendImages(
+        chatId: String,
+    ) = singleLoading {
+        chatVm.onSendMessage(
+            chatId = chatId,
+            photos = selected.value
+                .map { File(it) }
+        )
     }
     
     suspend fun selectImage(path: String) {

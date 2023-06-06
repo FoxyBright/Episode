@@ -1,12 +1,9 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +17,6 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
@@ -40,8 +36,8 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
@@ -114,11 +110,12 @@ data class ProfileState(
     val lockState: Boolean = false,
     val isError: Boolean = false,
     val errorText: String = "",
-    val activeAlbumId: Int? = null
+    val activeAlbumId: Int? = null,
+    val isAlbumVisible: Boolean = false,
 )
 
 interface ProfileCallback {
-
+    
     fun onBack() {}
     fun onNext() {}
     fun onDisabledButtonClick() {}
@@ -145,7 +142,7 @@ fun Profile(
     val profile = state.profile
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
-
+    
     Column(modifier) {
         TopBar(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -171,7 +168,7 @@ fun Profile(
             ) { callback?.profileImage() }
             Spacer(
                 Modifier.width(
-                    if (state.profileType == CREATE)
+                    if(state.profileType == CREATE)
                         14.dp else 16.dp
                 )
             )
@@ -185,7 +182,7 @@ fun Profile(
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
-                        if ((state.profileType == CREATE))
+                        if((state.profileType == CREATE))
                             14.dp else 18.dp
                     )
                 )
@@ -200,41 +197,41 @@ fun Profile(
             }
         }
         Spacer(Modifier.height(12.dp))
-
-        AlbumPictures(
-            picturesWithEmojis = listOf(
-                AlbumPictureWithEmoji(
-                    id = 1,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel
+        if(state.isAlbumVisible)
+            AlbumPictures(
+                picturesWithEmojis = listOf(
+                    AlbumPictureWithEmoji(
+                        id = 1,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 2,
+                        image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
+                        emoji = DemoEmojiModel
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 3,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel,
+                        isVisible = false,
+                    ),
+                    AlbumPictureWithEmoji(
+                        id = 4,
+                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                        emoji = DemoEmojiModel
+                    ),
                 ),
-                AlbumPictureWithEmoji(
-                    id = 2,
-                    image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
-                    emoji = DemoEmojiModel
-                ),
-                AlbumPictureWithEmoji(
-                    id = 3,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel,
-                    isVisible = false,
-                ),
-                AlbumPictureWithEmoji(
-                    id = 4,
-                    image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                    emoji = DemoEmojiModel
-                ),
-            ),
-            activeAlbumId = state.activeAlbumId,
-            type = state.profileType,
-            onAlbumClick = { id ->
-                callback?.onAlbumClick(id)
-            },
-            onAlbumLongClick = { id ->
-                callback?.onAlbumLongClick(id)
-            }
-        )
-
+                activeAlbumId = state.activeAlbumId,
+                type = state.profileType,
+                onAlbumClick = { id ->
+                    callback?.onAlbumClick(id)
+                },
+                onAlbumLongClick = { id ->
+                    callback?.onAlbumLongClick(id)
+                }
+            )
+        
         AboutMe(
             modifier = Modifier.padding(horizontal = 16.dp),
             text = state.profile?.aboutMe,
@@ -261,11 +258,11 @@ private fun AboutMe(
             callback?.onSaveDescription()
         }
     ) { callback?.onDescriptionChange(it) }
-
-    when (type) {
+    
+    when(type) {
         CREATE, USERPROFILE -> description()
         ORGANIZER, ANONYMOUS_ORGANIZER ->
-            if (!text.isNullOrBlank())
+            if(!text.isNullOrBlank())
                 description()
     }
 }
@@ -276,7 +273,9 @@ private fun ErrorLabel(errorText: String) {
         text = errorText,
         modifier = Modifier.offset(y = -(10).dp),
         color = colorScheme.primary,
-        style = typography.titleSmall
+        style = typography.titleSmall.copy(
+            fontSize = 10.dp.toSp()
+        )
     )
 }
 
@@ -292,7 +291,7 @@ private fun TopBar(
 ) {
     val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
-    if (
+    if(
         profileType != ORGANIZER
         && profileType != ANONYMOUS_ORGANIZER
     ) TextField(
@@ -310,7 +309,13 @@ private fun TopBar(
                     text = stringResource(R.string.user_name),
                     modifier = Modifier.padding(end = 8.dp),
                     color = colorScheme.onTertiary,
-                    style = typography.headlineLarge
+                    style = typography.headlineLarge.copy(
+                        fontSize = when(profileType){
+                            CREATE -> 23
+                            USERPROFILE -> 28
+                            else -> 20
+                        }.dp.toSp()
+                    )
                 )
                 Icon(
                     painter = painterResource(R.drawable.ic_edit),
@@ -333,7 +338,7 @@ private fun TopBar(
         visualTransformation = transformationOf(
             mask = CharArray(userName.length) { '#' }
                 .concatToString(),
-            endChar = if (userAge in 18..99 && !focus)
+            endChar = if(userAge in 18..99 && !focus)
                 ", $userAge" else ""
         )
     )
@@ -349,16 +354,18 @@ private fun Description(
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val style = if (profileType == CREATE)
-        typography.headlineSmall
-    else typography.bodyMedium
-
+    val style = typography.bodyMedium.copy(
+        fontSize = (if(profileType == CREATE)
+            12 else 16).dp.toSp()
+    )
+    
     Column(modifier) {
         Text(
             text = stringResource(R.string.profile_about_me),
             style = typography.labelLarge.copy(
-                colorScheme.tertiary,
-                if (profileType == CREATE) 17.sp else 20.sp
+                color = colorScheme.tertiary,
+                fontSize = if(profileType == CREATE)
+                    17.dp.toSp() else 20.dp.toSp()
             )
         )
         Box(
@@ -374,13 +381,13 @@ private fun Description(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = if (profileType == CREATE)
+                        vertical = if(profileType == CREATE)
                             12.dp else 14.dp,
-                        horizontal = if (profileType == CREATE)
+                        horizontal = if(profileType == CREATE)
                             16.dp else 14.dp,
                     ),
-                onValueChange = { if (it.length <= 120) onTextChange(it) },
-                readOnly = when (profileType) {
+                onValueChange = { if(it.length <= 120) onTextChange(it) },
+                readOnly = when(profileType) {
                     ORGANIZER, ANONYMOUS_ORGANIZER -> true
                     else -> false
                 },
@@ -426,13 +433,13 @@ fun AlbumPictures(
     activeAlbumId: Int?,
     type: ProfileType,
     onAlbumClick: (Int) -> Unit,
-    onAlbumLongClick: (Int?) -> Unit
+    onAlbumLongClick: (Int?) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth by remember {
         mutableStateOf(configuration.screenWidthDp)
     }
-
+    
     @Composable
     fun album() {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
@@ -440,7 +447,7 @@ fun AlbumPictures(
                 Spacer(modifier = Modifier.width(16.dp))
             }
             itemsIndexed(picturesWithEmojis) { index, item ->
-                if (activeAlbumId == null || activeAlbumId == item.id)
+                if(activeAlbumId == null || activeAlbumId == item.id)
                     AlbumPictureItem(
                         modifier = Modifier
                             .animateItemPlacement()
@@ -448,12 +455,13 @@ fun AlbumPictures(
                             .clip(
                                 lazyRowAlbumItemsShapes(
                                     index = index,
-                                    size = if (activeAlbumId != null) 1 else picturesWithEmojis.size
+                                    size = if(activeAlbumId != null)
+                                        1 else picturesWithEmojis.size
                                 )
                             ),
                         albumPictureWithEmoji = item,
                         onClick = {
-                            if (activeAlbumId == null)
+                            if(activeAlbumId == null)
                                 onAlbumClick(item.id)
                             else onAlbumLongClick(null)
                         },
@@ -462,14 +470,15 @@ fun AlbumPictures(
                         }
                     )
             }
-            item {
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-            if (activeAlbumId != null) {
+            item { Spacer(modifier = Modifier.width(16.dp)) }
+            if(activeAlbumId != null) {
                 item {
                     AlbumDescription(
                         modifier = Modifier
-                            .size((screenWidth / 4 * 3 - (12 * 3)).dp, (screenWidth / 4).dp)
+                            .size(
+                                (screenWidth / 4 * 3 - (12 * 3)).dp,
+                                (screenWidth / 4).dp
+                            )
                             .clip(RoundedCornerShape(16.dp)),
                         name = "Токиосити ван",
                         isVisible = false,
@@ -479,12 +488,11 @@ fun AlbumPictures(
             }
         }
     }
-
-    when (type) {
+    
+    when(type) {
         CREATE, USERPROFILE -> album()
         ORGANIZER, ANONYMOUS_ORGANIZER -> {}
     }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -493,7 +501,7 @@ fun AlbumPictureItem(
     modifier: Modifier = Modifier,
     albumPictureWithEmoji: AlbumPictureWithEmoji,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
 ) {
     Box(
         modifier = modifier.combinedClickable(
@@ -523,81 +531,99 @@ fun AlbumDescription(
     isVisible: Boolean,
     emojis: List<EmojiModel>,
 ) {
-    Box(modifier = modifier.background(colorScheme.primaryContainer), contentAlignment = Center) {
+    Box(
+        modifier = modifier.background(
+            colorScheme.primaryContainer
+        ),
+        contentAlignment = Center
+    ) {
         Row(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            SpaceBetween,
+            CenterVertically
         ) {
             Column {
                 Text(text = name)
                 Row(
-                    modifier = Modifier
+                    Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.Gray)
-                        .then(Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp))
+                        .then(
+                            Modifier.padding(
+                                start = 4.dp,
+                                top = 4.dp,
+                                bottom = 4.dp
+                            )
+                        )
                 ) {
                     emojis.forEach {
                         GEmojiImage(
-                            emoji = it, modifier = Modifier
+                            emoji = it,
+                            modifier = Modifier
                                 .size(26.dp)
                                 .padding(end = 4.dp)
                         )
                     }
                 }
             }
-            AlbumIcon(modifier = Modifier.size(52.dp), onClick = {
-
-            }, content = {
-                Image(
-                    painterResource(R.drawable.ic_image_box),
-                    (null), Modifier
-                        .size(32.dp)
-                        .padding(4.dp)
-                )
-            })
-
-            AlbumIcon(modifier = Modifier.size(52.dp), onClick = {
-
-            }, content = {
-                Image(
-                    painterResource(if (isVisible) R.drawable.ic_open_eye else R.drawable.ic_closed_eye),
-                    (null),
-                    Modifier
-                        .size(32.dp)
-                        .padding(4.dp)
-                )
-            })
-
+            AlbumIcon(
+                modifier = Modifier.size(52.dp),
+                onClick = {},
+                content = {
+                    Image(
+                        painter = painterResource(
+                            R.drawable.ic_image_box
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                    )
+                }
+            )
+            AlbumIcon(
+                modifier = Modifier.size(52.dp),
+                onClick = {},
+                content = {
+                    Image(
+                        painter = painterResource(
+                            if(isVisible)
+                                R.drawable.ic_open_eye
+                            else
+                                R.drawable.ic_closed_eye
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                    )
+                }
+            )
         }
-
     }
-
 }
 
 @Composable
 fun AlbumIcon(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
             .clip(CircleShape)
             .background(Color(0x88000000))
-            .clickable { onClick() }, contentAlignment = Center
-    ) {
-        content()
-    }
-
+            .clickable { onClick() },
+        contentAlignment = Center
+    ) { content() }
 }
 
 @Composable
 fun EmojiAlbumFloat(
     modifier: Modifier = Modifier,
-    emoji: EmojiModel
+    emoji: EmojiModel,
 ) {
     Box(
         modifier = modifier
@@ -605,9 +631,12 @@ fun EmojiAlbumFloat(
             .background(Color(0x88000000)),
         contentAlignment = Center
     ) {
-        GEmojiImage(modifier = Modifier.padding(4.dp), emoji = emoji)
+        GEmojiImage(
+            modifier = Modifier
+                .padding(4.dp),
+            emoji = emoji
+        )
     }
-
 }
 
 data class AlbumPictureWithEmoji(

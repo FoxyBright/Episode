@@ -18,11 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private const val TITLE = "Заголовок"
@@ -34,7 +35,10 @@ fun ActionBar(
     title: String,
     modifier: Modifier = Modifier,
     details: String? = null,
-    extra:String?=null,
+    extra:String? = null,
+    titleStyle: TextStyle = typography.titleLarge,
+    detailedStyle: TextStyle = typography.labelSmall,
+    extraStyle: TextStyle = typography.bodyLarge,
     onBack: (() -> Unit)? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
@@ -55,15 +59,15 @@ fun ActionBar(
             Text(
                 title,
                 Modifier,
-                style = typography.titleLarge,
+                style = titleStyle,
                 color = colorScheme.tertiary
             )
             extra?.let {
                 Text(
                     text = extra,
-                    Modifier.padding(start = 4.dp),
+                    Modifier.padding(start = 4.dp, bottom = 2.dp),
                     colorScheme.onTertiary,
-                    style = typography.bodyMedium
+                    style = extraStyle
                 )
             }
         }
@@ -72,7 +76,7 @@ fun ActionBar(
                 it, Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp, start = 16.dp),
-                style = typography.labelSmall,
+                style = detailedStyle,
                 color = colorScheme.onTertiary
             )
         }
@@ -168,7 +172,7 @@ fun ClosableActionBar(
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
             style = typography.titleLarge.copy(
-                lineHeight = 37.sp
+                lineHeight = 37.dp.toSp()
             ), color = colorScheme.tertiary
         )
         details?.let {

@@ -17,14 +17,10 @@ import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
-import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.Category
 import ru.rikmasters.gilty.shared.models.meets.Meeting
-import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper.Paginator
-import ru.rikmasters.gilty.shared.wrapper.errorWrapped
-import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
-import ru.rikmasters.gilty.shared.wrapper.wrapped
+import ru.rikmasters.gilty.shared.wrapper.*
 import java.io.File
 
 class ProfileWebSource: KtorSource() {
@@ -34,53 +30,53 @@ class ProfileWebSource: KtorSource() {
         OBSERVABLES("watch")
     }
     
-    suspend fun getUser(id: String) =
-        get("http://$HOST$PREFIX_URL/users/$id")
-            ?.let {
-                if(it.status == OK)
-                    it.wrapped<Profile>().map()
-                else null
-            } ?: ProfileModel()
+    suspend fun getUser(id: String) = tryGet(
+        "http://$HOST$PREFIX_URL/users/$id"
+    ).let {
+        coroutinesState({ it }) {
+            it.wrapped<Profile>().map()
+        }
+    }
     
     suspend fun getUserMeets(
         page: Int? = null,
         perPage: Int? = null,
         type: MeetingsType,
-    ) = get("http://$HOST$PREFIX_URL/profile/meetings") {
+    ) = tryGet("http://$HOST$PREFIX_URL/profile/meetings") {
         url {
             page?.let { query("page" to "$it") }
             query("is_completed" to type.ordinal.toString())
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<Meeting>() to Paginator())
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<Meeting>>()
+                .let { it.first to it.second.currentPage }
+        }
+    }
     
-    
-    suspend fun getUserCategories() = get(
+    suspend fun getUserCategories() = tryGet(
         "http://$HOST$PREFIX_URL/profile/categories"
-    )?.let {
-        if(it.status == OK)
+    ).let {
+        coroutinesState({ it }) {
             it.wrapped<List<Category>>()
-        else null
-    } ?: emptyList()
-    
-    suspend fun subscribeToUser(memberId: String) {
-        post("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
-            url { query("user_id" to memberId) }
         }
     }
     
-    suspend fun unsubscribeFromUser(memberId: String) {
-        delete("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
-            url { query("user_id" to memberId) }
-        }
-    }
+    suspend fun subscribeToUser(memberId: String) =
+        tryPost("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}")
+        { url { query("user_id" to memberId) } }
+            .let { coroutinesState({ it }) {} }
     
-    suspend fun deleteObserver(member: UserModel) {
-        delete("http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}") {
+    suspend fun unsubscribeFromUser(memberId: String) =
+        tryDelete("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
+            url { query("user_id" to memberId) }
+        }.let { coroutinesState({ it }) {} }
+    
+    suspend fun deleteObserver(member: UserModel) =
+        tryDelete("http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}") {
             url { query("user_id" to member.id.toString()) }
-        }
-    }
+        }.let { coroutinesState({ it }) {} }
     
     suspend fun getObservers(
         query: String,
@@ -89,7 +85,7 @@ class ProfileWebSource: KtorSource() {
         page: Int = 0,
         @Suppress("unused_parameter")
         perPage: Int = 15,
-    ) = get(
+    ) = tryGet(
         "http://$HOST$PREFIX_URL/profile/${type.value}${
             if(query.isNotBlank()) "?query=$query" else ""
         }"
@@ -98,77 +94,99 @@ class ProfileWebSource: KtorSource() {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<User>() to Paginator())
-    
-    suspend fun deleteHidden(albumId: String, imageId: String) {
-        delete("http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId")
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<User>>().first
+        }
     }
     
-    suspend fun getFiles(albumId: String): Pair<List<Avatar>, Int> = get(
-        "http://$HOST$PREFIX_URL/albums/$albumId/files"
-    )?.let {
-        if(it.status == OK) {
-            val amount = it.paginateWrapped<List<Avatar>>()
-            Pair(amount.first, amount.second.total)
-        } else null
-    } ?: (Pair(emptyList(), 0))
+    suspend fun deleteHidden(albumId: String, imageId: String) =
+        tryDelete(
+            "http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId"
+        ).let { coroutinesState({ it }) {} }
+    
+    suspend fun getFiles(
+        albumId: String,
+    ) = tryGet("http://$HOST$PREFIX_URL/albums/$albumId/files")
+        .let {
+            coroutinesState({ it }) {
+                it.paginateWrapped<List<Avatar>>()
+                    .let { p -> p.first to p.second.total }
+            }
+        }
     
     suspend fun addHidden(albumId: String, files: List<File>) =
-        postFormData(
-            "http://$HOST$PREFIX_URL/albums/$albumId/upload",
-            formData {
-                append("type", "PHOTO")
+        tryPostFormData(
+            url = "http://$HOST$PREFIX_URL/albums/$albumId/upload",
+            formData = formData {
+                append(
+                    key = "type",
+                    value = "PHOTO"
+                )
                 files.forEach {
                     append(
-                        "photos[]",
-                        it.readBytes(),
-                        Headers.build {
-                            append(ContentType, "image/jpg")
+                        key = "photos[]",
+                        value = it.readBytes(),
+                        headers = Headers.build {
                             append(
-                                ContentDisposition,
-                                "filename=\"${it.name}\""
+                                name = ContentType,
+                                value = "image/jpg"
+                            )
+                            append(
+                                name = ContentDisposition,
+                                value = "filename=\"${it.name}\""
                             )
                         }
                     )
                 }
             }
-        )?.let {
-            if(it.status == OK)
+        ).let {
+            coroutinesState({ it }) {
                 it.wrapped<List<Avatar>>()
-            else null
-        } ?: emptyList()
+            }
+        }
     
-    suspend fun setUserAvatar(
-        avatar: File,
-        list: List<Float>,
-    ) {
-        postFormData(
-            "http://$HOST$PREFIX_URL/profile/avatar",
-            formData {
+    suspend fun setUserAvatar(avatar: File, list: List<Float>) =
+        tryPostFormData(
+            url = "http://$HOST$PREFIX_URL/profile/avatar",
+            formData = formData {
                 append(
-                    "photo",
-                    avatar.readBytes(),
-                    Headers.build {
-                        append(ContentType, "image/jpg")
+                    key = "photo",
+                    value = avatar.readBytes(),
+                    headers = Headers.build {
                         append(
-                            ContentDisposition,
-                            "filename=\"photo.jpg\""
+                            name = ContentType,
+                            value = "image/jpg"
+                        )
+                        append(
+                            name = ContentDisposition,
+                            value = "filename=\"photo.jpg\""
                         )
                     }
                 )
-                append("crop_x", list[0])
-                append("crop_y", list[1])
-                append("crop_width", list[2])
-                append("crop_height", list[3])
+                append(
+                    key = "crop_x",
+                    value = list[0]
+                )
+                append(
+                    key = "crop_y",
+                    value = list[1]
+                )
+                append(
+                    key = "crop_width",
+                    value = list[2]
+                )
+                append(
+                    key = "crop_height",
+                    value = list[3]
+                )
             }
-        )
-    }
+        ).let { coroutinesState({ it }) {} }
     
-    suspend fun checkUserName(username: String) = unExpectGet(
-        "http://$HOST$PREFIX_URL/profile/checkname"
-    ) { url { query("username" to username) } }
-        .let {
+    suspend fun checkUserName(username: String) =
+        tryGet("http://$HOST$PREFIX_URL/profile/checkname") {
+            url { query("username" to username) }
+        }.let {
             if(it.status == OK) false
             else it.errorWrapped().error.message ==
                     "errors.user.username.exists"
@@ -180,84 +198,92 @@ class ProfileWebSource: KtorSource() {
         age: Int?,
         gender: GenderType?,
         orientationId: String?,
-    ) {
-        patch("http://$HOST$PREFIX_URL/profile") {
-            setBody(
-                ProfileRequest(
-                    username,
-                    gender?.name,
-                    age,
-                    orientationId,
-                    aboutMe
-                )
+    ) = tryPatch("http://$HOST$PREFIX_URL/profile") {
+        setBody(
+            ProfileRequest(
+                username, gender?.name,
+                age, orientationId, aboutMe
             )
+        )
+    }.let { coroutinesState({ it }) {} }
+    
+    suspend fun getUserData() = tryGet(
+        "http://$HOST$PREFIX_URL/profile"
+    ).let {
+        coroutinesState({ it }) {
+            it.wrapped<Profile>()
         }
     }
     
-    suspend fun getUserData() = get(
-        "http://$HOST$PREFIX_URL/profile"
-    )?.let {
-        if(it.status == OK)
-            it.wrapped<Profile>()
-        else null
-    } ?: Profile()
-    
-    suspend fun deleteAccount() {
-        delete("http://$HOST$PREFIX_URL/profile/account")
-    }
+    suspend fun deleteAccount() =
+        tryDelete("http://$HOST$PREFIX_URL/profile/account")
+            .let { coroutinesState({ it }) {} }
     
     suspend fun getResponds(
         type: RespondType, page: Int?, perPage: Int?,
-    ) = get("http://$HOST$PREFIX_URL/responds") {
+    ) = tryGet("http://$HOST$PREFIX_URL/responds") {
         url {
             query("type" to type.name)
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<MeetWithRespondsResponse>() to Paginator())
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<MeetWithRespondsResponse>>().first
+        }
+    }
     
     suspend fun getFilesPaging(
-        albumId: String,
-        page: Int,
-        perPage: Int,
-    ) = get("http://$HOST$PREFIX_URL/albums/$albumId/files") {
+        albumId: String, page: Int, perPage: Int,
+    ) = tryGet("http://$HOST$PREFIX_URL/albums/$albumId/files") {
         url {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<Avatar>() to Paginator())
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<Avatar>>().first
+        }
+    }
     
     suspend fun getMeetResponds(
-        meetId: String,
-        page: Int?,
-        perPage: Int?,
-    ) = get("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
+        meetId: String, page: Int?, perPage: Int?,
+    ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
         url {
             page?.let { query("page" to "$it") }
             perPage?.let { query("per_page" to "$it") }
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<RespondResponse>() to Paginator())
-    
-    suspend fun deleteRespond(respondId: String) {
-        delete("http://$HOST$PREFIX_URL/responds/$respondId")
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<RespondResponse>>().first
+        }
     }
     
-    suspend fun getNotificationResponds() = getResponds(
-        RECEIVED, null, null
-    ).first.firstOrNull().let { respond ->
-        (respond?.responds_count ?: 0) to
-                (respond?.responds?.firstOrNull()
-                    ?.author?.avatar?.thumbnail?.url ?: "")
+    suspend fun deleteRespond(respondId: String) =
+        tryDelete("http://$HOST$PREFIX_URL/responds/$respondId")
+            .let { coroutinesState({ it }) {} }
+    
+    suspend fun getNotificationResponds(): Pair<Int, String> {
+        val request = getResponds(
+            RECEIVED, null, null
+        ).on(
+            success = { it },
+            loading = { emptyList() },
+            error = { emptyList() }
+        ).firstOrNull()
+        
+        return request.let {
+            (it?.responds_count ?: 0) to
+                    (it?.responds?.firstOrNull()
+                        ?.author?.avatar?.thumbnail?.url ?: "")
+        }
     }
     
-    suspend fun acceptRespond(respondId: String) {
-        post("http://$HOST$PREFIX_URL/responds/$respondId/accept")
-    }
+    suspend fun acceptRespond(respondId: String) =
+        tryPost("http://$HOST$PREFIX_URL/responds/$respondId/accept")
+            .let { coroutinesState({ it }) {} }
     
-    suspend fun cancelRespond(respondId: String) {
-        patch("http://$HOST$PREFIX_URL/responds/$respondId/cancel")
-    }
+    suspend fun cancelRespond(respondId: String) =
+        tryPatch("http://$HOST$PREFIX_URL/responds/$respondId/cancel")
+            .let { coroutinesState({ it }) {} }
 }

@@ -28,8 +28,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.meeting.DemoLocationModel
 import ru.rikmasters.gilty.shared.model.meeting.FilterModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
@@ -163,8 +163,9 @@ private fun Search(
     onBack: (() -> Unit)? = null,
 ) {
     Card(
-        modifier.height(48.dp), shapes.medium,
-        cardColors(colorScheme.primaryContainer)
+        modifier = modifier,
+        shape = shapes.medium,
+        colors = cardColors(colorScheme.primaryContainer)
     ) {
         Row(
             Modifier
@@ -173,7 +174,7 @@ private fun Search(
             Start, CenterVertically
         ) {
             val style = typography.bodyMedium.copy(
-                fontSize = 17.sp,
+                fontSize = 17.dp.toSp(),
                 fontWeight = Bold
             )
             Icon(
@@ -184,7 +185,7 @@ private fun Search(
                 Modifier
                     .size(20.dp)
                     .clickable {
-                        if(text.isNotBlank())
+                        if (text.isNotBlank())
                             onBack?.let { it() }
                     }, colorScheme.onTertiary
             )

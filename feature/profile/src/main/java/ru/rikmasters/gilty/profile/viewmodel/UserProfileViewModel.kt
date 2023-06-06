@@ -1,8 +1,7 @@
 package ru.rikmasters.gilty.profile.viewmodel
 
 import android.content.Context
-import android.util.Log
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,6 +16,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
 import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -27,6 +27,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
@@ -79,7 +81,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _photoViewState = MutableStateFlow(false)
     val photoViewState = _photoViewState.asStateFlow()
-
+    
     private val _activeAlbumId = MutableStateFlow<Int?>(null)
     val activeAlbumId = _activeAlbumId.asStateFlow()
     
@@ -102,17 +104,30 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             profileManager.getProfile(true)
         )
     }
-    suspend fun changeActiveAlbumId(id:Int?){
-        Log.d("Hello", id.toString())
+    
+    suspend fun changeActiveAlbumId(id: Int?) {
         _activeAlbumId.emit(id)
     }
+    
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
     
     suspend fun updateUsername() {
         if(!occupied.value) regManager
-            .userUpdateData(username.value)
+            .userUpdateData(
+                username = username.value,
+                aboutMe = description.value
+            )
+            .on(
+                success = {},
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
     }
     
     suspend fun changeUsername(name: String) {
@@ -128,8 +143,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val _unreadMessages = MutableStateFlow(
         lazy {
-            val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+            val count = context.getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
@@ -137,6 +152,26 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     val unreadMessages = _unreadMessages.asStateFlow()
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
+    }
+    
+    private val _unreadNotification =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    
+    val unreadNotification =
+        _unreadNotification.asStateFlow()
+    
+    suspend fun setUnreadNotification(hasUnread: Boolean) {
+        _unreadNotification.emit(
+            if(hasUnread) NEW_INACTIVE
+            else INACTIVE
+        )
     }
     
     suspend fun photoAlertDismiss(state: Boolean) {
@@ -171,7 +206,16 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun updateDescription() {
         regManager.userUpdateData(
+            username = username.value,
             aboutMe = description.value
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
         )
     }
     
@@ -181,7 +225,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun setUserDate(
-        forceWeb: Boolean = false,
+        forceWeb: Boolean,
     ) = singleLoading {
         profileManager.getProfile(forceWeb)
             .let { user ->

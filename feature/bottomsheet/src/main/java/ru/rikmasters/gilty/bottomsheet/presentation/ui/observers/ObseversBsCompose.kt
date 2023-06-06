@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
@@ -33,10 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.DELETE
@@ -45,6 +43,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.U
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.common.pagingPreview
+import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -58,9 +57,10 @@ fun ObserversListPreview() {
         ObserversListContent(
             ObserversListState(
                 DemoProfileModel.username ?: "",
+                EmojiModel.flyingDollar,
                 pagingPreview(DemoUserModelList),
                 pagingPreview(DemoUserModelList),
-                emptyList(), (0), (""),(""), (12 to 100),
+                emptyList(), (0), (""), (""), (12 to 100),
                 rememberCoroutineScope()
             )
         )
@@ -70,6 +70,7 @@ fun ObserversListPreview() {
 
 data class ObserversListState(
     val user: String,
+    val emoji: EmojiModel,
     val observers: LazyPagingItems<UserModel>,
     val observed: LazyPagingItems<UserModel>,
     val unsubList: List<UserModel>,
@@ -81,7 +82,7 @@ data class ObserversListState(
 )
 
 interface ObserversListCallback {
-
+    
     fun onTabChange(point: Int)
     fun onButtonClick(member: UserModel, type: SubscribeType)
     fun onClick(member: UserModel)
@@ -96,24 +97,36 @@ fun ObserversListContent(
     modifier: Modifier = Modifier,
     callback: ObserversListCallback? = null,
 ) {
-    val pagerState: PagerState = rememberPagerState(initialPage = 0)
-    val indicator = @Composable { tabPositions: List<TabPosition> ->
-        TabIndicator(tabPositions, pagerState)
-    }
-
+    val pagerState: PagerState =
+        rememberPagerState(initialPage = 0)
+    val indicator =
+        @Composable { tabPositions: List<TabPosition> ->
+            TabIndicator(tabPositions, pagerState)
+        }
     Column(
         modifier
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        ActionBar(state.user, Modifier.padding(bottom = 22.dp))
-
+        BrieflyRow(
+            text = state.user,
+            emoji = state.emoji,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 22.dp),
+            textStyle = typography.labelLarge
+                .copy(fontWeight = Bold)
+        )
         GiltyPagerTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .clip(CircleShape)
-                .border(0.5.dp, colorScheme.scrim, CircleShape),
+                .clip(shape = CircleShape)
+                .border(
+                    width = 0.5.dp,
+                    color = colorScheme.scrim,
+                    shape = CircleShape
+                ),
             selectedTabIndex = pagerState.currentPage,
             indicator = indicator,
             titles = listOf(
@@ -125,16 +138,18 @@ fun ObserversListContent(
                 }"
             ),
             onTabClick = { index ->
-                state.scope.launch { pagerState.animateScrollToPage(index) }
+                state.scope.launch {
+                    pagerState.animateScrollToPage(index)
+                }
             }
         )
-
+        
         HorizontalPager(
             state = pagerState,
             count = 2
         ) { selectTab: Int ->
             Column(modifier = Modifier.fillMaxSize()) {
-                if (selectTab == 0) {
+                if(selectTab == 0) {
                     Search(
                         state.searchObserved,
                         Modifier.padding(16.dp, 18.dp)
@@ -185,7 +200,7 @@ private fun LazyListScope.list(
         load.refresh is LoadState.Error -> Unit
         load.append is LoadState.Error -> Unit
         else -> {
-            if (load.refresh is LoadState.Loading)
+            if(load.refresh is LoadState.Loading)
                 item { PagingLoader(load) }
             itemsIndexed(items) { index, member ->
                 member?.let {
@@ -209,7 +224,7 @@ private fun LazyListScope.list(
                     }
                 }
             }
-            if (load.append is LoadState.Loading)
+            if(load.append is LoadState.Loading)
                 item { PagingLoader(load) }
             itemSpacer(40.dp)
         }
@@ -241,7 +256,7 @@ private fun ObserveItem(
             ) {
                 BrieflyRow(
                     "${member.username}${
-                        if (member.age in 18..99) {
+                        if(member.age in 18..99) {
                             ", ${member.age}"
                         } else ""
                     }",
@@ -251,19 +266,19 @@ private fun ObserveItem(
                 )
                 SmallButton(
                     stringResource(
-                        when (button) {
+                        when(button) {
                             SUB -> R.string.profile_organizer_observe
                             UNSUB -> R.string.profile_user_observe
                             DELETE -> R.string.meeting_filter_delete_tag_label
                         }
                     ),
-                    color = if (button == SUB)
+                    color = if(button == SUB)
                         colorScheme.primary
                     else colorScheme.outlineVariant
                 ) { onButtonClick?.let { it() } }
             }
         }
-        if (index < size - 1) GDivider(
+        if(index < size - 1) GDivider(
             Modifier.padding(start = 16.dp)
         )
     }
@@ -318,7 +333,7 @@ private fun Search(
                     capitalization = Sentences
                 )
             ) {
-                if (value.isEmpty()) Text(
+                if(value.isEmpty()) Text(
                     stringResource(R.string.search_placeholder),
                     Modifier,
                     colorScheme.onTertiary,

@@ -15,10 +15,7 @@ import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
-import ru.rikmasters.gilty.profile.viewmodel.AlbumDetailsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.CategoryViewModel
-import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
-import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
+import ru.rikmasters.gilty.profile.viewmodel.*
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
@@ -29,16 +26,34 @@ object Profile: FeatureDefinition() {
         
         nested("profile", "main") {
             
-            screen<UserProfileViewModel>("main") { vm, _ ->
-                UserProfileScreen(vm)
+            screen<UserProfileViewModel>(
+                route = "main?update={update}",
+                arguments = listOf(
+                    navArgument("update") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    }
+                )
+            ) { vm, it ->
+                it.arguments
+                    ?.getBoolean("update")
+                    ?.let { update ->
+                        UserProfileScreen(vm, update)
+                    }
             }
-
-            screen<AlbumDetailsViewModel>("album?id={albumId}", listOf(navArgument("albumId"){
-                type = NavType.IntType; defaultValue = 0
-            })){ vm, stack->
-                stack.arguments?.getInt("albumId")?.let {
-                    AlbumDetailsScreen(vm, it)
-                }
+            
+            screen<AlbumDetailsViewModel>(
+                route = "album?id={albumId}",
+                arguments = listOf(
+                    navArgument("albumId") {
+                        type = NavType.IntType
+                        defaultValue = 0
+                    }
+                )
+            ) { vm, stack ->
+                stack.arguments
+                    ?.getInt("albumId")
+                    ?.let { AlbumDetailsScreen(vm, it) }
             }
             
             screen<SettingsViewModel>("settings") { vm, _ ->
@@ -46,48 +61,75 @@ object Profile: FeatureDefinition() {
             }
             
             screen<GalleryViewModel>(
-                "cropper?image={image}", listOf(navArgument("image") {
+                route = "cropper?image={image}",
+                arguments = listOf(navArgument("image") {
                     type = NavType.StringType; defaultValue = ""
                 })
             ) { vm, stack ->
-                stack.arguments?.getString("image")?.let {
-                    CropperScreen(vm, it)
-                }
+                stack.arguments
+                    ?.getString("image")
+                    ?.let { CropperScreen(vm, it) }
             }
             
             screen<GalleryViewModel>(
-                "gallery?multi={multi}",
-                listOf(navArgument("multi") {
-                    type = NavType.BoolType; defaultValue = false
-                })
-            ) { vm, it ->
-                it.arguments?.getBoolean("multi")
-                    ?.let { multi -> GalleryScreen(vm, multi) }
+                route = "gallery?multi={multi}&dest={dest}",
+                arguments = listOf(
+                    navArgument("multi") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                    navArgument("dest") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { vm, backStack ->
+                val arg = backStack.arguments
+                arg?.getBoolean("multi")
+                    ?.let { multi ->
+                        arg.getString("dest")
+                            ?.let { dest ->
+                                GalleryScreen(vm, multi, dest)
+                            }
+                    }
             }
             
             screen<CategoryViewModel>("categories") { vm, _ ->
                 CategoriesScreen(vm)
             }
-
-            screen<HiddenViewModel>("hidden"){ vm, _->
-                HiddenBsScreen(vm = vm)
+            
+            screen<HiddenViewModel>(
+                route = "hidden?update={update}",
+                arguments = listOf(
+                    navArgument("update") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    })
+            ) { vm, it ->
+                it.arguments
+                    ?.getBoolean("update")
+                    ?.let { update ->
+                        HiddenBsScreen(vm, update)
+                    }
             }
         }
     }
     
     override fun Module.koin() {
         singleOf(::OrientationBsViewModel)
-        singleOf(::UserProfileViewModel)
         singleOf(::AlbumDetailsViewModel)
+        singleOf(::UserProfileViewModel)
         singleOf(::ObserverBsViewModel)
         singleOf(::CategoryViewModel)
         singleOf(::SettingsViewModel)
         singleOf(::GenderBsViewModel)
-        singleOf(::HiddenViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
+        singleOf(::HiddenViewModel)
         singleOf(::AgeBsViewModel)
     }
     
-    override fun include() = setOf(ProfileData, Auth)
+    override fun include() = setOf(
+        ProfileData, Auth
+    )
 }

@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import ru.rikmasters.gilty.chats.repository.MessageRepository
 import ru.rikmasters.gilty.chats.source.web.ChatWebSource
 import ru.rikmasters.gilty.core.common.CoroutineController
-import ru.rikmasters.gilty.shared.common.extentions.FileSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import java.io.File
 
 class MessageManager(
     private val store: MessageRepository,
@@ -35,91 +35,70 @@ class MessageManager(
         }
     }
     
-    // получение подробных данных о конкретном чате
-    suspend fun getChat(
-        chatId: String,
-    ) = withContext(IO) {
-        web.getChat(chatId)
-    }
+    suspend fun getChat(chatId: String) =
+        withContext(IO) { web.getChat(chatId) }
     
     @Suppress("unused")
     suspend fun getTranslationViewers(
         chatId: String,
         query: String? = null,
         page: Int? = null, perPage: Int? = null,
-    ) = web.getTranslationViewers(
-        chatId, query, page, perPage
-    )?.first ?: emptyList()
+    ) = web.getTranslationViewers(chatId, query, page, perPage)
     
-    suspend fun getTranslationViewersCount(
-        chatId: String,
-    ) = web.getTranslationViewers(
-        chatId, null, null, null
-    )?.second?.total ?: 0
+    suspend fun getTranslationViewersCount(chatId: String) =
+        web.getTranslationViewers(chatId, (null), (null), (null))
+            .on(
+                success = { it.second.total },
+                loading = { 0 },
+                error = { 0 }
+            )
     
-    // завершение чата
-    suspend fun completeChat(chatId: String) {
-        withContext(IO) {
-            web.completeChat(chatId)
-        }
-    }
+    suspend fun completeChat(chatId: String) =
+        withContext(IO) { web.completeChat(chatId) }
     
-    // пользователь печатает
-    suspend fun isTyping(chatId: String) {
-        withContext(IO) {
-            web.isTyping(chatId)
-        }
-    }
+    suspend fun isTyping(chatId: String) =
+        withContext(IO) { web.isTyping(chatId) }
     
-    // был сделан скриншот
-    suspend fun madeScreenshot(chatId: String) {
-        withContext(IO) {
-            web.madeScreenshot(chatId)
-        }
-    }
+    suspend fun madeScreenshot(chatId: String) =
+        withContext(IO) { web.madeScreenshot(chatId) }
     
     // пометка сообщения или всех как прочитанных
     suspend fun markAsReadMessage(
         chatId: String,
         messageIds: List<String> = emptyList(),
         all: Boolean = false,
-    ) {
-        withContext(IO) {
-            web.markAsReadMessage(
-                chatId, messageIds, all
-            )
-        }
+    ) = withContext(IO) {
+        web.markAsReadMessage(
+            chatId, messageIds, all
+        )
     }
     
-    // удаление сообщения
     suspend fun deleteMessage(
         chatId: String,
         messageIds: List<String>,
         allMembers: Boolean,
-    ) {
-        withContext(IO) {
-            web.deleteMessage(
-                chatId, messageIds,
-                allMembers.compareTo(false)
-            )
-        }
+    ) = withContext(IO) {
+        web.deleteMessage(
+            chatId = chatId,
+            messageIds = messageIds,
+            allMembers = allMembers.compareTo(false)
+        )
     }
     
-    // отправка сообщения
     suspend fun sendMessage(
         chatId: String,
         repliedId: String?,
         text: String?,
         attachment: List<AvatarModel>?,
-        photos: List<FileSource>?,
-        videos: List<FileSource>?,
-    ) {
+        photos: List<File>?,
+    ) = single {
         withContext(IO) {
             web.sendMessage(
-                chatId, repliedId, text,
-                photos?.map { it.bytes() },
-                attachment,
-                videos?.map { it.bytes() }
+                chatId = chatId,
+                replyId = repliedId,
+                text = text,
+                photos = photos,
+                attachments = attachment,
             )
         }
     }

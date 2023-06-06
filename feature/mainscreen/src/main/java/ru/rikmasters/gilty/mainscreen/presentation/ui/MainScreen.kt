@@ -40,20 +40,20 @@ fun MainScreen(vm: MainViewModel) {
     val activity = getActivity()
     val nav = get<NavState>()
     
+    val unreadNotifications by vm.unreadNotifications.collectAsState()
+    val unreadMessages by vm.unreadMessages.collectAsState()
+    val location by vm.location.collectAsState()
     val meetings by vm.meetings.collectAsState()
     val days by vm.days.collectAsState()
-    val alert by vm.alert.collectAsState()
     val today by vm.today.collectAsState()
+    val alert by vm.alert.collectAsState()
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
     
-    val location by vm.location.collectAsState()
-    
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
-            ACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, INACTIVE
+            ACTIVE, unreadNotifications,
+            INACTIVE, unreadMessages, INACTIVE
         )
     }
     
@@ -69,16 +69,17 @@ fun MainScreen(vm: MainViewModel) {
         if(meetBsState == COLLAPSED)
             vm.resetMeets()
     }
-    
+
     LaunchedEffect(Unit) {
         vm.getAllCategories()
         vm.getUserCategories()
         vm.getUnread()
         vm.getMeets()
         vm.getLocation(activity)
-        context.listenPreference("unread_messages", 0) {
-            scope.launch { vm.setUnreadMessages(it > 0) }
-        }
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotifications(it > 0) } }
     }
     
     val bsState = rememberBottomSheetScaffoldState(

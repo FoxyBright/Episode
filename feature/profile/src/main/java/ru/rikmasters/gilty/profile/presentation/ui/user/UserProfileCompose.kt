@@ -161,12 +161,10 @@ fun ProfileContent(
         state.photoAlertState,
         onDismissRequest = { callback?.closePhotoAlert() },
         title = stringResource(R.string.profile_blocked_photo_alert),
-        success = Pair(stringResource(R.string.edit_button)) {
-            callback?.onMenuItemClick(
-                1
-            )
-        },
-        cancel = Pair(stringResource(R.string.notification_respond_cancel_button)) { callback?.closePhotoAlert() }
+        success = Pair(stringResource(R.string.edit_button))
+        { callback?.onMenuItemClick(1) },
+        cancel = Pair(stringResource(R.string.notification_respond_cancel_button))
+        { callback?.closePhotoAlert() }
     )
 }
 
@@ -181,15 +179,15 @@ private fun Content(
         state = state.listState
     ) {
         item(key = 1) {
-            Box(
-                Modifier
-                    .padding(top = 80.dp)
-            ) {
+            Box(Modifier.padding(top = 10.dp)) {
                 Profile(
                     state = state.profileState,
                     callback = callback
                 )
-                Box(Modifier.fillMaxWidth(), CenterEnd) {
+                Box(
+                    Modifier.fillMaxWidth(),
+                    CenterEnd
+                ) {
                     IconButton(
                         onClick = { callback?.menu(true) },
                         modifier = Modifier.padding(top = 8.dp)

@@ -32,6 +32,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
     val context = LocalContext.current
     val nav = get<NavState>()
     
+    val interests by vm.selected.collectAsState()
     val orientation by vm.orientation.collectAsState()
     val orientationList by vm.orientations.collectAsState()
     val notification by vm.notifications.collectAsState()
@@ -61,6 +62,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
         checkNotification()
         vm.getUserData()
         vm.getOrientations()
+        vm.getInterest()
     }
     
     Use<SettingsViewModel>(LoadingTrait) {
@@ -68,7 +70,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
             SettingsState(
                 gender, age, orientation,
                 phone, notification,
-                exitAlert, deleteAlert
+                exitAlert, deleteAlert, interests
             ), Modifier, object: SettingsCallback {
                 
                 override fun onGenderClick() {
@@ -126,7 +128,8 @@ fun SettingsScreen(vm: SettingsViewModel) {
                     scope.launch {
                         vm.exitAlertDismiss(false)
                         vm.logout()
-                        nav.navigateAbsolute("login")
+                        nav.clearStackNavigation("login")
+                        nav.clearNavigationOptions()
                     }
                 }
                 
@@ -134,7 +137,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                     scope.launch {
                         vm.deleteAlertDismiss(false)
                         vm.deleteAccount()
-                        nav.navigateAbsolute("login")
+                        nav.clearStackNavigation("login")
                     }
                 }
                 

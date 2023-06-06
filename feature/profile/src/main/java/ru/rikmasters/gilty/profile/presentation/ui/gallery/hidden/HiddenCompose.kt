@@ -29,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.items
@@ -39,28 +41,47 @@ import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 interface HiddenBsCallback {
-    
+
     fun onSelectImage(image: AvatarModel) {}
     fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
     fun onBack() {}
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
 }
 
 data class HiddenBsState(
     val photoList: LazyPagingItems<AvatarModel>,
-    val photoAmount:Int,
+    val photoAmount: Int,
+    val photoViewState:Boolean,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
+    val viewerType: PhotoViewType = PhotoViewType.PHOTO,
 )
 
 @Composable
 fun HiddenBsContent(
-    state:HiddenBsState,
+    state: HiddenBsState,
     modifier: Modifier = Modifier,
     callback: HiddenBsCallback? = null,
 ) {
+    if(state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
+        type = state.viewerType,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
+
     Column(modifier) {
-        ActionBar(stringResource(R.string.profile_hidden_photo),
+        ActionBar(
+            stringResource(R.string.profile_hidden_photo),
             Modifier.padding(bottom = 20.dp),
-            extra = stringResource(R.string.profile_hidden_photo_amount,state.photoAmount)
+            extra = stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
         ) { callback?.onBack() }
 
         LazyVerticalGrid(
@@ -78,6 +99,7 @@ fun HiddenBsContent(
                         PagingLoader(state.photoList.loadState)
                     }
                 }
+
                 else -> {
                     item { GalleryButton(Modifier.weight(1f), callback) }
                     items(state.photoList) { image ->
@@ -93,7 +115,7 @@ fun HiddenBsContent(
                             PagingLoader(state.photoList.loadState)
                         }
                     }
-                    
+
                     items(3) {
                         Spacer(
                             Modifier

@@ -18,6 +18,7 @@ data class AvatarModel(
     val width: Int,
     val height: Int,
     val hasAccess: Boolean,
+    val position: Int = 0,
     val blockedAt: String? = null,
 ) {
     

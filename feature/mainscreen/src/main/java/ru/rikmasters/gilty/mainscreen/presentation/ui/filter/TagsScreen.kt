@@ -57,7 +57,8 @@ fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
             
             override fun onCreateTag(tagName: String) {
                 scope.launch {
-                    vm.selectTag(TagModel(tagName))
+                    if(tagName.isNotBlank())
+                        vm.selectTag(TagModel(tagName))
                     vm.clearTagSearch()
                 }
             }

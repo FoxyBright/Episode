@@ -7,7 +7,6 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.ExifInterface.TAG_ORIENTATION
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
@@ -58,13 +57,12 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
     
     Use<GalleryViewModel>(LoadingTrait) {
         ImageCropper(
-            GImageCropperState(bitmap.asImageBitmap()),
-            Modifier, object: GImageCropperCallback {
-                
+            state = GImageCropperState(bitmap.asImageBitmap()),
+            callback = object: GImageCropperCallback {
                 override fun onCrop(img: ImageBitmap, list: List<Float>) {
                     scope.launch {
                         vm.setImage(file, list)
-                        nav.navigate("main")
+                        nav.navigate("main?update=${true}")
                     }
                 }
                 

@@ -31,7 +31,10 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun UserProfileScreen(vm: UserProfileViewModel) {
+fun UserProfileScreen(
+    vm: UserProfileViewModel,
+    update: Boolean,
+) {
     
     val listState = rememberLazyListScrollState("profile")
     val storagePermissions = permissionState()
@@ -42,29 +45,29 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     
     val meetsHistory = vm.historyMeetsTest.collectAsLazyPagingItems()
     val meets = vm.meetsTest.collectAsLazyPagingItems()
+    val unreadNotification by vm.unreadNotification.collectAsState()
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val viewerImages by vm.viewerImages.collectAsState()
+    val unreadMessages by vm.unreadMessages.collectAsState()
     val photoAlertState by vm.photoAlertState.collectAsState()
+    val photoViewState by vm.photoViewState.collectAsState()
     val lastRespond by vm.lastRespond.collectAsState()
+    val activeAlbumId by vm.activeAlbumId.collectAsState()
     val profile by vm.profile.collectAsState()
-    val username by vm.username.collectAsState()
     val occupied by vm.occupied.collectAsState()
+    val username by vm.username.collectAsState()
     val history by vm.history.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
-    val activeAlbumId by vm.activeAlbumId.collectAsState()
-
-    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
-    val viewerImages by vm.viewerImages.collectAsState()
-    val photoViewState by vm.photoViewState.collectAsState()
     
-    val unreadMessages by vm.unreadMessages.collectAsState()
     val navBar = remember {
         mutableListOf(
-            INACTIVE, INACTIVE, INACTIVE,
-            unreadMessages, ACTIVE
+            INACTIVE, unreadNotification,
+            INACTIVE, unreadMessages, ACTIVE
         )
     }
     
-    val regexError = username.contains(Regex("[^A-Za-z\\d]"))
+    val regexError = username.contains(Regex("[^A-Za-z]"))
     val shortUserNameError = username.length in 1 until 4
     val longUserNameError = username.length > 20
     
@@ -90,10 +93,11 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
     }
     
     LaunchedEffect(Unit) {
-        vm.setUserDate()
-        context.listenPreference("unread_messages", 0) {
-            scope.launch { vm.setUnreadMessages(it > 0) }
-        }
+        vm.setUserDate(update)
+        context.listenPreference("unread_messages", 0)
+        { scope.launch { vm.setUnreadMessages(it > 0) } }
+        context.listenPreference("unread_notification", 0)
+        { scope.launch { vm.setUnreadNotification(it > 0) } }
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{
         //            vm.photoAlertDismiss(true)
@@ -122,7 +126,8 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                 profileType = USERPROFILE,
                 observeState = false,
                 errorText = errorText,
-                activeAlbumId = activeAlbumId
+                activeAlbumId = activeAlbumId,
+                isAlbumVisible = true
             ),
             currentMeetings = meets,
             meetingsHistory = meetsHistory,
@@ -150,15 +155,15 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             override fun onProfileImageRefresh() {
                 scope.launch { vm.updateUserData() }
             }
-
+            
             override fun onAlbumClick(id: Int) {
-                scope.launch { nav.navigate("album") }
+                scope.launch { nav.navigate("album?id=${id}") }
             }
-
+            
             override fun onAlbumLongClick(id: Int?) {
                 scope.launch { vm.changeActiveAlbumId(id) }
             }
-
+            
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
@@ -190,7 +195,7 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
                     asm.bottomSheet.expand {
                         BottomSheet(
                             vm.scope, OBSERVERS,
-                            username = profile?.username
+                            user = profile?.map()
                         )
                     }
                 }
@@ -225,15 +230,18 @@ fun UserProfileScreen(vm: UserProfileViewModel) {
             }
             
             override fun onMenuItemClick(point: Int) {
-                when(point) {
-                    0 -> scope.launch {
-                        vm.setPhotoViewSelected(profile?.avatar)
-                        vm.setPhotoViewImages(listOf(profile?.avatar))
-                        vm.changePhotoViewState(true)
+                scope.launch {
+                    vm.menuDispose(false)
+                    when(point) {
+                        0 -> {
+                            vm.setPhotoViewSelected(profile?.avatar)
+                            vm.setPhotoViewImages(listOf(profile?.avatar))
+                            vm.changePhotoViewState(true)
+                        }
+                        else -> context.checkStoragePermission(
+                            storagePermissions, scope, asm,
+                        ) { nav.navigate("gallery?multi=false") }
                     }
-                    else -> context.checkStoragePermission(
-                        storagePermissions, scope, asm,
-                    ) { nav.navigate("gallery?multi=false") }
                 }
             }
             

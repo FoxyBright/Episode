@@ -10,67 +10,57 @@ import ru.rikmasters.gilty.notification.model.MarkAsReadRequest
 import ru.rikmasters.gilty.notification.model.PutRatingRequest
 import ru.rikmasters.gilty.shared.models.Notification
 import ru.rikmasters.gilty.shared.models.Rating
-import ru.rikmasters.gilty.shared.wrapper.ResponseWrapper
+import ru.rikmasters.gilty.shared.wrapper.coroutinesState
 import ru.rikmasters.gilty.shared.wrapper.paginateWrapped
 import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class NotificationWebSource: KtorSource() {
     
-    // выставление реакции на встречу или пользователю
-    suspend fun putRatings(meetId: String, userId: String, emoji: String) :Boolean{
-        data class Ratings(val ratings: List<PutRatingRequest>)
-        put("http://$HOST$PREFIX_URL/meetings/$meetId/ratings") {
-            setBody(Ratings(listOf(PutRatingRequest(userId, emoji))))
-        }?.let {
-            return it.status.value == 200
-        }
-        return false
-    }
+    private data class Ratings(val ratings: List<PutRatingRequest>)
     
-    // удаление уведомления
+    suspend fun putRatings(
+        meetId: String, userId: String, emoji: String,
+    ) = tryPut("http://$HOST$PREFIX_URL/meetings/$meetId/ratings") {
+        setBody(Ratings(listOf(PutRatingRequest(userId, emoji))))
+    }.let { coroutinesState({ it }) { it.status == OK } }
+    
     suspend fun deleteNotifications(
-        notifyIds: List<String>,
-        deleteAll: Int,
-    ) {
-        delete("http://$HOST$PREFIX_URL/notifications") {
-            url {
-                notifyIds.forEach { notify ->
-                    query("notification_ids[]" to notify)
-                }
-                query("delete_all" to "$deleteAll")
+        notifyIds: List<String>, deleteAll: Int,
+    ) = tryDelete("http://$HOST$PREFIX_URL/notifications") {
+        url {
+            notifyIds.forEach { notify ->
+                query("notification_ids[]" to notify)
             }
+            query("delete_all" to "$deleteAll")
         }
-    }
+    }.let { coroutinesState({ it }) {} }
     
-    // пометка уведомления как прочитанного
     suspend fun markNotifiesAsRead(
         notifyIds: List<String>,
         readAll: Boolean,
-    ) {
-        post("http://$HOST$PREFIX_URL/notifications/markAsRead") {
-            MarkAsReadRequest(notifyIds, readAll)
+    ) = tryPost("http://$HOST$PREFIX_URL/notifications/markAsRead") {
+        MarkAsReadRequest(notifyIds, readAll)
+    }.let { coroutinesState({ it }) {} }
+    
+    suspend fun getRatings() = tryGet(
+        "http://$HOST$PREFIX_URL/ratings"
+    ).let {
+        coroutinesState({ it }) {
+            it.wrapped<List<Rating>>()
+                .map { it.map() }
         }
     }
     
-    // получение списка возможных реакций на встречу или участника
-    suspend fun getRatings() =
-        get("http://$HOST$PREFIX_URL/ratings")
-            ?.let { res ->
-                if(res.status == OK)
-                    res.wrapped<List<Rating>>().map { it.map() }
-                else null
-            } ?: emptyList()
-    
-    // получение списка уведомлений
-    suspend
-    
-    fun getNotifications(
+    suspend fun getNotifications(
         page: Int, perPage: Int,
-    ) = get("http://$HOST$PREFIX_URL/profile/notifications") {
+    ) = tryGet("http://$HOST$PREFIX_URL/profile/notifications") {
         url {
             query("page" to "$page")
             query("per_page" to "$perPage")
         }
-    }?.let { if(it.status == OK) it.paginateWrapped() else null }
-        ?: (emptyList<Notification>() to ResponseWrapper.Paginator())
+    }.let {
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<Notification>>().first
+        }
+    }
 }

@@ -1,19 +1,21 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
+import ru.rikmasters.gilty.chats.manager.ChatManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
+import ru.rikmasters.gilty.shared.common.errorToast
+import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
@@ -24,6 +26,9 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val notificationManger by inject<NotificationManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
+    private val chatManager by inject<ChatManager>()
+    
+    private val context = getKoin().get<Context>()
     
     private val _lastRespond = MutableStateFlow(Pair(0, ""))
     val lastRespond = _lastRespond.asStateFlow()
@@ -43,12 +48,104 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     private val _unreadMessages = MutableStateFlow(
         lazy {
             val count = getKoin().get<Context>().getSharedPreferences(
-                "sharedPref", ComponentActivity.MODE_PRIVATE
+                "sharedPref", MODE_PRIVATE
             ).getInt("unread_messages", 0)
             if(count > 0) NEW_INACTIVE else INACTIVE
         }.value
     )
     val unreadMessages = _unreadMessages.asStateFlow()
+    
+    private val _unreadNotifications =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_ACTIVE else ACTIVE
+            }.value
+        )
+    val unreadNotifications =
+        _unreadNotifications.asStateFlow()
+    
+    suspend fun setUnreadNotifications(hasUnread: Boolean) {
+        _unreadNotifications.emit(
+            if(hasUnread) NEW_INACTIVE else INACTIVE
+        )
+    }
+    
+    private val _ratings =
+        MutableStateFlow(emptyList<RatingModel>())
+    val ratings = _ratings.asStateFlow()
+    
+    private val _selectedNotification =
+        MutableStateFlow<NotificationModel?>(null)
+    val selectedNotification =
+        _selectedNotification.asStateFlow()
+    
+    private val _meetId =
+        MutableStateFlow<String?>(null)
+    
+    private val refreshMember =
+        MutableStateFlow(false)
+    
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val participants by lazy {
+        refreshMember.flatMapLatest {
+            _meetId.value?.let {
+                meetManager.getMeetMembers(
+                    meetId = it,
+                    excludeMe = true
+                )
+            } ?: flow { }
+        }
+    }
+    
+    private val _participantsStates =
+        MutableStateFlow(emptyList<Int>())
+    val participantsStates =
+        _participantsStates.asStateFlow()
+    
+    private var currentIndexToSplit = 0
+    
+    val splitMonthNotifications =
+        MutableStateFlow(emptyList<Pair<Int, NotificationModel>>())
+    
+    suspend fun getUnread() {
+        notificationManger.markNotifyAsRead(
+            readAll = true
+        ).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+        chatManager.updateUnreadMessages().on(
+            success = {
+                context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).edit()
+                    .putInt(
+                        "unread_messages",
+                        it.unreadCount
+                    )
+                    .putInt(
+                        "unread_notification",
+                        it.notificationsUnread
+                    )
+                    .apply()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
+    
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
     }
@@ -90,6 +187,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
             meetManager.clearAddMeet()
             "addmeet/category"
         }
+        
         3 -> "chats/main"
         4 -> "profile/main"
         else -> "notification/list"
@@ -100,35 +198,31 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     ) = singleLoading {
         notificationManger.deleteNotifications(
             listOf(notification.id)
-        )
-        forceRefresh()
-    }
-    private val _ratings = MutableStateFlow(emptyList<RatingModel>())
-    val ratings = _ratings.asStateFlow()
-    
-    private val _selectedNotification = MutableStateFlow<NotificationModel?>(null)
-    val selectedNotification = _selectedNotification.asStateFlow()
-    
-    private val _meetId = MutableStateFlow<String?>(null)
-
-    private val refreshMember = MutableStateFlow<Boolean>(false)
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val participants by lazy {
-        refreshMember.flatMapLatest {
-            _meetId.value?.let {
-                meetManager.getMeetMembers(
-                    meetId = it,
-                    excludeMe = true
+        ).on(
+            success = {
+                // deletes item locally after success
+                deleteLocalNotifications(notification)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
                 )
-            } ?: flow { }
-        }
+            }
+        )
+
     }
-    
-    private val _participantsStates = MutableStateFlow(emptyList<Int>())
-    val participantsStates = _participantsStates.asStateFlow()
     
     suspend fun getRatings() = singleLoading {
-        _ratings.emit(notificationManger.getRatings())
+        notificationManger.getRatings().on(
+            success = { _ratings.emit(it) },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     
     private fun changeMeetId(meetId: String) {
@@ -139,16 +233,62 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
         emoji: EmojiModel,
         meetId: String,
         userId: String,
-        isOrganizer:Boolean,
+        isOrganizer: Boolean,
     ) = singleLoading {
-        val isSuccessful = notificationManger.putRatings(meetId, userId, emoji)
-        // Adds emoji to notification locally
-        if(isSuccessful && isOrganizer && _selectedNotification.value?.feedback == null){
-            val feedback = _selectedNotification.value?.feedback?.ratings?.toMutableList()?: mutableListOf() //.copy(ratings = ))
-            feedback.add(RatingModel("0.0", emoji))
-            _selectedNotification.emit(_selectedNotification.value?.copy(feedback = _selectedNotification.value?.feedback?.copy(ratings = feedback)?: FeedBackModel(ratings = feedback.toList(), respond = null)))
+        
+        notificationManger.putRatings(meetId, userId, emoji).on(
+            success = {
+                if(it) {
+                        val feedback =
+                            _selectedNotification.value
+                                ?.feedback?.ratings?.toMutableList()
+                                ?: mutableListOf()
+                        feedback.add(RatingModel("0.0", emoji))
+                        _selectedNotification.emit(
+                            _selectedNotification
+                                .value?.copy(
+                                    feedback = _selectedNotification
+                                        .value?.feedback?.copy(
+                                            ratings = feedback
+                                        ) ?: FeedBackModel(
+                                        ratings = feedback.toList(),
+                                        respond = null
+                                    )
+                                )
+                        )
+
+                    // Updates list item after putting rating
+                    updateLocalNotifications(
+                                    _selectedNotification.value)
+                }
+                changeMeetId(meetId)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
+
+    private suspend fun updateLocalNotifications(notification:NotificationModel?){
+        val splitByMonthList = splitMonthNotifications.value.toMutableList()
+        val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == notification?.id }
+        if(indexOfSelected != -1){
+            notification?.let { item ->
+                splitByMonthList[indexOfSelected] = splitByMonthList[indexOfSelected].copy(second = item)
+            }
+            splitMonthNotifications.emit(splitByMonthList)
         }
-        changeMeetId(meetId)
+    }
+    private suspend fun deleteLocalNotifications(notification:NotificationModel?){
+        val splitByMonthList = splitMonthNotifications.value.toMutableList()
+        val indexOfSelected = splitByMonthList.indexOfFirst { item-> item.second.id == notification?.id }
+        if(indexOfSelected != -1){
+            splitByMonthList.removeAt(indexOfSelected)
+            splitMonthNotifications.emit(splitByMonthList)
+        }
     }
     
     suspend fun selectParticipants(participant: Int) {
@@ -159,7 +299,38 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
             } else list + participant
         )
     }
-    suspend fun forceRefreshMembers(){
+    
+    suspend fun forceRefreshMembers() {
         refreshMember.emit(!refreshMember.value)
+    }
+    
+    suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
+        // 20 - today
+        // 30 - yesterday
+        // 40 - this week
+        // 50 - month earlier
+        // 1-12 - months
+        if(notifications.size < currentIndexToSplit) {
+            currentIndexToSplit = 0
+            splitMonthNotifications.emit(emptyList())
+        }
+        val list =
+            splitMonthNotifications.value.toMutableList()
+        for(current in currentIndexToSplit until notifications.size) {
+            val curDate = notifications[current].date
+            if(todayControl(curDate)) {
+                list.add(20 to notifications[current])
+            } else if(yesterdayControl(curDate)) {
+                list.add(30 to notifications[current])
+            } else if(weekControl(curDate)) {
+                list.add(40 to notifications[current])
+            } else if(monthControl(curDate)) {
+                list.add(50 to notifications[current])
+            } else {
+                list.add(getMonth(curDate) to notifications[current])
+            }
+        }
+        currentIndexToSplit = notifications.size
+        splitMonthNotifications.emit(list)
     }
 }
