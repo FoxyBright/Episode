@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.models
 
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
@@ -21,6 +22,7 @@ data class Profile(
     val phone: String? = null,
     val username: String? = null,
     val gender: String? = null,
+    val group: UserGroupTypeModel? = null,
     val orientation: OrientationModel? = null,
     val age: Int? = null,
     val aboutMe: String? = null,
@@ -48,6 +50,7 @@ data class Profile(
         gender = (""),
         orientation = OrientationModel(),
         age = (-1),
+        group = UserGroupTypeModel.DEFAULT,
         aboutMe = (""),
         emojiType = (""),
         average = (0.0),
@@ -66,6 +69,7 @@ data class Profile(
             GenderType.MALE
         },
         orientation = orientation,
+        group = group,
         age = age ?: 0,
         aboutMe = aboutMe,
         rating = RatingModel(

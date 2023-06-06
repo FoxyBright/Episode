@@ -1,9 +1,16 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -13,6 +20,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,12 +34,17 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.shared.GDropMenu
+import ru.rikmasters.gilty.shared.shared.GKebabButton
+import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
+import ru.rikmasters.gilty.shared.shared.itemSpacer
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -41,9 +54,10 @@ private fun OrganizerProfilePreview() {
         OrganizerContent(
             UserState(
                 ProfileState(
-                    DemoProfileModel,
-                    ORGANIZER, (false)
-                ), DemoMeetingList, (true)
+                    profile = DemoProfileModel,
+                    profileType = ORGANIZER,
+                    observeState = (false),
+                ), currentMeetings = DemoMeetingList, backButton = (true)
             )
         )
     }
@@ -55,15 +69,14 @@ data class UserState(
     val backButton: Boolean = false,
     val menuState: Boolean = false,
     val isMyProfile: Boolean = false,
-    
     val photoViewState: Boolean = false,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
 )
 
-interface OrganizerCallback: ProfileCallback {
-    
+interface OrganizerCallback : ProfileCallback {
+
     fun onMenuDismiss(state: Boolean)
     fun onMenuItemSelect(point: Int, userId: String?)
     fun onMeetingClick(meet: MeetingModel)
@@ -92,6 +105,7 @@ fun OrganizerContent(
             }",
             state.backButton, state.menuState,
             state.isMyProfile,
+            state.profileState.profile?.group?:UserGroupTypeModel.DEFAULT,
             { callback?.onBack() },
             { callback?.onMenuDismiss(it) },
         ) { callback?.onMenuItemSelect(it, user?.id) }
@@ -106,15 +120,15 @@ fun OrganizerContent(
                 Profile(
                     state = state.profileState,
                     callback = callback
-            ) { callback?.onObserveChange(it) }
-        }
-        if(state.currentMeetings.isNotEmpty()) {
-            item { MeetLabel() }
-            item {
-                ActualMeetings(state.currentMeetings)
-                { callback?.onMeetingClick(it) }
+                ) { callback?.onObserveChange(it) }
             }
-            itemSpacer(40.dp)
+            if (state.currentMeetings.isNotEmpty()) {
+                item { MeetLabel() }
+                item {
+                    ActualMeetings(state.currentMeetings)
+                    { callback?.onMeetingClick(it) }
+                }
+                itemSpacer(40.dp)
             }
         }
         if (state.photoViewState) PhotoView(
@@ -165,6 +179,7 @@ private fun TopBar(
     backButton: Boolean,
     menuState: Boolean,
     isMyProfile: Boolean,
+    profileGroup:UserGroupTypeModel,
     onBack: () -> Unit,
     onKebabClick: (Boolean) -> Unit,
     onMenuItemSelect: (Int) -> Unit,
@@ -180,7 +195,7 @@ private fun TopBar(
             Modifier.weight(1f),
             Start, CenterVertically
         ) {
-            if(backButton) IconButton(
+            if (backButton) IconButton(
                 onClick = { onBack() },
                 modifier = Modifier
                     .padding(end = 16.dp)
@@ -195,15 +210,18 @@ private fun TopBar(
                     tint = colorScheme.tertiary
                 )
             }
-            Text(
-                text = username,
-                color = colorScheme.tertiary,
-                style = typography.labelLarge,
-                overflow = Ellipsis,
-                maxLines = 1
-            )
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Text(
+                    text = username,
+                    color = colorScheme.tertiary,
+                    style = typography.labelLarge,
+                    overflow = Ellipsis,
+                    maxLines = 1
+                )
+                ProfileBadge(group = profileGroup, modifier = Modifier.padding(start = 4.dp))
+            }
         }
-        if(!isMyProfile) {
+        if (!isMyProfile) {
             GDropMenu(
                 menuState = menuState,
                 collapse = { onKebabClick(false) },

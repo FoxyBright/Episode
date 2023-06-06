@@ -1,6 +1,10 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.viewmodel.UserBsViewModel
@@ -18,10 +22,10 @@ fun OrganizerBs(
     meetId: String,
     nav: NavHostController,
 ) {
-    
+
     val backButton = nav.previousBackStackEntry != null
     val scope = rememberCoroutineScope()
-    
+
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
     val meets by vm.userActualMeets.collectAsState()
@@ -31,8 +35,8 @@ fun OrganizerBs(
     val menuState by vm.menuState.collectAsState()
     val meetState by vm.meetType.collectAsState()
     val profile by vm.profile.collectAsState()
-    
-    
+
+
     LaunchedEffect(Unit) {
         vm.setUser(userId)
         vm.setMeetType(meetId)
@@ -40,17 +44,17 @@ fun OrganizerBs(
         vm.observeUser(profile.isWatching)
         vm.getUserActualMeets(userId)
     }
-    
+
     val profileState = ProfileState(
         profile = profile,
-        profileType = if(meetState == ANONYMOUS)
+        profileType = if (meetState == ANONYMOUS)
             ANONYMOUS_ORGANIZER else ORGANIZER,
         observeState = observeState,
         lockState = profile.hiddenAccess,
         isError = false,
         errorText = ""
     )
-    
+
     OrganizerContent(
         state = UserState(
             profileState = profileState,
@@ -61,8 +65,8 @@ fun OrganizerBs(
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
-        ), callback = object: OrganizerCallback {
-        
+        ), callback = object : OrganizerCallback {
+
             override fun profileImage() {
                 scope.launch {
                     vm.setPhotoViewSelected(profile.avatar)
@@ -70,31 +74,31 @@ fun OrganizerBs(
                     vm.changePhotoViewState(true)
                 }
             }
-        
+
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
-        
+
             override fun onMenuItemSelect(point: Int, userId: String?) {
                 nav.navigate("REPORTS?id=$userId&type=$PROFILE")
                 this.onMenuDismiss(false)
             }
-        
+
             override fun onObserveChange(state: Boolean) {
                 scope.launch { vm.observeUser(state, profile.id) }
             }
-        
+
             override fun onMeetingClick(meet: MeetingModel) {
                 nav.navigate("MEET?meet=${meet.id}")
             }
-        
+
             override fun onMenuDismiss(state: Boolean) {
                 scope.launch { vm.menuDismiss(state) }
             }
-        
+
             override fun hiddenImages() {
             }
-        
+
             override fun onBack() {
                 nav.popBackStack()
             }

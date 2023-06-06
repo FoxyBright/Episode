@@ -127,7 +127,7 @@ fun UserProfileScreen(
                 observeState = false,
                 errorText = errorText,
                 activeAlbumId = activeAlbumId,
-                isAlbumVisible = true
+                isAlbumVisible = true,
             ),
             currentMeetings = meets,
             meetingsHistory = meetsHistory,

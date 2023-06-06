@@ -34,9 +34,11 @@ import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
@@ -123,6 +125,10 @@ fun MeetingBsTopBarCompose(
                 }",
                 Modifier, (null), org.emoji
             )
+
+            ProfileBadge(group = state.meet.organizer.group
+                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp))
+
             Text(
                 state.meet.display(),
                 Modifier, colorScheme.onTertiary,

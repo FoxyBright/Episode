@@ -35,12 +35,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.toSp
+import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.common.transform.transformationOf
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.*
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.DemoEmojiModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -58,8 +61,8 @@ private fun EditProfilePreview() {
             )
         ) {
             Profile(
-                ProfileState(DemoProfileModel),
-                Modifier.padding(16.dp)
+                state = ProfileState(DemoProfileModel),
+                modifier = Modifier.padding(16.dp),
             )
         }
     }
@@ -76,8 +79,8 @@ private fun OrganizerProfilePreview() {
         ) {
             Profile(
                 ProfileState(
-                    DemoProfileModel,
-                    profileType = ORGANIZER
+                    profile = DemoProfileModel,
+                    profileType = ORGANIZER,
                 ), Modifier.padding(16.dp)
             )
         }
@@ -95,9 +98,9 @@ private fun UserProfilePreview() {
         ) {
             Profile(
                 ProfileState(
-                    DemoProfileModel,
-                    profileType = USERPROFILE
-                ), Modifier.padding(16.dp)
+                    profile = DemoProfileModel,
+                    profileType = USERPROFILE,
+                ), modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -115,7 +118,6 @@ data class ProfileState(
 )
 
 interface ProfileCallback {
-    
     fun onBack() {}
     fun onNext() {}
     fun onDisabledButtonClick() {}
@@ -142,22 +144,17 @@ fun Profile(
     val profile = state.profile
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
-    
+
     Column(modifier) {
-        TopBar(
-            modifier = Modifier.padding(horizontal = 16.dp),
+        TopBar(modifier = Modifier.padding(horizontal = 16.dp),
             userName = (profile?.username ?: ""),
             userAge = (profile?.age ?: -1),
             profileType = state.profileType,
-            onSaveUsername = { callback?.onSaveUserName() }
-        ) { callback?.onNameChange(it) }
-        ErrorLabel(
-            modifier = Modifier.padding(start = 16.dp),
-            errorText = state.errorText
-        )
+            profileGroup = profile?.group?:UserGroupTypeModel.DEFAULT,
+            onSaveUsername = { callback?.onSaveUserName() }) { callback?.onNameChange(it) }
+        ErrorLabel(state.errorText)
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-            ProfileImageContent(
-                modifier = Modifier.weight(1f),
+            ProfileImageContent(modifier = Modifier.weight(1f),
                 image = profile?.avatar,
                 type = state.profileType,
                 observeState = state.observeState,
@@ -167,12 +164,10 @@ fun Profile(
                 isError = state.isError,
                 onImageRefresh = {
                     callback?.onProfileImageRefresh()
-                }
-            ) { callback?.profileImage() }
+                }) { callback?.profileImage() }
             Spacer(
                 Modifier.width(
-                    if(state.profileType == CREATE)
-                        14.dp else 16.dp
+                    if (state.profileType == CREATE) 14.dp else 16.dp
                 )
             )
             Column(Modifier.weight(1f)) {
@@ -185,56 +180,46 @@ fun Profile(
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
-                        if((state.profileType == CREATE))
-                            14.dp else 18.dp
+                        if ((state.profileType == CREATE)) 14.dp else 18.dp
                     )
                 )
-                HiddenContent(
-                    image = hidden,
+                HiddenContent(image = hidden,
                     profileType = state.profileType,
                     lockState = state.lockState,
                     onImageRefresh = {
                         callback?.onProfileImageRefresh()
-                    }
-                ) { callback?.hiddenImages() }
+                    }) { callback?.hiddenImages() }
             }
         }
         Spacer(Modifier.height(12.dp))
-        if(state.isAlbumVisible)
-            AlbumPictures(
-                picturesWithEmojis = listOf(
-                    AlbumPictureWithEmoji(
-                        id = 1,
-                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                        emoji = DemoEmojiModel
-                    ),
-                    AlbumPictureWithEmoji(
-                        id = 2,
-                        image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
-                        emoji = DemoEmojiModel
-                    ),
-                    AlbumPictureWithEmoji(
-                        id = 3,
-                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                        emoji = DemoEmojiModel,
-                        isVisible = false,
-                    ),
-                    AlbumPictureWithEmoji(
-                        id = 4,
-                        image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
-                        emoji = DemoEmojiModel
-                    ),
-                ),
-                activeAlbumId = state.activeAlbumId,
-                type = state.profileType,
-                onAlbumClick = { id ->
-                    callback?.onAlbumClick(id)
-                },
-                onAlbumLongClick = { id ->
-                    callback?.onAlbumLongClick(id)
-                }
-            )
-        
+        if (state.isAlbumVisible) AlbumPictures(picturesWithEmojis = listOf(
+            AlbumPictureWithEmoji(
+                id = 1,
+                image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                emoji = DemoEmojiModel
+            ),
+            AlbumPictureWithEmoji(
+                id = 2,
+                image = "https://flxt.tmsimg.com/assets/878203_v9_bc.jpg",
+                emoji = DemoEmojiModel
+            ),
+            AlbumPictureWithEmoji(
+                id = 3,
+                image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                emoji = DemoEmojiModel,
+                isVisible = false,
+            ),
+            AlbumPictureWithEmoji(
+                id = 4,
+                image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
+                emoji = DemoEmojiModel
+            ),
+        ), activeAlbumId = state.activeAlbumId, type = state.profileType, onAlbumClick = { id ->
+            callback?.onAlbumClick(id)
+        }, onAlbumLongClick = { id ->
+            callback?.onAlbumLongClick(id)
+        })
+
         AboutMe(
             modifier = Modifier.padding(horizontal = 16.dp),
             text = state.profile?.aboutMe,
@@ -253,31 +238,24 @@ private fun AboutMe(
     callback: ProfileCallback?,
 ) {
     @Composable
-    fun description() = Description(
-        text = text ?: "",
+    fun description() = Description(text = text ?: "",
         profileType = type,
         modifier = modifier.padding(top = 20.dp),
         onSaveDescription = {
             callback?.onSaveDescription()
-        }
-    ) { callback?.onDescriptionChange(it) }
-    
-    when(type) {
+        }) { callback?.onDescriptionChange(it) }
+
+    when (type) {
         CREATE, USERPROFILE -> description()
-        ORGANIZER, ANONYMOUS_ORGANIZER ->
-            if(!text.isNullOrBlank())
-                description()
+        ORGANIZER, ANONYMOUS_ORGANIZER -> if (!text.isNullOrBlank()) description()
     }
 }
 
 @Composable
-private fun ErrorLabel(
-    modifier: Modifier,
-    errorText: String,
-) {
+private fun ErrorLabel(errorText: String) {
     Text(
         text = errorText,
-        modifier = modifier.offset(y = -(10).dp),
+        modifier = Modifier.offset(y = -(10).dp, x = 16.dp),
         color = colorScheme.primary,
         style = typography.titleSmall.copy(
             fontSize = 10.dp.toSp()
@@ -291,63 +269,65 @@ private fun TopBar(
     userName: String,
     userAge: Int,
     profileType: ProfileType,
+    profileGroup: UserGroupTypeModel,
     modifier: Modifier = Modifier,
     onSaveUsername: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
-    if(
-        profileType != ORGANIZER
-        && profileType != ANONYMOUS_ORGANIZER
-    ) TextField(
-        value = userName,
-        onValueChange = onTextChange,
+
+    if (profileType != ORGANIZER && profileType != ANONYMOUS_ORGANIZER) Row(
         modifier = modifier
-            .offset((-16).dp)
             .fillMaxWidth()
-            .onFocusChanged { focus = it.isFocused },
-        colors = transparentTextFieldColors(),
-        textStyle = typography.headlineLarge,
-        placeholder = {
-            Row(Modifier, Arrangement.Center, CenterVertically) {
-                Text(
-                    text = stringResource(R.string.user_name),
-                    modifier = Modifier.padding(end = 8.dp),
-                    color = colorScheme.onTertiary,
-                    style = typography.headlineLarge.copy(
-                        fontSize = when(profileType) {
-                            CREATE -> 23
-                            USERPROFILE -> 28
-                            else -> 20
-                        }.dp.toSp()
+            .offset((-16).dp),
+        verticalAlignment = CenterVertically,
+    ) {
+        TextField(
+            value = userName,
+            onValueChange = onTextChange,
+            modifier = Modifier
+                .widthIn(1.dp, Dp.Infinity)
+                .onFocusChanged { focus = it.isFocused },
+            colors = transparentTextFieldColors(),
+            textStyle = typography.headlineLarge,
+            placeholder = {
+                Row(Modifier, Arrangement.Center, CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.user_name),
+                        modifier = Modifier.padding(end = 8.dp),
+                        color = colorScheme.onTertiary,
+                        style = typography.headlineLarge.copy(
+                            fontSize = when (profileType) {
+                                CREATE -> 23
+                                USERPROFILE -> 28
+                                else -> 20
+                            }.dp.toSp()
+                        )
                     )
-                )
-                Icon(
-                    painter = painterResource(R.drawable.ic_edit),
-                    contentDescription = null,
-                    modifier = Modifier.padding(top = 4.dp),
-                    tint = colorScheme.onTertiary
-                )
-            }
-        },
-        keyboardActions = KeyboardActions {
-            focusManager.clearFocus()
-            onSaveUsername()
-        },
-        keyboardOptions = Default.copy(
-            imeAction = Done,
-            keyboardType = Text,
-            capitalization = Sentences
-        ),
-        singleLine = true,
-        visualTransformation = transformationOf(
-            mask = CharArray(userName.length) { '#' }
-                .concatToString(),
-            endChar = if(userAge in 18..99 && !focus)
-                ", $userAge" else ""
+                    Icon(
+                        painter = painterResource(R.drawable.ic_edit),
+                        contentDescription = null,
+                        modifier = Modifier.padding(top = 4.dp),
+                        tint = colorScheme.onTertiary
+                    )
+                }
+            },
+            keyboardActions = KeyboardActions {
+                focusManager.clearFocus()
+                onSaveUsername()
+            },
+            keyboardOptions = Default.copy(
+                imeAction = Done, keyboardType = Text, capitalization = Sentences
+            ),
+            singleLine = true,
+            visualTransformation = transformationOf(mask = CharArray(userName.length) { '#' }.concatToString(),
+                endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""),
         )
-    )
+        ProfileBadge(
+            modifier = Modifier.offset(x = (-12).dp), group = profileGroup
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -361,25 +341,21 @@ private fun Description(
 ) {
     val focusManager = LocalFocusManager.current
     val style = typography.bodyMedium.copy(
-        fontSize = (if(profileType == CREATE)
-            12 else 16).dp.toSp()
+        fontSize = (if (profileType == CREATE) 12 else 16).dp.toSp()
     )
-    
+
     Column(modifier) {
         Text(
-            text = stringResource(R.string.profile_about_me),
-            style = typography.labelLarge.copy(
+            text = stringResource(R.string.profile_about_me), style = typography.labelLarge.copy(
                 color = colorScheme.tertiary,
-                fontSize = if(profileType == CREATE)
-                    17.dp.toSp() else 20.dp.toSp()
+                fontSize = if (profileType == CREATE) 17.dp.toSp() else 20.dp.toSp()
             )
         )
         Box(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .background(
-                    color = colorScheme.primaryContainer,
-                    shape = shapes.large
+                    color = colorScheme.primaryContainer, shape = shapes.large
                 )
         ) {
             BasicTextField(
@@ -387,13 +363,11 @@ private fun Description(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = if(profileType == CREATE)
-                            12.dp else 14.dp,
-                        horizontal = if(profileType == CREATE)
-                            16.dp else 14.dp,
+                        vertical = if (profileType == CREATE) 12.dp else 14.dp,
+                        horizontal = if (profileType == CREATE) 16.dp else 14.dp,
                     ),
-                onValueChange = { if(it.length <= 120) onTextChange(it) },
-                readOnly = when(profileType) {
+                onValueChange = { if (it.length <= 120) onTextChange(it) },
+                readOnly = when (profileType) {
                     ORGANIZER, ANONYMOUS_ORGANIZER -> true
                     else -> false
                 },
@@ -401,10 +375,9 @@ private fun Description(
                 keyboardActions = KeyboardActions {
                     focusManager.clearFocus()
                     onSaveDescription()
-                }, keyboardOptions = Default.copy(
-                    imeAction = Done,
-                    keyboardType = Text,
-                    capitalization = Sentences
+                },
+                keyboardOptions = Default.copy(
+                    imeAction = Done, keyboardType = Text, capitalization = Sentences
                 ),
                 cursorBrush = SolidColor(colorScheme.primary)
             ) { innerTextField ->
@@ -425,7 +398,8 @@ private fun Description(
                     enabled = true,
                     interactionSource = remember {
                         MutableInteractionSource()
-                    }, colors = textFieldColors()
+                    },
+                    colors = textFieldColors()
                 )
             }
         }
@@ -445,7 +419,7 @@ fun AlbumPictures(
     val screenWidth by remember {
         mutableStateOf(configuration.screenWidthDp)
     }
-    
+
     @Composable
     fun album() {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
@@ -453,37 +427,28 @@ fun AlbumPictures(
                 Spacer(modifier = Modifier.width(16.dp))
             }
             itemsIndexed(picturesWithEmojis) { index, item ->
-                if(activeAlbumId == null || activeAlbumId == item.id)
-                    AlbumPictureItem(
-                        modifier = Modifier
-                            .animateItemPlacement()
-                            .size((screenWidth / 4).dp)
-                            .clip(
-                                lazyRowAlbumItemsShapes(
-                                    index = index,
-                                    size = if(activeAlbumId != null)
-                                        1 else picturesWithEmojis.size
-                                )
-                            ),
-                        albumPictureWithEmoji = item,
-                        onClick = {
-                            if(activeAlbumId == null)
-                                onAlbumClick(item.id)
-                            else onAlbumLongClick(null)
-                        },
-                        onLongClick = {
-                            onAlbumLongClick(item.id)
-                        }
-                    )
+                if (activeAlbumId == null || activeAlbumId == item.id) AlbumPictureItem(modifier = Modifier
+                    .animateItemPlacement()
+                    .size((screenWidth / 4).dp)
+                    .clip(
+                        lazyRowAlbumItemsShapes(
+                            index = index,
+                            size = if (activeAlbumId != null) 1 else picturesWithEmojis.size
+                        )
+                    ), albumPictureWithEmoji = item, onClick = {
+                    if (activeAlbumId == null) onAlbumClick(item.id)
+                    else onAlbumLongClick(null)
+                }, onLongClick = {
+                    onAlbumLongClick(item.id)
+                })
             }
             item { Spacer(modifier = Modifier.width(16.dp)) }
-            if(activeAlbumId != null) {
+            if (activeAlbumId != null) {
                 item {
                     AlbumDescription(
                         modifier = Modifier
                             .size(
-                                (screenWidth / 4 * 3 - (12 * 3)).dp,
-                                (screenWidth / 4).dp
+                                (screenWidth / 4 * 3 - (12 * 3)).dp, (screenWidth / 4).dp
                             )
                             .clip(RoundedCornerShape(16.dp)),
                         name = "Токиосити ван",
@@ -494,8 +459,8 @@ fun AlbumPictures(
             }
         }
     }
-    
-    when(type) {
+
+    when (type) {
         CREATE, USERPROFILE -> album()
         ORGANIZER, ANONYMOUS_ORGANIZER -> {}
     }
@@ -516,9 +481,7 @@ fun AlbumPictureItem(
         )
     ) {
         GCachedImage(
-            modifier = modifier,
-            url = albumPictureWithEmoji.image,
-            contentScale = ContentScale.Crop
+            modifier = modifier, url = albumPictureWithEmoji.image, contentScale = ContentScale.Crop
         )
         EmojiAlbumFloat(
             modifier = Modifier
@@ -540,15 +503,12 @@ fun AlbumDescription(
     Box(
         modifier = modifier.background(
             colorScheme.primaryContainer
-        ),
-        contentAlignment = Center
+        ), contentAlignment = Center
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            SpaceBetween,
-            CenterVertically
+                .padding(16.dp), SpaceBetween, CenterVertically
         ) {
             Column {
                 Text(text = name)
@@ -558,55 +518,38 @@ fun AlbumDescription(
                         .background(Color.Gray)
                         .then(
                             Modifier.padding(
-                                start = 4.dp,
-                                top = 4.dp,
-                                bottom = 4.dp
+                                start = 4.dp, top = 4.dp, bottom = 4.dp
                             )
                         )
                 ) {
                     emojis.forEach {
                         GEmojiImage(
-                            emoji = it,
-                            modifier = Modifier
+                            emoji = it, modifier = Modifier
                                 .size(26.dp)
                                 .padding(end = 4.dp)
                         )
                     }
                 }
             }
-            AlbumIcon(
-                modifier = Modifier.size(52.dp),
-                onClick = {},
-                content = {
-                    Image(
-                        painter = painterResource(
-                            R.drawable.ic_image_box
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .padding(4.dp)
-                    )
-                }
-            )
-            AlbumIcon(
-                modifier = Modifier.size(52.dp),
-                onClick = {},
-                content = {
-                    Image(
-                        painter = painterResource(
-                            if(isVisible)
-                                R.drawable.ic_open_eye
-                            else
-                                R.drawable.ic_closed_eye
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .padding(4.dp)
-                    )
-                }
-            )
+            AlbumIcon(modifier = Modifier.size(52.dp), onClick = {}, content = {
+                Image(
+                    painter = painterResource(
+                        R.drawable.ic_image_box
+                    ), contentDescription = null, modifier = Modifier
+                        .size(32.dp)
+                        .padding(4.dp)
+                )
+            })
+            AlbumIcon(modifier = Modifier.size(52.dp), onClick = {}, content = {
+                Image(
+                    painter = painterResource(
+                        if (isVisible) R.drawable.ic_open_eye
+                        else R.drawable.ic_closed_eye
+                    ), contentDescription = null, modifier = Modifier
+                        .size(32.dp)
+                        .padding(4.dp)
+                )
+            })
         }
     }
 }
@@ -638,9 +581,7 @@ fun EmojiAlbumFloat(
         contentAlignment = Center
     ) {
         GEmojiImage(
-            modifier = Modifier
-                .padding(4.dp),
-            emoji = emoji
+            modifier = Modifier.padding(4.dp), emoji = emoji
         )
     }
 }

@@ -137,7 +137,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun changeUsername(name: String) {
-        _username.emit(name)
+        if(name.length <= 21)
+            _username.emit(name)
     }
     
     private val _alert = MutableStateFlow(false)

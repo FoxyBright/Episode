@@ -29,7 +29,7 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ProfilePreview() {
-    GiltyTheme { ProfileContent(ProfileState(DemoProfileModel), (true)) }
+    GiltyTheme { ProfileContent(ProfileState(profile = DemoProfileModel, ), (true)) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

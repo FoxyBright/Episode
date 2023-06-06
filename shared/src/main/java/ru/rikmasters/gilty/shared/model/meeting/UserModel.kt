@@ -15,6 +15,7 @@ data class UserModel(
     val gender: GenderType?,
     val username: String?,
     val emoji: EmojiModel?,
+    val group: UserGroupTypeModel?,
     val avatar: AvatarModel?,
     val thumbnail: ThumbnailModel?,
     val age: Int?,
@@ -25,7 +26,7 @@ data class UserModel(
     
     constructor(): this(
         (null), (null), (null),
-        (null), (null), (null),
+        (null), (null), (null), (null),
         (null), (null), (null),
         (null),
     )
@@ -35,6 +36,7 @@ val DemoUserModel = UserModel(
     id = "userID",
     gender = FEMALE,
     username = "cristina",
+    group = UserGroupTypeModel.DEFAULT,
     emoji = DemoEmojiModel,
     avatar = DemoAvatarModel,
     thumbnail = DemoThumbnailModel,
@@ -48,6 +50,7 @@ val DemoUserModelTwo = UserModel(
     gender = MALE,
     username = "gosha",
     emoji = DemoEmojiModel,
+    group = UserGroupTypeModel.TEAM,
     avatar = DemoAvatarModel,
     thumbnail = DemoThumbnailModel,
     age = 40,
@@ -61,11 +64,6 @@ val DemoUserModelList = listOf(
     DemoUserModel,
     DemoUserModelTwo,
 )
-
-
-
-
-
 
 
 

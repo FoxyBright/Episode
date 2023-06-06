@@ -52,11 +52,11 @@ private fun ProfilePreview() {
         ProfileContent(
             UserProfileState(
                 ProfileState(
-                    DemoProfileModel,
-                    ProfileType.USERPROFILE
-                ), pagingPreview(DemoMeetingList),
-                pagingPreview(DemoMeetingList),
-                Pair(4, "image"), (false), listOf(
+                    profile = DemoProfileModel,
+                    profileType = ProfileType.USERPROFILE,
+                ), currentMeetings = pagingPreview(DemoMeetingList),
+                meetingsHistory = pagingPreview(DemoMeetingList),
+                lastRespond = Pair(4, "image"), historyState = (false), stateList = listOf(
                     INACTIVE, INACTIVE,
                     INACTIVE, INACTIVE, ACTIVE
                 ), alert = false,

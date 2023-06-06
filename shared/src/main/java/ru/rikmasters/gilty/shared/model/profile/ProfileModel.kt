@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.model.profile
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType.MALE
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.DemoThumbnailModel
 import ru.rikmasters.gilty.shared.model.image.ThumbnailModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -14,6 +15,7 @@ data class ProfileModel(
     val username: String?,
     val gender: GenderType,
     val orientation: OrientationModel?,
+    val group: UserGroupTypeModel?,
     val age: Int,
     val aboutMe: String?,
     val rating: RatingModel,
@@ -40,6 +42,7 @@ data class ProfileModel(
         username = null,
         gender = MALE,
         orientation = null,
+        group = UserGroupTypeModel.DEFAULT,
         age = 0, aboutMe = null,
         rating = RatingModel(),
         avatar = AvatarModel(),
@@ -63,6 +66,7 @@ data class ProfileModel(
         id = id,
         gender = gender,
         username = username.toString(),
+        group = group,
         emoji = rating.emoji,
         avatar = avatar,
         thumbnail = thumbnail,
@@ -79,6 +83,7 @@ val DemoProfileModel = ProfileModel(
     gender = FEMALE,
     orientation = DemoOrientationModel,
     age = 27,
+    group = UserGroupTypeModel.TEAM,
     aboutMe = "Instagram @cristi",
     rating = DemoRatingModel,
     avatar = DemoAvatarModel,
