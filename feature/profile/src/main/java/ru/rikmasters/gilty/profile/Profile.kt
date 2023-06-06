@@ -32,7 +32,8 @@ object Profile: FeatureDefinition() {
                     navArgument("update") {
                         type = NavType.BoolType
                         defaultValue = false
-                    })
+                    }
+                )
             ) { vm, it ->
                 it.arguments
                     ?.getBoolean("update")

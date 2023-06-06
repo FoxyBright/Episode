@@ -343,7 +343,6 @@ class ChatViewModel: ViewModel() {
             _translationTimer.emit(
                 it.minus(1)
             )
-            Log.d("TEST","TranslationTimer $it")
         }
     }
     

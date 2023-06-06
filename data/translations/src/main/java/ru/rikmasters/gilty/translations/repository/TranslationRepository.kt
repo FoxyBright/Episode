@@ -41,12 +41,10 @@ class TranslationRepository(
     }
     
     suspend fun connectToTranslation(translationId: String) =
-        coroutinesState {
-            withContext(Dispatchers.IO) {
-                webSocket.connectToTranslation(
-                    id = translationId
-                )
-            }
+        withContext(Dispatchers.IO) {
+            webSocket.connectToTranslation(
+                id = translationId
+            )
         }
     
     suspend fun disconnectFromTranslation(): DataStateTest<Unit> {
@@ -56,19 +54,16 @@ class TranslationRepository(
     }
     
     suspend fun connectToTranslationChat(translationId: String) =
-        coroutinesState {
-            withContext(Dispatchers.IO) {
-                webSocket.connectToTranslationChat(
-                    id = translationId
-                )
-            }
+        withContext(Dispatchers.IO) {
+            webSocket.connectToTranslationChat(
+                id = translationId
+            )
         }
     
-    suspend fun disconnectFromTranslationChat() = coroutinesState {
+    suspend fun disconnectFromTranslationChat() =
         withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslationChat()
         }
-    }
     
     suspend fun getTranslationInfo(
         translationId: String,

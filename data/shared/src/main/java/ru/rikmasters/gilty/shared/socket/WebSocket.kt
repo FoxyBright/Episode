@@ -11,35 +11,37 @@ import io.ktor.websocket.send
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.data.shared.BuildConfig
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.ExceptionCause
-import ru.rikmasters.gilty.data.shared.BuildConfig
 import ru.rikmasters.gilty.shared.models.socket.Res
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import java.io.IOException
 import java.net.SocketException
 
-abstract class WebSocket : KtorSource() {
-
-    private val socketUrl = "app/local?protocol=7&amp;client=js&amp;version=7.2.0&amp;flash=false"
-
+abstract class WebSocket: KtorSource() {
+    
+    private val socketUrl =
+        "app/local?protocol=7&amp;client=js&amp;version=7.2.0&amp;flash=false"
+    
     val socketId = MutableStateFlow<String?>(null)
     val userId = MutableStateFlow("")
     var inPing: Boolean = false
-
+    
     abstract val port: Int
     abstract val pingInterval: Long
-
-    private val _session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-
+    
+    private val _session =
+        MutableStateFlow<DefaultClientWebSocketSession?>(null)
+    
     private var sessionHandlerJob: Job? = null
-
+    
     abstract suspend fun handleResponse(response: SocketResponse)
     suspend fun subscribe(
         channel: String,
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
-        Log.d("TranslationWeb","Subscribing CHANNEL $channel")
+        Log.d("TranslationWeb", "Subscribing CHANNEL $channel")
         tryPost(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
@@ -60,7 +62,7 @@ abstract class WebSocket : KtorSource() {
             )
         }
     }
-
+    
     suspend fun send(data: Map<String, String>, event: String) {
         try {
             _session.value?.send(
@@ -71,12 +73,15 @@ abstract class WebSocket : KtorSource() {
                     ),
                 ),
             )
-        } catch (e: Exception) {
-            Log.d("TEST","Inner")
+        } catch(e: Exception) {
+            Log.d("TEST", "Inner")
         }
     }
-
-    suspend fun trySend(data: Map<String, String>, event: String): DataStateTest<Unit> {
+    
+    suspend fun trySend(
+        data: Map<String, String>,
+        event: String,
+    ): DataStateTest<Unit> {
         try {
             _session.value?.send(
                 mapper.writeValueAsString(
@@ -87,14 +92,18 @@ abstract class WebSocket : KtorSource() {
                 ),
             )
             return DataStateTest.Success(Unit)
-        } catch (e: Exception) {
-            return DataStateTest.Error(cause = ExceptionCause.IO)
+        } catch(e: Exception) {
+            return DataStateTest.Error(
+                cause = ExceptionCause.IO(
+                    e.message ?: "Ошибка отправки сессии"
+                )
+            )
         }
     }
-
+    
     private suspend fun doPing(session: DefaultClientWebSocketSession) {
-        if (inPing) throw IOException("Соединение прервано: не получен PONG.")
-
+        if(inPing) throw IOException("Соединение прервано: не получен PONG.")
+        
         val message = mapper.writeValueAsBytes(
             mapOf("event" to "pusher:ping"),
         )
@@ -103,56 +112,57 @@ abstract class WebSocket : KtorSource() {
         )
         inPing = true
     }
-
+    
     fun disconnect() {
         sessionHandlerJob?.cancel()
     }
-
+    
     suspend fun connect(userId: String) {
         try {
             connection(userId)
-            Log.d("TEST","conn socck 5")
-        } catch (e: Exception) {
+            Log.d("TEST", "conn socck 5")
+        } catch(e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
             disconnect()
             try {
-                Log.d("TEST","conn socck 6")
+                Log.d("TEST", "conn socck 6")
                 connection(userId)
-            } catch (e: Exception) {
+            } catch(e: Exception) {
                 logE("Bad reconnection")
                 logE("$e")
             }
         }
     }
-
-    private suspend fun connection(userId: String) = withContext(Dispatchers.IO) {
-        this@WebSocket.userId.emit(userId)
-        sessionHandlerJob = launch {
-            val session = wsSession(BuildConfig.HOST, port, socketUrl)
-            try {
-                launch {
-                    while (true) {
-                        delay(pingInterval)
-                        doPing(session)
-                        Log.d("WebSoc","PINGING WITH $port")
+    
+    private suspend fun connection(userId: String) =
+        withContext(Dispatchers.IO) {
+            this@WebSocket.userId.emit(userId)
+            sessionHandlerJob = launch {
+                val session = wsSession(BuildConfig.HOST, port, socketUrl)
+                try {
+                    launch {
+                        while(true) {
+                            delay(pingInterval)
+                            doPing(session)
+                            Log.d("WebSoc", "PINGING WITH $port")
+                        }
                     }
+                    _session.emit(session)
+                    while(true) {
+                        val response = session.incoming.receive()
+                        logV("Frame: ${String(response.data)}")
+                        
+                        val socketResponse = mapper
+                            .readValue<SocketResponse>(response.data)
+                        handleResponse(socketResponse)
+                    }
+                } catch(e: SocketException) {
+                    e.stackTraceToString()
+                } finally {
+                    logV("Closing session...")
+                    closeClient()
                 }
-                _session.emit(session)
-                while (true) {
-                    val response = session.incoming.receive()
-                    logV("Frame: ${String(response.data)}")
-
-                    val socketResponse = mapper
-                        .readValue<SocketResponse>(response.data)
-                    handleResponse(socketResponse)
-                }
-            } catch (e: SocketException) {
-                e.stackTraceToString()
-            } finally {
-                logV("Closing session...")
-                closeClient()
             }
         }
-    }
 }
