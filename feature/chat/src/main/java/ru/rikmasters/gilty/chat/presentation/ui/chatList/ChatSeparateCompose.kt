@@ -5,7 +5,7 @@ import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayR
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 
-fun getSortedChats(chats: List<ChatModel>) = chats
+fun getSortedByTimeChats(chats: List<ChatModel>) = chats
     .groupBy { it.datetime.take(10) }
     .map {
         when {

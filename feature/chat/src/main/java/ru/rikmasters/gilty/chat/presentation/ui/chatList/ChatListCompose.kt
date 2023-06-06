@@ -44,7 +44,6 @@ import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.chat.*
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MEETING_DATE
 import ru.rikmasters.gilty.shared.model.chat.SortTypeModel.MESSAGE_DATE
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -96,7 +95,7 @@ data class ChatListState(
 )
 
 interface ChatListCallback {
-    
+
     fun onNavBarSelect(point: Int)
     fun onChatClick(chat: ChatModel)
     fun onChatSwipe(chat: ChatModel)
@@ -127,7 +126,7 @@ fun ChatListContent(
         },
         containerColor = Transparent,
         content = {
-            if(!state.smthError)
+            if (!state.smthError)
                 Column(Modifier.padding(it)) {
                     Use<ChatListViewModel>(PullToRefreshTrait) {
                         Content(state, Modifier, callback)
@@ -177,8 +176,8 @@ private fun Content(
 ) {
     val chats = state.chats
     val itemCount = state.chatsCount
-    
-    if(LocalInspectionMode.current)
+
+    if (LocalInspectionMode.current)
         PreviewLazy() else {
         Column(modifier = modifier) {
             LazyColumn(
@@ -186,13 +185,18 @@ private fun Content(
                     .fillMaxWidth(),
                 state = state.listState
             ) {
-                item { Spacer(Modifier.height(12.dp)) }
                 when {
                     chats.loadState.refresh is LoadState.Error -> Unit
                     chats.loadState.append is LoadState.Error -> Unit
                     else -> {
-                        if(chats.loadState.refresh is LoadState.Loading)
+                        if (chats.loadState.refresh is LoadState.Loading ||
+                            chats.loadState.append is LoadState.Loading)
                             item { PagingLoader(chats.loadState) }
+
+                        item {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
                         item {
                             SortTypeLabels(
                                 modifier = Modifier.animateItemPlacement(),
@@ -200,99 +204,84 @@ private fun Content(
                                 callback = callback
                             )
                         }
-                        if(itemCount != 0) {
-                            getSortedChats(
-                                chats.itemSnapshotList.items.filter {
-                                    it.meetStatus == MeetStatusType.ACTIVE
-                                }
-                            ).let {
-                                if(it.isNotEmpty())
-                                    items(it) { (label, list) ->
-                                        Label(
-                                            label,
-                                            Modifier
-                                                .padding(
-                                                    top = 28.dp,
-                                                    bottom = 18.dp
-                                                )
-                                                .padding(horizontal = 16.dp)
-                                                .animateItemPlacement()
-                                        )
-                                        list.map { chatModel ->
-                                            chatModel to rememberDragRowState()
-                                        }.forEachIndexed { index, chat ->
-                                            ElementChat(
-                                                modifier = Modifier
+
+                        if (itemCount != 0 && chats.loadState.append is NotLoading && chats.loadState.refresh is NotLoading) {
+                            if ((state.sortType == null && !state.isArchiveOn) || state.sortType == MEETING_DATE) { // No sort or Meeting Date
+                                getSortedByTimeChats(state.chats.itemSnapshotList.items).let {
+                                    if (it.isNotEmpty())
+                                        items(it) { (label, list) ->
+                                            Label(
+                                                label,
+                                                Modifier
                                                     .padding(
-                                                        horizontal = 16.dp
+                                                        top = 28.dp,
+                                                        bottom = 18.dp
                                                     )
-                                                    .animateItemPlacement(),
-                                                chat.first,
-                                                index,
-                                                list.size,
-                                                chat.second,
-                                                callback
+                                                    .padding(horizontal = 16.dp)
+                                                    .animateItemPlacement()
                                             )
+                                            list.map { chatModel ->
+                                                chatModel to rememberDragRowState()
+                                            }.forEachIndexed { index, chat ->
+                                                ElementChat(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 16.dp)
+                                                        .animateItemPlacement(),
+                                                    chat.first, index, list.size,
+                                                    chat.second, callback
+                                                )
+                                            }
                                         }
-                                    }
-                            }
-                            
-                            val inactiveItems = state
-                                .chats.itemSnapshotList
-                                .items.filter {
-                                    it.meetStatus != MeetStatusType.ACTIVE
                                 }
-                            
-                            if(inactiveItems.isNotEmpty()) item {
-                                ActionRow(
-                                    Modifier.padding(
-                                        top = 28.dp,
-                                        bottom = 18.dp,
-                                        end = 16.dp,
-                                        start = 16.dp
-                                    ),
-                                    state.endedState
-                                ) { callback?.onEndedClick() }
-                            }
-                            
-                            if(state.endedState && inactiveItems.isNotEmpty()) {
-                                val inactiveChatsSize = inactiveItems.size
+                            } else if (state.sortType == MESSAGE_DATE && state.chats.loadState.append is NotLoading) { // Message Date
+                                item {
+                                    Spacer(Modifier.height(28.dp))
+                                }
                                 itemsIndexed(state.chats) { index, item ->
-                                    if(item?.meetStatus != MeetStatusType.ACTIVE) {
-                                        val chat =
-                                            (item ?: ChatModel()) to
-                                                    rememberDragRowState()
-                                        val indexCalc = if(
-                                            index + 1 == (state.chats.itemCount
-                                                    - inactiveChatsSize) // TODO change itemCount to chats_count once backend is ready
-                                        ) 0 else index
+                                    val chat = (item) to rememberDragRowState()
+                                    chat.first?.let {
                                         ElementChat(
                                             modifier = Modifier
                                                 .padding(horizontal = 16.dp)
                                                 .animateItemPlacement(),
-                                            chat = chat.first,
-                                            index = indexCalc,
-                                            size = state.chats.itemCount -
-                                                    (state.chats.itemCount
-                                                            - inactiveChatsSize),
-                                            rowState = chat.second, // TODO change itemCount to chats_count once backend is ready
+                                            chat = it,
+                                            index = (index),
+                                            size = (state.chats.itemCount),  // TODO change itemCount to chats_count once backend is ready
+                                            rowState = (chat.second),
+                                            callback = callback
+                                        )
+                                    }
+                                }
+                            } else { // Archieve
+                                item {
+                                    Spacer(Modifier.height(28.dp))
+                                }
+                                itemsIndexed(state.chats) { index, item ->
+                                    val chat = (item) to rememberDragRowState()
+                                    chat.first?.let {
+                                        ElementChat(
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp)
+                                                .animateItemPlacement(),
+                                            chat = it,
+                                            index = index,
+                                            size = state.chats.itemCount,  // TODO change itemCount to chats_count once backend is ready
+                                            rowState = chat.second,
                                             callback = callback
                                         )
                                     }
                                 }
                             }
-                            if(state.chats.loadState.append is LoadState.Loading
-                                && state.endedState
-                            ) item { PagingLoader(state.chats.loadState) }
                         }
                     }
                 }
                 item { Spacer(Modifier.height(20.dp)) }
             }
-            val emptyChats = state.chats.loadState.refresh is NotLoading
+            val emptyChats = chats.loadState.append is NotLoading
+                    && chats.loadState.refresh is NotLoading
                     && (itemCount == 0 || state.chats.itemCount == 0) // TODO Delete itemcount once backend is ready
-            
-            if(emptyChats) ChatListPlaceholder(
+
+            if (emptyChats) ChatListPlaceholder(
                 modifier = Modifier.padding(bottom = 120.dp)
             )
         }
@@ -345,7 +334,7 @@ private fun ElementChat(
             rowState, chat, shape, Modifier,
             { callback?.onChatClick(it) }
         ) { callback?.onChatSwipe(it) }
-        if(index < size - 1) GDivider(
+        if (index < size - 1) GDivider(
             Modifier.padding(start = 78.dp)
         )
     }
@@ -367,7 +356,7 @@ private fun ActionRow(
     ) {
         Label(stringResource(chats_ended_chats_label))
         Icon(
-            if(state) Filled.KeyboardArrowDown
+            if (state) Filled.KeyboardArrowDown
             else Filled.KeyboardArrowRight,
             (null), Modifier.size(28.dp),
             colorScheme.tertiary
@@ -404,7 +393,7 @@ fun SortTypeLabels(
             state.sortType?.let {
                 GChip(
                     modifier = Modifier.padding(
-                        start = if(sortLabelHeightDp - 16.dp >= 0.dp)
+                        start = if (sortLabelHeightDp - 16.dp >= 0.dp)
                             sortLabelHeightDp - 16.dp
                         else 0.dp
                     ),
@@ -417,10 +406,10 @@ fun SortTypeLabels(
                 sortLabelHeightDp =
                     with(localDensity) { coordinates.size.width.toDp() }
             }, verticalAlignment = CenterVertically) {
-                if(state.sortType != null) {
+                if (state.sortType != null) {
                     Image(
                         painter = painterResource(
-                            if(isSystemInDarkTheme())
+                            if (isSystemInDarkTheme())
                                 R.drawable.ic_close_sort_dark
                             else R.drawable.ic_close_sort
                         ),
@@ -441,19 +430,19 @@ fun SortTypeLabels(
                 ) { callback?.onSortClick(MEETING_DATE) }
             }
         }
-        if(state.sortType != null)
+        if (state.sortType != null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
-                text = (if(state.sortType == MEETING_DATE)
+                text = (if (state.sortType == MEETING_DATE)
                     MESSAGE_DATE else MEETING_DATE).getSortName()
             ) {
                 callback?.onSortClick(
-                    if(state.sortType == MEETING_DATE)
+                    if (state.sortType == MEETING_DATE)
                         MESSAGE_DATE else MEETING_DATE
                 )
             }
-        
-        if(state.sortType == null)
+
+        if (state.sortType == null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
                 text = stringResource(id = R.string.chats_archive_label),
