@@ -2,8 +2,6 @@ package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType.Companion.BoolType
 import androidx.navigation.NavType.Companion.StringType
@@ -24,14 +22,12 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.reports.ReportsBs
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBs
 import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState
+import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.viewmodel.connector.Connector
-import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
-import ru.rikmasters.gilty.yandexmap.presentation.MapAppsBs
 import ru.rikmasters.gilty.yandexmap.presentation.YandexMapScreen
 import ru.rikmasters.gilty.yandexmap.viewmodel.YandexMapViewModel
 
@@ -49,18 +45,16 @@ fun BottomSheet(
     user: UserModel? = UserModel(),
 ) {
     
+    val coroutineScope = rememberCoroutineScope()
     val nav = rememberNavController()
     val asm = get<AppStateModel>()
-    val context = LocalContext.current
-    
-    val coroutineScope = rememberCoroutineScope()
     
     BackHandler {
-        if(asm.bottomSheet.current.value != BottomSheetSwipeState.COLLAPSED) {
-            coroutineScope.launch { asm.bottomSheet.collapse() }
-        } else {
-            nav.popBackStack()
-        }
+        if(asm.bottomSheet.current.value != COLLAPSED)
+            coroutineScope.launch {
+                asm.bottomSheet.collapse()
+            }
+        else nav.popBackStack()
     }
     
     NavHost(
@@ -72,7 +66,6 @@ fun BottomSheet(
             PARTICIPANTS -> "PARTICIPANTS?meet={meet}"
             REPORTS -> "REPORTS?id={id}&type={type}"
             USER -> "USER?user={user}&meet={meet}"
-            APPS -> "APPS?lat={lat}&lng={lng}"
             LOCATION -> "LOCATION"
         }
     ) {
@@ -119,43 +112,6 @@ fun BottomSheet(
                                 meet else null, it, nav
                         )
                     }
-                }
-            }
-        }
-        
-        composable(
-            route = "APPS?lat={lat}&lng={lng}",
-            arguments = listOf(
-                setStringArg("lat", "${location?.lat}"),
-                setStringArg("lng", "${location?.lng}"),
-            )
-        ) {
-            
-            var alert by remember { mutableStateOf(false) }
-            var appIndex by remember { mutableStateOf(0) }
-            
-            val corScope = rememberCoroutineScope()
-            
-            it.GetStringArg("lat") { lat ->
-                it.GetStringArg("lng") { lng ->
-                    val googleMap =
-                        "https://maps.google.com/?daddr=$lat%2C$lng&zoom=18"
-                    val yandexMap =
-                        "https://maps.yandex.ru/?pt=$lng%2C$lat&z=18"
-                    MapAppsBs(
-                        alert, appIndex, Modifier, { state ->
-                            if(state) {
-                                openInWeb(
-                                    context,
-                                    if(appIndex == 0) googleMap
-                                    else yandexMap
-                                )
-                                corScope.launch {
-                                    asm.bottomSheet.collapse()
-                                }
-                            } else alert = false
-                        }
-                    ) { app -> appIndex = app; alert = true }
                 }
             }
         }

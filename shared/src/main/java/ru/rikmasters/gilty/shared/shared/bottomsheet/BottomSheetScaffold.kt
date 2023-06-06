@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.shared.bottomsheet
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -71,7 +72,8 @@ class BottomSheetState(
         )
     }
     
-    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
+    internal val nestedScrollConnection =
+        this.PreUpPostDownNestedScrollConnection
 }
 
 @Composable
@@ -105,7 +107,9 @@ class BottomSheetScaffoldState(
 @Composable
 fun rememberBottomSheetScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-    bottomSheetState: BottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed),
+    bottomSheetState: BottomSheetState = rememberBottomSheetState(
+        BottomSheetValue.Collapsed
+    ),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ): BottomSheetScaffoldState {
     return remember(drawerState, bottomSheetState, snackbarHostState) {
@@ -119,17 +123,20 @@ fun rememberBottomSheetScaffoldState(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("unused")
 fun BottomSheetScaffold(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(),
     topBar: (@Composable () -> Unit)? = null,
-    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
+    snackbarHost: @Composable (SnackbarHostState) -> Unit = {
+        SnackbarHost(
+            it
+        )
+    },
     floatingActionButton: (@Composable () -> Unit)? = null,
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     sheetGesturesEnabled: Boolean = true,
-    sheetShape: Shape = MaterialTheme.shapes.large,
+    sheetShape: Shape = RoundedCornerShape(24.dp),
     @Suppress("unused_parameter")
     sheetElevation: Dp = BottomSheetScaffoldDefaults.SheetElevation,
     sheetBackgroundColor: Color = MaterialTheme.colorScheme.surface,
@@ -149,7 +156,8 @@ fun BottomSheetScaffold(
     val scope = rememberCoroutineScope()
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
-        val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
+        val peekHeightPx =
+            with(LocalDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
         
         val swipeable = Modifier
@@ -158,7 +166,8 @@ fun BottomSheetScaffold(
                 state = scaffoldState.bottomSheetState,
                 anchors = mapOf(
                     fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
-                    fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
+                    fullHeight - bottomSheetHeight to BottomSheetValue.Expanded,
+//                    fullHeight - peekHeightPx / 2 to BottomSheetValue.HalfExpand
                 ),
                 orientation = Orientation.Vertical,
                 enabled = sheetGesturesEnabled,
@@ -168,14 +177,20 @@ fun BottomSheetScaffold(
                 if(peekHeightPx != bottomSheetHeight) {
                     if(scaffoldState.bottomSheetState.isCollapsed) {
                         expand {
-                            if(scaffoldState.bottomSheetState.confirmStateChange(BottomSheetValue.Expanded)) {
+                            if(scaffoldState.bottomSheetState.confirmStateChange(
+                                    BottomSheetValue.Expanded
+                                )
+                            ) {
                                 scope.launch { scaffoldState.bottomSheetState.expand() }
                             }
                             true
                         }
                     } else {
                         collapse {
-                            if(scaffoldState.bottomSheetState.confirmStateChange(BottomSheetValue.Collapsed)) {
+                            if(scaffoldState.bottomSheetState.confirmStateChange(
+                                    BottomSheetValue.Collapsed
+                                )
+                            ) {
                                 scope.launch { scaffoldState.bottomSheetState.collapse() }
                             }
                             true
@@ -203,7 +218,8 @@ fun BottomSheetScaffold(
                             .fillMaxWidth()
                             .requiredHeightIn(min = sheetPeekHeight)
                             .onGloballyPositioned {
-                                bottomSheetHeight = it.size.height.toFloat()
+                                bottomSheetHeight =
+                                    it.size.height.toFloat()
                             },
                         shape = sheetShape,
                         // parameter does not exists in material3
@@ -265,13 +281,24 @@ private fun BottomSheetScaffoldStack(
     ) { measurables, constraints ->
         val placeable = measurables.first().measure(constraints)
         
-        layout(placeable.width, placeable.height) {
+        layout(
+            width = placeable.width,
+            height = placeable.height
+        ) {
             placeable.placeRelative(0, 0)
             
-            val (sheetPlaceable, fabPlaceable, snackbarPlaceable) =
-                measurables.drop(1).map {
-                    it.measure(constraints.copy(minWidth = 0, minHeight = 0))
-                }
+            val (
+                sheetPlaceable,
+                fabPlaceable,
+                snackbarPlaceable,
+            ) = measurables.drop(1).map {
+                it.measure(
+                    constraints.copy(
+                        minWidth = 0,
+                        minHeight = 0
+                    )
+                )
+            }
             
             val sheetOffsetY = bottomSheetOffset.value.roundToInt()
             
@@ -285,10 +312,15 @@ private fun BottomSheetScaffoldStack(
             
             fabPlaceable.placeRelative(fabOffsetX, fabOffsetY)
             
-            val snackbarOffsetX = (placeable.width - snackbarPlaceable.width) / 2
-            val snackbarOffsetY = placeable.height - snackbarPlaceable.height
+            val snackbarOffsetX =
+                (placeable.width - snackbarPlaceable.width) / 2
+            val snackbarOffsetY =
+                placeable.height - snackbarPlaceable.height
             
-            snackbarPlaceable.placeRelative(snackbarOffsetX, snackbarOffsetY)
+            snackbarPlaceable.placeRelative(
+                snackbarOffsetX,
+                snackbarOffsetY
+            )
         }
     }
 }
@@ -301,11 +333,11 @@ object BottomSheetScaffoldDefaults {
     val SheetPeekHeight = 56.dp
 }
 
-
+@Suppress("unused")
 @OptIn(ExperimentalMaterial3Api::class)
 val BottomSheetState.expandProgress: Float
     get() {
-        return when (progress.from) {
+        return when(progress.from) {
             BottomSheetValue.Collapsed -> {
                 when(progress.to) {
                     BottomSheetValue.Collapsed -> 0f
@@ -314,7 +346,7 @@ val BottomSheetState.expandProgress: Float
                 }
             }
             BottomSheetValue.Expanded -> {
-                when (progress.to) {
+                when(progress.to) {
                     BottomSheetValue.Expanded -> 1f
                     BottomSheetValue.Collapsed -> 1f - progress.fraction
                     else -> 0f

@@ -13,7 +13,9 @@ object PushMessageWrapper {
         MESSAGE("CHAT_MESSAGE"),
         MEETING_CREATED("MEETING_CREATED")
     }
-    // Data: {type=MEETING_CREATED, content={"meeting":{"id":"ef9aaa75-2bbf-4a01-ad77-8e867918f544","title":"DEBUG",
+    
+    // отсюда вырезать id и открывать при клике на него ботомщит
+//     Data: {type=MEETING_CREATED,content={"meeting":{"id":"ef9aaa75-2bbf-4a01-ad77-8e867918f544","title":"DEBUG",
     
     fun getChatId(data: String, type: LinkType) =
         mapper.readValue(

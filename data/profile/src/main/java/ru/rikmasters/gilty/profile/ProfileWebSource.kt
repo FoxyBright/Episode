@@ -5,7 +5,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders.ContentDisposition
 import io.ktor.http.HttpHeaders.ContentType
-import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
@@ -186,11 +185,7 @@ class ProfileWebSource: KtorSource() {
     suspend fun checkUserName(username: String) =
         tryGet("http://$HOST$PREFIX_URL/profile/checkname") {
             url { query("username" to username) }
-        }.let {
-            if(it.status == OK) false
-            else it.errorWrapped().error.message ==
-                    "errors.user.username.exists"
-        }
+        }.let { coroutinesState({ it }) { false } }
     
     suspend fun setUserData(
         username: String?,

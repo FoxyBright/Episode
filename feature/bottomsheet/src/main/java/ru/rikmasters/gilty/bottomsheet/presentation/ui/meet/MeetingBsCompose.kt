@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -173,45 +172,38 @@ fun MeetingBsContent(
     BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)
-        }, scaffoldState = bsState,
+        },
+        scaffoldState = bsState,
         sheetPeekHeight = 0.dp,
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Color.Transparent
     ) {
-        Box {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(colorScheme.background)
-                    .alpha(0.5f)
-            )
-            Scaffold(
-                bottomBar = {
-                    Button(
-                        memberState = state
-                            .meet.memberState,
-                        isOnline = state
-                            .meet.isOnline,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        if(state.detailed)
-                            callback?.onRespond(state.meet.id)
-                        else scope.launch {
-                            bsState.bottomSheetState.expand()
-                        }
+        Scaffold(
+            bottomBar = {
+                Button(
+                    memberState = state
+                        .meet.memberState,
+                    isOnline = state
+                        .meet.isOnline,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                ) {
+                    if(state.detailed)
+                        callback?.onRespond(state.meet.id)
+                    else scope.launch {
+                        bsState.bottomSheetState.expand()
                     }
                 }
-            ) {
-                MeetContent(
-                    state = state,
-                    modifier = modifier.padding(
-                        bottom = if(it.calculateBottomPadding() >= 0.dp)
-                            it.calculateBottomPadding() - 24.dp else 0.dp
-                    ),
-                    callback = callback
-                )
             }
+        ) {
+            MeetContent(
+                state = state,
+                modifier = modifier.padding(
+                    bottom = if(it.calculateBottomPadding() >= 0.dp)
+                        it.calculateBottomPadding() - 24.dp else 0.dp
+                ),
+                callback = callback
+            )
         }
     }
     MeetReaction(

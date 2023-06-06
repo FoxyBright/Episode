@@ -31,25 +31,6 @@ class TagsViewModel: ViewModel() {
         MutableStateFlow("")
     val search = _search.asStateFlow()
 
-    @OptIn(FlowPreview::class)
-    @Suppress("Unused")
-    private val _searchHelper = _search
-        .debounce(250)
-        .onEach {
-            manager.searchTags(it).on(
-                success = {
-                    _tags.emit(it)
-                },
-                loading = {},
-                error = {
-                    context.errorToast(
-                        it.serverMessage
-                    )
-                }
-            )
-        }
-        .state(_search.value, SharingStarted.Eagerly)
-
     private val _category =
         MutableStateFlow<CategoryModel?>(null)
     val category = _category.asStateFlow()
@@ -63,7 +44,7 @@ class TagsViewModel: ViewModel() {
     
     @OptIn(FlowPreview::class)
     val tags = _search
-        .combine(_search.debounce(250)) { _, current ->
+        .combine(search.debounce(250)) { _, current ->
             if(current.isNotBlank())
                 manager.searchTags(current).on(
                     success = { it },

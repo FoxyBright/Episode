@@ -10,18 +10,23 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
 import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.geometry.Point
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -40,17 +45,18 @@ data class YandexMapState(
     val categoryName: String? = null,
     val isSearching: Boolean = false,
     val currentPoint: Point? = null,
-    val subBsState: BottomSheetScaffoldState
+    val subBsState: BottomSheetScaffoldState,
+    val appBsState: BottomSheetScaffoldState,
 )
 
 interface YandexMapCallback {
     
     fun onBack()
-    fun getRoute()
     fun onMarkerClick(meetPlaceModel: MeetPlaceModel)
     fun onIsSearchingChange(value: Boolean)
     fun onCameraChange(point: Point)
     fun subBsExpandState(state: Boolean)
+    fun appBsExpandState(state: Boolean)
 }
 
 
@@ -62,26 +68,83 @@ fun YandexMapContent(
     callback: YandexMapCallback? = null,
 ) {
     BottomSheetScaffold(
-        scaffoldState = state.subBsState,
+        scaffoldState = state.appBsState,
         sheetContent = {
-            Bottom(state) {
-                callback?.getRoute()
+            val loc = state.location
+            loc?.lat?.let { lat ->
+                loc.lng?.let { lng ->
+                    AppBs(lat to lng)
+                }
             }
         },
         sheetBackgroundColor = Transparent,
-        sheetPeekHeight = 80.dp
+        sheetPeekHeight = 0.dp
     ) {
-        Column(modifier.fillMaxSize()) {
-            TopBar(Modifier) { callback?.onBack() }
-            MapContent(
-                state = state,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .offset(y = 24.dp),
-                callback = callback
-            )
+        BottomSheetScaffold(
+            scaffoldState = state.subBsState,
+            sheetContent = {
+                Bottom(state) {
+                    callback?.appBsExpandState(
+                        state = true
+                    )
+                }
+            },
+            sheetBackgroundColor = Transparent,
+            sheetPeekHeight = 80.dp
+        ) {
+            Column(modifier.fillMaxSize()) {
+                TopBar(Modifier) { callback?.onBack() }
+                MapContent(
+                    state = state,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .offset(y = 24.dp),
+                    callback = callback
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun AppBs(loc: Pair<Double, Double>) {
+    var alert by remember {
+        mutableStateOf(false)
+    }
+    var appIndex by remember {
+        mutableStateOf(0)
+    }
+    val scope =
+        rememberCoroutineScope()
+    
+    val googleMap =
+        "https://maps.google.com/?daddr=" +
+                "${loc.first}%2C$${loc.second}&zoom=18"
+    val yandexMap =
+        "https://maps.yandex.ru/?pt=" +
+                "${loc.second}%2C${loc.first}&z=18"
+    
+    val context = LocalContext.current
+    val asm = get<AppStateModel>()
+    MapAppsBs(
+        alert = alert,
+        appName = appIndex,
+        modifier = Modifier.background(
+            colorScheme.background
+        ),
+        alertDismiss = { state ->
+            if(state) {
+                openInWeb(
+                    context = context,
+                    uri = if(appIndex == 0)
+                        googleMap else yandexMap
+                )
+                scope.launch {
+                    asm.bottomSheet.collapse()
+                }
+            } else alert = false
+        }
+    ) { app -> appIndex = app; alert = true }
 }
 
 @Composable

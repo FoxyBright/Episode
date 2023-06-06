@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,10 +20,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.REPORTS
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.ChatAppBarState
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_AWAIT
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_ORGANIZER
-import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.TRANSLATION_ORGANIZER_AWAIT
+import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.GalleryBs
 import ru.rikmasters.gilty.chat.presentation.ui.chat.bottom.HiddenBs
 import ru.rikmasters.gilty.chat.viewmodel.ChatViewModel
@@ -209,7 +205,9 @@ fun ChatScreen(
                                 context.checkMediaPermissions(
                                     mediaPermissions
                                 ) {
-                                    nav.navigateAbsolute("translationviewer/viewer?id=${state.meet.id}")
+                                    nav.navigateAbsolute(
+                                        "translationviewer/viewer?id=${state.meet.id}"
+                                    )
                                     // TODO: to translation
                                     // vm.toTranslation()
                                 }

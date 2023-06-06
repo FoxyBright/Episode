@@ -65,13 +65,19 @@ class RegistrationManager(
             }
         }
     
-    suspend fun addHidden(files: List<File>) =
-        withContext(IO) { profileStore.addHidden(files) }
+    suspend fun addHidden(
+        files: List<File>,
+    ) = withContext(IO) {
+        profileStore
+            .addHidden(files)
+    }
     
-    suspend fun isNameOccupied(name: String) =
-        withContext(IO) {
-            profileWebSource.checkUserName(name)
-        }
+    suspend fun isNameOccupied(
+        name: String,
+    ) = withContext(IO) {
+        profileWebSource
+            .checkUserName(name)
+    }
     
     suspend fun userUpdateData(
         username: String? = null,

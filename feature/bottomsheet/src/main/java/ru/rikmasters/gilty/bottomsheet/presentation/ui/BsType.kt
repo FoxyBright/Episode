@@ -8,7 +8,6 @@ enum class BsType {
     USER,
     MEET,
     MAP,
-    APPS,
     SHORT_MEET,
     LOCATION
 }

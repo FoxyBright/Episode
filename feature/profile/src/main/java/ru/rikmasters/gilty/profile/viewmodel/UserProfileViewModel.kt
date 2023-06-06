@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
-import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -72,10 +71,17 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     val usernameDebounced = username
         .debounce(250)
         .onEach { name ->
-            _occupied.emit(
+            val occupied =
                 if(name == profile.value?.username) false
-                else regManager.isNameOccupied(name).log()
-            )
+                else regManager.isNameOccupied(name).on(
+                    success = { it },
+                    loading = { false },
+                    error = {
+                        it.serverMessage ==
+                                "errors.user.username.exists"
+                    }
+                )
+            _occupied.emit(occupied)
         }
         .state(_username.value, Eagerly)
     

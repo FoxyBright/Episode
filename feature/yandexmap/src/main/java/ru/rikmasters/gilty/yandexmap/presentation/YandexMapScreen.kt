@@ -7,11 +7,10 @@ import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue.Collapsed
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue.Expanded
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.yandexmap.model.MeetPlaceModel
@@ -26,12 +25,10 @@ fun YandexMapScreen(
 ) {
     
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
-    val userVisibility = false
     
+    val isSearching by vm.isSearching.collectAsState()
     val addMeet by vm.addMeet.collectAsState()
     val mapKit by vm.mapKit.collectAsState()
-    val isSearching by vm.isSearching.collectAsState()
     val address = addMeet?.address ?: ""
     val place = addMeet?.place ?: ""
     
@@ -41,11 +38,16 @@ fun YandexMapScreen(
     var placeNameChangeJob: Job? = null
     
     LaunchedEffect(Unit) {
-        vm.setMapKit(MapKitFactory.getInstance())
+        vm.setMapKit(
+            MapKitFactory
+                .getInstance()
+        )
         vm.changeMeetPlace(
             MeetPlaceModel(
-                loc.lat, loc.lng,
-                loc.place, loc.address
+                lat = loc.lat,
+                lng = loc.lng,
+                place = loc.place,
+                address = loc.address
             )
         )
     }
@@ -58,6 +60,11 @@ fun YandexMapScreen(
             bottomSheetState = BottomSheetState(Expanded)
         )
     
+    val appBsState =
+        rememberBottomSheetScaffoldState(
+            bottomSheetState = BottomSheetState(Collapsed)
+        )
+    
     LaunchedEffect(bsState) {
         subBsState.bottomSheetState.let {
             if(bsState) it.expand()
@@ -67,16 +74,27 @@ fun YandexMapScreen(
     
     mapKit?.let { map ->
         YandexMapContent(
-            YandexMapState(
+            state = YandexMapState(
                 mapKit = map,
                 location = loc,
-                userVisible = userVisibility,
+                userVisible = false,
                 address = address,
                 place = place,
                 categoryName = categoryName,
                 isSearching = isSearching,
-                subBsState = subBsState
-            ), callback = object: YandexMapCallback {
+                subBsState = subBsState,
+                appBsState = appBsState
+            ),
+            callback = object: YandexMapCallback {
+                
+                override fun appBsExpandState(state: Boolean) {
+                    val bs =
+                        appBsState.bottomSheetState
+                    scope.launch {
+                        if(state) bs.expand()
+                        else bs.collapse()
+                    }
+                }
                 
                 override fun subBsExpandState(state: Boolean) {
                     bsState = state
@@ -88,15 +106,6 @@ fun YandexMapScreen(
                 
                 override fun onCameraChange(point: Point) {
                     scope.launch { vm.onCameraChange(point) }
-                }
-                
-                override fun getRoute() {
-                    val route = "APPS?lat=${loc.lat}&lng=${loc.lng}"
-                    scope.launch {
-                        if(categoryName.isNullOrBlank())
-                            nav.navigate(route)
-                        else asm.bottomSheet.collapse()
-                    }
                 }
                 
                 override fun onMarkerClick(

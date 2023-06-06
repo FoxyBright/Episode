@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -36,10 +35,16 @@ fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
     
     TagsContent(
         TagsState(
-            selected, popular, search,
-            searchResult, isOnline,
-            (null), (false), alpha
-        ), Modifier, object: TagsCallback {
+            selected = selected,
+            populars = popular,
+            search = search,
+            searchResult = searchResult,
+            isOnline = isOnline,
+            category = null,
+            add = false,
+            alpha = alpha
+        ),
+        callback = object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {
                 scope.launch {

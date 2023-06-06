@@ -24,11 +24,11 @@ fun FiltersBs(
     val categories by vm.categories.collectAsState()
     val distanceState by vm.distanceState.collectAsState()
     val meetTypes by vm.meetTypes.collectAsState()
+    val results by vm.mainVm.results.collectAsState()
     val today by vm.mainVm.today.collectAsState()
     val isOnline by vm.isOnline.collectAsState()
     val tags by vm.tags.collectAsState()
     val distance by vm.distance.collectAsState()
-    val results by vm.mainVm.results.collectAsState()
     val city by vm.city.collectAsState()
     val screen by vm.screen.collectAsState()
     

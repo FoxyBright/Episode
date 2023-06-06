@@ -151,7 +151,10 @@ fun Profile(
             profileType = state.profileType,
             onSaveUsername = { callback?.onSaveUserName() }
         ) { callback?.onNameChange(it) }
-        ErrorLabel(state.errorText)
+        ErrorLabel(
+            modifier = Modifier.padding(start = 16.dp),
+            errorText = state.errorText
+        )
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             ProfileImageContent(
                 modifier = Modifier.weight(1f),
@@ -268,10 +271,13 @@ private fun AboutMe(
 }
 
 @Composable
-private fun ErrorLabel(errorText: String) {
+private fun ErrorLabel(
+    modifier: Modifier,
+    errorText: String,
+) {
     Text(
         text = errorText,
-        modifier = Modifier.offset(y = -(10).dp),
+        modifier = modifier.offset(y = -(10).dp),
         color = colorScheme.primary,
         style = typography.titleSmall.copy(
             fontSize = 10.dp.toSp()
@@ -310,7 +316,7 @@ private fun TopBar(
                     modifier = Modifier.padding(end = 8.dp),
                     color = colorScheme.onTertiary,
                     style = typography.headlineLarge.copy(
-                        fontSize = when(profileType){
+                        fontSize = when(profileType) {
                             CREATE -> 23
                             USERPROFILE -> 28
                             else -> 20

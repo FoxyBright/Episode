@@ -186,7 +186,8 @@
     <string name="meetings_finished">Завершено</string>
     <string name="maps_google">Google\nMaps</string>
     <string name="maps_yandex">Yandex\nMaps</string>
-
+    <string name="maps_google_space">Google Maps</string>
+    <string name="maps_yandex_space">Yandex Maps</string>
 
     <!--Meeting Filters-->
     <string name="meeting_filter_add_tag_text_holder">Добавьте тег</string>

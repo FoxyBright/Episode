@@ -7,7 +7,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-@Suppress("unused")
 @OptIn(ExperimentalPermissionsApi::class)
 val mediaPermissionState: @Composable () -> MultiplePermissionsState = {
     rememberMultiplePermissionsState(
