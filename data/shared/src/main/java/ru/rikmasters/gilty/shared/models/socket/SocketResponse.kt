@@ -13,4 +13,6 @@ data class SocketResponse(
 ) {
     
     val data get() = _data as String
+
+    val dataRaw get() = _data
 }

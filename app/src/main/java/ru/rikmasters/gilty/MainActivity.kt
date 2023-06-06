@@ -34,7 +34,6 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.ErrorConnection
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GLoader
 import ru.rikmasters.gilty.ui.GSnackbar
@@ -44,7 +43,6 @@ class MainActivity : ComponentActivity() {
 
     private val authManager by inject<AuthManager>()
     private val chatManager by inject<ChatManager>()
-    private val translationRepository by inject<TranslationRepository>()
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
     private val context by inject<Context>()
@@ -55,7 +53,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-MapKitFactory.getInstance().onStart()
+        MapKitFactory.getInstance().onStart()
         
         CoroutineScope(IO).launch {
             inject<MeetingManager>()
@@ -93,7 +91,7 @@ MapKitFactory.getInstance().onStart()
                 }
             )
 
-            GiltyTheme{ if (errorState) ErrorConnection() }
+            GiltyTheme { if (errorState) ErrorConnection() }
             corScope.launch {
                 while (true) {
                     delay(2000)

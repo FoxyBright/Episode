@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.data.ktor.KtorSource
+import ru.rikmasters.gilty.shared.model.DataStateTest
+import ru.rikmasters.gilty.shared.model.ExceptionCause
 import ru.rikmasters.gilty.shared.models.socket.Res
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import java.io.IOException
@@ -64,14 +66,34 @@ abstract class WebSocket : KtorSource() {
     }
 
     suspend fun send(data: Map<String, String>, event: String) {
-        _session.value?.send(
-            mapper.writeValueAsString(
-                mapOf(
-                    "data" to data,
-                    "event" to event,
+        try {
+            _session.value?.send(
+                mapper.writeValueAsString(
+                    mapOf(
+                        "data" to data,
+                        "event" to event,
+                    ),
                 ),
-            ),
-        )
+            )
+        } catch (e: Exception) {
+            Log.d("TEST","Inner")
+        }
+    }
+
+    suspend fun trySend(data: Map<String, String>, event: String): DataStateTest<Unit> {
+        try {
+            _session.value?.send(
+                mapper.writeValueAsString(
+                    mapOf(
+                        "data" to data,
+                        "event" to event,
+                    ),
+                ),
+            )
+            return DataStateTest.Success(Unit)
+        } catch (e: Exception) {
+            return DataStateTest.Error(cause = ExceptionCause.IO)
+        }
     }
 
     private suspend fun doPing(session: DefaultClientWebSocketSession) {
@@ -93,11 +115,13 @@ abstract class WebSocket : KtorSource() {
     suspend fun connect(userId: String) {
         try {
             connection(userId)
+            Log.d("TEST","conn socck 5")
         } catch (e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
             disconnect()
             try {
+                Log.d("TEST","conn socck 6")
                 connection(userId)
             } catch (e: Exception) {
                 logE("Bad reconnection")

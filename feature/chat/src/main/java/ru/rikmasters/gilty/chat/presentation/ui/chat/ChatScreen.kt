@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.WindowInsets
@@ -42,8 +43,8 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
-import ru.rikmasters.gilty.translation.util.checkMediaPermissions
-import ru.rikmasters.gilty.translation.util.mediaPermissionState
+import ru.rikmasters.gilty.translation.shared.util.checkMediaPermissions
+import ru.rikmasters.gilty.translation.shared.util.mediaPermissionState
 import java.io.File
 
 @SuppressLint("Recycle")
@@ -205,17 +206,29 @@ fun ChatScreen(
                 
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
-                        if(type == TRANSLATION || type == TRANSLATION_ORGANIZER) {
-                            context.checkMediaPermissions(
-                                mediaPermissions
-                            ) {
-                                nav.navigateAbsolute("translations/main?id=${state.meet.id}")
-                                // TODO: to translation
-                               // vm.toTranslation()
+                        when(type) {
+                            TRANSLATION -> {
+                                context.checkMediaPermissions(
+                                    mediaPermissions
+                                ) {
+                                    nav.navigateAbsolute("translationviewer/viewer?id=${state.meet.id}")
+                                    // TODO: to translation
+                                    // vm.toTranslation()
+                                }
                             }
-                        } else {
-                            vm.completeChat(chat)
-                            nav.navigate("main")
+                            TRANSLATION_ORGANIZER -> {
+                                context.checkMediaPermissions(
+                                    mediaPermissions
+                                ) {
+                                    nav.navigateAbsolute("translations/streamer?id=${state.meet.id}")
+                                    // TODO: to translation
+                                    // vm.toTranslation()
+                                }
+                            }
+                            else -> {
+                                vm.completeChat(chat)
+                                nav.navigate("main")
+                            }
                         }
                     }
                 }

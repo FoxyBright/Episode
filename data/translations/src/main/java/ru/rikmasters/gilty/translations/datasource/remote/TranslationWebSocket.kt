@@ -2,11 +2,15 @@ package ru.rikmasters.gilty.translations.datasource.remote
 
 import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.gson.Gson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
+import ru.rikmasters.gilty.shared.model.DataStateTest
+import ru.rikmasters.gilty.shared.model.ExceptionCause
 import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
+import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import ru.rikmasters.gilty.shared.socket.WebSocket
@@ -14,7 +18,7 @@ import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
 
-data class User(val user: String, val count: String)
+data class Count(val count: Int)
 class TranslationWebSocket : WebSocket() {
 
     override val port: Int = 6002
@@ -34,6 +38,7 @@ class TranslationWebSocket : WebSocket() {
             TranslationsSocketEvents.CONNECTION_ESTABLISHED -> {
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
                 subscribe("private-translation.${_translationId.value}")
+                _answer.send(TranslationCallbackEvents.ConnectionEstablished)
             }
 
             TranslationsSocketEvents.SUBSCRIPTION_SUCCEEDED -> {
@@ -81,8 +86,7 @@ class TranslationWebSocket : WebSocket() {
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserConnected(
-                        user = user.user,
-                        count = user.count.toInt()
+                        user = user.map()
                     ),
                 )
             }
@@ -91,26 +95,38 @@ class TranslationWebSocket : WebSocket() {
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserDisconnected(
-                        user = user.user,
-                        count = user.count.toInt()
+                        user = user.map()
                     ),
                 )
             }
+
             TranslationsSocketEvents.USER_KICKED -> {
                 val user = mapper.readValue<User>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserKicked(
-                        user = user.user,
-                        count = user.count.toInt()
+                        user = user.map()
                     ),
                 )
             }
+
             TranslationsSocketEvents.MESSAGE_SENT -> {
                 _answer.send(
                     TranslationCallbackEvents.MessageReceived
                 )
             }
+
             else -> {}
+        }
+        if (
+            event == TranslationsSocketEvents.USER_CONNECTED || event == TranslationsSocketEvents.USER_DISCONNECTED
+            || event == TranslationsSocketEvents.USER_KICKED
+        ) {
+            val count = mapper.readValue<Count>(response.data)
+            _answer.send(
+                TranslationCallbackEvents.MembersCountChanged(
+                    count = count.count
+                )
+            )
         }
     }
 
@@ -121,19 +137,20 @@ class TranslationWebSocket : WebSocket() {
 
     suspend fun connectToTranslation(id: String) {
         disconnectFromTranslation()
-        Log.d("TranslationWeb","CONNECT TRY WITH USERID ${_userId.value} TRRRID $id")
         subscribe("private-translation.$id.${_userId.value}") {
             if (it) _translationId.emit(id)
         }
     }
 
-    suspend fun disconnectFromTranslation() {
-        _translationId.value?.let {
-            send(
+    suspend fun disconnectFromTranslation(): DataStateTest<Unit> {
+        return _translationId.value?.let {
+            trySend(
                 data = mapOf("channel" to "private-translation.$it.${_userId.value}"),
                 event = TranslationsSocketEvents.UNSUBSCRIBE.value,
             )
-        }
+        } ?: DataStateTest.Error(
+            cause = ExceptionCause.IO
+        )
     }
 
     suspend fun connectToTranslationChat(id: String) {

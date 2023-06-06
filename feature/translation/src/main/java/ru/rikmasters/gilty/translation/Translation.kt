@@ -7,15 +7,16 @@ import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.translation.presentation.ui.logic.TestTranslationScreen
-import ru.rikmasters.gilty.translation.viewmodel.TranslationViewModel
+import ru.rikmasters.gilty.translation.streamer.presentation.ui.logic.TestTranslationScreen
+import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationViewModel
+import ru.rikmasters.gilty.translation.viewer.viewmodel.TranslationViewerViewModel
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
 object Translation : FeatureDefinition() {
     override fun DeepNavGraphBuilder.navigation() {
-        nested("translations","main") {
+        nested("translations","streamer") {
             screen<TranslationViewModel>(
-                route = "main?id={id}",
+                route = "streamer?id={id}",
                 arguments = listOf(
                     navArgument("id"){
                         type = NavType.StringType; defaultValue = ""
@@ -36,5 +37,6 @@ object Translation : FeatureDefinition() {
         singleOf(::TranslationRepository)
         singleOf(::MeetingManager)
         singleOf(::TranslationViewModel)
+        singleOf(::TranslationViewerViewModel)
     }
 }
