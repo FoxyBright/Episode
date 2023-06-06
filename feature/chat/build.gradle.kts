@@ -15,7 +15,8 @@ dependencies {
     implementation(project(":feature:animated"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:gallery"))
-    
+    implementation(project(":feature:translation"))
+
     implementation(project(":domain:paginator"))
     
     implementation(project(":data:meetings"))

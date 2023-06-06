@@ -300,3 +300,26 @@ object BottomSheetScaffoldDefaults {
     val SheetElevation = 8.dp
     val SheetPeekHeight = 56.dp
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+val BottomSheetState.expandProgress: Float
+    get() {
+        return when (progress.from) {
+            BottomSheetValue.Collapsed -> {
+                when(progress.to) {
+                    BottomSheetValue.Collapsed -> 0f
+                    BottomSheetValue.Expanded -> progress.fraction
+                    else -> 0f
+                }
+            }
+            BottomSheetValue.Expanded -> {
+                when (progress.to) {
+                    BottomSheetValue.Expanded -> 1f
+                    BottomSheetValue.Collapsed -> 1f - progress.fraction
+                    else -> 0f
+                }
+            }
+            else -> 0f
+        }
+    }

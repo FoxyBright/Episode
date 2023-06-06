@@ -254,12 +254,12 @@ class ChatViewModel: ViewModel() {
                         if(c.organizer.id != c.userId)
                             if(!c.isOnline) MEET
                             else getTranslationType(
-                                c.datetime, chatId
+                                c.datetime, chatId, false
                             )
                         else when {
                             c.meetStatus != ACTIVE -> MEET_FINISHED
                             c.isOnline -> getTranslationType(
-                                c.datetime, chatId
+                                c.datetime, chatId, true
                             )
                             else -> MEET
                         }
@@ -279,13 +279,14 @@ class ChatViewModel: ViewModel() {
         date: String?,
         @Suppress("UNUSED_PARAMETER")
         chatId: String,
+        isOrganizer: Boolean
     ) = date?.let {
         val start = ofZ(it).millis()
         val now = nowZ().millis()
         val difference = start - now
         
         logD("Data --->>> $date")
-        logD("Data --->>> ${ofZ(it)}")
+        logD("Data --->>> ${ofZ(date)}")
         logD("Data --->>> ${nowZ()}")
         logD("Data --->>> ${ofZ(it).millis() - nowZ().millis()}")
         logD("Data --->>> ${(ofZ(it).millis() - nowZ().millis()) / 3600000}")
@@ -298,14 +299,14 @@ class ChatViewModel: ViewModel() {
                             .getTranslationViewersCount(id)
                     )
                 }
-                if(_meet.value?.organizer?.id == _meet.value?.userId)
+                if(isOrganizer)
                     TRANSLATION_ORGANIZER
                 else TRANSLATION
             }
             
             (start - now) < 1_800_000 -> {
                 _translationTimer.emit(difference)
-                if(_meet.value?.organizer?.id == _meet.value?.userId) {
+                if(isOrganizer) {
                     TRANSLATION_ORGANIZER_AWAIT
                 } else {
                     TRANSLATION_AWAIT
@@ -342,6 +343,7 @@ class ChatViewModel: ViewModel() {
             _translationTimer.emit(
                 it.minus(1)
             )
+            Log.d("TEST","TranslationTimer $it")
         }
     }
     

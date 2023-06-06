@@ -36,7 +36,6 @@ import ru.rikmasters.gilty.shared.common.ErrorConnection
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
 import ru.rikmasters.gilty.ui.GLoader
 import ru.rikmasters.gilty.ui.GSnackbar
@@ -46,9 +45,6 @@ class MainActivity: ComponentActivity() {
     
     private val authManager by inject<AuthManager>()
     private val chatManager by inject<ChatManager>()
-    
-    @Suppress("unused")
-    private val translationRepository by inject<TranslationRepository>()
     private val regManager by inject<RegistrationManager>()
     private val profileManager by inject<ProfileManager>()
     private val context by inject<Context>()

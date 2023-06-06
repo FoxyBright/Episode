@@ -40,29 +40,31 @@ class TranslationRepository(
         webSocket.connect(userId)
     }
     
-    suspend fun connectToTranslation(translationId: String) {
-        withContext(Dispatchers.IO) {
-            webSocket.connectToTranslation(
-                id = translationId
-            )
+    suspend fun connectToTranslation(translationId: String) =
+        coroutinesState {
+            withContext(Dispatchers.IO) {
+                webSocket.connectToTranslation(
+                    id = translationId
+                )
+            }
         }
-    }
     
-    suspend fun disconnectFromTranslation() {
-        withContext(Dispatchers.IO) {
+    suspend fun disconnectFromTranslation(): DataStateTest<Unit> {
+        return withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslation()
         }
     }
     
-    suspend fun connectToTranslationChat(translationId: String) {
-        withContext(Dispatchers.IO) {
-            webSocket.connectToTranslationChat(
-                id = translationId
-            )
+    suspend fun connectToTranslationChat(translationId: String) =
+        coroutinesState {
+            withContext(Dispatchers.IO) {
+                webSocket.connectToTranslationChat(
+                    id = translationId
+                )
+            }
         }
-    }
     
-    suspend fun disconnectFromTranslationChat() {
+    suspend fun disconnectFromTranslationChat() = coroutinesState {
         withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslationChat()
         }
@@ -165,4 +167,3 @@ class TranslationRepository(
         .ping(translationId)
         .let { coroutinesState({ it }) {} }
 }
-
