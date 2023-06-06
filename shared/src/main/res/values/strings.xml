@@ -163,7 +163,7 @@
     <string name="meeting_only_online_meetings_button">Только онлайн episodes</string>
     <string name="meeting_comment_text_holder">Комментарий</string>
     <string name="meeting_respond_title">Отклик отправлен</string>
-    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат episode</string>
+    <string name="meeting_respond_label">Когда организатор примет ваш\nотклик, вам будет доступен чат\nepisode</string>
     <string name="meeting_without_respond_title">Мгновенное\nучастие!</string>
     <string name="meeting_without_respond_label">Вы стали участником, теперь вам\nдоступен чат episode</string>
     <string name="meeting_shared_button">Поделиться</string>

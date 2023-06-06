@@ -35,7 +35,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
     
-    val regexError = username.contains(Regex("[^A-Za-z\\d]"))
+    val regexError = username.contains(Regex("[^A-Za-z]"))
     val shortUserNameError = username.length in 1 until 4
     var errorAvatar by remember { mutableStateOf(false) }
     val longUserNameError = username.length > 20

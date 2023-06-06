@@ -1,14 +1,7 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,10 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.Center
@@ -87,27 +77,38 @@ fun CategoryItem(
     onClick: ((Boolean) -> Unit)? = null,
 ) {
     val animatedSize by animateDpAsState(
-        targetValue = if(isAnimating) 40.dp else size.dp, animationSpec = tween(
+        targetValue = if(isAnimating)
+            40.dp else size.dp,
+        animationSpec = tween(
             durationMillis = 100,
             easing = FastOutLinearInEasing
         )
     )
     val animatableSize = animatedSize.value
-
-    val backgroundColor by animateColorAsState(if (state)
-        color else colorScheme.outlineVariant,
-        animationSpec = tween(100, easing = LinearEasing)
+    
+    val backgroundColor by animateColorAsState(
+        if(state)
+            color else colorScheme.outlineVariant,
+        animationSpec = tween(
+            durationMillis = 100,
+            easing = LinearEasing
+        )
     )
-
+    
     AnimatedVisibility(
         visible = !isAnimating,
-        enter = fadeIn(animationSpec = tween(700)),
-        exit = fadeOut(animationSpec = tween(700))
+        enter = fadeIn(
+            animationSpec = tween(700)
+        ),
+        exit = fadeOut(
+            animationSpec = tween(700)
+        )
     ) {
         Box(
             modifier
                 .padding(4.dp)
-                .size((animatableSize).dp)) {
+                .size((animatableSize).dp)
+        ) {
             Box(
                 Modifier
                     .size(animatableSize.dp)
@@ -132,7 +133,7 @@ fun CategoryItem(
                     .clip(CircleShape)
                     .background(White)
                     .align(
-                        if (iconBottomState)
+                        if(iconBottomState)
                             BottomStart else TopEnd
                     ), Center
             ) { GEmojiImage(icon, Modifier.size((animatableSize / 6).dp)) }

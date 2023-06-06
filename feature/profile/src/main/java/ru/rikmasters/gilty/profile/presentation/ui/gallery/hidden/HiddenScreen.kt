@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -17,7 +16,10 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HiddenBsScreen(vm: HiddenViewModel) {
+fun HiddenBsScreen(
+    vm: HiddenViewModel,
+    update: Boolean,
+) {
     
     val photoList = vm.images.collectAsLazyPagingItems()
     val photoAmount = vm.photosAmount.collectAsState()
@@ -33,20 +35,21 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
     
     
     LaunchedEffect(Unit) {
-        vm.uploadPhotoList()
+        vm.uploadPhotoList(update)
         vm.getHiddenPhotosAmount()
     }
     
     HiddenBsContent(
-        HiddenBsState(
-            photoList,
-            photoAmount.value,
-            photoViewState,
-            viewerImages,
-            viewerSelectImage,
-            false,
-            photoViewType
-        ), Modifier, object: HiddenBsCallback {
+        state = HiddenBsState(
+            photoList = photoList,
+            photoAmount = photoAmount.value,
+            photoViewState = photoViewState,
+            viewerImages = viewerImages,
+            viewerSelectImage = viewerSelectImage,
+            viewerMenuState = false,
+            viewerType = photoViewType
+        ),
+        callback = object: HiddenBsCallback {
             
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
@@ -61,7 +64,12 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
                 scope.launch {
                     context.checkStoragePermission(
                         storagePermissions, scope, asm,
-                    ) { nav.navigate("gallery?multi=true") }
+                    ) {
+                        nav.navigate(
+                            "gallery?multi=true" +
+                                    "&dest=profile/hidden?update=${true}"
+                        )
+                    }
                 }
             }
             
@@ -70,7 +78,7 @@ fun HiddenBsScreen(vm: HiddenViewModel) {
             }
             
             override fun onBack() {
-                nav.navigate("main?update=${true}")
+                nav.navigate("main?update=$update")
             }
             
             override fun onPhotoViewDismiss(state: Boolean) {

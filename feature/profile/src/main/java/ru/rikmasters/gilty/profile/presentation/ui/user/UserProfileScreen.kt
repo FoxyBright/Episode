@@ -67,7 +67,7 @@ fun UserProfileScreen(
         )
     }
     
-    val regexError = username.contains(Regex("[^A-Za-z\\d]"))
+    val regexError = username.contains(Regex("[^A-Za-z]"))
     val shortUserNameError = username.length in 1 until 4
     val longUserNameError = username.length > 20
     

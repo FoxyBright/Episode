@@ -34,7 +34,8 @@ object Profile: FeatureDefinition() {
                         defaultValue = false
                     })
             ) { vm, it ->
-                it.arguments?.getBoolean("update")
+                it.arguments
+                    ?.getBoolean("update")
                     ?.let { update ->
                         UserProfileScreen(vm, update)
                     }
@@ -51,9 +52,7 @@ object Profile: FeatureDefinition() {
             ) { vm, stack ->
                 stack.arguments
                     ?.getInt("albumId")
-                    ?.let {
-                        AlbumDetailsScreen(vm, it)
-                    }
+                    ?.let { AlbumDetailsScreen(vm, it) }
             }
             
             screen<SettingsViewModel>("settings") { vm, _ ->
@@ -66,27 +65,51 @@ object Profile: FeatureDefinition() {
                     type = NavType.StringType; defaultValue = ""
                 })
             ) { vm, stack ->
-                stack.arguments?.getString("image")?.let {
-                    CropperScreen(vm, it)
-                }
+                stack.arguments
+                    ?.getString("image")
+                    ?.let { CropperScreen(vm, it) }
             }
             
             screen<GalleryViewModel>(
-                "gallery?multi={multi}",
-                listOf(navArgument("multi") {
-                    type = NavType.BoolType; defaultValue = false
-                })
-            ) { vm, it ->
-                it.arguments?.getBoolean("multi")
-                    ?.let { multi -> GalleryScreen(vm, multi) }
+                route = "gallery?multi={multi}&dest={dest}",
+                arguments = listOf(
+                    navArgument("multi") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                    navArgument("dest") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { vm, backStack ->
+                val arg = backStack.arguments
+                arg?.getBoolean("multi")
+                    ?.let { multi ->
+                        arg.getString("dest")
+                            ?.let { dest ->
+                                GalleryScreen(vm, multi, dest)
+                            }
+                    }
             }
             
             screen<CategoryViewModel>("categories") { vm, _ ->
                 CategoriesScreen(vm)
             }
             
-            screen<HiddenViewModel>("hidden") { vm, _ ->
-                HiddenBsScreen(vm)
+            screen<HiddenViewModel>(
+                route = "hidden?update={update}",
+                arguments = listOf(
+                    navArgument("update") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    })
+            ) { vm, it ->
+                it.arguments
+                    ?.getBoolean("update")
+                    ?.let { update ->
+                        HiddenBsScreen(vm, update)
+                    }
             }
         }
     }

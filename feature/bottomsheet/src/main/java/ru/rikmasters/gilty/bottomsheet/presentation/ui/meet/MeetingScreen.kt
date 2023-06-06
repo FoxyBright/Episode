@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -62,14 +61,25 @@ fun MeetingBs(
     Use<MeetingBsViewModel>(LoadingTrait) {
         meeting?.let { meet ->
             MeetingBsContent(
-                MeetingBsState(
-                    menu, meet, lastResponse, memberList,
-                    distance, buttonState, detailed,
-                    comment, hidden, backBut, meetReaction,
-                ), Modifier, object: MeetingBsCallback {
+                state = MeetingBsState(
+                    menuState = menu,
+                    meet = meet,
+                    lastRespond = lastResponse,
+                    membersList = memberList,
+                    meetDistance = distance,
+                    buttonState = buttonState,
+                    detailed = detailed,
+                    comment = comment,
+                    hidden = hidden,
+                    backButton = backBut,
+                    meetReaction = meetReaction,
+                ),
+                callback = object: MeetingBsCallback {
                     
                     override fun meetReactionDisable() {
-                        scope.launch { vm.meetReactionDisable(false) }
+                        scope.launch {
+                            vm.meetReactionDisable(false)
+                        }
                     }
                     
                     override fun onMenuItemClick(

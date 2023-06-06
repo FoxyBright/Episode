@@ -64,7 +64,8 @@ class ProfileManager(
     
     fun getHiddenPhotos() = store.getUserHiddenPaging()
     
-    suspend fun getHiddenPhotosAmount() = store.getHiddenPhotosAmount()
+    suspend fun getHiddenPhotosAmount() =
+        store.getHiddenPhotosAmount()
     
     suspend fun getProfileHiddens(forceWeb: Boolean) =
         withContext(IO) { store.getUserHidden(forceWeb) }

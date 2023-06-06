@@ -329,7 +329,7 @@ private fun MeetContent(
             item {
                 MeetingBsTopBarCompose(
                     modifier = Modifier.padding(
-                        bottom = if (state.detailed)
+                        bottom = if(state.detailed)
                             28.dp else 0.dp
                     ),
                     state = MeetingBsTopBarState(
@@ -342,9 +342,9 @@ private fun MeetContent(
                     callback = callback
                 )
             }
-
-            if (state.detailed) {
-
+            
+            if(state.detailed) {
+                
                 item {
                     Text(
                         text = stringResource(
@@ -354,7 +354,7 @@ private fun MeetContent(
                         style = typography.labelLarge
                     )
                 }
-
+                
                 item {
                     MeetingBsComment(
                         text = state.comment ?: "",
@@ -363,7 +363,7 @@ private fun MeetContent(
                         modifier = Modifier.padding(top = 22.dp)
                     ) { callback?.onCommentTextClear() }
                 }
-
+                
                 item {
                     MeetingBsHidden(
                         modifier = Modifier.padding(top = 8.dp),
@@ -376,7 +376,7 @@ private fun MeetContent(
                     MeetingBsConditions(
                         meet = state.meet.map(),
                         modifier = Modifier.padding(
-                            top = if (state.meet.description.isNotBlank())
+                            top = if(state.meet.description.isNotBlank())
                                 32.dp else 0.dp
                         )
                     )
@@ -398,7 +398,7 @@ private fun MeetContent(
                         )
                     }
                 }
-                if (state.meetDistance != null
+                if(state.meetDistance != null
                     && !state.meet.isOnline
                 ) item {
                     MeetingBsMap(

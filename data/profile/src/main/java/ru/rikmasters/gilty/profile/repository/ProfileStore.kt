@@ -95,19 +95,18 @@ class ProfileStore(
             list
         }
     
-    fun getUserHiddenPaging() =
-        Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                HiddenPhotosPagingSource(
-                    webSource = webSource,
-                    localSource = primarySource
-                )
-            }
-        ).flow
+    fun getUserHiddenPaging() = Pager(
+        config = PagingConfig(
+            pageSize = 15,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            HiddenPhotosPagingSource(
+                webSource = webSource,
+                localSource = primarySource
+            )
+        }
+    ).flow
     
     suspend fun getUserHidden(
         forceWeb: Boolean,
@@ -129,6 +128,7 @@ class ProfileStore(
                 }
             }
         
+        logD("UPDATE IMAGES")
         primarySource.deleteAll<Avatar>()
         primarySource.deleteAll<AvatarAmount>()
         

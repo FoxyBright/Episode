@@ -225,7 +225,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun setUserDate(
-        forceWeb: Boolean = false,
+        forceWeb: Boolean,
     ) = singleLoading {
         profileManager.getProfile(forceWeb)
             .let { user ->

@@ -3,8 +3,6 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.mainscreen.presentation.ui.categories.CategoriesScreen
 import ru.rikmasters.gilty.mainscreen.viewmodels.bottoms.FiltersBsViewModel
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
@@ -18,7 +16,6 @@ fun FiltersBs(
 ) {
     
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
     
     val selectedCategories by vm.selectedCategories.collectAsState()
     val interest by vm.mainVm.userCategories.collectAsState()
@@ -79,7 +76,7 @@ fun FiltersBs(
                 categoriesStates, city, hasFilters, alpha
             ),
             callback = object: MeetingFilterBottomCallback {
-    
+                
                 override fun onCategoryClick(
                     index: Int, category: CategoryModel,
                 ) {
@@ -89,58 +86,55 @@ fun FiltersBs(
                             ?: run { vm.selectCategory(category) }
                     }
                 }
-    
+                
                 override fun onSubClick(parent: CategoryModel) {
                     scope.launch { vm.selectCategory(parent) }
                 }
-    
+                
                 override fun onAllCategoryClick() {
                     if(!isCollapsed)
                         scope.launch { vm.navigate(1) }
                 }
-    
+                
                 override fun onFilterClick() {
                     scope.launch { vm.navigate(2) }
                 }
-    
+                
                 override fun onCityClick() {
                     if(!isCollapsed)
                         scope.launch { vm.navigate(3) }
                 }
-    
+                
                 override fun onDeleteTag(tag: TagModel) {
                     scope.launch { vm.deleteTag(tag) }
                 }
-    
+                
                 override fun onClear() {
                     scope.launch { vm.clearFilters() }
                 }
-    
+                
                 override fun onDistanceClick() {
                     scope.launch { vm.changeDistanceState() }
                 }
-    
+                
                 override fun onDistanceValueChange(it: Int) {
                     scope.launch { vm.changeDistance(it) }
                 }
-    
+                
                 override fun onOnlyOnlineClick() {
                     scope.launch { vm.changeOnline() }
                 }
-    
+                
                 override fun onMeetingTypeSelect(index: Int) {
                     scope.launch { vm.selectMeetType(index) }
                 }
-    
+                
                 override fun onConditionSelect(index: Int) {
                     scope.launch { vm.selectCondition(index) }
                 }
-    
+                
                 override fun onFilter() {
-                    scope.launch {
-                        vm.onSave()
-                        asm.bottomSheet.collapse()
-                    }
+                    scope.launch { vm.onSave() }
                 }
             }
         )

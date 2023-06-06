@@ -18,25 +18,26 @@ class HiddenViewModel: ViewModel() {
     private val context = getKoin().get<Context>()
     
     val images by lazy {
-        profileManager.getHiddenPhotos().cachedIn(coroutineScope)
+        profileManager.getHiddenPhotos()
+            .cachedIn(coroutineScope)
     }
     
     private val _photosAmount = MutableStateFlow(0)
     val photosAmount = _photosAmount.asStateFlow()
-
+    
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
-
+    
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
-
+    
     private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
     val viewerType = _viewerType.asStateFlow()
-
+    
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
-
-    suspend fun uploadPhotoList(forceWeb: Boolean = false) {
+    
+    suspend fun uploadPhotoList(forceWeb: Boolean) {
         profileManager.getProfileHiddens(forceWeb)
     }
     
@@ -54,20 +55,23 @@ class HiddenViewModel: ViewModel() {
     }
     
     suspend fun getHiddenPhotosAmount() {
-        _photosAmount.emit(profileManager.getHiddenPhotosAmount())
+        _photosAmount.emit(
+            profileManager.getHiddenPhotosAmount()
+        )
     }
+    
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
     }
-
+    
     suspend fun changePhotoViewType(type: PhotoViewType) {
         _viewerType.emit(type)
     }
-
+    
     suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
         _viewerImages.emit(list)
     }
-
+    
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }

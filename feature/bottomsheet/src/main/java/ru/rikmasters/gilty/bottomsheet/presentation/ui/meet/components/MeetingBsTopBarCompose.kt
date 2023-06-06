@@ -188,7 +188,7 @@ private fun Meet(
             }
             MeetDetails(
                 meet, Modifier
-                    .offset(y = -(4).dp)
+                    .offset(y = -(10).dp)
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
             )
@@ -216,7 +216,6 @@ private fun MeetDetails(
         Row(Modifier.fillMaxWidth(), SpaceBetween) {
             SubLabel(
                 text = meet.datetime.format("HH:mm"),
-                modifier = Modifier.weight(1f),
                 color = when {
                     meet.status == COMPLETED ->
                         colorScheme.onTertiary
@@ -254,11 +253,15 @@ private fun SubLabel(
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(12.dp, 3.dp),
-            style = typography.labelSmall.copy(
-                fontSize = 14.dp.toSp(),
-                color = White, fontWeight = Bold,
-            )
+            modifier = Modifier
+                .padding(12.dp, 3.dp),
+            style = typography
+                .labelSmall.copy(
+                    fontSize = 14
+                        .dp.toSp(),
+                    color = White,
+                    fontWeight = Bold,
+                )
         )
     }
 }

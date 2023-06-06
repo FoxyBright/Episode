@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,27 +13,34 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.CategoryItem
+import ru.rikmasters.gilty.shared.common.CATEGORY_ELEMENT_SIZE
 import ru.rikmasters.gilty.shared.common.GCachedImage
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
+import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
@@ -60,17 +68,21 @@ fun MeetReaction(
     if(state) Popup {
         Box(modifier.fillMaxSize()) {
             GCachedImage(
-                meet.organizer.avatar?.thumbnail?.url,
-                Modifier.fillMaxSize(),
+                url = meet.organizer.avatar
+                    ?.thumbnail?.url,
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentScale = Crop
             )
             Bottom(
-                meet.category,
-                meet.withoutResponds,
-                Modifier.align(BottomCenter)
+                category = meet.category,
+                withoutResponds = meet
+                    .withoutResponds,
+                modifier = Modifier
+                    .align(BottomCenter)
             )
             CloseButton(
-                Modifier
+                modifier = Modifier
                     .padding(16.dp, 28.dp)
                     .align(TopEnd)
             ) {
@@ -96,17 +108,63 @@ private fun Bottom(
             .clip(shapes.largeTopRoundedShape)
             .background(colorScheme.primaryContainer)
     ) {
-        BottomText(withoutResponds)
         CategoryItem(
-            category.name,
-            category.emoji,
-            category.color,
-            (true), Modifier
+            category = category,
+            modifier = Modifier
                 .align(TopEnd)
-                .offset(12.dp, (-18).dp)
+                .offset(16.dp, (-20).dp)
         )
+        BottomText(withoutResponds)
     }
 }
+
+
+@Composable
+private fun CategoryItem(
+    category: CategoryModel,
+    modifier: Modifier = Modifier,
+    size: Dp = CATEGORY_ELEMENT_SIZE.dp,
+) {
+    Box(
+        modifier
+            .padding(4.dp)
+            .size(size)
+    ) {
+        Box(
+            Modifier
+                .size(size)
+                .clip(CircleShape)
+                .background(category.color)
+                .align(BottomCenter),
+            Center
+        ) {
+            Text(
+                text = category.name,
+                modifier = Modifier.animateContentSize(),
+                style = typography.labelSmall.copy(
+                    color = Color.White,
+                    fontSize = 14.dp.toSp(),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                ),
+            )
+        }
+        Box(
+            Modifier
+                .size((size / 3))
+                .clip(CircleShape)
+                .background(Color.White)
+                .align(Alignment.BottomStart),
+            Center
+        ) {
+            GEmojiImage(
+                emoji = category.emoji,
+                modifier = Modifier.size((size / 6))
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun BottomText(withoutResponds: Boolean) {
