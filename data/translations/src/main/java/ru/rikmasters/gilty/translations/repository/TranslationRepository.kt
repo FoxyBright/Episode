@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translations.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -8,8 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import ru.rikmasters.gilty.core.common.CoroutineController
-import ru.rikmasters.gilty.core.viewmodel.Strategy
-import ru.rikmasters.gilty.core.viewmodel.Strategy.JOIN
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
@@ -21,6 +18,7 @@ import ru.rikmasters.gilty.translations.datasource.paging.TranslationConnectedUs
 import ru.rikmasters.gilty.translations.datasource.paging.TranslationMessagesPagingSource
 import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSocket
 import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
+
 class TranslationRepository(
     private val remoteSource: TranslationWebSource,
     private val webSocket: TranslationWebSocket
@@ -31,11 +29,16 @@ class TranslationRepository(
     fun disconnectWebSocket() {
         webSocket.disconnect()
     }
-    suspend fun connectWebSocket(userId: String, translationId: String) {
+
+    suspend fun connectWebSocket(
+        userId: String,
+        translationId: String
+    ) {
         webSocket.updateTranslationId(translationId)
         webSocket.connect(userId)
     }
-    suspend fun connectToTranslation(translationId: String) {
+
+    suspend fun connectToTranslation(translationId: String) = coroutinesState {
         withContext(Dispatchers.IO) {
             webSocket.connectToTranslation(
                 id = translationId
@@ -43,13 +46,13 @@ class TranslationRepository(
         }
     }
 
-    suspend fun disconnectFromTranslation() {
-        withContext(Dispatchers.IO) {
+    suspend fun disconnectFromTranslation(): DataStateTest<Unit> {
+        return withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslation()
         }
     }
 
-    suspend fun connectToTranslationChat(translationId: String) {
+    suspend fun connectToTranslationChat(translationId: String) = coroutinesState {
         withContext(Dispatchers.IO) {
             webSocket.connectToTranslationChat(
                 id = translationId
@@ -57,7 +60,7 @@ class TranslationRepository(
         }
     }
 
-    suspend fun disconnectFromTranslationChat() {
+    suspend fun disconnectFromTranslationChat() = coroutinesState {
         withContext(Dispatchers.IO) {
             webSocket.disconnectFromTranslationChat()
         }
@@ -158,7 +161,6 @@ class TranslationRepository(
     suspend fun ping(
         translationId: String,
     ): DataStateTest<Unit> {
-        Log.d("WebSoc","PINGGGGEDDD")
         return coroutinesState {
             remoteSource.ping(
                 translationId = translationId,

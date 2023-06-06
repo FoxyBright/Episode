@@ -50,6 +50,10 @@ fun DependencyHandlerScope.compose() = implementation(
 
 val pagingVer = "3.1.1"
 
+fun DependencyHandlerScope.json() = implementation(
+    "com.google.code.gson:gson:2.10.1"
+)
+
 fun DependencyHandlerScope.rtmp() = implementation(
     "com.github.pedroSG94.rtmp-rtsp-stream-client-java:rtplibrary:2.1.9"
 )
@@ -86,7 +90,8 @@ fun DependencyHandlerScope.firebase() = implementation(
 fun DependencyHandlerScope.accompanist() = implementation(
     "com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc",
     "com.google.accompanist:accompanist-pager-indicators:0.28.0",
-    "com.google.accompanist:accompanist-pager:0.28.0"
+    "com.google.accompanist:accompanist-pager:0.28.0",
+    "com.google.accompanist:accompanist-insets:0.18.0"
 )
 
 const val accompanistPermissionsVer = "0.20.3"
@@ -139,6 +144,7 @@ private fun DependencyHandler.implementationIf(condition: Boolean, dependencyNot
 
 private fun DependencyHandler.implementation(vararg dependencyNotations: Any) =
     dependencyNotations.forEach { add("implementation", it) }
+
 
 private fun DependencyHandler.debugImplementation(vararg dependencyNotations: Any) =
     dependencyNotations.forEach { add("debugImplementation", it) }

@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        flatDir {
+            dirs("libs")
+        }
+    }
+}
+
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +19,7 @@ dependencies {
     androidBase()
     compose()
 
+    implementation(files("libs/libwebrtc.aar"))
     implementation(project(":shared"))
     implementation(project(":data:meetings"))
     implementation(project(":data:translations"))

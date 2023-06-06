@@ -34,9 +34,9 @@ android {
 dependencies {
     androidBase()
     compose()
-    
+
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
-    
+
     implementation(project(":feature:notifications"))
     implementation(project(":feature:bottomsheet"))
     implementation(project(":feature:mainscreen"))

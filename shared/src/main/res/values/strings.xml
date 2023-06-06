@@ -409,6 +409,11 @@
     <string name="translations_main_camera">Задняя камера</string>
     <string name="translations_start_strean">Начать</string>
     <string name="translations_micro_off_organizer">Вы выключили микрофон</string>
+    <string name="translations_micro_off_viewer">Организатор отключил микрофон</string>
+    <string name="translation_extended">Организатор продлил трансляцию</string>
+    <string name="translation_resumed">Трансляция возобновлена</string>
+    <string name="translation_paused">Трансляция приостановлена</string>
+    <string name="translation_paused_text">Пожалуйста, дождитесь продолжения трансляции</string>
     <string name="translations_members">Участники</string>
     <string name="translations_chat">Чат</string>
     <string name="translations_chat_commentary">Комментарий…</string>
@@ -426,6 +431,8 @@
     <string name="translations_no_connection_refresh">Обновить</string>
     <string name="translations_expired_time">Время трансляции закончилось</string>
     <string name="translations_completed">Трансляция завершена</string>
+    <string name="translations_kicked">Трансляция для вас окончена</string>
+    <string name="translations_kicked_text">Организатору не понравилось ваше поведение, поэтому он исключил вас из episode</string>
     <string name="translations_completed_text">Позже вы сможете оставить \nэмоции участникам episode</string>
     <string name="translations_expired_time_append">Трансляция приостановлена, \nдля продолжения продлите время</string>
     <string name="translations_expired_button_turn_on">Включить</string>
@@ -438,6 +445,12 @@
     <string name="translations_complete_text_b">Вы действительно хотите завершить \nтрансляцию?</string>
     <string name="translations_complete_positive">Завершить</string>
     <string name="translations_complete_negative">Отменить</string>
+
+    <string name="translations_viewer_complain_text">Вы действительно хотите пожаловаться?</string>
+    <string name="translations_viewer_complain_posiitive_nex">Далее</string>
+    <string name="translations_viewer_complain_exit">Выйти</string>
+    <string name="translations_viewer_complain_exit_text">Вы действительно хотите выйти?</string>
+    <string name="translations_viewer_complain_exit_positive">Да</string>
 
     <string name="update_button_label">Обновить</string>
     <string name="internet_error_label">Что-то пошло не так</string>

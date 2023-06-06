@@ -207,12 +207,12 @@ class ChatViewModel : ViewModel() {
                 if (it.organizer.id != it.userId)
                     if (!it.isOnline) MEET
                     else getTranslationType(
-                        it.datetime, chatId
+                        it.datetime, chatId, false
                     )
                 else when {
                     it.meetStatus != ACTIVE -> MEET_FINISHED
                     it.isOnline -> getTranslationType(
-                        it.datetime, chatId
+                        it.datetime, chatId, true
                     )
 
                     else -> MEET
@@ -225,6 +225,7 @@ class ChatViewModel : ViewModel() {
     private suspend fun getTranslationType(
         date: String?,
         chatId: String,
+        isOrganizer: Boolean
     ) = date?.let {
         val start = ofZ(it).millis()
         val now = nowZ().millis()
@@ -245,7 +246,7 @@ class ChatViewModel : ViewModel() {
                         )
                     )
                 }
-                if (_meet.value?.organizer?.id == _meet.value?.userId) {
+                if (isOrganizer) {
                     TRANSLATION_ORGANIZER
                 } else {
                     TRANSLATION
@@ -254,7 +255,7 @@ class ChatViewModel : ViewModel() {
 
             (start - now) < 1_800_000 -> {
                 _translationTimer.emit(difference)
-                if (_meet.value?.organizer?.id == _meet.value?.userId) {
+                if (isOrganizer) {
                     TRANSLATION_ORGANIZER_AWAIT
                 } else {
                     TRANSLATION_AWAIT

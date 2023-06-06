@@ -8,8 +8,8 @@ data class TranslationInfoModel(
     val id: String,
     val userId: String,
     val startedAt: LocalDateTime ?= null,
-    val camera: Boolean ?= null,
-    val microphone: Boolean ?= null,
+    val camera: Boolean,
+    val microphone: Boolean,
     val status: TranslationStatusModel,
     val beginAt: LocalDateTime,
     val completedAt: LocalDateTime,
@@ -21,6 +21,6 @@ data class TranslationInfoModel(
     val webrtc: String,
     val llhlsHost: String,
     val llhls: String,
-    val rtmpHost: String,
-    val rtmp: String
+    val rtmpHost: String ? = null,
+    val rtmp: String ? = null
 )
