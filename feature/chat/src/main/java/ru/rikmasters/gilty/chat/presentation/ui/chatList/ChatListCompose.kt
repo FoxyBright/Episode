@@ -189,9 +189,7 @@ private fun Content(
                     chats.loadState.refresh is LoadState.Error -> Unit
                     chats.loadState.append is LoadState.Error -> Unit
                     else -> {
-                        if (chats.loadState.refresh is LoadState.Loading ||
-                            chats.loadState.append is LoadState.Loading
-                        )
+                        if (chats.loadState.refresh is LoadState.Loading || chats.loadState.append is LoadState.Loading)
                             item { PagingLoader(chats.loadState) }
 
                         item {
@@ -206,7 +204,7 @@ private fun Content(
                             )
                         }
 
-                        if (itemCount != 0 && chats.loadState.append is NotLoading && chats.loadState.refresh is NotLoading) {
+                        if (itemCount != 0) {
                             if ((state.sortType == null && !state.isArchiveOn) || state.sortType == MEETING_DATE) { // No sort or Meeting Date
                                 getSortedByTimeChats(state.chats.itemSnapshotList.items).let {
                                     if (it.isNotEmpty())
