@@ -190,7 +190,8 @@ private fun Content(
                     chats.loadState.append is LoadState.Error -> Unit
                     else -> {
                         if (chats.loadState.refresh is LoadState.Loading ||
-                            chats.loadState.append is LoadState.Loading)
+                            chats.loadState.append is LoadState.Loading
+                        )
                             item { PagingLoader(chats.loadState) }
 
                         item {
@@ -234,9 +235,11 @@ private fun Content(
                                         }
                                 }
                             } else if (state.sortType == MESSAGE_DATE && state.chats.loadState.append is NotLoading) { // Message Date
-                                item {
-                                    Spacer(Modifier.height(28.dp))
-                                }
+                                if (state.chats.itemSnapshotList.isNotEmpty())
+                                    item {
+                                        Spacer(Modifier.height(28.dp))
+                                    }
+
                                 itemsIndexed(state.chats) { index, item ->
                                     val chat = (item) to rememberDragRowState()
                                     chat.first?.let {
@@ -253,9 +256,11 @@ private fun Content(
                                     }
                                 }
                             } else { // Archieve
-                                item {
-                                    Spacer(Modifier.height(28.dp))
-                                }
+                                if (state.chats.itemSnapshotList.isNotEmpty())
+                                    item {
+                                        Spacer(Modifier.height(28.dp))
+                                    }
+
                                 itemsIndexed(state.chats) { index, item ->
                                     val chat = (item) to rememberDragRowState()
                                     chat.first?.let {
