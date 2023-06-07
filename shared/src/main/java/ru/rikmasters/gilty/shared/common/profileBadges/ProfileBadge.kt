@@ -31,6 +31,7 @@ private fun ProfileBadgePreview() {
             ProfileBadge(modifier = Modifier.padding(4.dp), group = UserGroupTypeModel.TEAM)
             ProfileBadge(modifier = Modifier.padding(4.dp), group = UserGroupTypeModel.ORIGINAL)
             ProfileBadge(modifier = Modifier.padding(4.dp), group = UserGroupTypeModel.PARTNER)
+            ProfileBadge(modifier = Modifier.padding(4.dp), group = UserGroupTypeModel.DEFAULT)
         }
     }
 }
@@ -40,6 +41,7 @@ fun ProfileBadge(
     modifier: Modifier = Modifier,
     group: UserGroupTypeModel
 ) {
+    if(group == UserGroupTypeModel.DEFAULT) return
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(4.dp))
