@@ -96,22 +96,26 @@ class LoginViewModel(
     ): Pair<Boolean, Boolean> {
         
         if(deepLink.host != "external")
-            return Pair(false, false)
+            return false to false
         
         if(deepLink.getQueryParameter("state") !=
             authManager.getAuth().externalState
-        ) return Pair(false, false)
+        ) return false to false
         
         deepLink.getQueryParameter("token")?.let {
             authManager.updateAuth { copy(externalToken = it) }
             
-            if(authManager.isExternalLinked(it))
-                return Pair(true, true)
-            else
-                return Pair(true, false)
+            return authManager.isExternalLinked(it).on(
+                success = { token ->
+                    authManager.login(token)
+                    true to true
+                },
+                loading = { true to false },
+                error = { true to false }
+            )
         }
         
-        return Pair(false, false)
+        return false to false
     }
     
     suspend fun sendCode(): String? {

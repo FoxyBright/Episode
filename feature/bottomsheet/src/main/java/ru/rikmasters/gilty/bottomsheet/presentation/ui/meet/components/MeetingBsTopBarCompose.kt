@@ -35,6 +35,7 @@ import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
@@ -140,12 +141,15 @@ fun MeetingBsTopBarCompose(
                 modifier = Modifier,
                 image = (null),
                 emoji = org.emoji,
-                isOnline = org.isOnline?:false,
+                isOnline = org.isOnline ?: false,
             )
-
-            ProfileBadge(group = state.meet.organizer.group
-                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp))
-
+            
+            ProfileBadge(
+                group = state.meet.organizer.group
+                    ?: UserGroupTypeModel.DEFAULT,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+            
             Text(
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,
@@ -253,7 +257,8 @@ private fun MeetDetails(
             SubLabel(
                 text = meet.datetime.format("HH:mm"),
                 color = when {
-                    meet.status == COMPLETED ->
+                    meet.status == COMPLETED
+                            || meet.status == CANCELED ->
                         colorScheme.onTertiary
                     meet.isOnline ->
                         colorScheme.secondary
@@ -266,7 +271,10 @@ private fun MeetDetails(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 5.dp),
-                color = colorScheme.outlineVariant,
+                color = if(meet.status == COMPLETED
+                    || meet.status == CANCELED
+                ) colorScheme.onTertiary
+                else colorScheme.outlineVariant,
                 shape = 6.dp
             )
         }

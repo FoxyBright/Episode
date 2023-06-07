@@ -208,8 +208,6 @@ fun ChatScreen(
                                     nav.navigateAbsolute(
                                         "translationviewer/viewer?id=${state.meet.id}"
                                     )
-                                    // TODO: to translation
-                                    // vm.toTranslation()
                                 }
                             }
                             TRANSLATION_ORGANIZER -> {

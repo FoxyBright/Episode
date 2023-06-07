@@ -6,7 +6,6 @@ buildscript {
     }
 }
 
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -18,8 +17,9 @@ compose()
 dependencies {
     androidBase()
     compose()
-
-    implementation(files("libs/libwebrtc.aar"))
+    
+    implementation("io.getstream:stream-webrtc-android:1.0.2")
+    
     implementation(project(":shared"))
     implementation(project(":data:meetings"))
     implementation(project(":data:translations"))

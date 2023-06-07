@@ -9,7 +9,7 @@ import ru.rikmasters.gilty.auth.login.LoginRepository
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.login.LoginErrorMessage
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.errorToast
 
 class CodeViewModel(
@@ -39,33 +39,35 @@ class CodeViewModel(
     }.value)
     val focuses = _focuses.asStateFlow()
     
-    suspend fun updateSendCode() {
+    suspend fun updateSendCode() = singleLoading {
         authManager.getAuth().phone?.let { phone ->
-            repository.sendCode(phone)
-                .let { (sendCode, message) ->
-                    
-                    if(sendCode == null)
-                        message?.let {
-                            makeToast(
-                                LoginErrorMessage(it, context).message
-                            )
-                        }
-                    
-                    authManager.updateAuth {
-                        copy(
-                            phone = phone,
-                            sendCode = sendCode
-                        )
-                    }
-                }
+            val codeOrError =
+                repository.sendCode(phone)
+            if(
+                codeOrError.first == null &&
+                codeOrError.second != null
+            ) context.errorToast(
+                message = context toMessError
+                        codeOrError.second!!
+            )
+            authManager.updateAuth {
+                copy(
+                    phone = phone,
+                    sendCode = sendCode
+                )
+            }
         }
         
         val sendCode = authManager.getSendCode()
-        sendCode?.codeTimeout?.let { _timer.emit(it) }
-        sendCode?.codeLength?.let { _codeLength.emit(it) }
+        sendCode?.codeTimeout?.let {
+            _timer.emit(it)
+        }
+        sendCode?.codeLength?.let {
+            _codeLength.emit(it)
+        }
     }
     
-    suspend fun linkExternalToken() {
+    suspend fun linkExternalToken() = singleLoading {
         authManager.getAuth().externalToken?.let {
             authManager.linkExternal(it).on(
                 success = {},
@@ -110,12 +112,31 @@ class CodeViewModel(
         } else _code.emit("")
     }
     
-    suspend fun onOtpAuthentication(code: String) =
-        authManager.onOtpAuthentication(code)
+    suspend fun onOtpAuthentication(
+        code: String,
+    ) = singleLoading {
+        authManager.onOtpAuthentication(code).on(
+            success = {
+                
+                logD("code_.  SUCCESS")
+                authManager.login(it); true
+            },
+            loading = {
+                logD("code_.  LOADING")
+                false
+            },
+            error = {
+                logD("code_.  ERROR")
+                context.errorToast(
+                    it.serverMessage
+                )
+                false
+            }
+        )
+    }
     
     suspend fun profileCompleted() =
         regManager.profileCompleted()
-    
     
     suspend fun onBlur(state: Boolean) {
         _blur.emit(state)
@@ -125,3 +146,17 @@ class CodeViewModel(
         _timer.emit(timer.value - 1)
     }
 }
+
+private infix fun Context.toMessError(
+    error: String,
+) = this.getString(
+    when(error) {
+        "invalid number" ->
+            R.string.login_error_invalid_phone
+        "parameters error" ->
+            R.string.login_error_parameters_error
+        "Timeout for sending a confirmation code." ->
+            R.string.login_error_timeout
+        else -> R.string.login_error_nothing_error
+    }
+)

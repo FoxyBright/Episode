@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.auth.manager
 
+import android.content.Context
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
@@ -22,9 +23,10 @@ class AuthManager(
     override val primarySource: TokenStore,
 ): Repository<TokenStore>(primarySource) {
     
+    val context = getKoin().get<Context>()
+    
     suspend fun hasTokens() = withContext(IO) {
         val token = primarySource.getTokensOrNull()
-        logD("YOUR TOKENS: ----->>> $token")
         token != null
     }
     
@@ -37,10 +39,17 @@ class AuthManager(
     }
     
     @Suppress("unused")
-    suspend fun deletePushToken(token: String, type: PushType = FIREBASE) =
-        withContext(IO) { tokenWebSource.deletePushToken(token, type) }
+    suspend fun deletePushToken(
+        token: String,
+        type: PushType = FIREBASE,
+    ) = withContext(IO) {
+        tokenWebSource.deletePushToken(
+            token = token,
+            type = type
+        )
+    }
     
-    private suspend fun login(
+    suspend fun login(
         tokens: Tokens,
     ) = withContext(IO) {
         primarySource.saveTokens(tokens)
@@ -88,7 +97,7 @@ class AuthManager(
         tokens(
             grantType = External,
             token = token,
-        )?.let { login(it); true } ?: false
+        )
     }
     
     suspend fun onOtpAuthentication(
@@ -98,7 +107,7 @@ class AuthManager(
             grantType = Otp,
             phone = getAuth().phone,
             code = code
-        )?.let { login(it); true } ?: false
+        )
     }
     
     private suspend fun tokens(
@@ -108,12 +117,13 @@ class AuthManager(
         phone: String? = null,
         code: String? = null,
     ) = withContext(IO) {
-        kotlin.runCatching {
-            tokenWebSource.getOauthTokens(
-                grantType, refreshToken,
-                token, phone, code
-            )
-        }.getOrNull()
+        tokenWebSource.getOauthTokens(
+            grantType = grantType,
+            refreshToken = refreshToken,
+            token = token,
+            phone = phone,
+            code = code
+        )
     }
     
     suspend fun linkExternal(token: String) =
@@ -128,6 +138,10 @@ class AuthManager(
         withContext(IO) {
             val tokens = tokenWebSource.getOauthTokens(
                 Refresh, getTokens().refreshToken
+            ).on(
+                success = { it },
+                loading = { null },
+                error = { null }
             ) ?: throw IllegalStateException("Сервер не отдал токены")
             
             primarySource.saveTokens(tokens)

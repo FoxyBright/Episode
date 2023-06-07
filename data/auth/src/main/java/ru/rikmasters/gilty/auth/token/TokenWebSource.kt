@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.auth.token
 
 import io.ktor.client.call.body
 import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode.Companion.OK
 import ru.rikmasters.gilty.data.ktor.KtorSource
 import ru.rikmasters.gilty.data.ktor.util.extension.query
 import ru.rikmasters.gilty.data.shared.BuildConfig.*
@@ -48,8 +47,8 @@ class TokenWebSource: KtorSource() {
             )
         )
     }.let {
-        if(it.status == OK)
-            it.body<TokensResponse?>()?.domain()
-        else null
+        coroutinesState({it}){
+            it.body<TokensResponse>().domain()
+        }
     }
 }
