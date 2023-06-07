@@ -35,7 +35,8 @@ import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
+import ru.rikmasters.gilty.shared.model.LastRespond
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
@@ -59,7 +60,7 @@ private fun MeetingBsTopBarPreview() {
                         description = "hello"
                     ),
                     menuState = false,
-                    lastRespond = 4 to "",
+                    lastRespond = LastRespond.DemoLastRespond,
                 )
             )
         }
@@ -76,7 +77,7 @@ private fun MeetingBsTopBarOnlinePreview() {
                 MeetingBsTopBarState(
                     DemoFullMeetingModel.copy(isOnline = true),
                     (false), backButton = true,
-                    lastRespond = 4 to ""
+                    lastRespond = LastRespond.DemoLastRespond,
                 )
             )
         }
@@ -86,7 +87,7 @@ private fun MeetingBsTopBarOnlinePreview() {
 data class MeetingBsTopBarState(
     val meet: FullMeetingModel,
     val menuState: Boolean = false,
-    val lastRespond: Pair<Int, String?>?,
+    val lastRespond: LastRespond?,
     val description: Boolean = false,
     val backButton: Boolean = false,
 )
@@ -103,11 +104,13 @@ fun MeetingBsTopBarCompose(
         if(
             state.lastRespond != null &&
             state.meet.memberState == IS_ORGANIZER
-            && (last?.first ?: 0) > 0
-        ) Responds(
-            last?.second, last?.first,
-            Modifier.padding(bottom = 12.dp)
-        ) { callback?.onRespondsClick(state.meet) }
+            && (last?.count ?: 0) > 0
+        ) last?.let {
+            Responds (
+                it,
+                Modifier.padding(bottom = 12.dp)
+            ) { callback?.onRespondsClick(state.meet) }
+        }
         Row(Modifier.height(Max)) {
             Avatar(
                 avatar = org.avatar?.thumbnail?.url,
@@ -141,15 +144,13 @@ fun MeetingBsTopBarCompose(
                 modifier = Modifier,
                 image = (null),
                 emoji = org.emoji,
-                isOnline = org.isOnline ?: false,
+                isOnline = org.isOnline?:false,
+                group = org.group?:UserGroupTypeModel.DEFAULT
             )
-            
-            ProfileBadge(
-                group = state.meet.organizer.group
-                    ?: UserGroupTypeModel.DEFAULT,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
-            
+
+            ProfileBadge(group = state.meet.organizer.group
+                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp))
+
             Text(
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,
@@ -258,7 +259,7 @@ private fun MeetDetails(
                 text = meet.datetime.format("HH:mm"),
                 color = when {
                     meet.status == COMPLETED
-                            || meet.status == CANCELED ->
+                            || meet.status == MeetStatusType.CANCELED ->
                         colorScheme.onTertiary
                     meet.isOnline ->
                         colorScheme.secondary
@@ -272,7 +273,7 @@ private fun MeetDetails(
                     .weight(1f)
                     .padding(start = 5.dp),
                 color = if(meet.status == COMPLETED
-                    || meet.status == CANCELED
+                    || meet.status == MeetStatusType.CANCELED
                 ) colorScheme.onTertiary
                 else colorScheme.outlineVariant,
                 shape = 6.dp

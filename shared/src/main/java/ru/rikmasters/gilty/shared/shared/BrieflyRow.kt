@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.shared.shared
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.common.GCachedImage
+import ru.rikmasters.gilty.shared.common.profileBadges.getBorderColor
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -64,27 +67,20 @@ fun BrieflyRow(
     maxLines: Int = 1,
     emojiSize: Int = 18,
     isOnline: Boolean = false,
+    group: UserGroupTypeModel = UserGroupTypeModel.DEFAULT
 ) {
     val label = buildAnnotatedString {
         append("$text "); emoji?.let { appendInlineContent("emoji") }
     }
+
     Row(modifier, Start, CenterVertically) {
         image?.let {
-            Box(
-                modifier = Modifier
-                    .padding(end = 12.dp),
-                contentAlignment = Center
-            ) {
-                GCachedImage(
-                    image, Modifier
-                        .size(38.dp)
-                        .clip(CircleShape),
-                    contentScale = Crop
-                )
-                if (isOnline) {
-                    OnlineIndicator(modifier = Modifier.align(BottomEnd))
-                }
-            }
+            UserAvatar(
+                modifier = Modifier.padding(end = 12.dp),
+                image = image,
+                group = group,
+                isOnline = isOnline
+            )
         }
         Text(
             label, Modifier, textColor,
@@ -96,6 +92,42 @@ fun BrieflyRow(
                 ) { GEmojiImage(emoji, Modifier.size(emojiSize.dp)) }
             )
         )
+    }
+}
+
+@Composable
+fun UserAvatar(
+    modifier: Modifier = Modifier,
+    image: String?,
+    group: UserGroupTypeModel? = UserGroupTypeModel.DEFAULT,
+    isOnline: Boolean = false,
+    imageSize: Int = 38
+) {
+    val hasGroup = group != UserGroupTypeModel.DEFAULT
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Center
+    ) {
+        GCachedImage(
+            image, Modifier
+                .size(if (hasGroup) (imageSize + 5).dp else imageSize.dp)
+                .clip(CircleShape)
+                .border(
+                    if (hasGroup) 2.dp else 0.dp,
+                    (group ?: UserGroupTypeModel.DEFAULT).getBorderColor(),
+                    CircleShape
+                )
+                .border(
+                    if (hasGroup) 3.dp else 0.dp,
+                    colorScheme.primaryContainer,
+                    CircleShape
+                ),
+            contentScale = Crop
+        )
+        if (isOnline) {
+            OnlineIndicator(modifier = Modifier.align(BottomEnd))
+        }
     }
 }
 

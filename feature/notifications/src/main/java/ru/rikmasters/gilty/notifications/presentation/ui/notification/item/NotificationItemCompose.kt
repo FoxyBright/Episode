@@ -2,21 +2,28 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,11 +32,14 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationsCallback
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable
-import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.DragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.model.enumeration.NotificationType
-import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.*
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.ADMIN_NOTIFICATION
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.MEETING_OVER
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.PHOTO_BLOCKED
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.RESPOND
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.WATCH
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.DemoInfoNotificationModel
@@ -37,6 +47,7 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 import ru.rikmasters.gilty.shared.shared.EmojiRow
 import ru.rikmasters.gilty.shared.shared.GDivider
 import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
+import ru.rikmasters.gilty.shared.shared.UserAvatar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.shapes
 
@@ -216,15 +227,14 @@ private fun TextNotification(
                         .padding(top = 6.dp),
                     Start, CenterVertically
                 ) {
-                    GCachedImage(
-                        user?.avatar?.thumbnail?.url, Modifier
-                            .padding(end = 16.dp)
-                            .clip(CircleShape)
-                            .size(38.dp)
-                            .clickable {
-                                callback?.onUserClick(user)
-                            },
-                        Crop
+                    UserAvatar(modifier = Modifier
+                        .padding(end = 16.dp)
+                        .clickable {
+                            callback?.onUserClick(user)
+                        },
+                        image = user?.avatar?.thumbnail?.url,
+                        group = user?.group,
+                        isOnline = user?.isOnline?:false
                     )
                     content.invoke()
                 }
@@ -255,7 +265,7 @@ private fun SwipeableContainer(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    if(isVisible) colorScheme.primary
+                    if (isVisible) colorScheme.primary
                     else Color.Transparent,
                     shape
                 )

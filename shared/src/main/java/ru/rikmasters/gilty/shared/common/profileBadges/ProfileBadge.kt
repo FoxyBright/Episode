@@ -59,22 +59,18 @@ fun ProfileBadge(
 
 fun UserGroupTypeModel.getBackgroundColor(): Color =
     when (this) {
-        UserGroupTypeModel.DEFAULT -> Color(0xFF6667AB)
-
+        UserGroupTypeModel.DEFAULT -> Color.Transparent
         UserGroupTypeModel.PREMIUM -> Color(0xFF9091C1)
         UserGroupTypeModel.TEAM -> Color(0xFFFC7449)
         UserGroupTypeModel.ORIGINAL -> Color(0xFFE55678)
         UserGroupTypeModel.PARTNER -> Color(0xFF5BBE75)
-
     }
 
 fun UserGroupTypeModel.getBorderColor(): Color =
     when (this) {
-        UserGroupTypeModel.DEFAULT -> Color(0x6667ABB2)
-
+        UserGroupTypeModel.DEFAULT -> Color.Transparent
         UserGroupTypeModel.PREMIUM -> Color(0xFF6667AB)
         UserGroupTypeModel.TEAM -> Color(0xFFFF3D00)
         UserGroupTypeModel.ORIGINAL -> Color(0xFFDF1343)
         UserGroupTypeModel.PARTNER -> Color(0xFF1AA73E)
-
     }

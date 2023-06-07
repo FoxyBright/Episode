@@ -32,7 +32,9 @@ import ru.rikmasters.gilty.shared.common.BackBlur
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.pagingPreview
+import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -59,7 +61,7 @@ private fun NotificationsContentPreview() {
                 NotificationsState(
                     pagingPreview(DemoNotificationModelList),
                     listOf(),
-                    Pair((3), ""), listOf(), (false),
+                    LastRespond("", false, UserGroupTypeModel.DEFAULT, 0), listOf(), (false),
                     DemoNotificationMeetingOverModel,
                     pagingPreview(DemoUserModelList),
                     listOf(), LazyListState(),
@@ -83,7 +85,7 @@ private fun NotificationsBlurPreview() {
                 NotificationsState(
                     pagingPreview(DemoNotificationModelList),
                     listOf(),
-                    Pair((3), ""), listOf(), (true),
+                    LastRespond("", false, UserGroupTypeModel.DEFAULT, 0), listOf(), (true),
                     DemoNotificationMeetingOverModel,
                     pagingPreview(DemoUserModelList),
                     listOf(), LazyListState(),
@@ -97,7 +99,7 @@ private fun NotificationsBlurPreview() {
 data class NotificationsState(
     val notifications: LazyPagingItems<NotificationModel>,
     val splitNotifications: List<Pair<Int, NotificationModel>>,
-    val lastRespond: Pair<Int, String>,
+    val lastRespond: LastRespond,
     val navBar: List<NavIconState>,
     val blur: Boolean,
     val activeNotification: NotificationModel?,
@@ -255,7 +257,7 @@ private fun Notifications(
     if(LocalInspectionMode.current) PreviewLazy()
     else LazyColumn(modifier, state.listState) {
         
-        val hasResponds = state.lastRespond.first > 0
+        val hasResponds = state.lastRespond.count > 0
         
         when {
             notifications.loadState.refresh is LoadState.Error -> {}
@@ -265,12 +267,10 @@ private fun Notifications(
                     item { PagingLoader(notifications.loadState) }
                 }
                 
-                val last = state.lastRespond
-                
                 if(hasResponds) item {
                     Box(Modifier.padding(top = 20.dp)) {
                         Responds(
-                            last.second, last.first
+                            state.lastRespond
                         ) { callback?.onRespondsClick() }
                     }
                 }

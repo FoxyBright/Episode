@@ -26,6 +26,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.pagingPreview
+import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
@@ -51,7 +52,7 @@ private fun MeetingBsDetailed() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = 0 to null,
+                    lastRespond = LastRespond.DemoLastRespond,
                     detailed = true,
                     comment = "",
                     hidden = true,
@@ -77,7 +78,7 @@ private fun MeetingBsObserve() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = 0 to null,
+                    lastRespond = LastRespond.DemoLastRespond,
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),
@@ -104,7 +105,7 @@ private fun MeetingBsShared() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = 0 to null,
+                    lastRespond = LastRespond.DemoLastRespond,
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),
@@ -135,7 +136,7 @@ private fun MeetingBsWhenUser() {
                         isPrivate = true,
                         isOnline = true
                     ),
-                    lastRespond = 0 to null,
+                    lastRespond = LastRespond.DemoLastRespond,
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),
@@ -150,7 +151,7 @@ private fun MeetingBsWhenUser() {
 data class MeetingBsState(
     val menuState: Boolean,
     val meet: FullMeetingModel,
-    val lastRespond: Pair<Int, String?>?,
+    val lastRespond: LastRespond?,
     val membersList: LazyPagingItems<UserModel>? = null,
     val meetDistance: String? = null,
     val buttonState: Boolean = true,

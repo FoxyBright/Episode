@@ -15,7 +15,9 @@ import ru.rikmasters.gilty.notification.NotificationManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.*
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.notification.FeedBackModel
 import ru.rikmasters.gilty.shared.model.notification.NotificationModel
@@ -30,7 +32,7 @@ class NotificationViewModel: ViewModel(), PullToRefreshTrait {
     
     private val context = getKoin().get<Context>()
     
-    private val _lastRespond = MutableStateFlow(Pair(0, ""))
+    private val _lastRespond = MutableStateFlow(LastRespond("", false, UserGroupTypeModel.DEFAULT, 0))
     val lastRespond = _lastRespond.asStateFlow()
     
     private val _blur = MutableStateFlow(false)

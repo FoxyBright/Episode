@@ -34,6 +34,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
+import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -56,7 +57,7 @@ private fun ProfilePreview() {
                     profileType = ProfileType.USERPROFILE,
                 ), currentMeetings = pagingPreview(DemoMeetingList),
                 meetingsHistory = pagingPreview(DemoMeetingList),
-                lastRespond = Pair(4, "image"), historyState = (false), stateList = listOf(
+                lastRespond = LastRespond.DemoLastRespond, historyState = (false), stateList = listOf(
                     INACTIVE, INACTIVE,
                     INACTIVE, INACTIVE, ACTIVE
                 ), alert = false,
@@ -70,7 +71,7 @@ data class UserProfileState(
     val profileState: ProfileState,
     val currentMeetings: LazyPagingItems<MeetingModel>,
     val meetingsHistory: LazyPagingItems<MeetingModel>,
-    val lastRespond: Pair<Int, String?>,
+    val lastRespond:LastRespond,
     val historyState: Boolean = false,
     val stateList: List<NavIconState>,
     val alert: Boolean,
@@ -215,8 +216,7 @@ private fun Content(
         item(key = 3) {
             Box(Modifier.padding(16.dp, 12.dp)) {
                 Responds(
-                    image = state.lastRespond.second,
-                    count = state.lastRespond.first
+                    state.lastRespond
                 ) { callback?.onRespondsClick() }
             }
         }

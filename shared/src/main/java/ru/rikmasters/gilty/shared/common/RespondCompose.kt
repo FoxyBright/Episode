@@ -15,6 +15,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.shared.*
@@ -71,6 +72,7 @@ fun LazyListScope.sentRespond(
                         top = 12.dp
                     ), image = organizer.avatar?.thumbnail?.url,
                     isOnline = respond.author.isOnline?: false,
+                    group = organizer.group?: UserGroupTypeModel.DEFAULT,
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     GDivider(Modifier)
@@ -110,6 +112,7 @@ fun ReceivedRespond(
                 image = user.avatar?.thumbnail?.url,
                 emoji = user.emoji,
                 isOnline = user.isOnline?: false,
+                group = user.group?: UserGroupTypeModel.DEFAULT,
             )
             Column(Modifier.padding(start = 66.dp)) {
                 GDivider(Modifier)

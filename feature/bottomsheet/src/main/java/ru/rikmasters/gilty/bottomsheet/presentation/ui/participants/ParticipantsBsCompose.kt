@@ -27,6 +27,7 @@ import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
 import ru.rikmasters.gilty.shared.common.extentions.swipeableRow
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -204,6 +205,7 @@ private fun MemberCard(
             modifier = Modifier.padding(16.dp),
             image = member.avatar?.thumbnail?.url,
             isOnline = member.isOnline?: false,
+            group = member.group?: UserGroupTypeModel.DEFAULT
         )
         if(index < size - 1) GDivider(
             Modifier.padding(start = 60.dp)

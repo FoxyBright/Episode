@@ -43,6 +43,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.observers.SubscribeType.U
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.digitalConverter
 import ru.rikmasters.gilty.shared.common.pagingPreview
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -263,7 +264,8 @@ private fun ObserveItem(
                     modifier = Modifier.weight(1f),
                     image = member.avatar?.thumbnail?.url,
                     emoji = member.emoji,
-                    isOnline = member.isOnline?:false
+                    isOnline = member.isOnline?:false,
+                    group = member.group?: UserGroupTypeModel.DEFAULT,
                 )
                 SmallButton(
                     stringResource(

@@ -36,6 +36,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_MEMBER
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -386,6 +387,7 @@ fun MeetingBsParticipants(
                                 ?.thumbnail?.url,
                             emoji = member.emoji,
                             isOnline = member.isOnline ?: false,
+                            group = member.group?:UserGroupTypeModel.DEFAULT
                         )
                         Icon(
                             imageVector = Filled

@@ -26,6 +26,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
@@ -170,6 +171,7 @@ private fun Participant(
                     image = member.avatar?.thumbnail?.url,
                     emoji = member.emoji,
                     isOnline = member.isOnline?: false,
+                    group = member.group?: UserGroupTypeModel.DEFAULT,
                 )
                 memberEmoji?.let {
                     GEmojiImage(

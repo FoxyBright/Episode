@@ -13,17 +13,19 @@ import ru.rikmasters.gilty.core.app.checkLocationPermissions
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.errorToast
+import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 
-class MeetingBsViewModel: ViewModel() {
-    
+class MeetingBsViewModel : ViewModel() {
+
     private val meetManager by inject<MeetingManager>()
     private val context = getKoin().get<Context>()
-    
+
     private val _meetId =
         MutableStateFlow<String?>(null)
-    
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val membersList by lazy {
         _meetId.flatMapLatest {
@@ -32,52 +34,59 @@ class MeetingBsViewModel: ViewModel() {
             } ?: flow { }
         }
     }
-    
+
     private val _meet =
         MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
-    
+
     private val _lastResponse =
-        MutableStateFlow<Pair<Int, String?>?>(null)
+        MutableStateFlow<LastRespond?>(null)
     val lastResponse = _lastResponse.asStateFlow()
-    
+
     private val _hidden =
         MutableStateFlow(false)
     val hidden = _hidden.asStateFlow()
-    
+
     private val _menu =
         MutableStateFlow(false)
     val menu = _menu.asStateFlow()
-    
+
     private val _meetReaction =
         MutableStateFlow(false)
     val meetReaction = _meetReaction.asStateFlow()
-    
+
     private val _comment =
         MutableStateFlow("")
     val comment = _comment.asStateFlow()
-    
+
     private val _distance =
         MutableStateFlow("")
     val distance = _distance.asStateFlow()
-    
+
     suspend fun meetReactionDisable(state: Boolean) {
         _meetReaction.emit(state)
     }
-    
+
     suspend fun getMeet(
         meetId: String,
     ) = singleLoading {
         meetManager.getDetailedMeet(meetId).on(
             success = {
                 _meet.emit(it)
-                if(meet.value?.memberState == IS_ORGANIZER) {
+                if (meet.value?.memberState == IS_ORGANIZER) {
+
+                    _meet.value?.organizer?.group
+
                     _lastResponse.emit(
-                        _meet.value?.responds?.count!! to
-                                _meet.value?.responds?.thumbnail?.url
+                        LastRespond(
+                            image = _meet.value?.responds?.thumbnail?.url,
+                            count = _meet.value?.responds?.count!!,
+                            isOnline = _meet.value?.isOnline?:false,
+                            group = _meet.value?.organizer?.group?:UserGroupTypeModel.DEFAULT,
+                        )
                     )
                 }
-                if(meet.value?.isOnline != true)
+                if (meet.value?.isOnline != true)
                     meet.value?.let {
                         _distance.emit("")
                     }
@@ -91,17 +100,17 @@ class MeetingBsViewModel: ViewModel() {
             }
         )
     }
-    
+
     suspend fun changeDistance(distance: String) {
         _distance.emit(distance)
     }
-    
+
     val location =
         MutableStateFlow<Pair<Double, Double>?>(null)
-    
+
     @SuppressLint("MissingPermission")
     suspend fun getLocation(activity: Activity) {
-        if(!activity.checkLocationPermissions()
+        if (!activity.checkLocationPermissions()
             || !activity.checkGPS()
         ) return
         getFusedLocationProviderClient(context)
@@ -114,23 +123,23 @@ class MeetingBsViewModel: ViewModel() {
                 }
             }
     }
-    
+
     suspend fun changeHidden(state: Boolean) {
         _hidden.emit(state)
     }
-    
+
     suspend fun changeComment(text: String) {
         _comment.emit(text)
     }
-    
+
     suspend fun clearComment() {
         _comment.emit("")
     }
-    
+
     suspend fun menuDismiss(state: Boolean) {
         _menu.emit(state)
     }
-    
+
     suspend fun respondForMeet(
         meetId: String,
     ) = singleLoading {
@@ -149,7 +158,7 @@ class MeetingBsViewModel: ViewModel() {
             }
         )
     }
-    
+
     suspend fun leaveMeet(
         meetId: String,
     ) = singleLoading {
@@ -163,7 +172,7 @@ class MeetingBsViewModel: ViewModel() {
             }
         )
     }
-    
+
     suspend fun canceledMeet(
         meetId: String,
     ) = singleLoading {

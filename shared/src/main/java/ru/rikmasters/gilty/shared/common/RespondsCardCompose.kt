@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -17,31 +16,32 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.toSp
+import ru.rikmasters.gilty.shared.model.LastRespond
+import ru.rikmasters.gilty.shared.shared.UserAvatar
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
 @Composable
 private fun RespondCardPreview() {
-    GiltyTheme { Responds("", 3) }
+    GiltyTheme { Responds(LastRespond.DemoLastRespond) }
 }
 
 @Preview
 @Composable
 private fun RespondCardEmptyPreview() {
-    GiltyTheme { Responds(null, 0) }
+    GiltyTheme { Responds(LastRespond.DemoLastRespond) }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun Responds(
-    image: String?, count: Int?,
+    lastRespond: LastRespond,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.profile_responds_label),
     onClick: (() -> Unit)? = null,
@@ -69,18 +69,18 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
-                image?.let {
-                    GCachedImage(
-                        it, Modifier
-                            .size(40.dp)
-                            .clip(CircleShape),
-                        Crop
+                lastRespond.image?.let {
+                    UserAvatar(
+                        image = it,
+                        imageSize = 40,
+                        isOnline = lastRespond.isOnline,
+                        group = lastRespond.group
                     )
                 }
                 Text(
                     text, Modifier
                         .padding(16.dp, 6.dp)
-                        .padding(vertical = image?.let {
+                        .padding(vertical = lastRespond.image?.let {
                             0.dp
                         } ?: 6.dp),
                     colorScheme.tertiary,
@@ -91,8 +91,8 @@ fun Responds(
                 Modifier, Start,
                 CenterVertically
             ) {
-                count?.let {
-                    if(it > 0) Box(
+                lastRespond.count.let {
+                    if (it > 0) Box(
                         Modifier
                             .clip(RoundedCornerShape(9.dp))
                             .background(colorScheme.primary)
