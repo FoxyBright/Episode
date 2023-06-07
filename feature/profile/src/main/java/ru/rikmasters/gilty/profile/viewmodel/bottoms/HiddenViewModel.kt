@@ -2,8 +2,11 @@ package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
 import android.content.Context
 import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
@@ -16,10 +19,18 @@ class HiddenViewModel: ViewModel() {
     private val profileManager by inject<ProfileManager>()
     
     private val context = getKoin().get<Context>()
-    
+
+    private val refresh = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     val images by lazy {
-        profileManager.getHiddenPhotos()
-            .cachedIn(coroutineScope)
+        combine(
+            refresh
+        ){it}.flatMapLatest {
+            this.getHiddenPhotosAmount()
+            profileManager.getHiddenPhotos()
+        }.cachedIn(coroutineScope)
+
     }
     
     private val _photosAmount = MutableStateFlow(0)
@@ -39,11 +50,15 @@ class HiddenViewModel: ViewModel() {
     
     suspend fun uploadPhotoList(forceWeb: Boolean) {
         profileManager.getProfileHiddens(forceWeb)
+        refreshImages()
     }
     
     suspend fun deleteImage(imageId: String) {
         profileManager.deleteHidden(imageId).on(
-            success = {},
+            success = {
+                profileManager.getProfile(true)
+                refreshImages()
+            },
             loading = {},
             error = {
                 context.errorToast(
@@ -51,7 +66,6 @@ class HiddenViewModel: ViewModel() {
                 )
             }
         )
-        profileManager.getProfile(true)
     }
     
     suspend fun getHiddenPhotosAmount() {
@@ -74,5 +88,8 @@ class HiddenViewModel: ViewModel() {
     
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
+    }
+    private suspend fun refreshImages(){
+        refresh.emit(!refresh.value)
     }
 }

@@ -35,8 +35,7 @@ fun HiddenBsScreen(
     
     
     LaunchedEffect(Unit) {
-        vm.uploadPhotoList(update)
-        vm.getHiddenPhotosAmount()
+        vm.uploadPhotoList(true)
     }
     
     HiddenBsContent(

@@ -77,13 +77,16 @@ class GalleryViewModel: ViewModel() {
         _menuState.emit(false)
     }
     
-    suspend fun attach() = singleLoading {
+    suspend fun attach(onSuccess:()->Unit) = singleLoading {
         regManager.addHidden(
             selected.value.map {
                 File(it).compress(context)
             }
         ).on(
-            success = {},
+            success = {
+                _selected.emit(emptyList())
+                onSuccess()
+            },
             loading = {},
             error = {
                 context.errorToast(

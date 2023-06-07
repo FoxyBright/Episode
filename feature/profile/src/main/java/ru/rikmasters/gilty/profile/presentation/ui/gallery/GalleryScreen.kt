@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -99,10 +100,14 @@ fun GalleryScreen(
                 
                 override fun onAttach() {
                     scope.launch {
-                        vm.attach()
-                        if(onBackDest.isNotBlank())
-                            nav.navigateAbsolute(onBackDest)
-                        else nav.navigationBack()
+                        vm.attach(onSuccess = {
+                            scope.launch(Dispatchers.Main) {
+                                nav.navigationBack()
+                                /*if(onBackDest.isNotBlank())
+                                    nav.navigateAbsolute(onBackDest)
+                                else nav.navigationBack()*/
+                            }
+                        })
                     }
                 }
                 

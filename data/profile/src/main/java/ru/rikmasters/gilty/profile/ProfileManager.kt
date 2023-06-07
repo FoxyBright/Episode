@@ -73,7 +73,7 @@ class ProfileManager(
     suspend fun deleteHidden(imageId: String) =
         withContext(IO) {
             store.deleteHidden(imageId).let {
-                getProfileHiddens(false)
+                getProfileHiddens(true)
                 it
             }
         }
