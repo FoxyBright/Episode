@@ -202,7 +202,8 @@ private fun MemberCard(
         BrieflyRow(
             text = username,
             modifier = Modifier.padding(16.dp),
-            image = member.avatar?.thumbnail?.url
+            image = member.avatar?.thumbnail?.url,
+            isOnline = member.isOnline?: false,
         )
         if(index < size - 1) GDivider(
             Modifier.padding(start = 60.dp)

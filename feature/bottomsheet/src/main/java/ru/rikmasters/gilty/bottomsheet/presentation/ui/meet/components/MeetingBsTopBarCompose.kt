@@ -123,7 +123,8 @@ fun MeetingBsTopBarCompose(
                         ", ${org.age}"
                     } else ""
                 }",
-                Modifier, (null), org.emoji
+                Modifier, (null), org.emoji,
+                isOnline = org.isOnline?:false,
             )
 
             ProfileBadge(group = state.meet.organizer.group

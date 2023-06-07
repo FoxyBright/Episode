@@ -66,10 +66,11 @@ fun LazyListScope.sentRespond(
         ) {
             Column {
                 BrieflyRow(
-                    name, Modifier.padding(
+                    text = name, modifier = Modifier.padding(
                         start = 16.dp,
                         top = 12.dp
-                    ), organizer.avatar?.thumbnail?.url
+                    ), image = organizer.avatar?.thumbnail?.url,
+                    isOnline = respond.author.isOnline?: false,
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     GDivider(Modifier)
@@ -102,12 +103,13 @@ fun ReceivedRespond(
                     ", ${user.age}"
                 } else ""
                 }",
-                Modifier.padding(
+                modifier = Modifier.padding(
                     start = 16.dp,
                     top = 12.dp
                 ),
-                user.avatar?.thumbnail?.url,
-                user.emoji
+                image = user.avatar?.thumbnail?.url,
+                emoji = user.emoji,
+                isOnline = user.isOnline?: false,
             )
             Column(Modifier.padding(start = 66.dp)) {
                 GDivider(Modifier)

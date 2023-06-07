@@ -1,7 +1,9 @@
 package ru.rikmasters.gilty.shared.shared
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -10,8 +12,11 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +46,7 @@ private fun BrieflyRowPreview() {
         BrieflyRow(
             (user.username ?: ""),
             Modifier.background(colorScheme.background),
-            user.avatar?.thumbnail?.url, user.rating.emoji
+            user.avatar?.thumbnail?.url, user.rating.emoji,
         )
     }
 }
@@ -58,19 +63,28 @@ fun BrieflyRow(
     overflow: TextOverflow = Ellipsis,
     maxLines: Int = 1,
     emojiSize: Int = 18,
+    isOnline: Boolean = false,
 ) {
     val label = buildAnnotatedString {
         append("$text "); emoji?.let { appendInlineContent("emoji") }
     }
     Row(modifier, Start, CenterVertically) {
         image?.let {
-            GCachedImage(
-                image, Modifier
-                    .padding(end = 12.dp)
-                    .size(38.dp)
-                    .clip(CircleShape),
-                contentScale = Crop
-            )
+            Box(
+                modifier = Modifier
+                    .padding(end = 12.dp),
+                contentAlignment = Center
+            ) {
+                GCachedImage(
+                    image, Modifier
+                        .size(38.dp)
+                        .clip(CircleShape),
+                    contentScale = Crop
+                )
+                if (isOnline) {
+                    OnlineIndicator(modifier = Modifier.align(BottomEnd))
+                }
+            }
         }
         Text(
             label, Modifier, textColor,
@@ -81,6 +95,24 @@ fun BrieflyRow(
                     Placeholder(emojiSize.sp, emojiSize.sp, TextCenter)
                 ) { GEmojiImage(emoji, Modifier.size(emojiSize.dp)) }
             )
+        )
+    }
+}
+
+@Composable
+private fun OnlineIndicator(
+    modifier: Modifier
+) {
+    Surface(
+        modifier, CircleShape,
+        colorScheme.primaryContainer,
+        border = BorderStroke(2.dp, colorScheme.primaryContainer)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF35C65A))
         )
     }
 }

@@ -168,7 +168,8 @@ private fun Participant(
                     }",
                     modifier = Modifier,
                     image = member.avatar?.thumbnail?.url,
-                    emoji = member.emoji
+                    emoji = member.emoji,
+                    isOnline = member.isOnline?: false,
                 )
                 memberEmoji?.let {
                     GEmojiImage(

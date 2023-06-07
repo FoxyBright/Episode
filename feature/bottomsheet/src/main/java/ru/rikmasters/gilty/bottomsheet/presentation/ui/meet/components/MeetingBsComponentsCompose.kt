@@ -344,7 +344,8 @@ fun MeetingBsParticipants(
                                 .padding(12.dp, 8.dp),
                             image = member.avatar
                                 ?.thumbnail?.url,
-                            emoji = member.emoji
+                            emoji = member.emoji,
+                            isOnline = member.isOnline ?: false,
                         )
                         Icon(
                             imageVector = Filled

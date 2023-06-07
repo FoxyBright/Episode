@@ -5,7 +5,10 @@ import android.util.Base64
 import android.util.Base64.DEFAULT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -48,10 +51,10 @@ fun GCachedImage(
     type: CachedImageType = WEB,
     refreshImage: (() -> Unit)? = null,
 ) {
-    
+
     val context = LocalContext.current
     val key = url?.getPhotoKey()
-    
+
     val builder = key(url) {
         remember(url) {
             val builder = ImageRequest
@@ -69,20 +72,19 @@ fun GCachedImage(
             builder.build()
         }
     }
-    
+
     val painter = rememberAsyncImagePainter(
         builder, filterQuality = High,
         contentScale = contentScale
     )
-    
+
     LaunchedEffect(painter.state) {
-        if(painter.state is Error)
+        if (painter.state is Error)
             refreshImage?.let { it() }
     }
-    
     Image(
         painter = url?.let {
-            when(type) {
+            when (type) {
                 WEB -> painter
                 FILE -> rememberAsyncImagePainter(File(it))
                 RESOURCE -> painterResource(it.toInt())
@@ -90,7 +92,7 @@ fun GCachedImage(
         } ?: rememberAsyncImagePainter(""),
         contentDescription = contentDescription,
         modifier = modifier.background(
-            if(painter.state !is Success)
+            if (painter.state !is Success)
                 placeholderColor
             else Transparent
         ), alignment = alignment,
@@ -98,6 +100,7 @@ fun GCachedImage(
         contentScale = contentScale,
         colorFilter = colorFilter
     )
+
 }
 
 private fun String.getPhotoKey() = try {
@@ -114,6 +117,6 @@ private fun String.getPhotoKey() = try {
                     "$path?blur=$blur"
                 }
         }
-} catch(e: Exception) {
+} catch (e: Exception) {
     null
 }

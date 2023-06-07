@@ -276,12 +276,12 @@ private fun Message(
             overflow = Ellipsis
         )
         BrieflyRow(
-            "${user.username}${
+            text = "${user.username}${
                 if(user.age in 18..99) {
                     ", ${user.age}"
                 } else ""
             }",
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(bottom = 7.dp),
             emoji = user.emoji,

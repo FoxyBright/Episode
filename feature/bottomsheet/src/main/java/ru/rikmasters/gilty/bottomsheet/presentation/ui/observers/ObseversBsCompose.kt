@@ -115,7 +115,7 @@ fun ObserversListContent(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 22.dp),
             textStyle = typography.labelLarge
-                .copy(fontWeight = Bold)
+                .copy(fontWeight = Bold),
         )
         GiltyPagerTab(
             modifier = Modifier
@@ -255,14 +255,15 @@ private fun ObserveItem(
                 SpaceBetween, CenterVertically
             ) {
                 BrieflyRow(
-                    "${member.username}${
+                    text = "${member.username}${
                         if(member.age in 18..99) {
                             ", ${member.age}"
                         } else ""
                     }",
-                    Modifier.weight(1f),
-                    member.avatar?.thumbnail?.url,
-                    member.emoji
+                    modifier = Modifier.weight(1f),
+                    image = member.avatar?.thumbnail?.url,
+                    emoji = member.emoji,
+                    isOnline = member.isOnline?:false
                 )
                 SmallButton(
                     stringResource(
