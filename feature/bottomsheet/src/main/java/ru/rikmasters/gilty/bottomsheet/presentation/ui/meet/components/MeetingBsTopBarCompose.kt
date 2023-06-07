@@ -108,22 +108,38 @@ fun MeetingBsTopBarCompose(
             Modifier.padding(bottom = 12.dp)
         ) { callback?.onRespondsClick(state.meet) }
         Row(Modifier.height(Max)) {
-            Avatar(org.avatar?.thumbnail?.url, Modifier.weight(1f))
-            { org.id?.let { callback?.onAvatarClick(it, state.meet.id) } }
+            Avatar(
+                avatar = org.avatar?.thumbnail?.url,
+                modifier = Modifier.weight(1f)
+            ) {
+                org.id?.let {
+                    callback?.onAvatarClick(
+                        organizerId = it,
+                        meetId = state.meet.id
+                    )
+                }
+            }
             Spacer(Modifier.width(18.dp))
-            Meet(state.meet, Modifier.weight(1f))
+            Meet(
+                meet = state.meet,
+                modifier = Modifier.weight(1f)
+            )
         }
         Row(
-            Modifier.padding(top = 10.dp, bottom = 12.dp),
-            Start, CenterVertically
+            Modifier.padding(
+                top = 10.dp,
+                bottom = 12.dp
+            ), Start, CenterVertically
         ) {
             BrieflyRow(
-                "${org.username}${
+                text = "${org.username}${
                     if(org.age in 18..99) {
                         ", ${org.age}"
                     } else ""
                 }",
-                Modifier, (null), org.emoji,
+                modifier = Modifier,
+                image = (null),
+                emoji = org.emoji,
                 isOnline = org.isOnline?:false,
             )
 
@@ -131,28 +147,32 @@ fun MeetingBsTopBarCompose(
                 ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp))
 
             Text(
-                state.meet.display(),
-                Modifier, colorScheme.onTertiary,
+                text = state.meet.display(),
+                color = colorScheme.onTertiary,
                 style = typography.labelSmall
             )
         }
-        if(state.description && state.meet
-                .description.isNotBlank()
-        ) Box(
-            Modifier
-                .fillMaxWidth()
-                .background(
-                    colorScheme.primaryContainer,
-                    shapes.large
+        if(state.meet.description.isNotBlank())
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = colorScheme
+                            .primaryContainer,
+                        shape = shapes.large
+                    )
+            ) {
+                Text(
+                    text = state.meet
+                        .description,
+                    modifier = Modifier
+                        .padding(14.dp),
+                    color = colorScheme
+                        .tertiary,
+                    style = typography
+                        .bodyMedium
                 )
-        ) {
-            Text(
-                state.meet.description,
-                Modifier.padding(14.dp),
-                colorScheme.tertiary,
-                style = typography.bodyMedium
-            )
-        }
+            }
     }
 }
 
@@ -175,26 +195,35 @@ private fun Meet(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.size(156.dp, 150.dp),
+        modifier = modifier
+            .width(156.dp)
+            .height(150.dp),
         shape = shapes.large,
-        colors = cardColors(colorScheme.primaryContainer)
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
         Column(Modifier, Top, End) {
             meet.category.let {
                 CategoryItem(
-                    name = it.name, icon = it.emoji,
+                    name = it.name,
+                    icon = it.emoji,
                     color = when {
                         meet.status == COMPLETED ->
                             colorScheme.onTertiary
                         meet.isOnline ->
                             colorScheme.secondary
                         else -> it.color
-                    }, state = true, size = 92,
-                    modifier = Modifier.offset(12.dp, -(18).dp)
+                    },
+                    state = true,
+                    size = 92,
+                    modifier = Modifier
+                        .offset(12.dp, -(18).dp)
                 )
             }
             MeetDetails(
-                meet, Modifier
+                meet = meet,
+                modifier = Modifier
                     .offset(y = -(10).dp)
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
@@ -252,11 +281,12 @@ private fun SubLabel(
     shape: Dp,
 ) {
     Box(
-        modifier
+        modifier = modifier
             .background(
                 color = color,
                 shape = RoundedCornerShape(shape)
-            ), Center
+            ),
+        contentAlignment = Center
     ) {
         Text(
             text = text,
@@ -280,15 +310,17 @@ private fun Avatar(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier
+        modifier = modifier
             .size(156.dp, 150.dp)
             .background(
-                colorScheme.primaryContainer,
-                shapes.large
+                color = colorScheme
+                    .primaryContainer,
+                shape = shapes.large
             )
     ) {
         GCachedImage(
-            avatar, Modifier
+            url = avatar,
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(shapes.large)
                 .clickable { onClick() },

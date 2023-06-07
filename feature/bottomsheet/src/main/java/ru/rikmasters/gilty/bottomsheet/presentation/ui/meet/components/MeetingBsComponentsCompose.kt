@@ -44,11 +44,16 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MeetingBsMapPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsMap(
-                DemoFullMeetingModel,
-                "18 км",
-                Modifier.padding(16.dp)
+                meet = DemoFullMeetingModel,
+                distance = "18 км",
+                modifier = Modifier
+                    .padding(16.dp)
             )
         }
     }
@@ -58,9 +63,15 @@ private fun MeetingBsMapPreview() {
 @Composable
 private fun MeetingBsConditionsPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsConditions(
-                DemoMeetingModel, Modifier.padding(16.dp)
+                meet = DemoMeetingModel,
+                modifier = Modifier
+                    .padding(16.dp)
             )
         }
     }
@@ -70,11 +81,19 @@ private fun MeetingBsConditionsPreview() {
 @Composable
 private fun MeetingBsParticipantsPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsParticipants(
-                DemoFullMeetingModel.copy(isOnline = true),
-                pagingPreview(DemoUserModelList),
-                Modifier.padding(16.dp)
+                meet = DemoFullMeetingModel
+                    .copy(isOnline = true),
+                membersList = pagingPreview(
+                    DemoUserModelList
+                ),
+                modifier = Modifier
+                    .padding(16.dp)
             )
         }
     }
@@ -84,7 +103,11 @@ private fun MeetingBsParticipantsPreview() {
 @Composable
 private fun MeetingBSCommentPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsComment(
                 (""), (false),
                 {}, Modifier.padding(16.dp)
@@ -97,7 +120,11 @@ private fun MeetingBSCommentPreview() {
 @Composable
 private fun MeetingBsHiddenPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsHidden(
                 Modifier.padding(16.dp),
                 (true), (true)
@@ -118,23 +145,34 @@ fun MeetingBsMap(
     Column(modifier) {
         Row(Modifier.padding(bottom = 18.dp)) {
             Text(
-                stringResource(R.string.meeting_distance_from_user),
-                Modifier.padding(end = 8.dp),
-                colorScheme.tertiary,
+                text = stringResource(
+                    R.string.meeting_distance_from_user
+                ),
+                modifier = Modifier
+                    .padding(end = 8.dp),
+                color = colorScheme.tertiary,
                 style = typography.labelLarge
             )
             Text(
-                distance, Modifier,
-                if(meet.isOnline) colorScheme.secondary
+                text = distance,
+                modifier = Modifier,
+                color = if(meet.isOnline)
+                    colorScheme.secondary
                 else colorScheme.primary,
                 style = typography.labelLarge
             )
         }
         Card(
-            { onClick?.let { it() } },
-            Modifier.fillMaxWidth(),
-            (true), shapes.medium,
-            cardColors(colorScheme.primaryContainer)
+            onClick = {
+                onClick?.let { it() }
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            enabled = true,
+            shape = shapes.medium,
+            colors = cardColors(
+                colorScheme.primaryContainer
+            )
         ) {
             Row(
                 Modifier.padding(horizontal = 16.dp),
@@ -289,19 +327,21 @@ fun MeetingBsParticipants(
                     else colorScheme.primary,
                     style = typography.labelLarge
                 )
-                Image(
-                    painter = painterResource(
-                        if(meet.isPrivate)
-                            R.drawable.ic_lock_close
-                        else R.drawable.ic_lock_open
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(start = 8.dp),
-                    colorFilter = tint(
-                        colorScheme.tertiary
+                if(meet.memberState != IS_ORGANIZER)
+                    Image(
+                        painter = painterResource(
+                            if(meet.memberState != IS_MEMBER
+                                || meet.type == ANONYMOUS
+                            ) R.drawable.ic_lock_close
+                            else R.drawable.ic_lock_open
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 8.dp),
+                        colorFilter = tint(
+                            colorScheme.tertiary
+                        )
                     )
-                )
             }
             Text(
                 text = stringResource(R.string.meeting_watch_all_members_in_meet),

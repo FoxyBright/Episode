@@ -14,7 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
@@ -26,7 +26,8 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.pagingPreview
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.*
@@ -47,9 +48,10 @@ private fun MeetingBsDetailed() {
             )
         ) {
             MeetingBsContent(
-                MeetingBsState(
-                    (false), DemoFullMeetingModel,
-                    Pair(0, null),
+                state = MeetingBsState(
+                    menuState = false,
+                    meet = DemoFullMeetingModel,
+                    lastRespond = 0 to null,
                     detailed = true,
                     comment = "",
                     hidden = true,
@@ -64,18 +66,24 @@ private fun MeetingBsDetailed() {
 @Composable
 private fun MeetingBsObserve() {
     GiltyTheme {
-        val meet = DemoFullMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
-                .background(colorScheme.background)
+                .background(
+                    colorScheme.background
+                )
         ) {
             MeetingBsContent(
-                MeetingBsState(
-                    (false), meet, Pair(0, null),
-                    pagingPreview(DemoUserModelList),
-                    "18 км", (false)
-                ), Modifier
+                state = MeetingBsState(
+                    menuState = false,
+                    meet = DemoFullMeetingModel,
+                    lastRespond = 0 to null,
+                    membersList = pagingPreview(
+                        DemoUserModelList
+                    ),
+                    meetDistance = "18 км",
+                    buttonState = false
+                ),
             )
         }
     }
@@ -85,17 +93,23 @@ private fun MeetingBsObserve() {
 @Composable
 private fun MeetingBsShared() {
     GiltyTheme {
-        val meet = DemoFullMeetingModel
         Box(
             Modifier
                 .fillMaxSize()
-                .background(colorScheme.background)
+                .background(
+                    colorScheme.background
+                )
         ) {
             MeetingBsContent(
-                MeetingBsState(
-                    (false), meet, Pair(0, null),
-                    pagingPreview(DemoUserModelList),
-                    "18 км", (false)
+                state = MeetingBsState(
+                    menuState = false,
+                    meet = DemoFullMeetingModel,
+                    lastRespond = 0 to null,
+                    membersList = pagingPreview(
+                        DemoUserModelList
+                    ),
+                    meetDistance = "18 км",
+                    buttonState = false
                 )
             )
         }
@@ -109,18 +123,24 @@ private fun MeetingBsWhenUser() {
         Box(
             Modifier
                 .fillMaxSize()
-                .background(colorScheme.background)
+                .background(
+                    colorScheme.background
+                )
         ) {
-            val meet = DemoFullMeetingModel.copy(
-                type = ANONYMOUS,
-                isPrivate = true,
-                isOnline = true
-            )
             MeetingBsContent(
-                MeetingBsState(
-                    (false), meet, Pair(0, null),
-                    pagingPreview(DemoUserModelList),
-                    "18 км", (true)
+                state = MeetingBsState(
+                    menuState = false,
+                    meet = DemoFullMeetingModel.copy(
+                        type = ANONYMOUS,
+                        isPrivate = true,
+                        isOnline = true
+                    ),
+                    lastRespond = 0 to null,
+                    membersList = pagingPreview(
+                        DemoUserModelList
+                    ),
+                    meetDistance = "18 км",
+                    buttonState = true
                 )
             )
         }
@@ -166,9 +186,10 @@ fun MeetingBsContent(
     callback: MeetingBsCallback? = null,
 ) {
     val scope = rememberCoroutineScope()
-    val bsState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(Collapsed)
-    )
+    val bsState =
+        rememberBottomSheetScaffoldState(
+            bottomSheetState = BottomSheetState(Collapsed)
+        )
     BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)
@@ -176,7 +197,7 @@ fun MeetingBsContent(
         scaffoldState = bsState,
         sheetPeekHeight = 0.dp,
         sheetShape = shapes.bigTopShapes,
-        sheetBackgroundColor = Color.Transparent
+        sheetBackgroundColor = Transparent
     ) {
         Scaffold(
             bottomBar = {
@@ -299,9 +320,11 @@ private fun MeetContent(
     callback: MeetingBsCallback?,
 ) {
     Column(
-        modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(colorScheme.background)
+            .background(
+                colorScheme.background
+            )
             .padding(horizontal = 16.dp)
     ) {
         TopBar(
@@ -311,19 +334,10 @@ private fun MeetContent(
             onBack = { callback?.onBack() },
             onKebabClick = { callback?.onKebabClick(it) }
         ) { callback?.onMenuItemClick(it, state.meet.id) }
-        LazyColumn(
-            modifier
-                .fillMaxWidth()
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(18.dp))
-            }
+        LazyColumn(modifier.fillMaxWidth()) {
+            itemSpacer(18.dp)
             item {
                 MeetingBsTopBarCompose(
-                    modifier = Modifier.padding(
-                        bottom = if(state.detailed)
-                            28.dp else 0.dp
-                    ),
                     state = MeetingBsTopBarState(
                         meet = state.meet,
                         menuState = state.menuState,
@@ -334,9 +348,7 @@ private fun MeetContent(
                     callback = callback
                 )
             }
-            
             if(state.detailed) {
-                
                 item {
                     Text(
                         text = stringResource(
@@ -346,7 +358,6 @@ private fun MeetContent(
                         style = typography.labelLarge
                     )
                 }
-                
                 item {
                     MeetingBsComment(
                         text = state.comment ?: "",
@@ -355,7 +366,6 @@ private fun MeetContent(
                         modifier = Modifier.padding(top = 22.dp)
                     ) { callback?.onCommentTextClear() }
                 }
-                
                 item {
                     MeetingBsHidden(
                         modifier = Modifier.padding(top = 8.dp),
@@ -452,9 +462,9 @@ private fun TopBar(
             Text(
                 text = stringResource(
                     when(meet.status) {
-                        MeetStatusType.CANCELED ->
-                            R.string.meetings_finished
-                        MeetStatusType.COMPLETED ->
+                        CANCELED ->
+                            R.string.meetings_canceled
+                        COMPLETED ->
                             R.string.meetings_finished
                         else -> R.string.empty_String
                     }

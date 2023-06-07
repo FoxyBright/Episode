@@ -68,30 +68,48 @@ fun DetailedContent(
     modifier: Modifier = Modifier,
     callback: DetailedCallback? = null,
 ) {
-    Scaffold(modifier, {
-        ClosableActionBar(
-            stringResource(R.string.add_meet_detailed_title),
-            Modifier.padding(bottom = 10.dp), (null),
-            { callback?.onCloseAlert(true) }
-        ) { callback?.onBack() }
-    }, {
-        Buttons(
-            Modifier, state.online,
-            state.isActive, (2)
-        ) { callback?.onNext() }
-    }) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            ClosableActionBar(
+                title = stringResource(
+                    R.string.add_meet_detailed_title
+                ),
+                modifier = Modifier
+                    .padding(bottom = 10.dp),
+                details = null,
+                onClose = {
+                    callback?.onCloseAlert(
+                        state = true
+                    )
+                }
+            ) { callback?.onBack() }
+        },
+        bottomBar = {
+            Buttons(
+                modifier = Modifier,
+                online = state.online,
+                enabled = state.isActive,
+                activeDash = 2
+            ) { callback?.onNext() }
+        }
+    ) {
         Content(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.88f)
                 .padding(top = it.calculateTopPadding()),
-            state, callback
+            state = state,
+            callback = callback
         )
     }
     CloseAddMeetAlert(
-        state.alert, state.online, {
+        state = state.alert,
+        online = state.online,
+        cancel = {
             callback?.onCloseAlert(false)
-        }, {
+        },
+        success = {
             callback?.onCloseAlert(false)
             callback?.onClose()
         }

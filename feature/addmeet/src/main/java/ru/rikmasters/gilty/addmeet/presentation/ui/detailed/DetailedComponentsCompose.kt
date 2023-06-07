@@ -10,11 +10,11 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.End
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Tags
@@ -26,14 +26,14 @@ fun tags(
     state: DetailedState,
     callback: DetailedCallback? = null,
 ) = FilterModel(
-    stringResource(R.string.add_meet_detailed_tags),
-    stringResource(R.string.add_meet_detailed_tags_maximum, (3))
+    name = stringResource(R.string.add_meet_detailed_tags),
+    details = stringResource(R.string.add_meet_detailed_tags_maximum, (3))
 ) {
     Column {
         Tags(
-            state.tagList,
-            { callback?.onTagsClick() },
-            state.online
+            tagList = state.tagList,
+            onClick = { callback?.onTagsClick() },
+            online = state.online
         ) { callback?.onTagDelete(it) }
     }
 }
@@ -42,67 +42,76 @@ fun tags(
 fun description(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) =
-    FilterModel(stringResource(R.string.add_meet_detailed_meet_description)) {
-        Column {
-            GTextField(
-                state.description, {
-                    if(it.length <= 120)
-                        callback?.onDescriptionChange(it)
-                },
-                Modifier.fillMaxWidth(),
-                colors = descriptionColors(state.online),
-                shape = shapes.medium,
-                label = if(state.description.isNotEmpty())
-                    textFieldLabel(
-                        (true),
-                        stringResource(R.string.add_meet_detailed_meet_description_place_holder),
-                        labelFont = typography.headlineSmall.copy(
-                            colorScheme.onTertiary
-                        ),
-                    ) else null,
-                placeholder = textFieldLabel(
-                    (false),
-                    stringResource(R.string.add_meet_detailed_meet_description_place_holder),
-                    holderFont = typography.bodyMedium
-                ), textStyle = typography.bodyMedium,
-                keyboardOptions = Default.copy(
-                    imeAction = Done,
-                    keyboardType = Text,
-                    capitalization = Sentences
-                ),
-                clear = { callback?.onDescriptionClear() }
+) = FilterModel(
+    name = stringResource(R.string.add_meet_detailed_meet_description)
+) {
+    Column {
+        GTextField(
+            value = state.description, onValueChange = {
+                if(it.length <= 120)
+                    callback?.onDescriptionChange(it)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = descriptionColors(state.online),
+            shape = shapes.medium,
+            label = if(state.description.isNotEmpty())
+                textFieldLabel(
+                    label = true,
+                    text = stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                    labelFont = typography.headlineSmall
+                        .copy(colorScheme.onTertiary),
+                ) else null,
+            placeholder = textFieldLabel(
+                label = false,
+                text = stringResource(R.string.add_meet_detailed_meet_description_place_holder),
+                holderFont = typography.bodyMedium
+            ),
+            textStyle = typography.bodyMedium,
+            keyboardOptions = Default.copy(
+                imeAction = Done,
+                keyboardType = Text,
+                capitalization = Sentences
+            ),
+            clear = {
+                callback?.onDescriptionClear()
+            }
+        )
+        Text(
+            text = "${state.description.length}/120",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, end = 16.dp),
+            style = typography.headlineSmall.copy(
+                color = colorScheme.onTertiary,
+                textAlign = End,
             )
-            Text(
-                "${state.description.length}/120",
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp, end = 16.dp),
-                colorScheme.onTertiary,
-                textAlign = TextAlign.End,
-                style = typography.headlineSmall
-            )
-        }
+        )
     }
+}
 
 @Composable
 fun additionally(
     state: DetailedState,
     callback: DetailedCallback? = null,
-) =
-    FilterModel(stringResource(R.string.add_meet_conditions_additionally)) {
-        Row(Modifier.fillMaxWidth()) {
-            DataTimeCard(
-                state.date, DataTimeType.DATE,
-                state.online, Modifier.weight(1f)
-            ) { callback?.onDateClick() }
-            Spacer(Modifier.width(16.dp))
-            DataTimeCard(
-                state.time, DataTimeType.TIME,
-                state.online, Modifier.weight(1f)
-            ) { callback?.onTimeClick() }
-        }
+) = FilterModel(
+    name = stringResource(R.string.add_meet_conditions_additionally)
+) {
+    Row(Modifier.fillMaxWidth()) {
+        DataTimeCard(
+            text = state.date,
+            type = DataTimeType.DATE,
+            online = state.online,
+            modifier = Modifier.weight(1f)
+        ) { callback?.onDateClick() }
+        Spacer(Modifier.width(16.dp))
+        DataTimeCard(
+            text = state.time,
+            type = DataTimeType.TIME,
+            online = state.online,
+            modifier = Modifier.weight(1f)
+        ) { callback?.onTimeClick() }
     }
+}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,45 +123,61 @@ fun MeetPlace(
     Column {
         Column(modifier.fillMaxWidth()) {
             Card(
-                { callback?.onMeetPlaceClick() },
-                Modifier.fillMaxWidth(), (true), shapes.medium,
-                cardColors(colorScheme.primaryContainer)
+                onClick = {
+                    callback?.onMeetPlaceClick()
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                enabled = true,
+                shape = shapes.medium,
+                colors = cardColors(
+                    colorScheme.primaryContainer
+                )
             ) {
                 state.meetPlace?.let {
                     Column(Modifier.fillMaxWidth()) {
                         state.meetPlace
                         Text(
-                            it.first, Modifier
+                            text = it.first,
+                            modifier = Modifier
                                 .padding(top = 8.dp)
                                 .padding(horizontal = 16.dp),
-                            colorScheme.onTertiary,
+                            color = colorScheme.onTertiary,
                             style = typography.headlineSmall
                         )
                         Text(
-                            it.second, Modifier
-                                .padding(top = 2.dp, bottom = 10.dp)
-                                .padding(horizontal = 16.dp),
-                            colorScheme.tertiary,
+                            text = it.second,
+                            modifier = Modifier
+                                .padding(
+                                    top = 2.dp,
+                                    bottom = 10.dp
+                                )
+                                .padding(
+                                    horizontal = 16.dp
+                                ),
+                            color = colorScheme.tertiary,
                             style = typography.bodyMedium
                         )
                     }
                 } ?: run {
                     Text(
-                        stringResource(R.string.add_meet_detailed_meet_place),
-                        Modifier.padding(16.dp),
-                        colorScheme.onTertiary,
+                        text = stringResource(R.string.add_meet_detailed_meet_place),
+                        modifier = Modifier.padding(16.dp),
+                        color = colorScheme.onTertiary,
                         style = typography.bodyMedium,
-                        fontWeight = W600
+                        fontWeight = SemiBold
                     )
                 }
             }
         }
         Text(
-            stringResource(R.string.add_meet_detailed_meet_place_place_holder),
-            Modifier
+            text = stringResource(
+                R.string.add_meet_detailed_meet_place_place_holder
+            ),
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, start = 32.dp),
-            colorScheme.onTertiary,
+            color = colorScheme.onTertiary,
             style = typography.headlineSmall
         )
     }
@@ -165,8 +190,11 @@ fun HideMeetPlace(
     callback: DetailedCallback? = null,
 ) {
     CheckBoxCard(
-        stringResource(R.string.add_meet_detailed_meet_hide_place),
-        modifier.fillMaxWidth(), state.hideMeetPlace,
+        label = stringResource(
+            R.string.add_meet_detailed_meet_hide_place
+        ),
+        modifier = modifier.fillMaxWidth(),
+        state = state.hideMeetPlace,
         online = state.online
     ) { callback?.onHideMeetPlaceClick() }
 }
