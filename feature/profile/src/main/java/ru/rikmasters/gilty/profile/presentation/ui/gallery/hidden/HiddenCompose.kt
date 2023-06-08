@@ -54,7 +54,7 @@ interface HiddenBsCallback {
 data class HiddenBsState(
     val photoList: LazyPagingItems<AvatarModel>,
     val photoAmount: Int,
-    val photoViewState:Boolean,
+    val photoViewState: Boolean,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
@@ -67,7 +67,7 @@ fun HiddenBsContent(
     modifier: Modifier = Modifier,
     callback: HiddenBsCallback? = null,
 ) {
-    if(state.photoViewState) PhotoView(
+    if (state.photoViewState) PhotoView(
         images = state.viewerImages,
         selected = state.viewerSelectImage,
         menuState = state.viewerMenuState,
@@ -81,10 +81,10 @@ fun HiddenBsContent(
         ActionBar(
             title = stringResource(R.string.profile_hidden_photo),
             modifier = Modifier.padding(bottom = 20.dp),
-            extra = if(state.photoAmount == 0) null
+            extra = if (state.photoAmount == 0) null
             else stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
         ) { callback?.onBack() }
-
+        //DragTable()
         LazyVerticalGrid(
             Fixed(3), Modifier
                 .fillMaxSize()
@@ -111,7 +111,7 @@ fun HiddenBsContent(
                             ) { callback?.onDeleteImage(img) }
                         }
                     }
-                    if(state.photoList.loadState.append is LoadState.Loading) {
+                    if (state.photoList.loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(3) }) {
                             PagingLoader(state.photoList.loadState)
                         }
@@ -138,8 +138,9 @@ private fun GalleryButton(
 ) {
     Card(
         { callback?.openGallery() },
-        modifier.size((screenWidth.dp - 72.dp) / 3),
-        shape = shapes.large
+        modifier.size((screenWidth.dp - 72.dp) / 3).clip(shapes.large),
+        shape = shapes.large,
+        colors = cardColors(Transparent)
     ) {
         Box(
             Modifier

@@ -297,9 +297,11 @@ fun ReorderableItem(
         isDragging: Boolean,
     ) -> Unit,
 ) {
-    val isDragging = index
-        ?.let { index == state.draggingItemIndex }
-        ?: run { key == state.draggingItemKey }
+    val isDragging = if (index != null) {
+        index == state.draggingItemIndex
+    } else {
+        key == state.draggingItemKey
+    }
     val draggingModifier =
         if(isDragging) Modifier
             .zIndex(1f)

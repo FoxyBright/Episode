@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -115,7 +116,7 @@ fun UserAvatar(
                 .clip(CircleShape)
                 .border(
                     if (hasGroup) 2.dp else 0.dp,
-                    (group ?: UserGroupTypeModel.DEFAULT).getBorderColor(),
+                    (group ?: UserGroupTypeModel.DEFAULT).getBorderColor(isSystemInDarkTheme()),
                     CircleShape
                 )
                 .border(

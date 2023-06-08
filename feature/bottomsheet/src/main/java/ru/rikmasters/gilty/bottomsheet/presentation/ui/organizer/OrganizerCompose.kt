@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -105,7 +106,7 @@ fun OrganizerContent(
             }",
             state.backButton, state.menuState,
             state.isMyProfile,
-            state.profileState.profile?.group?:UserGroupTypeModel.DEFAULT,
+            state.profileState.profile?.group ?: UserGroupTypeModel.DEFAULT,
             { callback?.onBack() },
             { callback?.onMenuDismiss(it) },
         ) { callback?.onMenuItemSelect(it, user?.id) }
@@ -179,7 +180,7 @@ private fun TopBar(
     backButton: Boolean,
     menuState: Boolean,
     isMyProfile: Boolean,
-    profileGroup:UserGroupTypeModel,
+    profileGroup: UserGroupTypeModel,
     onBack: () -> Unit,
     onKebabClick: (Boolean) -> Unit,
     onMenuItemSelect: (Int) -> Unit,
@@ -210,7 +211,7 @@ private fun TopBar(
                     tint = colorScheme.tertiary
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically){
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = username,
                     color = colorScheme.tertiary,
@@ -218,7 +219,10 @@ private fun TopBar(
                     overflow = Ellipsis,
                     maxLines = 1
                 )
-                ProfileBadge(group = profileGroup, modifier = Modifier.padding(start = 4.dp))
+                ProfileBadge(
+                    group = profileGroup, modifier = Modifier.padding(start = 4.dp), labelSize = 9,
+                    textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
+                )
             }
         }
         if (!isMyProfile) {

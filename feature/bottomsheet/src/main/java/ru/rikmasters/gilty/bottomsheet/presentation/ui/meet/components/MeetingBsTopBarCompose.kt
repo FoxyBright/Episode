@@ -149,7 +149,10 @@ fun MeetingBsTopBarCompose(
             )
 
             ProfileBadge(group = state.meet.organizer.group
-                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp))
+                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp),
+                labelSize = 8,
+                textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
+            )
 
             Text(
                 text = state.meet.display(),
