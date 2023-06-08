@@ -81,6 +81,7 @@ object Colors {
     val DarkPurple = Color(0xFF8284EC)
     
     /*     ANOTHER COLORS    */
+    val ExtraLightGray = Color(0xFFDADADA)
     val Gray = Color(0xFFE9E9EA)
     val RatGray = Color(0xFF484649)
     val Border = Color(0xFFB0B0B0)

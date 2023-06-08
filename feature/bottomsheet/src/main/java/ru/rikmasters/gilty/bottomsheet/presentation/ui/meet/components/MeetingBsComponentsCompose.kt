@@ -163,7 +163,23 @@ fun MeetingBsMap(
                 style = typography.labelLarge
             )
         }
-        Card(
+        if(
+            meet.hideAddress == true &&
+            meet.memberState != IS_ORGANIZER
+        ) Text(
+            text = stringResource(
+                R.string.add_meet_detailed_hide_meet_place_placeholder
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 16.dp,
+                    bottom = 12.dp
+                ),
+            color = colorScheme.onTertiary,
+            style = typography.headlineSmall
+        )
+        else Card(
             onClick = {
                 onClick?.let { it() }
             },
@@ -201,36 +217,46 @@ fun MeetingBsMap(
                         .weight(1f)
                 ) {
                     Text(
-                        meet.address ?: "", Modifier
+                        text = meet.address ?: "",
+                        modifier = Modifier
                             .padding(top = 8.dp),
-                        colorScheme.onTertiary,
+                        color = colorScheme.onTertiary,
                         style = typography.headlineSmall
                     )
                     Text(
-                        meet.place ?: "", Modifier
-                            .padding(top = 2.dp, bottom = 10.dp),
-                        colorScheme.tertiary,
+                        text = meet.place ?: "",
+                        modifier = Modifier
+                            .padding(
+                                top = 2.dp,
+                                bottom = 10.dp
+                            ),
+                        color = colorScheme.tertiary,
                         style = typography.bodyMedium
                     )
                 }
                 Icon(
-                    Filled.KeyboardArrowRight,
-                    (null), Modifier.size(28.dp),
-                    colorScheme.onTertiary
+                    imageVector = Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = colorScheme.onTertiary
                 )
             }
         }
         when(meet.memberState) {
-            IS_MEMBER, IS_ORGANIZER -> Text(
-                stringResource(R.string.add_meet_detailed_meet_place_place_holder),
-                Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 14.dp, start = 16.dp,
-                        bottom = 12.dp
-                    ), colorScheme.onTertiary,
-                style = typography.headlineSmall
-            )
+            IS_MEMBER, IS_ORGANIZER ->
+                if(meet.hideAddress != true) Text(
+                    text = stringResource(
+                        R.string.add_meet_detailed_meet_place_place_holder
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 14.dp, start = 16.dp,
+                            bottom = 12.dp
+                        ),
+                    color = colorScheme.onTertiary,
+                    style = typography.headlineSmall
+                )
             else -> Unit
         }
     }
@@ -344,7 +370,12 @@ fun MeetingBsParticipants(
                         )
                     )
             }
-            Text(
+            val count = meet.membersCount
+            val mState = meet.memberState
+            if(
+                (mState == IS_ORGANIZER && count > 1) ||
+                (mState == IS_MEMBER && count > 3)
+            ) Text(
                 text = stringResource(R.string.meeting_watch_all_members_in_meet),
                 modifier = Modifier.clickable(
                     MutableInteractionSource(),
@@ -384,10 +415,11 @@ fun MeetingBsParticipants(
                             modifier = Modifier
                                 .padding(12.dp, 8.dp),
                             image = member.avatar
-                                ?.thumbnail?.url,
+                                ?.thumbnail?.url ?: "",
                             emoji = member.emoji,
                             isOnline = member.isOnline ?: false,
-                            group = member.group?:UserGroupTypeModel.DEFAULT
+                            group = member.group
+                                ?: UserGroupTypeModel.DEFAULT
                         )
                         Icon(
                             imageVector = Filled

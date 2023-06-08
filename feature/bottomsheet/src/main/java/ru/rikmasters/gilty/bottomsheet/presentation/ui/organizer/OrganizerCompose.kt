@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,14 +38,12 @@ import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.shared.GDropMenu
-import ru.rikmasters.gilty.shared.shared.GKebabButton
-import ru.rikmasters.gilty.shared.shared.MeetingCategoryCard
-import ru.rikmasters.gilty.shared.shared.itemSpacer
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -76,8 +74,8 @@ data class UserState(
     val viewerMenuState: Boolean = false,
 )
 
-interface OrganizerCallback : ProfileCallback {
-
+interface OrganizerCallback: ProfileCallback {
+    
     fun onMenuDismiss(state: Boolean)
     fun onMenuItemSelect(point: Int, userId: String?)
     fun onMeetingClick(meet: MeetingModel)
@@ -99,31 +97,36 @@ fun OrganizerContent(
             .background(colorScheme.background)
     ) {
         TopBar(
-            "${user?.username}${
-                if (user?.age in 18..99) {
+            username = "${user?.username}${
+                if(user?.age in 18..99) {
                     ", ${user?.age}"
                 } else ""
             }",
-            state.backButton, state.menuState,
-            state.isMyProfile,
-            state.profileState.profile?.group ?: UserGroupTypeModel.DEFAULT,
-            { callback?.onBack() },
-            { callback?.onMenuDismiss(it) },
-        ) { callback?.onMenuItemSelect(it, user?.id) }
-        LazyColumn(
-            modifier
-                .fillMaxWidth()
+            backButton = state.backButton,
+            menuState = state.menuState,
+            isMyProfile = state.isMyProfile,
+            profileGroup = state.profileState
+                .profile?.group ?: DEFAULT,
+            onBack = { callback?.onBack() },
+            onKebabClick = {
+                callback?.onMenuDismiss(it)
+            },
         ) {
-            item {
-                Spacer(modifier = Modifier.height(18.dp))
-            }
+            callback?.onMenuItemSelect(
+                point = it,
+                userId = user?.id
+            )
+        }
+        LazyColumn(modifier.fillMaxWidth()) {
+            itemSpacer(18.dp)
             item {
                 Profile(
                     state = state.profileState,
                     callback = callback,
+                    isMyProfile = state.isMyProfile
                 ) { callback?.onObserveChange(it) }
             }
-            if (state.currentMeetings.isNotEmpty()) {
+            if(state.currentMeetings.isNotEmpty()) {
                 item { MeetLabel() }
                 item {
                     ActualMeetings(state.currentMeetings)
@@ -132,7 +135,7 @@ fun OrganizerContent(
                 itemSpacer(40.dp)
             }
         }
-        if (state.photoViewState) PhotoView(
+        if(state.photoViewState) PhotoView(
             images = state.viewerImages,
             selected = state.viewerSelectImage,
             menuState = state.viewerMenuState,
@@ -149,10 +152,10 @@ private fun MeetLabel() {
     Text(
         text = stringResource(R.string.profile_actual_meetings_label),
         modifier = Modifier
-            .padding(top = 28.dp, bottom = 14.dp)
+            .padding(top = 13.dp, bottom = 14.dp)
             .padding(horizontal = 16.dp),
         color = colorScheme.tertiary,
-        style = typography.titleLarge
+        style = typography.labelLarge
     )
 }
 
@@ -196,7 +199,7 @@ private fun TopBar(
             Modifier.weight(1f),
             Start, CenterVertically
         ) {
-            if (backButton) IconButton(
+            if(backButton) IconButton(
                 onClick = { onBack() },
                 modifier = Modifier
                     .padding(end = 16.dp)
@@ -211,7 +214,7 @@ private fun TopBar(
                     tint = colorScheme.tertiary
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = CenterVertically) {
                 Text(
                     text = username,
                     color = colorScheme.tertiary,
@@ -220,12 +223,14 @@ private fun TopBar(
                     maxLines = 1
                 )
                 ProfileBadge(
-                    group = profileGroup, modifier = Modifier.padding(start = 4.dp), labelSize = 9,
+                    group = profileGroup,
+                    modifier = Modifier.padding(start = 4.dp)
+                , labelSize = 9,
                     textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
                 )
             }
         }
-        if (!isMyProfile) {
+        if(!isMyProfile) {
             GDropMenu(
                 menuState = menuState,
                 collapse = { onKebabClick(false) },

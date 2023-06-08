@@ -36,6 +36,7 @@ import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.LastRespond
+import ru.rikmasters.gilty.shared.model.LastRespond.Companion.DemoLastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
@@ -50,17 +51,21 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Composable
 private fun MeetingBsTopBarPreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    meet = DemoFullMeetingModel.copy(
-                        type = ANONYMOUS,
-                        isPrivate = true,
-                        description = "hello"
-                    ),
-                    menuState = false,
-                    lastRespond = LastRespond.DemoLastRespond,
+                    meet = DemoFullMeetingModel
+                        .copy(
+                            type = ANONYMOUS,
+                            isPrivate = true,
+                            description = "hello"
+                        ),
+                    lastRespond = DemoLastRespond,
                 )
             )
         }
@@ -71,13 +76,18 @@ private fun MeetingBsTopBarPreview() {
 @Composable
 private fun MeetingBsTopBarOnlinePreview() {
     GiltyTheme {
-        Box(Modifier.background(colorScheme.background)) {
+        Box(
+            Modifier.background(
+                colorScheme.background
+            )
+        ) {
             MeetingBsTopBarCompose(
                 Modifier.padding(16.dp),
                 MeetingBsTopBarState(
-                    DemoFullMeetingModel.copy(isOnline = true),
-                    (false), backButton = true,
-                    lastRespond = LastRespond.DemoLastRespond,
+                    meet = DemoFullMeetingModel
+                        .copy(isOnline = true),
+                    backButton = true,
+                    lastRespond = DemoLastRespond,
                 )
             )
         }
@@ -86,7 +96,6 @@ private fun MeetingBsTopBarOnlinePreview() {
 
 data class MeetingBsTopBarState(
     val meet: FullMeetingModel,
-    val menuState: Boolean = false,
     val lastRespond: LastRespond?,
     val description: Boolean = false,
     val backButton: Boolean = false,
@@ -106,7 +115,7 @@ fun MeetingBsTopBarCompose(
             state.meet.memberState == IS_ORGANIZER
             && (last?.count ?: 0) > 0
         ) last?.let {
-            Responds (
+            Responds(
                 it,
                 Modifier.padding(bottom = 12.dp)
             ) { callback?.onRespondsClick(state.meet) }
@@ -141,18 +150,23 @@ fun MeetingBsTopBarCompose(
                         ", ${org.age}"
                     } else ""
                 }",
-                modifier = Modifier,
-                image = (null),
                 emoji = org.emoji,
-                group = org.group?:UserGroupTypeModel.DEFAULT
+                
+                group = org.group ?: UserGroupTypeModel.DEFAULT
             )
-
-            ProfileBadge(group = state.meet.organizer.group
-                ?:UserGroupTypeModel.DEFAULT, modifier = Modifier.padding(horizontal = 4.dp),
+            
+            ProfileBadge(
+                group = state.meet.organizer.group
+                    ?: UserGroupTypeModel.DEFAULT,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp),
                 labelSize = 8,
-                textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
+                textPadding = PaddingValues(
+                    horizontal = 8.dp,
+                    vertical = 3.dp
+                )
             )
-
+            
             Text(
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,

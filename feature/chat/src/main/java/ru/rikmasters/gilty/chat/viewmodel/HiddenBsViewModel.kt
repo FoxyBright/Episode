@@ -26,7 +26,7 @@ class HiddenBsViewModel(
         chatId: String,
     ) = singleLoading {
         selected.value.forEach {
-            chatVm.onSendMessage(
+            chatVm.sendHiddenMessage(
                 chatId = chatId,
                 attachment = listOf(it)
             )

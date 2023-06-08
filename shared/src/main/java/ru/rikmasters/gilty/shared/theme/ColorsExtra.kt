@@ -19,6 +19,7 @@ import ru.rikmasters.gilty.shared.theme.Colors.DarkPurple
 import ru.rikmasters.gilty.shared.theme.Colors.DarkRed
 import ru.rikmasters.gilty.shared.theme.Colors.DarkShadow
 import ru.rikmasters.gilty.shared.theme.Colors.DarkYellow
+import ru.rikmasters.gilty.shared.theme.Colors.ExtraLightGray
 import ru.rikmasters.gilty.shared.theme.Colors.Gray
 import ru.rikmasters.gilty.shared.theme.Colors.Lead
 import ru.rikmasters.gilty.shared.theme.Colors.LightGray
@@ -82,6 +83,7 @@ data class ExtraColors(
     val erotic: Color = Unspecified,
     val party: Color = Unspecified,
     val art: Color = Unspecified,
+    val galleryCircle: Color = Unspecified,
     // Add new color in scheme = Color.Unspecified
     
     
@@ -137,6 +139,7 @@ val LightExtraColors = ExtraColors(
     meetingTransparencyShape = halfTransparentlyGray,
     gripColor = Ash,
     miniCategoriesBackground = LightGray,
+    galleryCircle = ExtraLightGray,
     
     // Categories Colors
     sport = Orange,
@@ -173,7 +176,7 @@ val LightExtraColors = ExtraColors(
 )
 val DarkExtraColors = ExtraColors(
     elementsBack = PreDark,
-    chipGray = Gray,
+    chipGray = RatGray,
     grayButton = RatGray,
     searchCardBackground = SuperDark,
     policyAgreeColor = Silver,
@@ -201,6 +204,7 @@ val DarkExtraColors = ExtraColors(
     meetingTransparencyShape = halfTransparentlyGray,
     gripColor = gripGrayDark,
     miniCategoriesBackground = Lead,
+    galleryCircle = Black,
     
     // Categories Colors
     sport = DarkOrange,

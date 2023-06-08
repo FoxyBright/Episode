@@ -143,7 +143,7 @@ fun ChatScreen(
                     context.contentResolver
                         .openInputStream(uri)
                         ?.use { file.writeBytes(it.readBytes()) }
-                    vm.onSendMessage(
+                    vm.sendImageMessage(
                         chatId = chatId,
                         photos = listOf(file)
                     )
@@ -283,8 +283,8 @@ fun ChatScreen(
                 }
                 
                 override fun onHiddenClick(message: MessageModel) {
-                    val attach =
-                        message.message?.attachments?.first()?.file
+                    val attach = message
+                        .message?.attachments?.first()?.file
                     scope.launch {
                         if(attach?.hasAccess == false) {
                             vm.changePhotoViewType(LOAD)
@@ -310,7 +310,11 @@ fun ChatScreen(
                 
                 override fun onSend() {
                     scope.launch {
-                        vm.onSendMessage(chatId, answer?.id, message)
+                        vm.onSendMessage(
+                            chatId = chatId,
+                            replied = answer?.id,
+                            text = message
+                        )
                         listState.animateScrollToItem(0)
                     }
                 }

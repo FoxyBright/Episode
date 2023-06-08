@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -20,8 +21,10 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,8 +44,7 @@ import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
-import ru.rikmasters.gilty.shared.shared.GEmojiImage
-import ru.rikmasters.gilty.shared.shared.ObserveCheckBox
+import ru.rikmasters.gilty.shared.shared.*
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
@@ -69,7 +71,8 @@ private fun ProfileImageContentPreview() {
             image = DemoAvatarModel,
             type = ORGANIZER,
             observeState = false,
-            onObserveChange = {}
+            onObserveChange = {},
+            isMyProfile = false
         ) {}
     }
 }
@@ -163,18 +166,48 @@ private fun Lock(
         )
     ) {
         Icon(
-            painterResource(
-                if(state) R.drawable.ic_lock_open
-                else R.drawable.ic_lock_close
-            ), (null), Modifier
+            painter = painterResource(
+                if(state)
+                    R.drawable.ic_lock_open
+                else
+                    R.drawable.ic_lock_close
+            ),
+            contentDescription = null,
+            modifier = Modifier
                 .padding(8.dp)
                 .size(16.dp),
-            White
+            tint = White
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Menu(
+    state: Boolean,
+    offset: Offset,
+    onDismiss: () -> Unit,
+    onSelect: (Int) -> Unit,
+) {
+    GPopUpMenu(
+        menuState = state,
+        collapse = onDismiss,
+        items = listOf(
+            Triple(
+                stringResource(R.string.profile_menu_watch_photo_button),
+                colorScheme.tertiary
+            ) { onDismiss(); onSelect(0) },
+            Triple(
+                stringResource(R.string.edit_button),
+                colorScheme.tertiary
+            ) { onDismiss(); onSelect(1) }
+        ),
+        modifier = Modifier.offset(
+            (offset.x / density).dp,
+            (offset.y / density).dp
+        )
+    )
+}
+
 @Composable
 fun ProfileImageContent(
     modifier: Modifier,
@@ -183,18 +216,27 @@ fun ProfileImageContent(
     observeState: Boolean,
     onObserveChange: (Boolean) -> Unit,
     isError: Boolean = false,
+    isMyProfile: Boolean,
     onImageRefresh: () -> Unit = {},
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
+    usProfClick: (Offset) -> Unit = {},
 ) {
     Card(
-        onClick = onClick,
         modifier = modifier
             .height(
                 if(type == CREATE)
                     200.dp else 254.dp
             )
-            .fillMaxWidth(0.45f),
-        enabled = true,
+            .fillMaxWidth(0.45f)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        if(type != USERPROFILE)
+                            onClick()
+                        else usProfClick(it)
+                    },
+                )
+            },
         shape = shapes.large,
         colors = cardColors(
             containerColor = colorScheme
@@ -209,7 +251,12 @@ fun ProfileImageContent(
     ) {
         Column {
             Box {
-                Avatar(image, type, Modifier, onImageRefresh)
+                Avatar(
+                    image = image,
+                    type = type,
+                    modifier = Modifier,
+                    onImageRefresh = onImageRefresh
+                )
                 when(type) {
                     USERPROFILE, ANONYMOUS_ORGANIZER -> Unit
                     
@@ -223,7 +270,7 @@ fun ProfileImageContent(
                     }
                     
                     ORGANIZER -> {
-                        CreateProfileCardRow(
+                        if(!isMyProfile) CreateProfileCardRow(
                             text = stringResource(R.string.profile_organizer_observe),
                             modifier = Modifier.align(BottomCenter),
                             profileType = type,
@@ -248,7 +295,8 @@ private fun Avatar(
             url = image?.thumbnail?.url,
             modifier = Modifier.fillMaxSize(),
             contentScale = Crop,
-            placeholderColor = colorScheme.primaryContainer
+            placeholderColor = colorScheme
+                .primaryContainer
         ) { onImageRefresh() }
         image?.blockedAt?.let {
             if(type == USERPROFILE) Column(
@@ -356,25 +404,39 @@ fun ProfileStatisticContent(
     onClick: (() -> Unit)? = null,
 ) {
     Card(
-        { onClick?.let { it() } },
-        modifier
+        onClick = { onClick?.let { it() } },
+        modifier = modifier
             .height(
                 if(profileType == CREATE)
                     93.dp else 118.dp
             )
             .fillMaxWidth()
-            .clip(shapes.large), (true),
-        shapes.large, cardColors(colorScheme.primaryContainer)
+            .clip(shapes.large),
+        enabled = true,
+        shape = shapes.large,
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
-        Column(Modifier, Top, CenterHorizontally) {
+        Column(
+            Modifier, Top,
+            CenterHorizontally
+        ) {
             Row(
                 Modifier
                     .padding(horizontal = 4.dp)
                     .padding(top = 8.dp),
                 Start, CenterVertically
             ) {
-                RatingText(rating, profileType)
-                Cloud(profileType, Modifier, emoji)
+                RatingText(
+                    text = rating,
+                    profileType = profileType
+                )
+                Cloud(
+                    profileType = profileType,
+                    modifier = Modifier,
+                    emoji = emoji
+                )
             }
             Row(
                 Modifier
@@ -385,16 +447,16 @@ fun ProfileStatisticContent(
                     .padding(bottom = 8.dp, top = 4.dp)
             ) {
                 Observe(
-                    Modifier.weight(1f),
-                    profileType,
-                    stringResource(R.string.profile_observers_in_profile),
-                    observers
+                    modifier = Modifier.weight(1f),
+                    profileType = profileType,
+                    text = stringResource(R.string.profile_observers_in_profile),
+                    count = observers
                 )
                 Observe(
-                    Modifier.weight(1f),
-                    profileType,
-                    stringResource(R.string.profile_user_observe),
-                    observed
+                    modifier = Modifier.weight(1f),
+                    profileType = profileType,
+                    text = stringResource(R.string.profile_user_observe),
+                    count = observed
                 )
             }
         }
@@ -415,7 +477,7 @@ private fun RatingText(
         )
     val string = text.ifBlank { "0.0" }
     Text(
-        buildAnnotatedString {
+        text = buildAnnotatedString {
             withStyle(style.toSpanStyle()) {
                 append(string.first())
             }
@@ -428,7 +490,9 @@ private fun RatingText(
             withStyle(style.toSpanStyle()) {
                 append(string.last())
             }
-        }, modifier, textAlign = Right,
+        },
+        modifier = modifier,
+        textAlign = Right,
         style = style,
         maxLines = 1
     )
@@ -441,31 +505,28 @@ private fun Observe(
     profileType: ProfileType,
     text: String, count: Int,
 ) {
-    val style =
-        typography.headlineSmall.copy(
-            fontSize = if(profileType == CREATE)
-                12.dp.toSp()
-            else 14.dp.toSp()
-        ) to typography.displaySmall.copy(
-            fontSize = if(profileType == CREATE)
-                8.dp.toSp()
-            else 10.dp.toSp()
-        )
     Column(
-        modifier, Top, CenterHorizontally
+        modifier, Top,
+        CenterHorizontally
     ) {
         Text(
-            digitalConverter(count),
-            Modifier, colorScheme.tertiary,
-            style = style.first,
-            fontWeight = SemiBold,
-            textAlign = TextAlign.Center,
+            text = digitalConverter(count),
+            style = typography.headlineSmall.copy(
+                color = colorScheme.tertiary,
+                fontSize = if(profileType == CREATE)
+                    12.dp.toSp() else 14.dp.toSp(),
+                fontWeight = SemiBold,
+                textAlign = TextAlign.Center,
+            ),
         )
         Text(
-            text, Modifier,
-            colorScheme.tertiary,
-            style = style.second,
-            textAlign = TextAlign.Center
+            text = text,
+            style = typography.displaySmall.copy(
+                color = colorScheme.tertiary,
+                fontSize = if(profileType == CREATE)
+                    8.dp.toSp() else 10.dp.toSp(),
+                textAlign = TextAlign.Center
+            )
         )
     }
 }
@@ -533,7 +594,8 @@ private fun Cloud(
             }
             emoji?.let {
                 GEmojiImage(
-                    it, Modifier
+                    emoji = it,
+                    modifier = Modifier
                         .padding(
                             paddings.first,
                             paddings.second
@@ -559,7 +621,7 @@ private fun MiniCloud(
     (() -> Unit)? = null,
 ) = Box(
     modifier.background(
-        colors.chipGray,
-        CircleShape
+        color = colors.grayButton,
+        shape = CircleShape
     )
 ) { content?.invoke() }

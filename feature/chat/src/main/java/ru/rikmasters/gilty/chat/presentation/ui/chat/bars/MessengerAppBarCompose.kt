@@ -42,9 +42,9 @@ import ru.rikmasters.gilty.shared.R.drawable.*
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.Gradients.green
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 @Preview
 @Composable
@@ -231,8 +231,8 @@ private fun PinedButton(
             Modifier.background(
                 linearGradient(
                     if(meetType) listOf(
-                        colors.chipGray,
-                        colors.chipGray
+                        Colors.RatGray,
+                        Colors.RatGray
                     ) else listOf(greenGradientAnim, greenGradientSecAnim, greenGradientThirdAnim)  //green()
                 ), shapes.large
             )

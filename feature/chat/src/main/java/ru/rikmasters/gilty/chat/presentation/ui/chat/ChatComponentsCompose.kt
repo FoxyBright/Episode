@@ -153,6 +153,14 @@ fun ChatMessage(
             ),
         callback
     )
-    MessageMenu(menuState, offset, { menuState = false })
-    { callback?.onMessageMenuItemSelect(it, message) }
+    MessageMenu(
+        state = menuState,
+        offset = offset,
+        onDismiss = { menuState = false }
+    ) {
+        callback?.onMessageMenuItemSelect(
+            point = it,
+            message = message
+        )
+    }
 }

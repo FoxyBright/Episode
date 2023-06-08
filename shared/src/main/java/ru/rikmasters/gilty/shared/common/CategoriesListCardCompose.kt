@@ -2,12 +2,17 @@ package ru.rikmasters.gilty.shared.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shape
@@ -25,19 +30,25 @@ fun CategoriesListCard(
     modifier: Modifier,
     meeting: MeetingModel,
     border: Boolean = false,
-    imageSize: Dp = 16.dp,
-    shape: Shape = shapes.medium
+    imageSize: Dp = 20.dp,
+    shape: Shape = shapes.medium,
 ) {
-    Surface(
-        modifier, shape,
-        colorScheme.background,
+    Card(
+        modifier = modifier,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = Transparent
+        ),
         border = if(border) BorderStroke(
             3.dp, colors.borderColor
         ) else BorderStroke(0.dp, Transparent)
     ) {
         Row(
-            Modifier, Arrangement.SpaceEvenly,
-            Alignment.CenterVertically
+            Modifier.background(
+                colorScheme.background
+            ),
+            SpaceEvenly,
+            CenterVertically
         ) {
             GEmojiImage(
                 meeting.category.emoji,

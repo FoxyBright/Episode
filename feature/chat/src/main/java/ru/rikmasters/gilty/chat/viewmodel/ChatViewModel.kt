@@ -279,7 +279,7 @@ class ChatViewModel: ViewModel() {
         date: String?,
         @Suppress("UNUSED_PARAMETER")
         chatId: String,
-        isOrganizer: Boolean
+        isOrganizer: Boolean,
     ) = date?.let {
         val start = ofZ(it).millis()
         val now = nowZ().millis()
@@ -354,13 +354,33 @@ class ChatViewModel: ViewModel() {
         _message.emit("")
     }
     
+    suspend fun sendImageMessage(
+        chatId: String,
+        photos: List<File>,
+    ) = singleLoading {
+        onSendMessage(
+            chatId = chatId,
+            photos = photos
+        )
+    }
+    
+    suspend fun sendHiddenMessage(
+        chatId: String,
+        attachment: List<AvatarModel>? = null,
+    ) {
+        onSendMessage(
+            chatId = chatId,
+            attachment = attachment
+        )
+    }
+    
     suspend fun onSendMessage(
         chatId: String,
         replied: String? = null,
         text: String? = null,
         attachment: List<AvatarModel>? = null,
         photos: List<File>? = null,
-    ) = singleLoading {
+    ) {
         changeAnswer(null)
         clearMessage()
         messageManager.sendMessage(

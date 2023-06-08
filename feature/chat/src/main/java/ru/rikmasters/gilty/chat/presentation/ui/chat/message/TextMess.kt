@@ -21,6 +21,9 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat.message
 //import ru.rikmasters.gilty.shared.common.extentions.TextFlow
 //import ru.rikmasters.gilty.shared.common.extentions.TextFlowObstacleAlignment
 //
+
+// TODO для того чтобы текст обтекал таймер пришедшего сообщения добавить в будущем
+
 //@Preview
 //@Composable
 //fun testMess() {

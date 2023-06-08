@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.RowActionBar
+import ru.rikmasters.gilty.shared.theme.base.switch
 
 data class GalleryState(
     val type: GalleryImageType,
@@ -115,32 +116,40 @@ fun GalleryDropMenu(
     menuList: List<String>?,
     callback: GalleryCallback?,
 ) {
-    Box(
-        Modifier.padding(
-            start = 130.dp,
-            top = 90.dp
-        )
+    MaterialTheme(
+        colorScheme = colorScheme.switch()
+            .copy(
+                surface = colorScheme.primaryContainer,
+                onSurface = colorScheme.primary
+            )
     ) {
-        DropdownMenu(
-            expanded = state,
-            onDismissRequest = {
-                callback?.onMenuDismiss(false)
-            },
-            modifier = Modifier.background(
-                colorScheme.primaryContainer
+        Box(
+            Modifier.padding(
+                start = 130.dp,
+                top = 90.dp
             )
         ) {
-            menuList?.forEachIndexed { i, it ->
-                DropdownMenuItem({
-                    Text(
-                        text = it,
-                        color = colorScheme.tertiary,
-                        style = typography.bodyMedium
-                    )
-                }, {
-                    callback?.onMenuDismiss(true)
-                    callback?.onMenuItemClick(i)
-                })
+            DropdownMenu(
+                expanded = state,
+                onDismissRequest = {
+                    callback?.onMenuDismiss(false)
+                },
+                modifier = Modifier.background(
+                    colorScheme.primaryContainer
+                )
+            ) {
+                menuList?.forEachIndexed { i, it ->
+                    DropdownMenuItem({
+                        Text(
+                            text = it,
+                            color = colorScheme.tertiary,
+                            style = typography.bodyMedium
+                        )
+                    }, {
+                        callback?.onMenuDismiss(true)
+                        callback?.onMenuItemClick(i)
+                    })
+                }
             }
         }
     }

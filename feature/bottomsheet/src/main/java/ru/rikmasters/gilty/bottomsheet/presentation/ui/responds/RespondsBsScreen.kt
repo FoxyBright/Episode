@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.responds
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
@@ -24,11 +23,14 @@ fun RespondsBs(
     val scope = rememberCoroutineScope()
     
     // Список встреч с пагинацией
-    val respondsList = vm.responds.collectAsLazyPagingItems()
+    val respondsList =
+        vm.responds.collectAsLazyPagingItems()
     // Список откликов с пагинацией
-    val sentResponds = vm.sentResponds.collectAsLazyPagingItems()
-    val receivedResponds = vm.receivedResponds.collectAsLazyPagingItems()
-
+    val sentResponds =
+        vm.sentResponds.collectAsLazyPagingItems()
+    val receivedResponds =
+        vm.receivedResponds.collectAsLazyPagingItems()
+    
     val groupsStates by vm.groupsStates.collectAsState()
     val tabs by vm.tabs.collectAsState()
     
@@ -49,7 +51,6 @@ fun RespondsBs(
             sentResponds = sentResponds,
             receivedResponds = receivedResponds,
             respondsStates = groupsStates,
-            selectTab = tabs, Modifier,
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
@@ -60,8 +61,16 @@ fun RespondsBs(
                     scope.launch { vm.changePhotoViewState(state) }
                 }
                 
-                override fun onRespondClick(authorId: String) {
-                    nav.navigate("USER?user=$authorId&meet=$meetId")
+                override fun onRespondClick(
+                    authorId: String,
+                    meetId: String,
+                ) {
+                    if(tabs == 0) nav.navigate(
+                        "MEET?meet=$meetId"
+                    )
+                    else nav.navigate(
+                        "USER?user=$authorId&meet=$meetId"
+                    )
                 }
                 
                 override fun onImageClick(image: AvatarModel) {

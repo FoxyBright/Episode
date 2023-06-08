@@ -210,8 +210,9 @@ fun MeetingCategoryCard(
                     .size(126.dp), Center
             ) {
                 if(hasAvatar) GCachedImage(
-                    user?.avatar?.thumbnail?.url,
-                    Modifier
+                    url = user?.avatar
+                        ?.thumbnail?.url,
+                    modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape),
                     contentScale = Crop
@@ -225,17 +226,20 @@ fun MeetingCategoryCard(
                         )
                 )
                 if(!hasAvatar) Text(
-                    meeting.category.name,
-                    Modifier.padding(horizontal = 16.dp), White,
-                    style = typography.labelSmall,
-                    textAlign = TextAlign.Center,
-                    fontWeight = SemiBold,
+                    text = meeting.category.name,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                    style = typography.labelSmall.copy(
+                        color = White,
+                        textAlign = TextAlign.Center,
+                        fontWeight = SemiBold,
+                    ),
                     overflow = Ellipsis,
                     maxLines = 3
                 )
             }
             CategoriesListCard(
-                Modifier
+                modifier = Modifier
                     .align(TopEnd)
                     .padding(
                         top = 10.dp, end = if(
@@ -243,7 +247,8 @@ fun MeetingCategoryCard(
                             != MEMBER_PAY
                         ) 28.dp else 0.dp
                     ),
-                meeting, (true)
+                meeting = meeting,
+                border = true
             )
         }
     }

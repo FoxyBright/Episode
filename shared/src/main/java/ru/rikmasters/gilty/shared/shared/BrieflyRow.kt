@@ -3,12 +3,9 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -68,12 +65,12 @@ fun BrieflyRow(
     maxLines: Int = 1,
     emojiSize: Int = 18,
     isOnline: Boolean = false,
-    group: UserGroupTypeModel = UserGroupTypeModel.DEFAULT
+    group: UserGroupTypeModel = UserGroupTypeModel.DEFAULT,
 ) {
     val label = buildAnnotatedString {
         append("$text "); emoji?.let { appendInlineContent("emoji") }
     }
-
+    
     Row(modifier, Start, CenterVertically) {
         image?.let {
             UserAvatar(
@@ -84,13 +81,27 @@ fun BrieflyRow(
             )
         }
         Text(
-            label, Modifier, textColor,
-            style = textStyle, fontWeight = textWeight,
-            overflow = overflow, maxLines = maxLines,
+            text = label,
+            modifier = Modifier,
+            color = textColor,
+            style = textStyle,
+            fontWeight = textWeight,
+            overflow = overflow,
+            maxLines = maxLines,
             inlineContent = mapOf(
                 "emoji" to InlineTextContent(
-                    Placeholder(emojiSize.sp, emojiSize.sp, TextCenter)
-                ) { GEmojiImage(emoji, Modifier.size(emojiSize.dp)) }
+                    Placeholder(
+                        width = emojiSize.sp,
+                        height = emojiSize.sp,
+                        placeholderVerticalAlign = TextCenter
+                    )
+                ) {
+                    GEmojiImage(
+                        emoji = emoji,
+                        modifier = Modifier
+                            .size(emojiSize.dp)
+                    )
+                }
             )
         )
     }
@@ -102,31 +113,31 @@ fun UserAvatar(
     image: String?,
     group: UserGroupTypeModel? = UserGroupTypeModel.DEFAULT,
     isOnline: Boolean = false,
-    imageSize: Int = 38
+    imageSize: Int = 38,
 ) {
     val hasGroup = group != UserGroupTypeModel.DEFAULT
-
+    
     Box(
         modifier = modifier,
         contentAlignment = Center
     ) {
         GCachedImage(
             image, Modifier
-                .size(if (hasGroup) (imageSize + 5).dp else imageSize.dp)
+                .size(if(hasGroup) (imageSize + 5).dp else imageSize.dp)
                 .clip(CircleShape)
                 .border(
-                    if (hasGroup) 2.dp else 0.dp,
+                    if(hasGroup) 2.dp else 0.dp,
                     (group ?: UserGroupTypeModel.DEFAULT).getBorderColor(isSystemInDarkTheme()),
                     CircleShape
                 )
                 .border(
-                    if (hasGroup) 3.dp else 0.dp,
+                    if(hasGroup) 3.dp else 0.dp,
                     colorScheme.primaryContainer,
                     CircleShape
                 ),
             contentScale = Crop
         )
-        if (isOnline) {
+        if(isOnline) {
             OnlineIndicator(modifier = Modifier.align(BottomEnd))
         }
     }
@@ -134,7 +145,7 @@ fun UserAvatar(
 
 @Composable
 private fun OnlineIndicator(
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Surface(
         modifier, CircleShape,

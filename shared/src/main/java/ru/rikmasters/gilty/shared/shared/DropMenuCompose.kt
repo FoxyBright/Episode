@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.theme.base.switch
 
 val METRICS: DisplayMetrics = Resources.getSystem().displayMetrics
-val screenWidth = METRICS.widthPixels / METRICS.density
-val screenHeight = METRICS.heightPixels / METRICS.density
+val density = METRICS.density
+val screenWidth = METRICS.widthPixels / density
+val screenHeight = METRICS.heightPixels / density
 
 @Composable
 fun GDropMenu(
@@ -29,7 +30,10 @@ fun GDropMenu(
 ) {
     MaterialTheme(
         colorScheme = colorScheme.switch()
-            .copy(surface = colorScheme.primaryContainer),
+            .copy(
+                surface = colorScheme.primaryContainer,
+                onSurface = colorScheme.primary,
+            ),
     ) {
         DropdownMenu(
             expanded = menuState,

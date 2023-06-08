@@ -341,7 +341,6 @@ private fun MeetContent(
                 MeetingBsTopBarCompose(
                     state = MeetingBsTopBarState(
                         meet = state.meet,
-                        menuState = state.menuState,
                         lastRespond = state.lastRespond,
                         description = state.detailed,
                         backButton = state.backButton

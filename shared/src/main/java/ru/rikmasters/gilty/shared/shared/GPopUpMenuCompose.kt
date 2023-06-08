@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -14,6 +15,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import ru.rikmasters.gilty.shared.theme.base.switch
 
 @Composable
 fun GPopUpMenu(
@@ -22,20 +24,25 @@ fun GPopUpMenu(
     items: List<Triple<String, Color, () -> Unit>>,
     modifier: Modifier = Modifier,
 ) {
-    if(menuState) Box(modifier) {
-        Popup(onDismissRequest = { collapse() }) {
-            Box(Modifier.shadow(1.dp, shapes.large)) {
-                Column(
-                    Modifier.background(
-                        colorScheme.primaryContainer,
-                        shapes.large
-                    )
-                ) {
-                    items.forEachIndexed { i, it ->
-                        Item(
-                            i, it.first, items.size,
-                            it.second, Modifier, it.third
+    MaterialTheme(
+        colorScheme = colorScheme.switch()
+            .copy(surface = colorScheme.primaryContainer)
+    ) {
+        if(menuState) Box(modifier) {
+            Popup(onDismissRequest = { collapse() }) {
+                Box(Modifier.shadow(1.dp, shapes.large)) {
+                    Column(
+                        Modifier.background(
+                            colorScheme.primaryContainer,
+                            shapes.large
                         )
+                    ) {
+                        items.forEachIndexed { i, it ->
+                            Item(
+                                i, it.first, items.size,
+                                it.second, Modifier, it.third
+                            )
+                        }
                     }
                 }
             }
@@ -48,7 +55,7 @@ private fun Item(
     index: Int, text: String,
     size: Int, color: Color,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
         modifier

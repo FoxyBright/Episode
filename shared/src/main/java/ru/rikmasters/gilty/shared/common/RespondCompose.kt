@@ -15,7 +15,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.notification.*
 import ru.rikmasters.gilty.shared.shared.*
@@ -51,31 +51,45 @@ private fun SentResponds() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun LazyListScope.sentRespond(
+    meetId: String,
     name: String,
     organizer: UserModel,
     responds: List<RespondWithPhotos>,
     modifier: Modifier = Modifier,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     items(responds) { respond ->
         Card(
-            { callback?.onRespondClick(organizer.id ?: "") },
-            modifier.fillMaxWidth(),
-            (true),
-            shapes.medium,
-            cardColors(colorScheme.primaryContainer)
+            onClick = {
+                callback?.onRespondClick(
+                    authorId = organizer.id ?: "",
+                    meetId = meetId
+                )
+            },
+            modifier = modifier.fillMaxWidth(),
+            shape = shapes.medium,
+            colors = cardColors(
+                colorScheme.primaryContainer
+            )
         ) {
             Column {
                 BrieflyRow(
-                    text = name, modifier = Modifier.padding(
+                    text = name,
+                    modifier = Modifier.padding(
                         start = 16.dp,
                         top = 12.dp
-                    ), image = organizer.avatar?.thumbnail?.url,
-                    group = organizer.group?: UserGroupTypeModel.DEFAULT,
+                    ),
+                    image = organizer.avatar
+                        ?.thumbnail?.url ?: "",
+                    
+                    group = organizer.group ?: DEFAULT,
                 )
                 Column(Modifier.padding(start = 66.dp)) {
                     GDivider(Modifier)
-                    Buttons(Modifier.padding(vertical = 8.dp), (true)) { callback?.onCancelClick(respond.id) }
+                    Buttons(
+                        Modifier.padding(vertical = 8.dp),
+                        (true)
+                    ) { callback?.onCancelClick(respond.id) }
                 }
             }
         }
@@ -87,34 +101,41 @@ fun LazyListScope.sentRespond(
 fun ReceivedRespond(
     respond: RespondWithPhotos,
     modifier: Modifier = Modifier,
-    callback: RespondsListCallback? = null
+    callback: RespondsListCallback? = null,
 ) {
     Card(
-        { callback?.onRespondClick(respond.author.id ?: "") },
-        modifier,
-        (true),
-        shapes.medium,
-        cardColors(colorScheme.primaryContainer)
+        onClick = {
+            callback?.onRespondClick(
+                respond.author.id ?: "",
+            )
+        },
+        modifier = modifier,
+        shape = shapes.medium,
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
         val user = respond.author
         Column {
             BrieflyRow(
-                "${user.username}${
-                if (user.age in 18..99) {
-                    ", ${user.age}"
-                } else ""
+                text = "${user.username}${
+                    if(user.age in 18..99) {
+                        ", ${user.age}"
+                    } else ""
                 }",
                 modifier = Modifier.padding(
                     start = 16.dp,
                     top = 12.dp
                 ),
-                image = user.avatar?.thumbnail?.url,
+                image = user.avatar
+                    ?.thumbnail?.url ?: "",
                 emoji = user.emoji,
-                group = user.group?: UserGroupTypeModel.DEFAULT,
+                
+                group = user.group ?: DEFAULT,
             )
             Column(Modifier.padding(start = 66.dp)) {
                 GDivider(Modifier)
-                if (respond.comment.isNotBlank()) Text(
+                if(respond.comment.isNotBlank()) Text(
                     respond.comment,
                     Modifier
                         .padding(end = 20.dp)
@@ -125,14 +146,14 @@ fun ReceivedRespond(
                 // TODO: error states
                 val photos = respond.photos?.collectAsLazyPagingItems()
                 photos?.let {
-                    if (photos.loadState.refresh is LoadState.Loading) {
+                    if(photos.loadState.refresh is LoadState.Loading) {
                         // TODO: заменить чем-нибудь
                         Spacer(
                             modifier = Modifier.height(60.dp)
                         )
                     } else {
                         val photosCount = it.itemCount
-                        if (photosCount != 0) {
+                        if(photosCount != 0) {
                             LazyRow(modifier) {
                                 items(it) { photo ->
                                     photo?.let {
@@ -141,8 +162,10 @@ fun ReceivedRespond(
                                             Modifier.padding(6.dp),
                                             !photo.hasAccess
                                         ) {
-                                            if (!photo.hasAccess) {
-                                                callback?.onImageClick(photo)
+                                            if(!photo.hasAccess) {
+                                                callback?.onImageClick(
+                                                    photo
+                                                )
                                             }
                                         }
                                     }
@@ -166,7 +189,7 @@ private fun Buttons(
     modifier: Modifier = Modifier,
     isMyRespond: Boolean,
     positive: (() -> Unit)? = null,
-    negative: () -> Unit
+    negative: () -> Unit,
 ) {
     Row(modifier) {
         positive?.let {
@@ -177,7 +200,7 @@ private fun Buttons(
             ) { it() }
         }
         SmallButton(
-            if (isMyRespond) stringResource(R.string.cancel_button)
+            if(isMyRespond) stringResource(R.string.cancel_button)
             else stringResource(R.string.meeting_filter_delete_tag_label),
             Modifier,
             colorScheme.outlineVariant

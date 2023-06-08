@@ -36,10 +36,13 @@ fun GalleryImage(
             contentScale = Crop,
             type = if(isWeb) WEB else FILE
         )
-        if(type == MULTIPLE) CheckBox(
-            (selected ?: false), Modifier
-                .align(TopEnd)
-                .padding(8.dp)
-        ) { callback?.onImageClick(image) }
+        if(type == MULTIPLE) {
+            CheckBox(
+                (selected ?: false),
+                Modifier
+                    .align(TopEnd)
+                    .padding(8.dp)
+            ) { callback?.onImageClick(image) }
+        }
     }
 }

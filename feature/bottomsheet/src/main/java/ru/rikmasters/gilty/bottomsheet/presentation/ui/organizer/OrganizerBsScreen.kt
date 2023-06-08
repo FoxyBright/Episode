@@ -1,10 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.viewmodel.UserBsViewModel
@@ -35,8 +31,7 @@ fun OrganizerBs(
     val menuState by vm.menuState.collectAsState()
     val meetState by vm.meetType.collectAsState()
     val profile by vm.profile.collectAsState()
-
-
+    
     LaunchedEffect(Unit) {
         vm.setUser(userId)
         vm.setMeetType(meetId)
@@ -55,6 +50,8 @@ fun OrganizerBs(
         errorText = ""
     )
 
+    
+    
     OrganizerContent(
         state = UserState(
             profileState = profileState,
@@ -67,7 +64,7 @@ fun OrganizerBs(
             viewerSelectImage = viewerSelectImage,
         ), callback = object : OrganizerCallback {
 
-            override fun profileImage() {
+            override fun profileImage(menuItem: Int) {
                 scope.launch {
                     vm.setPhotoViewSelected(profile.avatar)
                     vm.setPhotoViewImages(listOf(profile.avatar))

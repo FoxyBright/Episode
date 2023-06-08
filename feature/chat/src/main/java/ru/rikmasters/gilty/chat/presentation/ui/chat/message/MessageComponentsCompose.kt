@@ -50,6 +50,7 @@ import ru.rikmasters.gilty.shared.model.enumeration.GenderType.FEMALE
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.badEmoji
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModel
+import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.shared.GEmojiImage
 import ru.rikmasters.gilty.shared.shared.HiddenImage
 import ru.rikmasters.gilty.shared.theme.Gradients.red
@@ -237,6 +238,17 @@ fun SystemMessage(
     notification?.let {
         Text(
             buildAnnotatedString {
+                
+                fun userLabel(user: UserModel): String {
+                    val username = user.username ?: ""
+                    val age =
+                        if(user.age in 18..99)
+                            "${user.age}" else ""
+                    return if(age.isBlank())
+                        "$username "
+                    else "$username, $age "
+                }
+                
                 emoji = badEmoji
                 
                 when(notification.type) {
@@ -250,15 +262,7 @@ fun SystemMessage(
                     MEMBER_JOIN ->
                         notification.member?.let {
                             emoji = it.emoji
-                            withStyle(bold) {
-                                append(
-                                    "${it.username}, ${
-                                        if(it.age in 18..99)
-                                            it.age
-                                        else ""
-                                    } "
-                                )
-                            }
+                            withStyle(bold) { append(userLabel(it)) }
                             appendInlineContent("emoji")
                             append(
                                 " ${
@@ -274,11 +278,7 @@ fun SystemMessage(
                     MEMBER_LEAVE ->
                         notification.member?.let {
                             emoji = it.emoji
-                            withStyle(bold) {
-                                append(
-                                    "${it.username}, ${it.age} "
-                                )
-                            }
+                            withStyle(bold) { append(userLabel(it)) }
                             appendInlineContent("emoji")
                             append(
                                 " ${
@@ -294,8 +294,7 @@ fun SystemMessage(
                     MEMBER_SCREENSHOT ->
                         notification.member?.let {
                             emoji = it.emoji
-                            withStyle(bold)
-                            { append("${it.username}, ${it.age} ") }
+                            withStyle(bold) { append(userLabel(it)) }
                             appendInlineContent("emoji")
                             append(
                                 " ${

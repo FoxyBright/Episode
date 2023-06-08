@@ -319,6 +319,7 @@
     <string name="add_meet_detailed_meet_description_place_holder">Краткое описание</string>
     <string name="add_meet_detailed_meet_place">Место episode</string>
     <string name="add_meet_detailed_meet_place_place_holder">Точное место будет видно только участникам</string>
+    <string name="add_meet_detailed_hide_meet_place_placeholder">Организатор скрыл место проведения episode</string>
     <string name="add_meet_detailed_meet_hide_place">Скрыть место от всех</string>
     <string name="requirements_title">Требования к\nучастникам</string>
     <string name="requirements_member_count_label">Количество</string>

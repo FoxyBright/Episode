@@ -257,8 +257,8 @@ fun UserProfileScreen(
                 scope.launch { vm.changeDescription(text) }
             }
             
-            override fun profileImage() {
-                scope.launch { vm.menuDispose(true) }
+            override fun profileImage(menuItem: Int) {
+                scope.launch { onMenuItemClick(menuItem) }
             }
             
             override fun onNameChange(text: String) {

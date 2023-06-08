@@ -1,8 +1,6 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,14 +25,20 @@ private fun CheckBoxPreviewEnabled() {
 @Composable
 private fun SquareCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }
-    SquareCheckBox(checkBoxState, Modifier.padding(10.dp)) { checkBoxState = it }
+    SquareCheckBox(
+        checkBoxState,
+        Modifier.padding(10.dp)
+    ) { checkBoxState = it }
 }
 
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ObserveCheckBoxPreview() {
     var checkBoxState by remember { mutableStateOf(true) }
-    ObserveCheckBox((checkBoxState), Modifier.padding(10.dp)) { checkBoxState = it }
+    ObserveCheckBox(
+        (checkBoxState),
+        Modifier.padding(10.dp)
+    ) { checkBoxState = it }
 }
 
 @Composable
@@ -44,10 +48,12 @@ fun CheckBox(
     changedImages: List<Int> =
         listOf(
             R.drawable.enabled_check_box,
-            R.drawable.disabled_check_box
+            if(isSystemInDarkTheme())
+                R.drawable.disabled_check_box_dark
+            else R.drawable.disabled_check_box
         ),
     color: Color? = null,
-    onCheckedChange: ((Boolean) -> Unit)? = null
+    onCheckedChange: ((Boolean) -> Unit)? = null,
 ) {
     Image(
         painterResource(
@@ -64,7 +70,7 @@ fun CheckBox(
 fun SquareCheckBox(
     checked: Boolean = false,
     modifier: Modifier = Modifier,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     Box(
         modifier
@@ -90,7 +96,7 @@ fun SquareCheckBox(
 fun ObserveCheckBox(
     checked: Boolean = false,
     modifier: Modifier = Modifier,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     Card(
         { onCheckedChange(!checked) },

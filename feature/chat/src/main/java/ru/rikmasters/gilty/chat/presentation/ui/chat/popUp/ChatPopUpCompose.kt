@@ -66,7 +66,7 @@ fun BottomBarMenu(
                 colorScheme.tertiary
             ) { onDismiss(); onSelect(2) }
         ),
-        modifier =Modifier.offset(
+        modifier = Modifier.offset(
             x = 30.dp,
             y = (displayHeight - 200).dp
         )
@@ -81,7 +81,9 @@ fun MessageMenu(
     onSelect: (Int) -> Unit,
 ) {
     GPopUpMenu(
-        state, onDismiss, listOf(
+        menuState = state,
+        collapse = onDismiss,
+        items = listOf(
             Triple(
                 stringResource(R.string.answer_button),
                 colorScheme.tertiary
@@ -90,7 +92,8 @@ fun MessageMenu(
                 stringResource(R.string.meeting_filter_delete_tag_label),
                 colorScheme.primary
             ) { onDismiss(); onSelect(1) }
-        ), Modifier.offset(
+        ),
+        modifier = Modifier.offset(
             (offset.x / density).dp,
             (offset.y / density).dp
         )

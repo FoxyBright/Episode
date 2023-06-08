@@ -98,7 +98,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             @SuppressLint("SuspiciousIndentation")
-            override fun profileImage() {
+            override fun profileImage(menuItem:Int) {
                 context.checkStoragePermission(
                     storagePermissions, scope, asm,
                 ) {

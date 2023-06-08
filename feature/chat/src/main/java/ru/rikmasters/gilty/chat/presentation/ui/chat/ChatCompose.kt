@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -252,8 +251,13 @@ private fun Content(
         reverseLayout = true
     ) {
         when {
-            state.messageList.loadState.refresh is LoadState.Error -> {}
-            state.messageList.loadState.append is LoadState.Error -> {}
+            state.messageList.loadState.refresh is
+                    LoadState.Error -> {
+            }
+            state.messageList
+                .loadState.append is
+                    LoadState.Error -> {
+            }
             else -> {
                 item { Spacer(Modifier.height(28.dp)) }
                 
@@ -264,28 +268,28 @@ private fun Content(
                     )
                 }
                 itemsIndexed(list) { index, item ->
-                    ((item
-                        ?: MessageModel()) to rememberDragRowState()).let { (mes, row) ->
-                        ChatMessage(
-                            mes, row,
-                            (mes.message?.author?.id == state.userId),
-                            state.meet.isOnline,
-                            if(index < list.itemCount.minus(1)) {
-                                list[index.plus(1)]
-                            } else null,
-                            if(index in 1..list.itemCount) {
-                                list[index.minus(1)]
-                            } else null,
-                            callback
-                        )
-                    }
+                    ((item ?: MessageModel()) to
+                            rememberDragRowState()
+                            ).let { (mes, row) ->
+                            ChatMessage(
+                                message = mes,
+                                state = row,
+                                sender = mes.message?.author?.id ==
+                                        state.userId,
+                                isOnline = state.meet.isOnline,
+                                last = if(index < list.itemCount.minus(1)) {
+                                    list[index.plus(1)]
+                                } else null,
+                                next = if(index in 1..list.itemCount) {
+                                    list[index.minus(1)]
+                                } else null,
+                                callback = callback
+                            )
+                        }
                 }
-                if(state.messageList.loadState.append is LoadState.Loading) {
-                    Log.d("TEST", "append")
-                    item {
-                        PagingLoader(list.loadState)
-                    }
-                }
+                if(state.messageList.loadState.append
+                            is LoadState.Loading
+                ) item { PagingLoader(list.loadState) }
             }
         }
     }

@@ -56,7 +56,11 @@ interface RespondsListCallback {
     
     fun onAcceptClick(respondId: String)
     fun onCancelClick(respondId: String)
-    fun onRespondClick(authorId: String)
+    fun onRespondClick(
+        authorId: String = "",
+        meetId: String = ""
+    )
+    
     fun onImageClick(image: AvatarModel)
     fun onArrowClick(index: Int)
     fun onTabChange(tab: Int) {}

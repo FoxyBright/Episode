@@ -168,7 +168,8 @@ private fun Participant(
                         } else ""
                     }",
                     modifier = Modifier,
-                    image = member.avatar?.thumbnail?.url,
+                    image = member.avatar
+                        ?.thumbnail?.url ?: "",
                     emoji = member.emoji,
                     //isOnline = member.isOnline?: false,
                     group = member.group?: UserGroupTypeModel.DEFAULT,

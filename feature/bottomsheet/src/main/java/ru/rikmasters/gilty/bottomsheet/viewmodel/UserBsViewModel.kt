@@ -93,7 +93,7 @@ class UserBsViewModel: ViewModel() {
     suspend fun setMeetType(
         meetId: String,
     ) = singleLoading {
-        if(meetId == "null") {
+        if(meetId == "null" || meetId.isBlank()) {
             _meetType.emit(GROUP)
             return@singleLoading
         }

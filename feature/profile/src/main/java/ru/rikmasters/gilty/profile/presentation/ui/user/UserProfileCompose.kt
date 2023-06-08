@@ -91,7 +91,7 @@ data class UserProfileState(
 )
 
 interface UserProfileCallback : ProfileCallback {
-
+    
     fun menu(state: Boolean)
     fun onHistoryShow()
     fun onMeetingClick(meet: MeetingModel)
@@ -115,21 +115,6 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     callback: UserProfileCallback? = null,
 ) {
-    Box {
-        GDropMenu(
-            menuState = state.menuState,
-            collapse = { callback?.onMenuClick(false) },
-            offset = DpOffset(180.dp, 300.dp),
-            menuItem = listOf(
-                Pair(stringResource(R.string.profile_menu_watch_photo_button)) {
-                    callback?.onMenuItemClick(0)
-                },
-                Pair(stringResource(R.string.edit_button)) {
-                    callback?.onMenuItemClick(1)
-                }
-            )
-        )
-    }
     Scaffold(
         modifier = modifier,
         bottomBar = {
@@ -199,71 +184,73 @@ private fun Content(
     modifier: Modifier = Modifier,
     callback: UserProfileCallback? = null,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        state = state.listState
-    ) {
-        item(key = 1) {
-            Box(Modifier.padding(top = 10.dp)) {
-                Profile(
-                    state = state.profileState,
-                    callback = callback,
-                    hasHeader = false
-                )
-            }
-        }
-        item(key = 2) {
-            Text(
-                text = stringResource(R.string.profile_actual_meetings_label),
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .padding(horizontal = 16.dp),
-                style = typography.labelLarge.copy(
-                    colorScheme.tertiary
-                )
-            )
-        }
-        item(key = 3) {
-            Box(Modifier.padding(16.dp, 12.dp)) {
-                Responds(
-                    state.lastRespond
-                ) { callback?.onRespondsClick() }
-            }
-        }
-        val userId = state.profileState.profile?.id ?: ""
-        if (state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
-            key = 4
+    
+        LazyColumn(
+            modifier = modifier.fillMaxWidth(),
+            state = state.listState
         ) {
-            LazyRow(
-                state = rememberLazyListScrollState(
-                    "profile_meet"
-                )
-            ) {
-                item { Spacer(Modifier.width(8.dp)) }
-                items(state.currentMeetings) {
-                    MeetingCategoryCard(
-                        userId = userId,
-                        meeting = it!!,
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                    ) { callback?.onMeetingClick(it) }
+            item(key = 1) {
+                Box(Modifier.padding(top = 10.dp)) {
+                    Profile(
+                        state = state.profileState,
+                        callback = callback,
+                        hasHeader = false
+                    )
                 }
             }
-        }
-        if (state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
-            item(5) {
-                MeetHistory(
-                    userId = userId,
-                    historyState = state.historyState,
-                    historyList = state.meetingsHistory,
-                    openHistory = { callback?.onHistoryShow() }
-                ) { callback?.onHistoryClick(it) }
+            item(key = 2) {
+                Text(
+                    text = stringResource(R.string.profile_actual_meetings_label),
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .padding(horizontal = 16.dp),
+                    style = typography.labelLarge.copy(
+                        colorScheme.tertiary
+                    )
+                )
             }
-        item(key = 6) {
-            Divider(
-                Modifier.fillMaxWidth(),
-                20.dp, Transparent
-            )
+            item(key = 3) {
+                Box(Modifier.padding(16.dp, 12.dp)) {
+                    Responds(
+                        state.lastRespond
+                    ) { callback?.onRespondsClick() }
+                }
+            }
+            val userId = state.profileState.profile?.id ?: ""
+            if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
+                key = 4
+            ) {
+                LazyRow(
+                    state = rememberLazyListScrollState(
+                        "profile_meet"
+                    )
+                ) {
+                    item { Spacer(Modifier.width(8.dp)) }
+                    items(state.currentMeetings) {
+                        MeetingCategoryCard(
+                            userId = userId,
+                            meeting = it!!,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                        ) { callback?.onMeetingClick(it) }
+                    }
+                }
+            }
+            if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
+                item(5) {
+                    MeetHistory(
+                        userId = userId,
+                        historyState = state.historyState,
+                        historyList = state.meetingsHistory,
+                        openHistory = { callback?.onHistoryShow() }
+                    ) { callback?.onHistoryClick(it) }
+                }
+            item(key = 6) {
+                Divider(
+                    Modifier.fillMaxWidth(),
+                    20.dp, Transparent
+                )
+            
         }
     }
 }

@@ -31,7 +31,7 @@ class GalleryViewModel(
     suspend fun sendImages(
         chatId: String,
     ) = singleLoading {
-        chatVm.onSendMessage(
+        chatVm.sendImageMessage(
             chatId = chatId,
             photos = selected.value
                 .map { File(it) }

@@ -262,7 +262,7 @@ private fun ObserveItem(
                         } else ""
                     }",
                     modifier = Modifier.weight(1f),
-                    image = member.avatar?.thumbnail?.url,
+                    image = member.avatar?.thumbnail?.url ?: "",
                     emoji = member.emoji,
                     group = member.group?: UserGroupTypeModel.DEFAULT,
                 )

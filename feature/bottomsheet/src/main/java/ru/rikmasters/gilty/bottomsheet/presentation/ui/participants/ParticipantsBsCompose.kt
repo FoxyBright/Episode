@@ -203,7 +203,7 @@ private fun MemberCard(
         BrieflyRow(
             text = username,
             modifier = Modifier.padding(16.dp),
-            image = member.avatar?.thumbnail?.url,
+            image = member.avatar?.thumbnail?.url ?: "",
             isOnline = member.isOnline?: false,
             group = member.group?: UserGroupTypeModel.DEFAULT
         )
