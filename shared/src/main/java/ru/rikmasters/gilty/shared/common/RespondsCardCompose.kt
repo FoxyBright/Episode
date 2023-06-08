@@ -73,7 +73,6 @@ fun Responds(
                     UserAvatar(
                         image = it,
                         imageSize = 40,
-                        isOnline = lastRespond.isOnline,
                         group = lastRespond.group
                     )
                 }

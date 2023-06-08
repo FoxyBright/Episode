@@ -264,7 +264,6 @@ private fun ObserveItem(
                     modifier = Modifier.weight(1f),
                     image = member.avatar?.thumbnail?.url,
                     emoji = member.emoji,
-                    isOnline = member.isOnline?:false,
                     group = member.group?: UserGroupTypeModel.DEFAULT,
                 )
                 SmallButton(

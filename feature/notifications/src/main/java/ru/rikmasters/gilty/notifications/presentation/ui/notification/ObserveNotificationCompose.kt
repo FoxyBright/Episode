@@ -170,7 +170,7 @@ private fun Participant(
                     modifier = Modifier,
                     image = member.avatar?.thumbnail?.url,
                     emoji = member.emoji,
-                    isOnline = member.isOnline?: false,
+                    //isOnline = member.isOnline?: false,
                     group = member.group?: UserGroupTypeModel.DEFAULT,
                 )
                 memberEmoji?.let {

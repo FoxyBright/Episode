@@ -144,7 +144,6 @@ fun MeetingBsTopBarCompose(
                 modifier = Modifier,
                 image = (null),
                 emoji = org.emoji,
-                isOnline = org.isOnline?:false,
                 group = org.group?:UserGroupTypeModel.DEFAULT
             )
 

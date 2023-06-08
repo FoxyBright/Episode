@@ -71,7 +71,6 @@ fun LazyListScope.sentRespond(
                         start = 16.dp,
                         top = 12.dp
                     ), image = organizer.avatar?.thumbnail?.url,
-                    isOnline = respond.author.isOnline?: false,
                     group = organizer.group?: UserGroupTypeModel.DEFAULT,
                 )
                 Column(Modifier.padding(start = 66.dp)) {
@@ -111,7 +110,6 @@ fun ReceivedRespond(
                 ),
                 image = user.avatar?.thumbnail?.url,
                 emoji = user.emoji,
-                isOnline = user.isOnline?: false,
                 group = user.group?: UserGroupTypeModel.DEFAULT,
             )
             Column(Modifier.padding(start = 66.dp)) {

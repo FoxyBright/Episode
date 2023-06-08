@@ -234,7 +234,6 @@ private fun TextNotification(
                         },
                         image = user?.avatar?.thumbnail?.url,
                         group = user?.group,
-                        isOnline = user?.isOnline?:false
                     )
                     content.invoke()
                 }
