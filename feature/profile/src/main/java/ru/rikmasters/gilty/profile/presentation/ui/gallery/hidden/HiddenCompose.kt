@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
@@ -38,6 +37,7 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.screenWidth
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 interface HiddenBsCallback {
@@ -79,9 +79,10 @@ fun HiddenBsContent(
 
     Column(modifier) {
         ActionBar(
-            stringResource(R.string.profile_hidden_photo),
-            Modifier.padding(bottom = 20.dp),
-            extra = stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
+            title = stringResource(R.string.profile_hidden_photo),
+            modifier = Modifier.padding(bottom = 20.dp),
+            extra = if(state.photoAmount == 0) null
+            else stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
         ) { callback?.onBack() }
 
         LazyVerticalGrid(
@@ -149,13 +150,13 @@ private fun GalleryButton(
             Box(
                 Modifier
                     .clip(CircleShape)
-                    .background(colorScheme.primary)
+                    .background(Colors.AlmostRed)
             ) {
                 Icon(
                     painterResource(R.drawable.ic_image_box),
                     (null),
                     Modifier
-                        .padding(6.dp)
+                        .padding(8.dp)
                         .size(32.dp),
                     White
                 )

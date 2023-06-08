@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Brush.Companion.horizontalGradient
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
@@ -99,7 +99,7 @@ fun GradientButton(
                 Modifier
                     .fillMaxWidth()
                     .background(
-                        linearGradient(color),
+                        horizontalGradient(color),
                         shape
                     )
                     .padding(

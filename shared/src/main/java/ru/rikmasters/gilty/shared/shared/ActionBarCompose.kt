@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,7 @@ fun ActionBar(
     extra:String? = null,
     titleStyle: TextStyle = typography.titleLarge,
     detailedStyle: TextStyle = typography.labelSmall,
-    extraStyle: TextStyle = typography.bodyLarge,
+    extraStyle: TextStyle = typography.bodyMedium.copy(fontWeight = FontWeight(600)),
     onBack: (() -> Unit)? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
@@ -65,7 +66,7 @@ fun ActionBar(
             extra?.let {
                 Text(
                     text = extra,
-                    Modifier.padding(start = 4.dp, bottom = 2.dp),
+                    Modifier.padding(start = 4.dp, bottom = 3.dp),
                     colorScheme.onTertiary,
                     style = extraStyle
                 )
