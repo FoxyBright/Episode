@@ -87,7 +87,7 @@ data class UserProfileState(
 )
 
 interface UserProfileCallback: ProfileCallback {
-    
+
     fun menu(state: Boolean)
     fun onHistoryShow()
     fun onMeetingClick(meet: MeetingModel)
@@ -175,85 +175,91 @@ private fun Content(
     modifier: Modifier = Modifier,
     callback: UserProfileCallback? = null,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        state = state.listState
-    ) {
-        item(key = 1) {
-            Box(Modifier.padding(top = 10.dp)) {
-                Profile(
-                    state = state.profileState,
-                    callback = callback
-                )
-                Box(
-                    Modifier.fillMaxWidth(),
-                    CenterEnd
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(Modifier.padding(top = 10.dp)) {
+            ProfileHeader(state = state.profileState, callback = callback)
+            Box(
+                Modifier.fillMaxWidth(),
+                CenterEnd
+            ) {
+                IconButton(
+                    onClick = { callback?.menu(true) },
+                    modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    IconButton(
-                        onClick = { callback?.menu(true) },
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(ic_kebab),
-                            contentDescription = null,
-                            tint = colorScheme.tertiary
-                        )
+                    Icon(
+                        painter = painterResource(ic_kebab),
+                        contentDescription = null,
+                        tint = colorScheme.tertiary
+                    )
+                }
+            }
+        }
+        LazyColumn(
+            modifier = modifier.fillMaxWidth(),
+            state = state.listState
+        ) {
+            item(key = 1) {
+                Box(Modifier.padding(top = 10.dp)) {
+                    Profile(
+                        state = state.profileState,
+                        callback = callback,
+                        hasHeader = false
+                    )
+                }
+            }
+            item(key = 2) {
+                Text(
+                    text = stringResource(R.string.profile_actual_meetings_label),
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .padding(horizontal = 16.dp),
+                    style = typography.labelLarge.copy(
+                        colorScheme.tertiary
+                    )
+                )
+            }
+            item(key = 3) {
+                Box(Modifier.padding(16.dp, 12.dp)) {
+                    Responds(
+                        state.lastRespond
+                    ) { callback?.onRespondsClick() }
+                }
+            }
+            val userId = state.profileState.profile?.id ?: ""
+            if (state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
+                key = 4
+            ) {
+                LazyRow(
+                    state = rememberLazyListScrollState(
+                        "profile_meet"
+                    )
+                ) {
+                    item { Spacer(Modifier.width(8.dp)) }
+                    items(state.currentMeetings) {
+                        MeetingCategoryCard(
+                            userId = userId,
+                            meeting = it!!,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                        ) { callback?.onMeetingClick(it) }
                     }
                 }
             }
-        }
-        item(key = 2) {
-            Text(
-                text = stringResource(R.string.profile_actual_meetings_label),
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .padding(horizontal = 16.dp),
-                style = typography.labelLarge.copy(
-                    colorScheme.tertiary
-                )
-            )
-        }
-        item(key = 3) {
-            Box(Modifier.padding(16.dp, 12.dp)) {
-                Responds(
-                    state.lastRespond
-                ) { callback?.onRespondsClick() }
-            }
-        }
-        val userId = state.profileState.profile?.id ?: ""
-        if(state.currentMeetings.itemSnapshotList.items.isNotEmpty()) item(
-            key = 4
-        ) {
-            LazyRow(
-                state = rememberLazyListScrollState(
-                    "profile_meet"
-                )
-            ) {
-                item { Spacer(Modifier.width(8.dp)) }
-                items(state.currentMeetings) {
-                    MeetingCategoryCard(
+            if (state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
+                item(5) {
+                    MeetHistory(
                         userId = userId,
-                        meeting = it!!,
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                    ) { callback?.onMeetingClick(it) }
+                        historyState = state.historyState,
+                        historyList = state.meetingsHistory,
+                        openHistory = { callback?.onHistoryShow() }
+                    ) { callback?.onHistoryClick(it) }
                 }
+            item(key = 6) {
+                Divider(
+                    Modifier.fillMaxWidth(),
+                    20.dp, Transparent
+                )
             }
-        }
-        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
-            item(5) {
-                MeetHistory(
-                    userId = userId,
-                    historyState = state.historyState,
-                    historyList = state.meetingsHistory,
-                    openHistory = { callback?.onHistoryShow() }
-                ) { callback?.onHistoryClick(it) }
-            }
-        item(key = 6) {
-            Divider(
-                Modifier.fillMaxWidth(),
-                20.dp, Transparent
-            )
         }
     }
 }

@@ -139,20 +139,16 @@ fun Profile(
     state: ProfileState,
     modifier: Modifier = Modifier,
     callback: ProfileCallback? = null,
+    hasHeader: Boolean = true,
     onChange: ((Boolean) -> Unit)? = null,
 ) {
     val profile = state.profile
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
-
     Column(modifier) {
-        TopBar(modifier = Modifier.padding(horizontal = 16.dp),
-            userName = (profile?.username ?: ""),
-            userAge = (profile?.age ?: -1),
-            profileType = state.profileType,
-            profileGroup = profile?.group?:UserGroupTypeModel.DEFAULT,
-            onSaveUsername = { callback?.onSaveUserName() }) { callback?.onNameChange(it) }
-        ErrorLabel(state.errorText)
+        if (hasHeader) {
+            ProfileHeader(state,callback)
+        }
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             ProfileImageContent(modifier = Modifier.weight(1f),
                 image = profile?.avatar,
@@ -214,11 +210,15 @@ fun Profile(
                 image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
                 emoji = DemoEmojiModel
             ),
-        ), activeAlbumId = state.activeAlbumId, type = state.profileType, onAlbumClick = { id ->
-            callback?.onAlbumClick(id)
-        }, onAlbumLongClick = { id ->
-            callback?.onAlbumLongClick(id)
-        })
+        ),
+            activeAlbumId = state.activeAlbumId,
+            type = state.profileType,
+            onAlbumClick = { id ->
+                callback?.onAlbumClick(id)
+            },
+            onAlbumLongClick = { id ->
+                callback?.onAlbumLongClick(id)
+            })
 
         AboutMe(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -230,6 +230,19 @@ fun Profile(
     }
 }
 
+@Composable
+fun ProfileHeader(state: ProfileState, callback: ProfileCallback?) {
+    Column {
+        TopBar(modifier = Modifier.padding(horizontal = 16.dp),
+            userName = (state.profile?.username ?: ""),
+            userAge = (state.profile?.age ?: -1),
+            profileType = state.profileType,
+            profileGroup = state.profile?.group ?: UserGroupTypeModel.DEFAULT,
+            onSaveUsername = { callback?.onSaveUserName() }) { callback?.onNameChange(it) }
+        if(state.errorText.isNotEmpty())
+            ErrorLabel(state.errorText)
+    }
+}
 @Composable
 private fun AboutMe(
     modifier: Modifier = Modifier,
@@ -321,8 +334,10 @@ private fun TopBar(
                 imeAction = Done, keyboardType = Text, capitalization = Sentences
             ),
             singleLine = true,
-            visualTransformation = transformationOf(mask = CharArray(userName.length) { '#' }.concatToString(),
-                endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""),
+            visualTransformation = transformationOf(
+                mask = CharArray(userName.length) { '#' }.concatToString(),
+                endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""
+            ),
         )
         ProfileBadge(
             modifier = Modifier.offset(x = (-12).dp), group = profileGroup

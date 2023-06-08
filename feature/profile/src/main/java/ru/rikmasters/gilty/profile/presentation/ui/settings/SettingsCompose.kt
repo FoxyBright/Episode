@@ -72,7 +72,7 @@ data class SettingsState(
 )
 
 interface SettingsCallback {
-    
+
     fun onBack()
     fun editCategories()
     fun onNotificationChange(it: Boolean)
@@ -96,15 +96,33 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
     callback: SettingsCallback? = null,
 ) {
-    LazyColumn(
-        modifier
-            .fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
             .background(colorScheme.background)
     ) {
-        item { Categories(Modifier, state.interests,callback) }
-        item { Information(state, Modifier, callback) }
-        item { Additionally(state, Modifier, callback) }
-        item { Buttons(Modifier, callback) }
+        IconButton(
+            onClick = { callback?.onBack() },
+            modifier = Modifier.padding(top = 32.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    R.drawable.ic_back
+                ),
+                contentDescription = null,
+                modifier = Modifier,
+                tint = colorScheme.tertiary
+            )
+        }
+        LazyColumn(
+            modifier
+                .fillMaxWidth()
+        ) {
+            item { Categories(Modifier, state.interests, callback) }
+            item { Information(state, Modifier, callback) }
+            item { Additionally(state, Modifier, callback) }
+            item { Buttons(Modifier, callback) }
+        }
     }
     GAlert(
         show = state.exitAlert,
@@ -133,19 +151,6 @@ private fun Categories(
     callback: SettingsCallback? = null,
 ) {
     Column(modifier.fillMaxWidth()) {
-        IconButton(
-            onClick = { callback?.onBack() },
-            modifier = Modifier.padding(top = 32.dp)
-        ) {
-            Icon(
-                painter = painterResource(
-                    R.drawable.ic_back
-                ),
-                contentDescription = null,
-                modifier = Modifier,
-                tint = colorScheme.tertiary
-            )
-        }
         Text(
             text = stringResource(settings_interest_label),
             modifier = Modifier.padding(
@@ -311,13 +316,13 @@ private fun Card(
                 style = typography.bodyMedium
             )
             Row(verticalAlignment = CenterVertically) {
-                if(!text.isNullOrBlank()) Text(
+                if (!text.isNullOrBlank()) Text(
                     text = text,
                     modifier = Modifier,
                     color = colorScheme.primary,
                     style = typography.bodyMedium,
                 )
-                if(arrow) Icon(
+                if (arrow) Icon(
                     imageVector = Filled.KeyboardArrowRight,
                     contentDescription = (null),
                     modifier = Modifier.size(28.dp),
@@ -330,10 +335,10 @@ private fun Card(
 
 @Composable
 private fun ageHolder(age: String): String {
-    if(age.isBlank()) return ""
-    if(age == "-1") return stringResource(R.string.condition_no_matter)
+    if (age.isBlank()) return ""
+    if (age == "-1") return stringResource(R.string.condition_no_matter)
     return "$age ${
-        when(age.last()) {
+        when (age.last()) {
             '1' -> "год"
             '2', '3', '4' -> "года"
             else -> "лет"

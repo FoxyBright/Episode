@@ -119,7 +119,7 @@ fun OrganizerContent(
             item {
                 Profile(
                     state = state.profileState,
-                    callback = callback
+                    callback = callback,
                 ) { callback?.onObserveChange(it) }
             }
             if (state.currentMeetings.isNotEmpty()) {
