@@ -161,10 +161,10 @@ private fun PhysicsFrameLayout.createBounds(width: Float, height: Float, actualW
     val horizontalParams = ViewGroup.LayoutParams((width + overflow).ceilToInt(), 1)
     val verticalParams = ViewGroup.LayoutParams(1, height.ceilToInt())
 
-    val top = -100f
+    val top = -50f
     val start = -overflow / 2 - 100
     val end = width + overflow / 2 + 100
-    val bottom = height + 100f
+    val bottom = height + 50f
     log.v("Top: $top Bottom: $height Start: $start End: $end")
 
     createBoundView(horizontalParams, start, top) // Top horizontal

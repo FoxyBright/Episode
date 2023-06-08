@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.settings.categories
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -18,6 +19,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val categories by vm.categories.collectAsState()
     val selected by vm.selected.collectAsState()
     val alert by vm.alert.collectAsState()
+    val phase by vm.phase.collectAsState()
     
     // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
     var sleep by remember { mutableStateOf(false) }
@@ -27,10 +29,24 @@ fun CategoriesScreen(vm: CategoryViewModel) {
         vm.getInterest()
         sleep = true
     }
+
+    LaunchedEffect(key1 = categories, block = {
+        sleep = false
+        delay(50L)
+        sleep = true
+    })
+
+    LaunchedEffect(key1 = phase, block = {
+        if(phase == 1) {
+            sleep = false
+            delay(50L)
+            sleep = true
+        }
+    })
     
-    if(sleep) CategoriesContent(
+    CategoriesContent(
         Modifier, CategoriesState(
-            categories, selected, alert
+            categories, selected, alert,sleep,
         ), object: CategoriesCallback {
             
             override fun onClose() {

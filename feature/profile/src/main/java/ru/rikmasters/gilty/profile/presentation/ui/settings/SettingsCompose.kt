@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.bubbles.Bubbles
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.string.settings_interest_label
@@ -150,6 +152,9 @@ private fun Categories(
     interests: List<CategoryModel>,
     callback: SettingsCallback? = null,
 ) {
+    val configuration = LocalConfiguration.current
+    val screenWidth: Int = configuration.screenWidthDp
+
     Column(modifier.fillMaxWidth()) {
         Text(
             text = stringResource(settings_interest_label),
@@ -175,11 +180,13 @@ private fun Categories(
                 elementSize = CATEGORY_ELEMENT_SIZE_SMALL.dp,
             ) { element ->
                 CategoryItem(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(0.dp),
                     name = element.name,
                     icon = element.emoji,
                     color = element.color,
                     state = true,
+                    size = ((screenWidth - 32) / 4),
+                    textSize = 11.sp,
                 ) {
                     callback?.editCategories()
                 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.categoryIcon
@@ -74,6 +75,7 @@ fun CategoryItem(
     iconBottomState: Boolean = true,
     size: Int = CATEGORY_ELEMENT_SIZE,
     isAnimating: Boolean = false,
+    textSize: TextUnit = typography.labelSmall.fontSize,
     onClick: ((Boolean) -> Unit)? = null,
 ) {
     val animatedSize by animateDpAsState(
@@ -105,9 +107,10 @@ fun CategoryItem(
         )
     ) {
         Box(
-            modifier
+            Modifier
                 .padding(4.dp)
                 .size((animatableSize).dp)
+                .then(modifier)
         ) {
             Box(
                 Modifier
@@ -122,7 +125,7 @@ fun CategoryItem(
                 Text(
                     name, Modifier.animateContentSize(), White,
                     style = typography.labelSmall,
-                    fontSize = typography.labelSmall.fontSize * (animatableSize / size),
+                    fontSize = textSize * (animatableSize / size),
                     textAlign = TextAlign.Center,
                     fontWeight = Bold
                 )
@@ -131,7 +134,7 @@ fun CategoryItem(
                 Modifier
                     .size((animatableSize / 3).dp)
                     .clip(CircleShape)
-                    .background(White)
+                    .background(colorScheme.background)
                     .align(
                         if(iconBottomState)
                             BottomStart else TopEnd

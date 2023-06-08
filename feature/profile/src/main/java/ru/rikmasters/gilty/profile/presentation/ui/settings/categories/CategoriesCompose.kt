@@ -27,6 +27,7 @@ data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategories: List<CategoryModel>,
     val alert: Boolean,
+    val sleep: Boolean,
 )
 
 interface CategoriesCallback {
@@ -52,7 +53,7 @@ fun CategoriesContent(
             )
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
-            else Bubbles(
+            else if(state.sleep) Bubbles(
                 data = state.categoryList,
                 elementSize = CATEGORY_ELEMENT_SIZE.dp,
                 modifier = Modifier.padding(
@@ -130,7 +131,7 @@ private fun CategoriesPreview() {
         CategoriesContent(
             state = CategoriesState(
                 listOf(DemoCategoryModel),
-                emptyList(), (false)
+                emptyList(), (false), true
             )
         )
     }
