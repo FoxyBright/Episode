@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.gallery.photoview
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -129,8 +130,7 @@ fun PhotoView(
             if(select != images.lastIndex) {
                 listState.animateScrollToItem(select + 1)
                 // TODO - обновление таймера нужно сделать
-            }
-            else onBack?.let { it() }
+            } else onBack?.let { it() }
         }
     }.value
     
@@ -139,6 +139,7 @@ fun PhotoView(
     val screenWidth = METRICS.widthPixels / METRICS.density
     
     Popup {
+        BackHandler { onBack?.let { it() } }
         Scaffold(
             modifier.background(
                 colorScheme.background
