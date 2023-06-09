@@ -216,7 +216,6 @@ fun UserProfileScreen(
             override fun onHistoryShow() {
                 scope.launch {
                     vm.showHistory()
-                    listState.animateScrollToItem(5)
                 }
             }
             

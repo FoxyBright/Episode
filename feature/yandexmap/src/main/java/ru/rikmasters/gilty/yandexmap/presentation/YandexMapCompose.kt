@@ -173,37 +173,47 @@ private fun Bottom(
                 ), Center
         ) { Grip() }
         Card(
-            Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    bottom = if(state.location?.hide == true)
+                        35.dp else 0.dp
+                ),
             shape = shapes.medium,
-            colors = cardColors(colorScheme.primaryContainer)
+            colors = cardColors(
+                colorScheme.primaryContainer
+            )
         ) {
-            if(state.location?.hide == true) Text(
-                stringResource(R.string.add_meet_detailed_meet_place_place_holder),
-                Modifier.padding(16.dp, 12.dp),
-                colorScheme.tertiary,
-                style = typography.bodyMedium,
-            ) else
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        state.address ?: "", Modifier.padding(top = 8.dp),
-                        colorScheme.onTertiary,
-                        style = typography.headlineSmall,
-                        maxLines = 1,
-                        overflow = Ellipsis
-                    )
-                    Text(
-                        state.place ?: "", Modifier.padding(
-                            top = 2.dp, bottom = 10.dp
-                        ), colorScheme.tertiary,
-                        style = typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = Ellipsis
-                    )
-                }
+            if(state.location?.hide == true)
+                Text(
+                    text = stringResource(
+                        R.string.add_meet_detailed_meet_place_place_holder
+                    ),
+                    modifier = Modifier.padding(16.dp, 12.dp),
+                    color = colorScheme.tertiary,
+                    style = typography.bodyMedium,
+                )
+            else Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    state.address ?: "", Modifier.padding(top = 8.dp),
+                    colorScheme.onTertiary,
+                    style = typography.headlineSmall,
+                    maxLines = 1,
+                    overflow = Ellipsis
+                )
+                Text(
+                    state.place ?: "", Modifier.padding(
+                        top = 2.dp, bottom = 10.dp
+                    ), colorScheme.tertiary,
+                    style = typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = Ellipsis
+                )
+            }
         }
         if(state.location?.hide != true) GradientButton(
             Modifier

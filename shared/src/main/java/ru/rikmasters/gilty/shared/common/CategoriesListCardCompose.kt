@@ -1,20 +1,15 @@
 package ru.rikmasters.gilty.shared.common
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -30,38 +25,62 @@ fun CategoriesListCard(
     modifier: Modifier,
     meeting: MeetingModel,
     border: Boolean = false,
-    imageSize: Dp = 20.dp,
+    imageSize: Dp = 16.dp,
     shape: Shape = shapes.medium,
 ) {
-    Card(
-        modifier = modifier,
-        shape = shape,
-        colors = CardDefaults.cardColors(
-            containerColor = Transparent
-        ),
-        border = if(border) BorderStroke(
-            3.dp, colors.borderColor
-        ) else BorderStroke(0.dp, Transparent)
-    ) {
-        Row(
-            Modifier.background(
-                colorScheme.background
-            ),
-            SpaceEvenly,
-            CenterVertically
-        ) {
-            GEmojiImage(
-                meeting.category.emoji,
-                Modifier
-                    .padding(6.dp)
-                    .size(imageSize)
+    if(border) Box(
+        modifier
+            .background(
+                color = colors.borderColor,
+                shape = shape
             )
-            if(meeting.condition == MEMBER_PAY) Image(
-                painterResource(ic_money),
-                (null), Modifier
-                    .padding(6.dp)
-                    .size(imageSize)
+            .padding(3.dp)
+    ) {
+        Box(
+            Modifier.background(
+                color = colorScheme.background,
+                shape = shape
+            ),
+            Center
+        ) {
+            IconRow(
+                modifier = Modifier,
+                meeting = meeting,
+                imageSize = imageSize
             )
         }
+    }
+    else Box(modifier, Center) {
+        IconRow(
+            modifier = Modifier,
+            meeting = meeting,
+            imageSize = imageSize
+        )
+    }
+}
+
+@Composable
+private fun IconRow(
+    modifier: Modifier,
+    meeting: MeetingModel,
+    imageSize: Dp,
+) {
+    Row(
+        modifier,
+        SpaceEvenly,
+        CenterVertically
+    ) {
+        GEmojiImage(
+            meeting.category.emoji,
+            Modifier
+                .padding(6.dp)
+                .size(imageSize)
+        )
+        if(meeting.condition == MEMBER_PAY) Image(
+            painterResource(ic_money),
+            (null), Modifier
+                .padding(6.dp)
+                .size(imageSize)
+        )
     }
 }

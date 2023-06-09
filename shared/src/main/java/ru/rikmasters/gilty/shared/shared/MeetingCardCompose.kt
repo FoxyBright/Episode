@@ -165,16 +165,25 @@ fun MeetingCategoryCard(
     val today = todayControl(meeting.datetime)
     val color = meeting.category.color
     Card(
-        { onClick?.let { it() } },
-        modifier, shape = shapes.large,
-        colors = cardColors(colors.meetingCardBackBackground)
+        onClick = {
+            onClick?.let { it() }
+        },
+        modifier = modifier,
+        shape = shapes.large,
+        colors = cardColors(
+            colors.meetingCardBackBackground
+        )
     ) {
         Text(
-            meeting.title, Modifier
+            text = meeting.title,
+            modifier = Modifier
                 .width(150.dp)
                 .padding(horizontal = 14.dp)
-                .padding(top = 14.dp, bottom = 8.dp),
-            colorScheme.tertiary,
+                .padding(
+                    top = 14.dp,
+                    bottom = 8.dp
+                ),
+            color = colorScheme.tertiary,
             style = typography.bodyMedium,
             fontWeight = Bold,
             overflow = Ellipsis,
@@ -182,12 +191,12 @@ fun MeetingCategoryCard(
         )
         Row(Modifier.padding(start = 14.dp)) {
             DateTimeCard(
-                meeting.datetime,
-                when {
+                dateTime = meeting.datetime,
+                color = when {
                     old -> gray()
                     meeting.isOnline -> green()
                     else -> listOf(color, color)
-                }, today
+                }, today = today
             )
         }
         Box(
@@ -197,15 +206,18 @@ fun MeetingCategoryCard(
                 .width(156.dp)
         ) {
             val user = meeting.organizer
-            val hasAvatar = user?.id != null && userId != user.id
+            val hasAvatar = user?.id != null
+                    && userId != user.id
             Box(
                 Modifier
                     .background(
-                        when {
+                        color = when {
                             old -> colorScheme.onTertiary
-                            meeting.isOnline -> colorScheme.secondary
+                            meeting.isOnline ->
+                                colorScheme.secondary
                             else -> color
-                        }, CircleShape
+                        },
+                        shape = CircleShape
                     )
                     .size(126.dp), Center
             ) {
