@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -21,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -108,80 +106,8 @@ fun GAlert(
     selected: Int? = null,
     listItemSelect: ((Int) -> Unit)? = null,
     accentColors: Color = colorScheme.primary,
-    content: (@Composable () -> Unit)? = null,
-) {
-    if(show) AlertDialog(
-        onDismissRequest ?: {},
-        confirmButton = {
-            Text(
-                success.first, Modifier
-                    .clickable(
-                        MutableInteractionSource(), (null)
-                    ) { success.second() },
-                accentColors,
-                style = typography.labelSmall,
-                fontWeight = SemiBold
-            )
-        }, modifier,
-        dismissButton = {
-            cancel?.let {
-                Text(
-                    it.first, Modifier
-                        .padding(end = 16.dp)
-                        .clickable(
-                            MutableInteractionSource(), (null)
-                        ) { it.second() },
-                    accentColors,
-                    style = typography.labelSmall,
-                    fontWeight = SemiBold
-                )
-            }
-        }, (null), {
-            title?.let {
-                Text(
-                    it, Modifier,
-                    colorScheme.tertiary,
-                    style = typography.displayLarge,
-                    fontWeight = SemiBold
-                )
-            }
-        }, {
-            Column {
-                label?.let {
-                    Text(
-                        it, Modifier.padding(bottom = 16.dp),
-                        colorScheme.tertiary,
-                        style = typography.labelSmall,
-                        fontWeight = SemiBold
-                    )
-                }; content?.invoke()
-                list?.let { items ->
-                    selected?.let {
-                        List(items, it, accentColors) {
-                            listItemSelect?.let { s -> s(it) }
-                        }
-                    }
-                }
-            }
-        },
-        containerColor = colorScheme.primaryContainer
-    )
-}
-
-@Composable
-fun GAlertDarkTheme(
-    show: Boolean,
-    modifier: Modifier = Modifier,
-    success: Pair<String, () -> Unit>,
-    label: String? = null,
-    title: String? = null,
-    onDismissRequest: (() -> Unit)? = null,
-    cancel: Pair<String, () -> Unit>? = null,
-    list: List<String>? = null,
-    selected: Int? = null,
-    listItemSelect: ((Int) -> Unit)? = null,
-    accentColors: Color = ThemeExtra.colors.mainDayGreen,
-    content: (@Composable () -> Unit)? = null,
+    onlyDarkTheme: Boolean = false,
+    content: (@Composable () -> Unit)? = null
 ) {
     if (show) AlertDialog(
         onDismissRequest ?: {},
@@ -191,7 +117,8 @@ fun GAlertDarkTheme(
                     .clickable(
                         MutableInteractionSource(), (null)
                     ) { success.second() },
-                accentColors,
+                if (onlyDarkTheme) ThemeExtra.colors.mainDayGreen else
+                    accentColors,
                 style = typography.labelSmall,
                 fontWeight = SemiBold
             )
@@ -204,7 +131,8 @@ fun GAlertDarkTheme(
                         .clickable(
                             MutableInteractionSource(), (null)
                         ) { it.second() },
-                    accentColors,
+                    if (onlyDarkTheme) ThemeExtra.colors.mainDayGreen else
+                        accentColors,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
@@ -213,8 +141,9 @@ fun GAlertDarkTheme(
             title?.let {
                 Text(
                     it, Modifier,
-                    Color.White,
-                    style = MaterialTheme.typography.displayLarge,
+                    if (onlyDarkTheme) White else
+                        colorScheme.tertiary,
+                    style = typography.displayLarge,
                     fontWeight = SemiBold
                 )
             }
@@ -223,7 +152,8 @@ fun GAlertDarkTheme(
                 label?.let {
                     Text(
                         it, Modifier.padding(bottom = 16.dp),
-                        Color(0xFF98989F),
+                        if (onlyDarkTheme) Color(0xFF98989F) else
+                            colorScheme.tertiary,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
@@ -237,7 +167,8 @@ fun GAlertDarkTheme(
                 }
             }
         },
-        containerColor = ThemeExtra.colors.mainCard
+        containerColor = if (onlyDarkTheme) ThemeExtra.colors.mainCard else
+            colorScheme.primaryContainer
     )
 }
 
@@ -260,7 +191,7 @@ private fun List(
                         .clip(CircleShape), listOf(
                         ic_radio_active,
                         ic_radio_inactive
-                    ), if(selected == index) accentColors
+                    ), if (selected == index) accentColors
                     else colorScheme.tertiary
                 ) { onSelect(index) }
                 Text(

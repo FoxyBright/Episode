@@ -57,11 +57,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.blur
 import ru.rikmasters.gilty.shared.common.extentions.getBitmap
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
-import ru.rikmasters.gilty.shared.shared.GAlertDarkTheme
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -1039,7 +1037,6 @@ fun TestTranslationScreen(
                 type = TranslationDialogType.COMPLETE_EARLIER,
                 show = showCompleteEarlierDialog,
                 onSuccess = {
-                    Log.d("TEST","COMPLETE EARLIER")
                     vm.onEvent(TranslationEvent.CompleteTranslation)
                 },
                 dismiss = { showCompleteEarlierDialog = false }
