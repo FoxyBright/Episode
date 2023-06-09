@@ -33,12 +33,15 @@ import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffold
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun MainScreen(vm: MainViewModel) {
-    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val activity = getActivity()
     val nav = get<NavState>()
+    
+    LaunchedEffect(Unit){
+        nav.navigateAbsolute("chats/chat?id=d7a15241-7b9a-49e5-a904-d0b8aeaa9351")
+    }
     
     val unreadNotifications by vm.unreadNotifications.collectAsState()
     val unreadMessages by vm.unreadMessages.collectAsState()

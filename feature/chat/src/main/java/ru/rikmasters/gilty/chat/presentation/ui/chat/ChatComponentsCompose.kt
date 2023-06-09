@@ -18,7 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -92,20 +92,22 @@ fun ChatFloatingButton(
             Modifier
                 .offset(offset.x, -offset.y)
                 .background(
-                    if(isOnline) colorScheme.secondary
+                    color = if(isOnline)
+                        colorScheme.secondary
                     else colorScheme.primary,
-                    CircleShape
+                    shape = CircleShape
                 )
                 .align(TopEnd)
         ) {
             Text(
-                unRead, Modifier.padding(
-                    horizontal = if(
-                        unRead.length == 1
-                    ) 8.dp else 4.dp,
+                text = unRead,
+                modifier = Modifier.padding(
+                    horizontal = if(unRead.length == 1)
+                        8.dp else 4.dp,
                     vertical = 2.dp
-                ), Color.White,
+                ),
                 style = typography.headlineSmall
+                    .copy(color = White)
             )
         }
     }
@@ -122,24 +124,32 @@ fun ChatMessage(
     callback: ChatCallback? = null,
 ) {
     val context = LocalContext.current
-    val type = message.type
     var offset by remember {
         mutableStateOf(Offset(0f, 0f))
     }
-    var menuState by
-    remember { mutableStateOf(false) }
+    var menuState by remember {
+        mutableStateOf(false)
+    }
     Message(
-        MessState(
-            message, sender, state,
-            messageShapes(
-                type, sender, last, next,
-            ), (message.message?.author != next?.message?.author),
-            isOnline
-        ), Modifier
+        state = MessState(
+            message = message,
+            sender = sender,
+            dragState = state,
+            shape = messageShapes(
+                type = message.type,
+                sender = sender,
+                last = last,
+                next = next,
+            ),
+            avatar = message.message?.author !=
+                    next?.message?.author,
+            isOnline = isOnline
+        ),
+        modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        if(type == MESSAGE) {
+                        if(message.type == MESSAGE) {
                             vibrate(context)
                             menuState = true
                             offset = it
@@ -148,10 +158,10 @@ fun ChatMessage(
                 )
             }
             .padding(
-                16.dp, if(type != NOTIFICATION)
+                16.dp, if(message.type != NOTIFICATION)
                     2.dp else 10.dp
             ),
-        callback
+        callBack = callback
     )
     MessageMenu(
         state = menuState,

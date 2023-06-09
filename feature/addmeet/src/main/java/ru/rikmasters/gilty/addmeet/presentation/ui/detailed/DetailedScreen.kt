@@ -13,7 +13,7 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.LOCATION
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.offset
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
@@ -55,22 +55,14 @@ fun DetailedScreen(vm: DetailedViewModel) {
         ), Modifier, object: DetailedCallback {
             
             override fun onDateClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<TimeBsViewModel>(vm.scope) {
-                            TimeBs(it)
-                        }
-                    }
+                vm.scope.openBS<TimeBsViewModel>(scope) {
+                    TimeBs(it)
                 }
             }
             
             override fun onTimeClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<DurationBsViewModel>(vm.scope) {
-                            DurationBs(it)
-                        }
-                    }
+                vm.scope.openBS<DurationBsViewModel>(scope) {
+                    DurationBs(it)
                 }
             }
             

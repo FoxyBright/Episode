@@ -8,10 +8,9 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.auth.login.LoginMethod
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.core.web.openInWeb
 import ru.rikmasters.gilty.login.presentation.ui.login.country.CountryBs
 import ru.rikmasters.gilty.login.viewmodel.LoginViewModel
@@ -22,7 +21,6 @@ import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
     val nav = get<NavState>()
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     
@@ -89,12 +87,8 @@ fun LoginScreen(vm: LoginViewModel) {
         }
         
         override fun changeCountry() {
-            scope.launch {
-                asm.bottomSheet.expand {
-                    Connector<CountryBsViewModel>(vm.scope) {
-                        CountryBs(it)
-                    }
-                }
+            vm.scope.openBS<CountryBsViewModel>(scope){
+                CountryBs(it)
             }
         }
         

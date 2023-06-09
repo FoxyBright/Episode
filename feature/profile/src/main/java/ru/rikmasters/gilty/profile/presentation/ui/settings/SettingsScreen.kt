@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.age.AgeBs
 import ru.rikmasters.gilty.profile.presentation.ui.settings.bottoms.icons.IconsBs
@@ -74,35 +74,24 @@ fun SettingsScreen(vm: SettingsViewModel) {
             ), Modifier, object: SettingsCallback {
                 
                 override fun onGenderClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<GenderBsViewModel>(vm.scope) {
-                                GenderBs(it)
-                            }
-                        }
+                    vm.scope.openBS<GenderBsViewModel>(scope) {
+                        GenderBs(it)
                     }
                 }
                 
                 override fun onOrientationClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<OrientationBsViewModel>(vm.scope) {
-                                OrientationsBs(
-                                    it, orientation,
-                                    orientationList
-                                )
-                            }
-                        }
+                    vm.scope.openBS<OrientationBsViewModel>(scope) {
+                        OrientationsBs(
+                            vm = it,
+                            orientation = orientation,
+                            orientationList = orientationList
+                        )
                     }
                 }
                 
                 override fun onAgeClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<AgeBsViewModel>(vm.scope) {
-                                AgeBs(it)
-                            }
-                        }
+                    vm.scope.openBS<AgeBsViewModel>(scope) {
+                        AgeBs(it)
                     }
                 }
                 
@@ -115,12 +104,8 @@ fun SettingsScreen(vm: SettingsViewModel) {
                 }
                 
                 override fun onIconAppClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
-                            Connector<IconsBsViewModel>(vm.scope) {
-                                IconsBs(it)
-                            }
-                        }
+                    vm.scope.openBS<IconsBsViewModel>(scope) {
+                        IconsBs(it)
                     }
                 }
                 
@@ -162,7 +147,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                 }
                 
                 override fun onPhoneClick() {
-                    // TODO функционал пока не существует
+                    // клик по телефону
                 }
                 
                 override fun editCategories() {

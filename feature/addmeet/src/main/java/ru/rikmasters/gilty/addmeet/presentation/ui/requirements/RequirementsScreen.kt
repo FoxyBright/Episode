@@ -14,9 +14,8 @@ import ru.rikmasters.gilty.addmeet.viewmodel.RequirementsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.AgeBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.GenderBsViewModel
 import ru.rikmasters.gilty.addmeet.viewmodel.bottoms.OrientationBsViewModel
-import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.common.extentions.offset
@@ -28,7 +27,6 @@ import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 fun RequirementsScreen(vm: RequirementsViewModel) {
     
     val scope = rememberCoroutineScope()
-    val asm = get<AppStateModel>()
     val nav = get<NavState>()
     val context = LocalContext.current
     
@@ -89,32 +87,20 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
         ), Modifier, object: RequirementsCallback {
             
             override fun onGenderClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<GenderBsViewModel>(vm.scope) {
-                            GenderBs(it)
-                        }
-                    }
+                vm.scope.openBS<GenderBsViewModel>(scope) {
+                    GenderBs(it)
                 }
             }
             
             override fun onAgeClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<AgeBsViewModel>(vm.scope) {
-                            AgeBs(it)
-                        }
-                    }
+                vm.scope.openBS<AgeBsViewModel>(scope) {
+                    AgeBs(it)
                 }
             }
             
             override fun onOrientationClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        Connector<OrientationBsViewModel>(vm.scope) {
-                            OrientationBs(it)
-                        }
-                    }
+                vm.scope.openBS<OrientationBsViewModel>(scope) {
+                    OrientationBs(it)
                 }
             }
             
