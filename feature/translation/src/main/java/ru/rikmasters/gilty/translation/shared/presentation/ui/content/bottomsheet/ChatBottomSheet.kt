@@ -36,7 +36,7 @@ import ru.rikmasters.gilty.translation.shared.presentation.ui.components.Comment
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.MessageItem
 
 @Composable
-fun ChatBottomSheet(
+fun  ChatBottomSheet(
     configuration: Configuration,
     messagesList: LazyPagingItems<TranslationMessageModel>?,
     onSendMessage: (String) -> Unit,

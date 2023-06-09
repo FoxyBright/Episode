@@ -408,7 +408,7 @@ class TranslationViewerViewModel : ViewModel() {
         meetingId: String
     ) {
         coroutineScope.launch {
-            meetingRepository.getDetailedMeetTest(
+            meetingRepository.getDetailedMeet(
                 meetId = meetingId
             ).on(
                 loading = {},

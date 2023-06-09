@@ -412,19 +412,16 @@ class TranslationViewModel : ViewModel() {
     private fun completeTranslation() {
         translationInfo { translation ->
             coroutineScope.launch {
-                Log.d("TEST","END TRANSLATION")
                 translationRepository.endTranslation(
                     translationId = translation.id
                 )
             }
         }
-        Log.d("TEST","UPDATE")
         _translationStreamerUiState.update {
             it.copy(
                 translationStatus = TranslationStreamerStatus.COMPLETED
             )
         }
-        Log.d("TEST","State updated ${_translationStreamerUiState.value.translationStatus}")
         coroutineScope.launch {
             _oneTimeEvent.send(
                 TranslationOneTimeEvent.CompleteTranslation
@@ -758,7 +755,7 @@ class TranslationViewModel : ViewModel() {
         meetingId: String
     ) {
         coroutineScope.launch {
-            meetingRepository.getDetailedMeetTest(
+            meetingRepository.getDetailedMeet(
                 meetId = meetingId
             ).on(
                 loading = {},
