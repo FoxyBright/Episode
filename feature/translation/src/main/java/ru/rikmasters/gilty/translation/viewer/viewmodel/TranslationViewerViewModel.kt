@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -73,7 +72,6 @@ class TranslationViewerViewModel : ViewModel() {
         Pair(reload, query)
     }.flatMapLatest { (_, query) ->
         _translationViewerUiState.value.translationInfo?.id?.let {
-            Log.d("TEST","id $it")
             translationRepository.getConnectedUsers(
                 translationId = it,
                 query = query
