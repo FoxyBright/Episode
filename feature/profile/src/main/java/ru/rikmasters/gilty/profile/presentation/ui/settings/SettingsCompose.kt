@@ -71,6 +71,7 @@ data class SettingsState(
     val exitAlert: Boolean,
     val deleteAlert: Boolean,
     val interests: List<CategoryModel>,
+    val sleep: Boolean = true,
 )
 
 interface SettingsCallback {
@@ -120,7 +121,7 @@ fun SettingsContent(
             modifier
                 .fillMaxWidth()
         ) {
-            item { Categories(Modifier, state.interests, callback) }
+            item { Categories(Modifier, state.interests, state.sleep, callback,) }
             item { Information(state, Modifier, callback) }
             item { Additionally(state, Modifier, callback) }
             item { Buttons(Modifier, callback) }
@@ -150,6 +151,7 @@ fun SettingsContent(
 private fun Categories(
     modifier: Modifier = Modifier,
     interests: List<CategoryModel>,
+    sleep: Boolean = true,
     callback: SettingsCallback? = null,
 ) {
     val configuration = LocalConfiguration.current
@@ -172,25 +174,26 @@ private fun Categories(
             .clip(shapes.large)
             .background(colorScheme.primaryContainer)
             .clickable { callback?.editCategories() }) {
-            Bubbles(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                data = interests,
-                elementSize = CATEGORY_ELEMENT_SIZE_SMALL.dp,
-            ) { element ->
-                CategoryItem(
-                    modifier = Modifier.padding(0.dp),
-                    name = element.name,
-                    icon = element.emoji,
-                    color = element.color,
-                    state = true,
-                    size = ((screenWidth - 32) / 4),
-                    textSize = 11.sp,
-                ) {
-                    callback?.editCategories()
+            if (sleep)
+                Bubbles(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    data = interests,
+                    elementSize = CATEGORY_ELEMENT_SIZE_SMALL.dp,
+                ) { element ->
+                    CategoryItem(
+                        modifier = Modifier.padding(0.dp),
+                        name = element.name,
+                        icon = element.emoji,
+                        color = element.color,
+                        state = true,
+                        size = ((screenWidth - 32) / 4),
+                        textSize = 11.sp,
+                    ) {
+                        callback?.editCategories()
+                    }
                 }
-            }
         }
     }
 }

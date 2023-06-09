@@ -52,8 +52,6 @@ class SettingsViewModel: ViewModel() {
     private val _selected = MutableStateFlow(emptyList<CategoryModel>())
     val selected = _selected.asStateFlow()
     suspend fun getInterest() = singleLoading {
-        _selected.emit(emptyList())
-        delay(20) // TODO Костыль для обновления баблов
         profileManager.getUserCategories().on(
             success = { list ->
                 _selected.emit(list)

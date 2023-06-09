@@ -60,10 +60,10 @@ class CategoryViewModel : ViewModel() {
                 success = {
                     profileManager.updateUserCategories().on(
                         success = {
-                            onSuccess()
                             _categories.emit(emptyList())
                             _selected.emit(emptyList())
                             phase.emit(0)
+                            onSuccess()
                         },
                         loading = {},
                         error = {
@@ -90,9 +90,9 @@ class CategoryViewModel : ViewModel() {
             success = { list ->
                 _selected.emit(list)
                 val newCategories = _categories.value.toMutableList()
-                list.forEach { child->
-                    if(newCategories.none{it.id == child.id}){
-                        newCategories.add(child)
+                list.forEach { cat ->
+                    if(newCategories.none{it.id == cat.id}){
+                        newCategories.add(cat)
                     }
                 }
                 _categories.emit(newCategories)
@@ -110,12 +110,15 @@ class CategoryViewModel : ViewModel() {
         meetManager.getCategoriesList().on(
             success = {
                 val categories = _categories.value.toMutableList()
+                //Log.d("Hello GetCategory Before", categories.map { it.name }.toString())
                 it.forEach { parent ->
-                    if(parent !in categories) {
+                    if(categories.none{it.id == parent.id}) {
                         categories.add(parent)
                     }
                 }
                 _categories.emit(categories)
+                //Log.d("Hello GetCategory After", categories.map { it.name }.toString())
+
             },
             loading = {},
             error = {

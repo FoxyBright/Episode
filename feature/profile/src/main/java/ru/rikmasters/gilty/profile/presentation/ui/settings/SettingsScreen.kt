@@ -41,7 +41,8 @@ fun SettingsScreen(vm: SettingsViewModel) {
     val gender by vm.gender.collectAsState()
     val phone by vm.phone.collectAsState()
     val age by vm.age.collectAsState()
-    
+    var sleep by remember{ mutableStateOf(false) } // TODO Костыль для обновления баблов
+
     val nm = context.getSystemService(
         FirebaseMessagingService.NOTIFICATION_SERVICE
     ) as NotificationManager
@@ -63,6 +64,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
         vm.getUserData()
         vm.getOrientations()
         vm.getInterest()
+        sleep = true
     }
     
     Use<SettingsViewModel>(LoadingTrait) {
@@ -70,7 +72,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
             SettingsState(
                 gender, age, orientation,
                 phone, notification,
-                exitAlert, deleteAlert, interests
+                exitAlert, deleteAlert, interests, sleep
             ), Modifier, object: SettingsCallback {
                 
                 override fun onGenderClick() {

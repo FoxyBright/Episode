@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings.categories
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     var sleep by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
+        Log.d("Hello First", categories.map { it.name }.toString())
         vm.getCategories()
         vm.getInterest()
         sleep = true
@@ -32,14 +34,15 @@ fun CategoriesScreen(vm: CategoryViewModel) {
 
     LaunchedEffect(key1 = categories, block = {
         sleep = false
-        delay(50L)
+        delay(10L)
         sleep = true
+        Log.d("Hello Category", categories.map { it.name }.toString())
     })
 
     LaunchedEffect(key1 = phase, block = {
         if(phase == 1) {
             sleep = false
-            delay(50L)
+            delay(10L)
             sleep = true
         }
     })
