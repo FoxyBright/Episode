@@ -599,44 +599,21 @@ class TranslationViewModel : ViewModel() {
 
     private fun handleSocketEvents(socketEvent: TranslationCallbackEvents) {
         when (socketEvent) {
-            TranslationCallbackEvents.MessageReceived -> {
-                handleMessageReceived()
-            }
-
-            TranslationCallbackEvents.TranslationCompleted -> {
-                handleBroadcastCompletion()
-            }
-
-            TranslationCallbackEvents.TranslationExpired -> {
-                handleTranslationExpired()
-            }
-
+            TranslationCallbackEvents.MessageReceived -> { handleMessageReceived() }
+            TranslationCallbackEvents.TranslationCompleted -> { handleBroadcastCompletion() }
+            TranslationCallbackEvents.TranslationExpired -> { handleTranslationExpired() }
+            is TranslationCallbackEvents.UserConnected -> { handleUserConnected() }
+            is TranslationCallbackEvents.SignalReceived -> { handleSignal(socketEvent.signal) }
+            is TranslationCallbackEvents.UserDisconnected -> { handleUserDisconnected() }
+            is TranslationCallbackEvents.UserKicked -> { handleUserKicked() }
             is TranslationCallbackEvents.TranslationExtended -> {
                 handleTranslationAppended(
                     socketEvent.completedAt, socketEvent.duration
                 )
             }
-
-            is TranslationCallbackEvents.UserConnected -> {
-                handleUserConnected()
-            }
-
-            is TranslationCallbackEvents.SignalReceived -> {
-                handleSignal(socketEvent.signal)
-            }
-
-            is TranslationCallbackEvents.UserDisconnected -> {
-                handleUserDisconnected()
-            }
-
-            is TranslationCallbackEvents.UserKicked -> {
-                handleUserKicked()
-            }
-
             is TranslationCallbackEvents.MembersCountChanged -> {
                 handleMembersCountChanged(socketEvent.count)
             }
-
             else -> {}
         }
     }

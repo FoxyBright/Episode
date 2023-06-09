@@ -398,14 +398,13 @@ fun TestTranslationScreen(
     }
 
     fun completeTranslation() {
-        Log.d("TEST","Complete translation")
         if (screenState.translationInfo?.camera != false) {
             toggleCamera(false)
         }
         if (screenState.translationInfo?.microphone != false) {
             toggleMicrophone(false)
         }
-
+        showCompleteDialog = false
     }
 
     /**
