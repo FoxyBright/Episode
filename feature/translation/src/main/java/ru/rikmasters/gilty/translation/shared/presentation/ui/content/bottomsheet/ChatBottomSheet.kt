@@ -114,7 +114,8 @@ fun ChatBottomSheet(
                     }
                 } else {
                     LazyColumn(
-                        state = scrollState
+                        state = scrollState,
+                        reverseLayout = true
                     ) {
                         messagesList?.let {
                             items(messagesList) { messageModel ->
