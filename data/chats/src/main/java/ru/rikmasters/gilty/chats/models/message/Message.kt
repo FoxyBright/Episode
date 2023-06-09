@@ -20,12 +20,15 @@ data class Message(
 ): DomainEntity {
     
     fun map(): MessageModel = MessageModel(
-        id, MessageType.valueOf(type),
-        replied?.map(),
-        notification?.map(),
-        message?.map(), otherRead, isRead,
-        (isDelivered ?: isRead), // TODO - must be delivered\read
-        LocalDateTime.of(createdAt).toString()
+        id = id,
+        type = MessageType.valueOf(type),
+        replied = replied?.map(),
+        notification = notification?.map(),
+        message = message?.map(),
+        otherRead = otherRead,
+        isRead = isRead,
+        isDelivered = isDelivered == true,
+        createdAt = LocalDateTime.of(createdAt).toString()
     )
     
     override fun primaryKey() = id

@@ -20,19 +20,28 @@ data class MessageModel(
 ) {
     
     constructor(): this(
-        randomUUID().toString(),
-        MESSAGE, (null), (null),
-        (null), (true), (true), (true),
-        NOW_DATE
+        id = randomUUID().toString(),
+        type = MESSAGE,
+        replied = null,
+        notification = null,
+        message = null,
+        otherRead = true,
+        isRead = true,
+        isDelivered = true,
+        createdAt = NOW_DATE
     )
 }
 
 val DemoMessageModel = MessageModel(
-    randomUUID().toString(),
-    MESSAGE, (null), (null),
-    DemoMemberMessageModel,
-    (true), (true), (true),
-    "2022-10-17T08:35:54.140Z"
+    id = randomUUID().toString(),
+    type = MESSAGE,
+    replied = null,
+    notification = null,
+    message = DemoMemberMessageModel,
+    otherRead = true,
+    isRead = true,
+    isDelivered = true,
+    createdAt = "2022-10-17T08:35:54.140Z"
 )
 
 val DemoLongMessageModel = DemoMessageModel.copy(

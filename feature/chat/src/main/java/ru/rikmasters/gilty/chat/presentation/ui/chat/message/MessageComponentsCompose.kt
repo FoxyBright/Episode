@@ -512,10 +512,11 @@ fun TextMessage(
                 }; TextWidget(message, sender)
             }
             MessageStatus(
-                if(sender) White
+                color = if(sender) White
                 else colorScheme.onTertiary,
-                sender, message,
-                Modifier.align(BottomEnd)
+                sender = sender,
+                messageModel = message,
+                modifier = Modifier.align(BottomEnd)
             )
         }
     }
@@ -529,13 +530,17 @@ private fun TextWidget(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        message.message?.text ?: "", modifier
+        text = message.message?.text ?: "",
+        modifier = modifier
             .padding(
-                end = if(sender) 50.dp else 36.dp
-            ), if(sender) White
-        else colorScheme.tertiary,
-        style = typography.bodyMedium,
-        textAlign = Left
+                end = if(sender)
+                    50.dp else 36.dp
+            ),
+        style = typography.bodyMedium.copy(
+            color = if(sender) White
+            else colorScheme.tertiary,
+            textAlign = Left
+        ),
     )
 }
 
@@ -551,19 +556,22 @@ private fun MessageStatus(
         CenterVertically
     ) {
         Text(
-            messageModel.createdAt
+            text = messageModel.createdAt
                 .format("HH:mm"),
-            Modifier, color,
+            color = color,
             style = typography.titleSmall,
-        ); if(sender && messageModel.isDelivered)
-        Icon(
-            painterResource(
+        )
+        if(sender) Icon(
+            painter = painterResource(
                 if(messageModel.isRead)
                     R.drawable.ic_sms_read
                 else R.drawable.ic_sms_delivered
-            ), (null), Modifier
+            ),
+            contentDescription = null,
+            modifier = Modifier
                 .padding(start = 2.dp)
-                .size(12.dp), color
+                .size(12.dp),
+            tint = color
         )
     }
 }

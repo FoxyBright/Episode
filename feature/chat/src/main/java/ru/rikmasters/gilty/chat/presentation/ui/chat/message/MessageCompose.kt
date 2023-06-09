@@ -169,20 +169,26 @@ private fun Content(
         when(message.type) {
             
             NOTIFICATION -> SystemMessage(
-                state.message.notification
+                notification = state.message.notification
             )
             
             MESSAGE -> {
                 when {
                     (!attach.isNullOrEmpty()) -> Image(
-                        attach.first().type, message,
-                        sender, state.shape,
-                        state.isOnline, callback,
+                        type = attach.first().type,
+                        message = message,
+                        sender = sender,
+                        shape = state.shape,
+                        isOnline = state.isOnline,
+                        callback = callback,
                     )
                     
                     (message.replied != null) -> Text(
-                        message, sender, state.shape,
-                        state.isOnline, message.replied,
+                        message = message,
+                        sender = sender,
+                        shape = state.shape,
+                        isOnline = state.isOnline,
+                        answer = message.replied,
                     ) {
                         callback?.onAnswerClick(
                             message.replied ?: MessageModel()
@@ -191,9 +197,10 @@ private fun Content(
                     
                     
                     else -> Text(
-                        message, sender,
-                        state.shape,
-                        state.isOnline
+                        message = message,
+                        sender = sender,
+                        shape = state.shape,
+                        isOnline = state.isOnline
                     )
                 }
             }
@@ -214,8 +221,10 @@ private fun Image(
         
         PHOTO -> {
             ImageMessage(
-                Modifier, message, sender,
-                shape, isOnline
+                message = message,
+                sender = sender,
+                shape = shape,
+                isOnline = isOnline
             ) { callback?.onImageClick(message) }
         }
         
@@ -224,11 +233,14 @@ private fun Image(
             val access = if(hide.isNullOrEmpty()) true
             else !(hide.first().file?.hasAccess ?: false)
             HiddenImageMessage(
-                Modifier, message, sender, access, shape
+                message = message,
+                sender = sender,
+                hide = access,
+                shape = shape
             ) { callback?.onHiddenClick(message) }
         }
         
-        VIDEO -> {} // TODO Видео в чате
+        VIDEO -> {} // Видео в чате
     }
 }
 
@@ -242,8 +254,10 @@ private fun Text(
     onClick: (() -> Unit)? = null,
 ) {
     TextMessage(
-        message, sender,
-        Modifier, answer,
-        shape, isOnline
+        message = message,
+        sender = sender,
+        answer = answer,
+        shape = shape,
+        isOnline = isOnline
     ) { onClick?.let { it() } }
 }

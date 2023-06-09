@@ -112,7 +112,13 @@ fun ChatScreen(
         } catch(_: Exception) {
             listState.scrollToItem(messages.itemCount)
         }
-        vm.markAsReadMessage(chatId, all = true)
+    }
+    
+    LaunchedEffect(chat) {
+        chat?.let {
+            if(it.userId != it.organizer.id)
+                vm.markAsReadMessage(chatId, all = true)
+        }
     }
     
     LaunchedEffect(writingUsers) {
