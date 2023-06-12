@@ -196,15 +196,16 @@ private fun Content(
                             Spacer(modifier = Modifier.height(8.dp))
                         }
 
-                        item {
-                            SortTypeLabels(
-                                modifier = Modifier.animateItemPlacement(),
-                                state = state,
-                                callback = callback
-                            )
-                        }
-
                         if (itemCount != 0) {
+
+                            item {
+                                SortTypeLabels(
+                                    modifier = Modifier.animateItemPlacement(),
+                                    state = state,
+                                    callback = callback
+                                )
+                            }
+
                             if ((state.sortType == null && !state.isArchiveOn) || state.sortType == MEETING_DATE) { // No sort or Meeting Date
                                 getSortedByTimeChats(state.chats.itemSnapshotList.items).let {
                                     if (it.isNotEmpty())
@@ -247,7 +248,7 @@ private fun Content(
                                                 .animateItemPlacement(),
                                             chat = it,
                                             index = (index),
-                                            size = (state.chats.itemCount),  // TODO change itemCount to chats_count once backend is ready
+                                            size = (state.chats.itemCount),
                                             rowState = (chat.second),
                                             callback = callback
                                         )
@@ -268,7 +269,7 @@ private fun Content(
                                                 .animateItemPlacement(),
                                             chat = it,
                                             index = index,
-                                            size = state.chats.itemCount,  // TODO change itemCount to chats_count once backend is ready
+                                            size = state.chats.itemCount,
                                             rowState = chat.second,
                                             callback = callback
                                         )
@@ -282,7 +283,7 @@ private fun Content(
             }
             val emptyChats = chats.loadState.append is NotLoading
                     && chats.loadState.refresh is NotLoading
-                    && (itemCount == 0 || state.chats.itemCount == 0) // TODO Delete itemcount once backend is ready
+                    && (itemCount == 0)
 
             if (emptyChats) ChatListPlaceholder(
                 modifier = Modifier.padding(bottom = 120.dp)
