@@ -16,60 +16,63 @@ class ProfileManager(
     private val web: ProfileWebSource,
     private val store: ProfileStore,
 ) {
-    
+
     suspend fun storageProfile() = withContext(IO) {
         store.storageProfile()?.map()
     }
-    
+
     suspend fun getUserCategories() = withContext(IO) {
         store.getUserCategories(false)
     }
-    
+
     suspend fun updateUserCategories() =
         withContext(IO) { store.updateUserCategories() }
-    
+
     fun getObservers(
         query: String,
         type: ObserversType,
     ) = store.getObservers(query, type)
-    
+
     suspend fun getUser(id: String) =
         withContext(IO) { web.getUser(id) }
-    
+
     suspend fun clearProfile() {
         withContext(IO) {
             store.deleteProfile()
         }
     }
-    
+
     @Suppress("unused")
     suspend fun getPhotos(
         albumId: String,
     ) = withContext(IO) {
-        if(albumId.isNotBlank()) {
+        if (albumId.isNotBlank()) {
             web.getFiles(albumId)
         } else DataStateTest.Success(
             emptyList<Avatar>() to 0
         )
     }
-    
+
     fun getPhotosPaging(albumId: String) =
         store.getFiles(albumId)
-    
+
     suspend fun getProfile(
         forceWeb: Boolean = false,
     ) = withContext(IO) {
         store.getProfile(forceWeb)
     }
-    
+
     fun getHiddenPhotos() = store.getUserHiddenPaging()
-    
+
+    suspend fun changeAlbumPosition(imageId: String, position: Int) =
+        store.changeAlbumPosition(imageId, position)
+
     suspend fun getHiddenPhotosAmount() =
         store.getHiddenPhotosAmount()
-    
+
     suspend fun getProfileHiddens(forceWeb: Boolean) =
         withContext(IO) { store.getUserHidden(forceWeb) }
-    
+
     suspend fun deleteHidden(imageId: String) =
         withContext(IO) {
             store.deleteHidden(imageId).let {
@@ -77,20 +80,20 @@ class ProfileManager(
                 it
             }
         }
-    
+
     suspend fun deleteObserver(member: UserModel) =
         withContext(IO) { web.deleteObserver(member) }
-    
+
     suspend fun subscribeToUser(member: String) =
         withContext(IO) { web.subscribeToUser(member) }
-    
+
     fun getUserMeets(
         type: MeetingsType,
     ) = store.getUserMeets(type)
-    
+
     suspend fun unsubscribeFromUser(member: String) =
         withContext(IO) { web.unsubscribeFromUser(member) }
-    
+
     suspend fun userUpdateData(
         username: String? = null,
         aboutMe: String? = null,
@@ -103,31 +106,31 @@ class ProfileManager(
             age, gender, orientation
         )
     }
-    
+
     fun getResponds(type: RespondType) =
         store.getResponds(type)
-    
+
     fun getMeetResponds(meetId: String) =
         store.getMeetResponds(meetId)
-    
+
     suspend fun deleteRespond(respondId: String) =
         withContext(IO) { web.deleteRespond(respondId) }
-    
+
     suspend fun getNotificationResponds() =
         withContext(IO) {
             web.getNotificationResponds()
         }
-    
+
     suspend fun acceptRespond(
         respondId: String,
     ) = withContext(IO) { web.acceptRespond(respondId) }
-    
+
     suspend fun cancelRespond(
         respondId: String,
     ) = withContext(IO) {
         web.cancelRespond(respondId)
     }
-    
+
     suspend fun deleteAccount() = withContext(IO) {
         web.deleteAccount().let {
             clearProfile(); it

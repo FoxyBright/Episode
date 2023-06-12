@@ -78,7 +78,9 @@ class ProfileStore(
                 imageId = imageId
             )
         }
-    
+
+    suspend fun changeAlbumPosition(imageId: String, position:Int) = webSource.changeAlbumPosition(uploadProfile(false)
+        .albumPrivate?.id ?: "", imageId, position)
     suspend fun addHidden(files: List<File>) =
         webSource.addHidden(
             albumId = uploadProfile(false)

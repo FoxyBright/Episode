@@ -1,6 +1,9 @@
 package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,13 +14,15 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.ItemData
+import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
-class HiddenViewModel: ViewModel() {
-    
+class HiddenViewModel : ViewModel() {
+
     private val profileManager by inject<ProfileManager>()
-    
+
     private val context = getKoin().get<Context>()
 
     private val refresh = MutableStateFlow(false)
@@ -26,33 +31,72 @@ class HiddenViewModel: ViewModel() {
     val images by lazy {
         combine(
             refresh
-        ){it}.flatMapLatest {
+        ) { it }.flatMapLatest {
             this.getHiddenPhotosAmount()
             profileManager.getHiddenPhotos()
         }.cachedIn(coroutineScope)
 
     }
-    
+
     private val _photosAmount = MutableStateFlow(0)
     val photosAmount = _photosAmount.asStateFlow()
-    
+
+    private val _photos = MutableStateFlow(listOf<AvatarModel>())
+    val photos = _photos.asStateFlow()
+
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
-    
+
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
-    
+
     private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
     val viewerType = _viewerType.asStateFlow()
-    
+
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
-    
+
+    var dogs by mutableStateOf(List(500) {
+        if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
+    })
+
+    suspend fun moveDog(fromOr: ItemPosition, toOr: ItemPosition) {
+        /*dogs = dogs.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }*/
+        (fromOr.index - 1).let { from ->
+            (toOr.index - 1).let { to ->
+                if (_photos.value.size > from && _photos.value.size > to) {
+                    val fromId = _photos.value[from].id
+                    val newList = _photos.value.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
+                    _photos.emit(newList)
+                    profileManager.changeAlbumPosition(fromId, to + 1).on(
+                        success = {
+                        },
+                        loading = {
+
+                        },
+                        error = {
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    suspend fun setPhotoList(value: List<AvatarModel>) {
+        _photos.emit(value)
+    }
+
+    //fun isDogDragEnabled(draggedOver: ItemPosition, dragging: ItemPosition) = dogs.getOrNull(draggedOver.index)?.isLocked != true
+
     suspend fun uploadPhotoList(forceWeb: Boolean) {
         profileManager.getProfileHiddens(forceWeb)
         refreshImages()
     }
-    
+
     suspend fun deleteImage(imageId: String) {
         profileManager.deleteHidden(imageId).on(
             success = {
@@ -67,29 +111,30 @@ class HiddenViewModel: ViewModel() {
             }
         )
     }
-    
+
     suspend fun getHiddenPhotosAmount() {
         _photosAmount.emit(
             profileManager.getHiddenPhotosAmount()
         )
     }
-    
+
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
     }
-    
+
     suspend fun changePhotoViewType(type: PhotoViewType) {
         _viewerType.emit(type)
     }
-    
+
     suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
         _viewerImages.emit(list)
     }
-    
+
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
-    private suspend fun refreshImages(){
+
+    private suspend fun refreshImages() {
         refresh.emit(!refresh.value)
     }
 }

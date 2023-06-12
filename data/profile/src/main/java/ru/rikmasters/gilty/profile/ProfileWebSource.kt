@@ -106,6 +106,18 @@ class ProfileWebSource : KtorSource() {
             "http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId"
         ).let { coroutinesState({ it }) {} }
 
+    suspend fun changeAlbumPosition(albumId: String, imageId: String, position: Int) =
+        tryPost(
+            "http://$HOST$PREFIX_URL/albums/$albumId/position"
+        ) {
+            setBody(ChangeAlbumPositionRequest(imageId, position))
+        }.let { coroutinesState({ it }) {} }
+
+    data class ChangeAlbumPositionRequest(
+        val file_id: String,
+        val position: Int,
+    )
+
     suspend fun getFiles(
         albumId: String,
     ) = tryGet("http://$HOST$PREFIX_URL/albums/$albumId/files")

@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -163,7 +165,7 @@ data class MeetingBsState(
 )
 
 interface MeetingBsCallback {
-    
+
     fun onKebabClick(state: Boolean)
     fun onMenuItemClick(index: Int, meetId: String)
     fun onMeetPlaceClick(location: LocationModel?)
@@ -200,32 +202,31 @@ fun MeetingBsContent(
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent
     ) {
-        Scaffold(
-            bottomBar = {
-                Button(
-                    memberState = state
-                        .meet.memberState,
-                    isOnline = state
-                        .meet.isOnline,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                ) {
-                    if(state.detailed)
-                        callback?.onRespond(state.meet.id)
-                    else scope.launch {
-                        bsState.bottomSheetState.expand()
-                    }
-                }
-            }
-        ) {
+        Box(modifier = Modifier.padding(it)) {
             MeetContent(
                 state = state,
-                modifier = modifier.padding(
-                    bottom = if(it.calculateBottomPadding() >= 0.dp)
-                        it.calculateBottomPadding() - 24.dp else 0.dp
-                ),
+                modifier = modifier
+                    .align(Center)
+                    .padding(bottom =
+                    if (state.meet.memberState != IS_MEMBER && state.meet.memberState != IS_ORGANIZER) 42.dp
+                    else 0.dp),
                 callback = callback
             )
+            Button(
+                memberState = state
+                    .meet.memberState,
+                isOnline = state
+                    .meet.isOnline,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(BottomCenter)
+            ) {
+                if (state.detailed)
+                    callback?.onRespond(state.meet.id)
+                else scope.launch {
+                    bsState.bottomSheetState.expand()
+                }
+            }
         }
     }
     MeetReaction(
@@ -241,16 +242,15 @@ private fun Button(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    when(memberState) {
+    when (memberState) {
         IS_MEMBER, IS_ORGANIZER -> Unit
         RESPOND_SENT -> TextButton(
-            modifier = modifier
-                .padding(bottom = 50.dp),
+            modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(R.string.respond_to_meet)
         )
+
         else -> GradientButton(
-            modifier = modifier
-                .padding(bottom = 50.dp),
+            modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(
                 R.string.meeting_join_button_name
             ),
@@ -348,13 +348,13 @@ private fun MeetContent(
                     callback = callback
                 )
             }
-            if(state.detailed) {
+            if (state.detailed) {
                 item {
                     Text(
                         text = stringResource(
                             R.string.meeting_question_comment_or_assess
                         ),
-                        modifier = Modifier,
+                        modifier = Modifier.padding(top = 4.dp),
                         style = typography.labelLarge
                     )
                 }
@@ -378,7 +378,7 @@ private fun MeetContent(
                     MeetingBsConditions(
                         meet = state.meet.map(),
                         modifier = Modifier.padding(
-                            top = if(state.meet.description.isNotBlank())
+                            top = if (state.meet.description.isNotBlank())
                                 32.dp else 0.dp
                         )
                     )
@@ -400,7 +400,7 @@ private fun MeetContent(
                         )
                     }
                 }
-                if(state.meetDistance != null
+                if (state.meetDistance != null
                     && !state.meet.isOnline
                 ) item {
                     MeetingBsMap(
@@ -415,7 +415,7 @@ private fun MeetContent(
                     )
                 }
             }
-            itemSpacer(40.dp)
+            itemSpacer(80.dp)
         }
     }
 }
@@ -439,7 +439,7 @@ private fun TopBar(
             Modifier.weight(1f),
             Start, CenterVertically
         ) {
-            if(backButton) IconButton(
+            if (backButton) IconButton(
                 { onBack() },
                 Modifier.padding(end = 16.dp)
             ) {
@@ -461,11 +461,13 @@ private fun TopBar(
             )
             Text(
                 text = stringResource(
-                    when(meet.status) {
+                    when (meet.status) {
                         CANCELED ->
                             R.string.meetings_canceled
+
                         COMPLETED ->
                             R.string.meetings_finished
+
                         else -> R.string.empty_String
                     }
                 ),
@@ -494,21 +496,21 @@ private fun Menu(
     val ms = meet.memberState
     val menuItems =
         arrayListOf<Pair<String, () -> Unit>>()
-    if(ms == IS_MEMBER || ms == IS_ORGANIZER)
+    if (ms == IS_MEMBER || ms == IS_ORGANIZER)
         menuItems.add(
             stringResource(R.string.meeting_shared_button) to
                     { onItemSelect(0) })
-    if(ms == IS_MEMBER)
+    if (ms == IS_MEMBER)
         menuItems.add(
             stringResource(R.string.exit_from_meet) to
                     { onItemSelect(1) })
     menuItems.add(
-        if(ms == IS_ORGANIZER)
+        if (ms == IS_ORGANIZER)
             stringResource(R.string.meeting_canceled) to
                     { onItemSelect(2) }
         else stringResource(R.string.meeting_complain) to
                 { onItemSelect(3) })
-    if(menuState && menuItems.size == 1) {
+    if (menuState && menuItems.size == 1) {
         onDismiss(false)
         menuItems.first().second()
     }

@@ -38,7 +38,8 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.ui:ui:$composeVer",
     "io.coil-kt:coil-compose:2.3.0",
-    "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    "androidx.constraintlayout:constraintlayout-compose:1.0.1",
+    "org.jetbrains.compose.ui:ui-util:1.4.0"
 ) and implementation(
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer",

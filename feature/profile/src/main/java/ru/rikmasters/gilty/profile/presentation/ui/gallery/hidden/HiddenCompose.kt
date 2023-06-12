@@ -1,13 +1,15 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.spacedBy
-import androidx.compose.foundation.lazy.grid.GridCells.Fixed
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
@@ -32,7 +35,11 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCachedImage
-import ru.rikmasters.gilty.shared.common.extentions.items
+import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
+import ru.rikmasters.gilty.shared.common.dragGrid.ReorderableItem
+import ru.rikmasters.gilty.shared.common.dragGrid.detectReorderAfterLongPress
+import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridState
+import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.PagingLoader
@@ -49,6 +56,7 @@ interface HiddenBsCallback {
     fun onPhotoViewDismiss(state: Boolean)
     fun onPhotoViewChangeMenuState(state: Boolean) = Unit
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
+    fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
 }
 
 data class HiddenBsState(
@@ -84,11 +92,22 @@ fun HiddenBsContent(
             extra = if (state.photoAmount == 0) null
             else stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
         ) { callback?.onBack() }
-        //DragTable()
+
+        val stateDragable = rememberReorderableLazyGridState(
+            onMove = { from, to ->
+                callback?.onPhotoMoved(from, to)
+            },
+            canDragOver = { draggedOver, dragging ->
+                draggedOver.index != 0
+            }
+        )
+
         LazyVerticalGrid(
-            Fixed(3), Modifier
+            GridCells.Fixed(3), Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .reorderable(stateDragable),
+            state = stateDragable.gridState,
             verticalArrangement = spacedBy(4.dp),
             horizontalArrangement = spacedBy(4.dp)
         ) {
@@ -103,12 +122,22 @@ fun HiddenBsContent(
 
                 else -> {
                     item { GalleryButton(Modifier.weight(1f), callback) }
-                    items(state.photoList) { image ->
-                        image?.let { img ->
-                            LazyItem(
-                                img.thumbnail.url, Modifier.weight(1f),
-                                { callback?.onSelectImage(img) }
-                            ) { callback?.onDeleteImage(img) }
+                    items(state.viewerImages, key = { it?.id ?: "" }) { img ->
+                        img?.let {
+                            ReorderableItem(
+                                stateDragable,
+                                img.id,
+                                modifier = Modifier
+                                    .clip(shapes.small)
+                            ) { isDragging ->
+                                val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                                LazyItem(
+                                    img.thumbnail.url, Modifier
+                                        .detectReorderAfterLongPress(stateDragable)
+                                        .shadow(elevation.value),
+                                    { callback?.onSelectImage(img) }
+                                ) { callback?.onDeleteImage(img) }
+                            }
                         }
                     }
                     if (state.photoList.loadState.append is LoadState.Loading) {
@@ -127,6 +156,33 @@ fun HiddenBsContent(
                 }
             }
         }
+        /*   LazyVerticalGrid(
+               columns = GridCells.Fixed(3),
+               state = stateDragable.gridState,
+               contentPadding = PaddingValues(horizontal = 8.dp),
+               verticalArrangement = Arrangement.spacedBy(4.dp),
+               horizontalArrangement = Arrangement.spacedBy(4.dp),
+               modifier = modifier.reorderable(stateDragable)
+           ) {
+               items(vm.dogs, { it.key }) { item ->
+                   ReorderableItem(stateDragable, item.key) { isDragging ->
+                       val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                       Box(
+                           contentAlignment = Alignment.Center,
+                           modifier = Modifier
+                               .detectReorderAfterLongPress(stateDragable)
+                               .shadow(elevation.value)
+                               .aspectRatio(1f)
+                               .background(MaterialTheme.colors.primary)
+                       ) {
+                           Text(item.title)
+                       }
+
+                   }
+               }
+           }*/
+      //  DragTable()
+
     }
 }
 
@@ -138,7 +194,9 @@ private fun GalleryButton(
 ) {
     Card(
         { callback?.openGallery() },
-        modifier.size((screenWidth.dp - 72.dp) / 3).clip(shapes.large),
+        modifier
+            .size((screenWidth.dp - 72.dp) / 3)
+            .clip(shapes.large),
         shape = shapes.large,
         colors = cardColors(Transparent)
     ) {
