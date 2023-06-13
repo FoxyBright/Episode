@@ -6,12 +6,11 @@ import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -57,23 +56,25 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.blur
 import ru.rikmasters.gilty.shared.common.extentions.getBitmap
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
 import ru.rikmasters.gilty.translation.streamer.event.TranslationOneTimeEvent
-import ru.rikmasters.gilty.translation.shared.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
-import ru.rikmasters.gilty.translation.streamer.model.Facing
-import ru.rikmasters.gilty.translation.streamer.model.TranslationStreamerStatus
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.CameraOff
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.CameraOffMicOff
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.LowConnectionMicroOff
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.LowConnectionMicroOffVideoOff
+import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.CONNECTED
+import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.FAILED
+import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState
+import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.ProfileAvatar
+import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroWave
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroInactiveSnackbar
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.NoConnection
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.Reconnecting
@@ -82,6 +83,7 @@ import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.Trans
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.TranslationStreamerDialog
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.content.TranslationStreamerContent
+import ru.rikmasters.gilty.translation.streamer.utils.map
 import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationViewModel
 import kotlin.math.roundToInt
 
@@ -113,7 +115,19 @@ fun TestTranslationScreen(
     /**
      * States from vm
      */
-    val screenState by vm.translationStreamerUiState.collectAsState()
+    val translation by vm.translation.collectAsState()
+    val meeting by vm.meeting.collectAsState()
+    val microphoneState by vm.microphone.collectAsState()
+    val cameraState by vm.camera.collectAsState()
+    val hudState by vm.hudState.collectAsState()
+    val facing by vm.facing.collectAsState()
+    val status by vm.translationStatus.collectAsState()
+    val remainTime by vm.remainTime.collectAsState()
+    val additionalTime by vm.additionalTime.collectAsState()
+    val snackbarState by vm.streamerSnackbarState.collectAsState()
+    val placeholderView by vm.placeHolderVisible.collectAsState()
+    val membersCount by vm.membersCount.collectAsState()
+    val viewState by vm.streamerViewState.collectAsState()
     val messages = vm.messages.collectAsLazyPagingItems()
     val members = vm.members.collectAsLazyPagingItems()
     val query by vm.query.collectAsState()
@@ -127,19 +141,7 @@ fun TestTranslationScreen(
     var showCompleteEarlierDialog by remember { mutableStateOf(false) }
     var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
     var currentComplainUser by remember { mutableStateOf<FullUserModel?>(null) }
-
-    /**
-     * Snackbar
-     */
-    var showMicroInactiveSnackbar by remember { mutableStateOf(false) }
-    var showTranslationResumedSnackbar by remember { mutableStateOf(false) }
-    var showWeakConnectionSnackbar by remember { mutableStateOf(false) }
-
-    /**
-     * Timer
-     */
-    var isTimerHighlighted by remember { mutableStateOf(false) }
-    var timerAdditionalTime by remember { mutableStateOf<String?>(null) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     /**
      * BottomSheetState
@@ -195,16 +197,6 @@ fun TestTranslationScreen(
     /**
      * Camera
      */
-    fun switchCamera(camera: RtmpCamera2) {
-        if (screenState.facing == Facing.FRONT && camera.cameraFacing != CameraHelper.Facing.FRONT
-            || screenState.facing == Facing.BACK && camera.cameraFacing != CameraHelper.Facing.BACK
-        ) {
-            camera.switchCamera()
-        }
-    }
-    camera?.let {
-        switchCamera(it)
-    }
     fun startPreview() {
         camera?.let {
             if (!it.isOnPreview) {
@@ -263,7 +255,6 @@ fun TestTranslationScreen(
                 val bitrate = if (isUHd) 4_500_000 else if (isHd) 3_000_000 else 1_500_000
                 if (it.prepareAudio() && it.prepareVideo(width, height, bitrate)) {
                     it.startStream(rtmpUrl)
-                    vm.onEvent(TranslationEvent.StartStreaming)
                 }
             }
         }
@@ -274,7 +265,6 @@ fun TestTranslationScreen(
             if (it.isStreaming) {
                 it.stopStream()
                 it.stopPreview()
-                vm.onEvent(TranslationEvent.StopStreaming)
             }
         }
     }
@@ -320,49 +310,6 @@ fun TestTranslationScreen(
     }
 
     /**
-     * Snackbars
-     */
-    fun showMicroOffSnackbar() {
-        scope.launch {
-            showMicroInactiveSnackbar = true
-            delay(2000)
-            showMicroInactiveSnackbar = false
-        }
-    }
-
-    fun showWeakConnectionSnackbar() {
-        scope.launch {
-            showWeakConnectionSnackbar = true
-            delay(2000)
-            showWeakConnectionSnackbar = false
-        }
-    }
-
-    suspend fun showTranslationResumedSnackbar() {
-        scope.launch {
-            showTranslationResumedSnackbar = true
-            delay(2000)
-            showTranslationResumedSnackbar = false
-        }
-    }
-
-    /**
-     * Timer
-     */
-    suspend fun handleExtendTranslation(duration: String?) {
-        duration?.let {
-            timerAdditionalTime = it
-            delay(2000)
-            timerAdditionalTime = null
-        } ?: run {
-            showTranslationResumedSnackbar()
-            isTimerHighlighted = true
-            delay(2000)
-            isTimerHighlighted = false
-        }
-    }
-
-    /**
      * Connection
      */
     fun reconnect() {
@@ -379,31 +326,9 @@ fun TestTranslationScreen(
     /**
      * Status
      */
-    fun processExpiredState() {
-        if (screenState.translationInfo?.camera != false) {
-            toggleCamera(false)
-        }
-        if (screenState.translationInfo?.microphone != false) {
-            toggleMicrophone(false)
-        }
-    }
-
-    fun processFromExpiredToPreview() {
-        if (screenState.translationInfo?.camera != true) {
-            toggleCamera(true)
-        }
-        if (screenState.translationInfo?.microphone != true) {
-            toggleMicrophone(true)
-        }
-    }
 
     fun completeTranslation() {
-        if (screenState.translationInfo?.camera != false) {
-            toggleCamera(false)
-        }
-        if (screenState.translationInfo?.microphone != false) {
-            toggleMicrophone(false)
-        }
+        stopBroadcast()
         showCompleteDialog = false
     }
 
@@ -414,45 +339,26 @@ fun TestTranslationScreen(
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             vm.oneTimeEvent.collectLatest { event ->
                 when (event) {
-                    is TranslationOneTimeEvent.OnError -> {}
-                    TranslationOneTimeEvent.Reconnect -> {
-                        reconnect()
+                    is TranslationOneTimeEvent.ChangeFacing -> {
+                        camera?.let {
+                            if (it.cameraFacing.map() != event.facing) {
+                                it.switchCamera()
+                            }
+                        }
                     }
-
-                    TranslationOneTimeEvent.ShowMicroDisabledSnackbar -> {
-                        showMicroOffSnackbar()
-                    }
-
-                    is TranslationOneTimeEvent.TranslationExtended -> {
-                        handleExtendTranslation(event.duration)
-                    }
-
                     is TranslationOneTimeEvent.ToggleCamera -> {
                         toggleCamera(event.value)
                     }
-
                     is TranslationOneTimeEvent.ToggleMicrophone -> {
                         toggleMicrophone(event.value)
                     }
-
-                    TranslationOneTimeEvent.ShowWeakConnectionSnackbar -> {
-                        showWeakConnectionSnackbar()
-                    }
-
-                    TranslationOneTimeEvent.ReconnectAfterOver -> {
-                        reconnectAfterOver()
-                    }
-
-                    TranslationOneTimeEvent.TranslationExpired -> {
-                        processExpiredState()
-                    }
-
-                    TranslationOneTimeEvent.FromExpiredToPreview -> {
-                        processFromExpiredToPreview()
-                    }
-
+                    is TranslationOneTimeEvent.OnError -> {}
                     TranslationOneTimeEvent.CompleteTranslation -> {
                         completeTranslation()
+                    }
+                    is TranslationOneTimeEvent.StartStream -> {
+                        //TODO:
+                       // startBroadCast(event.rtmpUrl)
                     }
                 }
             }
@@ -467,32 +373,16 @@ fun TestTranslationScreen(
             override fun onAuthErrorRtmp() {}
             override fun onAuthSuccessRtmp() {}
             override fun onConnectionFailedRtmp(reason: String) {
-                camera?.let {
-                    if (reTryRemained > 0) {
-                        vm.onEvent(TranslationEvent.Reconnect)
-                    } else {
-                        vm.onEvent(TranslationEvent.ReconnectAttemptsOver)
-                    }
-                }
+                vm.onEvent(TranslationEvent.ProcessRTMPStatus(FAILED))
             }
-
             override fun onConnectionStartedRtmp(rtmpUrl: String) {}
             override fun onConnectionSuccessRtmp() {
-                camera?.setReTries(7)
-                reTryRemained = 7
-                camera?.let {
-                    bitrateAdapter = BitrateAdapter { bitrate ->
-                        it.setVideoBitrateOnFly(bitrate)
-                    }
-                    bitrateAdapter?.setMaxBitrate(it.bitrate)
-                }
-                vm.onEvent(TranslationEvent.ConnectionSucceed)
+                vm.onEvent(TranslationEvent.ProcessRTMPStatus(CONNECTED))
             }
-
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
-                if (screenState.translationStatus == TranslationStreamerStatus.STREAM) {
-                    if (screenState.translationInfo?.camera == true) {
+                if (viewState == StreamerViewState.STREAM) {
+                    if (cameraState) {
                         if (bitrate < 300_000) {
                             vm.onEvent(TranslationEvent.LowBitrate)
                         }
@@ -514,7 +404,6 @@ fun TestTranslationScreen(
                     glViewChanged = false
                 }
             }
-
             override fun surfaceChanged(
                 holder: SurfaceHolder,
                 format: Int,
@@ -523,24 +412,19 @@ fun TestTranslationScreen(
             ) {
                 sensorRotationManager.start()
                 camera?.let {
-                    when (screenState.translationStatus) {
-                        TranslationStreamerStatus.PREVIEW -> {
+                    when (viewState) {
+                        StreamerViewState.PREVIEW, StreamerViewState.PREVIEW_REOPENED -> {
                             startPreview()
                         }
-
-                        TranslationStreamerStatus.STREAM -> {
-                            screenState.translationInfo?.let { translation ->
-                                startBroadCast(
-                                    rtmpUrl = translation.rtmp ?: ""
-                                )
-                            }
+                        StreamerViewState.STREAM -> {
+                            startBroadCast(
+                                rtmpUrl = translation?.rtmp ?: ""
+                            )
                         }
-
                         else -> {}
                     }
                 }
             }
-
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 sensorRotationManager.stop()
                 camera?.let {
@@ -558,31 +442,31 @@ fun TestTranslationScreen(
      * Back pressed handler
      */
     BackHandler {
-        when (screenState.translationStatus) {
-            TranslationStreamerStatus.STREAM -> {
+        showExitDialog = true
+        /*
+        when(viewState) {
+            StreamerViewState.EXPIRED -> {
                 showCompleteDialog = true
             }
-
-            TranslationStreamerStatus.EXPIRED -> {
+            StreamerViewState.STREAM -> {
                 showCompleteEarlierDialog = true
             }
-
-            TranslationStreamerStatus.COMPLETED -> {
+            StreamerViewState.COMPLETED -> {
                 camera?.stopStream()
                 camera?.stopPreview()
                 nav.navigationBack()
             }
-
-            TranslationStreamerStatus.PREVIEW -> {
-                if (screenState.onPreviewFromExpired) {
-                    showCompleteDialog = true
-                } else {
-                    camera?.stopStream()
-                }
+            StreamerViewState.PREVIEW -> {
+                camera?.stopPreview()
+                camera?.stopStream()
+                nav.navigationBack()
             }
-
-            else -> {}
+            StreamerViewState.PREVIEW_REOPENED -> {
+                showCompleteDialog = true
+            }
         }
+
+         */
     }
 
     /**
@@ -615,7 +499,7 @@ fun TestTranslationScreen(
                         )
                     )
                 },
-                membersCount = screenState.membersCount,
+                membersCount = membersCount,
                 searchValue = query,
                 onSearchValueChange = { newQuery ->
                     vm.onEvent(
@@ -664,22 +548,20 @@ fun TestTranslationScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             TranslationStreamerContent(
-                translationStatus = screenState.translationStatus
-                    ?: TranslationStreamerStatus.PREVIEW,
+                viewState = viewState,
                 initCamera = { view ->
                     currentOpenGlView = view
                     if (camera == null) {
                         camera = RtmpCamera2(view, connectionChecker)
-                    } else {
-                        glViewChanged = true
                     }
                 },
                 surfaceHolderCallback = surfaceHolderCallback,
                 isPortrait = orientation == Configuration.ORIENTATION_PORTRAIT,
-                meetingModel = screenState.meetingModel,
-                remainTime = screenState.remainTime,
-                isHighlightTimer = isTimerHighlighted,
-                addTimerString = timerAdditionalTime ?: "",
+                meetingModel = meeting,
+                remainTime = remainTime,
+                // TODO
+                isHighlightTimer = false,
+                addTimerString = additionalTime,
                 onChatClicked = {
                     scope.launch {
                         when {
@@ -760,7 +642,7 @@ fun TestTranslationScreen(
                         }
                     }
                 },
-                membersCount = screenState.membersCount,
+                membersCount = membersCount,
                 onTimerClicked = {
                     scope.launch {
                         bottomSheetState = TranslationBottomSheetState.DURATION
@@ -768,15 +650,15 @@ fun TestTranslationScreen(
                     }
                 },
                 onCloseClicked = {
-                    if (screenState.onPreviewFromExpired || screenState.translationStatus == TranslationStreamerStatus.EXPIRED) {
+                    if (viewState == StreamerViewState.PREVIEW_REOPENED || viewState == StreamerViewState.EXPIRED) {
                         showCompleteDialog = true
                     } else {
                         showCompleteEarlierDialog = true
                     }
                 },
                 bsOpened = scaffoldState.bottomSheetState.isExpanded,
-                cameraEnabled = screenState.translationInfo?.camera ?: true,
-                microphoneEnabled = screenState.translationInfo?.microphone ?: true,
+                cameraEnabled = cameraState,
+                microphoneEnabled = microphoneState,
                 onCameraClicked = { vm.onEvent(TranslationEvent.ToggleCamera) },
                 onMicrophoneClicked = { vm.onEvent(TranslationEvent.ToggleMicrophone) },
                 changeFacing = { vm.onEvent(TranslationEvent.ChangeFacing) },
@@ -788,14 +670,7 @@ fun TestTranslationScreen(
                 startBroadCast = {
                     vm.onEvent(TranslationEvent.ChangeUiToStream)
                 },
-                selectedFacing = screenState.facing,
-                closeFromPreview = {
-                    if (screenState.onPreviewFromExpired || screenState.translationStatus == TranslationStreamerStatus.EXPIRED) {
-                        showCompleteDialog = true
-                    } else {
-                        showCompleteEarlierDialog = true
-                    }
-                }
+                selectedStreamerFacing = facing,
             )
 
             /**
@@ -836,170 +711,87 @@ fun TestTranslationScreen(
                 }
             }
 
-            /**
-             * Snackbar
-             */
-            AnimatedVisibility(
-                visible = showWeakConnectionSnackbar &&
-                        screenState.translationInfo?.microphone == false &&
-                        screenState.translationInfo?.camera == false &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS  && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LowConnectionMicroOffVideoOff(
-                    meetingModel = screenState.meetingModel,
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
+            when(hudState) {
+                StreamerHUD.RECONNECTING -> {
+                    Reconnecting(
+                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            Modifier
+                                .fillMaxHeight()
+                                .width((configuration.screenWidthDp * 0.6).dp)
+                        } else {
+                            Modifier.fillMaxSize()
+                        }
+                    )
+                }
+                StreamerHUD.RECONNECT_FAILED -> {
+                    NoConnection(
+                        onReconnectCLicked = {
+                            vm.onEvent(TranslationEvent.Reconnect)
+                        },
+                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            Modifier
+                                .fillMaxHeight()
+                                .width((configuration.screenWidthDp * 0.6).dp)
+                        } else {
+                            Modifier.fillMaxSize()
+                        }
+                    )
+                }
+                else -> {}
             }
-            AnimatedVisibility(
-                visible = showWeakConnectionSnackbar &&
-                        screenState.translationInfo?.microphone == false &&
-                        screenState.translationInfo?.camera == true &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS  && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LowConnectionMicroOff(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
+                if (placeholderView) {
+                    if (!cameraState) {
+                        ProfileAvatar(meetingModel = meeting, modifier = Modifier)
+                        if (!microphoneState) {
+                            MicroWave(meetingModel = meeting, modifier = Modifier)
+                        }
                     }
-                )
-            }
-            AnimatedVisibility(
-                visible = screenState.translationInfo?.camera == false &&
-                        screenState.translationInfo?.microphone == true &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS  && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                CameraOff(
-                    meetingModel = screenState.meetingModel,
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
+                }
+                Log.d("TEST","snackbarState $snackbarState")
+                when(snackbarState) {
+                    StreamerSnackbarState.MICRO_OFF -> {
+                        MicroInactiveSnackbar(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
                     }
-                )
-            }
-            AnimatedVisibility(
-                visible = !showWeakConnectionSnackbar &&
-                        screenState.translationInfo?.camera == false &&
-                        screenState.translationInfo?.microphone == false &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                CameraOffMicOff(
-                    meetingModel = screenState.meetingModel,
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
+                    StreamerSnackbarState.WEAK_CONNECTION -> {
+                        WeakConnectionSnackbar(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
                     }
-                )
-            }
-            AnimatedVisibility(
-                visible = screenState.connectionStatus == ConnectionStatus.RECONNECTING && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Reconnecting(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
+                    StreamerSnackbarState.BROADCAST_EXTENDED -> {
+                        TranslationResumedSnackbar(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
                     }
-                )
+                    else -> {}
+                }
             }
-            AnimatedVisibility(
-                visible = screenState.connectionStatus == ConnectionStatus.NO_CONNECTION && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                NoConnection(
-                    onReconnectCLicked = {
-                        vm.onEvent(TranslationEvent.ReconnectAfterAttemptsOver)
-                    },
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
-            }
-            AnimatedVisibility(
-                visible = showMicroInactiveSnackbar &&
-                        screenState.translationInfo?.camera == true &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                MicroInactiveSnackbar(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
-            }
-            AnimatedVisibility(
-                visible = showTranslationResumedSnackbar &&
-                        screenState.translationInfo?.microphone == true &&
-                        screenState.translationInfo?.camera == true &&
-                        !showWeakConnectionSnackbar &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                TranslationResumedSnackbar(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
-            }
-            AnimatedVisibility(
-                visible = showWeakConnectionSnackbar &&
-                        screenState.translationInfo?.microphone == true &&
-                        screenState.translationInfo?.camera == true &&
-                        screenState.connectionStatus == ConnectionStatus.SUCCESS && screenState.translationStatus == TranslationStreamerStatus.STREAM,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                WeakConnectionSnackbar(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
-            }
+
 
             /**
              * Dialogs
@@ -1039,6 +831,19 @@ fun TestTranslationScreen(
                     vm.onEvent(TranslationEvent.CompleteTranslation)
                 },
                 dismiss = { showCompleteEarlierDialog = false }
+            )
+            GAlert(
+                show = showExitDialog,
+                success = Pair(stringResource(id = R.string.translations_viewer_complain_exit_positive)) {
+                    showExitDialog = false
+                    nav.navigationBack()
+                },
+                label = stringResource(id = R.string.translations_viewer_complain_exit_text),
+                title = stringResource(id = R.string.translations_viewer_complain_exit),
+                onDismissRequest = { showExitDialog = false },
+                cancel = Pair(stringResource(id = R.string.translations_complete_negative)) {
+                    showExitDialog = false
+                }
             )
         }
     }

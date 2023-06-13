@@ -44,12 +44,12 @@ import ru.rikmasters.gilty.translation.shared.presentation.ui.components.Members
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.MicrophoneItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.StreamerItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.TimerItem
-import ru.rikmasters.gilty.translation.streamer.model.Facing
-import ru.rikmasters.gilty.translation.streamer.model.TranslationStreamerStatus
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
+import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState
 
 @Composable
 fun TranslationStreamerContent(
-    translationStatus: TranslationStreamerStatus,
+    viewState: StreamerViewState,
     initCamera: (OpenGlView) -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback,
     isPortrait: Boolean,
@@ -70,8 +70,7 @@ fun TranslationStreamerContent(
     changeFacing: () -> Unit,
     onToChatPressed: () -> Unit,
     startBroadCast: () -> Unit,
-    selectedFacing: Facing,
-    closeFromPreview: () -> Unit
+    selectedStreamerFacing: StreamerFacing
 ) {
     Box {
         Column(
@@ -87,7 +86,7 @@ fun TranslationStreamerContent(
                 )
         ) {
             Box(
-                if (translationStatus == TranslationStreamerStatus.STREAM) {
+                if (viewState == StreamerViewState.STREAM) {
                     if (isPortrait) {
                         Modifier
                             .weight(1f)
@@ -125,7 +124,7 @@ fun TranslationStreamerContent(
                 }
             ) {
                 Surface(
-                    shape = if (translationStatus == TranslationStreamerStatus.STREAM) RoundedCornerShape(14.dp) else RectangleShape
+                    shape = if (viewState == StreamerViewState.STREAM) RoundedCornerShape(14.dp) else RectangleShape
                 ) {
                     CameraView(
                         initCamera = initCamera,
@@ -133,15 +132,15 @@ fun TranslationStreamerContent(
                         modifier = Modifier.matchParentSize()
                     )
                 }
-                if (translationStatus == TranslationStreamerStatus.PREVIEW) {
+                if (viewState == StreamerViewState.PREVIEW || viewState == StreamerViewState.PREVIEW_REOPENED) {
                     Preview(
-                        onCloseClicked = closeFromPreview,
+                        onCloseClicked = onCloseClicked,
                         changeFacing = changeFacing,
-                        selectedFacing = selectedFacing,
+                        selectedStreamerFacing = selectedStreamerFacing,
                         startBroadCast = startBroadCast
                     )
                 }
-                if (translationStatus == TranslationStreamerStatus.STREAM || translationStatus == TranslationStreamerStatus.EXPIRED) {
+                if (viewState == StreamerViewState.STREAM || viewState == StreamerViewState.EXPIRED) {
                     if (isPortrait) {
                         OnStreamTopBarPortrait(
                             meetingModel = meetingModel,
@@ -174,11 +173,11 @@ fun TranslationStreamerContent(
                         )
                     }
                 }
-                if (translationStatus == TranslationStreamerStatus.COMPLETED) {
+                if (viewState == StreamerViewState.COMPLETED) {
                     CompletedPortrait(onToChatPressed = onToChatPressed)
                 }
             }
-            if (translationStatus == TranslationStreamerStatus.STREAM && isPortrait) {
+            if (viewState == StreamerViewState.STREAM && isPortrait) {
                 BottomBarPortrait(
                     cameraEnabled = cameraEnabled,
                     microphoneEnabled = microphoneEnabled,
@@ -195,7 +194,7 @@ fun TranslationStreamerContent(
 fun Preview(
     onCloseClicked: () -> Unit,
     changeFacing: () -> Unit,
-    selectedFacing: Facing,
+    selectedStreamerFacing: StreamerFacing,
     startBroadCast: () -> Unit
 ) {
     Column(
@@ -222,7 +221,7 @@ fun Preview(
         Spacer(modifier = Modifier.weight(1f))
         CameraOrientationRow(
             onChange = changeFacing,
-            selectedFacing = selectedFacing
+            selectedStreamerFacing = selectedStreamerFacing
         )
         Spacer(modifier = Modifier.height(12.dp))
         GradientButton(

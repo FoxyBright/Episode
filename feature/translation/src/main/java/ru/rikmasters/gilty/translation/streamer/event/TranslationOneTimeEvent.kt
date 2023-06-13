@@ -1,15 +1,13 @@
 package ru.rikmasters.gilty.translation.streamer.event
 
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
+
 sealed interface TranslationOneTimeEvent {
-    data class OnError(val message: String) : TranslationOneTimeEvent
-    data class TranslationExtended(val duration: String? = null) : TranslationOneTimeEvent
-    object CompleteTranslation : TranslationOneTimeEvent
-    object FromExpiredToPreview : TranslationOneTimeEvent
-    object TranslationExpired : TranslationOneTimeEvent
-    object ReconnectAfterOver : TranslationOneTimeEvent
-    object Reconnect : TranslationOneTimeEvent
-    object ShowWeakConnectionSnackbar : TranslationOneTimeEvent
-    object ShowMicroDisabledSnackbar : TranslationOneTimeEvent
+    data class StartStream(val rtmpUrl: String) : TranslationOneTimeEvent
     data class ToggleCamera(val value: Boolean) : TranslationOneTimeEvent
     data class ToggleMicrophone(val value: Boolean) : TranslationOneTimeEvent
+    object CompleteTranslation : TranslationOneTimeEvent
+    data class ChangeFacing(val facing: StreamerFacing) : TranslationOneTimeEvent
+    data class OnError(val message: String) : TranslationOneTimeEvent
+
 }

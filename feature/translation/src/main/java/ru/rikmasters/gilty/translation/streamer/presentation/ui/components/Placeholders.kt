@@ -197,50 +197,28 @@ fun NoConnection(
 }
 
 @Composable
-fun CameraOffMicOff(
+fun MicroWave(
     meetingModel: FullMeetingModel?,
     modifier: Modifier
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        GCachedImage(
-            url = meetingModel?.organizer?.avatar?.thumbnail?.url,
-            modifier = Modifier
-                .size(90.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.ic_microphone_off_voice),
-            contentDescription = "Microphone off",
-            tint = Color.Unspecified
-        )
-    }
+    Icon(
+        painter = painterResource(id = R.drawable.ic_microphone_off_voice),
+        contentDescription = "Microphone off",
+        tint = Color.Unspecified
+    )
+    // TODO: Сделать полоску голоса
 }
 
 @Composable
-fun CameraOff(
+fun ProfileAvatar(
     meetingModel: FullMeetingModel?,
     modifier: Modifier
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        GCachedImage(
-            url = meetingModel?.organizer?.avatar?.thumbnail?.url,
-            modifier = Modifier
-                .size(90.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-        // TODO: Сделать полоску голоса
-    }
+    GCachedImage(
+        url = meetingModel?.organizer?.avatar?.thumbnail?.url,
+        modifier = Modifier
+            .size(90.dp)
+            .clip(CircleShape),
+        contentScale = ContentScale.Crop
+    )
 }

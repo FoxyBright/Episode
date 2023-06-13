@@ -40,7 +40,7 @@ import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
 import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.streamer.model.Facing
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 
 @Composable
 fun CameraItem(
@@ -363,7 +363,7 @@ fun MembersCountItem(
 @Composable
 fun CameraOrientationRow(
     onChange: () -> Unit,
-    selectedFacing: Facing,
+    selectedStreamerFacing: StreamerFacing,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -372,7 +372,7 @@ fun CameraOrientationRow(
         Surface(
             modifier = Modifier
                 .clickable { onChange() },
-            color = if (selectedFacing == Facing.FRONT) {
+            color = if (selectedStreamerFacing == StreamerFacing.FRONT) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent
@@ -392,7 +392,7 @@ fun CameraOrientationRow(
         Surface(
             modifier = Modifier
                 .clickable { onChange() },
-            color = if (selectedFacing == Facing.BACK) {
+            color = if (selectedStreamerFacing == StreamerFacing.BACK) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent

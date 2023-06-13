@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.translation.viewer.presentation.ui.logic
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.Log
 import android.view.TextureView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -60,15 +59,14 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.blur
-import ru.rikmasters.gilty.shared.shared.GAlertDarkTheme
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.shared.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.CameraOff
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.CameraOffMicOff
+import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.ProfileAvatar
+import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroWave
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.LowConnectionMicroOff
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.LowConnectionMicroOffVideoOff
 import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroInactiveViewerSnackbar
@@ -79,7 +77,6 @@ import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.WeakC
 import ru.rikmasters.gilty.translation.viewer.event.TranslationViewerEvent
 import ru.rikmasters.gilty.translation.viewer.event.TranslationViewerOneTimeEvents
 import ru.rikmasters.gilty.translation.viewer.model.TranslationViewerStatus
-import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.OnLifecycleEvent
 import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.VideoTextureViewRenderer
 import ru.rikmasters.gilty.translation.viewer.presentation.ui.content.TranslationViewerScreenContent
 import ru.rikmasters.gilty.translation.viewer.viewmodel.TranslationViewerViewModel
@@ -482,7 +479,7 @@ fun TranslationViewerScreenLogic(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                CameraOff(
+                ProfileAvatar(
                     meetingModel = screenState.meetingModel,
                     modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         Modifier
@@ -501,7 +498,7 @@ fun TranslationViewerScreenLogic(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                CameraOffMicOff(
+                MicroWave(
                     meetingModel = screenState.meetingModel,
                     modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         Modifier
@@ -603,6 +600,7 @@ fun TranslationViewerScreenLogic(
                     }
                 )
             }
+            /*
             GAlertDarkTheme(
                 show = showComplainDialog,
                 success = Pair(stringResource(id = R.string.translations_viewer_complain_posiitive_nex)) {
@@ -630,6 +628,7 @@ fun TranslationViewerScreenLogic(
                     showExitDialog = false
                 }
             )
+             */
         }
     }
 }

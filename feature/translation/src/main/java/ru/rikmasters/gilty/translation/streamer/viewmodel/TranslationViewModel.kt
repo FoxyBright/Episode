@@ -3,15 +3,23 @@ package ru.rikmasters.gilty.translation.streamer.viewmodel
 import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
@@ -19,17 +27,27 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.extentions.Duration
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
-import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel.CAMERA
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel.MICROPHONE
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel.COMPLETED
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
-import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
-import ru.rikmasters.gilty.translation.shared.model.ConnectionStatus
 import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
 import ru.rikmasters.gilty.translation.streamer.event.TranslationOneTimeEvent
-import ru.rikmasters.gilty.translation.streamer.model.Facing
-import ru.rikmasters.gilty.translation.streamer.model.TranslationStreamerStatus
-import ru.rikmasters.gilty.translation.streamer.model.TranslationStreamerUiState
+import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing.BACK
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing.FRONT
+import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
+import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD.RECONNECTING
+import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD.RECONNECT_FAILED
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.BROADCAST_EXTENDED
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.MICRO_OFF
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.WEAK_CONNECTION
+import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState.PREVIEW
+import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState.STREAM
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import java.util.Timer
@@ -44,8 +62,101 @@ class TranslationViewModel : ViewModel() {
     private var pingTimer: Timer? = Timer()
     private var durationTimer: Timer? = Timer()
 
-    private val _translationStreamerUiState = MutableStateFlow(TranslationStreamerUiState())
-    val translationStreamerUiState = _translationStreamerUiState.asStateFlow()
+    private val _membersCount = MutableStateFlow(0)
+    val membersCount = _membersCount.asStateFlow()
+
+    private val retryCount = MutableStateFlow(8)
+
+    private val _additionalTime = MutableStateFlow("")
+    val additionalTime = _additionalTime.asStateFlow()
+
+    private val _remainTime = MutableStateFlow("")
+    val remainTime = _remainTime.asStateFlow()
+
+    private val _translation = MutableStateFlow<TranslationInfoModel?>(null)
+    val translation = _translation.onEach {
+        it?.let { translation ->
+            startDurationTimer()
+            _oneTimeEvent.send(TranslationOneTimeEvent.StartStream(it.rtmp ?: ""))
+            _translationStatus.value = translation.status
+            _microphone.value = translation.microphone
+            _camera.value = translation.camera
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
+    private val _meeting = MutableStateFlow<FullMeetingModel?>(null)
+    val meeting = _meeting.asStateFlow()
+
+    private val _translationStatus = MutableStateFlow<TranslationStatusModel?>(null)
+    val translationStatus = _translationStatus.onEach {
+        it?.let { translationStatus ->
+            when (translationStatus) {
+                TranslationStatusModel.ACTIVE -> {
+                    _hudState.value = null
+                }
+
+                TranslationStatusModel.EXPIRED -> {
+                    _streamerViewState.value = StreamerViewState.EXPIRED
+                }
+
+                COMPLETED -> {
+                    _streamerViewState.value = StreamerViewState.COMPLETED
+                }
+
+                else -> {}
+            }
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
+    private val _microphone = MutableStateFlow(true)
+    val microphone = _microphone.onEach { value ->
+        _oneTimeEvent.send(TranslationOneTimeEvent.ToggleMicrophone(value))
+        _translation.value?.id?.let {
+            translationRepository.sendSignal(it, MICROPHONE, value)
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), true)
+
+    private val _camera = MutableStateFlow(true)
+    val camera = _camera.onEach { value ->
+        _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(value))
+        _translation.value?.id?.let {
+            translationRepository.sendSignal(it, CAMERA, value)
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), true)
+
+    private val _facing = MutableStateFlow(FRONT)
+    val facing = _facing.onEach { value ->
+        _oneTimeEvent.send(TranslationOneTimeEvent.ChangeFacing(value))
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), FRONT)
+
+    private val _hudState = MutableStateFlow<StreamerHUD?>(null)
+    val hudState = _hudState.asStateFlow()
+
+    private val _streamerViewState = MutableStateFlow(PREVIEW)
+    val streamerViewState = _streamerViewState.asStateFlow()
+
+    val placeHolderVisible = combine(_hudState, _streamerViewState) { hud, state ->
+        Pair(hud, state)
+    }.map { (hud, state) ->
+        when(state) {
+            STREAM -> {
+                hud == null
+            }
+            else -> false
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
+
+    private val _streamerSnackbarState = MutableStateFlow<StreamerSnackbarState?>(null)
+    @OptIn(FlowPreview::class)
+    val streamerSnackbarState = _streamerSnackbarState
+        .transform { value ->
+            emit(value)
+            delay(2000)
+            emit(null)
+        }
+        .debounce(2000)
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
 
@@ -55,7 +166,7 @@ class TranslationViewModel : ViewModel() {
     val query = _query.asStateFlow()
 
     val messages = reloadChat.flatMapLatest {
-        _translationStreamerUiState.value.translationInfo?.id?.let {
+        _translation.value?.id?.let {
             translationRepository.getMessages(
                 translationId = it
             )
@@ -68,7 +179,7 @@ class TranslationViewModel : ViewModel() {
     ) { reload, query ->
         Pair(reload, query)
     }.flatMapLatest { (_, query) ->
-        _translationStreamerUiState.value.translationInfo?.id?.let {
+        _translation.value?.id?.let {
             translationRepository.getConnectedUsers(
                 translationId = it,
                 query = query
@@ -79,7 +190,53 @@ class TranslationViewModel : ViewModel() {
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->
-                handleSocketEvents(socketEvent)
+                when (socketEvent) {
+                    TranslationCallbackEvents.MessageReceived -> {
+                        reloadChat.value = !reloadChat.value
+                    }
+
+                    TranslationCallbackEvents.TranslationCompleted -> {
+                        _translationStatus.value = COMPLETED
+                    }
+
+                    TranslationCallbackEvents.TranslationExpired -> {
+                        _translationStatus.value = TranslationStatusModel.EXPIRED
+                    }
+
+                    is TranslationCallbackEvents.UserConnected -> {
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.SignalReceived -> {
+                        if (socketEvent.signal.signal == MICROPHONE) {
+                            if (!socketEvent.signal.value) {
+                                coroutineScope.launch {
+                                    _streamerSnackbarState.value = MICRO_OFF
+                                }
+                            }
+                        }
+                    }
+
+                    is TranslationCallbackEvents.UserDisconnected -> {
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.UserKicked -> {
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.TranslationExtended -> {
+                        handleTranslationAppended(
+                            socketEvent.completedAt, socketEvent.duration
+                        )
+                    }
+
+                    is TranslationCallbackEvents.MembersCountChanged -> {
+                        _membersCount.value = socketEvent.count
+                    }
+
+                    else -> {}
+                }
             }
         }
     }
@@ -99,12 +256,24 @@ class TranslationViewModel : ViewModel() {
                 stopDurationTimer()
             }
 
+            TranslationEvent.EnterBackground -> {
+                //TODO: Destroy RTMP
+                disconnectSocket()
+                stopPinging()
+            }
+
+            is TranslationEvent.EnterForeground -> {
+                loadTranslationInfo(event.meetingId)
+                connectSocket(event.meetingId)
+                startPinging()
+            }
+
             TranslationEvent.ChangeFacing -> {
-                changeFacing()
+                _facing.value = if (_facing.value == FRONT) BACK else FRONT
             }
 
             is TranslationEvent.AppendTranslation -> {
-                translationInfo { info ->
+                _translation.value?.let { info ->
                     extendTranslation(
                         translationId = info.id,
                         appendMinutes = (event.appendMinutes).toLong()
@@ -113,276 +282,120 @@ class TranslationViewModel : ViewModel() {
             }
 
             TranslationEvent.CompleteTranslation -> {
-                completeTranslation()
-            }
-
-            TranslationEvent.ChangeUiToPreview -> {
-                changeUiToPreview()
-            }
-
-            TranslationEvent.ChangeUiToStream -> {
-                changeUiToStream()
-            }
-
-            is TranslationEvent.ChatBottomSheetOpened -> {
-                if (event.isOpened) {
-                    connectToChat()
-                } else {
-                    disconnectFromChat()
+                _translationStatus.value = COMPLETED
+                _translation.value?.let { info ->
+                    coroutineScope.launch {
+                        translationRepository.endTranslation(
+                            translationId = info.id
+                        )
+                    }
+                }
+                coroutineScope.launch {
+                    _oneTimeEvent.send(
+                        TranslationOneTimeEvent.CompleteTranslation
+                    )
                 }
             }
 
+            TranslationEvent.ChangeUiToPreview -> {
+                _streamerViewState.value = PREVIEW
+            }
+
+            TranslationEvent.ChangeUiToStream -> {
+                _streamerViewState.value = STREAM
+            }
+
+            is TranslationEvent.ChatBottomSheetOpened -> {
+                /*
+                if (event.isOpened) {
+                    translationInfo { info ->
+                        coroutineScope.launch {
+                            translationRepository.connectToTranslationChat(
+                                translationId = info.id
+                            )
+                        }
+                        reloadChat.value = !reloadChat.value
+                    }
+                } else {
+                    coroutineScope.launch {
+                        translationRepository.disconnectFromTranslationChat()
+                    }
+                    reloadChat.value = !reloadChat.value
+                }
+
+                 */
+            }
+
             is TranslationEvent.KickUser -> {
-                kickUser(event)
+                _translation.value?.let { translation ->
+                    coroutineScope.launch {
+                        event.user.id?.let { userId ->
+                            translationRepository.kickUser(
+                                translationId = translation.id,
+                                userId = userId
+                            )
+                        }
+                    }
+                }
             }
 
             TranslationEvent.Reconnect -> {
-                reconnect()
+                retryCount.value = 8
+                _translation.value?.id?.let {
+                    loadTranslationInfo(it)
+                }
+                _hudState.value = RECONNECTING
             }
 
             is TranslationEvent.SendMessage -> {
-                sendMessage(event.text)
-            }
-
-            TranslationEvent.StartStreaming -> {
-                startStreaming()
-            }
-
-            TranslationEvent.StopStreaming -> {
-                stopStreaming()
+                _translation.value?.let { translation ->
+                    coroutineScope.launch {
+                        translationRepository.sendMessage(
+                            translationId = translation.id,
+                            text = event.text
+                        )
+                    }
+                }
             }
 
             is TranslationEvent.UserBottomSheetOpened -> {
                 if (event.isOpened) {
-                    reloadMembers()
+                    reloadMembers.value = !reloadMembers.value
                 }
             }
 
             is TranslationEvent.UserBottomSheetQueryChanged -> {
-                changeUserQuery(event.newQuery)
+                _query.value = event.newQuery
             }
 
             TranslationEvent.ToggleCamera -> {
-                toggle(toggleCamera = true)
+                _camera.value = !_camera.value
             }
 
             TranslationEvent.ToggleMicrophone -> {
-                toggle(toggleCamera = false)
+                _microphone.value = !_microphone.value
+            }
+
+            is TranslationEvent.ProcessRTMPStatus -> {
+                when(event.status) {
+                    RTMPStatus.CONNECTED -> { _hudState.value = null }
+                    RTMPStatus.FAILED -> {
+                        if (retryCount.value > 0) {
+                            _hudState.value = RECONNECTING
+                        } else {
+                            _hudState.value = RECONNECT_FAILED
+                        }
+                        retryCount.value = retryCount.value - 1
+                    }
+                }
             }
 
             TranslationEvent.LowBitrate -> {
-                processLowBitrate()
-            }
-
-            TranslationEvent.ReconnectAttemptsOver -> {
-                reconnectAttemptsOver()
-            }
-
-            TranslationEvent.ReconnectAfterAttemptsOver -> {
-                reconnectAfterAttemptsOver()
-            }
-
-            TranslationEvent.ConnectionSucceed -> {
-                handleSucceedConnection()
+                _streamerSnackbarState.value = WEAK_CONNECTION
             }
         }
     }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private fun handleSucceedConnection() {
-        _translationStreamerUiState.update {
-            it.copy(
-                connectionStatus = ConnectionStatus.SUCCESS
-            )
-        }
-    }
-    private fun reconnectAfterAttemptsOver() {
-        disconnectAndDoSmth()
-        _translationStreamerUiState.update {
-            it.copy(
-                connectionStatus = ConnectionStatus.RECONNECTING
-            )
-        }
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.ReconnectAfterOver
-            )
-        }
-    }
-    private fun reconnectAttemptsOver() {
-        _translationStreamerUiState.update {
-            it.copy(
-                connectionStatus = ConnectionStatus.NO_CONNECTION
-            )
-        }
-    }
-    private fun reconnect() {
-        _translationStreamerUiState.update {
-            it.copy(
-                connectionStatus = ConnectionStatus.RECONNECTING
-            )
-        }
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.Reconnect
-            )
-        }
-    }
-    private fun processLowBitrate() {
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.ShowWeakConnectionSnackbar
-            )
-        }
-    }
-    private fun handleSignal(signal: TranslationSignalModel) {
-        if (signal.signal == TranslationSignalTypeModel.MICROPHONE) {
-            if (!signal.value) {
-                coroutineScope.launch {
-                    _oneTimeEvent.send(
-                        TranslationOneTimeEvent.ShowMicroDisabledSnackbar
-                    )
-                }
-            }
-        }
-    }
-
-    private fun toggle(toggleCamera: Boolean) {
-        translationInfo { info ->
-            coroutineScope.launch {
-                translationRepository.sendSignal(
-                    translationId = info.id,
-                    signalType = if (toggleCamera) TranslationSignalTypeModel.CAMERA
-                    else TranslationSignalTypeModel.MICROPHONE,
-                    value = if (toggleCamera) !info.camera else !info.microphone
-                ).on(
-                    success = {
-                        _translationStreamerUiState.update {
-                            it.copy(
-                                translationInfo = it.translationInfo?.copy(
-                                    camera = if (toggleCamera) !info.camera else info.camera,
-                                    microphone = if (toggleCamera) info.microphone else !info.microphone
-                                )
-                            )
-                        }
-                        _oneTimeEvent.send(
-                            if (toggleCamera) TranslationOneTimeEvent.ToggleCamera(value = !info.camera)
-                            else TranslationOneTimeEvent.ToggleMicrophone(value = !info.microphone)
-                        )
-                    },
-                    error = {},
-                    loading = {}
-                )
-            }
-        }
-    }
-
-    private fun changeUiToStream() {
-        _translationStreamerUiState.update {
-            it.copy(
-                translationStatus = TranslationStreamerStatus.STREAM
-            )
-        }
-    }
-
-    private fun changeUiToPreview() {
-        _translationStreamerUiState.update {
-            it.copy(
-                translationStatus = TranslationStreamerStatus.PREVIEW
-            )
-        }
-    }
-
-    private fun sendMessage(message: String) {
-        translationInfo { translation ->
-            coroutineScope.launch {
-                translationRepository.sendMessage(
-                    translationId = translation.id,
-                    text = message
-                )
-            }
-        }
-    }
-
-    private fun changeUserQuery(query: String) {
-        _query.value = query
-    }
-
-    private fun stopStreaming() {
-        coroutineScope.launch {
-            translationRepository.disconnectFromTranslation()
-            stopPinging()
-        }
-    }
-
-    private fun startStreaming() {
-        translationInfo { translation ->
-            coroutineScope.launch {
-                connectSocket(translation.id)
-                startPinging()
-                startDurationTimer()
-            }
-        }
-    }
-
-    private fun reloadMembers() {
-        reloadMembers.value = !reloadMembers.value
-    }
-
-    private fun connectToChat() {
-        translationInfo { info ->
-            coroutineScope.launch {
-                translationRepository.connectToTranslationChat(
-                    translationId = info.id
-                )
-            }
-            reloadChat.value = !reloadChat.value
-        }
-    }
-
-    private fun disconnectFromChat() {
-        coroutineScope.launch {
-            translationRepository.disconnectFromTranslationChat()
-        }
-        reloadChat.value = !reloadChat.value
-    }
-
-    private fun kickUser(event: TranslationEvent.KickUser) {
-        translationInfo { translation ->
-            coroutineScope.launch {
-                event.user.id?.let { userId ->
-                    translationRepository.kickUser(
-                        translationId = translation.id,
-                        userId = userId
-                    )
-                }
-            }
-        }
-    }
-
-    private fun changeFacing() {
-        _translationStreamerUiState.update {
-            it.copy(
-                facing = if (it.facing == Facing.BACK) Facing.FRONT else Facing.BACK
-            )
-        }
-    }
-
     private fun extendTranslation(translationId: String, appendMinutes: Long) {
-        if (_translationStreamerUiState.value.translationStatus == TranslationStreamerStatus.EXPIRED) {
-            _translationStreamerUiState.update {
-                it.copy(
-                    onPreviewFromExpired = true,
-                    translationStatus = TranslationStreamerStatus.PREVIEW
-                )
-            }
-            coroutineScope.launch {
-                _oneTimeEvent.send(
-                    TranslationOneTimeEvent.FromExpiredToPreview
-                )
-            }
-        }
         coroutineScope.launch {
             translationRepository.extendTranslation(
                 translationId = translationId,
@@ -409,32 +422,6 @@ class TranslationViewModel : ViewModel() {
         }
     }
 
-    private fun completeTranslation() {
-        translationInfo { translation ->
-            coroutineScope.launch {
-                translationRepository.endTranslation(
-                    translationId = translation.id
-                )
-            }
-        }
-        _translationStreamerUiState.update {
-            it.copy(
-                translationStatus = TranslationStreamerStatus.COMPLETED
-            )
-        }
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.CompleteTranslation
-            )
-        }
-    }
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      REMAIN TIME METHODS
-     */
     private fun startDurationTimer() {
         if (durationTimer == null) {
             durationTimer = Timer()
@@ -454,7 +441,7 @@ class TranslationViewModel : ViewModel() {
     }
 
     private fun calculateTimeDiff() {
-        translationInfo { info ->
+        _translation.value?.let { info ->
             val current = LocalDateTime.nowZ()
             val duration = Duration.between(
                 current, info.completedAt
@@ -482,17 +469,13 @@ class TranslationViewModel : ViewModel() {
                 "$seconds"
             }
             val diff = "$hourString$minuteString:$secondString"
-            _translationStreamerUiState.update {
-                it.copy(
-                    remainTime = diff
-                )
-            }
+            _remainTime.value = diff
         }
     }
 
     private fun handleAppendTime(duration: Int? = null) {
         duration?.let {
-            translationInfo { model ->
+            _translation.value?.let { model ->
                 if (LocalDateTime.nowZ().isBefore(model.completedAt)) {
                     val hour = (duration / 60).takeIf { it > 0 }
                     val hourString = hour?.let { "$hour:" } ?: ""
@@ -504,31 +487,15 @@ class TranslationViewModel : ViewModel() {
                             "$minute"
                         }
                     } ?: "$minute"
-                    coroutineScope.launch {
-                        _oneTimeEvent.send(
-                            TranslationOneTimeEvent.TranslationExtended(
-                                duration = "$hourString$minuteString:00"
-                            )
-                        )
-                    }
+                    _streamerSnackbarState.value = BROADCAST_EXTENDED
+                    _additionalTime.value = "$hourString$minuteString:00"
                 }
             }
         } ?: kotlin.run {
-            coroutineScope.launch {
-                _oneTimeEvent.send(
-                    TranslationOneTimeEvent.TranslationExtended(
-                        duration = null
-                    )
-                )
-            }
+            _streamerSnackbarState.value = BROADCAST_EXTENDED
         }
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-     PINGING
-     */
     private fun startPinging() {
         if (pingTimer == null) {
             pingTimer = Timer()
@@ -536,7 +503,7 @@ class TranslationViewModel : ViewModel() {
         pingTimer?.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
-                    translationInfo { info ->
+                    _translation.value?.let { info ->
                         coroutineScope.launch {
                             translationRepository.ping(
                                 translationId = info.id
@@ -553,40 +520,11 @@ class TranslationViewModel : ViewModel() {
         pingTimer = null
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-       SOCKET HANDLING
-     */
     private fun connectSocket(meetingId: String) {
         coroutineScope.launch {
             translationRepository.connectToTranslation(
                 translationId = meetingId
-            )
-        }
-    }
-
-    private fun disconnectAndDoSmth() {
-        coroutineScope.launch {
-            translationRepository.disconnectFromTranslation().on(
-                success = {
-                    translationInfo {
-                        connectSocket(it.id)
-                    }
-                },
-                loading = {},
-                error = {
-                    meetInfo {
-                        coroutineScope.launch {
-                            translationRepository.disconnectWebSocket()
-                            Log.d("TEST","Connect")
-                            translationRepository.connectWebSocket(
-                                userId = it.userId,
-                                translationId = it.id
-                            )
-                        }
-                    }
-                }
             )
         }
     }
@@ -597,97 +535,19 @@ class TranslationViewModel : ViewModel() {
         }
     }
 
-    private fun handleSocketEvents(socketEvent: TranslationCallbackEvents) {
-        when (socketEvent) {
-            TranslationCallbackEvents.MessageReceived -> { handleMessageReceived() }
-            TranslationCallbackEvents.TranslationCompleted -> { handleBroadcastCompletion() }
-            TranslationCallbackEvents.TranslationExpired -> { handleTranslationExpired() }
-            is TranslationCallbackEvents.UserConnected -> { handleUserConnected() }
-            is TranslationCallbackEvents.SignalReceived -> { handleSignal(socketEvent.signal) }
-            is TranslationCallbackEvents.UserDisconnected -> { handleUserDisconnected() }
-            is TranslationCallbackEvents.UserKicked -> { handleUserKicked() }
-            is TranslationCallbackEvents.TranslationExtended -> {
-                handleTranslationAppended(
-                    socketEvent.completedAt, socketEvent.duration
-                )
-            }
-            is TranslationCallbackEvents.MembersCountChanged -> {
-                handleMembersCountChanged(socketEvent.count)
-            }
-            else -> {}
-        }
-    }
-
-    private fun handleMessageReceived() {
-        reloadChat.value = !reloadChat.value
-    }
-
     private fun handleTranslationAppended(completedAt: LocalDateTime, duration: Int) {
         coroutineScope.launch {
             handleAppendTime(duration)
             delay(2000)
-            _translationStreamerUiState.update {
-                it.copy(
-                    translationInfo = it.translationInfo?.copy(
-                        status = TranslationStatusModel.ACTIVE,
-                        completedAt = completedAt
-                    )
+            _translation.update {
+                it?.copy(
+                    status = TranslationStatusModel.ACTIVE,
+                    completedAt = completedAt
                 )
             }
         }
     }
 
-    private fun handleMembersCountChanged(count: Int) {
-        _translationStreamerUiState.update {
-            it.copy(
-                membersCount = count
-            )
-        }
-    }
-
-    private fun handleUserKicked() {
-        reloadMembers.value = !reloadMembers.value
-    }
-
-    private fun handleUserDisconnected() {
-        reloadMembers.value = !reloadMembers.value
-    }
-
-    private fun handleUserConnected() {
-        reloadMembers.value = !reloadMembers.value
-    }
-
-    private fun handleTranslationExpired() {
-        _translationStreamerUiState.update {
-            it.copy(
-                translationStatus = TranslationStreamerStatus.EXPIRED
-            )
-        }
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.TranslationExpired
-            )
-        }
-    }
-
-    private fun handleBroadcastCompletion() {
-        _translationStreamerUiState.update {
-            it.copy(
-                translationStatus = TranslationStreamerStatus.COMPLETED
-            )
-        }
-        coroutineScope.launch {
-            _oneTimeEvent.send(
-                TranslationOneTimeEvent.CompleteTranslation
-            )
-        }
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      LOAD DETAILS METHODS
-     */
     private fun loadTranslationInfo(
         meetingId: String
     ) {
@@ -696,19 +556,7 @@ class TranslationViewModel : ViewModel() {
                 translationId = meetingId
             ).on(
                 loading = {},
-                success = { translation ->
-                    _translationStreamerUiState.update {
-                        it.copy(
-                            translationInfo = translation,
-                            translationStatus = when (translation.status) {
-                                TranslationStatusModel.INACTIVE -> TranslationStreamerStatus.PREVIEW
-                                TranslationStatusModel.ACTIVE -> TranslationStreamerStatus.PREVIEW
-                                TranslationStatusModel.EXPIRED -> TranslationStreamerStatus.EXPIRED
-                                TranslationStatusModel.COMPLETED -> TranslationStreamerStatus.COMPLETED
-                            }
-                        )
-                    }
-                },
+                success = { translation -> _translation.value = translation },
                 error = { cause ->
                     cause.serverMessage?.let {
                         _oneTimeEvent.send(
@@ -736,13 +584,7 @@ class TranslationViewModel : ViewModel() {
                 meetId = meetingId
             ).on(
                 loading = {},
-                success = { meetingModel ->
-                    _translationStreamerUiState.update {
-                        it.copy(
-                            meetingModel = meetingModel
-                        )
-                    }
-                },
+                success = { meetingModel -> _meeting.value = meetingModel },
                 error = { cause ->
                     cause.serverMessage?.let {
                         _oneTimeEvent.send(
@@ -759,27 +601,6 @@ class TranslationViewModel : ViewModel() {
                     }
                 }
             )
-        }
-    }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      UTILS
-     */
-    private fun translationInfo(
-        block: (TranslationInfoModel) -> Unit
-    ) {
-        _translationStreamerUiState.value.translationInfo?.let { info ->
-            block(info)
-        }
-    }
-
-    private fun meetInfo(
-        block: (FullMeetingModel) -> Unit
-    ) {
-        _translationStreamerUiState.value.meetingModel?.let { info ->
-            block(info)
         }
     }
 }
