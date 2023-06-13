@@ -22,11 +22,15 @@ fun MeetingsListContent(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-
     states.forEachIndexed { index, (meeting, state) ->
         EpisodeCard(
-            meeting, state, (index < states.lastIndex), modifier,
-            notInteresting, onSelect, onClick
+            meeting = meeting,
+            state = state,
+            stack = (index < states.lastIndex),
+            modifier = modifier,
+            notInteresting = notInteresting,
+            onSelect = onSelect,
+            onClick = onClick
         )
     }
 }

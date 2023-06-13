@@ -324,7 +324,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if (today) -(3).dp
+                        if(today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -349,27 +349,31 @@ private fun Content(
 ) {
     Box {
         if(meetings.size < 2) MeetCard(
-            modifier, EMPTY, hasFilters = hasFilters,
+            modifier = modifier,
+            type = EMPTY,
+            hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
-        if(state && meetings.isNotEmpty()) MeetingGridContent(
-            modifier = modifier.fillMaxSize(),
-            meetings = meetings
-        ) { callback?.onRespond(it) }
-        else MeetingsListContent(
-            states = meetings.map { item ->
-                item to rememberSwipeableCardState()
-            },
-            modifier = modifier.padding(top = 24.dp),
-            notInteresting = { meet, it ->
-                callback?.meetInteraction(LEFT, meet, it)
-            },
-            onSelect = { meet, it ->
-                callback?.onRespond(meet)
-                callback?.meetInteraction(RIGHT, meet, it)
-            }
-        ) { callback?.onMeetClick(it) }
+        if(state && meetings.isNotEmpty())
+            MeetingGridContent(
+                modifier = modifier.fillMaxSize(),
+                meetings = meetings
+            ) { callback?.onRespond(it) }
+        else
+            MeetingsListContent(
+                states = meetings.map { item ->
+                    item to rememberSwipeableCardState()
+                },
+                modifier = modifier.padding(top = 24.dp),
+                notInteresting = { meet, it ->
+                    callback?.meetInteraction(LEFT, meet, it)
+                },
+                onSelect = { meet, it ->
+                    callback?.onRespond(meet)
+                    callback?.meetInteraction(RIGHT, meet, it)
+                }
+            ) { callback?.onMeetClick(it) }
     }
 }
 
