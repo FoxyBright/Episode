@@ -1,9 +1,6 @@
 package ru.rikmasters.gilty.profile.viewmodel.bottoms
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +11,6 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.ItemData
 import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -56,14 +52,14 @@ class HiddenViewModel : ViewModel() {
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
 
-    var dogs by mutableStateOf(List(500) {
-        if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
-    })
+    /*    var dogs by mutableStateOf(List(500) {
+            if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
+        })*/
 
     suspend fun moveDog(fromOr: ItemPosition, toOr: ItemPosition) {
-        /*dogs = dogs.toMutableList().apply {
-            add(to.index, removeAt(from.index))
-        }*/
+        /*   dogs = dogs.toMutableList().apply {
+               add(toOr.index, removeAt(fromOr.index))
+           }*/
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photos.value.size > from && _photos.value.size > to) {

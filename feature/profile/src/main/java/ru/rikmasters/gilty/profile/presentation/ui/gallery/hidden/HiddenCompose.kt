@@ -121,14 +121,21 @@ fun HiddenBsContent(
                 }
 
                 else -> {
-                    item { GalleryButton(Modifier.weight(1f), callback) }
+                    item {
+                        GalleryButton(
+                            Modifier
+                                .weight(1f)
+                                .aspectRatio(1f), callback
+                        )
+                    }
                     items(state.viewerImages, key = { it?.id ?: "" }) { img ->
                         img?.let {
                             ReorderableItem(
                                 stateDragable,
                                 img.id,
                                 modifier = Modifier
-                                    .clip(shapes.small)
+                                    .aspectRatio(1f)
+                                .clip(shapes.large)
                             ) { isDragging ->
                                 val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                                 LazyItem(
@@ -156,33 +163,6 @@ fun HiddenBsContent(
                 }
             }
         }
-        /*   LazyVerticalGrid(
-               columns = GridCells.Fixed(3),
-               state = stateDragable.gridState,
-               contentPadding = PaddingValues(horizontal = 8.dp),
-               verticalArrangement = Arrangement.spacedBy(4.dp),
-               horizontalArrangement = Arrangement.spacedBy(4.dp),
-               modifier = modifier.reorderable(stateDragable)
-           ) {
-               items(vm.dogs, { it.key }) { item ->
-                   ReorderableItem(stateDragable, item.key) { isDragging ->
-                       val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                       Box(
-                           contentAlignment = Alignment.Center,
-                           modifier = Modifier
-                               .detectReorderAfterLongPress(stateDragable)
-                               .shadow(elevation.value)
-                               .aspectRatio(1f)
-                               .background(MaterialTheme.colors.primary)
-                       ) {
-                           Text(item.title)
-                       }
-
-                   }
-               }
-           }*/
-      //  DragTable()
-
     }
 }
 
@@ -234,8 +214,8 @@ private fun LazyItem(
 ) {
     Box(
         modifier
-            .fillMaxSize()
-            .clip(shapes.small)
+            // .fillMaxSize()
+            .clip(shapes.large)
             .clickable { onSelect(image) },
         TopEnd
     ) {
