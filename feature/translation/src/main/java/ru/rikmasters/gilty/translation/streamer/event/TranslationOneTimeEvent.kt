@@ -9,5 +9,6 @@ sealed interface TranslationOneTimeEvent {
     object CompleteTranslation : TranslationOneTimeEvent
     data class ChangeFacing(val facing: StreamerFacing) : TranslationOneTimeEvent
     data class OnError(val message: String) : TranslationOneTimeEvent
+    object ShowSnackbar : TranslationOneTimeEvent
 
 }

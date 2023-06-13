@@ -121,7 +121,6 @@ fun TestTranslationScreen(
     val cameraState by vm.camera.collectAsState()
     val hudState by vm.hudState.collectAsState()
     val facing by vm.facing.collectAsState()
-    val status by vm.translationStatus.collectAsState()
     val remainTime by vm.remainTime.collectAsState()
     val additionalTime by vm.additionalTime.collectAsState()
     val snackbarState by vm.streamerSnackbarState.collectAsState()
@@ -142,6 +141,11 @@ fun TestTranslationScreen(
     var currentDeleteUser by remember { mutableStateOf<FullUserModel?>(null) }
     var currentComplainUser by remember { mutableStateOf<FullUserModel?>(null) }
     var showExitDialog by remember { mutableStateOf(false) }
+
+    /**
+     * Snackbars
+     */
+    var isShowSnackbar by remember { mutableStateOf(false) }
 
     /**
      * BottomSheetState
@@ -359,6 +363,13 @@ fun TestTranslationScreen(
                     is TranslationOneTimeEvent.StartStream -> {
                         //TODO:
                        // startBroadCast(event.rtmpUrl)
+                    }
+                    TranslationOneTimeEvent.ShowSnackbar -> {
+                        scope.launch {
+                            isShowSnackbar = true
+                            delay(2000)
+                            isShowSnackbar = false
+                        }
                     }
                 }
             }
@@ -753,42 +764,44 @@ fun TestTranslationScreen(
                         }
                     }
                 }
-                Log.d("TEST","snackbarState $snackbarState")
-                when(snackbarState) {
-                    StreamerSnackbarState.MICRO_OFF -> {
-                        MicroInactiveSnackbar(
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                Modifier
-                                    .fillMaxHeight()
-                                    .width((configuration.screenWidthDp * 0.6).dp)
-                            } else {
-                                Modifier.fillMaxSize()
-                            }
-                        )
+                Log.d("TEST","snackbarState $snackbarState isShow $isShowSnackbar")
+                if(isShowSnackbar) {
+                    when(snackbarState) {
+                        StreamerSnackbarState.MICRO_OFF -> {
+                            MicroInactiveSnackbar(
+                                modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    Modifier
+                                        .fillMaxHeight()
+                                        .width((configuration.screenWidthDp * 0.6).dp)
+                                } else {
+                                    Modifier.fillMaxSize()
+                                }
+                            )
+                        }
+                        StreamerSnackbarState.WEAK_CONNECTION -> {
+                            WeakConnectionSnackbar(
+                                modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    Modifier
+                                        .fillMaxHeight()
+                                        .width((configuration.screenWidthDp * 0.6).dp)
+                                } else {
+                                    Modifier.fillMaxSize()
+                                }
+                            )
+                        }
+                        StreamerSnackbarState.BROADCAST_EXTENDED -> {
+                            TranslationResumedSnackbar(
+                                modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    Modifier
+                                        .fillMaxHeight()
+                                        .width((configuration.screenWidthDp * 0.6).dp)
+                                } else {
+                                    Modifier.fillMaxSize()
+                                }
+                            )
+                        }
+                        else -> {}
                     }
-                    StreamerSnackbarState.WEAK_CONNECTION -> {
-                        WeakConnectionSnackbar(
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                Modifier
-                                    .fillMaxHeight()
-                                    .width((configuration.screenWidthDp * 0.6).dp)
-                            } else {
-                                Modifier.fillMaxSize()
-                            }
-                        )
-                    }
-                    StreamerSnackbarState.BROADCAST_EXTENDED -> {
-                        TranslationResumedSnackbar(
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                Modifier
-                                    .fillMaxHeight()
-                                    .width((configuration.screenWidthDp * 0.6).dp)
-                            } else {
-                                Modifier.fillMaxSize()
-                            }
-                        )
-                    }
-                    else -> {}
                 }
             }
 

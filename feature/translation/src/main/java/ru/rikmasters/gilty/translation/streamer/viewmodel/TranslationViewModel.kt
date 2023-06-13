@@ -1,25 +1,22 @@
 package ru.rikmasters.gilty.translation.streamer.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
@@ -106,7 +103,7 @@ class TranslationViewModel : ViewModel() {
                 else -> {}
             }
         }
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+    }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
 
     private val _microphone = MutableStateFlow(true)
     val microphone = _microphone.onEach { value ->
@@ -138,24 +135,20 @@ class TranslationViewModel : ViewModel() {
     val placeHolderVisible = combine(_hudState, _streamerViewState) { hud, state ->
         Pair(hud, state)
     }.map { (hud, state) ->
-        when(state) {
+        when (state) {
             STREAM -> {
                 hud == null
             }
+
             else -> false
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
 
-    private val _streamerSnackbarState = MutableStateFlow<StreamerSnackbarState?>(null)
-    @OptIn(FlowPreview::class)
+    private val _streamerSnackbarState = MutableSharedFlow<StreamerSnackbarState?>(1, 0, BufferOverflow.DROP_OLDEST)
     val streamerSnackbarState = _streamerSnackbarState
-        .transform { value ->
-            emit(value)
-            delay(2000)
-            emit(null)
-        }
-        .debounce(2000)
-        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+        .onEach {
+            _oneTimeEvent.send(TranslationOneTimeEvent.ShowSnackbar)
+        }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
 
     private val _oneTimeEvent = Channel<TranslationOneTimeEvent>()
     val oneTimeEvent = _oneTimeEvent.receiveAsFlow()
@@ -211,7 +204,7 @@ class TranslationViewModel : ViewModel() {
                         if (socketEvent.signal.signal == MICROPHONE) {
                             if (!socketEvent.signal.value) {
                                 coroutineScope.launch {
-                                    _streamerSnackbarState.value = MICRO_OFF
+                                    _streamerSnackbarState.emit(MICRO_OFF)
                                 }
                             }
                         }
@@ -377,8 +370,11 @@ class TranslationViewModel : ViewModel() {
             }
 
             is TranslationEvent.ProcessRTMPStatus -> {
-                when(event.status) {
-                    RTMPStatus.CONNECTED -> { _hudState.value = null }
+                when (event.status) {
+                    RTMPStatus.CONNECTED -> {
+                        _hudState.value = null
+                    }
+
                     RTMPStatus.FAILED -> {
                         if (retryCount.value > 0) {
                             _hudState.value = RECONNECTING
@@ -391,10 +387,13 @@ class TranslationViewModel : ViewModel() {
             }
 
             TranslationEvent.LowBitrate -> {
-                _streamerSnackbarState.value = WEAK_CONNECTION
+                coroutineScope.launch {
+                    _streamerSnackbarState.emit(WEAK_CONNECTION)
+                }
             }
         }
     }
+
     private fun extendTranslation(translationId: String, appendMinutes: Long) {
         coroutineScope.launch {
             translationRepository.extendTranslation(
@@ -487,12 +486,16 @@ class TranslationViewModel : ViewModel() {
                             "$minute"
                         }
                     } ?: "$minute"
-                    _streamerSnackbarState.value = BROADCAST_EXTENDED
+                    coroutineScope.launch {
+                        _streamerSnackbarState.emit(BROADCAST_EXTENDED)
+                    }
                     _additionalTime.value = "$hourString$minuteString:00"
                 }
             }
         } ?: kotlin.run {
-            _streamerSnackbarState.value = BROADCAST_EXTENDED
+            coroutineScope.launch {
+                _streamerSnackbarState.emit(BROADCAST_EXTENDED)
+            }
         }
     }
 
