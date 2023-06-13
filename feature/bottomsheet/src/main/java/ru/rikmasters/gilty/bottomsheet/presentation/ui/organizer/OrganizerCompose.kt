@@ -93,7 +93,7 @@ fun OrganizerContent(
             .background(colorScheme.background)
     ) {
         TopBar(
-            username = "fsdaffadsfasdfasdfadsf${user?.username}${ // TODO Delete
+            username = "${user?.username}${
                 if (user?.age in 18..99) {
                     ", ${user?.age}"
                 } else ""
