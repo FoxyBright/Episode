@@ -6,6 +6,6 @@ enum class SortTypeModel {
 }
 
 fun SortTypeModel.getSortName():String = when(this) {
-        SortTypeModel.MEETING_DATE -> "  По дате"
-        SortTypeModel.MESSAGE_DATE -> "  По сообщению"
+        SortTypeModel.MEETING_DATE -> "По дате"
+        SortTypeModel.MESSAGE_DATE -> "По сообщению"
 }

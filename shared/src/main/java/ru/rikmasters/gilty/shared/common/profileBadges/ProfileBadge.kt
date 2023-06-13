@@ -57,7 +57,8 @@ fun ProfileBadge(
             text = group.name,
             modifier = Modifier.padding(textPadding),
             color = Color.White,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight(700), fontSize = labelSize.sp)
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight(700), fontSize = labelSize.sp),
+            maxLines = 1,
         )
     }
 }

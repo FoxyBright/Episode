@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.imePadding
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.common.extentions.vibrate
@@ -414,6 +415,7 @@ private fun Description(
         )
         Box(
             modifier = Modifier
+                .imePadding()
                 .padding(top = 12.dp)
                 .background(
                     color = colorScheme.primaryContainer,

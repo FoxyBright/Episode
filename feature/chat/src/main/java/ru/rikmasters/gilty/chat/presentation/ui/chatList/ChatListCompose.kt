@@ -403,7 +403,8 @@ fun SortTypeLabels(
                     ),
                     text = it.getSortName(),
                     isSelected = true,
-                    primary = Red
+                    primary = Red,
+                    textModifier = Modifier.padding(start = 8.dp)
                 ) {}
             }
             Row(modifier = Modifier.onGloballyPositioned { coordinates ->

@@ -43,21 +43,18 @@ class HiddenViewModel : ViewModel() {
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
 
-    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
-    val viewerImages = _viewerImages.asStateFlow()
-
     private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
     val viewerType = _viewerType.asStateFlow()
 
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
 
-    /*    var dogs by mutableStateOf(List(500) {
+  /*      var dogs by mutableStateOf(List(500) {
             if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
         })*/
 
     suspend fun moveDog(fromOr: ItemPosition, toOr: ItemPosition) {
-        /*   dogs = dogs.toMutableList().apply {
+           /*dogs = dogs.toMutableList().apply {
                add(toOr.index, removeAt(fromOr.index))
            }*/
         (fromOr.index - 1).let { from ->
@@ -69,13 +66,9 @@ class HiddenViewModel : ViewModel() {
                     }
                     _photos.emit(newList)
                     profileManager.changeAlbumPosition(fromId, to + 1).on(
-                        success = {
-                        },
-                        loading = {
-
-                        },
-                        error = {
-                        }
+                        success = {},
+                        loading = {},
+                        error = {}
                     )
                 }
             }
@@ -120,10 +113,6 @@ class HiddenViewModel : ViewModel() {
 
     suspend fun changePhotoViewType(type: PhotoViewType) {
         _viewerType.emit(type)
-    }
-
-    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
-        _viewerImages.emit(list)
     }
 
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {

@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
@@ -123,46 +124,74 @@ fun HiddenBsContent(
                 else -> {
                     item {
                         GalleryButton(
-                            Modifier
-                                .weight(1f)
-                                .aspectRatio(1f), callback
+                            modifier = Modifier
+                                .aspectRatio(1f),
+                            callback = callback
                         )
                     }
-                    items(state.viewerImages, key = { it?.id ?: "" }) { img ->
+                    items(items = state.viewerImages, key = { it?.id ?: "" }) { img ->
                         img?.let {
                             ReorderableItem(
-                                stateDragable,
-                                img.id,
+                                reorderableState = stateDragable,
+                                key = img.id,
                                 modifier = Modifier
                                     .aspectRatio(1f)
-                                .clip(shapes.large)
+                                    .detectReorderAfterLongPress(stateDragable)
+                                    .clip(shapes.large)
                             ) { isDragging ->
                                 val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                                 LazyItem(
-                                    img.thumbnail.url, Modifier
-                                        .detectReorderAfterLongPress(stateDragable)
+                                    image = img.thumbnail.url,
+                                    modifier = Modifier
+                                        .zIndex(if(isDragging) 1f else 2f)
                                         .shadow(elevation.value),
-                                    { callback?.onSelectImage(img) }
-                                ) { callback?.onDeleteImage(img) }
+                                    onSelect = { callback?.onSelectImage(img) },
+                                    onDelete = { callback?.onDeleteImage(img) }
+                                )
                             }
                         }
                     }
-                    if (state.photoList.loadState.append is LoadState.Loading) {
+                   if (state.photoList.loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(3) }) {
-                            PagingLoader(state.photoList.loadState)
+                            PagingLoader(state = state.photoList.loadState)
                         }
                     }
 
-                    items(3) {
+                    /*items(3) {
                         Spacer(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxSize()
                                 .weight(1f)
                         )
-                    }
+                    }*/
                 }
             }
         }
+        /*LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            state = stateDragable.gridState,
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = modifier.reorderable(stateDragable)
+        ) {
+            items(vm.dogs, { it.key }) { item ->
+                ReorderableItem(stateDragable, item.key) { isDragging ->
+                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .detectReorderAfterLongPress(stateDragable)
+                            .shadow(elevation.value)
+                            .aspectRatio(1f)
+                            .background(Color.Red)
+                    ) {
+                        Text(item.title)
+                    }
+
+                }
+            }
+        }*/
     }
 }
 
@@ -181,7 +210,7 @@ private fun GalleryButton(
         colors = cardColors(Transparent)
     ) {
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(colors.grayButton),
             Center

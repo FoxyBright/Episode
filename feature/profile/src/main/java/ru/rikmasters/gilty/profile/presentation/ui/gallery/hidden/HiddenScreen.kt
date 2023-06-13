@@ -59,7 +59,6 @@ fun HiddenBsScreen(
                 scope.launch {
                     vm.changePhotoViewType(PhotoViewType.PHOTO)
                     vm.setPhotoViewSelected(image)
-                    vm.setPhotoViewImages(photoList.itemSnapshotList.items)
                     vm.changePhotoViewState(true)
                 }
             }

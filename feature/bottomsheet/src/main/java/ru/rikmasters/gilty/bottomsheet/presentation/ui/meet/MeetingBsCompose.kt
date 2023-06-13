@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -420,6 +422,7 @@ private fun MeetContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TopBar(
     meet: FullMeetingModel,
@@ -453,7 +456,7 @@ private fun TopBar(
                 text = meet.tags
                     .joinToString(", ")
                     { it.title },
-                modifier = Modifier.padding(end = 9.dp),
+                modifier = Modifier.padding(end = 9.dp).basicMarquee(),
                 color = colorScheme.tertiary,
                 style = typography.labelLarge,
                 overflow = Ellipsis,

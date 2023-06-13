@@ -97,6 +97,7 @@ fun GChip(
     secondary: Color = colorScheme.secondary,
     empty: Color = colorScheme.primaryContainer,
     border: Color = colors.chipGray,
+    textModifier:Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Box(
@@ -138,7 +139,7 @@ fun GChip(
                 )
         ) {
             Text(
-                text, Modifier.padding(16.dp, 6.dp),
+                text, modifier = Modifier.padding(16.dp, 6.dp).then(textModifier),
                 if(isSelected) White
                 else colorScheme.tertiary,
                 fontWeight = SemiBold,

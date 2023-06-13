@@ -88,8 +88,7 @@ fun YandexMapScreen(
             callback = object: YandexMapCallback {
                 
                 override fun appBsExpandState(state: Boolean) {
-                    val bs =
-                        appBsState.bottomSheetState
+                    val bs = appBsState.bottomSheetState
                     scope.launch {
                         if(state) bs.expand()
                         else bs.collapse()
