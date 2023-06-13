@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package ru.rikmasters.gilty.presentation.model
+package ru.rikmasters.gilty.presentation.utils
 
 sealed class DataState<out T: Any> {
     

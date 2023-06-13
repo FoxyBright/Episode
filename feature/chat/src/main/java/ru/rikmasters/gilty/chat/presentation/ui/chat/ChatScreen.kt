@@ -36,6 +36,8 @@ import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.blockNotify
+import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.clearSelectChat
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.translation.shared.util.checkMediaPermissions
@@ -135,6 +137,11 @@ fun ChatScreen(
             delay(1000)
             vm.timerTick()
         }
+    }
+    
+    DisposableEffect(chat) {
+        chat?.let { blockNotify(context, it.id) }
+        onDispose { clearSelectChat(context) }
     }
     
     val uri = getUriForFile(

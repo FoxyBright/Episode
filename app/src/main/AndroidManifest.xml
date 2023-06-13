@@ -44,7 +44,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <provider
-            android:name=".presentation.model.GiltyFileProvider"
+            android:name=".presentation.utils.GiltyFileProvider"
             android:authorities="ru.rikmasters.gilty.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -53,7 +53,7 @@
                 android:resource="@xml/provider_paths" />
         </provider>
         <service
-            android:name=".presentation.model.FireBaseService"
+            android:name=".presentation.utils.FireBaseService"
             android:exported="true"
             android:permission="com.google.android.c2dm.permissions.RECEIVE">
             <intent-filter>
