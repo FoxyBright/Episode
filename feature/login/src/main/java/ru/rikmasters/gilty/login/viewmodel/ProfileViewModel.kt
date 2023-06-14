@@ -45,7 +45,15 @@ class ProfileViewModel: ViewModel() {
     
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
-    
+
+    val desc = description
+        .debounce(250)
+        .onEach {
+            if(it.isNotEmpty())
+                onDescriptionSave()
+        }
+        .state(_description.value, Eagerly)
+
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
     
@@ -63,6 +71,8 @@ class ProfileViewModel: ViewModel() {
     
     suspend fun usernameChange(text: String) {
         _username.emit(text)
+        if(text.isNotEmpty())
+            onUsernameSave()
     }
     
     suspend fun descriptionChange(text: String) {
