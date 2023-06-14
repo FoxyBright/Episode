@@ -49,19 +49,19 @@ fun GalleryContent(
 ) {
     Scaffold(modifier, {
         GalleryDropMenu(
-            state.menuState,
-            state.menuItems,
-            callback
+            state = state.menuState,
+            menuList = state.menuItems,
+            callback = callback
         )
-        GalleryTopBar(state.menuState, callback)
+        GalleryTopBar(menuState = state.menuState, callback = callback)
     }) { paddings ->
         GalleryGrid(
-            modifier.padding(top = paddings.calculateTopPadding()),
-            state.images,
-            state.selectedImages,
-            state.type,
-            (false),
-            callback
+            modifier = modifier.padding(top = paddings.calculateTopPadding()),
+            images = state.images,
+            selected = state.selectedImages,
+            type = state.type,
+            isWeb = (false),
+            callback = callback
         )
     }
     if(state.type == MULTIPLE)

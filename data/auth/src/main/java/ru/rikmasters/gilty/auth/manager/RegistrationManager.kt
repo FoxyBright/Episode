@@ -20,6 +20,8 @@ class RegistrationManager(
     suspend fun profileCompleted() = withContext(IO) {
         profileStore.checkCompletable()
     }
+    suspend fun changeAlbumPosition(imageId: String, position: Int) =
+        profileStore.changeAlbumPosition(imageId, position)
     
     suspend fun clearProfile() {
         profileStore.deleteProfile()
@@ -57,6 +59,8 @@ class RegistrationManager(
     suspend fun getUserCategories() = withContext(IO) {
         profileStore.getUserCategories(true)
     }
+    suspend fun updateUserCategories() =
+        withContext(IO) { profileStore.updateUserCategories() }
     
     suspend fun deleteHidden(files: List<String>) =
         withContext(IO) {

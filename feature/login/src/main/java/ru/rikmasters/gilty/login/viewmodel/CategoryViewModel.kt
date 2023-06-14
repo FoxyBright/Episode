@@ -25,7 +25,9 @@ class CategoryViewModel: ViewModel() {
     private val _categories =
         MutableStateFlow(emptyList<CategoryModel>())
     val categories = _categories.asStateFlow()
-    
+
+    val phase = MutableStateFlow(0)
+
     suspend fun selectCategory(category: CategoryModel) {
         val list = selected.value
         _selected.emit(
@@ -34,9 +36,102 @@ class CategoryViewModel: ViewModel() {
             else list + category
         )
     }
+    suspend fun setUserInterest(onSuccess: () -> Unit) = singleLoading {
+        val newList = selected.value.toMutableList()
+        var updateList = true
+        selected.value.forEach { cat ->
+            if (cat.children?.isNotEmpty() == true) {
+                updateList = false
+                cat.children?.forEach { child: CategoryModel ->
+                    if (newList.none { it.id == child.id }) {
+                        newList.add(child)
+                    }
+                }
+            }
+        }
+        //
+        if (phase.value == 1 || updateList) {
+            saveInterests {
+                onSuccess()
+            }
+        }
+        /*else {
+            saveInterests{
+
+            }
+        }*/
+        _categories.emit(newList)
+        phase.emit(1)
+    }
+    suspend fun saveInterests(onSuccess: () -> Unit){
+        meetManager.setUserInterest(selected.value).on(
+            success = {
+                regManager.updateUserCategories().on(
+                    success = {
+                        _categories.emit(emptyList())
+                        _selected.emit(emptyList())
+                        phase.emit(0)
+                        onSuccess()
+                    },
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
+    suspend fun getInterest() = singleLoading {
+        regManager.getUserCategories().on(
+            success = { list ->
+                _selected.emit(list)
+                val newCategories = _categories.value.toMutableList()
+                list.forEach { cat ->
+                    if(newCategories.none{it.id == cat.id}){
+                        newCategories.add(cat)
+                    }
+                }
+                _categories.emit(newCategories)
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }
     
     suspend fun getCategories() {
         meetManager.getCategoriesList().on(
+            success = {
+                val categories = _categories.value.toMutableList()
+                //Log.d("Hello GetCategory Before", categories.map { it.name }.toString())
+                it.forEach { parent ->
+                    if(categories.none{it.id == parent.id}) {
+                        categories.add(parent)
+                    }
+                }
+                _categories.emit(categories)
+                //Log.d("Hello GetCategory After", categories.map { it.name }.toString())
+
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+       /* meetManager.getCategoriesList().on(
             success = {
                 _categories.emit(it)
                 regManager.getUserCategories().on(
@@ -57,9 +152,17 @@ class CategoryViewModel: ViewModel() {
                     it.serverMessage
                 )
             }
-        )
+        )*/
     }
-    
+    suspend fun emptyPhase() {
+        phase.emit(0)
+    }
+    suspend fun emptyCategories(){
+        _categories.emit(emptyList())
+    }
+    suspend fun emptySelected(){
+        _selected.emit(emptyList())
+    }
     suspend fun sendCategories() {
         meetManager.setUserInterest(
             selected.value

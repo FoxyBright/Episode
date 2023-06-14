@@ -19,6 +19,7 @@ class GalleryViewModel: ViewModel() {
     private val context = getKoin().get<Context>()
     
     private val imagesList = getImages(context)
+
     private val _images = MutableStateFlow(imagesList)
     val images = _images.asStateFlow()
     
@@ -78,10 +79,12 @@ class GalleryViewModel: ViewModel() {
     }
     
     suspend fun attach() = singleLoading {
+        val files = selected.value.map {
+            File(it).compress(context)
+        }
+        //Log.d("Hello Files", files.map { it.absolutePath }.toString())
         regManager.addHidden(
-            selected.value.map {
-                File(it).compress(context)
-            }
+            files
         ).on(
             success = {},
             loading = {},

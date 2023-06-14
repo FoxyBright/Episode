@@ -59,15 +59,20 @@ fun GalleryScreen(
             }
         }
     }
+
     
     Use<GalleryViewModel>(LoadingTrait) {
         GalleryContent(
-            GalleryState(
-                type, images, selected, menuState,
-                filters, (false),
-                stringResource(R.string.add_button),
-                selected.isNotEmpty(),
-            ), Modifier, object: GalleryCallback {
+            state = GalleryState(
+                type = type,
+                images = images,
+                selectedImages = selected,
+                menuState = menuState,
+                menuItems = filters,
+                isOnline = (false),
+                buttonLabel = stringResource(R.string.add_button),
+                buttonEnabled = selected.isNotEmpty(),
+            ), modifier = Modifier, callback = object: GalleryCallback {
                 
                 override fun onImageClick(image: String) {
                     scope.launch {

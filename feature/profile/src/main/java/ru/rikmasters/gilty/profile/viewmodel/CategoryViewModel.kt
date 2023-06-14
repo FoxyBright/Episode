@@ -140,13 +140,13 @@ class CategoryViewModel : ViewModel() {
             }
         )
     }
-    suspend fun setPhase(value:Int) {
-        phase.emit(value)
+    suspend fun emptyPhase() {
+        phase.emit(0)
     }
-    suspend fun setCategories(){
+    suspend fun emptyCategories(){
         _categories.emit(emptyList())
     }
-    suspend fun setSelected(){
+    suspend fun emptySelected(){
         _selected.emit(emptyList())
     }
 }

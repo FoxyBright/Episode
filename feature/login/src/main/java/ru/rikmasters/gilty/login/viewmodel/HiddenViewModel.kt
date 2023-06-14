@@ -74,16 +74,16 @@ class HiddenViewModel: ViewModel() {
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photoList.value.size > from && _photoList.value.size > to) {
-                    val fromId = _photoList.value[from]
+                    val fromId = _photoList.value[from].id
                     val newList = _photoList.value.toMutableList().apply {
                         add(to, removeAt(from))
                     }
                     _photoList.emit(newList)
-                    /*regManager.changeAlbumPosition(fromId, to + 1).on(
+                    regManager.changeAlbumPosition(fromId, to + 1).on(
                         success = {},
                         loading = {},
                         error = {}
-                    )*/
+                    )
                 }
             }
         }
