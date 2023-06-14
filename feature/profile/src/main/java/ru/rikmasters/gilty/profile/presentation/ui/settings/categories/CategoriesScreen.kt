@@ -24,24 +24,22 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     
     // TODO - Не вызывается рекомпозиция блока с пузырями. Костыль для задержки
     var sleep by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
+        // empties data
         vm.setPhase(0)
         vm.setCategories()
         vm.setSelected()
-
+        // fetches data
         vm.getCategories()
         vm.getInterest()
         sleep = true
-        Log.d("Hello First", categories.map { it.name }.toString())
-        Log.d("Hello First", phase.toString())
     }
 
     LaunchedEffect(key1 = categories, block = {
         sleep = false
         delay(10L)
         sleep = true
-        Log.d("Hello Category", categories.map { it.name }.toString())
     })
 
     LaunchedEffect(key1 = phase, block = {
@@ -53,9 +51,14 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     })
     
     CategoriesContent(
-        Modifier, CategoriesState(
-            categories, selected, alert,sleep,
-        ), object: CategoriesCallback {
+        modifier = Modifier,
+        state = CategoriesState(
+            categoryList = categories,
+            selectCategories = selected,
+            alert = alert,
+            sleep = sleep,
+            hasParentCategory = if(phase == 1) false else selected.firstOrNull{ it.children?.isNotEmpty() == true } != null,
+        ), callback = object: CategoriesCallback {
             
             override fun onClose() {
                 nav.navigationBack()

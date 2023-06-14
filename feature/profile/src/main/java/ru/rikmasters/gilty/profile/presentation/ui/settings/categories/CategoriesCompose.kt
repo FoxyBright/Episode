@@ -1,6 +1,11 @@
 package ru.rikmasters.gilty.profile.presentation.ui.settings.categories
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,10 +33,11 @@ data class CategoriesState(
     val selectCategories: List<CategoryModel>,
     val alert: Boolean,
     val sleep: Boolean,
+    val hasParentCategory: Boolean,
 )
 
 interface CategoriesCallback {
-    
+
     fun onCategoryClick(category: CategoryModel) {}
     fun onNext() {}
     fun onClose() {}
@@ -55,9 +61,9 @@ fun CategoriesContent(
                     callback?.onBack()
                 }
             )
-            if(LocalInspectionMode.current)
+            if (LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
-            else if(state.sleep) Bubbles(
+            else if (state.sleep) Bubbles(
                 data = state.categoryList,
                 elementSize = CATEGORY_ELEMENT_SIZE.dp,
                 modifier = Modifier.padding(
@@ -77,7 +83,8 @@ fun CategoriesContent(
             Modifier
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            stringResource(R.string.next_button)
+            if (state.hasParentCategory) stringResource(R.string.next_button)
+            else stringResource(R.string.save_button)
         ) { callback?.onNext() }
     }
     val dismiss = { callback?.onCloseAlert(false) }
@@ -107,11 +114,11 @@ private fun BubblesForPreview(
             Box(Modifier.fillMaxHeight()) {
                 Column(
                     Modifier.align(
-                        if(index % 3 != 0) TopCenter
+                        if (index % 3 != 0) TopCenter
                         else BottomCenter
                     )
                 ) {
-                    for(element in item)
+                    for (element in item)
                         CategoryItem(
                             name = element.name,
                             icon = element.emoji,
@@ -135,7 +142,7 @@ private fun CategoriesPreview() {
         CategoriesContent(
             state = CategoriesState(
                 listOf(DemoCategoryModel),
-                emptyList(), (false), true
+                emptyList(), (false), true, false
             )
         )
     }
