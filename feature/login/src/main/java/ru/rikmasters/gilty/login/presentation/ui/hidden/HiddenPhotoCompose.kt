@@ -41,6 +41,7 @@ import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
 import ru.rikmasters.gilty.shared.common.dragGrid.ReorderableItem
 import ru.rikmasters.gilty.shared.common.dragGrid.detectReorderAfterLongPress
 import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridState
+import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
@@ -59,7 +60,7 @@ private fun HiddenPhotoPreview() {
             )
         ) {
             HiddenContent(
-                HiddenState(listOf(),0, false,)
+                HiddenState(listOf(), 0, false)
             )
         }
     }
@@ -67,7 +68,7 @@ private fun HiddenPhotoPreview() {
 
 data class HiddenState(
     val photoList: List<AvatarModel>,
-    val photosAmount:Int,
+    val photosAmount: Int,
     val photoViewState: Boolean,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
@@ -76,7 +77,7 @@ data class HiddenState(
 )
 
 interface HiddenCallback {
-    
+
     fun onNext() {}
     fun onBack() {}
     fun onSelectImage(image: AvatarModel) {}
@@ -127,10 +128,14 @@ fun HiddenContent(
         )
 
         LazyVerticalGrid(
-            GridCells.Fixed(3),
-            Modifier.padding(horizontal = 16.dp),
+            columns = GridCells.Fixed(3),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .reorderable(stateDragable),
             verticalArrangement = spacedBy(4.dp),
-            horizontalArrangement = spacedBy(4.dp)
+            horizontalArrangement = spacedBy(4.dp),
+            state = stateDragable.gridState,
         ) {
             item {
                 GalleryButton(
@@ -159,12 +164,12 @@ fun HiddenContent(
                     )
                 }
             }
-      /*      items(state.photoList) { image ->
-                LazyItem(
-                    image, Modifier,
-                    { callback?.onSelectImage(it) })
-                { callback?.onDeleteImage(it) }
-            }*/
+            /*      items(state.photoList) { image ->
+                      LazyItem(
+                          image, Modifier,
+                          { callback?.onSelectImage(it) })
+                      { callback?.onDeleteImage(it) }
+                  }*/
         }
     }
     Box(Modifier.fillMaxSize()) {
@@ -181,10 +186,11 @@ fun HiddenContent(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun GalleryButton(modifier:Modifier = Modifier, callback: HiddenCallback?) {
+private fun GalleryButton(modifier: Modifier = Modifier, callback: HiddenCallback?) {
     Card(
         onClick = { callback?.openGallery() },
-        modifier = modifier.size((screenWidth.dp - 72.dp) / 3)
+        modifier = modifier
+            .size((screenWidth.dp - 72.dp) / 3)
             .clip(shapes.large),
         shape = shapes.large,
         colors = cardColors(Transparent)

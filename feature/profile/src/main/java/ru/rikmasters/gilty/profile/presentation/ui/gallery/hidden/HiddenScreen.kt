@@ -21,7 +21,7 @@ fun HiddenBsScreen(
     vm: HiddenViewModel,
     update: Boolean,
 ) {
-    
+
     val photoList = vm.images.collectAsLazyPagingItems()
     val photoAmount = vm.photosAmount.collectAsState()
     val storagePermissions = permissionState()
@@ -33,8 +33,8 @@ fun HiddenBsScreen(
     val viewerImages by vm.photos.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
-    
-    
+
+
     LaunchedEffect(Unit) {
         vm.uploadPhotoList(true)
     }
@@ -42,7 +42,7 @@ fun HiddenBsScreen(
     LaunchedEffect(key1 = photoList.itemSnapshotList.items, block = {
         vm.setPhotoList(photoList.itemSnapshotList.items)
     })
-    
+
     HiddenBsContent(
         state = HiddenBsState(
             photoList = photoList,
@@ -53,8 +53,8 @@ fun HiddenBsScreen(
             viewerMenuState = false,
             viewerType = photoViewType
         ),
-        callback = object: HiddenBsCallback {
-            
+        callback = object : HiddenBsCallback {
+
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     vm.changePhotoViewType(PhotoViewType.PHOTO)
@@ -68,6 +68,7 @@ fun HiddenBsScreen(
                     vm.movePhoto(from, to)
                 }
             }
+
             override fun openGallery() {
                 scope.launch {
                     context.checkStoragePermission(
@@ -80,15 +81,15 @@ fun HiddenBsScreen(
                     }
                 }
             }
-            
+
             override fun onDeleteImage(image: AvatarModel) {
                 scope.launch { vm.deleteImage(image.id) }
             }
-            
+
             override fun onBack() {
                 nav.navigate("main?update=$update")
             }
-            
+
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
