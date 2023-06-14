@@ -26,10 +26,15 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     var sleep by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
-        Log.d("Hello First", categories.map { it.name }.toString())
+        vm.setPhase(0)
+        vm.setCategories()
+        vm.setSelected()
+
         vm.getCategories()
         vm.getInterest()
         sleep = true
+        Log.d("Hello First", categories.map { it.name }.toString())
+        Log.d("Hello First", phase.toString())
     }
 
     LaunchedEffect(key1 = categories, block = {
@@ -55,7 +60,19 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             override fun onClose() {
                 nav.navigationBack()
             }
-            
+
+            override fun onBack() {
+                if(phase == 0) nav.navigationBack()
+                else {
+                    scope.launch {
+                        vm.setPhase(0)
+                        vm.setCategories()
+
+                        vm.getCategories()
+                        sleep = true
+                    }
+                }
+            }
             override fun onCloseAlert(it: Boolean) {
                 scope.launch { vm.alertDismiss(it) }
             }

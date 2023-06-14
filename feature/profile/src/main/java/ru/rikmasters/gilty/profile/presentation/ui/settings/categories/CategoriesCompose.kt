@@ -35,6 +35,7 @@ interface CategoriesCallback {
     fun onCategoryClick(category: CategoryModel) {}
     fun onNext() {}
     fun onClose() {}
+    fun onBack() {}
     fun onCloseAlert(it: Boolean) {}
 }
 
@@ -49,7 +50,10 @@ fun CategoriesContent(
             ClosableActionBar(
                 title = stringResource(R.string.interested_you),
                 details = stringResource(R.string.interested_you_details),
-                onClose = { callback?.onCloseAlert(true) }
+                onClose = { callback?.onCloseAlert(true) },
+                onBack = {
+                    callback?.onBack()
+                }
             )
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)

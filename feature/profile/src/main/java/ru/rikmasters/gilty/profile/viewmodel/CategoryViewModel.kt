@@ -43,10 +43,11 @@ class CategoryViewModel : ViewModel() {
     }
 
     suspend fun setUserInterest(onSuccess: () -> Unit) = singleLoading {
-
         val newList = selected.value.toMutableList()
+        var updateList = true
         selected.value.forEach { cat ->
             if (cat.children?.isNotEmpty() == true) {
+                updateList = false
                 cat.children?.forEach { child: CategoryModel ->
                     if (newList.none { it.id == child.id }) {
                         newList.add(child)
@@ -55,34 +56,45 @@ class CategoryViewModel : ViewModel() {
             }
         }
         //
-        if (phase.value == 1) {
-            meetManager.setUserInterest(selected.value).on(
-                success = {
-                    profileManager.updateUserCategories().on(
-                        success = {
-                            _categories.emit(emptyList())
-                            _selected.emit(emptyList())
-                            phase.emit(0)
-                            onSuccess()
-                        },
-                        loading = {},
-                        error = {
-                            context.errorToast(
-                                it.serverMessage
-                            )
-                        }
-                    )
-                },
-                loading = {},
-                error = {
-                    context.errorToast(
-                        it.serverMessage
-                    )
-                }
-            )
+        if (phase.value == 1 || updateList) {
+            saveInterests {
+                onSuccess()
+            }
         }
+        /*else {
+            saveInterests{
+
+            }
+        }*/
         _categories.emit(newList)
         phase.emit(1)
+    }
+
+    suspend fun saveInterests(onSuccess: () -> Unit){
+        meetManager.setUserInterest(selected.value).on(
+            success = {
+                profileManager.updateUserCategories().on(
+                    success = {
+                        _categories.emit(emptyList())
+                        _selected.emit(emptyList())
+                        phase.emit(0)
+                        onSuccess()
+                    },
+                    loading = {},
+                    error = {
+                        context.errorToast(
+                            it.serverMessage
+                        )
+                    }
+                )
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
 
     suspend fun getInterest() = singleLoading {
@@ -127,5 +139,14 @@ class CategoryViewModel : ViewModel() {
                 )
             }
         )
+    }
+    suspend fun setPhase(value:Int) {
+        phase.emit(value)
+    }
+    suspend fun setCategories(){
+        _categories.emit(emptyList())
+    }
+    suspend fun setSelected(){
+        _selected.emit(emptyList())
     }
 }
