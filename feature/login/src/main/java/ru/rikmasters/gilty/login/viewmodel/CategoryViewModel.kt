@@ -163,17 +163,4 @@ class CategoryViewModel: ViewModel() {
     suspend fun emptySelected(){
         _selected.emit(emptyList())
     }
-    suspend fun sendCategories() {
-        meetManager.setUserInterest(
-            selected.value
-        ).on(
-            success = {},
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
-    }
 }

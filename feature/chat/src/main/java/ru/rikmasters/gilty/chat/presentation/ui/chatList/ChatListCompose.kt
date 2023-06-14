@@ -2,7 +2,6 @@
 
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -387,13 +386,17 @@ fun SortTypeLabels(
 ) {
     var sortLabelHeightDp by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
+
     Row(
         modifier = modifier
             .horizontalScroll(rememberScrollState())
             .fillMaxWidth()
     ) {
         Spacer(modifier = Modifier.width(16.dp))
-        Box(modifier = Modifier.animateContentSize()) {
+        Box(modifier = /*if (!isAnimated) Modifier.animateContentSize(finishedListener = { initial, target ->
+            Log.d("Hello Listener", "$initial $target")
+            isAnimated = true
+        }) else */Modifier) {
             state.sortType?.let {
                 GChip(
                     modifier = Modifier.padding(
@@ -432,7 +435,9 @@ fun SortTypeLabels(
                 GChip(
                     text = stringResource(R.string.chats_sort_label),
                     isSelected = state.sortType != null
-                ) { callback?.onSortClick(MEETING_DATE) }
+                ) {
+                    callback?.onSortClick(MEETING_DATE)
+                }
             }
         }
         if (state.sortType != null)
@@ -452,7 +457,9 @@ fun SortTypeLabels(
                 modifier = Modifier.padding(start = 8.dp),
                 text = stringResource(id = R.string.chats_archive_label),
                 isSelected = state.isArchiveOn
-            ) { callback?.onArchiveClick() }
+            ) {
+                callback?.onArchiveClick()
+            }
     }
 }
 
