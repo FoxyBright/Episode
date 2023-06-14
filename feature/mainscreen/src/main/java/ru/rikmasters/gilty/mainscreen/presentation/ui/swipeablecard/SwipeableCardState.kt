@@ -1,27 +1,28 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.*
 import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
 import androidx.compose.animation.core.Spring.StiffnessMedium
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.core.util.composable.getConfiguration
+import ru.rikmasters.gilty.core.util.composable.getDensity
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType.*
 
 @Composable
-fun rememberSwipeableCardState(): SwipeableCardState {
-    val density = LocalDensity.current
-    val config = LocalConfiguration.current
-    return remember {
-        with(density) {
-            SwipeableCardState(
-                config.screenWidthDp.dp.toPx(),
-                config.screenHeightDp.dp.toPx()
-            )
-        }
+fun rememberSwipeableCardState(
+    density: Density = getDensity(),
+    config: Configuration = getConfiguration(),
+) = remember {
+    with(density) {
+        SwipeableCardState(
+            config.screenWidthDp.dp.toPx(),
+            config.screenHeightDp.dp.toPx()
+        )
     }
 }
 
@@ -41,7 +42,10 @@ class SwipeableCardState(
     
     internal suspend fun reset() = offset.animateTo(
         Offset(0f, 0f),
-        spring(DampingRatioMediumBouncy, StiffnessMedium)
+        spring(
+            dampingRatio = DampingRatioMediumBouncy,
+            stiffness = StiffnessMedium
+        )
     )
     
     suspend fun swipe(
@@ -49,12 +53,13 @@ class SwipeableCardState(
         tween: Int = 500,
     ) {
         offset.animateTo(
-            when(direction) {
+            targetValue = when(direction) {
                 LEFT -> Offset(-(maxWidth * 1.5f), off.y)
                 RIGHT -> Offset((maxWidth * 1.5f), off.y)
                 UP -> Offset(off.x, -maxHeight)
                 DOWN -> Offset(off.x, maxHeight)
-            }, tween(tween)
+            },
+            animationSpec = tween(tween)
         )
         swipedDirection = direction
     }

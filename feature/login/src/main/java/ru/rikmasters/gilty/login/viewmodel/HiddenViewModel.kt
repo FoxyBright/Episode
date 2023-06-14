@@ -7,10 +7,10 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
+import ru.rikmasters.gilty.shared.common.compressor.compress
 import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import ru.rikmasters.gilty.shared.shared.compress
 import java.io.File
 
 class HiddenViewModel: ViewModel() {
@@ -50,6 +50,7 @@ class HiddenViewModel: ViewModel() {
         }
     }
     
+    @Suppress("unused")
     suspend fun selectImage(image: AvatarModel) {
         if(!photoList.value.contains(image))
             _photoList.emit(photoList.value + image)

@@ -10,7 +10,6 @@ compose()
 
 dependencies {
     androidBase()
-    compressor()
     dataBase()
     compose()
     toasty()

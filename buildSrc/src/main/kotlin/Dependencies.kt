@@ -68,10 +68,6 @@ fun DependencyHandlerScope.imageCropper() = implementation(
     "com.github.SmartToolFactory:Compose-AnimatedList:0.5.1",
 )
 
-fun DependencyHandlerScope.compressor() = implementation(
-    "id.zelory:compressor:3.0.1"
-)
-
 fun DependencyHandlerScope.lottie() = implementation(
     "com.airbnb.android:lottie-compose:5.2.0"
 )

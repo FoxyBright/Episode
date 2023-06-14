@@ -2,7 +2,18 @@ package ru.rikmasters.gilty.core.util.composable
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 
-@Composable
-fun getActivity() = (LocalContext.current as Activity)
+val getActivity = @Composable {
+    (LocalContext.current as Activity)
+}
+
+val getDensity = @Composable {
+    LocalDensity.current
+}
+
+val getConfiguration = @Composable {
+    LocalConfiguration.current
+}

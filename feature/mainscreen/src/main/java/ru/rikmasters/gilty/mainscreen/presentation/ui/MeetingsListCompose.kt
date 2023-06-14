@@ -22,11 +22,11 @@ fun MeetingsListContent(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-    states.forEachIndexed { index, (meeting, state) ->
+    states.forEachIndexed { index, state ->
         EpisodeCard(
-            meeting = meeting,
-            state = state,
-            stack = (index < states.lastIndex),
+            meeting = state.first,
+            state = state.second,
+            stack = index < states.lastIndex,
             modifier = modifier,
             notInteresting = notInteresting,
             onSelect = onSelect,
@@ -45,27 +45,47 @@ private fun EpisodeCard(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-    fun DirectionType.swipe(
-        meeting: MeetingModel,
-        state: SwipeableCardState,
-    ) = when(this) {
-        RIGHT -> onSelect?.let { it(meeting, state) }
-        LEFT -> notInteresting?.let { it(meeting, state) }
-        else -> Unit
-    }
-    
     state.swipedDirection ?: run {
         MeetCard(
             modifier = modifier
                 .fillMaxSize()
                 .clickable(
-                    MutableInteractionSource(), (null)
+                    MutableInteractionSource(),
+                    indication = null
                 ) { onClick?.let { it(meeting) } }
                 .swipeableCard(
-                    onSwiped = { it.swipe(meeting, state) },
+                    onSwiped = {
+                        it.swipe(
+                            meeting = meeting,
+                            state = state,
+                            onSelect = onSelect,
+                            notInteresting = notInteresting
+                        )
+                    },
                     state = state,
-                ), type = MEET, stack = stack,
-            meet = meeting, offset = state.offset.value.x
-        ) { it.swipe(meeting, state) }
+                ),
+            type = MEET,
+            stack = stack,
+            meet = meeting,
+            offset = state.offset.value.x
+        ) {
+            it.swipe(
+                meeting = meeting,
+                state = state,
+                onSelect = onSelect,
+                notInteresting = notInteresting
+            )
+        }
     }
+}
+
+private fun DirectionType.swipe(
+    meeting: MeetingModel,
+    state: SwipeableCardState,
+    onSelect: ((MeetingModel, SwipeableCardState) -> Unit)?,
+    notInteresting: ((MeetingModel, SwipeableCardState) -> Unit)?,
+) = when(this) {
+    RIGHT -> onSelect?.let { it(meeting, state) }
+    LEFT -> notInteresting?.let { it(meeting, state) }
+    else -> Unit
 }
