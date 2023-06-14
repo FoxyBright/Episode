@@ -106,10 +106,12 @@ fun ProfileScreen(vm: ProfileViewModel) {
                         "registration/gallery?multi=false"
                     )
                 }
+                onSaveDescription()
             }
             
             override fun hiddenImages() {
                 nav.navigate("hidden")
+                onSaveDescription()
             }
             
             override fun onDescriptionChange(text: String) {

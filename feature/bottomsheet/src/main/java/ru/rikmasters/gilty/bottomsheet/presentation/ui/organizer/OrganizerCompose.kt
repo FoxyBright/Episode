@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.aligned
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -93,7 +94,7 @@ fun OrganizerContent(
             .background(colorScheme.background)
     ) {
         TopBar(
-            username = "asdfasdfasdfasdasdfasdff${user?.username}${
+            username = "dfasdfasdasdfasdff${user?.username}${
                 if (user?.age in 18..99) {
                     ", ${user?.age}"
                 } else ""
@@ -217,17 +218,19 @@ private fun TopBar(
                 )
             }
 
-            ConstraintLayout(modifier = Modifier.constrainAs(usernameGroupedRef) {
+            Row(modifier = Modifier
+                .constrainAs(usernameGroupedRef) {
                 start.linkTo(if (backButton) backButtonRef.end else parent.start)
                 top.linkTo(if (backButton) backButtonRef.top else if (!isMyProfile) menuRef.top else parent.top)
                 if (backButton) bottom.linkTo(backButtonRef.bottom)
                 if (!backButton && !isMyProfile) bottom.linkTo(menuRef.bottom)
                 end.linkTo(if (!isMyProfile) menuRef.start else parent.end)
                 width = Dimension.fillToConstraints
-            }.background(Color.Green)) {
-                val (usernameRef, badgeRef, extra) = createRefs()
+            }.background(Color.Green),
+            ) {
+                /*val (usernameRef, badgeRef, extra) = createRefs()
                 val barrier = createEndBarrier(extra, badgeRef)
-
+*/
                 //createHorizontalChain(usernameRef,badgeRef, chainStyle = ChainStyle.Packed)
 
                 Text(
@@ -237,13 +240,14 @@ private fun TopBar(
                     overflow = Ellipsis,
                     maxLines = 1,
                     modifier = Modifier
-                        .constrainAs(usernameRef) {
+                        .fillMaxWidth(0.8f)
+                        /*.constrainAs(usernameRef) {
                             top.linkTo(parent.top)
                             bottom.linkTo(parent.bottom)
-                            /*start.linkTo(parent.start)
+                            *//*start.linkTo(parent.start)
                             //end.linkTo(if(profileGroup != DEFAULT) badgeRef.start else parent.end)
-                            width = Dimension.fillToConstraints*/
-                        }
+                            width = Dimension.fillToConstraints*//*
+                        }*/
                         .basicMarquee(
                             spacing = MarqueeSpacing(14.dp),
                             iterations = Int.MAX_VALUE
@@ -253,10 +257,10 @@ private fun TopBar(
                 ProfileBadge(
                     group = profileGroup,
                     modifier = Modifier
-                        .constrainAs(badgeRef) {
+                        /*.constrainAs(badgeRef) {
                             //end.linkTo(if (!isMyProfile) menuRef.start else parent.end,)
-                            /*if (backButton) bottom.linkTo(backButtonRef.bottom)
-                            if (!backButton && !isMyProfile) bottom.linkTo(menuRef.bottom)*/
+                            *//*if (backButton) bottom.linkTo(backButtonRef.bottom)
+                            if (!backButton && !isMyProfile) bottom.linkTo(menuRef.bottom)*//*
                             //end.linkTo(parent.end)
                             top.linkTo(parent.top)
                             bottom.linkTo(parent.bottom)
@@ -264,17 +268,18 @@ private fun TopBar(
                             start.linkTo(usernameRef.end)
                             width = Dimension.preferredWrapContent
                             end.linkTo(barrier)
-                            /*start.linkTo(usernameRef.end)
-                            top.linkTo(if (backButton) backButtonRef.top else if (!isMyProfile) menuRef.top else parent.top)*/
-                        }
-                        .padding(start = 6.dp), labelSize = 9,
+                            *//*start.linkTo(usernameRef.end)
+                            top.linkTo(if (backButton) backButtonRef.top else if (!isMyProfile) menuRef.top else parent.top)*//*
+                        }*/
+                        .padding(start = 6.dp)
+                        .weight(1f), labelSize = 9,
                     textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
                 )
-                Text(text = "", modifier = Modifier.constrainAs(extra){
+                /*Text(text = "", modifier = Modifier.constrainAs(extra){
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end)
-                })
+                })*/
             }
 
 
