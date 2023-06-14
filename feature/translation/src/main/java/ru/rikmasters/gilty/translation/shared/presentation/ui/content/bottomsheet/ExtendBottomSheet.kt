@@ -99,6 +99,8 @@ fun ExtendBottomSheet(
                 val minutes = current.substringBeforeLast('м').trim().toInt()
                 onSave(minutes)
             }
+        } else {
+            onSave(60)
         }
     }
 }

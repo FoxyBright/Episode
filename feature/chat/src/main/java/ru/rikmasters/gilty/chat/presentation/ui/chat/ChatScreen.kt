@@ -39,6 +39,8 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
+import ru.rikmasters.gilty.translation.bottoms.PreviewBsScreen
+import ru.rikmasters.gilty.translation.bottoms.PreviewBsViewModel
 import ru.rikmasters.gilty.translation.shared.util.checkMediaPermissions
 import ru.rikmasters.gilty.translation.shared.util.mediaPermissionState
 import java.io.File
@@ -59,9 +61,9 @@ fun ChatScreen(
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-    
+
     vm.changeChatId(chatId)
-    
+
     // список сообщений чата
     val messages = vm.messages.collectAsLazyPagingItems()
     // состояние меню сообщения
@@ -92,52 +94,53 @@ fun ChatScreen(
     val alert by vm.alert.collectAsState()
     // информация о текущем чате
     val chat by vm.chat.collectAsState()
-    
+
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
-    
+
+
     val imeExpandOffset = WindowInsets.ime
         .getBottom(LocalDensity.current)
     LaunchedEffect(imeExpandOffset) {
-        if(imeExpandOffset > 0) asm.keyboard
+        if (imeExpandOffset > 0) asm.keyboard
             .setSoftInputMode(Nothing)
     }
-    
+
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
-        if(unreadCount > 0) try {
+        if (unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
-        } catch(_: Exception) {
+        } catch (_: Exception) {
             listState.scrollToItem(messages.itemCount)
         }
         vm.markAsReadMessage(chatId, all = true)
     }
-    
+
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {
             delay(3000)
             vm.deleteWriter(it.first)
         }
     }
-    
+
     LaunchedEffect(Unit) {
-        if(type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) {
+        if (type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) {
             delay(1000)
             vm.timerTick()
         }
     }
-    
+
     val uri = getUriForFile(
         context, ("ru.rikmasters.gilty.provider"),
         File(context.filesDir, "my_images")
     )
-    
+
     val photographer =
         rememberLauncherForActivityResult(TakePicture()) { success ->
-            if(success) uri?.path?.let {
+            if (success) uri?.path?.let {
                 scope.launch {
                     val file = File(context.filesDir, "photo.jpg")
                     context.contentResolver
@@ -151,7 +154,7 @@ fun ChatScreen(
                 }
             }
         }
-    
+
     val state = meeting?.let { meet ->
         chat?.let { chat ->
             ChatState(
@@ -185,22 +188,22 @@ fun ChatScreen(
             )
         }
     }
-    
+
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
-            ChatContent(state, Modifier, object: ChatCallback {
-                
+            ChatContent(state, Modifier, object : ChatCallback {
+
                 override fun onPhotoViewDismiss(state: Boolean) {
                     scope.launch { vm.changePhotoViewState(state) }
                 }
-                
+
                 override fun onAnswerClick(message: MessageModel) {
                     // навигации к сообщению при клике на ответ
                 }
-                
+
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
-                        when(type) {
+                        when (type) {
                             TRANSLATION -> {
                                 context.checkMediaPermissions(
                                     mediaPermissions
@@ -210,15 +213,34 @@ fun ChatScreen(
                                     )
                                 }
                             }
+
                             TRANSLATION_ORGANIZER -> {
                                 context.checkMediaPermissions(
                                     mediaPermissions
                                 ) {
-                                    nav.navigateAbsolute("translations/streamer?id=${state.meet.id}")
+                                    scope.launch {
+                                        asm.bottomSheet.expand {
+                                            PreviewBsScreen(
+                                                vm = PreviewBsViewModel(),
+                                                closeClicked = {
+                                                    scope.launch {
+                                                        asm.bottomSheet.collapse()
+                                                    }
+                                                },
+                                                startBroadcastClicked = {
+                                                    scope.launch {
+                                                        asm.bottomSheet.collapse()
+                                                        nav.navigateAbsolute("translations/streamer?id=${state.meet.id}")
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
                                     // TODO: to translation
                                     // vm.toTranslation()
                                 }
                             }
+
                             else -> {
                                 vm.completeChat(chat)
                                 nav.navigate("main")
@@ -226,15 +248,15 @@ fun ChatScreen(
                         }
                     }
                 }
-                
+
                 override fun onImageMenuItemSelect(point: Int) {
-                    when(point) {
+                    when (point) {
                         1 -> cameraPermissions.let {
-                            if(it.hasPermission)
+                            if (it.hasPermission)
                                 photographer.launch(uri)
                             else it.launchPermissionRequest()
                         }
-                        
+
                         0 -> context.checkStoragePermission(
                             storagePermissions, scope, asm,
                         ) {
@@ -251,6 +273,7 @@ fun ChatScreen(
                                 }
                             }
                         }
+
                         2 -> scope.launch {
                             asm.bottomSheet.expand {
                                 Connector<HiddenBsViewModel>(vm.scope) {
@@ -265,7 +288,7 @@ fun ChatScreen(
                         }
                     }
                 }
-                
+
                 override fun onImageClick(message: MessageModel) {
                     scope.launch {
                         message
@@ -281,12 +304,12 @@ fun ChatScreen(
                             }
                     }
                 }
-                
+
                 override fun onHiddenClick(message: MessageModel) {
                     val attach = message
                         .message?.attachments?.first()?.file
                     scope.launch {
-                        if(attach?.hasAccess == false) {
+                        if (attach?.hasAccess == false) {
                             vm.changePhotoViewType(LOAD)
                             vm.setPhotoViewSelected(attach)
                             vm.setPhotoViewImages(listOf(attach))
@@ -294,20 +317,20 @@ fun ChatScreen(
                         } else vm.onHiddenBlock()
                     }
                 }
-                
+
                 override fun onMessageMenuItemSelect(
                     point: Int,
                     message: MessageModel,
                 ) {
                     scope.launch {
-                        when(point) {
+                        when (point) {
                             0 -> vm.changeAnswer(message)
                             1 -> vm.deleteMessage(chatId, message)
                         }
                         vm.changeMessageMenuState(false)
                     }
                 }
-                
+
                 override fun onSend() {
                     scope.launch {
                         vm.onSendMessage(
@@ -318,11 +341,11 @@ fun ChatScreen(
                         listState.animateScrollToItem(0)
                     }
                 }
-                
+
                 override fun onMenuItemClick(point: Int) {
                     scope.launch {
                         vm.changeKebabMenuState(false)
-                        when(point) {
+                        when (point) {
                             0 -> vm.changeMeetOutAlert(true)
                             1 -> asm.bottomSheet.expand {
                                 BottomSheet(
@@ -335,7 +358,7 @@ fun ChatScreen(
                         }
                     }
                 }
-                
+
                 override fun onTopBarClick() {
                     scope.launch {
                         asm.bottomSheet.expand {
@@ -343,64 +366,64 @@ fun ChatScreen(
                         }
                     }
                 }
-                
+
                 override fun onDownButtonClick() {
                     scope.launch {
                         vm.changeUnreadCount(0)
                         listState.animateScrollToItem(0)
                     }
                 }
-                
+
                 override fun gallery() {
                     scope.launch {
                         focusManager.clearFocus()
                         vm.changeImageMenuState(true)
                     }
                 }
-                
+
                 override fun onMeetOut() {
                     scope.launch {
                         vm.changeMeetOutAlert(false)
                         nav.navigate("main")
                     }
                 }
-                
+
                 override fun onKebabClick() {
                     scope.launch { vm.changeKebabMenuState(!kebabMenuState) }
                 }
-                
+
                 override fun onListDown() {
                     scope.launch { vm.changeUnreadCount((unreadCount - 1)) }
                 }
-                
+
                 override fun onMessageMenuDismiss() {
                     scope.launch { vm.changeMessageMenuState(false) }
                 }
-                
+
                 override fun onImageMenuDismiss() {
                     scope.launch { vm.changeImageMenuState(false) }
                 }
-                
+
                 override fun onMeetOutAlertDismiss() {
                     scope.launch { vm.changeMeetOutAlert(false) }
                 }
-                
+
                 override fun closeAlert() {
                     scope.launch { vm.alertDismiss(false) }
                 }
-                
+
                 override fun onSwipe(message: MessageModel) {
                     scope.launch { vm.changeAnswer(message) }
                 }
-                
+
                 override fun textChange(text: String) {
                     scope.launch { vm.changeMessage(text) }
                 }
-                
+
                 override fun onCancelAnswer() {
                     scope.launch { vm.changeAnswer(null) }
                 }
-                
+
                 override fun onBack() {
                     nav.navigate("main")
                 }

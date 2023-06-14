@@ -11,8 +11,8 @@ sealed interface TranslationEvent {
     data class ProcessRTMPStatus(val status: RTMPStatus) : TranslationEvent
     object LowBitrate : TranslationEvent
     object Reconnect : TranslationEvent
-
-
+    object BitrateStabilized : TranslationEvent
+    object DecreaseRetryCount : TranslationEvent
 
 
     data class UserBottomSheetOpened(val isOpened: Boolean) : TranslationEvent

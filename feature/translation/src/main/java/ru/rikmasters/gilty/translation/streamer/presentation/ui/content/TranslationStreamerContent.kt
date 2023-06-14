@@ -220,7 +220,7 @@ fun Preview(
         }
         Spacer(modifier = Modifier.weight(1f))
         CameraOrientationRow(
-            onChange = changeFacing,
+            onChange = { changeFacing },
             selectedStreamerFacing = selectedStreamerFacing
         )
         Spacer(modifier = Modifier.height(12.dp))

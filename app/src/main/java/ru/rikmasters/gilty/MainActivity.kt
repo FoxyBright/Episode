@@ -86,6 +86,8 @@ class MainActivity: ComponentActivity() {
                 mutableStateOf(false)
             }
             val corScope = rememberCoroutineScope()
+
+            var lastConnectionState by remember { mutableStateOf(false) }
             
             AppEntrypoint(
                 theme = GiltyTheme,
@@ -109,6 +111,7 @@ class MainActivity: ComponentActivity() {
                 while(true) {
                     delay(2000)
                     errorState = !internetCheck(context)
+                    lastConnectionState = internetCheck(context)
                 }
             }
             
@@ -121,7 +124,7 @@ class MainActivity: ComponentActivity() {
                 }
             }
             
-            LaunchedEffect(Unit) {
+            LaunchedEffect(Unit, lastConnectionState) {
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 if(internetCheck(context))
                     profileManager

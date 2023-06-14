@@ -77,6 +77,19 @@ fun TranslationStreamerDialog(
                 onlyDarkTheme = true
             )
         }
+        TranslationDialogType.EXIT -> {
+            GAlert(
+                show = show,
+                success = Pair(stringResource(id = R.string.translations_viewer_complain_exit_positive)) {
+                    onSuccess()
+                },
+                label = stringResource(id = R.string.translations_viewer_complain_exit_text),
+                title = stringResource(id = R.string.translations_viewer_complain_exit),
+                onDismissRequest = dismiss,
+                cancel = Pair(stringResource(id = R.string.translations_complete_negative), dismiss),
+                onlyDarkTheme = true
+            )
+        }
     }
 }
 
@@ -84,5 +97,6 @@ enum class TranslationDialogType {
     KICK,
     COMPLAIN,
     COMPLETE,
-    COMPLETE_EARLIER
+    COMPLETE_EARLIER,
+    EXIT
 }

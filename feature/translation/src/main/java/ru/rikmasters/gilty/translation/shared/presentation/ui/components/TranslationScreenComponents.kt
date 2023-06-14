@@ -138,6 +138,7 @@ fun CameraView(
         factory = {
             val view = OpenGlView(it)
             view.keepScreenOn = true
+            view.isKeepAspectRatio = true
             view.setAspectRatioMode(AspectRatioMode.AdjustRotate)
             view.holder.addCallback(surfaceHolderCallback)
             view
@@ -150,16 +151,18 @@ fun CameraView(
 
 @Composable
 fun CloseButton(
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_close_translations),
-        contentDescription = "Close preview",
-        tint = Color.Unspecified,
-        modifier = Modifier.clickable {
-            onClick()
-        }
-    )
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(29.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_close_translations),
+            contentDescription = "Close preview",
+            tint = Color.Unspecified
+        )
+    }
 }
 
 @Composable
@@ -360,9 +363,10 @@ fun MembersCountItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CameraOrientationRow(
-    onChange: () -> Unit,
+    onChange: (StreamerFacing) -> Unit,
     selectedStreamerFacing: StreamerFacing,
 ) {
     Row(
@@ -370,14 +374,14 @@ fun CameraOrientationRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Surface(
-            modifier = Modifier
-                .clickable { onChange() },
             color = if (selectedStreamerFacing == StreamerFacing.FRONT) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent
             },
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            onClick = { onChange(StreamerFacing.FRONT) },
+            enabled = selectedStreamerFacing != StreamerFacing.FRONT
         ) {
             Text(
                 modifier = Modifier.padding(
@@ -390,14 +394,14 @@ fun CameraOrientationRow(
             )
         }
         Surface(
-            modifier = Modifier
-                .clickable { onChange() },
             color = if (selectedStreamerFacing == StreamerFacing.BACK) {
                 ThemeExtra.colors.thirdOpaqueGray
             } else {
                 Color.Transparent
             },
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            onClick = { onChange(StreamerFacing.BACK) },
+            enabled = selectedStreamerFacing != StreamerFacing.BACK
         ) {
             Text(
                 modifier = Modifier.padding(
@@ -479,7 +483,8 @@ fun CommentPanel(
                         }
                 )
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(50.dp)
         )
     }

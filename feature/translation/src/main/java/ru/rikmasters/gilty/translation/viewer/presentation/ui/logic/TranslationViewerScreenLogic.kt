@@ -572,15 +572,7 @@ fun TranslationViewerScreenLogic(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                TranslationResumedSnackbar(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
+                TranslationResumedSnackbar()
             }
             AnimatedVisibility(
                 visible = isLowConnection &&
@@ -590,15 +582,7 @@ fun TranslationViewerScreenLogic(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                WeakConnectionSnackbar(
-                    modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Modifier
-                            .fillMaxHeight()
-                            .width((configuration.screenWidthDp * 0.6).dp)
-                    } else {
-                        Modifier.fillMaxSize()
-                    }
-                )
+                WeakConnectionSnackbar()
             }
             /*
             GAlertDarkTheme(

@@ -57,18 +57,11 @@ private fun CustomSnackbar(
 }
 
 @Composable
-fun MicroInactiveSnackbar(
-    modifier: Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        CustomSnackbar(
-            text = stringResource(id = R.string.translations_micro_off_organizer),
-            iconPainter = painterResource(id = R.drawable.ic_micro_inactive)
-        )
-    }
+fun MicroInactiveSnackbar() {
+    CustomSnackbar(
+        text = stringResource(id = R.string.translations_micro_off_organizer),
+        iconPainter = painterResource(id = R.drawable.ic_micro_inactive)
+    )
 }
 
 @Composable
@@ -87,31 +80,17 @@ fun MicroInactiveViewerSnackbar(
 }
 
 @Composable
-fun TranslationResumedSnackbar(
-    modifier: Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
+fun TranslationResumedSnackbar() {
         CustomSnackbar(
             text = stringResource(id = R.string.translation_resumed),
             iconPainter = painterResource(id = R.drawable.ic_play)
         )
-    }
 }
 
 @Composable
-fun WeakConnectionSnackbar(
-    modifier: Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        CustomSnackbar(
-            text = stringResource(id = R.string.translations_weak_connection),
-            iconPainter = painterResource(id = R.drawable.ic_weak_connection)
-        )
-    }
+fun WeakConnectionSnackbar() {
+    CustomSnackbar(
+        text = stringResource(id = R.string.translations_weak_connection),
+        iconPainter = painterResource(id = R.drawable.ic_weak_connection)
+    )
 }

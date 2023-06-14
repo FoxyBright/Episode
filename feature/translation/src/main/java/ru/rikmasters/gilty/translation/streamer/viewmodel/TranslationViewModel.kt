@@ -62,7 +62,8 @@ class TranslationViewModel : ViewModel() {
     private val _membersCount = MutableStateFlow(0)
     val membersCount = _membersCount.asStateFlow()
 
-    private val retryCount = MutableStateFlow(8)
+    private val _retryCount = MutableStateFlow(8)
+    val retryCount = _retryCount.asStateFlow()
 
     private val _additionalTime = MutableStateFlow("")
     val additionalTime = _additionalTime.asStateFlow()
@@ -91,15 +92,12 @@ class TranslationViewModel : ViewModel() {
                 TranslationStatusModel.ACTIVE -> {
                     _hudState.value = null
                 }
-
                 TranslationStatusModel.EXPIRED -> {
                     _streamerViewState.value = StreamerViewState.EXPIRED
                 }
-
                 COMPLETED -> {
                     _streamerViewState.value = StreamerViewState.COMPLETED
                 }
-
                 else -> {}
             }
         }
@@ -127,7 +125,14 @@ class TranslationViewModel : ViewModel() {
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), FRONT)
 
     private val _hudState = MutableStateFlow<StreamerHUD?>(null)
-    val hudState = _hudState.asStateFlow()
+    val hudState = _hudState
+        .onEach {
+            if (it == RECONNECTING || it == RECONNECT_FAILED) {
+                //_oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(false))
+            } else {
+                //_oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(true))
+            }
+        }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
     private val _streamerViewState = MutableStateFlow(PREVIEW)
     val streamerViewState = _streamerViewState.asStateFlow()
@@ -139,7 +144,6 @@ class TranslationViewModel : ViewModel() {
             STREAM -> {
                 hud == null
             }
-
             else -> false
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
@@ -147,6 +151,11 @@ class TranslationViewModel : ViewModel() {
     private val _streamerSnackbarState = MutableSharedFlow<StreamerSnackbarState?>(1, 0, BufferOverflow.DROP_OLDEST)
     val streamerSnackbarState = _streamerSnackbarState
         .onEach {
+            if (it == WEAK_CONNECTION) {
+                _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(false))
+            } else {
+                _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(true))
+            }
             _oneTimeEvent.send(TranslationOneTimeEvent.ShowSnackbar)
         }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
 
@@ -333,9 +342,12 @@ class TranslationViewModel : ViewModel() {
             }
 
             TranslationEvent.Reconnect -> {
-                retryCount.value = 8
+                _retryCount.value = 8
                 _translation.value?.id?.let {
                     loadTranslationInfo(it)
+                }
+                coroutineScope.launch {
+                    _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
                 }
                 _hudState.value = RECONNECTING
             }
@@ -376,12 +388,14 @@ class TranslationViewModel : ViewModel() {
                     }
 
                     RTMPStatus.FAILED -> {
-                        if (retryCount.value > 0) {
+                        if (_retryCount.value > 0) {
                             _hudState.value = RECONNECTING
+                            coroutineScope.launch {
+                                _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
+                            }
                         } else {
                             _hudState.value = RECONNECT_FAILED
                         }
-                        retryCount.value = retryCount.value - 1
                     }
                 }
             }
@@ -390,6 +404,16 @@ class TranslationViewModel : ViewModel() {
                 coroutineScope.launch {
                     _streamerSnackbarState.emit(WEAK_CONNECTION)
                 }
+            }
+
+            TranslationEvent.BitrateStabilized -> {
+                coroutineScope.launch {
+                    _streamerSnackbarState.emit(null)
+                }
+            }
+
+            TranslationEvent.DecreaseRetryCount -> {
+                _retryCount.value = _retryCount.value - 1
             }
         }
     }
@@ -472,7 +496,7 @@ class TranslationViewModel : ViewModel() {
         }
     }
 
-    private fun handleAppendTime(duration: Int? = null) {
+    private fun handleAppendTime(duration: Int? = null, completedAt: LocalDateTime) {
         duration?.let {
             _translation.value?.let { model ->
                 if (LocalDateTime.nowZ().isBefore(model.completedAt)) {
@@ -487,9 +511,15 @@ class TranslationViewModel : ViewModel() {
                         }
                     } ?: "$minute"
                     coroutineScope.launch {
-                        _streamerSnackbarState.emit(BROADCAST_EXTENDED)
+                        _additionalTime.value = "$hourString$minuteString:00"
+                        delay(2000)
+                        _additionalTime.value = ""
+                        _translation.update {
+                            it?.copy(
+                                completedAt = completedAt
+                            )
+                        }
                     }
-                    _additionalTime.value = "$hourString$minuteString:00"
                 }
             }
         } ?: kotlin.run {
@@ -540,14 +570,7 @@ class TranslationViewModel : ViewModel() {
 
     private fun handleTranslationAppended(completedAt: LocalDateTime, duration: Int) {
         coroutineScope.launch {
-            handleAppendTime(duration)
-            delay(2000)
-            _translation.update {
-                it?.copy(
-                    status = TranslationStatusModel.ACTIVE,
-                    completedAt = completedAt
-                )
-            }
+            handleAppendTime(duration, completedAt)
         }
     }
 

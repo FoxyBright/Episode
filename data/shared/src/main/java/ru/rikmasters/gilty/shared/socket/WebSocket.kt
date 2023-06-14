@@ -120,15 +120,17 @@ abstract class WebSocket: KtorSource() {
     suspend fun connect(userId: String) {
         try {
             connection(userId)
-            Log.d("TEST", "conn socck 5")
+            Log.d("TEST", "Connect")
         } catch(e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
+            Log.d("TEST", "exception $e")
             disconnect()
             try {
-                Log.d("TEST", "conn socck 6")
+                Log.d("TEST", "Retry")
                 connection(userId)
             } catch(e: Exception) {
+                Log.d("TEST", "Bad reconnection $e")
                 logE("Bad reconnection")
                 logE("$e")
             }
@@ -145,7 +147,7 @@ abstract class WebSocket: KtorSource() {
                         while(true) {
                             delay(pingInterval)
                             doPing(session)
-                            Log.d("WebSoc", "PINGING WITH $port")
+                            logV("Ping...port:$port")
                         }
                     }
                     _session.emit(session)
