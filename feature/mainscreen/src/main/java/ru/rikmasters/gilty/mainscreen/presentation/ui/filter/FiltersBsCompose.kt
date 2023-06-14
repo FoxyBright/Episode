@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui.filter
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
@@ -122,19 +121,22 @@ private fun TopBar(
     callback: MeetingFilterBottomCallback?,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
+    Row(
         modifier
             .fillMaxWidth()
             .padding(top = 14.dp, bottom = 8.dp)
     ) {
-        itemSpacer(16.dp, true)
-        items(state.interest.reversed()) {
+        Spacer(Modifier.width(16.dp))
+        state.interest.reversed().forEach {
             GChip(
-                Modifier.padding(end = 8.dp), it.name,
-                state.selectedCategories.contains(it)
+                modifier = Modifier
+                    .padding(end = 8.dp),
+                text = it.name,
+                isSelected = state.selectedCategories
+                    .contains(it)
             ) { callback?.onSubClick(it) }
         }
-        itemSpacer(8.dp, true)
+        Spacer(Modifier.width(8.dp))
     }
 }
 
@@ -144,32 +146,39 @@ private fun Content(
     callback: MeetingFilterBottomCallback?,
     modifier: Modifier = Modifier,
 ) {
-    val list = filterList(state, callback)
     Box(
         Modifier
             .fillMaxSize()
             .alpha(state.alpha)
-            .background(colorScheme.primaryContainer)
+            .background(
+                colorScheme.primaryContainer
+            )
     )
-    LazyColumn(modifier.fillMaxSize()) {
-        itemsIndexed(list) { i, it ->
+    Column(
+        modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        filterList(state, callback).forEachIndexed { i, it ->
             Column(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    it.name, Modifier.padding(
+                    text = it.name,
+                    modifier = Modifier.padding(
                         top = if(i == 0) 0.dp
                         else 28.dp,
                         bottom = 18.dp
-                    ), colorScheme.tertiary,
+                    ),
+                    color = colorScheme.tertiary,
                     style = typography.labelLarge
                 )
                 it.content()
             }
         }
-        itemSpacer(40.dp)
+        Spacer(Modifier.height(40.dp))
     }
 }
 
@@ -197,12 +206,15 @@ private fun Buttons(
             }
         ) { onFilter() }
         if(hasFilter) Text(
-            stringResource(R.string.meeting_filter_clear),
-            Modifier
+            text = stringResource(R.string.meeting_filter_clear),
+            modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClear() }
-                .padding(top = 12.dp, bottom = 28.dp),
-            colorScheme.tertiary,
+                .padding(
+                    top = 12.dp,
+                    bottom = 28.dp
+                ),
+            color = colorScheme.tertiary,
             textAlign = Center,
             style = typography.bodyLarge
         )
@@ -217,28 +229,36 @@ private fun filterList(
     val filters = arrayListOf(
         FilterModel(stringResource(R.string.meeting_filter_category)) {
             Category(
-                state.categories,
-                state.categoriesStates,
-                state.selectedCategories,
-                { index, category ->
+                categories = state.categories,
+                states = state.categoriesStates,
+                selected = state.selectedCategories,
+                onCategoryClick = { index, category ->
                     callback?.onCategoryClick(index, category)
-                }, { callback?.onSubClick(it) },
-                { callback?.onAllCategoryClick() }
+                },
+                onSubClick = { callback?.onSubClick(it) },
+                onAllCategoryClick = { callback?.onAllCategoryClick() }
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_tag_search)) {
             Tags(
-                state.tags,
-                { callback?.onFilterClick() },
+                tagList = state.tags,
+                onClick = { callback?.onFilterClick() },
             ) { callback?.onDeleteTag(it) }
         },
         FilterModel(stringResource(R.string.meeting_filter_meet_type)) {
             MeetingType(
-                state.onlyOnline,
-                state.meetType,
-                stringResource(R.string.meeting_only_online_meetings_button),
-                (false), { callback?.onOnlyOnlineClick() },
-                { callback?.onMeetingTypeSelect(it) }
+                checkState = state.onlyOnline,
+                selected = state.meetType,
+                checkLabel = stringResource(
+                    R.string.meeting_only_online_meetings_button
+                ),
+                online = false,
+                onOnlyOnlineClick = {
+                    callback?.onOnlyOnlineClick()
+                },
+                onMeetingTypeSelect = {
+                    callback?.onMeetingTypeSelect(it)
+                }
             )
         },
         FilterModel(stringResource(R.string.meeting_filter_conditions)) {
@@ -251,19 +271,19 @@ private fun filterList(
         (2),
         FilterModel(stringResource(R.string.meeting_filter_distance)) {
             Distance(
-                state.distance,
-                state.distanceState,
-                { callback?.onDistanceClick() },
-                { callback?.onDistanceValueChange(it) }
+                distance = state.distance,
+                state = state.distanceState,
+                onClick = { callback?.onDistanceClick() },
+                onValueChange = { callback?.onDistanceValueChange(it) }
             )
         })
     else filters.add(
         (0), FilterModel(stringResource(add_meet_detailed_meet_place)) {
             CardRow(
-                stringResource(R.string.select_city),
-                state.city?.name ?: "",
-                Modifier.padding(),
-                shapes.medium
+                label = stringResource(R.string.select_city),
+                text = state.city?.name ?: "",
+                modifier = Modifier.padding(),
+                shape = shapes.medium
             ) { callback?.onCityClick() }
         }
     )

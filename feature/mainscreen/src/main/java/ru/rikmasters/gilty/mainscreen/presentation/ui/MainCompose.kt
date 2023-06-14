@@ -355,32 +355,33 @@ private fun Content(
     callback: MainContentCallback?,
 ) {
     Box {
-        if(meetings.size < 2) MeetCard(
+        if(remember { meetings.size } < 2) MeetCard(
             modifier = modifier,
             type = EMPTY,
             hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
-        if(state && meetings.isNotEmpty())
-            MeetingGridContent(
-                modifier = modifier.fillMaxSize(),
-                meetings = meetings
-            ) { callback?.onRespond(it) }
-        else
-            MeetingsListContent(
-                states = meetings.map { item ->
-                    item to rememberSwipeableCardState()
-                },
-                modifier = modifier.padding(top = 24.dp),
-                notInteresting = { meet, it ->
-                    callback?.meetInteraction(LEFT, meet, it)
-                },
-                onSelect = { meet, it ->
-                    callback?.onRespond(meet)
-                    callback?.meetInteraction(RIGHT, meet, it)
-                }
-            ) { callback?.onMeetClick(it) }
+        //        if(state && meetings.isNotEmpty())
+        //            MeetingGridContent(
+        //                modifier = modifier.fillMaxSize(),
+        //                meetings = meetings
+        //            ) { callback?.onRespond(it) }
+        //        else
+        val states = meetings.map {
+            it to rememberSwipeableCardState()
+        }
+        MeetingsListContent(
+            states = states,
+            modifier = modifier.padding(top = 24.dp),
+            notInteresting = { meet, it ->
+                callback?.meetInteraction(LEFT, meet, it)
+            },
+            onSelect = { meet, it ->
+                callback?.onRespond(meet)
+                callback?.meetInteraction(RIGHT, meet, it)
+            }
+        ) { callback?.onMeetClick(it) }
     }
 }
 
@@ -424,19 +425,20 @@ private fun Filters(
     alpha: Float,
     scope: Scope?,
 ) {
-    if(scope == null) return
-    Box {
-        Box(
-            Modifier
-                .offset(y = gripOffset(isCollapsed))
-                .clip(shapes.bigTopShapes)
-        ) {
-            Connector<FiltersBsViewModel>(scope) {
-                FiltersBs(it, alpha, isCollapsed)
+    scope?.let {
+        Box {
+            Box(
+                Modifier
+                    .offset(y = gripOffset(isCollapsed))
+                    .clip(shapes.bigTopShapes)
+            ) {
+                Connector<FiltersBsViewModel>(scope) {
+                    FiltersBs(it, alpha, isCollapsed)
+                }
             }
+            Grip(Modifier.align(TopCenter), !isCollapsed)
         }
-        Grip(Modifier.align(TopCenter), !isCollapsed)
-    }
+    } ?: return
 }
 
 @Composable

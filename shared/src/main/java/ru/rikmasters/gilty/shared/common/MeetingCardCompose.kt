@@ -341,14 +341,16 @@ private fun MeetCard(
     meet?.let {
         Box {
             MeetTop(
-                it.organizer?.avatar,
-                Modifier
+                avatar = it.organizer?.avatar,
+                modifier = Modifier
                     .clip(ThemeExtra.shapes.bigTopShapes)
                     .fillMaxSize()
                     .offset(y = (-24).dp)
             )
             MeetBottom(
-                it, offset, Modifier.align(BottomCenter)
+                meet = it,
+                offset = offset,
+                modifier = Modifier.align(BottomCenter)
             ) { type -> onSelect?.let { it(type) } }
         }
     }
@@ -360,8 +362,8 @@ private fun MeetTop(
     modifier: Modifier,
 ) {
     GCachedImage(
-        avatar?.thumbnail?.url,
-        modifier
+        url = avatar?.thumbnail?.url,
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 1.dp),
         contentScale = Crop,
