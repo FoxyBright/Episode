@@ -85,7 +85,7 @@ fun YandexMapContent(
             sheetContent = {
                 Bottom(state) {
                     callback?.appBsExpandState(
-                        state = true
+                        state = false
                     )
                 }
             },

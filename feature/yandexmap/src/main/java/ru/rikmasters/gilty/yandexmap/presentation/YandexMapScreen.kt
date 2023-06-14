@@ -7,6 +7,8 @@ import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetState
@@ -31,7 +33,9 @@ fun YandexMapScreen(
     val mapKit by vm.mapKit.collectAsState()
     val address = addMeet?.address ?: ""
     val place = addMeet?.place ?: ""
-    
+
+    val asm = get<AppStateModel>()
+
     val loc = mapper.readValue(
         location, LocationModel::class.java
     )
@@ -88,10 +92,13 @@ fun YandexMapScreen(
             callback = object: YandexMapCallback {
                 
                 override fun appBsExpandState(state: Boolean) {
-                    val bs = appBsState.bottomSheetState
+                    /*val bs = appBsState.bottomSheetState
                     scope.launch {
                         if(state) bs.expand()
                         else bs.collapse()
+                    }*/
+                    scope.launch {
+                        asm.bottomSheet.collapse()
                     }
                 }
                 
