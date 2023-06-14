@@ -53,7 +53,7 @@ class HiddenViewModel : ViewModel() {
             if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
         })*/
 
-    suspend fun moveDog(fromOr: ItemPosition, toOr: ItemPosition) {
+    suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
            /*dogs = dogs.toMutableList().apply {
                add(toOr.index, removeAt(fromOr.index))
            }*/

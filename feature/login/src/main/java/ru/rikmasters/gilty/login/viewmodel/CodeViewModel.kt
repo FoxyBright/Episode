@@ -91,6 +91,7 @@ class CodeViewModel(
     }
     
     suspend fun onCodeChange(index: Int, text: String) {
+        if(_blur.value) return
         if(code.value.length <= codeLength.value) {
             if(text.length == codeLength.value) {
                 _code.emit(text)
@@ -117,7 +118,6 @@ class CodeViewModel(
     ) = singleLoading {
         authManager.onOtpAuthentication(code).on(
             success = {
-                
                 logD("code_.  SUCCESS")
                 authManager.login(it); true
             },
@@ -128,7 +128,8 @@ class CodeViewModel(
             error = {
                 logD("code_.  ERROR")
                 context.errorToast(
-                    it.serverMessage
+                    context toMessError
+                            (it.serverMessage?:"")
                 )
                 false
             }

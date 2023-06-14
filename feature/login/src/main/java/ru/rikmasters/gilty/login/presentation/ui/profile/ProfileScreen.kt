@@ -115,6 +115,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
             override fun onDescriptionChange(text: String) {
                 scope.launch {
                     vm.descriptionChange(text)
+                    onSaveDescription()
                     errorAvatar = false
                 }
             }
@@ -124,7 +125,10 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun onNameChange(text: String) {
-                scope.launch { vm.usernameChange(text) }
+                scope.launch {
+                    vm.usernameChange(text)
+                    onSaveUserName()
+                }
             }
             
             override fun onSaveUserName() {

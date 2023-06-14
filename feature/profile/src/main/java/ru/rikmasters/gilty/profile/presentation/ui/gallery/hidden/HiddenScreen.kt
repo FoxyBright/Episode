@@ -65,7 +65,7 @@ fun HiddenBsScreen(
 
             override fun onPhotoMoved(from: ItemPosition, to: ItemPosition) {
                 scope.launch {
-                    vm.moveDog(from, to)
+                    vm.movePhoto(from, to)
                 }
             }
             override fun openGallery() {

@@ -6,6 +6,7 @@ import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.profile.repository.ProfileStore
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.enumeration.GenderType
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.OrientationModel
 import java.io.File
 
@@ -36,12 +37,13 @@ class RegistrationManager(
         val response = profileWebSource
             .getFiles(albumId).on(
                 success = {
-                    it.first.map { url ->
+                   /* it.first.map { url ->
                         url.thumbnail?.url ?: ""
-                    } to it.second
+                    } to it.second*/
+                     it.first.map { it.map() } to it.second
                 },
-                loading = { emptyList<String>() to 0 },
-                error = { emptyList<String>() to 0 }
+                loading = { emptyList<AvatarModel>() to 0 },
+                error = { emptyList<AvatarModel>() to 0 }
             )
         DataStateTest.Success(response)
     }
@@ -90,6 +92,7 @@ class RegistrationManager(
             OrientationModel("HETERO", "Гетеро")
         )
     }
+
 }
 
 private fun String.substring(

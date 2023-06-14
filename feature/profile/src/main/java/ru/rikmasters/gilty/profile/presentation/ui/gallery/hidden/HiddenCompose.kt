@@ -135,14 +135,14 @@ fun HiddenBsContent(
                                 reorderableState = stateDragable,
                                 key = img.id,
                                 modifier = Modifier
-                                    .aspectRatio(1f)
-                                    .detectReorderAfterLongPress(stateDragable)
-                                    .clip(shapes.large)
                             ) { isDragging ->
                                 val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                                 LazyItem(
                                     image = img.thumbnail.url,
                                     modifier = Modifier
+                                        .aspectRatio(1f)
+                                        .detectReorderAfterLongPress(stateDragable)
+                                        .clip(shapes.large)
                                         .zIndex(if(isDragging) 1f else 2f)
                                         .shadow(elevation.value),
                                     onSelect = { callback?.onSelectImage(img) },
@@ -202,8 +202,8 @@ private fun GalleryButton(
     callback: HiddenBsCallback?,
 ) {
     Card(
-        { callback?.openGallery() },
-        modifier
+        onClick = { callback?.openGallery() },
+        modifier = modifier
             .size((screenWidth.dp - 72.dp) / 3)
             .clip(shapes.large),
         shape = shapes.large,

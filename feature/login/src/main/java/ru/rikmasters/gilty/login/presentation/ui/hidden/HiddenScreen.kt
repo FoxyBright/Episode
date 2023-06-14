@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.login.presentation.ui.gallery
+package ru.rikmasters.gilty.login.presentation.ui.hidden
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,10 +10,10 @@ import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.login.viewmodel.HiddenViewModel
-import ru.rikmasters.gilty.shared.common.HiddenCallback
-import ru.rikmasters.gilty.shared.common.HiddenContent
-import ru.rikmasters.gilty.shared.common.HiddenState
+import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -26,18 +26,32 @@ fun HiddenScreen(vm: HiddenViewModel) {
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-    
+    val viewerSelectImage by vm.viewerSelectImage.collectAsState()
+    val photoViewType by vm.viewerType.collectAsState()
+    val photoViewState by vm.viewerState.collectAsState()
+
     LaunchedEffect(Unit) { vm.getHidden() }
     
     HiddenContent(
-        HiddenState(photoList, photosAmount),
+        state = HiddenState(photoList = photoList,
+            photosAmount = photoList.size//photosAmount
+            ,
+            photoViewState = photoViewState,
+            viewerImages = photoList,
+            viewerSelectImage = viewerSelectImage,
+            viewerMenuState = false,
+            viewerType = photoViewType),
         Modifier, object: HiddenCallback {
             
-            override fun onSelectImage(image: String) {
-                scope.launch { vm.selectImage(image) }
+            override fun onSelectImage(image: AvatarModel) {
+                scope.launch {
+                    vm.changePhotoViewType(PhotoViewType.PHOTO)
+                    vm.setPhotoViewSelected(image)
+                    vm.changePhotoViewState(true)
+                }
             }
             
-            override fun onDeleteImage(image: String) {
+            override fun onDeleteImage(image: AvatarModel) {
                 scope.launch { vm.deleteImage(image) }
             }
             
@@ -46,7 +60,11 @@ fun HiddenScreen(vm: HiddenViewModel) {
                     storagePermissions, scope, asm,
                 ) { nav.navigate("gallery?multi=true") }
             }
-            
+
+            override fun onPhotoViewDismiss(state: Boolean) {
+                scope.launch { vm.changePhotoViewState(state) }
+            }
+
             override fun onBack() {
                 nav.navigationBack()
             }
@@ -54,8 +72,12 @@ fun HiddenScreen(vm: HiddenViewModel) {
             override fun onNext() {
                 scope.launch {
                     // TODO СДЕЛАТЬ НОРМАЛЬНЫЙ МЕХАНИЗМ ДОБАВЛЕНИЯ И УДАЛЕНИЯ СКРЫТЫХ
-                    nav.navigate("profile")
+                    nav.navigationBack()
                 }
+            }
+
+            override fun onPhotoMoved(from: ItemPosition, to: ItemPosition) {
+                scope.launch { vm.movePhoto(from, to) }
             }
         }
     )

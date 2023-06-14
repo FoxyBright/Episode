@@ -1,5 +1,6 @@
-package ru.rikmasters.gilty.shared.common
+package ru.rikmasters.gilty.login.presentation.ui.hidden
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
@@ -31,9 +33,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.GCachedImage
+import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
+import ru.rikmasters.gilty.shared.common.dragGrid.ReorderableItem
+import ru.rikmasters.gilty.shared.common.dragGrid.detectReorderAfterLongPress
+import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridState
+import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.shared.screenWidth
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
@@ -47,24 +59,33 @@ private fun HiddenPhotoPreview() {
             )
         ) {
             HiddenContent(
-                HiddenState(listOf(),0)
+                HiddenState(listOf(),0, false,)
             )
         }
     }
 }
 
 data class HiddenState(
-    val photoList: List<String>,
+    val photoList: List<AvatarModel>,
     val photosAmount:Int,
+    val photoViewState: Boolean,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
+    val viewerType: PhotoViewType = PhotoViewType.PHOTO,
 )
 
 interface HiddenCallback {
     
     fun onNext() {}
     fun onBack() {}
-    fun onSelectImage(image: String) {}
-    fun onDeleteImage(image: String) {}
+    fun onSelectImage(image: AvatarModel) {}
+    fun onDeleteImage(image: AvatarModel) {}
     fun openGallery() {}
+    fun onPhotoViewDismiss(state: Boolean)
+    fun onPhotoViewChangeMenuState(state: Boolean) = Unit
+    fun onPhotoViewMenuItemClick(imageId: String) = Unit
+    fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
 }
 
 @Composable
@@ -73,6 +94,16 @@ fun HiddenContent(
     modifier: Modifier = Modifier,
     callback: HiddenCallback? = null,
 ) {
+    if (state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
+        type = state.viewerType,
+        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        onBack = { callback?.onPhotoViewDismiss(false) },
+    )
+
     Column(
         modifier
             .fillMaxWidth()
@@ -82,21 +113,58 @@ fun HiddenContent(
             stringResource(R.string.profile_hidden_photo),
             Modifier.padding(bottom = 20.dp),
             stringResource(R.string.profile_hidden_photo_label),
-            extra = stringResource(R.string.profile_hidden_photo_amount, state.photosAmount)
+            extra = if (state.photosAmount == 0) null
+            else stringResource(R.string.profile_hidden_photo_amount, state.photosAmount)
         ) { callback?.onBack() }
+
+        val stateDragable = rememberReorderableLazyGridState(
+            onMove = { from, to ->
+                callback?.onPhotoMoved(from, to)
+            },
+            canDragOver = { draggedOver, dragging ->
+                draggedOver.index != 0
+            }
+        )
+
         LazyVerticalGrid(
             GridCells.Fixed(3),
             Modifier.padding(horizontal = 16.dp),
             verticalArrangement = spacedBy(4.dp),
             horizontalArrangement = spacedBy(4.dp)
         ) {
-            item { GalleryButton(callback) }
-            items(state.photoList) { image ->
+            item {
+                GalleryButton(
+                    modifier = Modifier
+                        .aspectRatio(1f),
+                    callback = callback
+                )
+            }
+            items(items = state.photoList, key = { it.thumbnail.url }) { img ->
+                ReorderableItem(
+                    reorderableState = stateDragable,
+                    key = img.thumbnail.url,
+                    modifier = Modifier
+
+                ) { isDragging ->
+                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                    LazyItem(
+                        image = img.thumbnail.url,
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .detectReorderAfterLongPress(stateDragable)
+                            .clip(shapes.large)
+                            .shadow(elevation.value),
+                        onSelect = { callback?.onSelectImage(img) },
+                        onDelete = { callback?.onDeleteImage(img) }
+                    )
+                }
+            }
+      /*      items(state.photoList) { image ->
                 LazyItem(
                     image, Modifier,
                     { callback?.onSelectImage(it) })
                 { callback?.onDeleteImage(it) }
-            }
+            }*/
         }
     }
     Box(Modifier.fillMaxSize()) {
@@ -113,14 +181,16 @@ fun HiddenContent(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun GalleryButton(callback: HiddenCallback?) {
+private fun GalleryButton(modifier:Modifier = Modifier, callback: HiddenCallback?) {
     Card(
-        { callback?.openGallery() },
-        Modifier.size(130.dp),
+        onClick = { callback?.openGallery() },
+        modifier = modifier.size((screenWidth.dp - 72.dp) / 3)
+            .clip(shapes.large),
         shape = shapes.large,
+        colors = cardColors(Transparent)
     ) {
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(colors.grayButton),
             Center
@@ -128,7 +198,7 @@ private fun GalleryButton(callback: HiddenCallback?) {
             Box(
                 Modifier
                     .clip(CircleShape)
-                    .background(colorScheme.primary)
+                    .background(Colors.AlmostRed)
             ) {
                 Icon(
                     painterResource(R.drawable.ic_image_box),

@@ -132,7 +132,7 @@
     <string name="notification_leave_emotion">Вы оставили эмоции от episode</string>
     <string name="notification_earlier_label">Ранее</string>
     <string name="notification_responds_on_user_meetings">Отклики на ваши episode</string>
-    <string name="notification_on_this_week_label">На этой неделе</string>
+    <string name="notification_on_this_week_label">Предыдущие 7 дней</string>
     <string name="notification_respond_cancel_button">Отменить</string>
     <string name="notification_respond_accept_button">Принять</string>
     <string name="notification_send_emotion">Оставьте эмоции участникам episode</string>
