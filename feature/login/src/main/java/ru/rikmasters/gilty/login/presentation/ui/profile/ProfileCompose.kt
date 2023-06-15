@@ -58,7 +58,8 @@ fun ProfileContent(
                 .padding(top = it.calculateTopPadding())
                 .offset(y = 24.dp)
                 .padding(horizontal = 32.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             shape = RoundedCornerShape(30.dp),
             colors = cardColors(colorScheme.background),
             border = BorderStroke(
@@ -69,11 +70,6 @@ fun ProfileContent(
             Profile(
                 state = state,
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    /*.scrollable(
-                        rememberScrollState(),
-                        Vertical
-                    )*/
                     .fillMaxHeight(0.8f)
                     .padding(top = 50.dp),
                 callback = callback

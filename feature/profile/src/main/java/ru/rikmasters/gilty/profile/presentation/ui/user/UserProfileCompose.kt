@@ -142,7 +142,7 @@ fun ProfileContent(
                     ) {
                         IconButton(
                             onClick = { callback?.menu(true) },
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = 5.dp)
                         ) {
                             Icon(
                                 painter = painterResource(ic_kebab),

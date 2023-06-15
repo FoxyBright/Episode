@@ -244,8 +244,6 @@ private fun TopBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
-
-
                     Text(
                         text = username,
                         color = colorScheme.tertiary,

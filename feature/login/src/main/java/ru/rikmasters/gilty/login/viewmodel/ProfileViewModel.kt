@@ -58,7 +58,7 @@ class ProfileViewModel: ViewModel() {
     val profile = _profile.asStateFlow()
     
     suspend fun getProfile() = singleLoading {
-        val profile = regManager.getProfile(false)
+        val profile = regManager.getProfile(true)
         _profile.emit(profile)
         _username.emit(profile.username ?: "")
         _description.emit(profile.aboutMe ?: "")

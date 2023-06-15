@@ -49,14 +49,7 @@ class HiddenViewModel : ViewModel() {
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
 
-  /*      var dogs by mutableStateOf(List(500) {
-            if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
-        })*/
-
     suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
-           /*dogs = dogs.toMutableList().apply {
-               add(toOr.index, removeAt(fromOr.index))
-           }*/
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photos.value.size > from && _photos.value.size > to) {
