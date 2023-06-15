@@ -455,7 +455,7 @@ fun ProfileStatisticContent(
                 Observe(
                     modifier = Modifier.weight(1f),
                     profileType = profileType,
-                    text = stringResource(R.string.profile_user_observe),
+                    text = if(profileType == USERPROFILE || profileType == CREATE) stringResource(R.string.profile_user_observe) else stringResource(R.string.profile_observe),
                     count = observed
                 )
             }
