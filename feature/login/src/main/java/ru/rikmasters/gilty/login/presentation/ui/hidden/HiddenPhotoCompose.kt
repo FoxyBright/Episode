@@ -164,15 +164,9 @@ fun HiddenContent(
                     )
                 }
             }
-            /*      items(state.photoList) { image ->
-                      LazyItem(
-                          image, Modifier,
-                          { callback?.onSelectImage(it) })
-                      { callback?.onDeleteImage(it) }
-                  }*/
         }
     }
-    Box(Modifier.fillMaxSize()) {
+/*    Box(Modifier.fillMaxSize()) {
         GradientButton(
             Modifier
                 .padding(bottom = 48.dp)
@@ -180,7 +174,7 @@ fun HiddenContent(
                 .align(Alignment.BottomCenter),
             stringResource(R.string.next_button)
         ) { callback?.onNext() }
-    }
+    }*/
 }
 
 
