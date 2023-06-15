@@ -49,6 +49,13 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
 
+    val desc = description
+        .debounce(250)
+        .onEach {
+            updateDescription()
+        }
+        .state(_description.value, Eagerly)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val meetsTest by lazy {
         refresh.flatMapLatest {

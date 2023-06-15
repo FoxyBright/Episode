@@ -49,8 +49,7 @@ class ProfileViewModel: ViewModel() {
     val desc = description
         .debounce(250)
         .onEach {
-            if(it.isNotEmpty())
-                onDescriptionSave()
+            onDescriptionSave()
         }
         .state(_description.value, Eagerly)
 
