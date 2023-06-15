@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.streamer.presentation.ui.components
+package ru.rikmasters.gilty.translation.shared.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

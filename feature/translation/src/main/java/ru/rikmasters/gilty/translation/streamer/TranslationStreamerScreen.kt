@@ -1,8 +1,8 @@
-package ru.rikmasters.gilty.translation.streamer.presentation.ui.logic
+package ru.rikmasters.gilty.translation.streamer
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.Size
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -44,11 +44,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pedro.encoder.input.gl.render.filters.`object`.ImageObjectFilterRender
-import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.util.BitrateAdapter
-import com.pedro.rtplibrary.util.SensorRotationManager
 import com.pedro.rtplibrary.view.OpenGlView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -62,31 +60,32 @@ import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
-import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
-import ru.rikmasters.gilty.translation.streamer.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.CONNECTED
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.FAILED
 import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
-import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.ProfileAvatar
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroWave
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.MicroInactiveSnackbar
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.NoConnection
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.Reconnecting
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.TranslationDialogType
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.TranslationResumedSnackbar
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.TranslationStreamerDialog
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.components.WeakConnectionSnackbar
-import ru.rikmasters.gilty.translation.streamer.presentation.ui.content.TranslationStreamerContent
+import ru.rikmasters.gilty.translation.streamer.model.SurfaceState
+import ru.rikmasters.gilty.translation.shared.components.ProfileAvatar
+import ru.rikmasters.gilty.translation.shared.components.MicroWave
+import ru.rikmasters.gilty.translation.shared.components.MicroInactiveSnackbar
+import ru.rikmasters.gilty.translation.shared.components.NoConnection
+import ru.rikmasters.gilty.translation.shared.components.Reconnecting
+import ru.rikmasters.gilty.translation.shared.components.TranslationDialogType
+import ru.rikmasters.gilty.translation.shared.components.TranslationResumedSnackbar
+import ru.rikmasters.gilty.translation.shared.components.TranslationStreamerDialog
+import ru.rikmasters.gilty.translation.shared.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationViewModel
-import ru.rikmasters.gilty.translation.utils.map
+import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
+import ru.rikmasters.gilty.translation.shared.utils.map
+import ru.rikmasters.gilty.translation.shared.utils.restartPreview
+import ru.rikmasters.gilty.translation.shared.utils.startBroadCast
+import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.OnLifecycleEvent
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestTranslationScreen(
+fun TranslationStreamerScreen(
     vm: TranslationViewModel,
     translationId: String
 ) {
@@ -124,7 +123,7 @@ fun TestTranslationScreen(
     val placeholderView by vm.placeHolderVisible.collectAsState()
     val membersCount by vm.membersCount.collectAsState()
     val retryCount by vm.retryCount.collectAsState()
-    val viewState by vm.streamerViewState.collectAsState()
+    val customHUDState by vm.customHUDState.collectAsState()
     val messages = vm.messages.collectAsLazyPagingItems()
     val members = vm.members.collectAsLazyPagingItems()
     val query by vm.query.collectAsState()
@@ -168,17 +167,34 @@ fun TestTranslationScreen(
      * Orientation
      */
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
-    var sensorOrientation by remember { mutableStateOf(0) }
     LaunchedEffect(key1 = configuration) {
         snapshotFlow { configuration.orientation }
             .collect {
-                if (camera?.isStreaming == true || camera?.isOnPreview == true) {
-                    camera?.glInterface?.setRotation(sensorOrientation)
-                }
                 orientation = it
             }
     }
 
+
+
+
+
+
+
+    /**
+     * Enter background / enter foreground
+     */
+    OnLifecycleEvent { _, event ->
+        // do stuff on event
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                vm.onEvent(TranslationEvent.EnterForeground(translationId))
+            }
+            Lifecycle.Event.ON_PAUSE -> {
+                vm.onEvent(TranslationEvent.EnterBackground)
+            }
+            else -> {}
+        }
+    }
     /**
      * Enter/leave screen
      */
@@ -186,6 +202,7 @@ fun TestTranslationScreen(
         vm.onEvent(TranslationEvent.Initialize(translationId))
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
         onDispose {
+            destroyRTMP(camera)
             vm.onEvent(TranslationEvent.Dismiss)
             if (isInDarkTheme) {
                 systemUiController.setSystemBarsColor(color = backgroundColor, darkIcons = false)
@@ -195,80 +212,12 @@ fun TestTranslationScreen(
         }
     }
 
+    val surfaceState by vm.surfaceState.collectAsState()
+
+
     /**
      * Camera
      */
-    fun startPreview() {
-        camera?.let {
-            if (!it.isOnPreview) {
-                val resolutionFront = it.resolutionsFront
-                val resolutionBack = it.resolutionsBack
-                val isUHd = (resolutionBack.contains(
-                    Size(
-                        1920,
-                        1080
-                    )
-                ) && resolutionFront.contains(Size(1920, 1080)))
-                val isHd = (resolutionBack.contains(Size(1280, 720)) && resolutionFront.contains(
-                    Size(
-                        1280,
-                        720
-                    )
-                ))
-                val width = if (isUHd) 1920 else if (isHd) 1280 else 640
-                val height = if (isUHd) 1080 else if (isHd) 720 else 480
-                it.startPreview(
-                    CameraHelper.Facing.FRONT,
-                    width,
-                    height
-                )
-            }
-        }
-    }
-
-    fun stopPreview() {
-        camera?.let {
-            if (it.isOnPreview) {
-                it.stopPreview()
-            }
-        }
-    }
-
-    fun startBroadCast(rtmpUrl: String) {
-        camera?.let {
-            if (!it.isStreaming) {
-                val resolutionFront = it.resolutionsFront
-                val resolutionBack = it.resolutionsBack
-                val isUHd = (resolutionBack.contains(
-                    Size(
-                        1920,
-                        1080
-                    )
-                ) && resolutionFront.contains(Size(1920, 1080)))
-                val isHd = (resolutionBack.contains(Size(1280, 720)) && resolutionFront.contains(
-                    Size(
-                        1280,
-                        720
-                    )
-                ))
-                val width = if (isUHd) 1920 else if (isHd) 1280 else 640
-                val height = if (isUHd) 1080 else if (isHd) 720 else 480
-                val bitrate = if (isUHd) 4_500_000 else if (isHd) 3_000_000 else 1_500_000
-                if (it.prepareAudio() && it.prepareVideo(width, height, bitrate)) {
-                    it.startStream(rtmpUrl)
-                }
-            }
-        }
-    }
-
-    fun stopBroadcast() {
-        camera?.let {
-            if (it.isStreaming) {
-                it.stopStream()
-                it.stopPreview()
-            }
-        }
-    }
 
     fun toggleCamera(value: Boolean) {
         if (value) {
@@ -300,22 +249,12 @@ fun TestTranslationScreen(
         }
     }
 
-    val sensorRotationManager = remember {
-        object : SensorRotationManager(
-            context,
-            object : RotationChangedListener {
-                override fun onRotationChanged(rotation: Int) {
-                    sensorOrientation = rotation
-                }
-            }) {}
-    }
-
     /**
      * Status
      */
 
     fun completeTranslation() {
-        stopBroadcast()
+       // stopBroadcast()
         showCompleteDialog = false
     }
 
@@ -347,11 +286,6 @@ fun TestTranslationScreen(
                         completeTranslation()
                     }
 
-                    is TranslationOneTimeEvent.StartStream -> {
-                        //TODO:
-                        // startBroadCast(event.rtmpUrl)
-                    }
-
                     TranslationOneTimeEvent.ShowSnackbar -> {
                         scope.launch {
                             isShowSnackbar = true
@@ -364,6 +298,21 @@ fun TestTranslationScreen(
                         camera?.setReTries(retryCount)
                         camera?.reTry(1000, "")
                         vm.onEvent(TranslationEvent.DecreaseRetryCount)
+                    }
+
+                    TranslationOneTimeEvent.DestroyRTMP -> {
+                        Log.d("TEST","DRSTROYING RTMP")
+                        destroyRTMP(camera)
+                    }
+                    is TranslationOneTimeEvent.StartStreaming -> {
+                        if (surfaceState == SurfaceState.CHANGED) {
+                            Log.d("TEST","STARTING BROADCAST")
+                            startBroadCast(
+                                rtmpUrl = event.url,
+                                camera = camera,
+                                context = context
+                            )
+                        }
                     }
                 }
             }
@@ -388,7 +337,8 @@ fun TestTranslationScreen(
 
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
-                if (viewState == StreamerViewState.STREAM) {
+                /*
+                if (customHUDState == StreamerViewState.STREAM) {
                     if (cameraState) {
                         if (bitrate < 300_000) {
                             //vm.onEvent(TranslationEvent.LowBitrate)
@@ -403,6 +353,7 @@ fun TestTranslationScreen(
                         }
                     }
                 }
+                 */
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
         }
@@ -410,45 +361,19 @@ fun TestTranslationScreen(
     val surfaceHolderCallback = remember {
         object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
-                if (glViewChanged && currentOpenGlView != null) {
-                    camera?.replaceView(currentOpenGlView)
-                    glViewChanged = false
-                }
+                vm.onEvent(TranslationEvent.ChangeSurfaceState(SurfaceState.CREATED))
             }
-
             override fun surfaceChanged(
                 holder: SurfaceHolder,
                 format: Int,
                 width: Int,
                 height: Int
             ) {
-                sensorRotationManager.start()
-                camera?.let {
-                    when (viewState) {
-                        StreamerViewState.PREVIEW, StreamerViewState.PREVIEW_REOPENED -> {
-                            startPreview()
-                        }
-
-                        StreamerViewState.STREAM -> {
-                            startBroadCast(
-                                rtmpUrl = translation?.rtmp ?: ""
-                            )
-                        }
-
-                        else -> {}
-                    }
-                }
+                vm.onEvent(TranslationEvent.ChangeSurfaceState(SurfaceState.CHANGED))
+                restartPreview(camera, facing, context)
             }
-
             override fun surfaceDestroyed(holder: SurfaceHolder) {
-                sensorRotationManager.stop()
-                camera?.let {
-                    if (it.isStreaming) {
-                        stopBroadcast()
-                    } else {
-                        stopPreview()
-                    }
-                }
+                vm.onEvent(TranslationEvent.ChangeSurfaceState(SurfaceState.DESTROYED))
             }
         }
     }
@@ -539,7 +464,6 @@ fun TestTranslationScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             TranslationStreamerContent(
-                viewState = viewState,
                 initCamera = { view ->
                     currentOpenGlView = view
                     if (camera == null) {
@@ -641,11 +565,14 @@ fun TestTranslationScreen(
                     }
                 },
                 onCloseClicked = {
+                    /*
                     if (viewState == StreamerViewState.PREVIEW_REOPENED || viewState == StreamerViewState.EXPIRED) {
                         showCompleteDialog = true
                     } else {
                         showCompleteEarlierDialog = true
                     }
+
+                     */
                 },
                 bsOpened = scaffoldState.bottomSheetState.isExpanded,
                 cameraEnabled = cameraState,
@@ -658,10 +585,7 @@ fun TestTranslationScreen(
                     camera?.stopPreview()
                     nav.navigationBack()
                 },
-                startBroadCast = {
-                    vm.onEvent(TranslationEvent.ChangeUiToStream)
-                },
-                selectedStreamerFacing = facing,
+                customHUDState = customHUDState
             )
 
             /**

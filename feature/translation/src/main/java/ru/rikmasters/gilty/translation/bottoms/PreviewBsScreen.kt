@@ -11,9 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.pedro.rtmp.utils.ConnectCheckerRtmp
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
-import ru.rikmasters.gilty.translation.utils.map
-import ru.rikmasters.gilty.translation.utils.restartPreview
-import ru.rikmasters.gilty.translation.utils.stopPreview
+import ru.rikmasters.gilty.translation.shared.utils.map
+import ru.rikmasters.gilty.translation.shared.utils.restartPreview
+import ru.rikmasters.gilty.translation.shared.utils.stopPreview
 
 @Composable
 fun PreviewBsScreen(

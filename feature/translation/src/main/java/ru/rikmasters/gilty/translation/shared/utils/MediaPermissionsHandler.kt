@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.shared.util
+package ru.rikmasters.gilty.translation.shared.utils
 
 import android.Manifest
 import android.content.Context

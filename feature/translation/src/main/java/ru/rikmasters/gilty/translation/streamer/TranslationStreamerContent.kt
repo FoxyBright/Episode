@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.streamer.presentation.ui.content
+package ru.rikmasters.gilty.translation.streamer
 
 import android.view.SurfaceHolder
 import androidx.compose.animation.AnimatedVisibility
@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,9 +32,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.BottomSheetDragItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraOrientationRow
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraView
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.ChangeFacingItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.ChatItem
@@ -44,12 +41,10 @@ import ru.rikmasters.gilty.translation.shared.presentation.ui.components.Members
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.MicrophoneItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.StreamerItem
 import ru.rikmasters.gilty.translation.shared.presentation.ui.components.TimerItem
-import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
-import ru.rikmasters.gilty.translation.streamer.model.StreamerViewState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
 
 @Composable
 fun TranslationStreamerContent(
-    viewState: StreamerViewState,
     initCamera: (OpenGlView) -> Unit,
     surfaceHolderCallback: SurfaceHolder.Callback,
     isPortrait: Boolean,
@@ -69,167 +64,82 @@ fun TranslationStreamerContent(
     onMicrophoneClicked: () -> Unit,
     changeFacing: () -> Unit,
     onToChatPressed: () -> Unit,
-    startBroadCast: () -> Unit,
-    selectedStreamerFacing: StreamerFacing
-) {
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            ThemeExtra.colors.preDarkColor,
-                            Color(0xFF070707)
-                        )
-                    )
-                )
-        ) {
-            Box(
-                if (viewState == StreamerViewState.STREAM) {
-                    if (isPortrait) {
-                        Modifier
-                            .weight(1f)
-                            .background(
-                                color = ThemeExtra.colors.preDarkColor,
-                                shape = RoundedCornerShape(14.dp)
-                            )
-                    } else {
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                color = ThemeExtra.colors.preDarkColor,
-                                shape = RectangleShape
-                            )
-                    }
-                } else {
-                    if (isPortrait) {
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                color = ThemeExtra.colors.preDarkColor,
-                                shape = RoundedCornerShape(
-                                    topStart = 14.dp,
-                                    topEnd = 14.dp
-                                )
-                            )
-                    } else {
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                color = ThemeExtra.colors.preDarkColor,
-                                shape = RectangleShape
-                            )
-                    }
-                }
-            ) {
-                Surface(
-                    shape = if (viewState == StreamerViewState.STREAM) RoundedCornerShape(14.dp) else RectangleShape
-                ) {
-                    CameraView(
-                        initCamera = initCamera,
-                        surfaceHolderCallback = surfaceHolderCallback,
-                        modifier = Modifier.matchParentSize()
-                    )
-                }
-                if (viewState == StreamerViewState.PREVIEW || viewState == StreamerViewState.PREVIEW_REOPENED) {
-                    Preview(
-                        onCloseClicked = onCloseClicked,
-                        changeFacing = changeFacing,
-                        selectedStreamerFacing = selectedStreamerFacing,
-                        startBroadCast = startBroadCast
-                    )
-                }
-                if (viewState == StreamerViewState.STREAM || viewState == StreamerViewState.EXPIRED) {
-                    if (isPortrait) {
-                        OnStreamTopBarPortrait(
-                            meetingModel = meetingModel,
-                            remainTime = remainTime,
-                            onChatClicked = onChatClicked,
-                            onMembersClicked = onMembersClicked,
-                            membersCount = membersCount,
-                            onTimerClicked = onTimerClicked,
-                            isHighlightTimer = isHighlightTimer,
-                            timerAddTime = addTimerString,
-                            onCloseClicked = onCloseClicked
-                        )
-                    } else {
-                        OnStreamLandscape(
-                            meetingModel = meetingModel,
-                            onChatClicked = onChatClicked,
-                            membersCount = membersCount,
-                            remainTime = remainTime,
-                            onTimerClicked = onTimerClicked,
-                            isHighlightTimer = isHighlightTimer,
-                            timerAddTime = addTimerString,
-                            onMembersClicked = onMembersClicked,
-                            onCloseClicked = onCloseClicked,
-                            bsOpened = bsOpened,
-                            cameraEnabled = cameraEnabled,
-                            microphoneEnabled = microphoneEnabled,
-                            onCameraClicked = onCameraClicked,
-                            onMicrophoneClicked = onMicrophoneClicked,
-                            changeFacing = changeFacing
-                        )
-                    }
-                }
-                if (viewState == StreamerViewState.COMPLETED) {
-                    CompletedPortrait(onToChatPressed = onToChatPressed)
-                }
-            }
-            if (viewState == StreamerViewState.STREAM && isPortrait) {
-                BottomBarPortrait(
-                    cameraEnabled = cameraEnabled,
-                    microphoneEnabled = microphoneEnabled,
-                    onCameraClicked = onCameraClicked,
-                    onMicrophoneClicked = onMicrophoneClicked,
-                    changeFacing = changeFacing
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun Preview(
-    onCloseClicked: () -> Unit,
-    changeFacing: () -> Unit,
-    selectedStreamerFacing: StreamerFacing,
-    startBroadCast: () -> Unit
+    customHUDState: StreamerCustomHUD?
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(12.dp))
-        BottomSheetDragItem(modifier = Modifier.align(Alignment.CenterHorizontally))
-        Spacer(modifier = Modifier.height(22.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.translations_preview_title),
-                color = ThemeExtra.colors.white,
-                style = ThemeExtra.typography.TranslationTitlePreview
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        ThemeExtra.colors.preDarkColor,
+                        Color(0xFF070707)
+                    )
+                )
             )
-            CloseButton { onCloseClicked() }
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    color = ThemeExtra.colors.preDarkColor
+                ).weight(1f)
+        ) {
+            Surface(shape = if (isPortrait) RoundedCornerShape(14.dp) else RoundedCornerShape(
+                topStart = 14.dp,
+                topEnd = 14.dp
+            )) {
+                CameraView(
+                    initCamera = initCamera,
+                    surfaceHolderCallback = surfaceHolderCallback,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
+            if (customHUDState == null || customHUDState == StreamerCustomHUD.EXPIRED) {
+                if (isPortrait) {
+                    OnStreamTopBarPortrait(
+                        meetingModel = meetingModel,
+                        remainTime = remainTime,
+                        onChatClicked = onChatClicked,
+                        onMembersClicked = onMembersClicked,
+                        membersCount = membersCount,
+                        onTimerClicked = onTimerClicked,
+                        isHighlightTimer = isHighlightTimer,
+                        timerAddTime = addTimerString,
+                        onCloseClicked = onCloseClicked
+                    )
+                } else {
+                    OnStreamLandscape(
+                        meetingModel = meetingModel,
+                        onChatClicked = onChatClicked,
+                        membersCount = membersCount,
+                        remainTime = remainTime,
+                        onTimerClicked = onTimerClicked,
+                        isHighlightTimer = isHighlightTimer,
+                        timerAddTime = addTimerString,
+                        onMembersClicked = onMembersClicked,
+                        onCloseClicked = onCloseClicked,
+                        bsOpened = bsOpened,
+                        cameraEnabled = cameraEnabled,
+                        microphoneEnabled = microphoneEnabled,
+                        onCameraClicked = onCameraClicked,
+                        onMicrophoneClicked = onMicrophoneClicked,
+                        changeFacing = changeFacing
+                    )
+                }
+            }
+            if (customHUDState == StreamerCustomHUD.COMPLETED) {
+                CompletedPortrait(onToChatPressed = onToChatPressed)
+            }
         }
-        Spacer(modifier = Modifier.weight(1f))
-        CameraOrientationRow(
-            onChange = { changeFacing },
-            selectedStreamerFacing = selectedStreamerFacing
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        GradientButton(
-            text = stringResource(id = R.string.translations_start_strean),
-            online = true,
-            onClick = startBroadCast
-        )
-        Spacer(modifier = Modifier.height(53.dp))
+        if (customHUDState == null && isPortrait) {
+            BottomBarPortrait(
+                cameraEnabled = cameraEnabled,
+                microphoneEnabled = microphoneEnabled,
+                onCameraClicked = onCameraClicked,
+                onMicrophoneClicked = onMicrophoneClicked,
+                changeFacing = changeFacing
+            )
+        }
     }
 }
 

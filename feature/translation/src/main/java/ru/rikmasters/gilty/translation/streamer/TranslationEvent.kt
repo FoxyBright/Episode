@@ -1,7 +1,8 @@
-package ru.rikmasters.gilty.translation.streamer.event
+package ru.rikmasters.gilty.translation.streamer
 
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus
+import ru.rikmasters.gilty.translation.streamer.model.SurfaceState
 
 sealed interface TranslationEvent {
     data class Initialize(val meetingId: String) : TranslationEvent
@@ -13,6 +14,8 @@ sealed interface TranslationEvent {
     object Reconnect : TranslationEvent
     object BitrateStabilized : TranslationEvent
     object DecreaseRetryCount : TranslationEvent
+    data class ChangeSurfaceState(val state:SurfaceState) : TranslationEvent
+
 
 
     data class UserBottomSheetOpened(val isOpened: Boolean) : TranslationEvent
@@ -22,9 +25,6 @@ sealed interface TranslationEvent {
     data class KickUser(val user: FullUserModel) : TranslationEvent
     data class AppendTranslation(val appendMinutes: Int) : TranslationEvent
     object ChangeFacing : TranslationEvent
-    object ChangeUiToStream : TranslationEvent
-    object ChangeUiToPreview : TranslationEvent
-
     object CompleteTranslation : TranslationEvent
 
     object ToggleCamera : TranslationEvent

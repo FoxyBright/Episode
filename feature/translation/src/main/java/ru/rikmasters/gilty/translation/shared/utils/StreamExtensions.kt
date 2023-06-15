@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.utils
+package ru.rikmasters.gilty.translation.shared.utils
 
 import com.pedro.encoder.input.video.CameraHelper
 import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing

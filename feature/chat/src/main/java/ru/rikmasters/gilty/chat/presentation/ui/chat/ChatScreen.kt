@@ -41,8 +41,8 @@ import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.translation.bottoms.PreviewBsScreen
 import ru.rikmasters.gilty.translation.bottoms.PreviewBsViewModel
-import ru.rikmasters.gilty.translation.shared.util.checkMediaPermissions
-import ru.rikmasters.gilty.translation.shared.util.mediaPermissionState
+import ru.rikmasters.gilty.translation.shared.utils.checkMediaPermissions
+import ru.rikmasters.gilty.translation.shared.utils.mediaPermissionState
 import java.io.File
 
 @SuppressLint("Recycle")
