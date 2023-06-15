@@ -37,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.imePadding
 import ru.rikmasters.gilty.shared.R
@@ -333,43 +332,26 @@ private fun TopBar(
 ) {
     val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
-    
+
+    val interactionSource = remember { MutableInteractionSource() }
+
     if(profileType != ORGANIZER && profileType != ANONYMOUS_ORGANIZER) Row(
         modifier = modifier
             .fillMaxWidth()
             .offset((-16).dp),
         verticalAlignment = CenterVertically,
     ) {
-        TextField(
+        BasicTextField(
             value = userName,
-            onValueChange = onTextChange,
             modifier = Modifier
-                .widthIn(1.dp, Dp.Infinity)
+                .width(IntrinsicSize.Min)
                 .onFocusChanged { focus = it.isFocused },
-            colors = transparentTextFieldColors(),
+            onValueChange = onTextChange,
             textStyle = typography.headlineLarge,
-            placeholder = {
-                Row(Modifier, Arrangement.Center, CenterVertically) {
-                    Text(
-                        text = stringResource(R.string.user_name),
-                        modifier = Modifier.padding(end = 8.dp),
-                        color = colorScheme.onTertiary,
-                        style = typography.headlineLarge.copy(
-                            fontSize = when(profileType) {
-                                CREATE -> 23
-                                USERPROFILE -> 28
-                                else -> 20
-                            }.dp.toSp()
-                        )
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_edit),
-                        contentDescription = null,
-                        modifier = Modifier.padding(top = 4.dp),
-                        tint = colorScheme.onTertiary
-                    )
-                }
-            },
+            visualTransformation = transformationOf(
+                mask = CharArray(userName.length) { '#' }.concatToString(),
+                endChar = if(userAge in 18..99 && !focus) ", $userAge" else ""
+            ),
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
                 onSaveUsername()
@@ -379,12 +361,46 @@ private fun TopBar(
                 keyboardType = Text,
                 capitalization = Sentences
             ),
+            interactionSource = interactionSource,
             singleLine = true,
-            visualTransformation = transformationOf(
-                mask = CharArray(userName.length) { '#' }.concatToString(),
-                endChar = if(userAge in 18..99 && !focus) ", $userAge" else ""
-            ),
+            decorationBox = @Composable { innerTextField ->
+                TextFieldDecorationBox(
+                    value = userName,
+                    visualTransformation = transformationOf(
+                        mask = CharArray(userName.length) { '#' }.concatToString(),
+                        endChar = if(userAge in 18..99 && !focus) ", $userAge" else ""
+                    ),
+                    innerTextField = innerTextField,
+                    placeholder = {
+                        Row(Modifier, Arrangement.Center, CenterVertically) {
+                            Text(
+                                text = stringResource(R.string.user_name),
+                                modifier = Modifier.padding(end = 8.dp),
+                                color = colorScheme.onTertiary,
+                                style = typography.headlineLarge.copy(
+                                    fontSize = when(profileType) {
+                                        CREATE -> 23
+                                        USERPROFILE -> 28
+                                        else -> 20
+                                    }.dp.toSp()
+                                )
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.ic_edit),
+                                contentDescription = null,
+                                modifier = Modifier.padding(top = 4.dp),
+                                tint = colorScheme.onTertiary
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    enabled = true,
+                    interactionSource = interactionSource,
+                    colors = transparentTextFieldColors(),
+                )
+            }
         )
+
         ProfileBadge(
             modifier = Modifier.offset(x = (-12).dp), group = profileGroup
         )
