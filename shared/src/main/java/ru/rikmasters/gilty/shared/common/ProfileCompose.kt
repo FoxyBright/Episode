@@ -26,12 +26,14 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
@@ -343,6 +345,8 @@ private fun TopBar(
         verticalAlignment = CenterVertically,
     ) {
 
+        val mergedTextStyle = typography.headlineLarge.merge(TextStyle(color = colorScheme.tertiary))
+
         BasicTextField(
             value = userName,
             modifier =
@@ -355,7 +359,7 @@ private fun TopBar(
                 .width(IntrinsicSize.Min)
                 .onFocusChanged { focus = it.isFocused },
             onValueChange = onTextChange,
-            textStyle = typography.headlineLarge,
+            textStyle = mergedTextStyle,
             visualTransformation = transformationOf(
                 mask = CharArray(userName.length) { '#' }.concatToString(),
                 endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""

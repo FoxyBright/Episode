@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.bottomsheet.presentation.ui.responds
 
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.responds.RespondsBsType.FULL
@@ -11,6 +12,8 @@ import ru.rikmasters.gilty.bottomsheet.viewmodel.RespondsBsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.RespondsListCallback
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
+import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
 @Composable
@@ -23,13 +26,10 @@ fun RespondsBs(
     val scope = rememberCoroutineScope()
     
     // Список встреч с пагинацией
-    val respondsList =
-        vm.responds.collectAsLazyPagingItems()
+    val respondsList: LazyPagingItems<RespondWithPhotos> = vm.responds.collectAsLazyPagingItems()
     // Список откликов с пагинацией
-    val sentResponds =
-        vm.sentResponds.collectAsLazyPagingItems()
-    val receivedResponds =
-        vm.receivedResponds.collectAsLazyPagingItems()
+    val sentResponds = vm.sentResponds.collectAsLazyPagingItems()
+    val receivedResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos> = vm.receivedResponds.collectAsLazyPagingItems()
     
     val groupsStates by vm.groupsStates.collectAsState()
     val tabs by vm.tabs.collectAsState()
