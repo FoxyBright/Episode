@@ -29,8 +29,15 @@ fun HiddenScreen(vm: HiddenViewModel) {
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
+    val isDragging by vm.isDragging.collectAsState()
 
     LaunchedEffect(Unit) { vm.getHidden() }
+
+    LaunchedEffect(key1 = isDragging, block = {
+        if(!isDragging){
+            vm.movePhotoRemote()
+        }
+    })
     
     HiddenContent(
         state = HiddenState(photoList = photoList,
@@ -42,7 +49,7 @@ fun HiddenScreen(vm: HiddenViewModel) {
             viewerMenuState = false,
             viewerType = photoViewType),
         Modifier, object: HiddenCallback {
-            
+
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
                     vm.changePhotoViewType(PhotoViewType.PHOTO)
@@ -78,6 +85,10 @@ fun HiddenScreen(vm: HiddenViewModel) {
 
             override fun onPhotoMoved(from: ItemPosition, to: ItemPosition) {
                 scope.launch { vm.movePhoto(from, to) }
+            }
+
+            override fun onIsDraggingChange(value: Boolean) {
+                scope.launch { vm.onIsDraggingChange(value) }
             }
         }
     )

@@ -49,14 +49,14 @@ class HiddenViewModel : ViewModel() {
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
 
-  /*      var dogs by mutableStateOf(List(500) {
-            if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
-        })*/
+
+    private val _isDragging = MutableStateFlow(false)
+    val isDragging = _isDragging.asStateFlow()
+
+    private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
+
 
     suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
-           /*dogs = dogs.toMutableList().apply {
-               add(toOr.index, removeAt(fromOr.index))
-           }*/
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photos.value.size > from && _photos.value.size > to) {
@@ -65,11 +65,16 @@ class HiddenViewModel : ViewModel() {
                         add(to, removeAt(from))
                     }
                     _photos.emit(newList)
-                    profileManager.changeAlbumPosition(fromId, to + 1).on(
-                        success = {},
-                        loading = {},
-                        error = {}
-                    )
+                    var newLastChanged = Pair<String?, Int?>(null, null)
+                    newLastChanged = if(_lastPositionsChanged.value.first == null){
+                        _lastPositionsChanged.emit(_lastPositionsChanged.value.copy(first = fromId))
+                        newLastChanged.copy(first = fromId)
+                    }else {
+                        newLastChanged.copy(first = _lastPositionsChanged.value.first)
+                    }
+                    newLastChanged = newLastChanged.copy(second = to + 1)
+                    _lastPositionsChanged.emit(newLastChanged)
+
                 }
             }
         }
@@ -121,5 +126,29 @@ class HiddenViewModel : ViewModel() {
 
     private suspend fun refreshImages() {
         refresh.emit(!refresh.value)
+    }
+
+    suspend fun onIsDraggingChange(value: Boolean) {
+        _isDragging.emit(value)
+    }
+    suspend fun movePhotoRemote() {
+        val fromId = _lastPositionsChanged.value.first
+        val to = _lastPositionsChanged.value.second
+        fromId?.let {
+            to?.let {
+                profileManager.changeAlbumPosition(fromId, to).on(
+                    success = {
+                        _lastPositionsChanged.emit(null to null)
+                    },
+                    loading = {
+                        _lastPositionsChanged.emit(null to null)
+                    },
+                    error = {
+                        _lastPositionsChanged.emit(null to null)
+                    }
+                )
+            }
+        }
+
     }
 }

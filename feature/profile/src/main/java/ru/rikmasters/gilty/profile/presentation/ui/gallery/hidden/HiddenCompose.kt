@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
@@ -58,6 +59,7 @@ interface HiddenBsCallback {
     fun onPhotoViewChangeMenuState(state: Boolean) = Unit
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
     fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
+    fun onIsDraggingChange(value:Boolean) = Unit
 }
 
 data class HiddenBsState(
@@ -136,6 +138,11 @@ fun HiddenBsContent(
                                 key = img.id,
                                 modifier = Modifier
                             ) { isDragging ->
+
+                                LaunchedEffect(key1 = isDragging, block = {
+                                    callback?.onIsDraggingChange(isDragging)
+                                })
+
                                 val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                                 LazyItem(
                                     image = img.thumbnail.url,
@@ -167,31 +174,6 @@ fun HiddenBsContent(
                 }
             }
         }
-        /*LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            state = stateDragable.gridState,
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = modifier.reorderable(stateDragable)
-        ) {
-            items(vm.dogs, { it.key }) { item ->
-                ReorderableItem(stateDragable, item.key) { isDragging ->
-                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .detectReorderAfterLongPress(stateDragable)
-                            .shadow(elevation.value)
-                            .aspectRatio(1f)
-                            .background(Color.Red)
-                    ) {
-                        Text(item.title)
-                    }
-
-                }
-            }
-        }*/
     }
 }
 

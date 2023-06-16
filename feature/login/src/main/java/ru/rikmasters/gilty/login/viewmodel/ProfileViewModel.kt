@@ -45,12 +45,19 @@ class ProfileViewModel: ViewModel() {
     
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
-    
+
+    val desc = description
+        .debounce(250)
+        .onEach {
+            onDescriptionSave()
+        }
+        .state(_description.value, Eagerly)
+
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
     
     suspend fun getProfile() = singleLoading {
-        val profile = regManager.getProfile(false)
+        val profile = regManager.getProfile(true)
         _profile.emit(profile)
         _username.emit(profile.username ?: "")
         _description.emit(profile.aboutMe ?: "")
@@ -63,6 +70,8 @@ class ProfileViewModel: ViewModel() {
     
     suspend fun usernameChange(text: String) {
         _username.emit(text)
+        if(text.isNotEmpty())
+            onUsernameSave()
     }
     
     suspend fun descriptionChange(text: String) {

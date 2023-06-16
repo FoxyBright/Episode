@@ -106,16 +106,17 @@ fun ProfileScreen(vm: ProfileViewModel) {
                         "registration/gallery?multi=false"
                     )
                 }
+                onSaveDescription()
             }
             
             override fun hiddenImages() {
                 nav.navigate("hidden")
+                onSaveDescription()
             }
             
             override fun onDescriptionChange(text: String) {
                 scope.launch {
                     vm.descriptionChange(text)
-                    onSaveDescription()
                     errorAvatar = false
                 }
             }
@@ -127,7 +128,6 @@ fun ProfileScreen(vm: ProfileViewModel) {
             override fun onNameChange(text: String) {
                 scope.launch {
                     vm.usernameChange(text)
-                    onSaveUserName()
                 }
             }
             

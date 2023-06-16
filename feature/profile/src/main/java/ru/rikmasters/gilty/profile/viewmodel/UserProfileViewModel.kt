@@ -15,7 +15,6 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.profile.models.MeetingsType.ACTUAL
 import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
-import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
@@ -49,6 +48,13 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
 
+    val desc = description
+        .debounce(250)
+        .onEach {
+            updateDescription()
+        }
+        .state(_description.value, Eagerly)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val meetsTest by lazy {
         refresh.flatMapLatest {
@@ -76,13 +82,16 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
             val occupied =
                 if (name == profile.value?.username) false
                 else regManager.isNameOccupied(name).on(
-                    success = { it },
+                    success = {
+                        it },
                     loading = { false },
                     error = {
-                        it.serverMessage ==
-                                "errors.user.username.exists"
+                        it.serverMessage == "errors.user.username.exists" ||
+                                it.serverMessage?.startsWith("The username has already been") == true
+                        false
                     }
                 )
+            //updateUsername()
             _occupied.emit(occupied)
         }
         .state(_username.value, Eagerly)
@@ -130,11 +139,7 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
             .on(
                 success = {},
                 loading = {},
-                error = {
-                    context.errorToast(
-                        it.serverMessage
-                    )
-                }
+                error = { }
             )
     }
 
@@ -221,9 +226,9 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
             success = {},
             loading = {},
             error = {
-                context.errorToast(
+                /*context.errorToast(
                     it.serverMessage
-                )
+                )*/
             }
         )
     }

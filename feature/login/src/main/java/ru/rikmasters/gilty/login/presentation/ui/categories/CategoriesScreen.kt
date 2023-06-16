@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.categories
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +49,19 @@ fun CategoriesScreen(vm: CategoryViewModel) {
         }
     })
 
+    BackHandler {
+        if(phase == 0){
+            nav.navigationBack()
+        }else {
+            scope.launch {
+                vm.emptyPhase()
+                vm.emptyCategories()
+
+                vm.getCategories()
+                sleep = true
+            }
+        }
+    }
     //LaunchedEffect(Unit) { vm.getCategories() }
     
     CategoriesContent(

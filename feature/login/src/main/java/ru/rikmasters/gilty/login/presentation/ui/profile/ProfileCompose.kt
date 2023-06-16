@@ -1,11 +1,10 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.gestures.Orientation.Vertical
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -59,7 +58,8 @@ fun ProfileContent(
                 .padding(top = it.calculateTopPadding())
                 .offset(y = 24.dp)
                 .padding(horizontal = 32.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             shape = RoundedCornerShape(30.dp),
             colors = cardColors(colorScheme.background),
             border = BorderStroke(
@@ -70,10 +70,6 @@ fun ProfileContent(
             Profile(
                 state = state,
                 modifier = Modifier
-                    .scrollable(
-                        rememberScrollState(),
-                        Vertical
-                    )
                     .fillMaxHeight(0.8f)
                     .padding(top = 50.dp),
                 callback = callback

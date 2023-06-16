@@ -30,12 +30,17 @@ class HiddenViewModel: ViewModel() {
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
 
+    private val _isDragging = MutableStateFlow(false)
+    val isDragging = _isDragging.asStateFlow()
+
     private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
     val viewerType = _viewerType.asStateFlow()
 
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
-    
+
+    private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
+
     suspend fun getHidden() = singleLoading {
         regManager.getProfile().hidden?.let {
             val response = regManager
@@ -80,11 +85,16 @@ class HiddenViewModel: ViewModel() {
                         add(to, removeAt(from))
                     }
                     _photoList.emit(newList)
-                    regManager.changeAlbumPosition(fromId, to + 1).on(
-                        success = {},
-                        loading = {},
-                        error = {}
-                    )
+
+                    var newLastChanged = Pair<String?, Int?>(null, null)
+                    newLastChanged = if(_lastPositionsChanged.value.first == null){
+                        _lastPositionsChanged.emit(_lastPositionsChanged.value.copy(first = fromId))
+                        newLastChanged.copy(first = fromId)
+                    }else {
+                        newLastChanged.copy(first = _lastPositionsChanged.value.first)
+                    }
+                    newLastChanged = newLastChanged.copy(second = to + 1)
+                    _lastPositionsChanged.emit(newLastChanged)
                 }
             }
         }
@@ -102,5 +112,28 @@ class HiddenViewModel: ViewModel() {
                 )
             }
         )
+    }
+    suspend fun onIsDraggingChange(value:Boolean){
+        _isDragging.emit(value)
+    }
+    suspend fun movePhotoRemote() {
+        val fromId = _lastPositionsChanged.value.first
+        val to = _lastPositionsChanged.value.second
+        fromId?.let {
+            to?.let {
+                regManager.changeAlbumPosition(fromId, to).on(
+                    success = {
+                        _lastPositionsChanged.emit(null to null)
+                    },
+                    loading = {
+                        _lastPositionsChanged.emit(null to null)
+                    },
+                    error = {
+                        _lastPositionsChanged.emit(null to null)
+                    }
+                )
+            }
+        }
+
     }
 }
