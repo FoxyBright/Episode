@@ -33,7 +33,13 @@ fun HiddenBsScreen(
     val viewerImages by vm.photos.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
+    val isDragging by vm.isDragging.collectAsState()
 
+    LaunchedEffect(key1 = isDragging, block = {
+        if(!isDragging){
+            vm.movePhotoRemote()
+        }
+    })
 
     LaunchedEffect(Unit) {
         vm.uploadPhotoList(true)
@@ -92,6 +98,9 @@ fun HiddenBsScreen(
 
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
+            }
+            override fun onIsDraggingChange(value: Boolean) {
+                scope.launch { vm.onIsDraggingChange(value) }
             }
         }
     )

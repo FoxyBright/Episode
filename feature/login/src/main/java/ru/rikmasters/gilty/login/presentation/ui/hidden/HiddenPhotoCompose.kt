@@ -19,7 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
@@ -44,7 +44,6 @@ import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridSta
 import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
-import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -87,6 +86,7 @@ interface HiddenCallback {
     fun onPhotoViewChangeMenuState(state: Boolean) = Unit
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
     fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
+    fun onIsDraggingChange(value:Boolean) = Unit
 }
 
 @Composable
@@ -151,6 +151,11 @@ fun HiddenContent(
                     modifier = Modifier
 
                 ) { isDragging ->
+
+                    LaunchedEffect(key1 = isDragging, block = {
+                        callback?.onIsDraggingChange(isDragging)
+                    })
+
                     val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                     LazyItem(
                         image = img.thumbnail.url,
