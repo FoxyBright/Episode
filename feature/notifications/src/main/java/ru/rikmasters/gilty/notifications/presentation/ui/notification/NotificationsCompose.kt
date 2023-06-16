@@ -197,11 +197,12 @@ fun NotificationsContent(
             }
         }
     }
+    
     state.activeNotification?.let {
         if(state.blur) BackBlur(
             Modifier.clickable {
                 callback?.onBlurClick()
-            }, radius = 25
+            }, radius = 25,
         ) {
             ObserveNotification(
                 state = ObserveNotificationState(

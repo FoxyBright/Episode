@@ -128,13 +128,14 @@ private fun BadCode(
     BackBlur(
         Modifier.clickable {
             onClick()
-        }
+        },
     ) {
         Column(
             Modifier
                 .fillMaxSize()
                 .align(Center),
-            Arrangement.Center, CenterHorizontally
+            Arrangement.Center,
+            CenterHorizontally
         ) {
             GEmojiImage(
                 badEmoji,

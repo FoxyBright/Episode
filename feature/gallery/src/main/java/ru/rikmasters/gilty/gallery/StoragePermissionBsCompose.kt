@@ -111,8 +111,11 @@ fun StoragePermissionBs(
                 tint = colorScheme.primary
             )
             Text(
-                stringResource(R.string.permissions_settings_label),
-                Modifier.padding(top = 22.dp),
+                text = stringResource(
+                    R.string.permissions_settings_label
+                ),
+                modifier = Modifier
+                    .padding(top = 22.dp),
                 style = typography.labelLarge,
                 textAlign = Center
             )

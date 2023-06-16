@@ -42,14 +42,15 @@ class RegistrationManager(
         profileStore.getProfile(forceWeb)
     }
     
+    @Suppress("unused")
     suspend fun getHidden(albumId: String) = withContext(IO) {
         val response = profileWebSource
             .getFiles(albumId).on(
                 success = {
-                   /* it.first.map { url ->
-                        url.thumbnail?.url ?: ""
-                    } to it.second*/
-                     it.first.map { it.map() } to it.second
+                    /* it.first.map { url ->
+                         url.thumbnail?.url ?: ""
+                     } to it.second*/
+                    it.first.map { it.map() } to it.second
                 },
                 loading = { emptyList<AvatarModel>() to 0 },
                 error = { emptyList<AvatarModel>() to 0 }
@@ -60,15 +61,19 @@ class RegistrationManager(
     suspend fun setAvatar(
         file: File, points: List<Float>,
     ) = withContext(IO) {
-        profileWebSource.setUserAvatar(file, points)
+        profileWebSource.setUserAvatar(
+            avatar = file, list = points
+        )
     }
     
     suspend fun getUserCategories() = withContext(IO) {
         profileStore.getUserCategories(true)
     }
+    
     suspend fun updateUserCategories() =
         withContext(IO) { profileStore.updateUserCategories() }
     
+    @Suppress("unused")
     suspend fun deleteHiddens(files: List<String>) =
         withContext(IO) {
             files.forEach {
@@ -79,10 +84,7 @@ class RegistrationManager(
         }
     suspend fun deleteHidden(imageId: String) =
         withContext(IO) {
-            profileStore.deleteHidden(imageId).let {
-                //getProfileHiddens(true)
-                it
-            }
+            profileStore.deleteHidden(imageId)
         }
     
     suspend fun addHidden(
@@ -110,7 +112,6 @@ class RegistrationManager(
             OrientationModel("HETERO", "Гетеро")
         )
     }
-
 }
 
 private fun String.substring(

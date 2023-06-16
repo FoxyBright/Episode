@@ -89,13 +89,18 @@ fun ImageCropper(
         
         val cropType = cropProperties.cropType
         val contentScale = cropProperties.contentScale
-        
-        val cropOutline = cropProperties.cropOutlineProperty.cropOutline
+        val cropOutline = cropProperties
+            .cropOutlineProperty.cropOutline
         
         // these keys are for resetting cropper when image width/height, contentScale or
         // overlay aspect ratio changes
-        val resetKeys =
-            getResetKeys(scaledImageBitmap, imageWidthPx, imageHeightPx, contentScale, cropType)
+        val resetKeys = getResetKeys(
+            scaledImageBitmap = scaledImageBitmap,
+            imageWidthPx = imageWidthPx,
+            imageHeightPx = imageHeightPx,
+            contentScale = contentScale,
+            cropType = cropType
+        )
         
         val cropState = rememberCropState(
             imageSize = IntSize(bitmapWidth, bitmapHeight),
@@ -124,11 +129,11 @@ fun ImageCropper(
         
         // Crops image when user invokes crop operation
         Crop(
-            crop,
-            scaledImageBitmap,
-            cropState.cropRect,
-            cropOutline,
-            onCropStart
+            crop = crop,
+            scaledImageBitmap = scaledImageBitmap,
+            cropRect = cropState.cropRect,
+            cropOutline = cropOutline,
+            onCropStart = onCropStart
         ) { onCropSuccess(it, cropState.cropRect) }
         
         val imageModifier = Modifier

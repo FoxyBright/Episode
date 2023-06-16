@@ -13,7 +13,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.unit.IntSize
-import ru.rikmasters.gilty.gallery.cropper.TouchRegion
+import ru.rikmasters.gilty.gallery.cropper.TouchRegion.None
 import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
 import ru.rikmasters.gilty.gallery.cropper.model.CropData
 import ru.rikmasters.gilty.gallery.cropper.settings.CropProperties
@@ -103,7 +103,7 @@ abstract class CropState internal constructor(
     /**
      * Region of touch inside, corners of or outside of overlay rectangle
      */
-    var touchRegion by mutableStateOf(TouchRegion.None)
+    var touchRegion by mutableStateOf(None)
     
     internal suspend fun init() {
         // When initial aspect ratio doesn't match drawable area
@@ -159,12 +159,12 @@ abstract class CropState internal constructor(
             // Update overlay rectangle based on current draw area and new aspect ratio
             animateOverlayRectTo(
                 getOverlayFromAspectRatio(
-                    containerSize.width.toFloat(),
-                    containerSize.height.toFloat(),
-                    drawAreaSize.width.toFloat(),
-                    drawAreaSize.height.toFloat(),
-                    aspectRatio,
-                    overlayRatio
+                    containerWidth = containerSize.width.toFloat(),
+                    containerHeight = containerSize.height.toFloat(),
+                    drawAreaWidth = drawAreaSize.width.toFloat(),
+                    drawAreaHeight = drawAreaSize.height.toFloat(),
+                    aspectRatio = aspectRatio,
+                    coefficient = overlayRatio
                 )
             )
         }
