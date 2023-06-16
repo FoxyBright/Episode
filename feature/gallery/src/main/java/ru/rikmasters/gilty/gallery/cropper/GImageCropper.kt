@@ -140,13 +140,13 @@ fun ImageCropper(
                 }
             }
             Frame()
-            if(isCropping) Box(Modifier, Center) {
+            /*if(isCropping) Box(Modifier, Center) {
                 AnimatedImage(
                     R.raw.loaging,
                     Modifier.size(24.dp),
                     isPlaying = isCropping
                 )
-            }
+            }*/
         }
     }
 }

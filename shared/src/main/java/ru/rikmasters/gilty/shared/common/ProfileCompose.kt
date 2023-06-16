@@ -395,7 +395,8 @@ private fun TopBar(
                                         USERPROFILE -> 28
                                         else -> 20
                                     }.dp.toSp()
-                                )
+                                ),
+                                maxLines = 1
                             )
                             Icon(
                                 painter = painterResource(R.drawable.ic_edit),
@@ -413,7 +414,7 @@ private fun TopBar(
             }
         )
         ProfileBadge(
-            modifier = Modifier.offset(x = (-12).dp), group = profileGroup
+            modifier = Modifier.offset(x = (-8).dp), group = profileGroup
         )
     }
 }
