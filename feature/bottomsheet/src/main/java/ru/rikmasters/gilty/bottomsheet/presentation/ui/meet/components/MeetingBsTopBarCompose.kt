@@ -169,7 +169,7 @@ fun MeetingBsTopBarCompose(
             
             Text(
                 modifier = Modifier
-                    .padding(start = 4.dp),
+                    .padding(start = 6.dp),
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,
                 style = typography.labelSmall
