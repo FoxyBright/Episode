@@ -39,10 +39,11 @@ import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.LastRespond
+import ru.rikmasters.gilty.shared.model.LastRespond.Companion.DemoLastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.ProfileType
+import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.USERPROFILE
 import ru.rikmasters.gilty.shared.model.meeting.DemoMeetingList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -55,14 +56,18 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 private fun ProfilePreview() {
     GiltyTheme {
         ProfileContent(
-            UserProfileState(
-                ProfileState(
+            state = UserProfileState(
+                profileState = ProfileState(
                     profile = DemoProfileModel,
-                    profileType = ProfileType.USERPROFILE,
+                    profileType = USERPROFILE,
                 ),
-                currentMeetings = pagingPreview(DemoMeetingList),
-                meetingsHistory = pagingPreview(DemoMeetingList),
-                lastRespond = LastRespond.DemoLastRespond,
+                currentMeetings = pagingPreview(
+                    DemoMeetingList
+                ),
+                meetingsHistory = pagingPreview(
+                    DemoMeetingList
+                ),
+                lastRespond = DemoLastRespond,
                 historyState = (false),
                 stateList = listOf(
                     INACTIVE, INACTIVE,
@@ -70,7 +75,9 @@ private fun ProfilePreview() {
                 ),
                 alert = false,
                 listState = rememberLazyListState()
-            ), Modifier.background(colorScheme.background)
+            ),
+            modifier = Modifier
+                .background(colorScheme.background)
         )
     }
 }
@@ -127,9 +134,7 @@ fun ProfileContent(
             }
         }
     ) {
-        if(state.smthError) ErrorInternetConnection {
-            callback?.updateProfile()
-        } else Box(Modifier.padding(it)) {
+        Box(Modifier.padding(it)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Box(Modifier.padding(top = 10.dp)) {
                     ProfileHeader(

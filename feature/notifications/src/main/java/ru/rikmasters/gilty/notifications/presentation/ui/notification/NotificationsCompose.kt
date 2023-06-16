@@ -8,22 +8,23 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState.Error
 import androidx.paging.LoadState.Loading
 import androidx.paging.LoadState.NotLoading
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationPeriodNames.Companion.getPeriodName
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItem
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.item.NotificationItemState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
@@ -34,7 +35,8 @@ import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.ADMIN_NOTIFICATION
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
@@ -59,13 +61,23 @@ private fun NotificationsContentPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    pagingPreview(DemoNotificationModelList),
-                    listOf(),
-                    LastRespond("", false, UserGroupTypeModel.DEFAULT, 0), listOf(), (false),
-                    DemoNotificationMeetingOverModel,
-                    pagingPreview(DemoUserModelList),
-                    listOf(), LazyListState(),
-                    DemoRatingModelList
+                    notifications = pagingPreview(
+                        DemoNotificationModelList
+                    ),
+                    splitNotifications = listOf(),
+                    lastRespond = LastRespond(
+                        image = "",
+                        isOnline = false,
+                        group = DEFAULT,
+                        count = 0
+                    ),
+                    navBar = listOf(),
+                    blur = false,
+                    activeNotification = DemoNotificationMeetingOverModel,
+                    participants = pagingPreview(DemoUserModelList),
+                    participantsStates = listOf(),
+                    listState = LazyListState(),
+                    ratings = DemoRatingModelList
                 )
             )
         }
@@ -83,13 +95,23 @@ private fun NotificationsBlurPreview() {
         ) {
             NotificationsContent(
                 NotificationsState(
-                    pagingPreview(DemoNotificationModelList),
-                    listOf(),
-                    LastRespond("", false, UserGroupTypeModel.DEFAULT, 0), listOf(), (true),
-                    DemoNotificationMeetingOverModel,
-                    pagingPreview(DemoUserModelList),
-                    listOf(), LazyListState(),
-                    DemoRatingModelList
+                    notifications = pagingPreview(
+                        DemoNotificationModelList
+                    ),
+                    splitNotifications = listOf(),
+                    lastRespond = LastRespond(
+                        image = "",
+                        isOnline = false,
+                        group = DEFAULT,
+                        count = 0
+                    ),
+                    navBar = listOf(),
+                    blur = true,
+                    activeNotification = DemoNotificationMeetingOverModel,
+                    participants = pagingPreview(DemoUserModelList),
+                    participantsStates = listOf(),
+                    listState = LazyListState(),
+                    ratings = DemoRatingModelList
                 )
             )
         }
@@ -111,14 +133,14 @@ data class NotificationsState(
 )
 
 interface NotificationsCallback {
-
+    
     fun onSwiped(notification: NotificationModel)
     fun onMeetClick(meet: MeetingModel?)
     fun onUserClick(
         user: UserModel?,
         meet: MeetingModel? = null,
     )
-
+    
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -144,282 +166,274 @@ fun NotificationsContent(
             .background(colorScheme.background),
         topBar = {
             Text(
-                stringResource(R.string.notification_screen_name),
-                Modifier.padding(
+                text = stringResource(
+                    R.string.notification_screen_name
+                ),
+                modifier = Modifier.padding(
                     start = 16.dp,
                     top = 80.dp,
                     bottom = 10.dp
-                ), colorScheme.tertiary,
+                ),
                 style = typography.titleLarge
+                    .copy(colorScheme.tertiary)
             )
-        }, bottomBar = {
+        },
+        bottomBar = {
             NavBar(
-                state.navBar,
-                Modifier
+                state = state.navBar,
+                modifier = Modifier
             ) { callback?.onNavBarSelect(it) }
         }
     ) { padding ->
-        if (state.smthError) ErrorInternetConnection {
-            callback?.onListUpdate()
-        } else Box(Modifier.padding(padding)) {
+        Box(Modifier.padding(padding)) {
             Use<NotificationViewModel>(PullToRefreshTrait) {
                 Notifications(
-                    state, Modifier
+                    state = state,
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
-                    callback
+                    callback = callback
                 )
             }
         }
     }
     state.activeNotification?.let {
-        if (state.blur) BackBlur(
+        if(state.blur) BackBlur(
             Modifier.clickable {
                 callback?.onBlurClick()
             }, radius = 25
         ) {
             ObserveNotification(
-                ObserveNotificationState(
-                    it,
-                    state.participants,
-                    state.participantsStates,
-                    (it.feedback?.ratings?.map {
-                        it.emoji
-                    } ?: state.ratings.map { it.emoji }),
-                    state.ratings.map { it.emoji }),
-                Modifier
+                state = ObserveNotificationState(
+                    notification = it,
+                    participants = state.participants,
+                    participantsStates = state.participantsStates,
+                    notificationEmojiList =
+                    it.feedback?.ratings?.map { it.emoji }
+                        ?: state.ratings.map { it.emoji },
+                    emojiList = state.ratings.map { it.emoji }),
+                modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 84.dp)
                     .align(TopCenter),
-                callback
+                callback = callback
             )
         }
     }
 }
 
-@Composable
-private fun EmptyNotification(
+private fun LazyListScope.emptyNotification(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(top = 56.dp),
-        Top, CenterHorizontally
-    ) {
-        Image(
-            painterResource(
-                if ((isSystemInDarkTheme())) {
-                    R.drawable.notify_dog_dark
-                } else R.drawable.notify_dog_light
-            ), (null), Modifier.fillMaxWidth()
-        )
-        Text(
-            stringResource(R.string.notification_place_holder),
-            Modifier.padding(top = 26.dp),
-            color = colorScheme.scrim,
-            style = typography.bodyMedium.copy(
-                fontWeight = SemiBold
+    item {
+        Column(
+            modifier
+                .fillMaxSize()
+                .padding(top = 56.dp),
+            Top, CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(
+                    if(isSystemInDarkTheme())
+                        R.drawable.notify_dog_dark
+                    else R.drawable.notify_dog_light
+                ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth()
             )
-        )
+            Text(
+                text = stringResource(
+                    R.string.notification_place_holder
+                ),
+                modifier = Modifier
+                    .padding(top = 26.dp),
+                style = typography.bodyMedium.copy(
+                    color = colorScheme.scrim,
+                    fontWeight = SemiBold
+                )
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Notifications(
     state: NotificationsState,
     modifier: Modifier = Modifier,
     callback: NotificationsCallback?,
 ) {
-    @Composable
-    fun getPeriodName(monthNumber: Int) = when (monthNumber) {
-        1 -> R.string.month_january_name
-        2 -> R.string.month_february_name
-        3 -> R.string.month_march_name
-        4 -> R.string.month_april_name
-        5 -> R.string.month_may_name
-        6 -> R.string.month_june_name
-        7 -> R.string.month_july_name
-        8 -> R.string.month_august_name
-        9 -> R.string.month_september_name
-        10 -> R.string.month_october_name
-        11 -> R.string.month_november_name
-        12 -> R.string.month_december_name
-        20 -> R.string.meeting_profile_bottom_today_label
-        30 -> R.string.meeting_profile_bottom_yesterday_label
-        40 -> R.string.notification_on_this_week_label
-        50 -> R.string.meeting_profile_bottom_30_days_earlier_label
-        else -> R.string.meeting_profile_bottom_latest_label
+    val defEmoji = remember(state.ratings) {
+        state.ratings.map { it.emoji }
     }
-
-    val notifications = state.notifications
-    if (LocalInspectionMode.current) PreviewLazy()
-    else LazyColumn(modifier, state.listState) {
-
-        val hasResponds = state.lastRespond.count > 0
-
+    LazyColumn(modifier, state.listState) {
+        val load = state.notifications.loadState
         when {
-            notifications.loadState.refresh is LoadState.Error -> {}
-            notifications.loadState.append is LoadState.Error -> {}
-            else -> {
-                if (notifications.loadState.refresh is Loading) {
-                    item { PagingLoader(notifications.loadState) }
-                }
+            load.refresh is Error -> Unit
+            load.append is Error -> Unit
+            else -> content(
+                load = load,
+                hasResponds = state.lastRespond.count > 0,
+                notifications = state.notifications,
+                splitNotifications = state.splitNotifications,
+                state = state,
+                defEmoji = defEmoji,
+                callback = callback
+            )
+        }
+        itemSpacer(20.dp)
+    }
+}
 
-                if (hasResponds) item {
-                    Box(Modifier.padding(top = 20.dp)) {
-                        Responds(
-                            state.lastRespond
-                        ) { callback?.onRespondsClick() }
-                    }
-                }
+private fun LazyListScope.content(
+    load: CombinedLoadStates,
+    hasResponds: Boolean,
+    notifications: LazyPagingItems<NotificationModel>,
+    splitNotifications: List<Pair<Int, NotificationModel>>,
+    state: NotificationsState,
+    defEmoji: List<EmojiModel>,
+    callback: NotificationsCallback?,
+) {
+    if(load.refresh is Loading) loader(load)
+    if(hasResponds) responds(state.lastRespond, callback)
+    if(
+        notifications.itemCount > 0
+        && splitNotifications.isNotEmpty()
+    ) {
+        notificationsList(
+            state = state,
+            defEmoji = defEmoji,
+            splitNotifications = splitNotifications,
+            hasResponds = hasResponds,
+            callback = callback
+        )
+        if(load.append is Loading
+            || splitNotifications.size
+            != state.notifications.itemCount
+        ) loader(load)
+    } else if(load.refresh is NotLoading)
+        emptyNotification()
+}
 
-                val splitNotifications = state.splitNotifications
-                if (notifications.itemCount > 0 && splitNotifications.isNotEmpty()) {
-                    itemsIndexed(state.notifications) { index, item ->
-                        if (splitNotifications.size > index) {
-                            // Displays Labels
-                            if (index == 0 || splitNotifications[index - 1].first
-                                != splitNotifications[index].first
-                            ) {
-                                Label(
-                                    text = getPeriodName(
-                                        monthNumber = splitNotifications[index].first
-                                    ),
-                                    hasResponds = hasResponds,
-                                    isFirst = getIndex(
-                                        prev = doesPrevExist(
-                                            index = index,
-                                            splitNotifications = splitNotifications
-                                        )
-                                    ) == 0
-                                )
-                            }
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyListScope.notificationsList(
+    state: NotificationsState,
+    defEmoji: List<EmojiModel>,
+    splitNotifications: List<Pair<Int, NotificationModel>>,
+    hasResponds: Boolean,
+    callback: NotificationsCallback?,
+) {
+    val items = state.notifications
+    items(
+        count = items.itemCount,
+        key = { items.peek(it)?.id ?: it },
+        contentType = {
+            items.peek(it)?.type
+                ?: ADMIN_NOTIFICATION
+        }
+    ) { index ->
+        if(splitNotifications.size > index) {
+            // Displays Labels
+            if(
+                index == 0
+                || splitNotifications[index - 1].first
+                != splitNotifications[index].first
+            ) Label(
+                text = getPeriodName(splitNotifications[index].first),
+                hasResponds = hasResponds,
+                isFirst = !doesPrevExist(index, splitNotifications)
+            )
+            // Displays actual notification
+            ElementNot(
+                index = doesPrevExist(index, splitNotifications).toInt(),
+                size = getSize(
+                    prev = doesPrevExist(index, splitNotifications),
+                    next = doesNextExist(index, splitNotifications),
+                ),
+                item = splitNotifications[index].second,
+                ratings = defEmoji,
+                modifier = Modifier.animateItemPlacement(),
+                callback = callback
+            )
+        }
+    }
+}
 
-                            // Displays actual notification
-                            ElementNot(
-                                index = getIndex(
-                                    prev = doesPrevExist(
-                                        index,
-                                        splitNotifications
-                                    )
-                                ),
-                                size = getSize(
-                                    prev = doesPrevExist(
-                                        index,
-                                        splitNotifications
-                                    ),
-                                    next = doesNextExist(
-                                        index,
-                                        splitNotifications
-                                    ),
-                                ),
-                                item = splitNotifications[index].second,
-                                ratings = state.ratings,
-                                modifier = Modifier.animateItemPlacement(),
-                                callback = callback
-                            )
-                        }
-                    }
-                    if (notifications.loadState.append is Loading
-                        || splitNotifications.size
-                        != state.notifications.itemCount
-                    ) item { PagingLoader(notifications.loadState) }
-                } else if (notifications.loadState.refresh is NotLoading)
-                    item { EmptyNotification() }
+private fun LazyListScope.responds(
+    lastRespond: LastRespond,
+    callback: NotificationsCallback?,
+) {
+    item {
+        Box(Modifier.padding(top = 20.dp)) {
+            Responds(lastRespond) {
+                callback?.onRespondsClick()
             }
         }
-        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 
-fun doesPrevExist(
+private fun LazyListScope.loader(
+    load: CombinedLoadStates,
+) {
+    item { PagingLoader(load) }
+}
+
+private fun doesPrevExist(
     index: Int,
     splitNotifications: List<Pair<Int, NotificationModel>>,
-) =
-    if (index == 0) false
-    else {
-        try {
-            splitNotifications[index - 1].first == splitNotifications[index].first
-        } catch (e: Exception) {
-            false
-        }
-    }
+) = if(index == 0) false else try {
+    splitNotifications[index - 1].first ==
+            splitNotifications[index].first
+} catch(e: Exception) {
+    false
+}
 
-fun doesNextExist(
+private fun doesNextExist(
     index: Int,
     splitNotifications: List<Pair<Int, NotificationModel>>,
-) =
-    if (index + 1 > splitNotifications.size) false
-    else {
-        try {
-            splitNotifications[index + 1].first == splitNotifications[index].first
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-
-fun getSize(prev: Boolean, next: Boolean): Int {
-    if (!prev && !next) return 1
-    if (prev && next) return 3
-    if (prev) return 2
-    if (next) return 2
-    return 0
+) = if(index + 1 > splitNotifications.size) false else try {
+    splitNotifications[index + 1].first ==
+            splitNotifications[index].first
+} catch(e: Exception) {
+    false
 }
 
-fun getIndex(prev: Boolean): Int {
-    if (!prev) return 0
-    return 1
-}
-
-@Composable
-private fun PreviewLazy() {
-    LazyColumn(
-        Modifier.padding(horizontal = 16.dp)
-    ) {
-        item {
-            Label(
-                R.string.notification_earlier_label,
-                isFirst = true,
-                hasResponds = false
-            )
-        }
-        itemsIndexed(
-            DemoNotificationModelList
-        ) { it, not ->
-            ElementNot(
-                it, (2), not,
-                DemoRatingModelList,
-                Modifier,
-            )
-        }
-    }
+private fun getSize(
+    prev: Boolean,
+    next: Boolean,
+) = when {
+    !prev && !next -> 1
+    prev && next -> 3
+    else -> 2
 }
 
 @Composable
 private fun ElementNot(
-    index: Int, size: Int,
+    index: Int,
+    size: Int,
     item: NotificationModel,
-    ratings: List<RatingModel>,
+    ratings: List<EmojiModel>,
     modifier: Modifier,
-    callback: NotificationsCallback? = null,
+    callback: NotificationsCallback?,
 ) {
     (item to rememberDragRowState())
         .let { (not, row) ->
             NotificationItem(
-                NotificationItemState(
+                state = NotificationItemState(
                     notification = not,
                     rowState = row,
                     shape = lazyItemsShapes(index, size),
                     duration = getDifferenceOfTime(not.date),
-                    emojiList = (not.feedback?.ratings?.map { it.emoji }
-                        ?: ratings.map { it.emoji })
-                ), modifier, callback
+                    emojiList = not getEmoji ratings
+                ),
+                modifier = modifier,
+                callback = callback
             )
         }
 }
+
+private infix fun NotificationModel.getEmoji(
+    defEmoji: List<EmojiModel>,
+) = feedback?.ratings?.map { it.emoji } ?: defEmoji
 
 @Composable
 private fun Label(
@@ -428,14 +442,16 @@ private fun Label(
     isFirst: Boolean,
 ) {
     Text(
-        stringResource(text),
-        Modifier.padding(
+        text = stringResource(text),
+        modifier = Modifier.padding(
             top = when {
                 hasResponds -> 24
                 isFirst -> 20
                 else -> 28
-            }.dp, bottom = 18.dp
-        ), colorScheme.tertiary,
+            }.dp,
+            bottom = 18.dp
+        ),
         style = typography.labelLarge
+            .copy(colorScheme.tertiary)
     )
 }

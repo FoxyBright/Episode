@@ -14,6 +14,10 @@ val getDensity = @Composable {
     LocalDensity.current
 }
 
+val getContext = @Composable {
+    LocalContext.current
+}
+
 val getConfiguration = @Composable {
     LocalConfiguration.current
 }

@@ -9,7 +9,7 @@ import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 fun Project.baseConfig(name: String = project.name) =
-    android (
+    android(
         app = { baseAppModuleConfig() },
         library = { libraryConfig() },
         feature = { featureConfig() },
@@ -29,19 +29,19 @@ private fun Project.android(
     feature: DynamicFeatureExtension.() -> Unit = {},
     common: BaseExtension.() -> Unit = {},
 ) = (this as ExtensionAware).extensions.run {
-
+    
     findByType<BaseAppModuleExtension>()?.apply {
         app()
         common()
         return@run
     }
-
+    
     findByType<LibraryExtension>()?.apply {
         library()
         common()
         return@run
     }
-
+    
     findByType<DynamicFeatureExtension>()?.apply {
         feature()
         common()
@@ -51,45 +51,47 @@ private fun Project.android(
 
 
 fun BaseAppModuleExtension.baseAppModuleConfig() {
-
+    
     compileSdk = Config.compileSdk
-
+    
     defaultConfig {
         applicationId = Config.applicationId
     }
-
+    
     buildTypes {
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.create("empty")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
 fun LibraryExtension.libraryConfig() {
-
+    
     compileSdk = Config.compileSdk
 }
 
 fun DynamicFeatureExtension.featureConfig() {
-
 }
 
 fun BaseExtension.baseConfig(name: String, project: Project) {
-
+    
     namespace = if(name == "app") Config.applicationId
     else if(project.rootProject.equals(project.parent))
         "${Config.namespacePrefix}.$name"
     else "${Config.namespacePrefix}.${project.parent!!.name}.$name"
-
+    
     defaultConfig {
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
         versionCode = Config.versionCode
         versionName = Config.versionName
     }
-
+    
     compileOptions {
         isCoreLibraryDesugaringEnabled
         sourceCompatibility = Config.sourceCompatibility

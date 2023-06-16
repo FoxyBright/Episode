@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString.Builder
 import androidx.compose.ui.text.PlaceholderVerticalAlign.Companion.TextCenter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -55,14 +56,16 @@ private fun PreviewHelper(
         Column {
             Text(type.name, Modifier.padding(6.dp))
             NotificationText(
-                DemoUserModel, type,
-                DemoMeetingModel.copy(
+                modifier = Modifier.padding(16.dp, 4.dp),
+                notification = adminText, emoji = emoji,
+                organizer = DemoUserModel,
+                duration = ("11 мин"),
+                type = type,
+                meet = DemoMeetingModel.copy(
                     memberState = if(isOrganizer)
                         IS_ORGANIZER else IS_MEMBER,
                     isOnline = isOnline
-                ), ("11 мин"),
-                Modifier.padding(16.dp, 4.dp),
-                adminText, emoji
+                )
             )
         }
     }
@@ -90,13 +93,15 @@ private fun InfoNotificationPreview() {
     GiltyTheme {
         Column {
             PreviewHelper(
-                ADMIN_NOTIFICATION,
-                ("Внимание! Ведутся технические " +
-                        "работы, возможны сбои в приложении")
+                type = ADMIN_NOTIFICATION,
+                adminText = "Внимание! Ведутся технические " +
+                        "работы, возможны сбои в приложении"
             )
             PreviewHelper(
-                PHOTO_BLOCKED,
-                stringResource(R.string.notification_meet_PHOTO_BLOCKED)
+                type = PHOTO_BLOCKED,
+                adminText = stringResource(
+                    R.string.notification_meet_PHOTO_BLOCKED
+                )
             )
         }
     }
@@ -147,265 +152,415 @@ fun NotificationText(
     onMeetClick: (() -> Unit)? = null,
     onUserClick: (() -> Unit)? = null,
 ) {
-    val user = "${organizer?.username}${
-        if(organizer?.age in 18..99) {
-            ", ${organizer?.age}"
-        } else ""
-    }"
-    val message = buildAnnotatedString {
-        when(type) {
-            MEETING_OVER -> if(meet?.memberState == IS_ORGANIZER) if(emoji.isNullOrEmpty()) {
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_took_place_for_organizer)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet.isOnline
-                    )
-                ) { append(" ${meet.title}") }
-                withStyle(style(TEXT)) { append("? ") }
-                withStyle(style(BOLD)) {
-                    append(stringResource(R.string.notification_leave_members_impressions))
-                }
-                withStyle(style(TIME)) { append(" $duration") }
-            } else {
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_emoji_for_members)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet.isOnline
-                    )
-                ) { append(" ${meet.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            else if(emoji.isNullOrEmpty()) {
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_took_place)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(BOLD)) {
-                    append(stringResource(R.string.notification_leave_meet_impressions))
-                }
-                withStyle(style(TIME)) { append(" $duration") }
-            } else {
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meeting_emoji_for_meet)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title} ") }
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_organizer_label)) }
-                withStyle(style(USER)) { append(" $user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            RESPOND_ACCEPTED -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(
-                        stringResource(
-                            R.string.notification_meet_RESPOND_ACCEPTED,
-                            genderEnding(
-                                organizer?.gender,
-                                RESPOND_ACCEPTED
-                            )
-                        )
-                    )
-                }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            RESPOND -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(
-                        stringResource(
-                            R.string.notification_meet_RESPOND,
-                            genderEnding(organizer?.gender, RESPOND)
-                        )
-                    )
-                }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            MEETING_CANCELED -> {
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append("${meet?.title} ") }
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_MEETING_CANCELED_start)) }
-                withStyle(style(USER)) { append(" $user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(
-                        stringResource(
-                            R.string.notification_meet_MEETING_CANCELED_end,
-                            genderEnding(
-                                organizer?.gender,
-                                MEETING_CANCELED
-                            )
-                        )
-                    )
-                }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            MEETING_KICKED -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(
-                        stringResource(
-                            R.string.notification_meet_MEETING_KICKED,
-                            genderEnding(organizer?.gender, MEETING_KICKED)
-                        )
-                    )
-                }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            WATCH -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(" " + stringResource(R.string.notification_meet_WATCH))
-                }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            TRANSLATION_15MIN -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_start)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title} ") }
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_end)) }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            ADMIN_NOTIFICATION, PHOTO_BLOCKED -> {
-                withStyle(style(TEXT)) { append(notification) }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            WATCH_MEETING_CREATED -> {
-                withStyle(style(USER)) { append("$user ") }
-                appendInlineContent("emoji")
-                withStyle(style(TEXT)) {
-                    append(
-                        stringResource(
-                            R.string.notification_meet_WATCH_MEETING_CREATED,
-                            genderEnding(
-                                organizer?.gender,
-                                WATCH_MEETING_CREATED
-                            )
-                        )
-                    )
-                }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}") }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-            
-            TRANSLATION_STARTED -> {
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_start)) }
-                withStyle(
-                    style(
-                        MEET,
-                        meet?.isOnline
-                    )
-                ) { append(" ${meet?.title}. ") }
-                withStyle(style(TEXT)) { append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_end)) }
-                withStyle(style(TIME)) { append(" $duration") }
-            }
-        }
-        val annotated = this.toAnnotatedString()
-        val userPlace = annotated.indexOf(user)
-        val meetPlace = annotated.indexOf("${meet?.title}")
-        addStringAnnotation(
-            ("user"), (""), userPlace,
-            (userPlace + user.length + 2)
-        )
-        addStringAnnotation(
-            ("meet"), (""), meetPlace,
-            (meetPlace + "${meet?.title}".length)
+    LinkText(
+        message = getMessage(
+            type = type,
+            organizer = organizer,
+            notification = notification,
+            meet = meet,
+            duration = duration,
+            user = "${organizer?.username}${
+                if(organizer?.age in 18..99) {
+                    ", ${organizer?.age}"
+                } else ""
+            }"
+        ),
+        modifier = modifier,
+        organizer = organizer,
+        onMeetClick = onMeetClick,
+        onUserClick = onUserClick
+    )
+}
+
+@Composable
+private fun getMessage(
+    type: NotificationType,
+    organizer: UserModel?,
+    notification: String?,
+    meet: MeetingModel?,
+    duration: String,
+    user: String,
+) = buildAnnotatedString {
+    when(type) {
+        RESPOND_ACCEPTED ->
+            RespondAccept(user, organizer, meet, duration)
+        WATCH_MEETING_CREATED ->
+            WatchMeetingCreated(user, organizer, meet, duration)
+        MEETING_CANCELED ->
+            MeetingCanceled(meet, user, organizer, duration)
+        MEETING_KICKED ->
+            MeetingKicked(user, organizer, meet, duration)
+        RESPOND ->
+            Respond(user, organizer, meet, duration)
+        TRANSLATION_15MIN ->
+            Translation15Min(user, meet, duration)
+        TRANSLATION_STARTED ->
+            TranslationStarted(meet, duration)
+        MEETING_OVER ->
+            MeetingOver(meet, user, duration)
+        ADMIN_NOTIFICATION, PHOTO_BLOCKED ->
+            System(notification, duration)
+        WATCH -> Watch(user, duration)
+    }
+    getLinkAnnotation(user, meet)
+}
+
+@Composable
+private fun Builder.MeetingOver(
+    meet: MeetingModel?,
+    user: String,
+    duration: String,
+    emoji: List<EmojiModel>?,
+) {
+    if(meet?.memberState == IS_ORGANIZER)
+        if(emoji.isNullOrEmpty())
+            MyMeetingOver(meet, duration)
+        else MyMeetingOverWithEmoji(meet, duration)
+    else if(emoji.isNullOrEmpty())
+        MeetingOver(meet, user, duration)
+    else MeetingOverWithEmoji(meet, user, duration)
+}
+
+@Composable
+private fun Builder.MeetingOver(
+    meet: MeetingModel?,
+    user: String,
+    duration: String,
+) {
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meeting_took_place))
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TEXT)) { append(stringResource(R.string.notification_words_connector)) }
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(BOLD)) {
+        append(stringResource(R.string.notification_leave_meet_impressions))
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.MeetingOverWithEmoji(
+    meet: MeetingModel?,
+    user: String,
+    duration: String,
+) {
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meeting_emoji_for_meet))
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title} ")
+    }
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_organizer_label))
+    }
+    withStyle(style(USER)) { append(" $user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.MyMeetingOver(
+    meet: MeetingModel,
+    duration: String,
+) {
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meeting_took_place_for_organizer))
+    }
+    withStyle(style(MEET, meet.isOnline)) {
+        append(" ${meet.title}")
+    }
+    withStyle(style(TEXT)) { append("? ") }
+    withStyle(style(BOLD)) {
+        append(stringResource(R.string.notification_leave_members_impressions))
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.MyMeetingOverWithEmoji(
+    meet: MeetingModel,
+    duration: String,
+) {
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meeting_emoji_for_members))
+    }
+    withStyle(style(MEET, meet.isOnline)) {
+        append(" ${meet.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.RespondAccept(
+    user: String,
+    organizer: UserModel?,
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(
+            stringResource(
+                R.string.notification_meet_RESPOND_ACCEPTED,
+                genderEnding(
+                    organizer?.gender,
+                    RESPOND_ACCEPTED
+                )
+            )
         )
     }
-    LinkedText(
-        message, modifier, mapOf(
-            "emoji" to InlineTextContent(
-                Placeholder(18.dp.toSp(), 18.dp.toSp(), TextCenter)
-            ) {
-                organizer?.emoji?.let {
-                    GEmojiImage(it, Modifier.size(18.dp))
-                }
-            }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.Respond(
+    user: String,
+    organizer: UserModel?,
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(
+            stringResource(
+                R.string.notification_meet_RESPOND,
+                genderEnding(organizer?.gender, RESPOND)
+            )
         )
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.MeetingCanceled(
+    meet: MeetingModel?,
+    user: String,
+    organizer: UserModel?,
+    duration: String,
+) {
+    withStyle(style(MEET, meet?.isOnline)) {
+        append("${meet?.title} ")
+    }
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meet_MEETING_CANCELED_start))
+    }
+    withStyle(style(USER)) { append(" $user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(
+            stringResource(
+                R.string.notification_meet_MEETING_CANCELED_end,
+                genderEnding(
+                    organizer?.gender,
+                    MEETING_CANCELED
+                )
+            )
+        )
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.MeetingKicked(
+    user: String,
+    organizer: UserModel?,
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(
+            stringResource(
+                R.string.notification_meet_MEETING_KICKED,
+                genderEnding(
+                    organizer?.gender,
+                    MEETING_KICKED
+                )
+            )
+        )
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.Watch(
+    user: String,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(" " + stringResource(R.string.notification_meet_WATCH))
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.Translation15Min(
+    user: String,
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_start))
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title} ")
+    }
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meet_TRANSLATION_15MIN_end))
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.System(
+    notification: String?,
+    duration: String,
+) {
+    withStyle(style(TEXT)) { append(notification) }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.WatchMeetingCreated(
+    user: String,
+    organizer: UserModel?,
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(USER)) { append("$user ") }
+    appendInlineContent("emoji")
+    withStyle(style(TEXT)) {
+        append(
+            stringResource(
+                R.string.notification_meet_WATCH_MEETING_CREATED,
+                genderEnding(
+                    organizer?.gender,
+                    WATCH_MEETING_CREATED
+                )
+            )
+        )
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}")
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+@Composable
+private fun Builder.TranslationStarted(
+    meet: MeetingModel?,
+    duration: String,
+) {
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_start))
+    }
+    withStyle(style(MEET, meet?.isOnline)) {
+        append(" ${meet?.title}. ")
+    }
+    withStyle(style(TEXT)) {
+        append(stringResource(R.string.notification_meet_ADMIN_NOTIFICATION_end))
+    }
+    withStyle(style(TIME)) { append(" $duration") }
+}
+
+private fun Builder.getLinkAnnotation(
+    user: String,
+    meet: MeetingModel?,
+) {
+    val (userPlace, meetPlace) =
+        toAnnotatedString().let {
+            it.indexOf(user) to
+                    it.indexOf("${meet?.title}")
+        }
+    addStringAnnotation(
+        tag = "user",
+        annotation = "",
+        start = userPlace,
+        end = userPlace + user.length + 2
+    )
+    addStringAnnotation(
+        tag = "meet",
+        annotation = "",
+        start = meetPlace,
+        end = meetPlace + "${meet?.title}".length
+    )
+}
+
+@Composable
+private fun LinkText(
+    message: AnnotatedString,
+    modifier: Modifier,
+    organizer: UserModel?,
+    onMeetClick: (() -> Unit)?,
+    onUserClick: (() -> Unit)?,
+) {
+    val inlineContent = mapOf(
+        "emoji" to InlineTextContent(
+            Placeholder(18.dp.toSp(), 18.dp.toSp(), TextCenter)
+        ) {
+            organizer?.emoji?.let {
+                GEmojiImage(it, Modifier.size(18.dp))
+            }
+        }
+    )
+    LinkedText(
+        text = message,
+        modifier = modifier,
+        inlineContent = inlineContent
     ) {
-        message.getStringAnnotations(("meet"), it, it)
+        message
+            .getStringAnnotations(("meet"), it, it)
             .firstOrNull()?.let { onMeetClick?.let { it() } }
-        message.getStringAnnotations(("user"), it, it)
+        message
+            .getStringAnnotations(("user"), it, it)
             .firstOrNull()?.let { onUserClick?.let { it() } }
     }
 }
 
-private enum class CustomText { USER, TEXT, MEET, TIME, BOLD }
+private enum class CustomText {
+    USER, TEXT, MEET, TIME, BOLD
+}
 
 @Composable
 private fun style(
     text: CustomText,
     online: Boolean? = false,
 ) = when(text) {
-    USER -> font(weight = Bold, textStyle = typography.bodyMedium)
+    USER -> font(
+        weight = Bold,
+        textStyle = typography.bodyMedium
+    )
     BOLD -> font(weight = SemiBold)
     TEXT -> font()
     TIME -> font(colorScheme.onTertiary)
     MEET -> font(
-        if(online == true) colorScheme.secondary
-        else colorScheme.primary, weight = SemiBold
+        if(online == true)
+            colorScheme.secondary
+        else colorScheme.primary,
+        weight = SemiBold
     )
 }.toSpanStyle()
 
@@ -413,10 +568,14 @@ private fun genderEnding(
     genderType: GenderType?,
     notType: NotificationType,
 ) = when(notType) {
-    RESPOND -> if(genderType == FEMALE) "ась" else "ся"
-    RESPOND_ACCEPTED, MEETING_CANCELED, MEETING_KICKED, WATCH_MEETING_CREATED ->
-        if(genderType == FEMALE) "а" else ""
-    
+    RESPOND -> if(genderType == FEMALE)
+        "ась" else "ся"
+    RESPOND_ACCEPTED,
+    MEETING_CANCELED,
+    MEETING_KICKED,
+    WATCH_MEETING_CREATED,
+    -> if(genderType == FEMALE)
+        "а" else ""
     else -> ""
 }
 
@@ -438,16 +597,20 @@ private fun LinkedText(
         mutableStateOf<TextLayoutResult?>(null)
     }
     BasicText(
-        text, modifier.pointerInput(onClick) {
-            detectTapGestures { pos ->
-                layoutResult.value?.let { layoutResult ->
-                    onClick(layoutResult.getOffsetForPosition(pos))
+        text = text,
+        modifier = modifier
+            .pointerInput(onClick) {
+                detectTapGestures { pos ->
+                    layoutResult.value?.let { layoutResult ->
+                        onClick(layoutResult.getOffsetForPosition(pos))
+                    }
                 }
-            }
-        }, onTextLayout = {
+            },
+        onTextLayout = {
             val onText: (TextLayoutResult) -> Unit = {}
             layoutResult.value = it
             onText(it)
-        }, inlineContent = inlineContent
+        },
+        inlineContent = inlineContent
     )
 }

@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.chat
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.chat.presentation.ui.chat.ChatScreen
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.ChatListScreen
@@ -42,7 +43,7 @@ object Chat: FeatureDefinition() {
         singleOf(::ChatManager)
         singleOf(::ProfileManager)
         singleOf(::MeetingManager)
-        singleOf(::ChatViewModel)
+        factoryOf(::ChatViewModel)
         singleOf(::ChatListViewModel)
         singleOf(::GalleryViewModel)
         singleOf(::HiddenBsViewModel)

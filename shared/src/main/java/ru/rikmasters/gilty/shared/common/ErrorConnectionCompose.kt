@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.Toast.LENGTH_LONG
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.Keep
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
@@ -42,6 +43,7 @@ private fun ErrorPReview() {
     }
 }
 
+@Keep
 @Composable
 fun ErrorConnection(
     errorMessage: String = stringResource(
