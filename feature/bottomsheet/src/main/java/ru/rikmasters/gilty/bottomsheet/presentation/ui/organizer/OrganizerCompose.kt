@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,10 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
@@ -250,12 +246,23 @@ private fun TopBar(
                         style = typography.labelLarge,
                         overflow = Ellipsis,
                         maxLines = 1,
-                        modifier = Modifier
-                            .widthIn(min = 1.dp, max = badgeWidth.width.dp)
-                            .basicMarquee(
-                                spacing = MarqueeSpacing(14.dp),
-                                iterations = Int.MAX_VALUE
-                            ),
+                        modifier =
+                        if (profileGroup != DEFAULT) {
+                            Modifier
+                                .widthIn(min = 1.dp, max = badgeWidth.width.dp)
+                                .basicMarquee(
+                                    spacing = MarqueeSpacing(14.dp),
+                                    iterations = Int.MAX_VALUE
+                                )
+                        } else {
+                            Modifier
+                                .width(IntrinsicSize.Max)
+                                .basicMarquee(
+                                    spacing = MarqueeSpacing(14.dp),
+                                    iterations = Int.MAX_VALUE
+                                )
+
+                        },
                     )
                     ProfileBadge(
                         group = profileGroup,

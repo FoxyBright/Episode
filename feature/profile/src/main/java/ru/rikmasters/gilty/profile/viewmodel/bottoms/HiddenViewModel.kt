@@ -49,32 +49,40 @@ class HiddenViewModel : ViewModel() {
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
 
-
     private val _isDragging = MutableStateFlow(false)
     val isDragging = _isDragging.asStateFlow()
 
     private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
 
 
+    private suspend fun getHiddenPhotosAmount() {
+        _photosAmount.emit(
+            profileManager.getHiddenPhotosAmount()
+        )
+    }
+
     suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photos.value.size > from && _photos.value.size > to) {
+                  //  Log.d("Hello Before List", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())
                     val fromId = _photos.value[from].id
                     val newList = _photos.value.toMutableList().apply {
                         add(to, removeAt(from))
                     }
                     _photos.emit(newList)
+
                     var newLastChanged = Pair<String?, Int?>(null, null)
                     newLastChanged = if(_lastPositionsChanged.value.first == null){
-                        _lastPositionsChanged.emit(_lastPositionsChanged.value.copy(first = fromId))
                         newLastChanged.copy(first = fromId)
                     }else {
                         newLastChanged.copy(first = _lastPositionsChanged.value.first)
                     }
                     newLastChanged = newLastChanged.copy(second = to + 1)
                     _lastPositionsChanged.emit(newLastChanged)
-
+                    /*Log.d("Hello", "${newLastChanged.first} ${newLastChanged.second} Poss")
+                    Log.d("Hello Before After", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())
+*/
                 }
             }
         }
@@ -84,17 +92,10 @@ class HiddenViewModel : ViewModel() {
         _photos.emit(value)
     }
 
-    //fun isDogDragEnabled(draggedOver: ItemPosition, dragging: ItemPosition) = dogs.getOrNull(draggedOver.index)?.isLocked != true
-
-    suspend fun uploadPhotoList(forceWeb: Boolean) {
-        profileManager.getProfileHiddens(forceWeb)
-        refreshImages()
-    }
-
     suspend fun deleteImage(imageId: String) {
         profileManager.deleteHidden(imageId).on(
             success = {
-                profileManager.getProfile(true)
+                profileManager.getProfile(true)// TODO Why?
                 refreshImages()
             },
             loading = {},
@@ -103,12 +104,6 @@ class HiddenViewModel : ViewModel() {
                     it.serverMessage
                 )
             }
-        )
-    }
-
-    suspend fun getHiddenPhotosAmount() {
-        _photosAmount.emit(
-            profileManager.getHiddenPhotosAmount()
         )
     }
 
@@ -124,7 +119,7 @@ class HiddenViewModel : ViewModel() {
         _viewerSelectImage.emit(photo)
     }
 
-    private suspend fun refreshImages() {
+    suspend fun refreshImages() {
         refresh.emit(!refresh.value)
     }
 

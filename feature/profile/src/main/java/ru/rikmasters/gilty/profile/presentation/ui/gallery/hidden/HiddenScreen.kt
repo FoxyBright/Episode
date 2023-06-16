@@ -41,9 +41,7 @@ fun HiddenBsScreen(
         }
     })
 
-    LaunchedEffect(Unit) {
-        vm.uploadPhotoList(true)
-    }
+    LaunchedEffect(Unit) { vm.refreshImages() }
 
     LaunchedEffect(key1 = photoList.itemSnapshotList.items, block = {
         vm.setPhotoList(photoList.itemSnapshotList.items)
@@ -52,7 +50,7 @@ fun HiddenBsScreen(
     HiddenBsContent(
         state = HiddenBsState(
             photoList = photoList,
-            photoAmount = photoAmount.value,
+            photosAmount = photoAmount.value,
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
@@ -93,7 +91,7 @@ fun HiddenBsScreen(
             }
 
             override fun onBack() {
-                nav.navigate("main?update=$update")
+                nav.navigationBack()
             }
 
             override fun onPhotoViewDismiss(state: Boolean) {

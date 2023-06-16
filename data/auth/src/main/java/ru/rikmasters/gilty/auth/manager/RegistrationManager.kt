@@ -16,10 +16,13 @@ class RegistrationManager(
     
     private val profileStore: ProfileStore,
 ) {
-    
+
+    fun getHiddenPhotos() = profileStore.getUserHiddenPaging()
     suspend fun profileCompleted() = withContext(IO) {
         profileStore.checkCompletable()
     }
+    suspend fun getHiddenPhotosAmount() =
+        profileStore.getHiddenPhotosAmount()
     suspend fun changeAlbumPosition(imageId: String, position: Int) =
         profileStore.changeAlbumPosition(imageId, position)
     
@@ -62,12 +65,19 @@ class RegistrationManager(
     suspend fun updateUserCategories() =
         withContext(IO) { profileStore.updateUserCategories() }
     
-    suspend fun deleteHidden(files: List<String>) =
+    suspend fun deleteHiddens(files: List<String>) =
         withContext(IO) {
             files.forEach {
                 profileStore.deleteHidden(
                     it.substring("thumbnails/", "?")
                 )
+            }
+        }
+    suspend fun deleteHidden(imageId: String) =
+        withContext(IO) {
+            profileStore.deleteHidden(imageId).let {
+                //getProfileHiddens(true)
+                it
             }
         }
     

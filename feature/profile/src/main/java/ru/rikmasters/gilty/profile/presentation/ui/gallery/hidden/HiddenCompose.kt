@@ -64,7 +64,7 @@ interface HiddenBsCallback {
 
 data class HiddenBsState(
     val photoList: LazyPagingItems<AvatarModel>,
-    val photoAmount: Int,
+    val photosAmount: Int,
     val photoViewState: Boolean,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
@@ -92,8 +92,8 @@ fun HiddenBsContent(
         ActionBar(
             title = stringResource(R.string.profile_hidden_photo),
             modifier = Modifier.padding(bottom = 20.dp),
-            extra = if (state.photoAmount == 0) null
-            else stringResource(R.string.profile_hidden_photo_amount, state.photoAmount)
+            extra = if (state.photosAmount == 0) null
+            else stringResource(R.string.profile_hidden_photo_amount, state.photosAmount)
         ) { callback?.onBack() }
 
         val stateDragable = rememberReorderableLazyGridState(

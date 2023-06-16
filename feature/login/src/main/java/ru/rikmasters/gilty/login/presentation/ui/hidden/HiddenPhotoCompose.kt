@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
@@ -33,6 +34,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.shared.R
@@ -42,8 +46,10 @@ import ru.rikmasters.gilty.shared.common.dragGrid.ReorderableItem
 import ru.rikmasters.gilty.shared.common.dragGrid.detectReorderAfterLongPress
 import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridState
 import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
+import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -59,14 +65,14 @@ private fun HiddenPhotoPreview() {
             )
         ) {
             HiddenContent(
-                HiddenState(listOf(), 0, false)
+                HiddenState(pagingPreview(list = listOf()), 0, false)
             )
         }
     }
 }
 
 data class HiddenState(
-    val photoList: List<AvatarModel>,
+    val photoList: LazyPagingItems<AvatarModel>,
     val photosAmount: Int,
     val photoViewState: Boolean,
     val viewerImages: List<AvatarModel?> = emptyList(),
@@ -137,36 +143,63 @@ fun HiddenContent(
             horizontalArrangement = spacedBy(4.dp),
             state = stateDragable.gridState,
         ) {
-            item {
-                GalleryButton(
-                    modifier = Modifier
-                        .aspectRatio(1f),
-                    callback = callback
-                )
-            }
-            items(items = state.photoList, key = { it.thumbnail.url }) { img ->
-                ReorderableItem(
-                    reorderableState = stateDragable,
-                    key = img.thumbnail.url,
-                    modifier = Modifier
+            when {
+                state.photoList.loadState.refresh is LoadState.Error -> {}
+                state.photoList.loadState.append is LoadState.Error -> {}
+                state.photoList.loadState.refresh is LoadState.Loading -> {
+                    item(span = { GridItemSpan(3) }) {
+                        PagingLoader(state.photoList.loadState)
+                    }
+                }
 
-                ) { isDragging ->
+                else -> {
+                    item {
+                        GalleryButton(
+                            modifier = Modifier
+                                .aspectRatio(1f),
+                            callback = callback
+                        )
+                    }
+                    items(items = state.viewerImages, key = { it?.id ?: "" }) { img ->
+                        img?.let {
+                            ReorderableItem(
+                                reorderableState = stateDragable,
+                                key = img.id,
+                                modifier = Modifier
+                            ) { isDragging ->
 
-                    LaunchedEffect(key1 = isDragging, block = {
-                        callback?.onIsDraggingChange(isDragging)
-                    })
+                                LaunchedEffect(key1 = isDragging, block = {
+                                    callback?.onIsDraggingChange(isDragging)
+                                })
 
-                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                    LazyItem(
-                        image = img.thumbnail.url,
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .detectReorderAfterLongPress(stateDragable)
-                            .clip(shapes.large)
-                            .shadow(elevation.value),
-                        onSelect = { callback?.onSelectImage(img) },
-                        onDelete = { callback?.onDeleteImage(img) }
-                    )
+                                val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                                LazyItem(
+                                    image = img.thumbnail.url,
+                                    modifier = Modifier
+                                        .aspectRatio(1f)
+                                        .detectReorderAfterLongPress(stateDragable)
+                                        .clip(shapes.large)
+                                        .zIndex(if(isDragging) 1f else 2f)
+                                        .shadow(elevation.value),
+                                    onSelect = { callback?.onSelectImage(img) },
+                                    onDelete = { callback?.onDeleteImage(img) }
+                                )
+                            }
+                        }
+                    }
+                    if (state.photoList.loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(3) }) {
+                            PagingLoader(state = state.photoList.loadState)
+                        }
+                    }
+
+                    /*items(3) {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .weight(1f)
+                        )
+                    }*/
                 }
             }
         }

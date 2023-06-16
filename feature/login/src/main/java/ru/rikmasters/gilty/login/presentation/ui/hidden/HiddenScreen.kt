@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.login.presentation.ui.hidden
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -18,9 +19,9 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HiddenScreen(vm: HiddenViewModel) {
-    
-    val photoList by vm.photoList.collectAsState()
-    val photosAmount by vm.photosAmount.collectAsState()
+
+    val photoList = vm.images.collectAsLazyPagingItems()
+    val photoAmount by vm.photosAmount.collectAsState()
     val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -31,20 +32,24 @@ fun HiddenScreen(vm: HiddenViewModel) {
     val photoViewState by vm.viewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
 
-    LaunchedEffect(Unit) { vm.getHidden() }
+    LaunchedEffect(Unit) { vm.refreshImages() }
 
     LaunchedEffect(key1 = isDragging, block = {
         if(!isDragging){
             vm.movePhotoRemote()
         }
     })
+
+    LaunchedEffect(key1 = photoList.itemSnapshotList.items, block = {
+        vm.setPhotoList(photoList.itemSnapshotList.items)
+    })
     
     HiddenContent(
-        state = HiddenState(photoList = photoList,
-            photosAmount = photoList.size//photosAmount
-            ,
+        state = HiddenState(
+            photoList = photoList,
+            photosAmount = photoAmount,
             photoViewState = photoViewState,
-            viewerImages = photoList,
+            viewerImages = photoList.itemSnapshotList.items,
             viewerSelectImage = viewerSelectImage,
             viewerMenuState = false,
             viewerType = photoViewType),
@@ -59,7 +64,7 @@ fun HiddenScreen(vm: HiddenViewModel) {
             }
             
             override fun onDeleteImage(image: AvatarModel) {
-                scope.launch { vm.deleteImage(image) }
+                scope.launch { vm.deleteImage(image.id) }
             }
             
             override fun openGallery() {

@@ -1,29 +1,47 @@
 package ru.rikmasters.gilty.login.viewmodel
 
 import android.content.Context
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
-import ru.rikmasters.gilty.shared.common.compressor.compress
 import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
-import java.io.File
 
-class HiddenViewModel: ViewModel() {
-    
+class HiddenViewModel : ViewModel() {
+
     private val regManager by inject<RegistrationManager>()
-    
+
     private val context = getKoin().get<Context>()
-    
-    private val _photoList = MutableStateFlow(emptyList<AvatarModel>())
-    val photoList = _photoList.asStateFlow()
-    
-    private val hiddenList = MutableStateFlow(emptyList<AvatarModel>())
-    
+
+    private val refresh = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val images by lazy {
+        combine(
+            refresh
+        ) { it }.flatMapLatest {
+            this.getHiddenPhotosAmount()
+            regManager.getHiddenPhotos()
+        }.cachedIn(coroutineScope)
+
+    }
+
+    private val _photos = MutableStateFlow(listOf<AvatarModel>())
+    val photos = _photos.asStateFlow()
+
+    /*    private val _photoList = MutableStateFlow(emptyList<AvatarModel>())
+        val photoList = _photoList.asStateFlow()
+
+        private val hiddenList = MutableStateFlow(emptyList<AvatarModel>())*/
+
     private val _photosAmount = MutableStateFlow(0)
     val photosAmount = _photosAmount.asStateFlow()
 
@@ -41,29 +59,55 @@ class HiddenViewModel: ViewModel() {
 
     private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
 
-    suspend fun getHidden() = singleLoading {
-        regManager.getProfile().hidden?.let {
-            val response = regManager
-                .getHidden(it.albumId).on(
-                    success = { list -> list },
-                    loading = { emptyList<AvatarModel>() to 0 },
-                    error = { emptyList<AvatarModel>() to 0 }
-                )
-            _photoList.emit(response.first)
-            hiddenList.emit(response.first)
-            _photosAmount.emit(response.second)
+    private suspend fun getHiddenPhotosAmount() {
+        _photosAmount.emit(
+            regManager.getHiddenPhotosAmount()
+        )
+    }
+
+    suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
+        (fromOr.index - 1).let { from ->
+            (toOr.index - 1).let { to ->
+                if (_photos.value.size > from && _photos.value.size > to) {
+                    //  Log.d("Hello Before List", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())
+                    val fromId = _photos.value[from].id
+                    val newList = _photos.value.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
+                    _photos.emit(newList)
+
+                    var newLastChanged = Pair<String?, Int?>(null, null)
+                    newLastChanged = if(_lastPositionsChanged.value.first == null){
+                        newLastChanged.copy(first = fromId)
+                    }else {
+                        newLastChanged.copy(first = _lastPositionsChanged.value.first)
+                    }
+                    newLastChanged = newLastChanged.copy(second = to + 1)
+                    _lastPositionsChanged.emit(newLastChanged)
+                    /*Log.d("Hello", "${newLastChanged.first} ${newLastChanged.second} Poss")
+                    Log.d("Hello Before After", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())*/
+                }
+            }
         }
     }
-    
-    @Suppress("unused")
-    suspend fun selectImage(image: AvatarModel) {
-        if(!photoList.value.contains(image))
-            _photoList.emit(photoList.value + image)
+
+    suspend fun setPhotoList(value: List<AvatarModel>) {
+        _photos.emit(value)
     }
-    
-    suspend fun deleteImage(image: AvatarModel) = singleLoading {
-        if(photoList.value.contains(image))
-            _photoList.emit(photoList.value - image)
+
+    suspend fun deleteImage(imageId: String) {
+        regManager.deleteHidden(imageId).on(
+            success = {
+                regManager.getProfile(true) // TODO Why?
+                refreshImages()
+            },
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
     }
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
@@ -76,44 +120,10 @@ class HiddenViewModel: ViewModel() {
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
-    suspend fun movePhoto(fromOr: ItemPosition, toOr: ItemPosition) {
-        (fromOr.index - 1).let { from ->
-            (toOr.index - 1).let { to ->
-                if (_photoList.value.size > from && _photoList.value.size > to) {
-                    val fromId = _photoList.value[from].id
-                    val newList = _photoList.value.toMutableList().apply {
-                        add(to, removeAt(from))
-                    }
-                    _photoList.emit(newList)
-
-                    var newLastChanged = Pair<String?, Int?>(null, null)
-                    newLastChanged = if(_lastPositionsChanged.value.first == null){
-                        _lastPositionsChanged.emit(_lastPositionsChanged.value.copy(first = fromId))
-                        newLastChanged.copy(first = fromId)
-                    }else {
-                        newLastChanged.copy(first = _lastPositionsChanged.value.first)
-                    }
-                    newLastChanged = newLastChanged.copy(second = to + 1)
-                    _lastPositionsChanged.emit(newLastChanged)
-                }
-            }
-        }
+    suspend fun refreshImages() {
+        refresh.emit(!refresh.value)
     }
-    suspend fun onNext() = singleLoading {
-        regManager.deleteHidden(hiddenList.value.map { it.thumbnail.url })
-        regManager.addHidden(photoList.value.map {
-            File(it.thumbnail.url).compress(context)
-        }).on(
-            success = {},
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
-    }
-    suspend fun onIsDraggingChange(value:Boolean){
+    suspend fun onIsDraggingChange(value: Boolean) {
         _isDragging.emit(value)
     }
     suspend fun movePhotoRemote() {
@@ -136,4 +146,20 @@ class HiddenViewModel: ViewModel() {
         }
 
     }
+
+/*    suspend fun onNext() = singleLoading {
+        regManager.deleteHidden(hiddenList.value.map { it.thumbnail.url })
+        regManager.addHidden(photoList.value.map {
+            File(it.thumbnail.url).compress(context)
+        }).on(
+            success = {},
+            loading = {},
+            error = {
+                context.errorToast(
+                    it.serverMessage
+                )
+            }
+        )
+    }*/
+
 }
