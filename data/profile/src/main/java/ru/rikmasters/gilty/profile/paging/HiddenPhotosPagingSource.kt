@@ -40,7 +40,8 @@ class HiddenPhotosPagingSource(
                 loading = { emptyList<Avatar>() to 0 },
                 error = { emptyList<Avatar>() to 0}
             ).let { photos ->
-
+                localSource.deleteAll<AvatarAmount>()
+                localSource.save(AvatarAmount(0))
                 localSource.deleteAll<AvatarAmount>()
                 localSource.save(AvatarAmount(photos.second))
 

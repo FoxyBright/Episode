@@ -23,6 +23,10 @@ class RegistrationManager(
     }
     suspend fun getHiddenPhotosAmount() =
         profileStore.getHiddenPhotosAmount()
+
+    suspend fun deleteHiddenPhotosAmount() =
+        profileStore.deleteHiddenPhotosAmount()
+
     suspend fun changeAlbumPosition(imageId: String, position: Int) =
         profileStore.changeAlbumPosition(imageId, position)
     

@@ -295,4 +295,7 @@ class ProfileStore(
     
     suspend fun getHiddenPhotosAmount() =
         primarySource.find<AvatarAmount>()?.amount ?: 0
+
+    suspend fun deleteHiddenPhotosAmount() =
+        primarySource.deleteAll<AvatarAmount>()
 }

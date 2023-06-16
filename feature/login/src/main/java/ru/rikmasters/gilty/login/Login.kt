@@ -115,7 +115,7 @@ object Login: FeatureDefinition() {
         }
         
         scope<ProfileViewModel> {
-            scopedOf(::ProfileViewModel)
+            singleOf(::ProfileViewModel)
         }
         
         scope<PersonalViewModel> {
