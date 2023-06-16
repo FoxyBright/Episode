@@ -4,8 +4,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingSource.LoadResult.Error
 import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.PagingState
+import ru.rikmasters.gilty.core.data.source.DbSource
 import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.models.Avatar
 
 class AlbumPagingSource(
     private val webSource: ProfileWebSource,
@@ -30,14 +32,14 @@ class AlbumPagingSource(
                 albumId = albumId
             ).on(
                 success = { it },
-                loading = { emptyList() },
-                error = { emptyList() }
-            ).let { albums ->
+                loading = { emptyList<Avatar>() to 0 },
+                error = { emptyList<Avatar>() to 0 }
+            ).let { albums: Pair<List<Avatar>, Int> ->
                 Page(
-                    data = albums.map { it.map() },
+                    data = albums.first.map { it.map() },
                     prevKey = if(page == 1)
                         null else page - 1,
-                    nextKey = if((albums.size) < params.loadSize)
+                    nextKey = if((albums.first.size) < params.loadSize)
                         null else page + 1
                 )
             }

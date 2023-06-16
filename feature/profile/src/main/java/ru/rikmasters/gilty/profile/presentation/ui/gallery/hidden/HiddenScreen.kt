@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -23,7 +24,7 @@ fun HiddenBsScreen(
 ) {
 
     val photoList = vm.images.collectAsLazyPagingItems()
-    val photoAmount = vm.photosAmount.collectAsState()
+    val photosAmount by vm.photosAmount.collectAsState()
     val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -35,22 +36,24 @@ fun HiddenBsScreen(
     val photoViewState by vm.viewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
 
+
+    LaunchedEffect(Unit) { vm.refreshImages() }
+
     LaunchedEffect(key1 = isDragging, block = {
         if(!isDragging){
             vm.movePhotoRemote()
         }
     })
 
-    LaunchedEffect(Unit) { vm.refreshImages() }
-
     LaunchedEffect(key1 = photoList.itemSnapshotList.items, block = {
         vm.setPhotoList(photoList.itemSnapshotList.items)
+        vm.getHiddenPhotosAmount()
     })
 
     HiddenBsContent(
         state = HiddenBsState(
             photoList = photoList,
-            photosAmount = photoAmount.value,
+            photosAmount = photosAmount,
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,

@@ -28,7 +28,6 @@ class HiddenViewModel : ViewModel() {
         combine(
             refresh
         ) { it }.flatMapLatest {
-            this.getHiddenPhotosAmount()
             regManager.getHiddenPhotos()
         }.cachedIn(coroutineScope)
 
@@ -36,11 +35,6 @@ class HiddenViewModel : ViewModel() {
 
     private val _photos = MutableStateFlow(listOf<AvatarModel>())
     val photos = _photos.asStateFlow()
-
-    /*    private val _photoList = MutableStateFlow(emptyList<AvatarModel>())
-        val photoList = _photoList.asStateFlow()
-
-        private val hiddenList = MutableStateFlow(emptyList<AvatarModel>())*/
 
     private val _photosAmount = MutableStateFlow(0)
     val photosAmount = _photosAmount.asStateFlow()
@@ -59,7 +53,7 @@ class HiddenViewModel : ViewModel() {
 
     private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
 
-    private suspend fun getHiddenPhotosAmount() {
+    suspend fun getHiddenPhotosAmount() {
         _photosAmount.emit(
             regManager.getHiddenPhotosAmount()
         )

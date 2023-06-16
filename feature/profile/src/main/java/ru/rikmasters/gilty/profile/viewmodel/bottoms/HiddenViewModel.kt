@@ -28,7 +28,6 @@ class HiddenViewModel : ViewModel() {
         combine(
             refresh
         ) { it }.flatMapLatest {
-            this.getHiddenPhotosAmount()
             profileManager.getHiddenPhotos()
         }.cachedIn(coroutineScope)
 
@@ -55,7 +54,7 @@ class HiddenViewModel : ViewModel() {
     private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
 
 
-    private suspend fun getHiddenPhotosAmount() {
+    suspend fun getHiddenPhotosAmount() {
         _photosAmount.emit(
             profileManager.getHiddenPhotosAmount()
         )

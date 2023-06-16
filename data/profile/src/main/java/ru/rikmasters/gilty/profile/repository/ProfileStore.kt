@@ -204,7 +204,7 @@ class ProfileStore(
             pagingSourceFactory = {
                 AlbumPagingSource(
                     webSource = webSource,
-                    albumId = albumId
+                    albumId = albumId,
                 )
             }
         ).flow

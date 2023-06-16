@@ -250,9 +250,14 @@ class ProfileWebSource : KtorSource() {
             query("per_page" to "$perPage")
         }
     }.let {
+
         coroutinesState({ it }) {
-            it.paginateWrapped<List<Avatar>>().first
+            it.paginateWrapped<List<Avatar>>()
+                .let { p -> p.first to p.second.total }
         }
+        /*coroutinesState({ it }) {
+            it.paginateWrapped<List<Avatar>>().first
+        }*/
     }
 
     suspend fun getMeetResponds(

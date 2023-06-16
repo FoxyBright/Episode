@@ -31,6 +31,8 @@ fun HiddenScreen(vm: HiddenViewModel) {
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
+    val viewerImages by vm.photos.collectAsState()
+
 
     LaunchedEffect(Unit) { vm.refreshImages() }
 
@@ -42,6 +44,8 @@ fun HiddenScreen(vm: HiddenViewModel) {
 
     LaunchedEffect(key1 = photoList.itemSnapshotList.items, block = {
         vm.setPhotoList(photoList.itemSnapshotList.items)
+        vm.getHiddenPhotosAmount()
+
     })
     
     HiddenContent(
@@ -49,7 +53,7 @@ fun HiddenScreen(vm: HiddenViewModel) {
             photoList = photoList,
             photosAmount = photoAmount,
             photoViewState = photoViewState,
-            viewerImages = photoList.itemSnapshotList.items,
+            viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
             viewerMenuState = false,
             viewerType = photoViewType),
