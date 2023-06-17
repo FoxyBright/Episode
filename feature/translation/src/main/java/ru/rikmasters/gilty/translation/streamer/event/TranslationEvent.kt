@@ -16,6 +16,9 @@ sealed interface TranslationEvent {
     object DecreaseRetryCount : TranslationEvent
     data class ChangeSurfaceState(val state:SurfaceState) : TranslationEvent
     object CompleteTranslation : TranslationEvent
+    object ToggleCamera : TranslationEvent
+    object ToggleMicrophone : TranslationEvent
+
 
 
 
@@ -27,7 +30,6 @@ sealed interface TranslationEvent {
     data class AppendTranslation(val appendMinutes: Int) : TranslationEvent
     object ChangeFacing : TranslationEvent
 
-    object ToggleCamera : TranslationEvent
-    object ToggleMicrophone : TranslationEvent
+
 
 }

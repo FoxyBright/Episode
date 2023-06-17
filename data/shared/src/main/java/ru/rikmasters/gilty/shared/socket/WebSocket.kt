@@ -41,7 +41,6 @@ abstract class WebSocket: KtorSource() {
         channel: String,
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
-        Log.d("TranslationWeb", "Subscribing CHANNEL $channel")
         tryPost(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
@@ -116,21 +115,22 @@ abstract class WebSocket: KtorSource() {
     fun disconnect() {
         sessionHandlerJob?.cancel()
     }
+
+    private val reconnectDelay = MutableStateFlow(2000L)
     
     suspend fun connect(userId: String) {
         try {
             connection(userId)
-            Log.d("TEST", "Connect")
         } catch(e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
-            Log.d("TEST", "exception $e")
             disconnect()
             try {
-                Log.d("TEST", "Retry")
                 connection(userId)
             } catch(e: Exception) {
-                Log.d("TEST", "Bad reconnection $e")
+                delay(reconnectDelay.value)
+                reconnectDelay.value = reconnectDelay.value + 1000L
+                connect(userId)
                 logE("Bad reconnection")
                 logE("$e")
             }
@@ -161,9 +161,6 @@ abstract class WebSocket: KtorSource() {
                     }
                 } catch(e: SocketException) {
                     e.stackTraceToString()
-                } finally {
-                    logV("Closing session...")
-                    closeClient()
                 }
             }
         }

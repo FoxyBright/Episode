@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.content.res.Configuration
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -10,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -73,7 +71,7 @@ import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationStreamerVie
 import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.OnLifecycleEvent
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslationStreamerScreen(
     vm: TranslationStreamerViewModel,
@@ -138,8 +136,6 @@ fun TranslationStreamerScreen(
      * BottomSheetState
      */
     var bottomSheetState by remember { mutableStateOf(TranslationBottomSheetState.CHAT) }
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-
 
     /**
      * Camera
@@ -157,9 +153,6 @@ fun TranslationStreamerScreen(
         snapshotFlow { configuration.orientation }
             .collect {
                 orientation = it
-                if (surfaceState == SurfaceState.CHANGED) {
-                    //   restartBroadCast(translation?.rtmp ?: "", camera, context, facing)
-                }
             }
     }
 
@@ -171,11 +164,9 @@ fun TranslationStreamerScreen(
             Lifecycle.Event.ON_RESUME -> {
                 vm.onEvent(TranslationEvent.EnterForeground(translationId))
             }
-
             Lifecycle.Event.ON_PAUSE -> {
                 vm.onEvent(TranslationEvent.EnterBackground)
             }
-
             else -> {}
         }
     }
@@ -234,17 +225,14 @@ fun TranslationStreamerScreen(
                             isShowSnackbar = false
                         }
                     }
-
                     TranslationOneTimeEvent.Reconnect -> {
                         camera?.setReTries(retryCount)
                         camera?.reTry(1000, "")
                         vm.onEvent(TranslationEvent.DecreaseRetryCount)
                     }
-
                     TranslationOneTimeEvent.DestroyRTMP -> {
                         destroyRTMP(camera)
                     }
-
                     is TranslationOneTimeEvent.StartStreaming -> {
                         if (surfaceState == SurfaceState.CHANGED) {
                             startBroadCast(
@@ -480,6 +468,9 @@ fun TranslationStreamerScreen(
                 customHUDState = customHUDState
             )
 
+            /**
+             * Connection placeholders
+             */
             when (hudState) {
                 StreamerHUD.RECONNECTING -> {
                     Reconnecting(
@@ -492,7 +483,6 @@ fun TranslationStreamerScreen(
                         }
                     )
                 }
-
                 StreamerHUD.RECONNECT_FAILED -> {
                     NoConnection(
                         onReconnectCLicked = {
@@ -507,7 +497,6 @@ fun TranslationStreamerScreen(
                         }
                     )
                 }
-
                 else -> {}
             }
 

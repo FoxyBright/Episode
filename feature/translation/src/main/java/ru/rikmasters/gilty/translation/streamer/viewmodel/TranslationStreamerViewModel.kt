@@ -137,9 +137,13 @@ class TranslationStreamerViewModel : ViewModel() {
     val hudState = _hudState
         .onEach {
             if (it == RECONNECTING || it == RECONNECT_FAILED) {
-                //_oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(false))
+                if (_camera.value) {
+                    _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(false))
+                }
             } else {
-                //_oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(true))
+                if (_camera.value) {
+                    _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(true))
+                }
             }
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
@@ -244,8 +248,7 @@ class TranslationStreamerViewModel : ViewModel() {
                     is TranslationCallbackEvents.TranslationExtended -> {
                         if (_customHUDState.value != StreamerCustomHUD.EXPIRED) {
                             coroutineScope.launch {
-                                _additionalTime.value =
-                                    getAdditionalTimeString(socketEvent.duration)
+                                _additionalTime.value = getAdditionalTimeString(socketEvent.duration)
                                 delay(2000)
                                 _additionalTime.value = ""
                                 _translation.update {
@@ -366,7 +369,6 @@ class TranslationStreamerViewModel : ViewModel() {
                     }
                 }
             }
-
             TranslationEvent.Reconnect -> {
                 _retryCount.value = 8
                 _translation.value?.id?.let {
@@ -375,7 +377,7 @@ class TranslationStreamerViewModel : ViewModel() {
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
                 }
-                _hudState.value = RECONNECTING
+                connectSocket()
             }
 
             is TranslationEvent.SendMessage -> {
@@ -412,7 +414,6 @@ class TranslationStreamerViewModel : ViewModel() {
                     RTMPStatus.CONNECTED -> {
                         _hudState.value = null
                     }
-
                     RTMPStatus.FAILED -> {
                         if (_retryCount.value > 0) {
                             _hudState.value = RECONNECTING
