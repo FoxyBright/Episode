@@ -80,7 +80,7 @@ class MainViewModel: ViewModel() {
                 if(reset) _meetings.emit(emptyList())
                 val meetings =
                     _meetings.value.toMutableList()
-                meetings.addAll(0, it.first)
+                meetings.addAll(if(meetings.size != 0)meetings.size - 1 else 0, it.first.reversed())
                 _meetings.emit(meetings)
                 _results.emit(it.second)
             },
