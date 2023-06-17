@@ -101,13 +101,6 @@ class CategoryViewModel : ViewModel() {
         profileManager.getUserCategories().on(
             success = { list ->
                 _selected.emit(list)
-                val newCategories = _categories.value.toMutableList()
-                list.forEach { cat ->
-                    if(newCategories.none{it.id == cat.id}){
-                        newCategories.add(cat)
-                    }
-                }
-                _categories.emit(newCategories)
             },
             loading = {},
             error = {

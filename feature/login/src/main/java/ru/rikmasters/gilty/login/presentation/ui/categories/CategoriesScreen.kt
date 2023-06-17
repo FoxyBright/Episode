@@ -62,8 +62,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             }
         }
     }
-    //LaunchedEffect(Unit) { vm.getCategories() }
-    
+
     CategoriesContent(
         modifier = Modifier,
         state = CategoriesState(
