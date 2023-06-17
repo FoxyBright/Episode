@@ -32,6 +32,7 @@ fun HiddenScreen(vm: HiddenViewModel) {
     val photoViewState by vm.viewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
     val viewerImages by vm.photos.collectAsState()
+    val alert by vm.alert.collectAsState()
 
 
     LaunchedEffect(Unit) { vm.refreshImages() }
@@ -56,8 +57,10 @@ fun HiddenScreen(vm: HiddenViewModel) {
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
             viewerMenuState = false,
-            viewerType = photoViewType),
-        Modifier, object: HiddenCallback {
+            viewerType = photoViewType,
+            alert = alert,
+        ),
+        modifier = Modifier, object: HiddenCallback {
 
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
@@ -66,9 +69,12 @@ fun HiddenScreen(vm: HiddenViewModel) {
                     vm.changePhotoViewState(true)
                 }
             }
-            
+
             override fun onDeleteImage(image: AvatarModel) {
-                scope.launch { vm.deleteImage(image.id) }
+                scope.launch {
+                    vm.alertDismiss(true)
+                    vm.setSelectedImageId(image.id)
+                }
             }
             
             override fun openGallery() {
@@ -98,6 +104,14 @@ fun HiddenScreen(vm: HiddenViewModel) {
 
             override fun onIsDraggingChange(value: Boolean) {
                 scope.launch { vm.onIsDraggingChange(value) }
+            }
+            override fun closeAlert(delete:Boolean) {
+                scope.launch {
+                    vm.alertDismiss(false)
+                    if(delete){
+                        vm.deleteImage()
+                    }
+                }
             }
         }
     )

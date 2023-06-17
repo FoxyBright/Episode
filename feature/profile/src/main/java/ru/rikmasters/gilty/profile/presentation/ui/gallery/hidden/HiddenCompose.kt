@@ -44,6 +44,7 @@ import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridSta
 import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.Colors
@@ -60,6 +61,8 @@ interface HiddenBsCallback {
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
     fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
     fun onIsDraggingChange(value:Boolean) = Unit
+    fun closeAlert(delete:Boolean = false)
+
 }
 
 data class HiddenBsState(
@@ -70,6 +73,7 @@ data class HiddenBsState(
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
     val viewerType: PhotoViewType = PhotoViewType.PHOTO,
+    val alert: Boolean,
 )
 
 @Composable
@@ -175,6 +179,16 @@ fun HiddenBsContent(
             }
         }
     }
+    GAlert(
+        show = state.alert,
+        title = stringResource(R.string.profile_hidden_images_delete_photos_title),
+        onDismissRequest = { callback?.closeAlert() },
+        label = stringResource(R.string.profile_hidden_images_delete_photos_label),
+        success = Pair(stringResource(R.string.profile_hidden_images_delete_photos_success)) { callback?.closeAlert(true) },
+        cancel = Pair(
+            stringResource(R.string.cancel)
+        ) { callback?.closeAlert() }
+    )
 }
 
 @Composable

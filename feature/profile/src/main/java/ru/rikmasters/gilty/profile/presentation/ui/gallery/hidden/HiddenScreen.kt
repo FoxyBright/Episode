@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -35,12 +34,13 @@ fun HiddenBsScreen(
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
+    val alert by vm.alert.collectAsState()
 
 
     LaunchedEffect(Unit) { vm.refreshImages() }
 
     LaunchedEffect(key1 = isDragging, block = {
-        if(!isDragging){
+        if (!isDragging) {
             vm.movePhotoRemote()
         }
     })
@@ -58,7 +58,8 @@ fun HiddenBsScreen(
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
             viewerMenuState = false,
-            viewerType = photoViewType
+            viewerType = photoViewType,
+            alert = alert,
         ),
         callback = object : HiddenBsCallback {
 
@@ -67,6 +68,15 @@ fun HiddenBsScreen(
                     vm.changePhotoViewType(PhotoViewType.PHOTO)
                     vm.setPhotoViewSelected(image)
                     vm.changePhotoViewState(true)
+                }
+            }
+
+            override fun closeAlert(delete: Boolean) {
+                scope.launch {
+                    vm.alertDismiss(false)
+                    if (delete) {
+                        vm.deleteImage()
+                    }
                 }
             }
 
@@ -90,7 +100,10 @@ fun HiddenBsScreen(
             }
 
             override fun onDeleteImage(image: AvatarModel) {
-                scope.launch { vm.deleteImage(image.id) }
+                scope.launch {
+                    vm.alertDismiss(true)
+                    vm.setSelectedImageId(image.id)
+                }
             }
 
             override fun onBack() {
@@ -100,6 +113,7 @@ fun HiddenBsScreen(
             override fun onPhotoViewDismiss(state: Boolean) {
                 scope.launch { vm.changePhotoViewState(state) }
             }
+
             override fun onIsDraggingChange(value: Boolean) {
                 scope.launch { vm.onIsDraggingChange(value) }
             }

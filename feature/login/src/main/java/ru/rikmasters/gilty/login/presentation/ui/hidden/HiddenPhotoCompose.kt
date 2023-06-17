@@ -49,6 +49,7 @@ import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.ActionBar
+import ru.rikmasters.gilty.shared.shared.GAlert
 import ru.rikmasters.gilty.shared.shared.PagingLoader
 import ru.rikmasters.gilty.shared.shared.screenWidth
 import ru.rikmasters.gilty.shared.theme.Colors
@@ -65,7 +66,7 @@ private fun HiddenPhotoPreview() {
             )
         ) {
             HiddenContent(
-                HiddenState(pagingPreview(list = listOf()), 0, false)
+                HiddenState(pagingPreview(list = listOf()), 0, false, alert = false)
             )
         }
     }
@@ -79,7 +80,8 @@ data class HiddenState(
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
     val viewerType: PhotoViewType = PhotoViewType.PHOTO,
-)
+    val alert: Boolean,
+    )
 
 interface HiddenCallback {
 
@@ -93,6 +95,8 @@ interface HiddenCallback {
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
     fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
     fun onIsDraggingChange(value:Boolean) = Unit
+    fun closeAlert(delete:Boolean = false)
+
 }
 
 @Composable
@@ -204,6 +208,16 @@ fun HiddenContent(
             }
         }
     }
+    GAlert(
+        show = state.alert,
+        title = stringResource(R.string.profile_hidden_images_delete_photos_title),
+        onDismissRequest = { callback?.closeAlert() },
+        label = stringResource(R.string.profile_hidden_images_delete_photos_label),
+        success = Pair(stringResource(R.string.profile_hidden_images_delete_photos_success)) { callback?.closeAlert(true) },
+        cancel = Pair(
+            stringResource(R.string.cancel)
+        ) { callback?.closeAlert() }
+    )
 /*    Box(Modifier.fillMaxSize()) {
         GradientButton(
             Modifier

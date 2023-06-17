@@ -3,8 +3,14 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -21,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,9 +47,12 @@ private const val content = "Любой контент"
 private fun AlertDialogPreview() {
     GiltyTheme {
         GAlert(
-            (true), Modifier.padding(10.dp),
-            Pair(stringResource(R.string.save_button)) {},
-            header, label, cancel = Pair(
+            show = (true),
+            modifier = Modifier.padding(10.dp),
+            success = Pair(stringResource(R.string.save_button)) {},
+            label = label,
+            title = header,
+            cancel = Pair(
                 stringResource(R.string.cancel)
             ) {}
         )
@@ -110,7 +118,7 @@ fun GAlert(
     accentColors: Color = colorScheme.primary,
     content: (@Composable () -> Unit)? = null,
 ) {
-    if(show) AlertDialog(
+    if (show) AlertDialog(
         onDismissRequest ?: {},
         confirmButton = {
             Text(
@@ -213,8 +221,8 @@ fun GAlertDarkTheme(
             title?.let {
                 Text(
                     it, Modifier,
-                    Color.White,
-                    style = MaterialTheme.typography.displayLarge,
+                    White,
+                    style = typography.displayLarge,
                     fontWeight = SemiBold
                 )
             }
@@ -260,7 +268,7 @@ private fun List(
                         .clip(CircleShape), listOf(
                         ic_radio_active,
                         ic_radio_inactive
-                    ), if(selected == index) accentColors
+                    ), if (selected == index) accentColors
                     else colorScheme.tertiary
                 ) { onSelect(index) }
                 Text(

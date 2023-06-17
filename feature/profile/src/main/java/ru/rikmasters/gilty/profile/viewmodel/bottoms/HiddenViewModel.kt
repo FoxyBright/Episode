@@ -53,6 +53,10 @@ class HiddenViewModel : ViewModel() {
 
     private val _lastPositionsChanged = MutableStateFlow(Pair<String?, Int?>(null, null))
 
+    private val _alert = MutableStateFlow(false)
+    val alert = _alert.asStateFlow()
+
+    private val _selectedImageId = MutableStateFlow<String?>(null)
 
     suspend fun getHiddenPhotosAmount() {
         _photosAmount.emit(
@@ -91,19 +95,20 @@ class HiddenViewModel : ViewModel() {
         _photos.emit(value)
     }
 
-    suspend fun deleteImage(imageId: String) {
-        profileManager.deleteHidden(imageId).on(
-            success = {
-                profileManager.getProfile(true)// TODO Why?
-                refreshImages()
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
+    suspend fun deleteImage() {
+        _selectedImageId.value?.let { imageId ->
+            profileManager.deleteHidden(imageId).on(
+                success = {
+                    refreshImages()
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
+        }
     }
 
     suspend fun changePhotoViewState(state: Boolean) {
@@ -144,5 +149,11 @@ class HiddenViewModel : ViewModel() {
             }
         }
 
+    }
+    suspend fun alertDismiss(state: Boolean) {
+        _alert.emit(state)
+    }
+    suspend fun setSelectedImageId(imageId:String){
+        _selectedImageId.emit(imageId)
     }
 }
