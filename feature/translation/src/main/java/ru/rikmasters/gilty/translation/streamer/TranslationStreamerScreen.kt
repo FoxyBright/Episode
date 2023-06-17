@@ -4,13 +4,9 @@ import android.content.res.Configuration
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -52,15 +48,10 @@ import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.shared.components.MicroInactiveSnackbar
-import ru.rikmasters.gilty.translation.shared.components.MicroWave
 import ru.rikmasters.gilty.translation.shared.components.NoConnection
-import ru.rikmasters.gilty.translation.shared.components.ProfileAvatar
 import ru.rikmasters.gilty.translation.shared.components.Reconnecting
 import ru.rikmasters.gilty.translation.shared.components.TranslationDialogType
-import ru.rikmasters.gilty.translation.shared.components.TranslationResumedSnackbar
 import ru.rikmasters.gilty.translation.shared.components.TranslationStreamerDialog
-import ru.rikmasters.gilty.translation.shared.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
@@ -73,7 +64,6 @@ import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.CONNECTED
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.FAILED
 import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
-import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
 import ru.rikmasters.gilty.translation.streamer.model.SurfaceState
 import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationStreamerViewModel
 import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.OnLifecycleEvent
@@ -111,7 +101,7 @@ fun TranslationStreamerScreen(
     val hudState by vm.hudState.collectAsState()
     val facing by vm.facing.collectAsState()
     val snackbarState by vm.streamerSnackbarState.collectAsState()
-    val placeholderView by vm.placeHolderVisible.collectAsState()
+    val isShowPlaceholder by vm.placeHolderVisible.collectAsState()
     val membersCount by vm.membersCount.collectAsState()
     val retryCount by vm.retryCount.collectAsState()
     val customHUDState by vm.customHUDState.collectAsState()
@@ -543,46 +533,20 @@ fun TranslationStreamerScreen(
                 else -> {}
             }
 
-            Column(
-                modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    Modifier
-                        .fillMaxHeight()
-                        .width((configuration.screenWidthDp * 0.6).dp)
-                } else {
-                    Modifier.fillMaxSize()
-                },
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (placeholderView) {
-                    if (!cameraState) {
-                        ProfileAvatar(meetingModel = meeting, modifier = Modifier)
-                        if (!microphoneState) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            MicroWave(meetingModel = meeting, modifier = Modifier)
-                        }
-                    }
-                }
-                if (isShowSnackbar) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    when (snackbarState) {
-                        StreamerSnackbarState.MICRO_OFF -> {
-                            MicroInactiveSnackbar()
-                        }
-
-                        StreamerSnackbarState.WEAK_CONNECTION -> {
-                            WeakConnectionSnackbar()
-                        }
-
-                        StreamerSnackbarState.BROADCAST_EXTENDED -> {
-                            TranslationResumedSnackbar()
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-
+            /**
+             * Snackbars / camera/micro placeholders
+             */
+            OnTopSnackbarsPlacehodlers(
+                orientation = orientation,
+                bsOpened = !scaffoldState.bottomSheetState.isCollapsed,
+                isShowPlacehodlers = isShowPlaceholder,
+                isShowSnackbar = isShowSnackbar,
+                cameraState = cameraState,
+                microphoneState = microphoneState,
+                meeting = meeting,
+                snackbarState = snackbarState,
+                configuration = configuration
+            )
 
             /**
              * Dialogs

@@ -54,9 +54,9 @@ private fun CustomSnackbar(
 }
 
 @Composable
-fun MicroInactiveSnackbar() {
+fun MicroInactiveSnackbar(organizer: Boolean) {
     CustomSnackbar(
-        text = stringResource(id = R.string.translations_micro_off_organizer),
+        text = stringResource(id = if (organizer) R.string.translations_micro_off_organizer else R.string.translations_micro_off_viewer),
         iconPainter = painterResource(id = R.drawable.ic_micro_inactive)
     )
 }
@@ -78,10 +78,10 @@ fun MicroInactiveViewerSnackbar(
 
 @Composable
 fun TranslationResumedSnackbar() {
-        CustomSnackbar(
-            text = stringResource(id = R.string.translation_resumed),
-            iconPainter = painterResource(id = R.drawable.ic_play)
-        )
+    CustomSnackbar(
+        text = stringResource(id = R.string.translation_resumed),
+        iconPainter = painterResource(id = R.drawable.ic_play)
+    )
 }
 
 @Composable
