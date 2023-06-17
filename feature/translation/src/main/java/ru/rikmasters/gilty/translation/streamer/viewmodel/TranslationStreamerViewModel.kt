@@ -166,11 +166,6 @@ class TranslationStreamerViewModel : ViewModel() {
         MutableSharedFlow<StreamerSnackbarState?>(1, 0, BufferOverflow.DROP_OLDEST)
     val streamerSnackbarState = _streamerSnackbarState
         .onEach {
-//            if (it == WEAK_CONNECTION) {
-//                _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(false))
-//            } else {
-//                _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(true))
-//            }
             _oneTimeEvent.send(TranslationOneTimeEvent.ShowSnackbar)
         }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
 
@@ -377,7 +372,6 @@ class TranslationStreamerViewModel : ViewModel() {
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
                 }
-                connectSocket()
             }
 
             is TranslationEvent.SendMessage -> {

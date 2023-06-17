@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.content.res.Configuration
-import android.util.Log
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -146,6 +145,11 @@ fun TranslationStreamerScreen(
     val surfaceState by vm.surfaceState.collectAsState()
 
     /**
+     * Connection
+     */
+    var bitrateCalc by remember { mutableStateOf(false) }
+
+    /**
      * Orientation
      */
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
@@ -203,21 +207,18 @@ fun TranslationStreamerScreen(
                             }
                         }
                     }
-
                     is TranslationOneTimeEvent.ToggleCamera -> {
                         toggleCamera(event.value, camera, context, currentOpenGlView)
                     }
-
                     is TranslationOneTimeEvent.ToggleMicrophone -> {
                         toggleMicrophone(event.value, camera)
                     }
-
-                    is TranslationOneTimeEvent.OnError -> {}
-
+                    is TranslationOneTimeEvent.OnError -> {
+                        //TODO: Тост с ошибкой
+                    }
                     TranslationOneTimeEvent.CompleteTranslation -> {
                         showExitDialog = false
                     }
-
                     TranslationOneTimeEvent.ShowSnackbar -> {
                         scope.launch {
                             isShowSnackbar = true
@@ -256,32 +257,33 @@ fun TranslationStreamerScreen(
             override fun onAuthSuccessRtmp() {}
             override fun onConnectionFailedRtmp(reason: String) {
                 vm.onEvent(TranslationEvent.ProcessRTMPStatus(FAILED))
+                bitrateCalc = false
             }
-
             override fun onConnectionStartedRtmp(rtmpUrl: String) {}
             override fun onConnectionSuccessRtmp() {
                 vm.onEvent(TranslationEvent.ProcessRTMPStatus(CONNECTED))
+                scope.launch {
+                    delay(3000)
+                    bitrateCalc = true
+                }
             }
-
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
-                /*
-                if (customHUDState == StreamerViewState.STREAM) {
+                if (customHUDState == null) {
                     if (cameraState) {
-                        if (bitrate < 300_000) {
-                            //vm.onEvent(TranslationEvent.LowBitrate)
+                        if (bitrate < 300_000 && bitrateCalc) {
+                            vm.onEvent(TranslationEvent.LowBitrate)
                         } else {
-                            //vm.onEvent(TranslationEvent.BitrateStabilized)
+                            vm.onEvent(TranslationEvent.BitrateStabilized)
                         }
                     } else {
-                        if (bitrate < 30_000) {
-                            //vm.onEvent(TranslationEvent.LowBitrate)
+                        if (bitrate < 30_000 && bitrateCalc) {
+                            vm.onEvent(TranslationEvent.LowBitrate)
                         } else {
-                            //vm.onEvent(TranslationEvent.BitrateStabilized)
+                            vm.onEvent(TranslationEvent.BitrateStabilized)
                         }
                     }
                 }
-                 */
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
         }
@@ -372,7 +374,8 @@ fun TranslationStreamerScreen(
                 topEnd = 24.dp
             )
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures {
                     scope.launch {
