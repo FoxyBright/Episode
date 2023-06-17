@@ -1,9 +1,12 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.swipeableCard
@@ -22,7 +25,13 @@ fun MeetingsListContent(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-    states.forEachIndexed { index, state ->
+
+    val list = remember(states) {
+        if (states.size <= 2) states
+        else states - states.dropLast(2).toSet()
+    }
+
+    list.forEachIndexed { index, state ->
         EpisodeCard(
             meeting = state.first,
             state = state.second,
