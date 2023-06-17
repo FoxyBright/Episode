@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.shared.presentation.ui.content.bottomsheet
+package ru.rikmasters.gilty.translation.bottoms.duration
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable

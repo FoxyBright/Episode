@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.shared.logic
+package ru.rikmasters.gilty.translation.bottoms
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -7,10 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.paging.compose.LazyPagingItems
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
-import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
-import ru.rikmasters.gilty.translation.shared.presentation.ui.content.bottomsheet.ChatBottomSheet
-import ru.rikmasters.gilty.translation.shared.presentation.ui.content.bottomsheet.ExtendBottomSheet
-import ru.rikmasters.gilty.translation.shared.presentation.ui.content.bottomsheet.MembersBottomSheet
+import ru.rikmasters.gilty.translation.bottoms.chat.ChatBottomSheet
+import ru.rikmasters.gilty.translation.bottoms.duration.ExtendBottomSheet
+import ru.rikmasters.gilty.translation.bottoms.members.MembersBottomSheet
 
 @Composable
 fun BottomSheetStateManager(

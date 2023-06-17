@@ -39,8 +39,8 @@ import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
-import ru.rikmasters.gilty.translation.bottoms.PreviewBsScreen
-import ru.rikmasters.gilty.translation.bottoms.PreviewBsViewModel
+import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsScreen
+import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsViewModel
 import ru.rikmasters.gilty.translation.shared.utils.checkMediaPermissions
 import ru.rikmasters.gilty.translation.shared.utils.mediaPermissionState
 import java.io.File

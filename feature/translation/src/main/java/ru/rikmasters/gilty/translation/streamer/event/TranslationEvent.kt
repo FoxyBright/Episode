@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.streamer
+package ru.rikmasters.gilty.translation.streamer.event
 
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus

@@ -1,7 +1,9 @@
-package ru.rikmasters.gilty.translation.streamer
+package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.view.SurfaceHolder
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,15 +34,15 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraView
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.ChangeFacingItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.ChatItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CloseButton
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.MembersCountItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.MicrophoneItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.StreamerItem
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.TimerItem
+import ru.rikmasters.gilty.translation.shared.components.CameraItem
+import ru.rikmasters.gilty.translation.shared.components.CameraView
+import ru.rikmasters.gilty.translation.shared.components.ChangeFacingItem
+import ru.rikmasters.gilty.translation.shared.components.ChatItem
+import ru.rikmasters.gilty.translation.shared.components.CloseButton
+import ru.rikmasters.gilty.translation.shared.components.MembersCountItem
+import ru.rikmasters.gilty.translation.shared.components.MicrophoneItem
+import ru.rikmasters.gilty.translation.shared.components.StreamerItem
+import ru.rikmasters.gilty.translation.shared.components.TimerItem
 import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
 
 @Composable
@@ -296,7 +298,11 @@ fun OnStreamLandscape(
                         addTimerTime = timerAddTime
                     )
                 }
-                AnimatedVisibility(visible = !bsOpened) {
+                AnimatedVisibility(
+                    visible = !bsOpened,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     Box(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.CenterEnd
@@ -314,7 +320,11 @@ fun OnStreamLandscape(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        AnimatedVisibility(visible = !bsOpened) {
+        AnimatedVisibility(
+            visible = !bsOpened,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

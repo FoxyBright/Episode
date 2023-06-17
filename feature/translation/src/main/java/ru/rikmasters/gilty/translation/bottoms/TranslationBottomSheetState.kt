@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.shared.model
+package ru.rikmasters.gilty.translation.bottoms
 
 enum class TranslationBottomSheetState {
     USERS, CHAT, DURATION

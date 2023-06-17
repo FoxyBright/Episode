@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.profile.ProfileData
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.translation.bottoms.PreviewBsViewModel
+import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsViewModel
 
 object Chat: FeatureDefinition() {
     

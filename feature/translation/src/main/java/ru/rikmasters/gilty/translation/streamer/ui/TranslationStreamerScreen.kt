@@ -1,8 +1,9 @@
-package ru.rikmasters.gilty.translation.streamer
+package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.content.res.Configuration
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,6 +28,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -52,14 +54,16 @@ import ru.rikmasters.gilty.translation.shared.components.NoConnection
 import ru.rikmasters.gilty.translation.shared.components.Reconnecting
 import ru.rikmasters.gilty.translation.shared.components.TranslationDialogType
 import ru.rikmasters.gilty.translation.shared.components.TranslationStreamerDialog
-import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
-import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
+import ru.rikmasters.gilty.translation.bottoms.BottomSheetStateManager
+import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
 import ru.rikmasters.gilty.translation.shared.utils.map
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
 import ru.rikmasters.gilty.translation.shared.utils.startBroadCast
 import ru.rikmasters.gilty.translation.shared.utils.toggleCamera
 import ru.rikmasters.gilty.translation.shared.utils.toggleMicrophone
+import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
+import ru.rikmasters.gilty.translation.streamer.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.CONNECTED
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus.FAILED
 import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
@@ -381,6 +385,15 @@ fun TranslationStreamerScreen(
             )
         },
         modifier = Modifier.fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    scope.launch {
+                        if (!scaffoldState.bottomSheetState.isCollapsed) {
+                            scaffoldState.bottomSheetState.collapse()
+                        }
+                    }
+                }
+            }
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -400,93 +413,58 @@ fun TranslationStreamerScreen(
                 addTimerString = additionalTime,
                 onChatClicked = {
                     scope.launch {
-                        when {
-                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState == TranslationBottomSheetState.CHAT -> {
-                                scaffoldState.bottomSheetState.collapse()
-                                vm.onEvent(
-                                    TranslationEvent.ChatBottomSheetOpened(
-                                        isOpened = false
-                                    )
+                        if (scaffoldState.bottomSheetState.isCollapsed) {
+                            vm.onEvent(
+                                TranslationEvent.ChatBottomSheetOpened(
+                                    isOpened = true
                                 )
-                            }
-
-                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState != TranslationBottomSheetState.CHAT -> {
-                                scaffoldState.bottomSheetState.collapse()
-                                vm.onEvent(
-                                    TranslationEvent.ChatBottomSheetOpened(
-                                        isOpened = false
-                                    )
-                                )
-                                bottomSheetState = TranslationBottomSheetState.CHAT
-                                scaffoldState.bottomSheetState.expand()
-                                vm.onEvent(
-                                    TranslationEvent.ChatBottomSheetOpened(
-                                        isOpened = true
-                                    )
-                                )
-                            }
-
-                            !scaffoldState.bottomSheetState.isExpanded -> {
-                                bottomSheetState = TranslationBottomSheetState.CHAT
-                                scaffoldState.bottomSheetState.expand()
-                                vm.onEvent(
-                                    TranslationEvent.ChatBottomSheetOpened(
-                                        isOpened = true
-                                    )
-                                )
-                            }
+                            )
+                            bottomSheetState = TranslationBottomSheetState.CHAT
+                            scaffoldState.bottomSheetState.expand()
+                        } else {
+                            scaffoldState.bottomSheetState.collapse()
                         }
                     }
                 },
                 onMembersClicked = {
                     scope.launch {
-                        when {
-                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState == TranslationBottomSheetState.USERS -> {
-                                scaffoldState.bottomSheetState.collapse()
-                                vm.onEvent(
-                                    TranslationEvent.UserBottomSheetOpened(
-                                        isOpened = false
-                                    )
+                        if (scaffoldState.bottomSheetState.isCollapsed) {
+                            vm.onEvent(
+                                TranslationEvent.UserBottomSheetOpened(
+                                    isOpened = true
                                 )
-                            }
-
-                            scaffoldState.bottomSheetState.isExpanded && bottomSheetState != TranslationBottomSheetState.USERS -> {
-                                scaffoldState.bottomSheetState.collapse()
-                                vm.onEvent(
-                                    TranslationEvent.UserBottomSheetOpened(
-                                        isOpened = false
-                                    )
-                                )
-                                bottomSheetState = TranslationBottomSheetState.USERS
-                                scaffoldState.bottomSheetState.expand()
-                                vm.onEvent(
-                                    TranslationEvent.UserBottomSheetOpened(
-                                        isOpened = true
-                                    )
-                                )
-                            }
-
-                            !scaffoldState.bottomSheetState.isExpanded -> {
-                                bottomSheetState = TranslationBottomSheetState.USERS
-                                scaffoldState.bottomSheetState.expand()
-                                vm.onEvent(
-                                    TranslationEvent.UserBottomSheetOpened(
-                                        isOpened = true
-                                    )
-                                )
-                            }
+                            )
+                            bottomSheetState = TranslationBottomSheetState.USERS
+                            scaffoldState.bottomSheetState.expand()
+                        } else {
+                            scaffoldState.bottomSheetState.collapse()
                         }
                     }
                 },
                 membersCount = membersCount,
                 onTimerClicked = {
                     scope.launch {
-                        bottomSheetState = TranslationBottomSheetState.DURATION
-                        scaffoldState.bottomSheetState.expand()
+                        if (scaffoldState.bottomSheetState.isCollapsed) {
+                            vm.onEvent(
+                                TranslationEvent.UserBottomSheetOpened(
+                                    isOpened = true
+                                )
+                            )
+                            bottomSheetState = TranslationBottomSheetState.DURATION
+                            scaffoldState.bottomSheetState.expand()
+                        } else {
+                            scaffoldState.bottomSheetState.collapse()
+                        }
                     }
                 },
                 onCloseClicked = {
-                    showExitDialog = true
+                    if (scaffoldState.bottomSheetState.isCollapsed) {
+                        showExitDialog = true
+                    } else {
+                        scope.launch {
+                            scaffoldState.bottomSheetState.collapse()
+                        }
+                    }
                 },
                 bsOpened = scaffoldState.bottomSheetState.isExpanded,
                 cameraEnabled = cameraState,

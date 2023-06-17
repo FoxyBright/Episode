@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.streamer
+package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility

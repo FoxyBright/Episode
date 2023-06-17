@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.bottoms
+package ru.rikmasters.gilty.translation.bottoms.preview
 
 import android.view.SurfaceHolder
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +19,9 @@ import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraOrientationRow
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CameraView
-import ru.rikmasters.gilty.translation.shared.presentation.ui.components.CloseButton
+import ru.rikmasters.gilty.translation.shared.components.CameraOrientationRow
+import ru.rikmasters.gilty.translation.shared.components.CameraView
+import ru.rikmasters.gilty.translation.shared.components.CloseButton
 import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 
 @Composable

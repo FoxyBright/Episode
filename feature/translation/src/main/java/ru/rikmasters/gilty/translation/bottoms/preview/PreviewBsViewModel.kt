@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.bottoms
+package ru.rikmasters.gilty.translation.bottoms.preview
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -62,9 +62,9 @@ import ru.rikmasters.gilty.shared.common.extentions.blur
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
-import ru.rikmasters.gilty.translation.shared.logic.BottomSheetStateManager
+import ru.rikmasters.gilty.translation.bottoms.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.shared.model.ConnectionStatus
-import ru.rikmasters.gilty.translation.shared.model.TranslationBottomSheetState
+import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.shared.components.ProfileAvatar
 import ru.rikmasters.gilty.translation.shared.components.MicroWave
 import ru.rikmasters.gilty.translation.shared.components.LowConnectionMicroOff

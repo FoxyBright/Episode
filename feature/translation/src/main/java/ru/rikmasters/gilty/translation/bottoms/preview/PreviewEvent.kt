@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.bottoms
+package ru.rikmasters.gilty.translation.bottoms.preview
 
 import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 

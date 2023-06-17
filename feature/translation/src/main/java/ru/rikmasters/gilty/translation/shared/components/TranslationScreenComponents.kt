@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.shared.presentation.ui.components
+package ru.rikmasters.gilty.translation.shared.components
 
 import android.view.SurfaceHolder
 import androidx.compose.animation.AnimatedVisibility
@@ -42,88 +42,105 @@ import ru.rikmasters.gilty.shared.theme.Gradients
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CameraItem(
     enabled: Boolean,
     onClick: () -> Unit,
     roundedBackground: Boolean = false
 ) {
-    Box(
-        modifier = Modifier
-            .size(46.dp)
-            .clickable { onClick() }
-    ) {
-        if (roundedBackground) {
-            Surface(
-                shape = CircleShape,
-                modifier = Modifier.size(46.dp),
-                color = ThemeExtra.colors.thirdOpaqueGray
-            ) {}
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray,
+            onClick = onClick
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
+                    else painterResource(id = R.drawable.ic_video_inactive),
+                    contentDescription = "turn on/off camera",
+                    tint = ThemeExtra.colors.white
+                )
+            }
         }
-        Icon(
-            painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
-            else painterResource(id = R.drawable.ic_video_inactive),
-            contentDescription = "turn on/off camera",
-            tint = ThemeExtra.colors.white,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
+    } else {
+        IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
+            Icon(
+                painter = if (enabled) painterResource(id = R.drawable.ic_video_active)
+                else painterResource(id = R.drawable.ic_video_inactive),
+                contentDescription = "turn on/off camera",
+                tint = ThemeExtra.colors.white
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MicrophoneItem(
     enabled: Boolean,
     onClick: () -> Unit,
     roundedBackground: Boolean = false,
 ) {
-    Box(
-        modifier = Modifier
-            .size(46.dp)
-            .clickable { onClick() }
-    ) {
-        if (roundedBackground) {
-            Surface(
-                shape = CircleShape,
-                modifier = Modifier.size(46.dp),
-                color = ThemeExtra.colors.thirdOpaqueGray
-            ) {}
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray,
+            onClick = onClick
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
+                    else painterResource(id = R.drawable.ic_micro_inactive),
+                    contentDescription = "turn on/off microphone",
+                    tint = ThemeExtra.colors.white
+                )
+            }
         }
-        Icon(
-            painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
-            else painterResource(id = R.drawable.ic_micro_inactive),
-            contentDescription = "turn on/off microphone",
-            tint = ThemeExtra.colors.white,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
+    } else {
+        IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
+            Icon(
+                painter = if (enabled) painterResource(id = R.drawable.ic_micro_active)
+                else painterResource(id = R.drawable.ic_micro_inactive),
+                contentDescription = "turn on/off microphone",
+                tint = ThemeExtra.colors.white
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangeFacingItem(
     onClick: () -> Unit,
     roundedBackground: Boolean = false,
 ) {
-    Box(
-        modifier = Modifier
-            .size(46.dp)
-            .clickable { onClick() }
-    ) {
-        if (roundedBackground) {
-            Surface(
-                shape = CircleShape,
-                modifier = Modifier.size(46.dp),
-                color = ThemeExtra.colors.thirdOpaqueGray
-            ) {}
+    if (roundedBackground) {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.size(46.dp),
+            color = ThemeExtra.colors.thirdOpaqueGray,
+            onClick = onClick
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_refresh),
+                    contentDescription = "change camera",
+                    tint = ThemeExtra.colors.white
+                )
+            }
         }
-        Icon(
-            painter = painterResource(id = R.drawable.ic_refresh),
-            contentDescription = "change camera",
-            tint = ThemeExtra.colors.white,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
+    } else {
+        IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_refresh),
+                contentDescription = "change camera",
+                tint = ThemeExtra.colors.white
+            )
+        }
     }
 }
 
@@ -231,7 +248,7 @@ fun StreamerItem(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TimerItem(
     time: String,
@@ -243,7 +260,7 @@ fun TimerItem(
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = ThemeExtra.colors.thirdOpaqueGray,
-        modifier = Modifier.clickable { onClick() }
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier.padding(
@@ -316,12 +333,16 @@ fun TimerItem(
 
 @Composable
 fun ChatItem(onClick: () -> Unit) {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_chat),
-        contentDescription = "Chat",
-        tint = ThemeExtra.colors.white,
-        modifier = Modifier.clickable { onClick() }
-    )
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(32.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_chat),
+            contentDescription = "Chat",
+            tint = ThemeExtra.colors.white
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -352,13 +373,13 @@ fun MembersCountItem(
                     )
                 }
             }
-        }
+        },
+        modifier = Modifier.clickable { onClick() }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_profile),
             contentDescription = "Chat",
-            tint = ThemeExtra.colors.white,
-            modifier = Modifier.clickable { onClick() }
+            tint = ThemeExtra.colors.white
         )
     }
 }
@@ -414,19 +435,6 @@ fun CameraOrientationRow(
             )
         }
     }
-}
-
-@Composable
-fun BottomSheetDragItem(
-    modifier: Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .height(5.dp)
-            .width(40.dp),
-        shape = RoundedCornerShape(11.dp),
-        color = ThemeExtra.colors.bottomSheetGray
-    ) {}
 }
 
 

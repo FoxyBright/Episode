@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.bottoms
+package ru.rikmasters.gilty.translation.bottoms.preview
 
 import android.view.SurfaceHolder
 import androidx.compose.runtime.Composable

@@ -30,8 +30,8 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.translation.shared.utils.getAdditionalTimeString
 import ru.rikmasters.gilty.translation.shared.utils.getTimeDifferenceString
-import ru.rikmasters.gilty.translation.streamer.TranslationEvent
-import ru.rikmasters.gilty.translation.streamer.TranslationOneTimeEvent
+import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
+import ru.rikmasters.gilty.translation.streamer.event.TranslationOneTimeEvent
 import ru.rikmasters.gilty.translation.streamer.model.RTMPStatus
 import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing.BACK
