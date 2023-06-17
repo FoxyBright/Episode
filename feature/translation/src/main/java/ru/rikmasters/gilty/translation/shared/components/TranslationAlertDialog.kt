@@ -45,38 +45,6 @@ fun TranslationStreamerDialog(
                 onlyDarkTheme = true
             )
         }
-
-        TranslationDialogType.COMPLETE -> {
-            GAlert(
-                show = show,
-                success = Pair(
-                    stringResource(id = R.string.translations_complete_positive)
-                ) {
-                    onSuccess()
-                },
-                label = stringResource(id = R.string.translations_complete_text_b),
-                title = stringResource(id = R.string.translations_complete),
-                onDismissRequest = dismiss,
-                cancel = Pair(stringResource(id = R.string.translations_complete_negative), dismiss),
-                onlyDarkTheme = true
-            )
-        }
-
-        TranslationDialogType.COMPLETE_EARLIER -> {
-            GAlert(
-                show = show,
-                success = Pair(
-                    stringResource(id = R.string.translations_complete_positive)
-                ) {
-                    onSuccess()
-                },
-                label = stringResource(id = R.string.translations_complete_text),
-                title = stringResource(id = R.string.translations_complete),
-                onDismissRequest = dismiss,
-                cancel = Pair(stringResource(id = R.string.translations_complete_negative), dismiss),
-                onlyDarkTheme = true
-            )
-        }
         TranslationDialogType.EXIT -> {
             GAlert(
                 show = show,
@@ -96,7 +64,5 @@ fun TranslationStreamerDialog(
 enum class TranslationDialogType {
     KICK,
     COMPLAIN,
-    COMPLETE,
-    COMPLETE_EARLIER,
     EXIT
 }

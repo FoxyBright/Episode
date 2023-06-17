@@ -11,12 +11,15 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-baseConfig()
+
 compose()
+baseConfig()
 
 dependencies {
     androidBase()
     compose()
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.6")
     
     implementation("io.getstream:stream-webrtc-android:1.0.2")
     

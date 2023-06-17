@@ -114,6 +114,9 @@ fun  ChatBottomSheet(
                     }
                 } else {
                     LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
                         state = scrollState,
                         reverseLayout = true
                     ) {

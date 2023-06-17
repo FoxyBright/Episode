@@ -4,17 +4,19 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.ExceptionCause
 import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
 import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
+import ru.rikmasters.gilty.shared.models.translations.AppendInfo
 import ru.rikmasters.gilty.shared.socket.WebSocket
 import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 data class Count(val count: Int)
 class TranslationWebSocket : WebSocket() {
@@ -65,14 +67,14 @@ class TranslationWebSocket : WebSocket() {
             }
 
             TranslationsSocketEvents.APPEND_TIME -> {
-                data class AppendInfo(val completed_at: String, val duration: String)
-
                 val info = mapper.readValue<AppendInfo>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.TranslationExtended(
-                        completedAt = LocalDateTime.of(info.completed_at),
+                        completedAt = ZonedDateTime.parse(info.completed_at).withZoneSameInstant(
+                            ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+                            ZoneId.systemDefault()),
                         duration = info.duration.toInt(),
-                    ),
+                    )
                 )
             }
 
@@ -134,7 +136,6 @@ class TranslationWebSocket : WebSocket() {
     val answer = _answer.receiveAsFlow()
 
     suspend fun connectToTranslation(id: String) {
-        disconnectFromTranslation()
         subscribe("private-translation.$id.${userId.value}") {
             if (it) _translationId.emit(id)
         }

@@ -1,18 +1,18 @@
 package ru.rikmasters.gilty.shared.model.translations
 
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
+import java.time.ZonedDateTime
 
 
 data class TranslationInfoModel(
     val id: String,
     val userId: String,
-    val startedAt: LocalDateTime ?= null,
+    val startedAt: ZonedDateTime ?= null,
     val camera: Boolean,
     val microphone: Boolean,
     val status: TranslationStatusModel,
-    val beginAt: LocalDateTime,
-    val completedAt: LocalDateTime,
+    val beginAt: ZonedDateTime,
+    val completedAt: ZonedDateTime,
     val isStreaming: Boolean,
     val wasStreaming: Boolean,
     val thumbnailHost: String,

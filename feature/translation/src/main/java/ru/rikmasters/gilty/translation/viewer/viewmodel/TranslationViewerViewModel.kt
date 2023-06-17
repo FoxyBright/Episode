@@ -93,7 +93,9 @@ class TranslationViewerViewModel : ViewModel() {
                 event.meetingId.let { meetingId ->
                     loadTranslationInfo(meetingId)
                     loadMeetDetails(meetingId)
-                    connectSocket(meetingId)
+                    translationInfo {
+                        connectSocket(it.id)
+                    }
                     startPinging()
                     startDurationTimer()
                 }
@@ -277,6 +279,7 @@ class TranslationViewerViewModel : ViewModel() {
 
     private fun calculateTimeDiff() {
         translationInfo { info ->
+            /*
             val current = LocalDateTime.nowZ()
             val duration = Duration.between(
                 current, info.completedAt
@@ -309,10 +312,13 @@ class TranslationViewerViewModel : ViewModel() {
                     remainTime = diff
                 )
             }
+
+             */
         }
     }
 
     private fun handleAppendTime(duration: Int? = null) {
+        /*
         duration?.let {
             translationInfo { model ->
                 if (LocalDateTime.nowZ().isBefore(model.completedAt)) {
@@ -344,6 +350,8 @@ class TranslationViewerViewModel : ViewModel() {
                 )
             }
         }
+
+         */
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,9 +487,12 @@ class TranslationViewerViewModel : ViewModel() {
             }
 
             is TranslationCallbackEvents.TranslationExtended -> {
+                /*
                 handleTranslationAppended(
                     socketEvent.completedAt, socketEvent.duration
                 )
+
+                 */
             }
 
             is TranslationCallbackEvents.UserConnected -> {
@@ -509,6 +520,7 @@ class TranslationViewerViewModel : ViewModel() {
     }
 
     private fun handleTranslationAppended(completedAt: LocalDateTime, duration: Int) {
+        /*
         handleAppendTime(duration)
         _translationViewerUiState.update {
             it.copy(
@@ -518,6 +530,8 @@ class TranslationViewerViewModel : ViewModel() {
                 )
             )
         }
+
+         */
     }
 
     private fun handleMembersCountChanged(count: Int) {

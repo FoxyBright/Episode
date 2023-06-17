@@ -15,6 +15,7 @@ sealed interface TranslationEvent {
     object BitrateStabilized : TranslationEvent
     object DecreaseRetryCount : TranslationEvent
     data class ChangeSurfaceState(val state:SurfaceState) : TranslationEvent
+    object CompleteTranslation : TranslationEvent
 
 
 
@@ -25,7 +26,6 @@ sealed interface TranslationEvent {
     data class KickUser(val user: FullUserModel) : TranslationEvent
     data class AppendTranslation(val appendMinutes: Int) : TranslationEvent
     object ChangeFacing : TranslationEvent
-    object CompleteTranslation : TranslationEvent
 
     object ToggleCamera : TranslationEvent
     object ToggleMicrophone : TranslationEvent

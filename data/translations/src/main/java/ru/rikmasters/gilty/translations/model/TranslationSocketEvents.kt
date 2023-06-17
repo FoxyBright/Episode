@@ -16,7 +16,6 @@ enum class TranslationsSocketEvents(val value: String) {
     USER_DISCONNECTED("user.disconnected"),
     USER_KICKED("user.kicked"),
     MESSAGE_SENT("message.sent");
-
     companion object {
         infix fun from(value: String) = values()
             .firstOrNull { it.value == value }
