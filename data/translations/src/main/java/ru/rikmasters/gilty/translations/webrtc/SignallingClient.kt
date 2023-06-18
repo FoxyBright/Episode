@@ -1,12 +1,17 @@
 package ru.rikmasters.gilty.translations.webrtc
 
+import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -27,20 +32,17 @@ import ru.rikmasters.gilty.translations.webrtc.utils.toMap
 
 class SignalingClient {
 
-    var isConnection = false
-        set(value) {
-            field = value
-            signalingScope.launch {
-                _signalingEventFlow.emit(
-                    WebRTCClientEvent.Connection(
-                        isConnected = field
-                    )
-                )
-            }
-        }
-
     private val signalingScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val client = OkHttpClient()
+
+    private val _isConnection = MutableStateFlow(false)
+    private val isConnection = _isConnection.onEach {
+        _signalingEventFlow.emit(
+            WebRTCClientEvent.Connection(
+                isConnected = it
+            )
+        )
+    }.stateIn(signalingScope, SharingStarted.Eagerly, false)
 
     private var request: Request? = null
     // Web socket connect with signalling server
@@ -61,7 +63,7 @@ class SignalingClient {
 
     // Send command to webSocket
     private fun sendCommand(message: AnswerMessage) {
-        if (isConnection) {
+        if (isConnection.value) {
             val gson = Gson()
             val jsonSendString = gson.toJson(message).toString()
             ws?.send(jsonSendString)
@@ -81,13 +83,13 @@ class SignalingClient {
     }
 
     fun destroy() {
-        isConnection = false
-        signalingScope.cancel()
+        _isConnection.value = false
+        //signalingScope.cancel()
         ws?.cancel()
     }
 
     fun connection() {
-        isConnection = true
+        _isConnection.value = true
         requestOffer()
     }
 
@@ -112,12 +114,15 @@ class SignalingClient {
             SignalingCommand.OFFER -> {
                 val offer = signallingMessage.body.mapToOffer()
                 id = offer.id
+                Log.d("TEST","RECEIVED OFFER")
                 signalingScope.launch {
+                    Log.d("TEST","LAUNCH")
                     _signalingEventFlow.emit(
                         WebRTCClientEvent.OfferSent(
                             offer = offer
                         )
                     )
+                    Log.d("TEST","EMITED")
                 }
             }
             else -> {}

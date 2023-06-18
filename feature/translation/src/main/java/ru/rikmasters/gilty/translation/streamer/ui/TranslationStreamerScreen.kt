@@ -179,7 +179,6 @@ fun TranslationStreamerScreen(
      */
     DisposableEffect(Unit) {
         vm.onEvent(TranslationEvent.Initialize(translationId))
-        systemUiController.isSystemBarsVisible = false
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
         onDispose {
             destroyRTMP(camera)
@@ -268,6 +267,7 @@ fun TranslationStreamerScreen(
             }
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
+                /*
                 if (customHUDState == null) {
                     if (cameraState) {
                         if (bitrate < 300_000 && bitrateCalc) {
@@ -283,6 +283,8 @@ fun TranslationStreamerScreen(
                         }
                     }
                 }
+
+                 */
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
         }

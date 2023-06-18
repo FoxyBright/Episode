@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translations.datasource.remote
 
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
 import ru.rikmasters.gilty.shared.models.translations.AppendInfo
+import ru.rikmasters.gilty.shared.models.translations.TranslationUser
 import ru.rikmasters.gilty.shared.socket.WebSocket
 import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
@@ -83,28 +85,31 @@ class TranslationWebSocket : WebSocket() {
             }
 
             TranslationsSocketEvents.USER_CONNECTED -> {
-                val user = mapper.readValue<User>(response.data)
+                Log.d("TEST","USER CONNECTED ${response.data}")
+                val user = mapper.readValue<TranslationUser>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserConnected(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }
 
             TranslationsSocketEvents.USER_DISCONNECTED -> {
-                val user = mapper.readValue<User>(response.data)
+                Log.d("TEST","USER DISCONNECTED ${response.data}")
+                val user = mapper.readValue<TranslationUser>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserDisconnected(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }
 
             TranslationsSocketEvents.USER_KICKED -> {
-                val user = mapper.readValue<User>(response.data)
+                Log.d("TEST","USER KICKED ${response.data}")
+                val user = mapper.readValue<TranslationUser>(response.data)
                 _answer.send(
                     TranslationCallbackEvents.UserKicked(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }

@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.translations.webrtc
 
 import android.content.Context
 import android.os.CountDownTimer
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -10,10 +11,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.webrtc.DataChannel
 import org.webrtc.EglBase
@@ -47,6 +50,7 @@ class WebRtcClient(
     private val sessionManagerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val eglBaseContext: EglBase.Context = EglBase.create().eglBaseContext
     private val connectionFactory = createPeerConnectionFactory(context, eglBaseContext).first
+
     init {
         sessionManagerScope.launch {
             doCollectSocket.collectLatest { doCollect ->
@@ -54,24 +58,27 @@ class WebRtcClient(
                     signalingClient.signalingEventFlow.collectLatest { event ->
                         // Отключаем таймер на ожидание офера
                         timer.cancel()
+                        Log.d("TEST","CANCELED TIMER")
                         when (event) {
                             is WebRTCClientEvent.OfferSent -> {
                                 val realOffer = event.offer.mapToRealOffer()
                                 setIceServer(
                                     iceServers = realOffer.iceServers
                                 )
-                                val setSDPResult = peerConnection?.setRemoteDescription(realOffer.sdp)
+                                val setSDPResult =
+                                    peerConnection?.setRemoteDescription(realOffer.sdp)
                                 setSDPResult?.onSuccess {
                                     realOffer.iceCandidates.forEach { candidate ->
                                         peerConnection?.addRtcIceCandidate(candidate)?.onFailure {
-                                            status = WebRtcStatus.failed
+                                            _status.value = WebRtcStatus.failed
                                         }
                                     }
                                     answer()
                                 }?.onFailure {
-                                    status = WebRtcStatus.failed
+                                    _status.value = WebRtcStatus.failed
                                 }
                             }
+
                             else -> {}
                         }
                     }
@@ -79,25 +86,46 @@ class WebRtcClient(
             }
         }
     }
-    private var status: WebRtcStatus = WebRtcStatus.unknow
-        set(value) {
-            setStatus()
-            if (field != value) field = value
-            sessionManagerScope.launch {
-                _webRtcStatus.send(status)
+
+    private val _status = MutableStateFlow(WebRtcStatus.unknow)
+    val status = _status.onEach {
+        when (it) {
+            WebRtcStatus.connect -> retry = 0
+            WebRtcStatus.failed -> {
+                destroy()
+                _config?.let { config ->
+                    if (config.retryEnable && retry < config.retryCount) {
+                        _status.value = WebRtcStatus.connecting
+                        retry += 1
+                        connecting(config)
+                    } else {
+                        _status.value = WebRtcStatus.reconnectAttemptsOver
+                    }
+                }
             }
 
+            WebRtcStatus.disconnect -> {
+                destroy()
+            }
+            else -> {}
         }
+    }.stateIn(sessionManagerScope, SharingStarted.Eagerly, WebRtcStatus.unknow)
+
     private var _config: WebRtcConfig? = null
     private var peerConnection: PeerConnection? = null
-    private val timer = object : CountDownTimer(_config?.retryInterval?.toLong() ?: 500L, _config?.retryInterval?.toLong() ?: 500L) {
-        override fun onTick(millisUntilFinished: Long) {}
-        override fun onFinish() {
-            status = WebRtcStatus.failed
-        }
-    }
     var retry = 0
     private var channel: DataChannel? = null
+
+    private val timer = object : CountDownTimer(
+        _config?.retryInterval?.toLong() ?: 500L,
+        _config?.retryInterval?.toLong() ?: 500L
+    ) {
+        override fun onTick(millisUntilFinished: Long) {}
+        override fun onFinish() {
+            Log.d("TEST","TIMER FINISH")
+            _status.value = WebRtcStatus.failed
+        }
+    }
 
     private val signalingClient = SignalingClient()
 
@@ -107,12 +135,8 @@ class WebRtcClient(
 
     private var previousStats: RTCStats? = null
 
-    private val _remoteVideoSinkFlow = MutableSharedFlow<VideoTrack>()
-    val remoteVideoSinkFlow: SharedFlow<VideoTrack> = _remoteVideoSinkFlow
-
-
-    private val _webRtcStatus = Channel<WebRtcStatus>()
-    val webRtcStatus = _webRtcStatus.receiveAsFlow()
+    private val _remoteVideoSinkFlow = MutableSharedFlow<VideoTrack?>()
+    val remoteVideoSinkFlow: SharedFlow<VideoTrack?> = _remoteVideoSinkFlow
 
     private val _webRtcAnswer = Channel<WebRtcAnswer>()
     val webRtcAnswer = _webRtcAnswer.receiveAsFlow()
@@ -123,35 +147,15 @@ class WebRtcClient(
     fun connecting(config: WebRtcConfig) {
         _config = config
         webRtcLog("Connecting!!!")
-        status = WebRtcStatus.connecting
+        _status.value = WebRtcStatus.connecting
         // Запускаем таймер на ожидание оффера
         timer.start()
         signalingClient.startConnection(config.wssUrl)
-        doCollectSocket.value = !doCollectSocket.value
+        doCollectSocket.value = true
     }
 
     fun disconnect() {
-        status = WebRtcStatus.disconnect
-    }
-
-    private fun setStatus() {
-        when (status) {
-            WebRtcStatus.connect -> retry = 0
-            WebRtcStatus.failed -> {
-                destroy()
-                _config?.let { config ->
-                    if (config.retryEnable && retry < config.retryCount) {
-                        status = WebRtcStatus.connecting
-                        retry += 1
-                        connecting(config)
-                    }
-                }
-            }
-            WebRtcStatus.disconnect -> {
-                destroy()
-            }
-            else -> {}
-        }
+        _status.value = WebRtcStatus.disconnect
     }
 
     private fun destroy() {
@@ -163,7 +167,9 @@ class WebRtcClient(
         bitrateTimer = null
         audioLevelTimer?.cancel()
         audioLevelTimer = null
-
+        sessionManagerScope.launch {
+            _remoteVideoSinkFlow.emit(null)
+        }
     }
 
     private fun setIceServer(iceServers: List<IceServer>) {
@@ -181,18 +187,19 @@ class WebRtcClient(
                     when (state) {
                         RTCIceConnectionState.completed,
                         RTCIceConnectionState.connected -> {
-                            status = WebRtcStatus.connect
+                            _status.value = WebRtcStatus.connect
                         }
 
                         RTCIceConnectionState.disconnected,
                         RTCIceConnectionState.failed -> {
-                            status = WebRtcStatus.failed
+                            _status.value = WebRtcStatus.failed
                         }
+
                         else -> {}
                     }
                 },
                 onIceCandidateRemoved = {
-                    status = WebRtcStatus.failed
+                    _status.value = WebRtcStatus.failed
                 },
                 onVideoTrack = { rtpTransceiver ->
                     rtpTransceiver.receiver?.track()?.let {
@@ -201,7 +208,7 @@ class WebRtcClient(
                             sessionManagerScope.launch {
                                 _remoteVideoSinkFlow.emit(videoTrack)
                             }
-                            status = WebRtcStatus.stream
+                            _status.value = WebRtcStatus.stream
                         }
                     }
                 }
@@ -294,10 +301,10 @@ class WebRtcClient(
             peerConnection?.setLocalDescription(it)?.onSuccess { sdp ->
                 signalingClient.answer(sdp)
             }?.onFailure {
-                status = WebRtcStatus.failed
+                _status.value = WebRtcStatus.failed
             }
         }?.onFailure {
-            status = WebRtcStatus.failed
+            _status.value = WebRtcStatus.failed
         }
     }
 

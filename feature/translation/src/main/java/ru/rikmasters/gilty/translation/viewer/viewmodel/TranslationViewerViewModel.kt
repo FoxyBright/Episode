@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.viewer.viewmodel
 
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -57,9 +57,12 @@ class TranslationViewerViewModel : ViewModel() {
             _cameraState.value = translation.camera
             _microphoneState.value = translation.microphone
             _isStreaming.value = translation.isStreaming
+            _completedAt.value = translation.completedAt
             _oneTimeEvent.send(TranslationViewerOneTimeEvents.ConnectToStream(translation.webrtc))
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
+    private val _completedAt = MutableStateFlow<ZonedDateTime?>(null)
 
     private val _cameraState = MutableStateFlow(true)
     val cameraState = _cameraState.asStateFlow()
@@ -254,6 +257,7 @@ class TranslationViewerViewModel : ViewModel() {
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->
+                Log.d("TEST","NEW WEb SOCKET EVENT $socketEvent")
                 when (socketEvent) {
                     TranslationCallbackEvents.MessageReceived -> {
                         reloadChat.value = !reloadChat.value
@@ -285,27 +289,19 @@ class TranslationViewerViewModel : ViewModel() {
 
                     is TranslationCallbackEvents.TranslationExtended -> {
                         _hudState.value = null
-                        if (ZonedDateTime.now().isBefore(_translation.value?.completedAt)) {
+                        if (ZonedDateTime.now().isBefore(_completedAt.value)) {
                             coroutineScope.launch {
                                 _additionalTime.value = getAdditionalTimeString(socketEvent.duration)
                                 delay(2000)
                                 _additionalTime.value = ""
-                                _translation.update {
-                                    it?.copy(
-                                        completedAt = socketEvent.completedAt
-                                    )
-                                }
+                                _completedAt.value = socketEvent.completedAt
                             }
                         } else {
                             coroutineScope.launch {
                                 _timerHighlighted.value = true
                                 delay(2000)
                                 _timerHighlighted.value = false
-                                _translation.update {
-                                    it?.copy(
-                                        completedAt = socketEvent.completedAt
-                                    )
-                                }
+                                _completedAt.value = socketEvent.completedAt
                             }
                         }
                     }
@@ -388,8 +384,8 @@ class TranslationViewerViewModel : ViewModel() {
         durationTimer?.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
-                    _translation.value?.let { info ->
-                        _remainTime.value = getTimeDifferenceString(info.completedAt)
+                    _completedAt.value?.let { time ->
+                        _remainTime.value = getTimeDifferenceString(time)
                     }
                 }
             }, 0, 1000

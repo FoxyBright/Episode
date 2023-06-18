@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translation.viewer.ui
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -158,7 +159,6 @@ fun TranslationViewerScreen(
      */
     DisposableEffect(Unit) {
         vm.onEvent(TranslationViewerEvent.Initialize(translationId))
-        systemUiController.isSystemBarsVisible = false
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
         onDispose {
             webRtcClient.disconnect()
@@ -199,14 +199,24 @@ fun TranslationViewerScreen(
                     }
                 }
             }
-            webRtcClient.webRtcStatus.collectLatest { status ->
+        }
+    }
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            webRtcClient.status.collectLatest { status ->
+                Log.d("TEST","NEw STatus $status")
                 vm.onEvent(
                     TranslationViewerEvent.HandleWebRtcStatus(
                         status = status
                     )
                 )
             }
+        }
+    }
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             webRtcClient.webRtcAnswer.collectLatest { answer ->
+                Log.d("TEST","NEw Answer $answer")
                 vm.onEvent(
                     TranslationViewerEvent.HandleWebRtcAnswer(
                         answer = answer

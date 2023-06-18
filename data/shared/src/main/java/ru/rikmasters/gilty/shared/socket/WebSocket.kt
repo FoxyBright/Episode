@@ -115,8 +115,6 @@ abstract class WebSocket: KtorSource() {
     fun disconnect() {
         sessionHandlerJob?.cancel()
     }
-
-    private val reconnectDelay = MutableStateFlow(2000L)
     
     suspend fun connect(userId: String) {
         try {
@@ -128,9 +126,6 @@ abstract class WebSocket: KtorSource() {
             try {
                 connection(userId)
             } catch(e: Exception) {
-                delay(reconnectDelay.value)
-                reconnectDelay.value = reconnectDelay.value + 1000L
-                connect(userId)
                 logE("Bad reconnection")
                 logE("$e")
             }
@@ -141,27 +136,32 @@ abstract class WebSocket: KtorSource() {
         withContext(Dispatchers.IO) {
             this@WebSocket.userId.emit(userId)
             sessionHandlerJob = launch {
-                val session = wsSession(BuildConfig.HOST, port, socketUrl)
-                try {
-                    launch {
-                        while(true) {
-                            delay(pingInterval)
-                            doPing(session)
-                            logV("Ping...port:$port")
-                        }
-                    }
-                    _session.emit(session)
-                    while(true) {
-                        val response = session.incoming.receive()
-                        logV("Frame: ${String(response.data)}")
-                        
-                        val socketResponse = mapper
-                            .readValue<SocketResponse>(response.data)
-                        handleResponse(socketResponse)
-                    }
-                } catch(e: SocketException) {
-                    e.stackTraceToString()
-                }
+                connect(this)
             }
         }
+
+    private suspend fun connect(coroutineScope: CoroutineScope) {
+        val session = wsSession(BuildConfig.HOST, port, socketUrl)
+        try {
+            coroutineScope.launch {
+                while(true) {
+                    delay(pingInterval)
+                    doPing(session)
+                    logV("Ping...port:$port")
+                }
+            }
+            _session.emit(session)
+            while(true) {
+                val response = session.incoming.receive()
+                logV("Frame: ${String(response.data)}")
+
+                val socketResponse = mapper
+                    .readValue<SocketResponse>(response.data)
+                handleResponse(socketResponse)
+            }
+        } catch(e: SocketException) {
+            connect(coroutineScope)
+            e.stackTraceToString()
+        }
+    }
 }
