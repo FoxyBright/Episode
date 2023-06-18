@@ -18,6 +18,7 @@ import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.nowZ
 import ru.rikmasters.gilty.shared.common.extentions.LocalTime.Companion.ofZ
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
+import ru.rikmasters.gilty.shared.model.enumeration.ChatNotificationType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -295,20 +296,20 @@ class ChatViewModel : ViewModel() {
         remainTimeTimer?.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
-                    _chat.value?.datetime?.let {
+                    _chat.value?.let {
                         val zdt =
-                            ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Moscow"))
+                            ZonedDateTime.parse(it.datetime).withZoneSameInstant(ZoneId.of("Europe/Moscow"))
                                 .withZoneSameLocal(
                                     ZoneId.systemDefault()
                                 )
                         val difference = getTimeDifferenceString(zdt)
                         if (difference == "00:00") {
                             coroutineScope.launch {
-                                _chatType.value = getTranslationType(
-                                    it,
-                                    _chat.value?.id ?: "",
-                                    _chat.value?.isOnline ?: true
-                                )
+                                if(it.userId == it.organizer.id) {
+                                    _chatType.value = TRANSLATION_ORGANIZER
+                                } else {
+                                    _chatType.value = TRANSLATION
+                                }
                                 stopDurationTimer()
                             }
                         } else {
@@ -425,13 +426,12 @@ class ChatViewModel : ViewModel() {
         )
     }
 
-    fun initialize(meetId: String?) {
-        coroutineScope.launch {
-            meetId?.let { meetId ->
-                meetManager.getDetailedMeet(meetId).on(
-                    success = { meeting ->
-                        _meet.emit(meeting)
-                        _membersCount.value = meeting.membersCount
+    suspend fun getMeet(meetId: String?) = singleLoading {
+        meetId?.let { meetId ->
+            meetManager.getDetailedMeet(meetId).on(
+                success = { meeting ->
+                    _meet.emit(meeting)
+                    coroutineScope.launch {
                         translationRepository.getTranslationInfo(
                             translationId = meetId
                         ).onSuccess {
@@ -441,15 +441,15 @@ class ChatViewModel : ViewModel() {
                                 userId = it.userId
                             )
                         }
-                    },
-                    loading = {},
-                    error = {
-                        context.errorToast(
-                            it.serverMessage
-                        )
                     }
-                )
-            }
+                },
+                loading = {},
+                error = {
+                    context.errorToast(
+                        it.serverMessage
+                    )
+                }
+            )
         }
     }
 

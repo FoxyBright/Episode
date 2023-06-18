@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
+import android.Manifest
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,6 +13,8 @@ import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionsRequired
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,7 +44,6 @@ import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsScreen
 import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsViewModel
-import ru.rikmasters.gilty.translation.shared.utils.checkMediaPermissions
 import ru.rikmasters.gilty.translation.shared.utils.mediaPermissionState
 import java.io.File
 
@@ -61,6 +63,13 @@ fun ChatScreen(
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
+
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+    )
 
     vm.changeChatId(chatId)
 
@@ -112,6 +121,7 @@ fun ChatScreen(
 
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
+        vm.getMeet(chat?.meetingId)
         if (unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
         } catch (_: Exception) {
@@ -121,7 +131,6 @@ fun ChatScreen(
     }
 
     DisposableEffect(Unit) {
-        vm.initialize(chatId)
         onDispose {
             vm.dispose()
         }
@@ -191,6 +200,8 @@ fun ChatScreen(
         }
     }
 
+
+
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
             ChatContent(state, Modifier, object : ChatCallback {
@@ -207,19 +218,15 @@ fun ChatScreen(
                     scope.launch {
                         when (type) {
                             TRANSLATION -> {
-                                context.checkMediaPermissions(
-                                    mediaPermissions
-                                ) {
-                                    nav.navigateAbsolute(
-                                        "translationviewer/viewer?id=${state.meet.id}"
-                                    )
-                                }
+                                nav.navigateAbsolute(
+                                    "translationviewer/viewer?id=${state.meet.id}"
+                                )
                             }
 
                             TRANSLATION_ORGANIZER -> {
-                                context.checkMediaPermissions(
-                                    mediaPermissions
-                                ) {
+                                if (!permissionsState.allPermissionsGranted) {
+                                    permissionsState.launchMultiplePermissionRequest()
+                                } else {
                                     scope.launch {
                                         asm.bottomSheet.expand {
                                             PreviewBsScreen(
@@ -241,10 +248,12 @@ fun ChatScreen(
                                 }
                             }
 
-                            else -> {
+                            MEET_FINISHED -> {
                                 vm.completeChat(chat)
                                 nav.navigate("main")
                             }
+
+                            else -> {}
                         }
                     }
                 }
