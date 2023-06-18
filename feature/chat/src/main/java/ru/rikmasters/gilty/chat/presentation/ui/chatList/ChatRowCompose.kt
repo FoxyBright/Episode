@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
@@ -201,8 +202,7 @@ private fun ChatRowContent(
                 }
             }
             chat.lastMessage?.let {
-                val createdTime = ZonedDateTime.parse(it.createdAt).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
-                    ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))
+                val createdTime = ZonedDateTime.parse(it.createdAt).format(DateTimeFormatter.ofPattern("HH:mm"))
                 Text(
                     createdTime,
                     Modifier
