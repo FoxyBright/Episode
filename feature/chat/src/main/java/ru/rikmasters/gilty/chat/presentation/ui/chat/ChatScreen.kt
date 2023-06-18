@@ -94,6 +94,8 @@ fun ChatScreen(
     val chat by vm.chat.collectAsState()
     // время до трансляции
     val remainTime by vm.remainTime.collectAsState()
+    // Количество участников
+    val membersCount by vm.membersCount.collectAsState()
 
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
@@ -110,7 +112,6 @@ fun ChatScreen(
 
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
-        vm.getMeet(chat?.meetingId)
         if (unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
         } catch (_: Exception) {
@@ -118,6 +119,14 @@ fun ChatScreen(
         }
         vm.markAsReadMessage(chatId, all = true)
     }
+
+    DisposableEffect(Unit) {
+        vm.initialize(chatId)
+        onDispose {
+            vm.dispose()
+        }
+    }
+
 
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {
@@ -154,7 +163,7 @@ fun ChatScreen(
                 topState = ChatAppBarState(
                     name = chat.title,
                     avatar = meet.organizer.avatar,
-                    memberCount = chat.membersCount,
+                    memberCount = membersCount,
                     chatType = type,
                     viewer = viewers,
                     toTranslation = remainTime,
