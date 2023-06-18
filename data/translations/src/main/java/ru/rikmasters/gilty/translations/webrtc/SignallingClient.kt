@@ -114,15 +114,12 @@ class SignalingClient {
             SignalingCommand.OFFER -> {
                 val offer = signallingMessage.body.mapToOffer()
                 id = offer.id
-                Log.d("TEST","RECEIVED OFFER")
                 signalingScope.launch {
-                    Log.d("TEST","LAUNCH")
                     _signalingEventFlow.emit(
                         WebRTCClientEvent.OfferSent(
                             offer = offer
                         )
                     )
-                    Log.d("TEST","EMITED")
                 }
             }
             else -> {}

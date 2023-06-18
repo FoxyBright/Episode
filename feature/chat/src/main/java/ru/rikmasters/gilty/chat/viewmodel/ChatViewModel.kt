@@ -22,8 +22,13 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.shared.shared.compress
+import ru.rikmasters.gilty.translation.shared.utils.getTimeDifferenceString
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import java.io.File
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Timer
+import java.util.TimerTask
 
 class ChatViewModel: ViewModel() {
     
@@ -80,9 +85,6 @@ class ChatViewModel: ViewModel() {
     private val _unreadCount = MutableStateFlow(0)
     val unreadCount = _unreadCount.asStateFlow()
     
-    private val _translationTimer = MutableStateFlow<Long?>(null)
-    val translationTimer = _translationTimer.asStateFlow()
-    
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
     
@@ -109,7 +111,11 @@ class ChatViewModel: ViewModel() {
     
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
-    
+
+    private var remainTimeTimer: Timer? = Timer()
+
+    private val _remainTime =  MutableStateFlow("")
+    val remainTime = _remainTime.asStateFlow()
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
     }
@@ -274,6 +280,36 @@ class ChatViewModel: ViewModel() {
             }
         )
     }
+
+    private fun startDurationTimer() {
+        if (remainTimeTimer == null) {
+            remainTimeTimer = Timer()
+        }
+        remainTimeTimer?.scheduleAtFixedRate(
+            object : TimerTask() {
+                override fun run() {
+                    _chat.value?.datetime?.let {
+                        val zdt = ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+                            ZoneId.systemDefault())
+                        val difference = getTimeDifferenceString(zdt)
+                        if (difference == "00:00") {
+                            coroutineScope.launch {
+                                getTranslationType(it, _chat.value?.id ?: "", _chat.value?.isOnline ?: true)
+                                stopDurationTimer()
+                            }
+                        } else {
+                            _remainTime.value = getTimeDifferenceString(zdt)
+                        }
+                    }
+                }
+            }, 0, 1000
+        )
+    }
+
+    private fun stopDurationTimer() {
+        remainTimeTimer?.cancel()
+        remainTimeTimer = null
+    }
     
     private suspend fun getTranslationType(
         date: String?,
@@ -281,9 +317,9 @@ class ChatViewModel: ViewModel() {
         chatId: String,
         isOrganizer: Boolean,
     ) = date?.let {
-        val start = ofZ(it).millis()
-        val now = nowZ().millis()
-        val difference = start - now
+        val start = ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+            ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val now = ZonedDateTime.now().toInstant().toEpochMilli()
         
         logD("Data --->>> $date")
         logD("Data --->>> ${ofZ(date)}")
@@ -305,7 +341,7 @@ class ChatViewModel: ViewModel() {
             }
             
             (start - now) < 1_800_000 -> {
-                _translationTimer.emit(difference)
+                startDurationTimer()
                 if(isOrganizer) {
                     TRANSLATION_ORGANIZER_AWAIT
                 } else {
@@ -316,35 +352,6 @@ class ChatViewModel: ViewModel() {
             else -> MEET
         }
     } ?: MEET
-    
-    fun timerConverter(millis: Long?): String? {
-        millis?.let {
-            val seconds = it / 1000
-            if(seconds > 3599) return "${seconds / 3600} ч"
-            if(seconds > 0L) {
-                val min = seconds / 60
-                val sec = seconds - 60 * min
-                return "${
-                    if(min < 10) "0" else ""
-                }$min:${
-                    if(sec < 10) "0" else ""
-                }$sec"
-            } else {
-                coroutineScope.launch {
-                    _chatType.emit(TRANSLATION)
-                }
-                return null
-            }
-        } ?: return null
-    }
-    
-    suspend fun timerTick() {
-        translationTimer.value?.let {
-            _translationTimer.emit(
-                it.minus(1)
-            )
-        }
-    }
     
     suspend fun changeMessage(text: String) {
         _message.emit(text)

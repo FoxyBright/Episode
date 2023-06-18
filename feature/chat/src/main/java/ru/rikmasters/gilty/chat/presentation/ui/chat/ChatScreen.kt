@@ -68,8 +68,6 @@ fun ChatScreen(
     val messages = vm.messages.collectAsLazyPagingItems()
     // состояние меню сообщения
     val messageMenuState by vm.messageMenuState.collectAsState()
-    // таймер времени до начала трансляции
-    val toTranslation by vm.translationTimer.collectAsState()
     // состояние меню выбора картинки
     val imageMenuState by vm.imageMenuState.collectAsState()
     // состояние меню в шапке
@@ -94,6 +92,8 @@ fun ChatScreen(
     val alert by vm.alert.collectAsState()
     // информация о текущем чате
     val chat by vm.chat.collectAsState()
+    // время до трансляции
+    val remainTime by vm.remainTime.collectAsState()
 
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
@@ -123,13 +123,6 @@ fun ChatScreen(
         writingUsers.forEach {
             delay(3000)
             vm.deleteWriter(it.first)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) {
-            delay(1000)
-            vm.timerTick()
         }
     }
 
@@ -164,7 +157,7 @@ fun ChatScreen(
                     memberCount = chat.membersCount,
                     chatType = type,
                     viewer = viewers,
-                    toTranslation = vm.timerConverter(toTranslation),
+                    toTranslation = remainTime,
                     isOnline = meet.isOnline,
                     isOrganizer = meet.organizer.id == chat.userId
                 ),
