@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.viewer.presentation.ui.components
+package ru.rikmasters.gilty.translation.viewer.ui
 
 import android.content.Context
 import android.content.res.Resources

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.viewer.presentation.ui.components
+package ru.rikmasters.gilty.translation.viewer.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

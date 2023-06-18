@@ -53,6 +53,7 @@ import ru.rikmasters.gilty.translation.shared.components.TranslationDialogType
 import ru.rikmasters.gilty.translation.shared.components.TranslationStreamerDialog
 import ru.rikmasters.gilty.translation.bottoms.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
+import ru.rikmasters.gilty.translation.shared.utils.OnLifecycleEvent
 import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
 import ru.rikmasters.gilty.translation.shared.utils.map
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
@@ -67,8 +68,6 @@ import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
 import ru.rikmasters.gilty.translation.streamer.model.SurfaceState
 import ru.rikmasters.gilty.translation.streamer.viewmodel.TranslationStreamerViewModel
-import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.OnLifecycleEvent
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,12 +174,12 @@ fun TranslationStreamerScreen(
         }
     }
 
-
     /**
      * Enter/leave screen
      */
     DisposableEffect(Unit) {
         vm.onEvent(TranslationEvent.Initialize(translationId))
+        systemUiController.isSystemBarsVisible = false
         systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
         onDispose {
             destroyRTMP(camera)

@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.streamer.ui
+package ru.rikmasters.gilty.translation.viewer.ui
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -22,10 +22,11 @@ import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.translation.shared.components.MicroInactiveSnackbar
 import ru.rikmasters.gilty.translation.shared.components.MicroWave
 import ru.rikmasters.gilty.translation.shared.components.ProfileAvatar
+import ru.rikmasters.gilty.translation.shared.components.TranslationExtendedSnackbar
 import ru.rikmasters.gilty.translation.shared.components.TranslationResumedSnackbar
 import ru.rikmasters.gilty.translation.shared.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.shared.utils.animatePlacement
-import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
+import ru.rikmasters.gilty.translation.viewer.model.ViewerSnackbarState
 
 @Composable
 fun OnTopSnackbarsPlacehodlers(
@@ -36,7 +37,7 @@ fun OnTopSnackbarsPlacehodlers(
     cameraState: Boolean,
     microphoneState: Boolean,
     meeting: FullMeetingModel?,
-    snackbarState: StreamerSnackbarState?,
+    snackbarState: ViewerSnackbarState?,
     configuration: Configuration
 ) {
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -68,13 +69,16 @@ fun OnTopSnackbarsPlacehodlers(
                     modifier = Modifier.align(Alignment.Center)
                 ) {
                     when (snackbarState) {
-                        StreamerSnackbarState.MICRO_OFF -> {
-                            MicroInactiveSnackbar(organizer = true)
+                        ViewerSnackbarState.MICRO_OFF -> {
+                            MicroInactiveSnackbar(organizer = false)
                         }
-                        StreamerSnackbarState.WEAK_CONNECTION -> {
+                        ViewerSnackbarState.WEAK_CONNECTION -> {
                             WeakConnectionSnackbar()
                         }
-                        StreamerSnackbarState.BROADCAST_EXTENDED -> {
+                        ViewerSnackbarState.BROADCAST_EXTENDED -> {
+                            TranslationExtendedSnackbar()
+                        }
+                        ViewerSnackbarState.BROADCAST_RESUMED -> {
                             TranslationResumedSnackbar()
                         }
                         else -> {}
@@ -120,13 +124,16 @@ fun OnTopSnackbarsPlacehodlers(
                     modifier = Modifier.align(Alignment.Center)
                 ) {
                     when (snackbarState) {
-                        StreamerSnackbarState.MICRO_OFF -> {
-                            MicroInactiveSnackbar(organizer = true)
+                        ViewerSnackbarState.MICRO_OFF -> {
+                            MicroInactiveSnackbar(organizer = false)
                         }
-                        StreamerSnackbarState.WEAK_CONNECTION -> {
+                        ViewerSnackbarState.WEAK_CONNECTION -> {
                             WeakConnectionSnackbar()
                         }
-                        StreamerSnackbarState.BROADCAST_EXTENDED -> {
+                        ViewerSnackbarState.BROADCAST_EXTENDED -> {
+                            TranslationExtendedSnackbar()
+                        }
+                        ViewerSnackbarState.BROADCAST_RESUMED -> {
                             TranslationResumedSnackbar()
                         }
                         else -> {}

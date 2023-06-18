@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
+import androidx.core.view.WindowCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
@@ -80,7 +81,8 @@ class MainActivity: ComponentActivity() {
         FirebaseMessaging
             .getInstance()
             .subscribeToTopic("all")
-        
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             var errorState by remember {
                 mutableStateOf(false)

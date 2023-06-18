@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.translation.viewer.presentation.ui.content
+package ru.rikmasters.gilty.translation.viewer.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,13 +37,11 @@ import ru.rikmasters.gilty.translation.shared.components.CloseButton
 import ru.rikmasters.gilty.translation.shared.components.MembersCountItem
 import ru.rikmasters.gilty.translation.shared.components.StreamerItem
 import ru.rikmasters.gilty.translation.shared.components.TimerItem
-import ru.rikmasters.gilty.translation.viewer.model.TranslationViewerStatus
-import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.VideoRenderer
-import ru.rikmasters.gilty.translation.viewer.presentation.ui.components.VideoTextureViewRenderer
+import ru.rikmasters.gilty.translation.viewer.model.ViewerCustomHUD
 
 @Composable
-fun TranslationViewerScreenContent(
-    translationStatus: TranslationViewerStatus,
+fun TranslationViewerContent(
+    customHUDState: ViewerCustomHUD?,
     videoTrack: VideoTrack?,
     eglBaseContext: EglBase.Context,
     membersCount: Int,
@@ -72,16 +70,16 @@ fun TranslationViewerScreenContent(
                 )
         ) {
             Box(
-                modifier = if (displayBars(translationStatus)) Modifier.weight(1f) else Modifier.fillMaxSize()
+                modifier = if (customHUDState == null) Modifier.weight(1f) else Modifier.fillMaxSize()
             ) {
                 Camera(
-                    shape = if (displayBars(translationStatus)) RoundedCornerShape(14.dp) else RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp),
+                    shape = if (customHUDState == null) RoundedCornerShape(14.dp) else RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp),
                     videoTrack = videoTrack,
                     eglBaseContext = eglBaseContext,
                     modifier = Modifier.matchParentSize(),
                     initialize = initialize
                 )
-                if (displayBars(translationStatus)) {
+                if (customHUDState == null) {
                     if (isPortrait) {
                         OnCameraTopBarPortrait(
                             meetingModel = meetingModel,
@@ -103,14 +101,14 @@ fun TranslationViewerScreenContent(
                         )
                     }
                 }
-                if (translationStatus == TranslationViewerStatus.COMPLETED) {
+                if (customHUDState == ViewerCustomHUD.COMPLETED) {
                     CompletedPortrait(onToChatPressed = onToChatPressed)
                 }
-                if (translationStatus == TranslationViewerStatus.KICKED) {
+                if (customHUDState == ViewerCustomHUD.KICKED) {
                     KickedPortrait(onToChatPressed = onToChatPressed)
                 }
             }
-            if (displayBars(translationStatus) && isPortrait) {
+            if (customHUDState == null && isPortrait) {
                 BottomBarPortrait(
                     onChatClicked = onChatClicked,
                     membersCount = membersCount,
@@ -410,8 +408,3 @@ fun OnCameraLandscape(
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
-
-fun displayBars(translationStatus: TranslationViewerStatus) =
-    (translationStatus == TranslationViewerStatus.STREAM
-            || translationStatus == TranslationViewerStatus.INACTIVE
-            || translationStatus == TranslationViewerStatus.PAUSED)

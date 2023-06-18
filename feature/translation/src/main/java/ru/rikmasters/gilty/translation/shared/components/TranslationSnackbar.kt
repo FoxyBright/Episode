@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.translation.shared.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -62,21 +61,6 @@ fun MicroInactiveSnackbar(organizer: Boolean) {
 }
 
 @Composable
-fun MicroInactiveViewerSnackbar(
-    modifier: Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        CustomSnackbar(
-            text = stringResource(id = R.string.translations_micro_off_viewer),
-            iconPainter = painterResource(id = R.drawable.ic_micro_inactive)
-        )
-    }
-}
-
-@Composable
 fun TranslationResumedSnackbar() {
     CustomSnackbar(
         text = stringResource(id = R.string.translation_resumed),
@@ -89,5 +73,13 @@ fun WeakConnectionSnackbar() {
     CustomSnackbar(
         text = stringResource(id = R.string.translations_weak_connection),
         iconPainter = painterResource(id = R.drawable.ic_weak_connection)
+    )
+}
+
+@Composable
+fun TranslationExtendedSnackbar() {
+    CustomSnackbar(
+        text = stringResource(id = R.string.translation_extended),
+        iconPainter = painterResource(id = R.drawable.ic_add)
     )
 }
