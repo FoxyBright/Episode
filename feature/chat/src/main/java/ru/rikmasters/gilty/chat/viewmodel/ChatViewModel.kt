@@ -465,7 +465,7 @@ class ChatViewModel : ViewModel() {
                         _membersCount.value = socketEvent.count
                     }
                     TranslationCallbackEvents.TranslationCompleted -> {
-
+                        _chatType.value = MEET_FINISHED
                     }
                     else -> {}
                 }

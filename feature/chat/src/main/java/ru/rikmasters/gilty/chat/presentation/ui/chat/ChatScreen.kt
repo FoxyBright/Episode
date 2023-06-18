@@ -238,8 +238,6 @@ fun ChatScreen(
                                             )
                                         }
                                     }
-                                    // TODO: to translation
-                                    // vm.toTranslation()
                                 }
                             }
 
