@@ -251,9 +251,9 @@ private fun PinedButton(
                     when(type) {
                         MEET_FINISHED -> stringResource(R.string.chats_close_chat_pinned_bar_button)
                         TRANSLATION -> viewString
-                        TRANSLATION_AWAIT, TRANSLATION_ORGANIZER_AWAIT -> toTranslation ?: viewString
+                        TRANSLATION_AWAIT -> if (toTranslation.isNullOrBlank()) viewString else toTranslation
+                        TRANSLATION_ORGANIZER_AWAIT -> if (toTranslation.isNullOrBlank()) stringResource(R.string.chats_translation_organizer_btn_begin) else toTranslation
                         TRANSLATION_ORGANIZER -> stringResource(R.string.chats_translation_organizer_btn_begin)
-                        
                         else -> ""
                     }, Modifier.padding(), if(meetType)
                         if(isOnline) colorScheme.secondary

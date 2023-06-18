@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -294,7 +295,7 @@ class ChatViewModel: ViewModel() {
                         val difference = getTimeDifferenceString(zdt)
                         if (difference == "00:00") {
                             coroutineScope.launch {
-                                getTranslationType(it, _chat.value?.id ?: "", _chat.value?.isOnline ?: true)
+                                _chatType.value =  getTranslationType(it, _chat.value?.id ?: "", _chat.value?.isOnline ?: true)
                                 stopDurationTimer()
                             }
                         } else {
