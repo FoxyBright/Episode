@@ -84,8 +84,48 @@ fun LazyListScope.sentRespond(
                     
                     group = organizer.group ?: DEFAULT,
                 )
+
                 Column(Modifier.padding(start = 66.dp)) {
                     GDivider(Modifier)
+                    if(respond.comment.isNotBlank()) Text(
+                        respond.comment,
+                        Modifier
+                            .padding(end = 20.dp)
+                            .padding(top = 12.dp, bottom = 8.dp),
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium
+                    )
+                    // TODO: error states
+                    val photos = respond.photos?.collectAsLazyPagingItems()
+                    photos?.let {
+                        if (it.loadState.refresh is LoadState.Loading) {
+                            // TODO: заменить чем-нибудь
+                            Spacer(
+                                modifier = Modifier.height(60.dp)
+                            )
+                        } else {
+                            val photosCount = it.itemCount
+                            if (photosCount != 0) {
+                                LazyRow(modifier) {
+                                    items(it) { photo ->
+                                        photo?.let {
+                                            HiddenImage(
+                                                photo,
+                                                Modifier.padding(6.dp),
+                                                !photo.hasAccess
+                                            ) {
+                                                if (!photo.hasAccess) {
+                                                    callback?.onImageClick(
+                                                        photo
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     Buttons(
                         Modifier.padding(vertical = 8.dp),
                         (true)

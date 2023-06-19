@@ -53,6 +53,7 @@ data class RespondsListState(
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
     val scope: CoroutineScope,
+    val currentTab: Int = 0,
 )
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -62,7 +63,7 @@ fun RespondsList(
     callback: RespondsListCallback? = null,
 ) {
     val pagerState: PagerState =
-        rememberPagerState(initialPage = 0)
+        rememberPagerState(initialPage = state.currentTab)
     val indicator =
         @Composable { tabPositions: List<TabPosition> ->
             TabIndicator(tabPositions, pagerState)
@@ -71,6 +72,10 @@ fun RespondsList(
     LaunchedEffect(pagerState.currentPage) {
         callback?.onTabChange(pagerState.currentPage)
     }
+
+    LaunchedEffect(key1 = state.currentTab, block = {
+        pagerState.animateScrollToPage(state.currentTab)
+    })
 
     Column(
         modifier = modifier

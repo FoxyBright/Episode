@@ -155,7 +155,7 @@ class RespondsBsViewModel: ViewModel() {
         _viewerSelectImage.emit(photo)
     }
     
-    fun selectTab(tab: Int) {
+    suspend fun selectTab(tab: Int) {
         _tabs.value = tab
     }
     
@@ -204,7 +204,9 @@ class RespondsBsViewModel: ViewModel() {
     suspend fun acceptRespond(respondId: String) =
         singleLoading {
             profileManager.acceptRespond(respondId).on(
-                success = {},
+                success = {
+                    selectTab(1)
+                },
                 loading = {},
                 error = {
                     context.errorToast(
