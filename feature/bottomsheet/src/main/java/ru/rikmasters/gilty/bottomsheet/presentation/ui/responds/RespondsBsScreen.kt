@@ -121,7 +121,7 @@ fun RespondsBs(
                     scope.launch {
                         vm.acceptRespond(respondId)
                         receivedResponds.refresh()
-                        vm.updateMeetId(meetId)
+                        //vm.updateMeetId(meetId)
                         vm.selectTab(1)
                     }
                 }

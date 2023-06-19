@@ -34,13 +34,13 @@ class SubcategoryViewModel: ViewModel() {
     private val _subcategories =
         MutableStateFlow(emptyList<CategoryModel>())
     val subcategories = _subcategories.asStateFlow()
-    
-    init {
+
+    suspend fun init(){
         coroutineScope.launch {
             addMeet.collectLatest {
                 _online.emit(it?.isOnline ?: false)
                 _selectedCategory.emit(it?.category)
-                
+
                 // Get categories and subcategories if category is subcategory
                 if(_selectedCategory.value?.parentId == null) {
                     _selectedCategory.value?.id?.let { it1 ->
@@ -52,7 +52,6 @@ class SubcategoryViewModel: ViewModel() {
             }
         }
     }
-    
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }

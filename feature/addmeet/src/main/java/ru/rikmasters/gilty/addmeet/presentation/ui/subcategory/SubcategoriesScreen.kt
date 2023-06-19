@@ -2,10 +2,15 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.subcategory
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.SubcategoryViewModel
@@ -23,6 +28,19 @@ fun SubcategoriesScreen(vm: SubcategoryViewModel) {
     val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
 
+    var sleep by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = Unit, block = {
+        vm.init()
+        sleep = true
+    })
+
+    LaunchedEffect(key1 = subcategories, block = {
+        sleep = false
+        delay(50L)
+        sleep = true
+    })
+
     BackHandler(true) {
         scope.launch { vm.unselectSubcategory() }
         nav.navigationBack()
@@ -30,7 +48,11 @@ fun SubcategoriesScreen(vm: SubcategoryViewModel) {
 
     SubcategoriesContent(
         Modifier, SubcategoriesState(
-            subcategories, selected, online, alert
+            subcategoryList = subcategories,
+            selectCategory = selected,
+            online = online,
+            alert = alert,
+            sleep = sleep,
         ), object : SubcategoriesCallback {
 
             override fun onCategoryClick(category: CategoryModel) {

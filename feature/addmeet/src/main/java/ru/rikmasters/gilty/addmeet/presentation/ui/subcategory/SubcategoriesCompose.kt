@@ -42,7 +42,8 @@ data class SubcategoriesState(
     val selectCategory: CategoryModel?,
     val online: Boolean,
     val alert: Boolean = false,
-)
+    val sleep: Boolean,
+    )
 
 interface SubcategoriesCallback {
 
@@ -88,7 +89,7 @@ fun SubcategoriesContent(
     ) {
         if (LocalInspectionMode.current)
             BubblesForPreview(state, callback)
-        else
+        else if (state.sleep)
             Bubbles(
                 state.subcategoryList,
                 CATEGORY_ELEMENT_SIZE.dp,
@@ -158,7 +159,7 @@ private fun SubcategoriesPreview() {
                 Modifier,
                 SubcategoriesState(
                     listOf(DemoCategoryModel),
-                    DemoCategoryModel, (false)
+                    DemoCategoryModel, (false), (false), (false),
                 )
             )
         }
