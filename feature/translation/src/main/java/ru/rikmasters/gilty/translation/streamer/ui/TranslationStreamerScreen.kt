@@ -60,6 +60,7 @@ import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.shared.utils.OnLifecycleEvent
 import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
 import ru.rikmasters.gilty.translation.shared.utils.map
+import ru.rikmasters.gilty.translation.shared.utils.restartBroadCast
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
 import ru.rikmasters.gilty.translation.shared.utils.startBroadCast
 import ru.rikmasters.gilty.translation.shared.utils.toggleCamera
@@ -161,6 +162,7 @@ fun TranslationStreamerScreen(
         snapshotFlow { configuration.orientation }
             .collect {
                 orientation = it
+                restartBroadCast(translation?.rtmp ?: "", camera, context, facing)
             }
     }
 

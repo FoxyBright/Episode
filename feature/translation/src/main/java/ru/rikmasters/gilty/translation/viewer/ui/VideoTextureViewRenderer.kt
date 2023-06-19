@@ -6,6 +6,7 @@ import android.graphics.SurfaceTexture
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import org.webrtc.EglBase
@@ -71,6 +72,7 @@ open class VideoTextureViewRenderer @JvmOverloads constructor(
             rotatedFrameWidth = videoFrame.rotatedWidth
             rotatedFrameHeight = videoFrame.rotatedHeight
             frameRotation = videoFrame.rotation
+            Log.d("TEST","RW $rotatedFrameWidth RH $rotatedFrameHeight FR $frameRotation")
 
             uiThreadHandler.post {
                 rendererEvents?.onFrameResolutionChanged(
@@ -87,6 +89,7 @@ open class VideoTextureViewRenderer @JvmOverloads constructor(
      * is scaled correctly.
      */
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        Log.d("TEST","LAR $changed  $left  $top  $right  $bottom")
         eglRenderer.setLayoutAspectRatio((right - left) / (bottom.toFloat() - top))
     }
 
@@ -128,6 +131,7 @@ open class VideoTextureViewRenderer @JvmOverloads constructor(
         width: Int,
         height: Int
     ) {
+        Log.d("TEST","SIZE CHANGED  W$width H$height")
     }
 
     override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) {}

@@ -14,8 +14,6 @@ sealed interface TranslationViewerEvent {
 
 
 
-
-
     data class MessageSent(val messageText: String) : TranslationViewerEvent
     data class QueryChanged(val newQuery: String) : TranslationViewerEvent
 

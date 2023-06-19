@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -136,8 +138,9 @@ fun Camera(
             VideoRenderer(
                 videoTrack = it,
                 eglBaseContext = eglBaseContext,
-                modifier = modifier,
-                initialize = initialize
+                initialize = initialize,
+                modifier = Modifier.fillMaxWidth()
+                    .wrapContentHeight()
             )
         }
     }

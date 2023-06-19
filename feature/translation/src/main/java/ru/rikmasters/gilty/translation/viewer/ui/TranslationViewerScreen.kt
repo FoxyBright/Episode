@@ -189,7 +189,6 @@ fun TranslationViewerScreen(
                     }
 
                     is TranslationViewerOneTimeEvents.ConnectToStream -> {
-                        Log.d("TEST","COnnect to STREAM")
                         webRtcClient.connecting(WebRtcConfig(event.wsUrl))
                     }
 
