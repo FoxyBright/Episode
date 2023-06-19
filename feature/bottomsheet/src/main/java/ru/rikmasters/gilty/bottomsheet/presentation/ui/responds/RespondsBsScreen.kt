@@ -12,7 +12,6 @@ import ru.rikmasters.gilty.bottomsheet.viewmodel.RespondsBsViewModel
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.shared.common.RespondsListCallback
-import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
 import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 
@@ -27,10 +26,17 @@ fun RespondsBs(
     
     // Список встреч с пагинацией
     val respondsList: LazyPagingItems<RespondWithPhotos> = vm.responds.collectAsLazyPagingItems()
-    // Список откликов с пагинацией
+    val localResponds = vm.localResponds.collectAsState()
+
+    // Список отправленных откликов с пагинацией
     val sentResponds = vm.sentResponds.collectAsLazyPagingItems()
-    val receivedResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos> = vm.receivedResponds.collectAsLazyPagingItems()
-    
+    val localSentResponds = vm.localSentResponds.collectAsState()
+
+    // Список полученных откликов с пагинацией
+    val receivedResponds = vm.receivedResponds.collectAsLazyPagingItems()
+    val localReceivedResponds = vm.localReceivedResponds.collectAsState()
+
+
     val groupsStates by vm.groupsStates.collectAsState()
     val tabs by vm.tabs.collectAsState()
     
@@ -42,19 +48,35 @@ fun RespondsBs(
         vm.updateMeetId(meetId)
         if(!full) vm.selectTab(1)
     }
-    
+
+    LaunchedEffect(key1 = respondsList.itemSnapshotList.items, block = {
+        vm.setLocalResponds(respondsList.itemSnapshotList.items)
+    })
+
+    LaunchedEffect(key1 = sentResponds.itemSnapshotList.items, block = {
+        vm.setLocalSentResponds(sentResponds.itemSnapshotList.items)
+    })
+
+    LaunchedEffect(key1 = receivedResponds.itemSnapshotList.items, block = {
+        vm.setLocalReceivedResponds(sentResponds.itemSnapshotList.items)
+    })
+
     Use<RespondsBsViewModel>(LoadingTrait) {
         RespondsList(
-            type = meetId?.let { MEET }
+            state = RespondsListState(type = meetId?.let { MEET }
                 ?: if(full) FULL else SHORT,
-            responds = respondsList,
-            sentResponds = sentResponds,
-            receivedResponds = receivedResponds,
-            respondsStates = groupsStates,
-            photoViewState = photoViewState,
-            viewerImages = viewerImages,
-            viewerSelectImage = viewerSelectImage,
-            scope = scope,
+                responds = respondsList,
+                localResponds = localResponds.value,
+                sentResponds = sentResponds,
+                localSentResponds = localSentResponds.value,
+                receivedResponds = receivedResponds,
+                localReceivedResponds = localReceivedResponds.value,
+                respondsStates = groupsStates,
+                photoViewState = photoViewState,
+                viewerImages = viewerImages,
+                viewerSelectImage = viewerSelectImage,
+                scope = scope,
+            ),
             callback = object: RespondsListCallback {
                 
                 override fun onPhotoViewDismiss(state: Boolean) {
@@ -83,8 +105,14 @@ fun RespondsBs(
                 
                 override fun onCancelClick(respondId: String) {
                     scope.launch {
-                        if(tabs == 0) vm.cancelRespond(respondId)
-                        else vm.deleteRespond(respondId)
+                        if(tabs == 0) {
+                            vm.cancelRespond(respondId)
+                            sentResponds.refresh()
+                        }
+                        else {
+                            vm.deleteRespond(respondId)
+                            receivedResponds.refresh()
+                        }
                         vm.updateMeetId(meetId)
                     }
                 }
@@ -92,7 +120,9 @@ fun RespondsBs(
                 override fun onAcceptClick(respondId: String) {
                     scope.launch {
                         vm.acceptRespond(respondId)
+                        receivedResponds.refresh()
                         vm.updateMeetId(meetId)
+                        vm.selectTab(1)
                     }
                 }
                 

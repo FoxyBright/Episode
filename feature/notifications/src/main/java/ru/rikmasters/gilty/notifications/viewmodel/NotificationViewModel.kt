@@ -108,10 +108,8 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
     val participantsStates =
         _participantsStates.asStateFlow()
 
-    // private var currentIndexToSplit = 0
-
     val splitMonthNotifications =
-        MutableStateFlow(emptyList<Triple<Int, Boolean, NotificationModel>>())
+        MutableStateFlow(emptyList<Triple<Int, Boolean, NotificationModel>>()) // Time_Period, Is_Deleted, Notification
 
     suspend fun getUnread() {
         notificationManger.markNotifyAsRead(

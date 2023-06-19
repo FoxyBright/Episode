@@ -39,20 +39,26 @@ import ru.rikmasters.gilty.shared.shared.*
 
 enum class RespondsBsType { MEET, FULL, SHORT }
 
+data class RespondsListState(
+    val type: RespondsBsType,
+    val responds: LazyPagingItems<RespondWithPhotos>,
+    val localResponds: List<Pair<Boolean, RespondWithPhotos>>,
+    val sentResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    val localSentResponds: List<Pair<Boolean, MeetWithRespondsModelWithPhotos>>,
+    val receivedResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    val localReceivedResponds: List<Pair<Boolean, MeetWithRespondsModelWithPhotos>>,
+    val respondsStates: List<Int>,
+    val photoViewState: Boolean = false,
+    val viewerImages: List<AvatarModel?> = emptyList(),
+    val viewerSelectImage: AvatarModel? = null,
+    val viewerMenuState: Boolean = false,
+    val scope: CoroutineScope,
+)
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RespondsList(
-    type: RespondsBsType,
-    responds: LazyPagingItems<RespondWithPhotos>,
-    sentResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
-    receivedResponds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
-    respondsStates: List<Int>,
     modifier: Modifier = Modifier,
-    photoViewState: Boolean = false,
-    viewerImages: List<AvatarModel?> = emptyList(),
-    viewerSelectImage: AvatarModel? = null,
-    viewerMenuState: Boolean = false,
-    scope: CoroutineScope,
+    state: RespondsListState,
     callback: RespondsListCallback? = null,
 ) {
     val pagerState: PagerState =
@@ -61,32 +67,33 @@ fun RespondsList(
         @Composable { tabPositions: List<TabPosition> ->
             TabIndicator(tabPositions, pagerState)
         }
+
     LaunchedEffect(pagerState.currentPage) {
         callback?.onTabChange(pagerState.currentPage)
     }
-    
+
     Column(
-        modifier
+        modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
         TopBar(
-            type,
+            type = state.type,
             Modifier.padding(
                 top = 28.dp,
-                bottom = if(type == FULL) {
+                bottom = if (state.type == FULL) {
                     16.dp
                 } else 8.dp
             )
         ) { callback?.onBack() }
-        when(type) {
+        when (state.type) {
             MEET -> MeetResponds(
-                Modifier.padding(vertical = 8.dp),
-                responds,
-                callback
+                modifier = Modifier.padding(vertical = 8.dp),
+                responds = state.responds,
+                callback = callback
             )
-            
+
             FULL -> {
                 GiltyPagerTab(
                     modifier = Modifier
@@ -100,45 +107,46 @@ fun RespondsList(
                         stringResource(R.string.profile_received_responds)
                     ),
                     onTabClick = { index ->
-                        scope.launch { pagerState.animateScrollToPage(index) }
-                        
+                        state.scope.launch { pagerState.animateScrollToPage(index) }
                     }
                 )
-                
+
                 HorizontalPager(
                     state = pagerState,
                     count = 2,
                     itemSpacing = 12.dp,
                 ) { selectTab: Int ->
                     Box(modifier = Modifier.fillMaxSize()) {
-                        if(selectTab == 0) {
+                        if (selectTab == 0)
                             SentResponds(
-                                Modifier.padding(vertical = 8.dp),
-                                sentResponds,
-                                callback
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                responds = state.sentResponds,
+                                localResponds = state.localSentResponds,
+                                callback = callback
                             )
-                        } else ReceivedResponds(
-                            Modifier.padding(vertical = 8.dp),
-                            receivedResponds,
-                            respondsStates,
-                            callback
-                        )
+                        else
+                            ReceivedResponds(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                responds = state.receivedResponds,
+                                respondsStates = state.respondsStates,
+                                callback = callback
+                            )
                     }
                 }
             }
-            
+
             SHORT -> ReceivedResponds(
-                Modifier.padding(vertical = 8.dp),
-                receivedResponds,
-                respondsStates,
-                callback
+               modifier = Modifier.padding(vertical = 8.dp),
+                responds = state.receivedResponds,
+                respondsStates = state.respondsStates,
+                callback = callback
             )
         }
     }
-    if(photoViewState) PhotoView(
-        images = viewerImages,
-        selected = viewerSelectImage,
-        menuState = viewerMenuState,
+    if (state.photoViewState) PhotoView(
+        images = state.viewerImages,
+        selected = state.viewerSelectImage,
+        menuState = state.viewerMenuState,
         type = LOAD,
         onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
         onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
@@ -150,6 +158,7 @@ fun RespondsList(
 private fun SentResponds(
     modifier: Modifier = Modifier,
     responds: LazyPagingItems<MeetWithRespondsModelWithPhotos>,
+    localResponds: List<Pair<Boolean, MeetWithRespondsModelWithPhotos>>,
     callback: RespondsListCallback? = null,
 ) {
     when {
@@ -158,11 +167,41 @@ private fun SentResponds(
         responds.loadState.refresh is LoadState.Loading -> {
             PagingLoader(responds.loadState)
         }
-        
+
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if(itemCount != 0) {
+                if (itemCount != 0) {
+                    /*itemsIndexed(items = responds, key = {index, item -> item.id}){ index, item ->
+                        if(index < localResponds.size && !localResponds[index].first){
+                            sentRespond(
+                                meetId = it.id,
+                                name = it.tags.joinToString(
+                                    separator = ", "
+                                ) { t -> t.title },
+                                organizer = it.organizer,
+                                responds = it.responds,
+                                modifier = Modifier
+                                    .padding(bottom = 12.dp),
+                                callback = callback
+                            )
+                        }
+                    }*/
+                    /*localResponds.forEach { item: Pair<Boolean, MeetWithRespondsModelWithPhotos> ->
+
+                        sentRespond(
+                            meetId = it.id,
+                            name = it.tags.joinToString(
+                                separator = ", "
+                            ) { t -> t.title },
+                            organizer = it.organizer,
+                            responds = it.responds,
+                            modifier = Modifier
+                                .padding(bottom = 12.dp),
+                            callback = callback
+                        )
+                    }*/
+                    //Original
                     responds.itemSnapshotList.items.forEach {
                         sentRespond(
                             meetId = it.id,
@@ -176,7 +215,8 @@ private fun SentResponds(
                             callback = callback
                         )
                     }
-                    if(responds.loadState.append is LoadState.Loading) {
+
+                    if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
@@ -189,7 +229,7 @@ private fun SentResponds(
                                 )
                         )
                     }
-                } else if(responds.loadState.refresh is LoadState.NotLoading) {
+                } else if (responds.loadState.refresh is LoadState.NotLoading) {
                     item {
                         Box(modifier = Modifier.fillParentMaxSize()) {
                             EmptyScreen(
@@ -218,11 +258,11 @@ private fun MeetResponds(
         responds.loadState.refresh is LoadState.Loading -> {
             PagingLoader(responds.loadState)
         }
-        
+
         else -> {
             LazyColumn(modifier.fillMaxWidth()) {
                 val itemCount = responds.itemCount
-                if(itemCount != 0) {
+                if (itemCount != 0) {
                     items(responds) {
                         it?.let {
                             ReceivedRespond(
@@ -233,7 +273,7 @@ private fun MeetResponds(
                             )
                         }
                     }
-                    if(responds.loadState.append is LoadState.Loading) {
+                    if (responds.loadState.append is LoadState.Loading) {
                         item { PagingLoader(responds.loadState) }
                     }
                     item {
@@ -247,7 +287,7 @@ private fun MeetResponds(
                         )
                     }
                 } else {
-                    if(responds.loadState.refresh is LoadState.NotLoading) {
+                    if (responds.loadState.refresh is LoadState.NotLoading) {
                         item {
                             Box(modifier = Modifier.fillParentMaxSize()) {
                                 EmptyScreen(
@@ -273,9 +313,9 @@ private fun ReceivedResponds(
     callback: RespondsListCallback? = null,
 ) {
     RespondsListContent(
-        RespondsListState(responds, respondsStates),
-        modifier,
-        callback
+        state = RespondsListState(responds, respondsStates),
+        modifier = modifier,
+        callback = callback
     )
 }
 
@@ -295,7 +335,7 @@ private fun TopBar(
             Start,
             CenterVertically
         ) {
-            if(type == MEET) IconButton(
+            if (type == MEET) IconButton(
                 { onBack() },
                 Modifier.padding(end = 16.dp)
             ) {

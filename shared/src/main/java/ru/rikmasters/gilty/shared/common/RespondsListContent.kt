@@ -89,17 +89,17 @@ fun RespondsListContent(
                     itemsIndexed(state.responds) { index, respond: MeetWithRespondsModelWithPhotos? ->
                         respond?.let {
                             GroupList(
-                                index,
-                                respond.tags.first().title,
-                                respond.responds,
-                                Modifier,
-                                !(state.groupStates.contains(index)),
-                                callback
+                                index = index,
+                                title = respond.tags.first().title,
+                                responds = respond.responds,
+                                modifier = Modifier,
+                                state = !(state.groupStates.contains(index)),
+                                callback = callback
                             )
                         }
                     }
                     if(state.responds.loadState.append is LoadState.Loading) {
-                        item { PagingLoader(state.responds.loadState) }
+                        item { PagingLoader(state = state.responds.loadState) }
                     }
                     item {
                         Spacer(
@@ -116,10 +116,10 @@ fun RespondsListContent(
                         item {
                             Box(modifier = Modifier.fillParentMaxSize()) {
                                 EmptyScreen(
-                                    stringResource(
+                                    text = stringResource(
                                         R.string.profile_hasnt_received_responds
                                     ),
-                                    R.drawable.broken_heart
+                                    icon = R.drawable.broken_heart
                                 )
                             }
                         }

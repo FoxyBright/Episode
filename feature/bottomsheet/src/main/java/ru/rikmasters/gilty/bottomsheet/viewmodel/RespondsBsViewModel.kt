@@ -10,6 +10,8 @@ import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.RECEIVED
 import ru.rikmasters.gilty.shared.model.enumeration.RespondType.SENT
+import ru.rikmasters.gilty.shared.model.notification.MeetWithRespondsModelWithPhotos
+import ru.rikmasters.gilty.shared.model.notification.RespondWithPhotos
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import java.util.*
 
@@ -44,7 +46,23 @@ class RespondsBsViewModel: ViewModel() {
             }
         }
     }
-    
+
+    val localSentResponds =
+        MutableStateFlow(emptyList<Pair<Boolean, MeetWithRespondsModelWithPhotos>>()) // Is_Deleted, RespondWithPhotos
+
+    suspend fun setLocalSentResponds(responds:List<MeetWithRespondsModelWithPhotos>) {
+        var currentIndex = localSentResponds.value.size
+        if (responds.size < currentIndex) {
+            currentIndex = 0
+            localSentResponds.emit(emptyList())
+        }
+        val newList = localSentResponds.value.toMutableList()
+        for(current in  currentIndex until responds.size){
+            newList.add(false to responds[current])
+        }
+        localSentResponds.emit(newList)
+    }
+
     val receivedResponds by lazy {
         profileManager.getResponds(
             type = RECEIVED
@@ -57,7 +75,22 @@ class RespondsBsViewModel: ViewModel() {
             }
         }
     }
-    
+    val localReceivedResponds =
+        MutableStateFlow(emptyList<Pair<Boolean, MeetWithRespondsModelWithPhotos>>()) // Is_Deleted, RespondWithPhotos
+
+    suspend fun setLocalReceivedResponds(responds:List<MeetWithRespondsModelWithPhotos>) {
+        var currentIndex = localReceivedResponds.value.size
+        if (responds.size < currentIndex) {
+            currentIndex = 0
+            localReceivedResponds.emit(emptyList())
+        }
+        val newList = localReceivedResponds.value.toMutableList()
+        for(current in  currentIndex until responds.size){
+            newList.add(false to responds[current])
+        }
+        localReceivedResponds.emit(newList)
+    }
+
     // Для случаев когда есть meetId, пагинируются отклики и фото внутри них
     @OptIn(ExperimentalCoroutinesApi::class)
     val responds by lazy {
@@ -74,7 +107,23 @@ class RespondsBsViewModel: ViewModel() {
             } ?: return@flatMapLatest flow { }
         }
     }
-    
+    val localResponds =
+        MutableStateFlow(emptyList<Pair<Boolean, RespondWithPhotos>>()) // Is_Deleted, RespondWithPhotos
+
+    suspend fun setLocalResponds(responds:List<RespondWithPhotos>) {
+        var currentIndex = localResponds.value.size
+        if (responds.size < currentIndex) {
+            currentIndex = 0
+            localResponds.emit(emptyList())
+        }
+        val newList = localResponds.value.toMutableList()
+        for(current in  currentIndex until responds.size){
+            newList.add(false to responds[current])
+        }
+        localResponds.emit(newList)
+    }
+
+
     private val _viewerState =
         MutableStateFlow(false)
     val viewerState =

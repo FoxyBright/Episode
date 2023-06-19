@@ -26,12 +26,13 @@ import ru.rikmasters.gilty.shared.common.extentions.Permissions.Companion.openNo
 
 @Composable
 fun SettingsScreen(vm: SettingsViewModel) {
-    
+
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
+
     val context = LocalContext.current
     val nav = get<NavState>()
-    
+
     val interests by vm.selected.collectAsState()
     val orientation by vm.orientation.collectAsState()
     val orientationList by vm.orientations.collectAsState()
@@ -41,16 +42,16 @@ fun SettingsScreen(vm: SettingsViewModel) {
     val gender by vm.gender.collectAsState()
     val phone by vm.phone.collectAsState()
     val age by vm.age.collectAsState()
-    var sleep by remember{ mutableStateOf(false) } // TODO Костыль для обновления баблов
+    var sleep by remember { mutableStateOf(false) } // TODO Костыль для обновления баблов
 
     val nm = context.getSystemService(
         FirebaseMessagingService.NOTIFICATION_SERVICE
     ) as NotificationManager
-    
+
     fun checkNotification() {
         scope.launch { vm.setNotification(nm.areNotificationsEnabled()) }
     }
-    
+
     val launcher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -58,7 +59,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
             openNotificationSettings(context)
             checkNotification()
         }
-    
+
     LaunchedEffect(Unit) {
         checkNotification()
         vm.getUserData()
@@ -66,21 +67,21 @@ fun SettingsScreen(vm: SettingsViewModel) {
         vm.getInterest()
         sleep = true
     }
-    
+
     Use<SettingsViewModel>(LoadingTrait) {
         SettingsContent(
             SettingsState(
                 gender, age, orientation,
                 phone, notification,
                 exitAlert, deleteAlert, interests, sleep
-            ), Modifier, object: SettingsCallback {
-                
+            ), Modifier, object : SettingsCallback {
+
                 override fun onGenderClick() {
                     vm.scope.openBS<GenderBsViewModel>(scope) {
                         GenderBs(it)
                     }
                 }
-                
+
                 override fun onOrientationClick() {
                     vm.scope.openBS<OrientationBsViewModel>(scope) {
                         OrientationsBs(
@@ -90,13 +91,13 @@ fun SettingsScreen(vm: SettingsViewModel) {
                         )
                     }
                 }
-                
+
                 override fun onAgeClick() {
                     vm.scope.openBS<AgeBsViewModel>(scope) {
                         AgeBs(it)
                     }
                 }
-                
+
                 override fun onAboutAppClick() {
                     scope.launch {
                         asm.bottomSheet.expand {
@@ -104,13 +105,13 @@ fun SettingsScreen(vm: SettingsViewModel) {
                         }
                     }
                 }
-                
+
                 override fun onIconAppClick() {
                     vm.scope.openBS<IconsBsViewModel>(scope) {
                         IconsBs(it)
                     }
                 }
-                
+
                 override fun onExitSuccess() {
                     scope.launch {
                         vm.exitAlertDismiss(false)
@@ -119,7 +120,7 @@ fun SettingsScreen(vm: SettingsViewModel) {
                         nav.clearNavigationOptions()
                     }
                 }
-                
+
                 override fun onDeleteSuccess() {
                     scope.launch {
                         vm.deleteAlertDismiss(false)
@@ -127,35 +128,35 @@ fun SettingsScreen(vm: SettingsViewModel) {
                         nav.clearStackNavigation("login")
                     }
                 }
-                
+
                 override fun onNotificationChange(it: Boolean) {
                     launcher.launch(openNotificationSettings(context))
                 }
-                
+
                 override fun onDeleteDismiss() {
                     scope.launch { vm.deleteAlertDismiss(false) }
                 }
-                
+
                 override fun onDelete() {
                     scope.launch { vm.deleteAlertDismiss(true) }
                 }
-                
+
                 override fun onExitDismiss() {
                     scope.launch { vm.exitAlertDismiss(false) }
                 }
-                
+
                 override fun onExit() {
                     scope.launch { vm.exitAlertDismiss(true) }
                 }
-                
+
                 override fun onPhoneClick() {
                     // клик по телефону
                 }
-                
+
                 override fun editCategories() {
                     nav.navigate("categories")
                 }
-                
+
                 override fun onBack() {
                     nav.navigationBack()
                 }

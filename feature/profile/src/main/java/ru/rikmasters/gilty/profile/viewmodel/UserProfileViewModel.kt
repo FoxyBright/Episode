@@ -39,8 +39,8 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     private val _menu = MutableStateFlow(false)
     val menu = _menu.asStateFlow()
 
-    private val _history = MutableStateFlow(false)
-    val history = _history.asStateFlow()
+    private val _historyState = MutableStateFlow(false)
+    val historyState = _historyState.asStateFlow()
 
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
@@ -263,7 +263,7 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     }
 
     suspend fun showHistory() {
-        _history.emit(!history.value)
+        _historyState.emit(!historyState.value)
     }
 
     suspend fun menuDispose(state: Boolean) {

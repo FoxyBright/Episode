@@ -56,7 +56,7 @@ fun UserProfileScreen(
     val profile by vm.profile.collectAsState()
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
-    val history by vm.history.collectAsState()
+    val history by vm.historyState.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
     
@@ -93,8 +93,8 @@ fun UserProfileScreen(
     }
     
     LaunchedEffect(Unit) {
-        //vm.setUserDate(update)
         vm.setUserDate(true)
+        vm.forceRefresh()
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }
         context.listenPreference("unread_notification", 0)

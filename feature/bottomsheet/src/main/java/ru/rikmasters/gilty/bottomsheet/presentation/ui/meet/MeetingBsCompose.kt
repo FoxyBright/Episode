@@ -456,7 +456,7 @@ private fun TopBar(
                 text = meet.tags
                     .joinToString(", ")
                     { it.title },
-                modifier = Modifier.padding(end = 9.dp).alignByBaseline().basicMarquee(),
+                modifier = Modifier.padding(end = 9.dp).basicMarquee(),
                 color = colorScheme.tertiary,
                 style = typography.labelLarge,
                 overflow = Ellipsis,
@@ -474,7 +474,7 @@ private fun TopBar(
                         else -> R.string.empty_String
                     }
                 ),
-                modifier = Modifier.alignByBaseline(),
+                modifier = Modifier,
                 style = typography.labelSmall,
                 overflow = Ellipsis,
                 maxLines = 1

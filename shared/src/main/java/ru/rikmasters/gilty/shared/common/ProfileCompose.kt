@@ -26,7 +26,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -163,9 +162,11 @@ fun Profile(
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
     Column(modifier) {
+
         if (hasHeader) {
             ProfileHeader(state, callback)
         }
+
         Row(Modifier.padding(horizontal = 16.dp)) {
             ProfileImageContent(
                 modifier = Modifier.weight(1f),
@@ -283,8 +284,7 @@ fun ProfileHeader(state: ProfileState, callback: ProfileCallback?) {
                 it
             )
         }
-        if (state.errorText.isNotEmpty())
-            ErrorLabel(state.errorText)
+        ErrorLabel(state.errorText.ifEmpty { " " })
     }
 }
 
@@ -313,7 +313,7 @@ private fun AboutMe(
 private fun ErrorLabel(errorText: String) {
     Text(
         text = errorText,
-        modifier = Modifier.offset(y = -(10).dp, x = 16.dp),
+        modifier = Modifier.offset(y = -(10).dp, x = 16.dp).height(10.dp),
         color = colorScheme.primary,
         style = typography.titleSmall.copy(
             fontSize = 10.dp.toSp()
@@ -373,6 +373,7 @@ private fun TopBar(
                 keyboardType = Text,
                 capitalization = Sentences
             ),
+            cursorBrush = SolidColor(colorScheme.primary),
             interactionSource = interactionSource,
             singleLine = true,
             decorationBox = @Composable { innerTextField ->
@@ -391,8 +392,8 @@ private fun TopBar(
                                 color = colorScheme.onTertiary,
                                 style = typography.headlineLarge.copy(
                                     fontSize = when (profileType) {
-                                        CREATE -> 23
-                                        USERPROFILE -> 28
+                                        CREATE -> 22 // 23
+                                        USERPROFILE -> 22 // 28
                                         else -> 20
                                     }.dp.toSp()
                                 ),
@@ -410,6 +411,7 @@ private fun TopBar(
                     enabled = true,
                     interactionSource = interactionSource,
                     colors = colors,
+
                 )
             }
         )
