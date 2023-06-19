@@ -25,6 +25,7 @@ import ru.rikmasters.gilty.translation.shared.components.ProfileAvatar
 import ru.rikmasters.gilty.translation.shared.components.TranslationResumedSnackbar
 import ru.rikmasters.gilty.translation.shared.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.shared.utils.animatePlacement
+import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
 
 @Composable
@@ -37,7 +38,8 @@ fun OnTopSnackbarsPlacehodlers(
     microphoneState: Boolean,
     meeting: FullMeetingModel?,
     snackbarState: StreamerSnackbarState?,
-    configuration: Configuration
+    configuration: Configuration,
+    hudState: StreamerHUD?
 ) {
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         Box(
@@ -59,7 +61,7 @@ fun OnTopSnackbarsPlacehodlers(
                 }
             }
             AnimatedVisibility(
-                visible = isShowSnackbar,
+                visible = isShowSnackbar && hudState == null,
                 modifier = Modifier.align(Alignment.Center),
                 exit = fadeOut(),
                 enter = fadeIn()

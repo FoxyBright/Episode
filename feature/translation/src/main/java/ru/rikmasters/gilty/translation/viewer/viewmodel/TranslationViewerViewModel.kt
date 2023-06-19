@@ -121,7 +121,6 @@ class TranslationViewerViewModel : ViewModel() {
             null -> {
                 hud == null
             }
-
             else -> false
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
@@ -306,10 +305,11 @@ class TranslationViewerViewModel : ViewModel() {
                             }
                         } else {
                             coroutineScope.launch {
+                                _customHUDState.value = null
+                                _completedAt.value = socketEvent.completedAt
                                 _timerHighlighted.value = true
                                 delay(2000)
                                 _timerHighlighted.value = false
-                                _completedAt.value = socketEvent.completedAt
                             }
                         }
                     }

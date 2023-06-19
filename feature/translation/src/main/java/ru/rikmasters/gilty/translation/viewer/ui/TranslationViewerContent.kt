@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.webrtc.EglBase
 import org.webrtc.VideoTrack
@@ -205,9 +207,10 @@ fun KickedPortrait(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_cry),
-                contentDescription = ""
+                contentDescription = "",
+                modifier = Modifier.size(48.dp)
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
@@ -215,7 +218,8 @@ fun KickedPortrait(
                 ),
                 text = stringResource(id = R.string.translations_kicked),
                 style = MaterialTheme.typography.bodyMedium,
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(13.dp))
             Text(
@@ -227,7 +231,8 @@ fun KickedPortrait(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal
                 ),
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
         }
         Column(
@@ -263,9 +268,10 @@ fun CompletedPortrait(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_admiration),
-                contentDescription = ""
+                contentDescription = "",
+                modifier = Modifier.size(48.dp)
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
@@ -273,7 +279,8 @@ fun CompletedPortrait(
                 ),
                 text = stringResource(id = R.string.translations_completed),
                 style = MaterialTheme.typography.bodyMedium,
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(13.dp))
             Text(
@@ -285,7 +292,8 @@ fun CompletedPortrait(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal
                 ),
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
         }
         Column(

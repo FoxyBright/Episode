@@ -26,6 +26,7 @@ import ru.rikmasters.gilty.translation.shared.components.TranslationExtendedSnac
 import ru.rikmasters.gilty.translation.shared.components.TranslationResumedSnackbar
 import ru.rikmasters.gilty.translation.shared.components.WeakConnectionSnackbar
 import ru.rikmasters.gilty.translation.shared.utils.animatePlacement
+import ru.rikmasters.gilty.translation.viewer.model.ViewerHUD
 import ru.rikmasters.gilty.translation.viewer.model.ViewerSnackbarState
 
 @Composable
@@ -38,7 +39,8 @@ fun OnTopSnackbarsPlacehodlers(
     microphoneState: Boolean,
     meeting: FullMeetingModel?,
     snackbarState: ViewerSnackbarState?,
-    configuration: Configuration
+    configuration: Configuration,
+    hudState: ViewerHUD?
 ) {
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         Box(
@@ -60,7 +62,7 @@ fun OnTopSnackbarsPlacehodlers(
                 }
             }
             AnimatedVisibility(
-                visible = isShowSnackbar,
+                visible = isShowSnackbar && hudState == null,
                 modifier = Modifier.align(Alignment.Center),
                 exit = fadeOut(),
                 enter = fadeIn()

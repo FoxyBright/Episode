@@ -343,7 +343,6 @@ fun TranslationViewerScreen(
                     ViewerHUD.RECONNECT_FAILED -> {
                         NoConnection(
                             onReconnectCLicked = {
-                                Log.d("TEST","Clicked")
                                 webRtcClient.retry = 0
                                 vm.onEvent(TranslationViewerEvent.Reconnect)
                             },
@@ -385,7 +384,8 @@ fun TranslationViewerScreen(
                 microphoneState = microphoneState,
                 meeting = meeting,
                 snackbarState = snackbarState,
-                configuration = configuration
+                configuration = configuration,
+                hudState = hudState
             )
 
             /**

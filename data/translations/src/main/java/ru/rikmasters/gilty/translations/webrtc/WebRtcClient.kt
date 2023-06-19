@@ -206,14 +206,12 @@ class WebRtcClient(
                                 _status.emit(WebRtcStatus.connect)
                             }
                         }
-
                         RTCIceConnectionState.disconnected,
                         RTCIceConnectionState.failed -> {
                             sessionManagerScope.launch {
                                 _status.emit(WebRtcStatus.failed)
                             }
                         }
-
                         else -> {}
                     }
                 },

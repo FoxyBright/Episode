@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translation.streamer.ui
 
 import android.content.res.Configuration
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -241,6 +242,7 @@ fun TranslationStreamerScreen(
                     }
                     is TranslationOneTimeEvent.StartStreaming -> {
                         if (surfaceState == SurfaceState.CHANGED) {
+                            restartPreview(camera, facing, context)
                             startBroadCast(
                                 rtmpUrl = event.url,
                                 camera = camera,
@@ -290,8 +292,8 @@ fun TranslationStreamerScreen(
                 width: Int,
                 height: Int
             ) {
-                vm.onEvent(TranslationEvent.ChangeSurfaceState(SurfaceState.CHANGED))
                 restartPreview(camera, facing, context)
+                vm.onEvent(TranslationEvent.ChangeSurfaceState(SurfaceState.CHANGED))
             }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -508,7 +510,8 @@ fun TranslationStreamerScreen(
                 microphoneState = microphoneState,
                 meeting = meeting,
                 snackbarState = snackbarState,
-                configuration = configuration
+                configuration = configuration,
+                hudState = hudState
             )
 
 

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.streamer.viewmodel
 
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -72,15 +73,19 @@ class TranslationStreamerViewModel : ViewModel() {
     private val _remainTime = MutableStateFlow("")
     val remainTime = _remainTime.asStateFlow()
 
+    private val updTr = MutableStateFlow(true)
+
     private val _translation = MutableStateFlow<TranslationInfoModel?>(null)
     val translation = _translation.onEach {
         it?.let { translation ->
-            startDurationTimer()
-            _translationStatus.value = translation.status
-            _microphone.value = translation.microphone
-            _camera.value = translation.camera
-            it.rtmp?.let { url ->
-                _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(url))
+            if (updTr.value) {
+                startDurationTimer()
+                _translationStatus.value = translation.status
+                _microphone.value = translation.microphone
+                _camera.value = translation.camera
+                it.rtmp?.let { url ->
+                    _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(url))
+                }
             }
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
@@ -244,6 +249,7 @@ class TranslationStreamerViewModel : ViewModel() {
                     }
 
                     is TranslationCallbackEvents.TranslationExtended -> {
+                        updTr.value = false
                         if (_customHUDState.value != StreamerCustomHUD.EXPIRED) {
                             coroutineScope.launch {
                                 _additionalTime.value = getAdditionalTimeString(socketEvent.duration)
@@ -269,6 +275,7 @@ class TranslationStreamerViewModel : ViewModel() {
                                 _timerHighlighted.value = false
                             }
                         }
+                        updTr.value = true
                     }
 
                     is TranslationCallbackEvents.MembersCountChanged -> {
@@ -398,6 +405,7 @@ class TranslationStreamerViewModel : ViewModel() {
             }
 
             is TranslationEvent.ProcessRTMPStatus -> {
+                Log.d("TEST","PROCESS STATUS ${event.status}")
                 when (event.status) {
                     RTMPStatus.CONNECTED -> {
                         _hudState.value = null

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
@@ -96,6 +98,9 @@ fun TranslationStreamerContent(
                     modifier = Modifier.matchParentSize()
                 )
             }
+            if (customHUDState == StreamerCustomHUD.EXPIRED) {
+                ExpiredPortrait(onTimerClicked = onTimerClicked)
+            }
             if (customHUDState == null) {
                 if (isPortrait) {
                     OnStreamTopBarPortrait(
@@ -129,9 +134,6 @@ fun TranslationStreamerContent(
                     )
                 }
 
-            }
-            if (customHUDState == StreamerCustomHUD.EXPIRED) {
-                ExpiredPortrait(onToChatPressed = onToChatPressed)
             }
             if (customHUDState == StreamerCustomHUD.COMPLETED) {
                 CompletedPortrait(onToChatPressed = onToChatPressed)
@@ -169,9 +171,10 @@ fun CompletedPortrait(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_admiration),
-                contentDescription = ""
+                contentDescription = "",
+                modifier = Modifier.size(48.dp)
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
@@ -179,7 +182,8 @@ fun CompletedPortrait(
                 ),
                 text = stringResource(id = R.string.translations_completed),
                 style = MaterialTheme.typography.bodyMedium,
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(13.dp))
             Text(
@@ -191,7 +195,8 @@ fun CompletedPortrait(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal
                 ),
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
         }
         Column(
@@ -260,7 +265,7 @@ fun BottomBarPortrait(
 
 @Composable
 fun ExpiredPortrait(
-    onToChatPressed: () -> Unit
+    onTimerClicked: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -276,9 +281,10 @@ fun ExpiredPortrait(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_bad),
-                contentDescription = ""
+                contentDescription = "",
+                modifier = Modifier.size(48.dp)
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
@@ -286,7 +292,8 @@ fun ExpiredPortrait(
                 ),
                 text = stringResource(id = R.string.translations_expired_time),
                 style = MaterialTheme.typography.bodyMedium,
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(13.dp))
             Text(
@@ -298,7 +305,8 @@ fun ExpiredPortrait(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal
                 ),
-                color = ThemeExtra.colors.white
+                color = ThemeExtra.colors.white,
+                textAlign = TextAlign.Center
             )
         }
         Column(
@@ -309,7 +317,7 @@ fun ExpiredPortrait(
             GradientButton(
                 text = stringResource(id = R.string.translations_expired_button_turn_on),
                 online = true,
-                onClick = onToChatPressed
+                onClick = onTimerClicked
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
