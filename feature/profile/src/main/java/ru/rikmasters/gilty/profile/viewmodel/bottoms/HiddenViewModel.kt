@@ -68,7 +68,6 @@ class HiddenViewModel : ViewModel() {
         (fromOr.index - 1).let { from ->
             (toOr.index - 1).let { to ->
                 if (_photos.value.size > from && _photos.value.size > to) {
-                  //  Log.d("Hello Before List", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())
                     val fromId = _photos.value[from].id
                     val newList = _photos.value.toMutableList().apply {
                         add(to, removeAt(from))
@@ -83,9 +82,6 @@ class HiddenViewModel : ViewModel() {
                     }
                     newLastChanged = newLastChanged.copy(second = to + 1)
                     _lastPositionsChanged.emit(newLastChanged)
-                    /*Log.d("Hello", "${newLastChanged.first} ${newLastChanged.second} Poss")
-                    Log.d("Hello Before After", _photos.value.mapIndexed { index, avatarModel ->  avatarModel.id to index  }.toString())
-*/
                 }
             }
         }

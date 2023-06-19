@@ -17,11 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState.Error
 import androidx.paging.LoadState.Loading
 import androidx.paging.LoadState.NotLoading
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
 import ru.rikmasters.gilty.notifications.presentation.ui.notification.NotificationPeriodNames.Companion.getPeriodName
@@ -35,7 +37,6 @@ import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
-import ru.rikmasters.gilty.shared.model.enumeration.NotificationType.ADMIN_NOTIFICATION
 import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.meeting.DemoUserModelList
@@ -120,7 +121,7 @@ private fun NotificationsBlurPreview() {
 
 data class NotificationsState(
     val notifications: LazyPagingItems<NotificationModel>,
-    val splitNotifications: List<Pair<Int, NotificationModel>>,
+    val splitNotifications: List<Triple<Int, Boolean, NotificationModel>>,
     val lastRespond: LastRespond,
     val navBar: List<NavIconState>,
     val blur: Boolean,
@@ -133,14 +134,14 @@ data class NotificationsState(
 )
 
 interface NotificationsCallback {
-    
+
     fun onSwiped(notification: NotificationModel)
     fun onMeetClick(meet: MeetingModel?)
     fun onUserClick(
         user: UserModel?,
         meet: MeetingModel? = null,
     )
-    
+
     fun onRespondsClick()
     fun onBlurClick()
     fun onParticipantClick(index: Int)
@@ -197,12 +198,13 @@ fun NotificationsContent(
             }
         }
     }
-    
+
     state.activeNotification?.let {
-        if(state.blur) BackBlur(
+        if (state.blur) BackBlur(
             Modifier.clickable {
                 callback?.onBlurClick()
-            }, radius = 25,
+            },
+            radius = 25,
         ) {
             ObserveNotification(
                 state = ObserveNotificationState(
@@ -235,7 +237,7 @@ private fun LazyListScope.emptyNotification(
         ) {
             Image(
                 painter = painterResource(
-                    if(isSystemInDarkTheme())
+                    if (isSystemInDarkTheme())
                         R.drawable.notify_dog_dark
                     else R.drawable.notify_dog_light
                 ),
@@ -289,14 +291,14 @@ private fun LazyListScope.content(
     load: CombinedLoadStates,
     hasResponds: Boolean,
     notifications: LazyPagingItems<NotificationModel>,
-    splitNotifications: List<Pair<Int, NotificationModel>>,
+    splitNotifications: List<Triple<Int, Boolean, NotificationModel>>,
     state: NotificationsState,
     defEmoji: List<EmojiModel>,
     callback: NotificationsCallback?,
 ) {
-    if(load.refresh is Loading) loader(load)
-    if(hasResponds) responds(state.lastRespond, callback)
-    if(
+    if (load.refresh is Loading) loader(load)
+    if (hasResponds) responds(state.lastRespond, callback)
+    if (
         notifications.itemCount > 0
         && splitNotifications.isNotEmpty()
     ) {
@@ -307,11 +309,11 @@ private fun LazyListScope.content(
             hasResponds = hasResponds,
             callback = callback
         )
-        if(load.append is Loading
+        if (load.append is Loading
             || splitNotifications.size
             != state.notifications.itemCount
         ) loader(load)
-    } else if(load.refresh is NotLoading)
+    } else if (load.refresh is NotLoading)
         emptyNotification()
 }
 
@@ -319,20 +321,82 @@ private fun LazyListScope.content(
 private fun LazyListScope.notificationsList(
     state: NotificationsState,
     defEmoji: List<EmojiModel>,
-    splitNotifications: List<Pair<Int, NotificationModel>>,
+    splitNotifications: List<Triple<Int, Boolean, NotificationModel>>,
     hasResponds: Boolean,
     callback: NotificationsCallback?,
 ) {
     val items = state.notifications
-    items(
-        count = items.itemCount,
-        key = { items.peek(it)?.id ?: it },
-        contentType = {
-            items.peek(it)?.type
-                ?: ADMIN_NOTIFICATION
+    /*itemsIndexed(
+        items = items,
+        key = { index, item ->
+             item.id
+              },
+        *//*contentType = { index, item ->
+            (item)?.type ?: ADMIN_NOTIFICATION
+
+        }*//*
+
+    ) { index, item ->
+        item?.let {
+            ElementNot(
+                index = doesPrevExist(index, splitNotifications).toInt(),
+                size = getSize(
+                    prev = doesPrevExist(index, splitNotifications),
+                    next = doesNextExist(index, splitNotifications),
+                ),
+                item = item,
+                ratings = defEmoji,
+                modifier = Modifier.animateItemPlacement(),
+                callback = callback
+            )
         }
-    ) { index ->
-        if(splitNotifications.size > index) {
+    }*/
+    itemsIndexed(
+        items = items,
+        key = { index, item ->
+            index
+     /*       if (splitNotifications.size > index) {
+                val splitNotItem = splitNotifications[index]
+                if (!splitNotItem.second) {
+                    item.id
+                } else null
+            } else null*/
+        },
+        /*contentType = { index, item ->
+            (item)?.type ?: ADMIN_NOTIFICATION
+
+        }*/
+
+    ) { index, item ->
+        if (splitNotifications.size > index) {
+            val splitNotItem = splitNotifications[index]
+            if (!splitNotItem.second) {
+                // Displays Labels
+                if (
+                    index == 0
+                    || splitNotifications[index - 1].first
+                    != splitNotItem.first
+                ) Label(
+                    text = getPeriodName(splitNotItem.first),
+                    hasResponds = hasResponds,
+                    isFirst = !doesPrevExist(index, splitNotifications)
+                )
+                // Displays actual notification
+                Text(text = "$index", fontSize = 22.sp)
+                ElementNot(
+                    index = doesPrevExist(index, splitNotifications).toInt(),
+                    size = getSize(
+                        prev = doesPrevExist(index, splitNotifications),
+                        next = doesNextExist(index, splitNotifications),
+                    ),
+                    item = splitNotItem.third,
+                    ratings = defEmoji,
+                    modifier = Modifier.animateItemPlacement(),
+                    callback = callback
+                )
+            }
+        }
+        /*if(splitNotifications.size > index) {
             // Displays Labels
             if(
                 index == 0
@@ -355,7 +419,7 @@ private fun LazyListScope.notificationsList(
                 modifier = Modifier.animateItemPlacement(),
                 callback = callback
             )
-        }
+        }*/
     }
 }
 
@@ -380,21 +444,21 @@ private fun LazyListScope.loader(
 
 private fun doesPrevExist(
     index: Int,
-    splitNotifications: List<Pair<Int, NotificationModel>>,
-) = if(index == 0) false else try {
+    splitNotifications: List<Triple<Int, Boolean, NotificationModel>>,
+) = if (index == 0) false else try {
     splitNotifications[index - 1].first ==
             splitNotifications[index].first
-} catch(e: Exception) {
+} catch (e: Exception) {
     false
 }
 
 private fun doesNextExist(
     index: Int,
-    splitNotifications: List<Pair<Int, NotificationModel>>,
-) = if(index + 1 > splitNotifications.size) false else try {
+    splitNotifications: List<Triple<Int, Boolean, NotificationModel>>,
+) = if (index + 1 > splitNotifications.size) false else try {
     splitNotifications[index + 1].first ==
             splitNotifications[index].first
-} catch(e: Exception) {
+} catch (e: Exception) {
     false
 }
 

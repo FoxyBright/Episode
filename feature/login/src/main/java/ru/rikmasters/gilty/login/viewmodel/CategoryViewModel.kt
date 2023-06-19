@@ -107,14 +107,12 @@ class CategoryViewModel: ViewModel() {
         meetManager.getCategoriesList().on(
             success = {
                 val categories = _categories.value.toMutableList()
-                //Log.d("Hello GetCategory Before", categories.map { it.name }.toString())
                 it.forEach { parent ->
                     if(categories.none{it.id == parent.id}) {
                         categories.add(parent)
                     }
                 }
                 _categories.emit(categories)
-                //Log.d("Hello GetCategory After", categories.map { it.name }.toString())
 
             },
             loading = {},

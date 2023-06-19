@@ -398,10 +398,7 @@ fun SortTypeLabels(
             .fillMaxWidth()
     ) {
         Spacer(modifier = Modifier.width(16.dp))
-        Box(modifier = /*if (!isAnimated) Modifier.animateContentSize(finishedListener = { initial, target ->
-            Log.d("Hello Listener", "$initial $target")
-            isAnimated = true
-        }) else */Modifier) {
+        Box(modifier = Modifier) {
             state.sortType?.let {
                 GChip(
                     modifier = Modifier.padding(

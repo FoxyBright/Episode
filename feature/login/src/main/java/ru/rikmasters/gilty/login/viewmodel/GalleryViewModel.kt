@@ -82,7 +82,6 @@ class GalleryViewModel: ViewModel() {
         val files = selected.value.map {
             File(it).compress(context)
         }
-        //Log.d("Hello Files", files.map { it.absolutePath }.toString())
         regManager.addHidden(
             files
         ).on(
