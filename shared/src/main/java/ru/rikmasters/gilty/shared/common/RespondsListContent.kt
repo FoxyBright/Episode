@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.shared.common
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -160,13 +163,15 @@ private fun GroupList(
                 )
             }
         }
-        if(state) Column {
-            responds.forEach {
-                ReceivedRespond(
-                    respond = it,
-                    modifier = Modifier.padding(bottom = 6.dp),
-                    callback = callback
-                )
+        AnimatedVisibility(visible = state) {
+            Column {
+                responds.forEach {
+                    ReceivedRespond(
+                        respond = it,
+                        modifier = Modifier.padding(bottom = 6.dp),
+                        callback = callback
+                    )
+                }
             }
         }
     }
