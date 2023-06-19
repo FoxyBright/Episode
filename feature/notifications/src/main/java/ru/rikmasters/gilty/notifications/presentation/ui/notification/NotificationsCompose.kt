@@ -326,47 +326,11 @@ private fun LazyListScope.notificationsList(
     callback: NotificationsCallback?,
 ) {
     val items = state.notifications
-    /*itemsIndexed(
-        items = items,
-        key = { index, item ->
-             item.id
-              },
-        *//*contentType = { index, item ->
-            (item)?.type ?: ADMIN_NOTIFICATION
-
-        }*//*
-
-    ) { index, item ->
-        item?.let {
-            ElementNot(
-                index = doesPrevExist(index, splitNotifications).toInt(),
-                size = getSize(
-                    prev = doesPrevExist(index, splitNotifications),
-                    next = doesNextExist(index, splitNotifications),
-                ),
-                item = item,
-                ratings = defEmoji,
-                modifier = Modifier.animateItemPlacement(),
-                callback = callback
-            )
-        }
-    }*/
     itemsIndexed(
         items = items,
         key = { index, item ->
             index
-     /*       if (splitNotifications.size > index) {
-                val splitNotItem = splitNotifications[index]
-                if (!splitNotItem.second) {
-                    item.id
-                } else null
-            } else null*/
         },
-        /*contentType = { index, item ->
-            (item)?.type ?: ADMIN_NOTIFICATION
-
-        }*/
-
     ) { index, item ->
         if (splitNotifications.size > index) {
             val splitNotItem = splitNotifications[index]
@@ -382,7 +346,6 @@ private fun LazyListScope.notificationsList(
                     isFirst = !doesPrevExist(index, splitNotifications)
                 )
                 // Displays actual notification
-                Text(text = "$index", fontSize = 22.sp)
                 ElementNot(
                     index = doesPrevExist(index, splitNotifications).toInt(),
                     size = getSize(

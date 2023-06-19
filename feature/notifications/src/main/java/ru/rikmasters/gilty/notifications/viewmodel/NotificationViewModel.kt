@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.notifications.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.paging.cachedIn
@@ -318,14 +317,13 @@ class NotificationViewModel : ViewModel(), PullToRefreshTrait {
     }
 
     suspend fun splitByMonthSM(notifications: List<NotificationModel>) {
-        Log.d("Hello", "Here ${notifications.size}")
         // 20 - today
         // 30 - yesterday
         // 40 - this week
         // 50 - month earlier
         // 1-12 - months
         var currentIndexToSplit =
-            splitMonthNotifications.value.size  // if(splitMonthNotifications.value.isEmpty()) 0 else splitMonthNotifications.value.size - 1
+            splitMonthNotifications.value.size
 
         if (notifications.size < currentIndexToSplit) {
             currentIndexToSplit = 0
