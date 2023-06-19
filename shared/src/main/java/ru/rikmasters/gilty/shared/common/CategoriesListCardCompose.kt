@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -30,11 +31,7 @@ fun CategoriesListCard(
 ) {
     if(border) Box(
         modifier
-            .background(
-                color = colors.borderColor,
-                shape = shape
-            )
-            .padding(3.dp)
+            .clip(shape)
     ) {
         Box(
             Modifier.background(
