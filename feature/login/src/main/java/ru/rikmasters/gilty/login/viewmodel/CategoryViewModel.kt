@@ -55,11 +55,6 @@ class CategoryViewModel: ViewModel() {
                 onSuccess()
             }
         }
-        /*else {
-            saveInterests{
-
-            }
-        }*/
         _categories.emit(newList)
         phase.emit(1)
     }
@@ -122,28 +117,6 @@ class CategoryViewModel: ViewModel() {
                 )
             }
         )
-       /* meetManager.getCategoriesList().on(
-            success = {
-                _categories.emit(it)
-                regManager.getUserCategories().on(
-                    success = { list ->
-                        _selected.emit(list)
-                    },
-                    loading = {},
-                    error = { e ->
-                        context.errorToast(
-                            e.serverMessage
-                        )
-                    }
-                )
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )*/
     }
     suspend fun emptyPhase() {
         phase.emit(0)

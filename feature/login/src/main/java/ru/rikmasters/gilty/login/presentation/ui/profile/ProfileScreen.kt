@@ -10,6 +10,8 @@ import kotlinx.coroutines.*
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
@@ -34,6 +36,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val profile by vm.profile.collectAsState()
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
+    val errorMessage by vm.errorMessage.collectAsState()
 
     val regexError = username.contains(Regex("[^A-Za-z]"))
     val shortUserNameError = username.length in 1 until 4
@@ -49,13 +52,14 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val usernameOccupiedString =
         stringResource(R.string.profile_user_name_is_occupied)
     
-    var errorText by remember(username, occupied) {
+    var errorText by remember(username, occupied, errorMessage) {
         mutableStateOf(
             when {
                 regexError -> regexString
                 longUserNameError -> longUsernameString
                 shortUserNameError -> shortUsernameString
                 occupied -> usernameOccupiedString
+                errorMessage.isNotEmpty()-> errorMessage
                 else -> ""
             }
         )
@@ -86,71 +90,71 @@ fun ProfileScreen(vm: ProfileViewModel) {
             && errorText.isBlank()
             && !profile?.avatar
         ?.thumbnail?.url.isNullOrBlank()
-    
-    ProfileContent(
-        profileState, isActive, Modifier,
-        object: ProfileCallback {
-            
-            override fun onDisabledButtonClick() {
-                errorAvatar = profile?.avatar?.thumbnail?.url == null
-                if(errorAvatar || username.isBlank())
-                    errorText = "Обязательное поле"
-            }
-            
-            @SuppressLint("SuspiciousIndentation")
-            override fun profileImage(menuItem:Int) {
-                context.checkStoragePermission(
-                    storagePermissions, scope, asm,
-                ) {
-                    nav.navigateAbsolute(
-                        "registration/gallery?multi=false"
-                    )
+    Use<ProfileViewModel>(LoadingTrait) {
+        ProfileContent(
+            profileState, isActive, Modifier,
+            object : ProfileCallback {
+
+                override fun onDisabledButtonClick() {
+                    errorAvatar = profile?.avatar?.thumbnail?.url == null
+                    if (errorAvatar || username.isBlank())
+                        errorText = "Обязательное поле"
                 }
-                onSaveDescription()
-            }
-            
-            override fun hiddenImages() {
-                nav.navigate("hidden")
-                onSaveDescription()
-            }
-            
-            override fun onDescriptionChange(text: String) {
-                scope.launch {
-                    vm.descriptionChange(text)
-                    errorAvatar = false
+
+                @SuppressLint("SuspiciousIndentation")
+                override fun profileImage(menuItem: Int) {
+                    context.checkStoragePermission(
+                        storagePermissions, scope, asm,
+                    ) {
+                        nav.navigateAbsolute(
+                            "registration/gallery?multi=false"
+                        )
+                    }
+                    onSaveDescription()
                 }
-            }
-            
-            override fun onSaveDescription() {
-                //scope.launch { vm.onDescriptionSave() }
-            }
-            
-            override fun onNameChange(text: String) {
-                scope.launch {
-                    vm.usernameChange(text)
+
+                override fun hiddenImages() {
+                    nav.navigate("hidden")
+                    onSaveDescription()
                 }
-            }
-            
-            override fun onSaveUserName() {
-                //scope.launch { vm.onUsernameSave() }
-            }
-            
-            override fun onBack() {
-                scope.launch {
-                    vm.clearLoginData()
-                    onNameChange("")
-                    onDescriptionChange("")
-                    nav.navigateAbsolute("login")
+
+                override fun onDescriptionChange(text: String) {
+                    scope.launch {
+                        vm.descriptionChange(text)
+                        errorAvatar = false
+                    }
                 }
-            }
-            
-            override fun onNext() {
-                scope.launch {
-                    vm.checkOnNext(onSuccess = {
+
+                override fun onSaveDescription() {
+                    //scope.launch { vm.onDescriptionSave() }
+                }
+
+                override fun onNameChange(text: String) {
+                    scope.launch {
+                        vm.usernameChange(text)
+                    }
+                }
+
+                override fun onSaveUserName() {
+                    //scope.launch { vm.onUsernameSave() }
+                }
+
+                override fun onBack() {
+                    scope.launch {
+                        vm.clearLoginData()
+                        onNameChange("")
+                        onDescriptionChange("")
+                        nav.navigateAbsolute("login")
+                    }
+                }
+
+                override fun onNext() {
+                    scope.launch {
+                        vm.checkOnNext(onSuccess = {})
                         nav.navigate("personal")
-                    })
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }

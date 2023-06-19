@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.login.viewmodel
 
-import android.content.Context
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
@@ -8,7 +7,6 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.AuthManager
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class ProfileViewModel : ViewModel() {
@@ -16,13 +14,14 @@ class ProfileViewModel : ViewModel() {
     private val regManager by inject<RegistrationManager>()
     private val authManager by inject<AuthManager>()
 
-    private val context = getKoin().get<Context>()
-
     private val _occupied = MutableStateFlow(false)
     val occupied = _occupied.asStateFlow()
 
     private val _username = MutableStateFlow("")
     val username = _username.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
 
 
 
@@ -37,8 +36,11 @@ class ProfileViewModel : ViewModel() {
                     success = { it },
                     loading = { false },
                     error = {
-                        it.serverMessage ==
-                                "errors.user.username.exists"
+                        if(it.serverMessage == "errors.user.username.exists") false
+                        else {
+                            _errorMessage.emit(it.serverMessage?:"")
+                            false
+                        }
                     }
                 )
                 else false
@@ -70,6 +72,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     suspend fun usernameChange(text: String) {
+        _errorMessage.emit("")
         _username.emit(text)
     }
 
@@ -86,14 +89,12 @@ class ProfileViewModel : ViewModel() {
             success = {onSuccess()},
             loading = {},
             error = {
-                context.errorToast(
-                    it.serverMessage
-                )
+                _errorMessage.emit(it.serverMessage.toString())
             }
         )
     }
 
-    suspend fun checkOnNext(onSuccess:()->Unit) {
+    suspend fun checkOnNext(onSuccess:()->Unit) = singleLoading {
         regManager
             .getProfile(true)
             .let {

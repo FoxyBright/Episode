@@ -77,7 +77,6 @@ fun CategoriesScreen(vm: CategoryViewModel) {
             }
             
             override fun onBack() {
-                // nav.navigationBack()
                 if (phase == 0) nav.navigationBack()
                 else {
                     scope.launch {
@@ -89,13 +88,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
                     }
                 }
             }
-            
-            /*override fun onNext() {
-                scope.launch {
-                    vm.sendCategories()
-                    nav.navigate("permissions")
-                }
-            }*/
+
             override fun onNext() {
                 scope.launch {
                     vm.setUserInterest(onSuccess = {

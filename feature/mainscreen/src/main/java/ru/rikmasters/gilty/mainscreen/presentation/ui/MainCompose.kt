@@ -331,7 +331,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if(today) -(3).dp
+                        if (today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -355,7 +355,7 @@ private fun Content(
     callback: MainContentCallback?,
 ) {
     Box {
-        if(remember { meetings.size } < 2) MeetCard(
+        if(meetings.size < 2) MeetCard(
             modifier = modifier,
             type = EMPTY,
             hasFilters = hasFilters,
