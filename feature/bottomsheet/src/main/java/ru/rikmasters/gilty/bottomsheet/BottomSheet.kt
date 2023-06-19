@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.bottomsheet
 
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.factoryOf
 import ru.rikmasters.gilty.bottomsheet.viewmodel.*
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
@@ -16,12 +16,12 @@ object BottomSheet: FeatureDefinition() {
     }
     
     override fun Module.koin() {
-        singleOf(::ParticipantsBsViewModel)
-        singleOf(::RespondsBsViewModel)
-        singleOf(::MeetingBsViewModel)
-        singleOf(::ReportsBsViewModel)
-        singleOf(::YandexMapViewModel)
-        singleOf(::UserBsViewModel)
+        factoryOf(::ParticipantsBsViewModel)
+        factoryOf(::RespondsBsViewModel)
+        factoryOf(::MeetingBsViewModel)
+        factoryOf(::ReportsBsViewModel)
+        factoryOf(::YandexMapViewModel)
+        factoryOf(::UserBsViewModel)
     }
     
     override fun include() = setOf(

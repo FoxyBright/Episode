@@ -59,14 +59,14 @@ fun ActionBar(
             verticalAlignment = Alignment.Bottom){
             Text(
                 title,
-                Modifier,
+                Modifier.alignByBaseline(),
                 style = titleStyle,
                 color = colorScheme.tertiary
             )
             extra?.let {
                 Text(
                     text = extra,
-                    Modifier.padding(start = 4.dp, bottom = 3.dp),
+                    Modifier.alignByBaseline().padding(start = 4.dp),//.padding(start = 4.dp, bottom = 3.dp),
                     colorScheme.onTertiary,
                     style = extraStyle
                 )

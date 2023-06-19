@@ -78,8 +78,11 @@ class ProfileStore(
                 imageId = imageId
             )
         }
-    
+
+    suspend fun changeAlbumPosition(imageId: String, position:Int) = webSource.changeAlbumPosition(uploadProfile(false)
+        .albumPrivate?.id ?: "", imageId, position)
     suspend fun addHidden(files: List<File>) =
+
         webSource.addHidden(
             albumId = uploadProfile(false)
                 .albumPrivate?.id ?: "",
@@ -201,7 +204,7 @@ class ProfileStore(
             pagingSourceFactory = {
                 AlbumPagingSource(
                     webSource = webSource,
-                    albumId = albumId
+                    albumId = albumId,
                 )
             }
         ).flow
@@ -292,4 +295,7 @@ class ProfileStore(
     
     suspend fun getHiddenPhotosAmount() =
         primarySource.find<AvatarAmount>()?.amount ?: 0
+
+    suspend fun deleteHiddenPhotosAmount() =
+        primarySource.deleteAll<AvatarAmount>()
 }

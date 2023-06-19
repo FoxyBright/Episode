@@ -133,16 +133,20 @@ private fun Item(
             SpaceBetween, CenterVertically
         ) {
             Column {
-                Text(
-                    location.address ?: "", Modifier,
-                    colorScheme.onTertiary,
-                    style = typography.headlineSmall
-                )
-                Text(
-                    location.place ?: "", Modifier,
-                    colorScheme.tertiary,
-                    style = typography.bodyMedium
-                )
+                if((location.address ?: "") != "") {
+                    Text(
+                        location.address ?: "", Modifier,
+                        colorScheme.onTertiary,
+                        style = typography.headlineSmall
+                    )
+                }
+                if((location.place ?: "") != "") {
+                    Text(
+                        location.place ?: "", Modifier,
+                        colorScheme.tertiary,
+                        style = typography.bodyMedium
+                    )
+                }
             }
             Icon(
                 Icons.Filled.KeyboardArrowRight,

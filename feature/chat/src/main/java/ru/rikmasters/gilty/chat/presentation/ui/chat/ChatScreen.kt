@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -32,14 +31,16 @@ import ru.rikmasters.gilty.chat.viewmodel.HiddenBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.SoftInputAdjust.Nothing
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.blockNotify
+import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.clearSelectChat
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsScreen
@@ -127,7 +128,13 @@ fun ChatScreen(
         } catch (_: Exception) {
             listState.scrollToItem(messages.itemCount)
         }
-        vm.markAsReadMessage(chatId, all = true)
+    }
+    
+    LaunchedEffect(chat) {
+        chat?.let {
+            if(it.userId != it.organizer.id)
+                vm.markAsReadMessage(chatId, all = true)
+        }
     }
 
     LaunchedEffect(writingUsers) {
@@ -136,7 +143,21 @@ fun ChatScreen(
             vm.deleteWriter(it.first)
         }
     }
-
+    
+    LaunchedEffect(Unit) {
+        if(type == TRANSLATION_AWAIT ||
+            type == TRANSLATION_ORGANIZER_AWAIT
+        ) {
+            delay(1000)
+            vm.timerTick()
+        }
+    }
+    
+    DisposableEffect(chat) {
+        chat?.let { blockNotify(context, it.id) }
+        onDispose { clearSelectChat(context) }
+    }
+    
     val uri = getUriForFile(
         context, ("ru.rikmasters.gilty.provider"),
         File(context.filesDir, "my_images")
@@ -197,14 +218,14 @@ fun ChatScreen(
 
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
-            ChatContent(state, Modifier, object : ChatCallback {
-
+            val callback = object: ChatCallback {
+                
                 override fun onPhotoViewDismiss(state: Boolean) {
                     scope.launch { vm.changePhotoViewState(state) }
                 }
 
                 override fun onAnswerClick(message: MessageModel) {
-                    // навигации к сообщению при клике на ответ
+                    // навигация к сообщению при клике на ответ
                 }
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
@@ -215,27 +236,12 @@ fun ChatScreen(
                                 )
                             }
                             TRANSLATION_ORGANIZER -> {
-                                if (!permissionsState.allPermissionsGranted) {
-                                    permissionsState.launchMultiplePermissionRequest()
-                                } else {
-                                    scope.launch {
-                                        asm.bottomSheet.expand {
-                                            PreviewBsScreen(
-                                                vm = PreviewBsViewModel(),
-                                                closeClicked = {
-                                                    scope.launch {
-                                                        asm.bottomSheet.collapse()
-                                                    }
-                                                },
-                                                startBroadcastClicked = {
-                                                    scope.launch {
-                                                        asm.bottomSheet.collapse()
-                                                        nav.navigateAbsolute("translations/streamer?id=${state.meet.id}")
-                                                    }
-                                                }
-                                            )
-                                        }
-                                    }
+                                context.checkMediaPermissions(
+                                    mediaPermissions
+                                ) {
+                                    nav.navigateAbsolute(
+                                        "translations/streamer?id=${state.meet.id}"
+                                    )
                                 }
                             }
                             MEET_FINISHED -> {
@@ -258,32 +264,25 @@ fun ChatScreen(
                         0 -> context.checkStoragePermission(
                             storagePermissions, scope, asm,
                         ) {
-                            scope.launch {
-                                asm.bottomSheet.expand {
-                                    Connector<GalleryViewModel>(vm.scope) {
-                                        GalleryBs(
-                                            vm = it,
-                                            isOnline = chat?.isOnline
-                                                ?: false,
-                                            chatId = chat?.id ?: ""
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        2 -> scope.launch {
-                            asm.bottomSheet.expand {
-                                Connector<HiddenBsViewModel>(vm.scope) {
-                                    HiddenBs(
+                            vm.scope
+                                .openBS<GalleryViewModel>(scope) {
+                                    GalleryBs(
                                         vm = it,
                                         isOnline = chat?.isOnline
                                             ?: false,
                                         chatId = chat?.id ?: ""
                                     )
                                 }
-                            }
                         }
+                        2 -> vm.scope
+                            .openBS<HiddenBsViewModel>(scope) {
+                                HiddenBs(
+                                    vm = it,
+                                    isOnline = chat?.isOnline
+                                        ?: false,
+                                    chatId = chat?.id ?: ""
+                                )
+                            }
                     }
                 }
 
@@ -323,7 +322,10 @@ fun ChatScreen(
                     scope.launch {
                         when (point) {
                             0 -> vm.changeAnswer(message)
-                            1 -> vm.deleteMessage(chatId, message)
+                            1 -> vm.deleteMessage(
+                                chatId = chatId,
+                                message = message
+                            )
                         }
                         vm.changeMessageMenuState(false)
                     }
@@ -347,8 +349,8 @@ fun ChatScreen(
                             0 -> vm.changeMeetOutAlert(true)
                             1 -> asm.bottomSheet.expand {
                                 BottomSheet(
-                                    vm.scope,
-                                    REPORTS,
+                                    scope = vm.scope,
+                                    type = REPORTS,
                                     reportObject = state.meet.id,
                                     reportType = MEETING
                                 )
@@ -360,7 +362,11 @@ fun ChatScreen(
                 override fun onTopBarClick() {
                     scope.launch {
                         asm.bottomSheet.expand {
-                            BottomSheet(vm.scope, MEET, state.meet.id)
+                            BottomSheet(
+                                scope = vm.scope,
+                                type = MEET,
+                                meetId = state.meet.id
+                            )
                         }
                     }
                 }
@@ -387,45 +393,69 @@ fun ChatScreen(
                 }
 
                 override fun onKebabClick() {
-                    scope.launch { vm.changeKebabMenuState(!kebabMenuState) }
+                    scope.launch {
+                        vm.changeKebabMenuState(!kebabMenuState)
+                    }
                 }
 
                 override fun onListDown() {
-                    scope.launch { vm.changeUnreadCount((unreadCount - 1)) }
+                    scope.launch {
+                        vm.changeUnreadCount((unreadCount - 1))
+                    }
                 }
 
                 override fun onMessageMenuDismiss() {
-                    scope.launch { vm.changeMessageMenuState(false) }
+                    scope.launch {
+                        vm.changeMessageMenuState(false)
+                    }
                 }
 
                 override fun onImageMenuDismiss() {
-                    scope.launch { vm.changeImageMenuState(false) }
+                    scope.launch {
+                        vm.changeImageMenuState(false)
+                    }
                 }
 
                 override fun onMeetOutAlertDismiss() {
-                    scope.launch { vm.changeMeetOutAlert(false) }
+                    scope.launch {
+                        vm.changeMeetOutAlert(false)
+                    }
                 }
 
                 override fun closeAlert() {
-                    scope.launch { vm.alertDismiss(false) }
+                    scope.launch {
+                        vm.alertDismiss(false)
+                    }
                 }
-
-                override fun onSwipe(message: MessageModel) {
-                    scope.launch { vm.changeAnswer(message) }
+                
+                override fun onSwipe(
+                    message: MessageModel,
+                ) {
+                    scope.launch {
+                        vm.changeAnswer(message)
+                    }
                 }
 
                 override fun textChange(text: String) {
-                    scope.launch { vm.changeMessage(text) }
+                    scope.launch {
+                        vm.changeMessage(text)
+                    }
                 }
 
                 override fun onCancelAnswer() {
-                    scope.launch { vm.changeAnswer(null) }
+                    scope.launch {
+                        vm.changeAnswer(null)
+                    }
                 }
 
                 override fun onBack() {
                     nav.navigate("main")
                 }
             }
+            
+            ChatContent(
+                state = state,
+                callback = callback
             )
         }
     }

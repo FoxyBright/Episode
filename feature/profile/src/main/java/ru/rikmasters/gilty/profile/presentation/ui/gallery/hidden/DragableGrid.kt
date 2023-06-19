@@ -18,7 +18,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
-import ru.rikmasters.gilty.shared.common.dragableGrid.*
+import ru.rikmasters.gilty.shared.common.dragGrid.ItemPosition
+import ru.rikmasters.gilty.shared.common.dragGrid.ReorderableItem
+import ru.rikmasters.gilty.shared.common.dragGrid.detectReorderAfterLongPress
+import ru.rikmasters.gilty.shared.common.dragGrid.rememberReorderableLazyGridState
+import ru.rikmasters.gilty.shared.common.dragGrid.reorderable
 
 class DragableViewModel: ViewModel()
 

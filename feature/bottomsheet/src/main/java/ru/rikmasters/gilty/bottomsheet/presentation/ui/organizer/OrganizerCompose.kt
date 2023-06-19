@@ -1,18 +1,11 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
-import androidx.compose.foundation.layout.Arrangement.Start
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,13 +15,22 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R
@@ -74,8 +76,8 @@ data class UserState(
     val viewerMenuState: Boolean = false,
 )
 
-interface OrganizerCallback: ProfileCallback {
-    
+interface OrganizerCallback : ProfileCallback {
+
     fun onMenuDismiss(state: Boolean)
     fun onMenuItemSelect(point: Int, userId: String?)
     fun onMeetingClick(meet: MeetingModel)
@@ -98,7 +100,7 @@ fun OrganizerContent(
     ) {
         TopBar(
             username = "${user?.username}${
-                if(user?.age in 18..99) {
+                if (user?.age in 18..99) {
                     ", ${user?.age}"
                 } else ""
             }",
@@ -126,7 +128,7 @@ fun OrganizerContent(
                     isMyProfile = state.isMyProfile
                 ) { callback?.onObserveChange(it) }
             }
-            if(state.currentMeetings.isNotEmpty()) {
+            if (state.currentMeetings.isNotEmpty()) {
                 item { MeetLabel() }
                 item {
                     ActualMeetings(state.currentMeetings)
@@ -135,7 +137,7 @@ fun OrganizerContent(
                 itemSpacer(40.dp)
             }
         }
-        if(state.photoViewState) PhotoView(
+        if (state.photoViewState) PhotoView(
             images = state.viewerImages,
             selected = state.viewerSelectImage,
             menuState = state.viewerMenuState,
@@ -177,6 +179,7 @@ private fun ActualMeetings(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TopBar(
     username: String,
@@ -188,6 +191,8 @@ private fun TopBar(
     onKebabClick: (Boolean) -> Unit,
     onMenuItemSelect: (Int) -> Unit,
 ) {
+    var badgeWidth by remember { mutableStateOf(IntSize.Zero) }
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -195,13 +200,18 @@ private fun TopBar(
             .padding(top = 18.dp),
         SpaceBetween, CenterVertically
     ) {
-        Row(
-            Modifier.weight(1f),
-            Start, CenterVertically
+        ConstraintLayout(
+            Modifier.fillMaxWidth(),
         ) {
-            if(backButton) IconButton(
+            val (backButtonRef, usernameGroupedRef, menuRef) = createRefs()
+
+            if (backButton) IconButton(
                 onClick = { onBack() },
                 modifier = Modifier
+                    .constrainAs(backButtonRef) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                    }
                     .padding(end = 16.dp)
             ) {
                 Icon(
@@ -214,31 +224,75 @@ private fun TopBar(
                     tint = colorScheme.tertiary
                 )
             }
-            Row(verticalAlignment = CenterVertically) {
-                Text(
-                    text = username,
-                    color = colorScheme.tertiary,
-                    style = typography.labelLarge,
-                    overflow = Ellipsis,
-                    maxLines = 1
-                )
-                ProfileBadge(
-                    group = profileGroup,
-                    modifier = Modifier.padding(start = 4.dp)
-                , labelSize = 9,
-                    textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
-                )
+
+            BoxWithConstraints(modifier = Modifier
+                .constrainAs(usernameGroupedRef) {
+                    start.linkTo(if (backButton) backButtonRef.end else parent.start)
+                    top.linkTo(if (backButton) backButtonRef.top else if (!isMyProfile) menuRef.top else parent.top)
+                    if (backButton) bottom.linkTo(backButtonRef.bottom)
+                    if (!backButton && !isMyProfile) bottom.linkTo(menuRef.bottom)
+                    end.linkTo(if (!isMyProfile) menuRef.start else parent.end)
+                    width = Dimension.fillToConstraints
+                }) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = username,
+                        color = colorScheme.tertiary,
+                        style = typography.labelLarge,
+                        overflow = Ellipsis,
+                        maxLines = 1,
+                        modifier =
+                        if (profileGroup != DEFAULT) {
+                            Modifier
+                                .widthIn(min = 1.dp, max = badgeWidth.width.dp)
+                                .basicMarquee(
+                                    spacing = MarqueeSpacing(14.dp),
+                                    iterations = Int.MAX_VALUE
+                                )
+                        } else {
+                            Modifier
+                                .width(IntrinsicSize.Max)
+                                .basicMarquee(
+                                    spacing = MarqueeSpacing(14.dp),
+                                    iterations = Int.MAX_VALUE
+                                )
+
+                        },
+                    )
+                    ProfileBadge(
+                        group = profileGroup,
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .onSizeChanged { coordinates ->
+                                badgeWidth = coordinates
+                            }, labelSize = 9,
+                        textPadding = PaddingValues(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                }
             }
-        }
-        if(!isMyProfile) {
-            GDropMenu(
-                menuState = menuState,
-                collapse = { onKebabClick(false) },
-                menuItem = listOf(
-                    stringResource(R.string.complaints_title) to
-                            { onMenuItemSelect(0) })
-            )
-            GKebabButton { onKebabClick(true) }
+
+
+            if (!isMyProfile) {
+                GDropMenu(
+                    menuState = menuState,
+                    collapse = { onKebabClick(false) },
+                    menuItem = listOf(
+                        stringResource(R.string.complaints_title) to
+                                { onMenuItemSelect(0) })
+                )
+                GKebabButton(
+                    modifier = Modifier
+                        .constrainAs(menuRef) {
+                            top.linkTo(if (backButton) backButtonRef.top else parent.top)
+                            end.linkTo(parent.end)
+                        },
+                ) { onKebabClick(true) }
+            }
         }
     }
 }

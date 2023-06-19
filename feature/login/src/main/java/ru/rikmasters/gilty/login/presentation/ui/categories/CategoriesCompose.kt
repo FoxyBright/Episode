@@ -25,7 +25,9 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategories: List<CategoryModel>,
-)
+    val hasParentCategory: Boolean,
+    val sleep: Boolean,
+    )
 
 interface CategoriesCallback {
     
@@ -48,7 +50,7 @@ fun CategoriesContent(
             ) { callback?.onBack() }
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
-            else Bubbles(
+            else if (state.sleep) Bubbles(
                 data = state.categoryList,
                 elementSize = CATEGORY_ELEMENT_SIZE.dp,
                 modifier = Modifier.padding(
@@ -69,7 +71,8 @@ fun CategoriesContent(
                 .wrapContentHeight()
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            stringResource(R.string.next_button)
+            if (state.hasParentCategory) stringResource(R.string.next_button)
+            else stringResource(R.string.save_button)
         ) { callback?.onNext() }
     }
 }
@@ -113,7 +116,9 @@ private fun CategoriesPreview() {
             Modifier,
             CategoriesState(
                 DemoCategoryModelList,
-                emptyList()
+                emptyList(),
+                false,
+                true
             )
         )
     }

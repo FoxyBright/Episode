@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.shared.model.notification
 
+import android.util.Log
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import ru.rikmasters.gilty.shared.model.meeting.*
@@ -38,7 +39,7 @@ data class MeetWithRespondsModel(
                         id = it.id,
                         author = it.author,
                         comment = it.comment,
-                        photoAccess = true,
+                        photoAccess = true, // TODO change to false?
                         photos = null
                     )
                 }

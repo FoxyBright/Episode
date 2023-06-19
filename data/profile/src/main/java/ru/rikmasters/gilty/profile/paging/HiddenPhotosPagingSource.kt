@@ -5,9 +5,12 @@ import androidx.paging.PagingSource.LoadResult.Error
 import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.core.data.source.DbSource
+import ru.rikmasters.gilty.core.data.source.deleteAll
 import ru.rikmasters.gilty.core.data.source.find
 import ru.rikmasters.gilty.profile.ProfileWebSource
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
+import ru.rikmasters.gilty.shared.models.Avatar
+import ru.rikmasters.gilty.shared.models.AvatarAmount
 import ru.rikmasters.gilty.shared.models.Profile
 
 class HiddenPhotosPagingSource(
@@ -34,14 +37,19 @@ class HiddenPhotosPagingSource(
                     ?.albumPrivate?.id ?: ""
             ).on(
                 success = { it },
-                loading = { emptyList() },
-                error = { emptyList() }
+                loading = { emptyList<Avatar>() to 0 },
+                error = { emptyList<Avatar>() to 0}
             ).let { photos ->
+                localSource.deleteAll<AvatarAmount>()
+                localSource.save(AvatarAmount(0))
+                localSource.deleteAll<AvatarAmount>()
+                localSource.save(AvatarAmount(photos.second))
+
                 Page(
-                    data = photos.map { it.map() },
+                    data = photos.first.map { it.map() },
                     prevKey = if(page == 1)
                         null else page - 1,
-                    nextKey = if((photos.size) < params.loadSize)
+                    nextKey = if((photos.first.size) < params.loadSize)
                         null else page + 1
                 )
             }

@@ -26,36 +26,64 @@ fun EmojiRow(
 ) {
     Column(modifier) {
         Icon(
-            painterResource(ic_cloud_part),
-            (null), Modifier.padding(start = 40.dp),
-            colors.notificationCloud
+            painter = painterResource(
+                ic_cloud_part
+            ),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 40.dp),
+            tint = colors.notificationCloud
         )
         Box(
             Modifier
                 .padding(top = 2.dp, bottom = 12.dp)
                 .background(
-                    colors.notificationCloud, CircleShape
+                    color = colors.notificationCloud,
+                    shape = CircleShape
                 ), Center
-        ) {
-            LazyRow(
-                Modifier
-                    .clip(CircleShape)
-                    .padding(vertical = 10.dp)
-            ) {
-                itemsIndexed(emojiList) { index, item ->
-                    GEmojiImage(item, Modifier
-                        .padding(
-                            start = if(index == 0)
-                                14.dp else 0.dp,
-                            end = 14.dp,
-                        )
-                        .size(30.dp)
-                        .clickable(
-                            MutableInteractionSource(), (null)
-                        ) { onClick(item) }
-                    )
-                }
-            }
+        ) { List(emojiList, onClick) }
+    }
+}
+
+@Composable
+private fun List(
+    emojiList: List<EmojiModel>,
+    onClick: (EmojiModel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier
+            .clip(CircleShape)
+            .padding(vertical = 10.dp)
+    ) {
+        itemsIndexed(
+            items = emojiList,
+            key = { i, e -> e.path.plus(i) },
+            contentType = { _, e -> e.type }
+        ) { index, item ->
+            Item(item, index, onClick)
         }
     }
+}
+
+@Composable
+private fun Item(
+    item: EmojiModel,
+    index: Int,
+    onClick: (EmojiModel) -> Unit,
+) {
+    GEmojiImage(
+        emoji = item,
+        modifier = Modifier
+            .padding(
+                start = if(index == 0)
+                    14.dp else 0.dp,
+                end = 14.dp,
+            )
+            .size(30.dp)
+            .clickable(
+                MutableInteractionSource(),
+                indication = null
+            ) { onClick(item) }
+    )
 }

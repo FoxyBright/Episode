@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import ru.rikmasters.gilty.shared.common.extentions.*
-import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.displayRodName
+import ru.rikmasters.gilty.shared.common.extentions.DayOfWeek.Companion.display
 import ru.rikmasters.gilty.shared.common.extentions.Month.Companion.displayRodName
 import ru.rikmasters.gilty.shared.model.chat.ChatModel
 
@@ -18,17 +18,16 @@ fun getSortedByTimeChats(chats: List<ChatModel>) = chats
 private fun getDateString(date: LocalDate): String {
     val weekDay = date.dayOfWeek()
     
-    val prefix = if(weekDay.ordinal == 2)
-        "Во" else "В"
+    /*val prefix = if(weekDay.ordinal == 2)
+        "Во" else "В"*/
     
     val wdName = weekDay
-        .displayRodName()
-        .lowercase()
-    
+        .display()
+
     val month = Month
         .of(date.month())
         .displayRodName()
         .lowercase()
     
-    return "$prefix $wdName ${date.day()} $month"
+    return "$wdName ${date.day()} $month"
 }

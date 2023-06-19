@@ -86,7 +86,7 @@ fun RespondsListContent(
             LazyColumn(modifier) {
                 val itemCount = state.responds.itemCount
                 if(itemCount != 0) {
-                    itemsIndexed(state.responds) { index, respond ->
+                    itemsIndexed(state.responds) { index, respond: MeetWithRespondsModelWithPhotos? ->
                         respond?.let {
                             GroupList(
                                 index,
@@ -142,14 +142,14 @@ private fun GroupList(
     Column(modifier) {
         Row(verticalAlignment = CenterVertically) {
             RowActionBar(
-                title,
-                Modifier.clickable(
+                title = title,
+                modifier = Modifier.clickable(
                     MutableInteractionSource(),
                     (null)
                 ) {
                     callback?.onArrowClick(index)
                 },
-                responds.size.toString()
+                details = responds.size.toString()
             )
             IconButton({ callback?.onArrowClick(index) }) {
                 Icon(
@@ -163,9 +163,9 @@ private fun GroupList(
         if(state) Column {
             responds.forEach {
                 ReceivedRespond(
-                    it,
-                    Modifier.padding(bottom = 6.dp),
-                    callback
+                    respond = it,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    callback = callback
                 )
             }
         }

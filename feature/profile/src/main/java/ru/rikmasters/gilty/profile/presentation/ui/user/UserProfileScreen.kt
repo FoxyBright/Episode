@@ -93,7 +93,8 @@ fun UserProfileScreen(
     }
     
     LaunchedEffect(Unit) {
-        vm.setUserDate(update)
+        //vm.setUserDate(update)
+        vm.setUserDate(true)
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }
         context.listenPreference("unread_notification", 0)

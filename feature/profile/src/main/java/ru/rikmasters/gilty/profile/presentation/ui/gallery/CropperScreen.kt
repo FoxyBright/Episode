@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
+import android.graphics.Bitmap.createBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
@@ -31,25 +31,23 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
     var bitmap = BitmapFactory.decodeFile(
         file.absolutePath
     )
-    
+    val orientation = ExifInterface(file.absolutePath)
+        .getAttributeInt(TAG_ORIENTATION, (1))
     try {
-        bitmap = Bitmap.createBitmap(
-            bitmap, (0), (0),
-            bitmap.width, bitmap.height,
+        bitmap = createBitmap(
+            bitmap, 0, 0,
+            bitmap.width,
+            bitmap.height,
             Matrix().also {
                 it.postRotate(
-                    when(ExifInterface(
-                        file.absolutePath
-                    ).getAttributeInt(
-                        TAG_ORIENTATION, (1)
-                    )) {
+                    when(orientation) {
                         6 -> 90f
                         3 -> 180f
                         8 -> 270f
                         else -> 0f
                     }
                 )
-            }, (true)
+            }, true
         )
     } catch(e: Exception) {
         e.printStackTrace()
@@ -57,9 +55,14 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
     
     Use<GalleryViewModel>(LoadingTrait) {
         ImageCropper(
-            state = GImageCropperState(bitmap.asImageBitmap()),
+            state = GImageCropperState(
+                image = bitmap.asImageBitmap()
+            ),
             callback = object: GImageCropperCallback {
-                override fun onCrop(img: ImageBitmap, list: List<Float>) {
+                override fun onCrop(
+                    img: ImageBitmap,
+                    list: List<Float>,
+                ) {
                     scope.launch {
                         vm.setImage(file, list)
                         nav.navigate("main?update=${true}")

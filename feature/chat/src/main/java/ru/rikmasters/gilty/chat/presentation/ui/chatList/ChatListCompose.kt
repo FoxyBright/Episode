@@ -2,7 +2,6 @@
 
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -95,7 +94,7 @@ data class ChatListState(
 )
 
 interface ChatListCallback {
-
+    
     fun onNavBarSelect(point: Int)
     fun onChatClick(chat: ChatModel)
     fun onChatSwipe(chat: ChatModel)
@@ -126,13 +125,10 @@ fun ChatListContent(
         },
         containerColor = Transparent,
         content = {
-            if (!state.smthError)
-                Column(Modifier.padding(it)) {
-                    Use<ChatListViewModel>(PullToRefreshTrait) {
-                        Content(state, Modifier, callback)
-                    }
-                } else ErrorInternetConnection {
-                callback?.onListUpdate()
+            Column(Modifier.padding(it)) {
+                Use<ChatListViewModel>(PullToRefreshTrait) {
+                    Content(state, Modifier, callback)
+                }
             }
         }
     )
@@ -176,8 +172,8 @@ private fun Content(
 ) {
     val chats = state.chats
     val itemCount = state.chatsCount
-
-    if (LocalInspectionMode.current)
+    
+    if(LocalInspectionMode.current)
         PreviewLazy() else {
         Column(modifier = modifier) {
             LazyColumn(
@@ -189,25 +185,26 @@ private fun Content(
                     chats.loadState.refresh is LoadState.Error -> Unit
                     chats.loadState.append is LoadState.Error -> Unit
                     else -> {
-                        if (chats.loadState.refresh is LoadState.Loading || chats.loadState.append is LoadState.Loading)
+                        if(chats.loadState.refresh is LoadState.Loading || chats.loadState.append is LoadState.Loading)
                             item { PagingLoader(chats.loadState) }
-
+                        
                         item {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-
-                        item {
-                            SortTypeLabels(
-                                modifier = Modifier.animateItemPlacement(),
-                                state = state,
-                                callback = callback
-                            )
-                        }
-
-                        if (itemCount != 0) {
-                            if ((state.sortType == null && !state.isArchiveOn) || state.sortType == MEETING_DATE) { // No sort or Meeting Date
+                        
+                        if(itemCount != 0) {
+                            
+                            item {
+                                SortTypeLabels(
+                                    modifier = Modifier.animateItemPlacement(),
+                                    state = state,
+                                    callback = callback
+                                )
+                            }
+                            
+                            if((state.sortType == null && !state.isArchiveOn) || state.sortType == MEETING_DATE) { // No sort or Meeting Date
                                 getSortedByTimeChats(state.chats.itemSnapshotList.items).let {
-                                    if (it.isNotEmpty())
+                                    if(it.isNotEmpty())
                                         items(it) { (label, list) ->
                                             Label(
                                                 label,
@@ -221,25 +218,32 @@ private fun Content(
                                             )
                                             list.map { chatModel ->
                                                 chatModel to rememberDragRowState()
-                                            }.forEachIndexed { index, chat ->
-                                                ElementChat(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 16.dp)
-                                                        .animateItemPlacement(),
-                                                    chat.first, index, list.size,
-                                                    chat.second, callback
-                                                )
                                             }
+                                                .forEachIndexed { index, chat ->
+                                                    ElementChat(
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                horizontal = 16.dp
+                                                            )
+                                                            .animateItemPlacement(),
+                                                        chat.first,
+                                                        index,
+                                                        list.size,
+                                                        chat.second,
+                                                        callback
+                                                    )
+                                                }
                                         }
                                 }
-                            } else if (state.sortType == MESSAGE_DATE && state.chats.loadState.append is NotLoading) { // Message Date
-                                if (state.chats.itemSnapshotList.isNotEmpty())
+                            } else if(state.sortType == MESSAGE_DATE && state.chats.loadState.append is NotLoading) { // Message Date
+                                if(state.chats.itemSnapshotList.isNotEmpty())
                                     item {
                                         Spacer(Modifier.height(28.dp))
                                     }
-
+                                
                                 itemsIndexed(state.chats) { index, item ->
-                                    val chat = (item) to rememberDragRowState()
+                                    val chat =
+                                        (item) to rememberDragRowState()
                                     chat.first?.let {
                                         ElementChat(
                                             modifier = Modifier
@@ -247,20 +251,21 @@ private fun Content(
                                                 .animateItemPlacement(),
                                             chat = it,
                                             index = (index),
-                                            size = (state.chats.itemCount),  // TODO change itemCount to chats_count once backend is ready
+                                            size = (state.chats.itemCount),
                                             rowState = (chat.second),
                                             callback = callback
                                         )
                                     }
                                 }
                             } else { // Archieve
-                                if (state.chats.itemSnapshotList.isNotEmpty())
+                                if(state.chats.itemSnapshotList.isNotEmpty())
                                     item {
                                         Spacer(Modifier.height(28.dp))
                                     }
-
+                                
                                 itemsIndexed(state.chats) { index, item ->
-                                    val chat = (item) to rememberDragRowState()
+                                    val chat =
+                                        (item) to rememberDragRowState()
                                     chat.first?.let {
                                         ElementChat(
                                             modifier = Modifier
@@ -268,7 +273,7 @@ private fun Content(
                                                 .animateItemPlacement(),
                                             chat = it,
                                             index = index,
-                                            size = state.chats.itemCount,  // TODO change itemCount to chats_count once backend is ready
+                                            size = state.chats.itemCount,
                                             rowState = chat.second,
                                             callback = callback
                                         )
@@ -282,9 +287,9 @@ private fun Content(
             }
             val emptyChats = chats.loadState.append is NotLoading
                     && chats.loadState.refresh is NotLoading
-                    && (itemCount == 0 || state.chats.itemCount == 0) // TODO Delete itemcount once backend is ready
-
-            if (emptyChats) ChatListPlaceholder(
+                    && (itemCount == 0)
+            
+            if(emptyChats) ChatListPlaceholder(
                 modifier = Modifier.padding(bottom = 120.dp)
             )
         }
@@ -337,7 +342,7 @@ private fun ElementChat(
             rowState, chat, shape, Modifier,
             { callback?.onChatClick(it) }
         ) { callback?.onChatSwipe(it) }
-        if (index < size - 1) GDivider(
+        if(index < size - 1) GDivider(
             Modifier.padding(start = 78.dp)
         )
     }
@@ -359,7 +364,7 @@ private fun ActionRow(
     ) {
         Label(stringResource(chats_ended_chats_label))
         Icon(
-            if (state) Filled.KeyboardArrowDown
+            if(state) Filled.KeyboardArrowDown
             else Filled.KeyboardArrowRight,
             (null), Modifier.size(28.dp),
             colorScheme.tertiary
@@ -386,33 +391,35 @@ fun SortTypeLabels(
 ) {
     var sortLabelHeightDp by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
+
     Row(
         modifier = modifier
             .horizontalScroll(rememberScrollState())
             .fillMaxWidth()
     ) {
         Spacer(modifier = Modifier.width(16.dp))
-        Box(modifier = Modifier.animateContentSize()) {
+        Box(modifier = Modifier) {
             state.sortType?.let {
                 GChip(
                     modifier = Modifier.padding(
-                        start = if (sortLabelHeightDp - 16.dp >= 0.dp)
+                        start = if(sortLabelHeightDp - 16.dp >= 0.dp)
                             sortLabelHeightDp - 16.dp
                         else 0.dp
                     ),
                     text = it.getSortName(),
                     isSelected = true,
-                    primary = Red
+                    primary = Red,
+                    textModifier = Modifier.padding(start = 8.dp)
                 ) {}
             }
             Row(modifier = Modifier.onGloballyPositioned { coordinates ->
                 sortLabelHeightDp =
                     with(localDensity) { coordinates.size.width.toDp() }
             }, verticalAlignment = CenterVertically) {
-                if (state.sortType != null) {
+                if(state.sortType != null) {
                     Image(
                         painter = painterResource(
-                            if (isSystemInDarkTheme())
+                            if(isSystemInDarkTheme())
                                 R.drawable.ic_close_sort_dark
                             else R.drawable.ic_close_sort
                         ),
@@ -430,27 +437,31 @@ fun SortTypeLabels(
                 GChip(
                     text = stringResource(R.string.chats_sort_label),
                     isSelected = state.sortType != null
-                ) { callback?.onSortClick(MEETING_DATE) }
+                ) {
+                    callback?.onSortClick(MEETING_DATE)
+                }
             }
         }
-        if (state.sortType != null)
+        if(state.sortType != null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
-                text = (if (state.sortType == MEETING_DATE)
+                text = (if(state.sortType == MEETING_DATE)
                     MESSAGE_DATE else MEETING_DATE).getSortName()
             ) {
                 callback?.onSortClick(
-                    if (state.sortType == MEETING_DATE)
+                    if(state.sortType == MEETING_DATE)
                         MESSAGE_DATE else MEETING_DATE
                 )
             }
-
-        if (state.sortType == null)
+        
+        if(state.sortType == null)
             GChip(
                 modifier = Modifier.padding(start = 8.dp),
                 text = stringResource(id = R.string.chats_archive_label),
                 isSelected = state.isArchiveOn
-            ) { callback?.onArchiveClick() }
+            ) {
+                callback?.onArchiveClick()
+            }
     }
 }
 

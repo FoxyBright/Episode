@@ -48,20 +48,24 @@ fun GalleryBsContent(
             .padding(top = 32.dp)
     ) {
         Text(
-            stringResource(R.string.profile_gallery_title),
-            Modifier.padding(bottom = 14.dp),
+            text = stringResource(R.string.profile_gallery_title),
+            modifier = Modifier.padding(bottom = 14.dp),
             style = typography.labelLarge,
         )
         GalleryGrid(
-            Modifier.weight(1f), state.images,
-            state.selectedImages,
-            state.type, (false), callback
+            modifier = Modifier.weight(1f),
+            images = state.images,
+            selected = state.selectedImages,
+            type = state.type,
+            isWeb = false,
+            callback = callback
         )
         GradientButton(
-            Modifier.padding(vertical = 28.dp),
-            state.buttonLabel,
-            state.buttonEnabled,
-            state.isOnline
+            modifier = Modifier
+                .padding(vertical = 28.dp),
+            text = state.buttonLabel,
+            enabled = state.buttonEnabled,
+            online = state.isOnline
         ) { callback?.onAttach() }
     }
 }

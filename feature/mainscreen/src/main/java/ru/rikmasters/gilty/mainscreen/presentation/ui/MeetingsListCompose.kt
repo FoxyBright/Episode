@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.swipeableCard
@@ -22,11 +23,20 @@ fun MeetingsListContent(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
+    val list = remember(states) {
+        if (states.size <= 2) states
+        else states - states.dropLast(2).toSet()
+    }
 
-    states.forEachIndexed { index, (meeting, state) ->
+    list.forEachIndexed { index, state ->
         EpisodeCard(
-            meeting, state, (index < states.lastIndex), modifier,
-            notInteresting, onSelect, onClick
+            meeting = state.first,
+            state = state.second,
+            stack = index < states.lastIndex,
+            modifier = modifier,
+            notInteresting = notInteresting,
+            onSelect = onSelect,
+            onClick = onClick
         )
     }
 }
@@ -41,27 +51,47 @@ private fun EpisodeCard(
     onSelect: ((MeetingModel, SwipeableCardState) -> Unit)? = null,
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
-    fun DirectionType.swipe(
-        meeting: MeetingModel,
-        state: SwipeableCardState,
-    ) = when(this) {
-        RIGHT -> onSelect?.let { it(meeting, state) }
-        LEFT -> notInteresting?.let { it(meeting, state) }
-        else -> Unit
-    }
-    
     state.swipedDirection ?: run {
         MeetCard(
             modifier = modifier
                 .fillMaxSize()
                 .clickable(
-                    MutableInteractionSource(), (null)
+                    MutableInteractionSource(),
+                    indication = null
                 ) { onClick?.let { it(meeting) } }
                 .swipeableCard(
-                    onSwiped = { it.swipe(meeting, state) },
+                    onSwiped = {
+                        it.swipe(
+                            meeting = meeting,
+                            state = state,
+                            onSelect = onSelect,
+                            notInteresting = notInteresting
+                        )
+                    },
                     state = state,
-                ), type = MEET, stack = stack,
-            meet = meeting, offset = state.offset.value.x
-        ) { it.swipe(meeting, state) }
+                ),
+            type = MEET,
+            stack = stack,
+            meet = meeting,
+            offset = state.offset.value.x
+        ) {
+            it.swipe(
+                meeting = meeting,
+                state = state,
+                onSelect = onSelect,
+                notInteresting = notInteresting
+            )
+        }
     }
+}
+
+private fun DirectionType.swipe(
+    meeting: MeetingModel,
+    state: SwipeableCardState,
+    onSelect: ((MeetingModel, SwipeableCardState) -> Unit)?,
+    notInteresting: ((MeetingModel, SwipeableCardState) -> Unit)?,
+) = when (this) {
+    RIGHT -> onSelect?.let { it(meeting, state) }
+    LEFT -> notInteresting?.let { it(meeting, state) }
+    else -> Unit
 }

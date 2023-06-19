@@ -25,9 +25,10 @@ class ParticipantsBsViewModel: ViewModel(), PullToRefreshTrait {
     
     private val refresh = MutableStateFlow(false)
     
-    override suspend fun forceRefresh() = singleLoading {
-        refresh.value = !refresh.value
-    }
+    override suspend fun forceRefresh() =
+        singleLoading {
+            refresh.value = !refresh.value
+        }
     
     @OptIn(ExperimentalCoroutinesApi::class)
     val participants by lazy {

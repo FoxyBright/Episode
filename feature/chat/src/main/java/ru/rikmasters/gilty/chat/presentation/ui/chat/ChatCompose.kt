@@ -260,38 +260,60 @@ private fun Content(
             }
             else -> {
                 item { Spacer(Modifier.height(28.dp)) }
-                
-                if(state.writingUsers.isNotEmpty()) item {
-                    Writing(
-                        state.writingUsers.map { it.second },
-                        Modifier.padding(16.dp, 2.dp)
-                    )
-                }
+                writingUsers(state.writingUsers)
                 itemsIndexed(list) { index, item ->
-                    ((item ?: MessageModel()) to
-                            rememberDragRowState()
-                            ).let { (mes, row) ->
-                            ChatMessage(
-                                message = mes,
-                                state = row,
-                                sender = mes.message?.author?.id ==
-                                        state.userId,
-                                isOnline = state.meet.isOnline,
-                                last = if(index < list.itemCount.minus(1)) {
-                                    list[index.plus(1)]
-                                } else null,
-                                next = if(index in 1..list.itemCount) {
-                                    list[index.minus(1)]
-                                } else null,
-                                callback = callback
-                            )
-                        }
+                    
+                    val messWithRow =
+                        (item ?: MessageModel()) to rememberDragRowState()
+                    
+                    val userSender = messWithRow.first
+                        .message?.author?.id == state.userId
+                    
+                    val lastMess by remember(list) {
+                        mutableStateOf(
+                            if(index < list.itemCount.minus(1)) {
+                                list[index.plus(1)]
+                            } else null
+                        )
+                    }
+                    
+                    val nextMess by remember(list) {
+                        mutableStateOf(
+                            if(index in 1..list.itemCount) {
+                                list[index.minus(1)]
+                            } else null
+                        )
+                    }
+                    
+                    ChatMessage(
+                        message = messWithRow.first,
+                        state = messWithRow.second,
+                        sender = userSender,
+                        isOnline = state.meet.isOnline,
+                        last = lastMess,
+                        next = nextMess,
+                        callback = callback
+                    )
                 }
                 if(state.messageList.loadState.append
                             is LoadState.Loading
                 ) item { PagingLoader(list.loadState) }
             }
         }
+    }
+}
+
+private fun LazyListScope.writingUsers(
+    users: List<Pair<String, ThumbnailModel>>,
+) {
+    if(users.isNotEmpty()) item {
+        Writing(
+            list = users.map {
+                it.second
+            },
+            modifier = Modifier
+                .padding(16.dp, 2.dp)
+        )
     }
 }
 
@@ -319,9 +341,7 @@ private fun Writing(
 
 @Composable
 @Suppress("unused")
-/*TODO отслеживает - когда лист пролистывают вверх
-   (понадобится для регулирования плавающей кнопки)
-*/
+// TODO отслеживает - когда лист пролистывают вверх
 private fun LazyListState.isScrollingUp(): Boolean {
     val firstIndex by remember {
         derivedStateOf { firstVisibleItemIndex }

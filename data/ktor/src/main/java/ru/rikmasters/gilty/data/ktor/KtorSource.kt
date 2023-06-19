@@ -1,12 +1,12 @@
 package ru.rikmasters.gilty.data.ktor
 
-import android.util.Log
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.HttpTimeout.Plugin.INFINITE_TIMEOUT_MS
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -71,7 +71,11 @@ open class KtorSource: WebSource() {
                 }
                 host = env[ENV_BASE_URL] ?: ""
             }
-            install(HttpTimeout) { socketTimeoutMillis = 15000 }
+            install(HttpTimeout) {
+                connectTimeoutMillis = INFINITE_TIMEOUT_MS
+                socketTimeoutMillis = INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = INFINITE_TIMEOUT_MS
+            }
             install(UserAgent) { agent = env[ENV_USER_AGENT] ?: "" }
             install(WebSockets) {
                 contentConverter = JacksonWebsocketContentConverter()

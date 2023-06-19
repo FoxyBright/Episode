@@ -19,21 +19,18 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.rikmasters.gilty.core.util.composable.getDensity
 import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
 import ru.rikmasters.gilty.gallery.cropper.model.OutlineType
 import ru.rikmasters.gilty.gallery.cropper.model.RoundedCornerCropShape
 import ru.rikmasters.gilty.gallery.cropper.settings.*
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.R.drawable
-import ru.rikmasters.gilty.shared.R.string
-import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
@@ -45,7 +42,7 @@ private fun ImageCropperPreview() {
             GImageCropperState(
                 ImageBitmap.imageResource(
                     LocalContext.current.resources,
-                    drawable.test_image
+                    R.drawable.test_image
                 )
             )
         )
@@ -70,9 +67,12 @@ fun ImageCropper(
     modifier: Modifier = Modifier,
     callback: GImageCropperCallback? = null,
 ) {
-    
-    val handleSize = LocalDensity.current.run { 20.dp.toPx() }
-    var crop by remember { mutableStateOf(false) }
+    val handleSize = getDensity().let {
+        remember { with(it) { 20.dp.toPx() } }
+    }
+    var crop by remember {
+        mutableStateOf(false)
+    }
     var croppedImage by remember {
         mutableStateOf<ImageBitmap?>(null)
     }
@@ -81,17 +81,23 @@ fun ImageCropper(
     }
     
     Scaffold(
-        modifier, topBar = {
-            TopBar(Modifier)
-            { callback?.onBack() }
-        }, bottomBar = {
+        modifier = modifier,
+        topBar = {
+            TopBar(Modifier) {
+                callback?.onBack()
+            }
+        },
+        bottomBar = {
             GradientButton(
-                Modifier
+                modifier = Modifier
                     .padding(bottom = 48.dp)
                     .padding(horizontal = 16.dp),
-                stringResource(string.meeting_filter_complete_button),
+                text = stringResource(
+                    R.string.meeting_filter_complete_button
+                ),
             ) { crop = true }
-        }) {
+        }
+    ) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -140,13 +146,13 @@ fun ImageCropper(
                 }
             }
             Frame()
-            if(isCropping) Box(Modifier, Center) {
+            /*if(isCropping) Box(Modifier, Center) {
                 AnimatedImage(
                     R.raw.loaging,
                     Modifier.size(24.dp),
                     isPlaying = isCropping
                 )
-            }
+            }*/
         }
     }
 }
@@ -162,7 +168,7 @@ private fun Frame() {
         Box(
             Modifier
                 .fillMaxWidth(0.5f)
-                .fillMaxHeight(0.455f)
+                .fillMaxHeight(0.454f)
                 .border(
                     width = 2.dp,
                     color = White,
@@ -192,28 +198,35 @@ private fun TopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.primaryContainer)
+            .background(
+                colorScheme.primaryContainer
+            )
             .padding(top = 16.dp),
         Start, CenterVertically
     ) {
         IconButton(
-            onBack,
-            Modifier.padding(start = 4.dp)
+            onClick = onBack,
+            modifier = Modifier
+                .padding(start = 4.dp)
         ) {
             Icon(
-                painterResource(drawable.ic_back),
-                (null), Modifier.size(24.dp),
-                colorScheme.tertiary
+                painter = painterResource(
+                    R.drawable.ic_back
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = colorScheme.tertiary
             )
         }
         Text(
-            stringResource(string.image_preview_cropper),
-            Modifier
+            text = stringResource(R.string.image_preview_cropper),
+            modifier = Modifier
                 .padding(vertical = 18.dp)
                 .padding(start = 4.dp),
-            style = typography.headlineLarge,
-            fontWeight = Medium,
-            color = colorScheme.tertiary
+            style = typography.headlineLarge.copy(
+                color = colorScheme.tertiary,
+                fontWeight = Medium
+            ),
         )
     }
 }

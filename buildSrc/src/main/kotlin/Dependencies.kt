@@ -38,7 +38,8 @@ fun DependencyHandlerScope.compose() = implementation(
     "androidx.activity:activity-compose:1.6.0",
     "androidx.compose.ui:ui:$composeVer",
     "io.coil-kt:coil-compose:2.3.0",
-    "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    "androidx.constraintlayout:constraintlayout-compose:1.0.1",
+    "org.jetbrains.compose.ui:ui-util:1.4.0"
 ) and implementation(
     "androidx.compose.ui:ui-tooling-preview:$composeVer",
     "androidx.compose.ui:ui-test-manifest:$composeVer",
@@ -65,10 +66,6 @@ fun DependencyHandlerScope.imageCropper() = implementation(
     "com.github.SmartToolFactory:Compose-Extended-Gestures:2.1.0",
     "com.github.SmartToolFactory:Compose-Colorful-Sliders:1.1.0",
     "com.github.SmartToolFactory:Compose-AnimatedList:0.5.1",
-)
-
-fun DependencyHandlerScope.compressor() = implementation(
-    "id.zelory:compressor:3.0.1"
 )
 
 fun DependencyHandlerScope.lottie() = implementation(

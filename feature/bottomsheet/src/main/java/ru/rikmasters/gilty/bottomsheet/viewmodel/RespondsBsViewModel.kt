@@ -16,16 +16,20 @@ import java.util.*
 class RespondsBsViewModel: ViewModel() {
     
     private val profileManager by inject<ProfileManager>()
-    
-    private val _meetId = MutableStateFlow<String?>(null)
-    
     private val context = getKoin().get<Context>()
     
-    private val _tabs = MutableStateFlow(0)
-    val tabs = _tabs.asStateFlow()
+    private val _meetId =
+        MutableStateFlow<String?>(null)
     
-    private val _groupsStates = MutableStateFlow(emptyList<Int>())
-    val groupsStates = _groupsStates.asStateFlow()
+    private val _tabs =
+        MutableStateFlow(0)
+    val tabs =
+        _tabs.asStateFlow()
+    
+    private val _groupsStates =
+        MutableStateFlow(emptyList<Int>())
+    val groupsStates =
+        _groupsStates.asStateFlow()
     
     // Для случаев когда нет meetId, пагинируются встречи и фото внутри откликов
     val sentResponds by lazy {
@@ -40,7 +44,7 @@ class RespondsBsViewModel: ViewModel() {
             }
         }
     }
-
+    
     val receivedResponds by lazy {
         profileManager.getResponds(
             type = RECEIVED
@@ -53,7 +57,7 @@ class RespondsBsViewModel: ViewModel() {
             }
         }
     }
-
+    
     // Для случаев когда есть meetId, пагинируются отклики и фото внутри них
     @OptIn(ExperimentalCoroutinesApi::class)
     val responds by lazy {
@@ -71,20 +75,30 @@ class RespondsBsViewModel: ViewModel() {
         }
     }
     
-    private val _viewerState = MutableStateFlow(false)
-    val viewerState = _viewerState.asStateFlow()
+    private val _viewerState =
+        MutableStateFlow(false)
+    val viewerState =
+        _viewerState.asStateFlow()
     
-    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
-    val viewerImages = _viewerImages.asStateFlow()
+    private val _viewerImages =
+        MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages =
+        _viewerImages.asStateFlow()
     
-    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
-    val viewerSelectImage = _viewerSelectImage.asStateFlow()
+    private val _viewerSelectImage =
+        MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage =
+        _viewerSelectImage.asStateFlow()
     
-    suspend fun changePhotoViewState(state: Boolean) {
+    suspend fun changePhotoViewState(
+        state: Boolean,
+    ) {
         _viewerState.emit(state)
     }
     
-    suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
+    suspend fun setPhotoViewImages(
+        list: List<AvatarModel?>,
+    ) {
         _viewerImages.emit(list)
     }
     

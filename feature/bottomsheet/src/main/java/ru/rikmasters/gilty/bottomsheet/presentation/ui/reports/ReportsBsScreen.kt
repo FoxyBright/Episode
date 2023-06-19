@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.reports
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -30,7 +29,9 @@ fun ReportsBs(
     val screen by vm.screen.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    val enabled = selected != null || description.isNotBlank()
+    val enabled = remember(selected, description) {
+        selected != null || description.isNotBlank()
+    }
     
     LaunchedEffect(Unit) {
         vm.navigate(null)
@@ -39,10 +40,15 @@ fun ReportsBs(
     
     Use<ReportsBsViewModel>(LoadingTrait) {
         ReportsBsContent(
-            ReportsBsState(
-                reports, screen, selected,
-                description, type, enabled
-            ), Modifier, object: ReportsBsCallback {
+            state = ReportsBsState(
+                reports = reports,
+                screen = screen,
+                selected = selected,
+                description = description,
+                objectType = type,
+                enabled = enabled
+            ),
+            callback = object: ReportsBsCallback {
                 
                 override fun onSendReport() {
                     scope.launch {

@@ -159,7 +159,7 @@ fun MeetingBsTopBarCompose(
                 group = state.meet.organizer.group
                     ?: UserGroupTypeModel.DEFAULT,
                 modifier = Modifier
-                    .padding(horizontal = 4.dp),
+                    .padding(start = 6.dp),
                 labelSize = 8,
                 textPadding = PaddingValues(
                     horizontal = 8.dp,
@@ -168,6 +168,8 @@ fun MeetingBsTopBarCompose(
             )
             
             Text(
+                modifier = Modifier
+                    .padding(start = 6.dp),
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,
                 style = typography.labelSmall

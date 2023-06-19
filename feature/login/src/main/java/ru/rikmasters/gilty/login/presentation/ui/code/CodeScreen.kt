@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.core.viewmodel.connector.Use
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.login.viewmodel.CodeViewModel
 
 @SuppressLint("MutableCollectionMutableState")
@@ -30,54 +32,57 @@ fun CodeScreen(vm: CodeViewModel) {
             vm.onTimerChange()
         }
     }
-    
-    CodeContent(
-        CodeState(code, focuses, timer, blur),
-        Modifier, object: CodeCallback {
-            
-            override fun onCodeChange(index: Int, text: String) {
-                scope.launch {
-                    vm.onCodeChange(index, text)
-                    
-                    if(vm.code.value.length == vm.codeLength.value) try {
-                        if(vm.onOtpAuthentication(vm.code.value)) {
-                            
-                            vm.linkExternalToken()
-                            
-                            if(vm.profileCompleted())
-                                nav.clearStackNavigationAbsolute("main/meetings")
-                            else
-                                nav.navigate("profile")
-                        } else badCode()
-                    } catch(e: Exception) {
-                        e.stackTraceToString()
-                        badCode()
+
+    Use<CodeViewModel>(LoadingTrait) {
+        CodeContent(
+            CodeState(code, focuses, timer, blur),
+            Modifier, object : CodeCallback {
+
+                override fun onCodeChange(index: Int, text: String) {
+                    if(blur || vm.loading.value) return
+                    scope.launch {
+                        vm.onCodeChange(index, text)
+
+                        if (vm.code.value.length == vm.codeLength.value) try {
+                            if (vm.onOtpAuthentication(vm.code.value)) {
+
+                                vm.linkExternalToken()
+
+                                if (vm.profileCompleted())
+                                    nav.clearStackNavigationAbsolute("main/meetings")
+                                else
+                                    nav.navigate("profile")
+                            } else badCode()
+                        } catch (e: Exception) {
+                            e.stackTraceToString()
+                            badCode()
+                        }
                     }
                 }
-            }
-            
-            private suspend fun badCode() {
-                scope.launch {
-                    asm.keyboard.hide()
-                    vm.onBlur(true)
-                    vm.onCodeClear()
+
+                private suspend fun badCode() {
+                    scope.launch {
+                        asm.keyboard.hide()
+                        vm.onBlur(true)
+                        vm.onCodeClear()
+                    }
+                }
+
+                override fun onBlur() {
+                    scope.launch {
+                        vm.onCodeClear()
+                        vm.onBlur(false)
+                    }
+                }
+
+                override fun onCodeSend() {
+                    scope.launch { vm.updateSendCode() }
+                }
+
+                override fun onBack() {
+                    nav.navigationBack()
                 }
             }
-            
-            override fun onBlur() {
-                scope.launch {
-                    vm.onCodeClear()
-                    vm.onBlur(false)
-                }
-            }
-            
-            override fun onCodeSend() {
-                scope.launch { vm.updateSendCode() }
-            }
-            
-            override fun onBack() {
-                nav.navigationBack()
-            }
-        }
-    )
+        )
+    }
 }

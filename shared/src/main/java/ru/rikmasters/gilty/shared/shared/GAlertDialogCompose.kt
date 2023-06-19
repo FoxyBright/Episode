@@ -3,8 +3,14 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -40,9 +46,12 @@ private const val content = "Любой контент"
 private fun AlertDialogPreview() {
     GiltyTheme {
         GAlert(
-            (true), Modifier.padding(10.dp),
-            Pair(stringResource(R.string.save_button)) {},
-            header, label, cancel = Pair(
+            show = (true),
+            modifier = Modifier.padding(10.dp),
+            success = Pair(stringResource(R.string.save_button)) {},
+            label = label,
+            title = header,
+            cancel = Pair(
                 stringResource(R.string.cancel)
             ) {}
         )
@@ -106,8 +115,80 @@ fun GAlert(
     selected: Int? = null,
     listItemSelect: ((Int) -> Unit)? = null,
     accentColors: Color = colorScheme.primary,
-    onlyDarkTheme: Boolean = false,
-    content: (@Composable () -> Unit)? = null
+    content: (@Composable () -> Unit)? = null,
+) {
+    if (show) AlertDialog(
+        onDismissRequest ?: {},
+        confirmButton = {
+            Text(
+                success.first, Modifier
+                    .clickable(
+                        MutableInteractionSource(), (null)
+                    ) { success.second() },
+                accentColors,
+                style = typography.labelSmall,
+                fontWeight = SemiBold
+            )
+        }, modifier,
+        dismissButton = {
+            cancel?.let {
+                Text(
+                    it.first, Modifier
+                        .padding(end = 16.dp)
+                        .clickable(
+                            MutableInteractionSource(), (null)
+                        ) { it.second() },
+                    accentColors,
+                    style = typography.labelSmall,
+                    fontWeight = SemiBold
+                )
+            }
+        }, (null), {
+            title?.let {
+                Text(
+                    it, Modifier,
+                    colorScheme.tertiary,
+                    style = typography.displayLarge,
+                    fontWeight = SemiBold
+                )
+            }
+        }, {
+            Column {
+                label?.let {
+                    Text(
+                        it, Modifier.padding(bottom = 16.dp),
+                        colorScheme.tertiary,
+                        style = typography.labelSmall,
+                        fontWeight = SemiBold
+                    )
+                }; content?.invoke()
+                list?.let { items ->
+                    selected?.let {
+                        List(items, it, accentColors) {
+                            listItemSelect?.let { s -> s(it) }
+                        }
+                    }
+                }
+            }
+        },
+        containerColor = colorScheme.primaryContainer
+    )
+}
+
+@Composable
+fun GAlertDarkTheme(
+    show: Boolean,
+    modifier: Modifier = Modifier,
+    success: Pair<String, () -> Unit>,
+    label: String? = null,
+    title: String? = null,
+    onDismissRequest: (() -> Unit)? = null,
+    cancel: Pair<String, () -> Unit>? = null,
+    list: List<String>? = null,
+    selected: Int? = null,
+    listItemSelect: ((Int) -> Unit)? = null,
+    accentColors: Color = ThemeExtra.colors.mainDayGreen,
+    content: (@Composable () -> Unit)? = null,
 ) {
     if (show) AlertDialog(
         onDismissRequest ?: {},
@@ -141,8 +222,7 @@ fun GAlert(
             title?.let {
                 Text(
                     it, Modifier,
-                    if (onlyDarkTheme) White else
-                        colorScheme.tertiary,
+                    White,
                     style = typography.displayLarge,
                     fontWeight = SemiBold
                 )

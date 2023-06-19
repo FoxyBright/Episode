@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.model
+package ru.rikmasters.gilty.presentation.utils
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -7,11 +7,13 @@ import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.Uri.parse
 import android.os.Build
+import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
@@ -51,7 +53,7 @@ class FireBaseService: FirebaseMessagingService() {
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if(Build.VERSION.SDK_INT >= O) {
             createNotificationChannel(
                 getString(R.string.chats_push_channel_name),
                 getString(R.string.chats_push_channel_descriptions),
@@ -70,41 +72,66 @@ class FireBaseService: FirebaseMessagingService() {
                 "${message.data["type"]}${message.data["content"]}"
             else message.data.toString()
         )
-        notificationManager.notify(
-            Random.nextInt(), NotificationCompat
-                .Builder(
-                    (this), when(message.data["type"]) {
-                        "CHAT_MESSAGE" -> CHATS_CHANNEL
-                        else -> MEETS_CHANNEL
-                    }
-                )
-                .setContentTitle(message.notification?.title)
-                .setContentText(message.notification?.body)
-                .setSmallIcon(R.drawable.small_notification_icon)
-                .setAutoCancel(true)
-                .setContentIntent(
-                    PendingIntent.getActivity(
-                        (this), (0), (intent),
-                        FLAG_UPDATE_CURRENT or
-                                FLAG_IMMUTABLE
-                    )
-                ).build()
-        )
+        
+        if(notifyRule(message))
+            notificationManager.notify(
+                Random.nextInt(),
+                notification(message, intent)
+            )
     }
     
-    @RequiresApi(Build.VERSION_CODES.O)
+    private fun Context.notifyRule(
+        message: RemoteMessage,
+    ) = if(message.data["type"] != "CHAT_MESSAGE")
+        true else message.data["content"]
+        ?.substringAfter("\"chat\":{\"id\":\"")
+        ?.substringBefore("\"")
+        ?.let { chatId ->
+            this.getSharedPreferences("sharedPref", MODE_PRIVATE)
+                .getString("opened_chat", "")
+                .let { opened ->
+                    if(opened.isNullOrBlank())
+                        return true
+                    chatId != opened
+                }
+        } ?: true
+    
+    @RequiresApi(O)
     private fun createNotificationChannel(
         name: String,
         description: String,
         channel_id: String,
         notificationManager: NotificationManager,
     ) {
-        notificationManager.createNotificationChannel(NotificationChannel(
+        val chanel = NotificationChannel(
             channel_id, name, IMPORTANCE_HIGH
-        ).apply {
-            this.description = description
-            enableLights(true)
-            lightColor = Color.GREEN
-        })
+        )
+        notificationManager.createNotificationChannel(
+            chanel.apply {
+                this.description = description
+                enableLights(true)
+                lightColor = Color.GREEN
+            })
     }
+    
+    private fun Context.notification(
+        message: RemoteMessage,
+        intent: Intent,
+    ) = NotificationCompat
+        .Builder(
+            (this), when(message.data["type"]) {
+                "CHAT_MESSAGE" -> CHATS_CHANNEL
+                else -> MEETS_CHANNEL
+            }
+        )
+        .setContentTitle(message.notification?.title)
+        .setContentText(message.notification?.body)
+        .setSmallIcon(R.drawable.small_notification_icon)
+        .setAutoCancel(true)
+        .setContentIntent(
+            PendingIntent.getActivity(
+                this, 0, intent,
+                (FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
+            )
+        ).build()
 }

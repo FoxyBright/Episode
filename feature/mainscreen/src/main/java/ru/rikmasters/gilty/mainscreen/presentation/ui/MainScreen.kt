@@ -15,7 +15,7 @@ import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
-import ru.rikmasters.gilty.core.viewmodel.connector.Connector
+import ru.rikmasters.gilty.core.viewmodel.connector.openBS
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.calendar.CalendarBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.bottomsheets.time.TimeBs
 import ru.rikmasters.gilty.mainscreen.presentation.ui.swipeablecard.SwipeableCardState
@@ -33,7 +33,6 @@ import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffold
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun MainScreen(vm: MainViewModel) {
-    
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
@@ -69,7 +68,7 @@ fun MainScreen(vm: MainViewModel) {
         if(meetBsState == COLLAPSED)
             vm.resetMeets()
     }
-
+    
     LaunchedEffect(Unit) {
         vm.getAllCategories()
         vm.getUserCategories()
@@ -149,15 +148,14 @@ fun MainScreen(vm: MainViewModel) {
             }
             
             override fun onTimeFilterClick() {
-                scope.launch {
-                    asm.bottomSheet.expand {
-                        if(today) Connector<TimeBsViewModel>(vm.scope) {
-                            TimeBs(it)
-                        } else Connector<CalendarBsViewModel>(vm.scope) {
-                            CalendarBs(it)
-                        }
-                    }
-                }
+                if(today) vm.scope.openBS<TimeBsViewModel>(
+                    scope = scope,
+                    content = { TimeBs(it) }
+                )
+                else vm.scope.openBS<CalendarBsViewModel>(
+                    scope = scope,
+                    content = { CalendarBs(it) }
+                )
             }
             
             override fun meetInteraction(

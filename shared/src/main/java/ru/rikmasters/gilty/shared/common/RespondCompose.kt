@@ -146,7 +146,7 @@ fun ReceivedRespond(
                 // TODO: error states
                 val photos = respond.photos?.collectAsLazyPagingItems()
                 photos?.let {
-                    if(photos.loadState.refresh is LoadState.Loading) {
+                    if(it.loadState.refresh is LoadState.Loading) {
                         // TODO: заменить чем-нибудь
                         Spacer(
                             modifier = Modifier.height(60.dp)

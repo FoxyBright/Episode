@@ -13,6 +13,7 @@ import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.meetings.MeetingManager
+import ru.rikmasters.gilty.shared.common.compressor.compress
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.nowZ
 import ru.rikmasters.gilty.shared.common.extentions.LocalTime.Companion.ofZ
@@ -23,9 +24,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.ACTIVE
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
-import ru.rikmasters.gilty.shared.shared.compress
-import ru.rikmasters.gilty.translation.shared.utils.getTimeDifferenceString
-import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import java.io.File
 import java.time.ZoneId

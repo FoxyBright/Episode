@@ -78,13 +78,13 @@ open class TransformState(
     val rotation: Float
         get() = animatableRotation.value
     
-    val isZooming: Boolean
+    private val isZooming: Boolean
         get() = animatableZoom.isRunning
     
-    val isPanning: Boolean
+    private val isPanning: Boolean
         get() = animatablePanX.isRunning || animatablePanY.isRunning
     
-    val isRotating: Boolean
+    private val isRotating: Boolean
         get() = animatableRotation.isRunning
     
     val isAnimationRunning: Boolean
@@ -140,7 +140,7 @@ open class TransformState(
         launch { animateRotationTo(rotation, animationSpec) }
     }
     
-    internal suspend fun animatePanXto(
+    private suspend fun animatePanXto(
         panX: Float,
         animationSpec: AnimationSpec<Float> = tween(400),
     ) {
@@ -149,7 +149,7 @@ open class TransformState(
         }
     }
     
-    internal suspend fun animatePanYto(
+    private suspend fun animatePanYto(
         panY: Float,
         animationSpec: AnimationSpec<Float> = tween(400),
     ) {
@@ -168,7 +168,7 @@ open class TransformState(
             )
     }
     
-    internal suspend fun animateRotationTo(
+    private suspend fun animateRotationTo(
         rotation: Float,
         animationSpec: AnimationSpec<Float> = tween(400),
     ) {
@@ -195,7 +195,7 @@ open class TransformState(
         )
     }
     
-    internal suspend fun snapRotationTo(rotation: Float) {
+    private suspend fun snapRotationTo(rotation: Float) {
         if(rotatable) {
             animatableRotation.snapTo(rotation)
         }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,29 +49,34 @@ fun GalleryContent(
 ) {
     Scaffold(modifier, {
         GalleryDropMenu(
-            state.menuState,
-            state.menuItems,
-            callback
+            state = state.menuState,
+            menuList = state.menuItems,
+            callback = callback
         )
-        GalleryTopBar(state.menuState, callback)
+        GalleryTopBar(
+            menuState = state.menuState,
+            callback = callback
+        )
     }) { paddings ->
         GalleryGrid(
-            modifier.padding(top = paddings.calculateTopPadding()),
-            state.images,
-            state.selectedImages,
-            state.type,
-            (false),
-            callback
+            modifier = modifier.padding(
+                top = paddings.calculateTopPadding()
+            ),
+            images = state.images,
+            selected = state.selectedImages,
+            type = state.type,
+            isWeb = (false),
+            callback = callback
         )
     }
     if(state.type == MULTIPLE)
         Box(Modifier.fillMaxSize()) {
             GradientButton(
-                Modifier
+                modifier = Modifier
                     .padding(bottom = 48.dp)
                     .padding(horizontal = 16.dp)
-                    .align(Alignment.BottomCenter),
-                state.buttonLabel
+                    .align(BottomCenter),
+                text = state.buttonLabel
             ) { callback?.onAttach() }
         }
 }

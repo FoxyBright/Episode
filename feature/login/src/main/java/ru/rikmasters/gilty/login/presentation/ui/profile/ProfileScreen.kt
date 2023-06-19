@@ -34,7 +34,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val profile by vm.profile.collectAsState()
     val occupied by vm.occupied.collectAsState()
     val username by vm.username.collectAsState()
-    
+
     val regexError = username.contains(Regex("[^A-Za-z]"))
     val shortUserNameError = username.length in 1 until 4
     var errorAvatar by remember { mutableStateOf(false) }
@@ -62,8 +62,8 @@ fun ProfileScreen(vm: ProfileViewModel) {
     }
     
     LaunchedEffect(Unit) {
-        vm.getProfile()
-        errorText = ""
+            vm.getProfile()
+            errorText = ""
     }
     
     val profileState = ProfileState(
@@ -106,10 +106,12 @@ fun ProfileScreen(vm: ProfileViewModel) {
                         "registration/gallery?multi=false"
                     )
                 }
+                onSaveDescription()
             }
             
             override fun hiddenImages() {
                 nav.navigate("hidden")
+                onSaveDescription()
             }
             
             override fun onDescriptionChange(text: String) {
@@ -120,28 +122,33 @@ fun ProfileScreen(vm: ProfileViewModel) {
             }
             
             override fun onSaveDescription() {
-                scope.launch { vm.onDescriptionSave() }
+                //scope.launch { vm.onDescriptionSave() }
             }
             
             override fun onNameChange(text: String) {
-                scope.launch { vm.usernameChange(text) }
+                scope.launch {
+                    vm.usernameChange(text)
+                }
             }
             
             override fun onSaveUserName() {
-                scope.launch { vm.onUsernameSave() }
+                //scope.launch { vm.onUsernameSave() }
             }
             
             override fun onBack() {
                 scope.launch {
                     vm.clearLoginData()
+                    onNameChange("")
+                    onDescriptionChange("")
                     nav.navigateAbsolute("login")
                 }
             }
             
             override fun onNext() {
                 scope.launch {
-                    vm.checkOnNext()
-                    nav.navigate("personal")
+                    vm.checkOnNext(onSuccess = {
+                        nav.navigate("personal")
+                    })
                 }
             }
         }

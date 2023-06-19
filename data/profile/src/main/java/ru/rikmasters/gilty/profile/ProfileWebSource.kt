@@ -24,13 +24,13 @@ import ru.rikmasters.gilty.shared.models.meets.Meeting
 import ru.rikmasters.gilty.shared.wrapper.*
 import java.io.File
 
-class ProfileWebSource : KtorSource() {
-
+class ProfileWebSource: KtorSource() {
+    
     enum class ObserversType(val value: String) {
         OBSERVERS("watchers"),
         OBSERVABLES("watch")
     }
-
+    
     suspend fun getUser(id: String) = tryGet(
         "http://$HOST$PREFIX_URL/users/$id"
     ).let {
@@ -38,7 +38,7 @@ class ProfileWebSource : KtorSource() {
             it.wrapped<Profile>().map()
         }
     }
-
+    
     suspend fun getUserMeets(
         page: Int? = null,
         perPage: Int? = null,
@@ -55,7 +55,7 @@ class ProfileWebSource : KtorSource() {
                 .let { it.first to it.second.currentPage }
         }
     }
-
+    
     suspend fun getUserCategories() = tryGet(
         "http://$HOST$PREFIX_URL/profile/categories"
     ).let {
@@ -63,22 +63,22 @@ class ProfileWebSource : KtorSource() {
             it.wrapped<List<Category>>()
         }
     }
-
+    
     suspend fun subscribeToUser(memberId: String) =
         tryPost("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}")
         { url { query("user_id" to memberId) } }
             .let { coroutinesState({ it }) {} }
-
+    
     suspend fun unsubscribeFromUser(memberId: String) =
         tryDelete("http://$HOST$PREFIX_URL/profile/${OBSERVABLES.value}") {
             url { query("user_id" to memberId) }
         }.let { coroutinesState({ it }) {} }
-
+    
     suspend fun deleteObserver(member: UserModel) =
         tryDelete("http://$HOST$PREFIX_URL/profile/${OBSERVERS.value}") {
             url { query("user_id" to member.id.toString()) }
         }.let { coroutinesState({ it }) {} }
-
+    
     suspend fun getObservers(
         query: String,
         type: ObserversType,
@@ -88,7 +88,7 @@ class ProfileWebSource : KtorSource() {
         perPage: Int = 15,
     ) = tryGet(
         "http://$HOST$PREFIX_URL/profile/${type.value}${
-            if (query.isNotBlank()) "?query=$query" else ""
+            if(query.isNotBlank()) "?query=$query" else ""
         }"
     ) {
         url {
@@ -100,12 +100,28 @@ class ProfileWebSource : KtorSource() {
             it.paginateWrapped<List<User>>().first
         }
     }
-
+    
     suspend fun deleteHidden(albumId: String, imageId: String) =
         tryDelete(
             "http://$HOST$PREFIX_URL/albums/$albumId/files/$imageId"
         ).let { coroutinesState({ it }) {} }
-
+    
+    suspend fun changeAlbumPosition(
+        albumId: String,
+        imageId: String,
+        position: Int,
+    ) =
+        tryPost(
+            "http://$HOST$PREFIX_URL/albums/$albumId/position"
+        ) {
+            setBody(ChangeAlbumPositionRequest(imageId, position))
+        }.let { coroutinesState({ it }) {} }
+    
+    data class ChangeAlbumPositionRequest(
+        val file_id: String,
+        val position: Int,
+    )
+    
     suspend fun getFiles(
         albumId: String,
     ) = tryGet("http://$HOST$PREFIX_URL/albums/$albumId/files")
@@ -115,7 +131,7 @@ class ProfileWebSource : KtorSource() {
                     .let { p -> p.first to p.second.total }
             }
         }
-
+    
     suspend fun addHidden(albumId: String, files: List<File>) =
         tryPostFormData(
             url = "http://$HOST$PREFIX_URL/albums/$albumId/upload",
@@ -146,7 +162,7 @@ class ProfileWebSource : KtorSource() {
                 it.wrapped<List<Avatar>>()
             }
         }
-
+    
     suspend fun setUserAvatar(avatar: File, list: List<Float>) =
         tryPostFormData(
             url = "http://$HOST$PREFIX_URL/profile/avatar",
@@ -165,30 +181,20 @@ class ProfileWebSource : KtorSource() {
                         )
                     }
                 )
-                append(
-                    key = "crop_x",
-                    value = list[0]
-                )
-                append(
-                    key = "crop_y",
-                    value = list[1]
-                )
-                append(
-                    key = "crop_width",
-                    value = list[2]
-                )
-                append(
-                    key = "crop_height",
-                    value = list[3]
-                )
+                listOf(
+                    "crop_x", "crop_y",
+                    "crop_width", "crop_height"
+                ).forEachIndexed { i, it ->
+                    append(it, list[i])
+                }
             }
         ).let { coroutinesState({ it }) {} }
-
+    
     suspend fun checkUserName(username: String) =
         tryGet("http://$HOST$PREFIX_URL/profile/checkname") {
             url { query("username" to username) }
         }.let { coroutinesState({ it }) { false } }
-
+    
     suspend fun setUserData(
         username: String?,
         aboutMe: String?,
@@ -203,7 +209,7 @@ class ProfileWebSource : KtorSource() {
             )
         )
     }.let { coroutinesState({ it }) {} }
-
+    
     suspend fun getUserData() = tryGet(
         "http://$HOST$PREFIX_URL/profile"
     ).let {
@@ -211,11 +217,11 @@ class ProfileWebSource : KtorSource() {
             it.wrapped<Profile>()
         }
     }
-
+    
     suspend fun deleteAccount() =
         tryDelete("http://$HOST$PREFIX_URL/profile/account")
             .let { coroutinesState({ it }) {} }
-
+    
     suspend fun getResponds(
         type: RespondType, page: Int?, perPage: Int?,
     ) = tryGet("http://$HOST$PREFIX_URL/responds") {
@@ -229,7 +235,7 @@ class ProfileWebSource : KtorSource() {
             it.paginateWrapped<List<MeetWithRespondsResponse>>().first
         }
     }
-
+    
     suspend fun getFilesPaging(
         albumId: String, page: Int, perPage: Int,
     ) = tryGet("http://$HOST$PREFIX_URL/albums/$albumId/files") {
@@ -238,11 +244,16 @@ class ProfileWebSource : KtorSource() {
             query("per_page" to "$perPage")
         }
     }.let {
-        coroutinesState({ it }) {
-            it.paginateWrapped<List<Avatar>>().first
-        }
-    }
 
+        coroutinesState({ it }) {
+            it.paginateWrapped<List<Avatar>>()
+                .let { p -> p.first to p.second.total }
+        }
+        /*coroutinesState({ it }) {
+            it.paginateWrapped<List<Avatar>>().first
+        }*/
+    }
+    
     suspend fun getMeetResponds(
         meetId: String, page: Int?, perPage: Int?,
     ) = tryGet("http://$HOST$PREFIX_URL/meetings/$meetId/responds") {
@@ -255,11 +266,11 @@ class ProfileWebSource : KtorSource() {
             it.paginateWrapped<List<RespondResponse>>().first
         }
     }
-
+    
     suspend fun deleteRespond(respondId: String) =
         tryDelete("http://$HOST$PREFIX_URL/responds/$respondId")
             .let { coroutinesState({ it }) {} }
-
+    
     suspend fun getNotificationResponds(): LastRespond {
         val request = getResponds(
             RECEIVED, null, null
@@ -268,24 +279,25 @@ class ProfileWebSource : KtorSource() {
             loading = { emptyList() },
             error = { emptyList() }
         ).firstOrNull()
-
+        
         return request.let {
             LastRespond(
                 (it?.responds?.firstOrNull()
                     ?.author?.avatar?.thumbnail?.url ?: ""),
                 it?.responds?.firstOrNull()?.author?.isOnline ?: false,
-                it?.responds?.firstOrNull()?.author?.group?.map() ?: UserGroupTypeModel.DEFAULT,
+                it?.responds?.firstOrNull()?.author?.group?.map()
+                    ?: UserGroupTypeModel.DEFAULT,
                 (it?.responds_count ?: 0)
             )
-
-
+            
+            
         }
     }
-
+    
     suspend fun acceptRespond(respondId: String) =
         tryPost("http://$HOST$PREFIX_URL/responds/$respondId/accept")
             .let { coroutinesState({ it }) {} }
-
+    
     suspend fun cancelRespond(respondId: String) =
         tryPatch("http://$HOST$PREFIX_URL/responds/$respondId/cancel")
             .let { coroutinesState({ it }) {} }

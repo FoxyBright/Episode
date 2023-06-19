@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.res.painterResource
@@ -293,53 +294,41 @@ fun MeetCard(
     onSelect: ((DirectionType) -> Unit)? = null,
 ) {
     Box(modifier) {
-        if(type == MEET) Image(
-            painterResource(
-                if(isSystemInDarkTheme())
-                    R.drawable.ic_back_rect_dark
-                else R.drawable.ic_back_rect
-            ), (null), Modifier
-                .align(BottomCenter)
-                .offset(
-                    y = animateDpAsState(
-                        if(stack) 16.dp
-                        else 0.dp,
-                        tween(800)
-                    ).value
-                )
-        )
+        if(type == MEET)
+            Image(
+                painter = painterResource(
+                    if(isSystemInDarkTheme())
+                        R.drawable.ic_back_rect_dark
+                    else R.drawable.ic_back_rect
+                ),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(BottomCenter)
+                    .offset(
+                        y = animateDpAsState(
+                            if(stack) 16.dp
+                            else 0.dp,
+                            tween(800)
+                        ).value
+                    )
+            )
         Column(
             Modifier
                 .fillMaxSize()
                 .clip(shapes.large)
         ) {
-            if(type == MEET) MeetCard(
-                meet, offset, onSelect
-            ) else EmptyCard(
-                hasFilters, onMoreClick,
-                onRepeatClick
+            if(type == MEET)
+                MeetCard(
+                    meet = meet,
+                    offset = offset,
+                    onSelect = onSelect
+                )
+            else EmptyCard(
+                hasFilters = hasFilters,
+                onMoreClick = onMoreClick,
+                onRepeatClick = onRepeatClick
             )
         }
-    }
-}
-
-@Composable
-private fun EmptyCard(
-    hasFilters: Boolean,
-    onMoreClick: (() -> Unit)?,
-    onRepeatClick: (() -> Unit)?,
-) {
-    Column {
-        EmptyTop(
-            Modifier
-                .weight(1f)
-                .offset(y = 24.dp)
-        )
-        EmptyBottom(
-            Modifier,
-            hasFilters,
-            { onRepeatClick?.let { it() } }
-        ) { onMoreClick?.let { it() } }
     }
 }
 
@@ -352,35 +341,19 @@ private fun MeetCard(
     meet?.let {
         Box {
             MeetTop(
-                it.organizer?.avatar,
-                Modifier
+                avatar = it.organizer?.avatar,
+                modifier = Modifier
                     .clip(ThemeExtra.shapes.bigTopShapes)
                     .fillMaxSize()
                     .offset(y = (-24).dp)
             )
             MeetBottom(
-                it, offset, Modifier.align(BottomCenter)
+                meet = it,
+                offset = offset,
+                modifier = Modifier.align(BottomCenter)
             ) { type -> onSelect?.let { it(type) } }
         }
     }
-}
-
-@Composable
-private fun EmptyTop(
-    modifier: Modifier,
-) {
-    AnimatedImage(
-        if(isSystemInDarkTheme())
-            R.raw.corgi_night else
-            R.raw.corgi,
-        modifier
-            .fillMaxSize()
-            .background(
-                colorScheme.primaryContainer,
-                ThemeExtra.shapes.bigTopShapes
-            ),
-        contentScale = Crop
-    )
 }
 
 @Composable
@@ -389,8 +362,8 @@ private fun MeetTop(
     modifier: Modifier,
 ) {
     GCachedImage(
-        avatar?.thumbnail?.url,
-        modifier
+        url = avatar?.thumbnail?.url,
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 1.dp),
         contentScale = Crop,
@@ -460,6 +433,51 @@ private fun MeetBottom(
                 ) { onSelect?.let { it(RIGHT) } }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyCard(
+    hasFilters: Boolean,
+    onMoreClick: (() -> Unit)?,
+    onRepeatClick: (() -> Unit)?,
+) {
+    Column {
+        EmptyTop(
+            Modifier
+                .weight(1f)
+                .offset(y = 24.dp)
+        )
+        EmptyBottom(
+            Modifier,
+            hasFilters,
+            { onRepeatClick?.let { it() } }
+        ) { onMoreClick?.let { it() } }
+    }
+}
+
+@Composable
+private fun EmptyTop(
+    modifier: Modifier,
+    shape: Shape = ThemeExtra
+        .shapes.bigTopShapes,
+) {
+    Box(
+        modifier.background(
+            color = colorScheme
+                .primaryContainer,
+            shape = shape
+        )
+    ) {
+        AnimatedImage(
+            resource = if(isSystemInDarkTheme())
+                R.raw.corgi_night
+            else R.raw.corgi,
+            modifier = modifier
+                .fillMaxSize()
+                .clip(shape),
+            contentScale = Crop
+        )
     }
 }
 

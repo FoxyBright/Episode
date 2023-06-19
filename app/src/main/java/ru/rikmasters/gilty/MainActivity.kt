@@ -30,11 +30,12 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.presentation.model.FireBaseService
+import ru.rikmasters.gilty.presentation.utils.FireBaseService
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.R.style.Theme_Gilty
 import ru.rikmasters.gilty.shared.common.ErrorConnection
 import ru.rikmasters.gilty.shared.common.errorToast
+import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.clearSelectChat
 import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.ui.GBottomSheetBackground
@@ -119,6 +120,7 @@ class MainActivity: ComponentActivity() {
             
             suspend fun authorize(userId: String) {
                 try {
+                    clearSelectChat(this)
                     authManager.savePushToken(token)
                     chatManager.connectWebSocket(userId)
                 }catch (e:Exception){

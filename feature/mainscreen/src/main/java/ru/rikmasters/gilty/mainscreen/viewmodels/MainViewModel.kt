@@ -69,9 +69,8 @@ class MainViewModel: ViewModel() {
     private val _results = MutableStateFlow<Int?>(null)
     val results = _results.asStateFlow()
     suspend fun getPageMeetings(reset: Boolean) {
-        if(reset) {
-            _page.emit(1)
-        } else _page.emit(_page.value + 1)
+        if(reset) _page.emit(1)
+        else _page.emit(_page.value + 1)
         meetManager.getMeetingsPaging(
             meetFilters.value,
             false,
@@ -81,10 +80,9 @@ class MainViewModel: ViewModel() {
                 if(reset) _meetings.emit(emptyList())
                 val meetings =
                     _meetings.value.toMutableList()
-                meetings.addAll(0, it.first)
+                meetings.addAll(if(meetings.size != 0)meetings.size - 1 else 0, it.first.reversed())
                 _meetings.emit(meetings)
                 _results.emit(it.second)
-                
             },
             loading = {},
             error = {

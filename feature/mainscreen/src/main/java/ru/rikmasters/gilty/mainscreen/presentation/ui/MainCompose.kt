@@ -63,12 +63,18 @@ fun MainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
-                (false), (false), (false), (false),
-                (DemoMeetingList), listOf(
+                grid = false,
+                today = false,
+                selectDate = false,
+                selectTime = false,
+                meetings = DemoMeetingList,
+                navBarStates = listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
-                ), (false), (false),
-                rememberBottomSheetScaffoldState()
+                ),
+                alert = false,
+                hasFilters = false,
+                bsState = rememberBottomSheetScaffoldState()
             )
         )
     }
@@ -80,13 +86,18 @@ fun GridMainContentPreview() {
     GiltyTheme {
         MainContent(
             MainContentState(
-                (true), (true), (false), (false),
-                (DemoMeetingList),
-                listOf(
+                grid = true,
+                today = true,
+                selectDate = false,
+                selectTime = false,
+                meetings = DemoMeetingList,
+                navBarStates = listOf(
                     INACTIVE, ACTIVE,
                     INACTIVE, NEW_INACTIVE, INACTIVE
-                ), (false), (false),
-                rememberBottomSheetScaffoldState()
+                ),
+                alert = false,
+                hasFilters = false,
+                bsState = rememberBottomSheetScaffoldState()
             )
         )
     }
@@ -139,15 +150,15 @@ fun MainContent(
             Modifier
                 .fillMaxSize()
                 .background(
-                    //                    if(state.smthError)
-                    //                        Transparent
-                    //                    else
+                    // if(state.smthError)
+                    // Transparent
+                    // else
                     colorScheme.background
                 )
         ) {
-            //            if(state.smthError) ErrorInternetConnection {
-            //                callback?.updateMainScreen()
-            //            }
+            // if(state.smthError) ErrorInternetConnection {
+            // callback?.updateMainScreen()
+            // }
             Column {
                 TopBar(
                     today = state.today,
@@ -157,7 +168,7 @@ fun MainContent(
                     onTodayChange = { callback?.onTodayChange(it) }
                 ) { callback?.onTimeFilterClick() }
                 Use<MainViewModel>(LoadingTrait) {
-                    //                    if(!state.smthError)
+                    // if(!state.smthError)
                     Content(
                         state = state.grid,
                         hasFilters = state.hasFilters,
@@ -213,11 +224,7 @@ private fun TopBar(
         Row(
             Modifier.padding(horizontal = 16.dp),
             Start, Bottom
-        ) {
-            TodayToggle(today, Modifier) {
-                onTodayChange(it)
-            }
-        }
+        ) { TodayToggle(today) { onTodayChange(it) } }
         IconButton(onTimeFilterClick) {
             val icons = if(isSystemInDarkTheme())
                 listOf(
@@ -252,7 +259,7 @@ private fun TopBar(
 @SuppressLint("CoroutineCreationDuringComposition")
 private fun TodayToggle(
     today: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onTodayChange: (Boolean) -> Unit,
 ) {
     val tween = 300
@@ -324,7 +331,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if (today) -(3).dp
+                        if(today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -348,19 +355,24 @@ private fun Content(
     callback: MainContentCallback?,
 ) {
     Box {
-        if(meetings.size < 2) MeetCard(
-            modifier, EMPTY, hasFilters = hasFilters,
+        if(remember { meetings.size } < 2) MeetCard(
+            modifier = modifier,
+            type = EMPTY,
+            hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
-        if(state && meetings.isNotEmpty()) MeetingGridContent(
-            modifier = modifier.fillMaxSize(),
-            meetings = meetings
-        ) { callback?.onRespond(it) }
-        else MeetingsListContent(
-            states = meetings.map { item ->
-                item to rememberSwipeableCardState()
-            },
+        //        if(state && meetings.isNotEmpty())
+        //            MeetingGridContent(
+        //                modifier = modifier.fillMaxSize(),
+        //                meetings = meetings
+        //            ) { callback?.onRespond(it) }
+        //        else
+        val states = meetings.map {
+            it to rememberSwipeableCardState()
+        }
+        MeetingsListContent(
+            states = states,
             modifier = modifier.padding(top = 24.dp),
             notInteresting = { meet, it ->
                 callback?.meetInteraction(LEFT, meet, it)
@@ -379,7 +391,7 @@ private fun Floating(
     state: MainContentState,
     callback: MainContentCallback?,
 ) {
-    SquareCheckBox(!state.grid, Modifier)
+    SquareCheckBox(!state.grid)
     { callback?.onStyleChange() }
 }
 
@@ -393,12 +405,14 @@ private fun Filters(
     BottomSheetScaffold(
         sheetContent = {
             Filters(
-                (state.bsState
+                isCollapsed = (state.bsState
                     .bottomSheetState
                     .offset.value > screenHeight / 2),
-                alpha, state.vmScope
+                alpha = alpha,
+                scope = state.vmScope
             )
-        }, scaffoldState = state.bsState,
+        },
+        scaffoldState = state.bsState,
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent,
         sheetPeekHeight = 126.dp
@@ -411,19 +425,20 @@ private fun Filters(
     alpha: Float,
     scope: Scope?,
 ) {
-    if(scope == null) return
-    Box {
-        Box(
-            Modifier
-                .offset(y = gripOffset(isCollapsed))
-                .clip(shapes.bigTopShapes)
-        ) {
-            Connector<FiltersBsViewModel>(scope) {
-                FiltersBs(it, alpha, isCollapsed)
+    scope?.let {
+        Box {
+            Box(
+                Modifier
+                    .offset(y = gripOffset(isCollapsed))
+                    .clip(shapes.bigTopShapes)
+            ) {
+                Connector<FiltersBsViewModel>(scope) {
+                    FiltersBs(it, alpha, isCollapsed)
+                }
             }
+            Grip(Modifier.align(TopCenter), !isCollapsed)
         }
-        Grip(Modifier.align(TopCenter), !isCollapsed)
-    }
+    } ?: return
 }
 
 @Composable

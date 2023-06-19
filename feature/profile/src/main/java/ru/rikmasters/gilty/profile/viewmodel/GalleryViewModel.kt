@@ -7,8 +7,8 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.auth.manager.RegistrationManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.gallery.GalleryAdapter.getImages
+import ru.rikmasters.gilty.shared.common.compressor.compress
 import ru.rikmasters.gilty.shared.common.errorToast
-import ru.rikmasters.gilty.shared.shared.compress
 import java.io.File
 
 

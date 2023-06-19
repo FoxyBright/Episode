@@ -201,10 +201,10 @@ fun BottomSheet(
                 stack.GetStringArg("type") { type ->
                     Connector<ReportsBsViewModel>(scope) {
                         ReportsBs(
-                            it,
-                            ReportObjectType.valueOf(type),
-                            id,
-                            nav
+                            vm = it,
+                            type = ReportObjectType.valueOf(type),
+                            id = id,
+                            nav = nav
                         )
                     }
                 }
