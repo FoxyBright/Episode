@@ -62,7 +62,6 @@ import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
 import ru.rikmasters.gilty.translation.shared.utils.map
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
 import ru.rikmasters.gilty.translation.shared.utils.startBroadCast
-import ru.rikmasters.gilty.translation.shared.utils.stopBroadcast
 import ru.rikmasters.gilty.translation.shared.utils.toggleCamera
 import ru.rikmasters.gilty.translation.shared.utils.toggleMicrophone
 import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
@@ -246,10 +245,6 @@ fun TranslationStreamerScreen(
                                 context = context
                             )
                         }
-                    }
-
-                    TranslationOneTimeEvent.StopStreaming -> {
-                        stopBroadcast(camera)
                     }
                 }
             }
@@ -468,33 +463,35 @@ fun TranslationStreamerScreen(
             /**
              * Connection placeholders
              */
-            when (hudState) {
-                StreamerHUD.RECONNECTING -> {
-                    Reconnecting(
-                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            Modifier
-                                .fillMaxHeight()
-                                .width((configuration.screenWidthDp * 0.6).dp)
-                        } else {
-                            Modifier.fillMaxSize()
-                        }
-                    )
+            if (customHUDState == null) {
+                when (hudState) {
+                    StreamerHUD.RECONNECTING -> {
+                        Reconnecting(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
+                    }
+                    StreamerHUD.RECONNECT_FAILED -> {
+                        NoConnection(
+                            onReconnectCLicked = {
+                                vm.onEvent(TranslationEvent.Reconnect)
+                            },
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
+                    }
+                    else -> {}
                 }
-                StreamerHUD.RECONNECT_FAILED -> {
-                    NoConnection(
-                        onReconnectCLicked = {
-                            vm.onEvent(TranslationEvent.Reconnect)
-                        },
-                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            Modifier
-                                .fillMaxHeight()
-                                .width((configuration.screenWidthDp * 0.6).dp)
-                        } else {
-                            Modifier.fillMaxSize()
-                        }
-                    )
-                }
-                else -> {}
             }
 
             /**

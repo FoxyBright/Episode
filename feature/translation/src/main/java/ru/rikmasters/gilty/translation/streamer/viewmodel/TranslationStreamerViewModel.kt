@@ -99,7 +99,7 @@ class TranslationStreamerViewModel : ViewModel() {
                 TranslationStatusModel.EXPIRED -> {
                     _customHUDState.value = StreamerCustomHUD.EXPIRED
                     if (_camera.value) {
-                        _oneTimeEvent.send(TranslationOneTimeEvent.StopStreaming)
+                        _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                     }
                 }
 

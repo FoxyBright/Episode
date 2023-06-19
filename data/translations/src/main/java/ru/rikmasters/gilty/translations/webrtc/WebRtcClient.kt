@@ -56,11 +56,12 @@ class WebRtcClient(
             doCollectSocket.collectLatest { doCollect ->
                 if (doCollect) {
                     signalingClient.signalingEventFlow.collectLatest { event ->
-                        // Отключаем таймер на ожидание офера
-                        timer.cancel()
-                        Log.d("TEST","CANCELED TIMER")
                         when (event) {
                             is WebRTCClientEvent.OfferSent -> {
+                                // Отключаем таймер на ожидание офера
+                                timer.cancel()
+                                Log.d("TEST","TIMER CANCEL")
+                                Log.d("TEST", "OFFER SENT")
                                 val realOffer = event.offer.mapToRealOffer()
                                 setIceServer(
                                     iceServers = realOffer.iceServers
@@ -70,16 +71,20 @@ class WebRtcClient(
                                 setSDPResult?.onSuccess {
                                     realOffer.iceCandidates.forEach { candidate ->
                                         peerConnection?.addRtcIceCandidate(candidate)?.onFailure {
-                                            _status.value = WebRtcStatus.failed
+                                            _status.emit(WebRtcStatus.failed)
                                         }
                                     }
                                     answer()
                                 }?.onFailure {
-                                    _status.value = WebRtcStatus.failed
+                                    _status.emit(WebRtcStatus.failed)
                                 }
                             }
-
-                            else -> {}
+                            is WebRTCClientEvent.Connection -> {
+                                Log.d("TEST","RECEIVED CONNECTION ${event.isConnected}")
+                                if (!event.isConnected) {
+                                    _status.emit(WebRtcStatus.failed)
+                                }
+                            }
                         }
                     }
                 }
@@ -87,19 +92,22 @@ class WebRtcClient(
         }
     }
 
-    private val _status = MutableStateFlow(WebRtcStatus.unknow)
+    private val _status = MutableSharedFlow<WebRtcStatus>(1, 0, BufferOverflow.DROP_OLDEST)
     val status = _status.onEach {
+        Log.d("TEST","NEW STATUS $it")
         when (it) {
             WebRtcStatus.connect -> retry = 0
             WebRtcStatus.failed -> {
                 destroy()
                 _config?.let { config ->
+                    Log.d("TEST","FAILED")
                     if (config.retryEnable && retry < config.retryCount) {
-                        _status.value = WebRtcStatus.connecting
+                        _status.emit(WebRtcStatus.connecting)
                         retry += 1
                         connecting(config)
+                        Log.d("TEST","AFTER RECONNECT")
                     } else {
-                        _status.value = WebRtcStatus.reconnectAttemptsOver
+                        _status.emit(WebRtcStatus.reconnectAttemptsOver)
                     }
                 }
             }
@@ -123,7 +131,9 @@ class WebRtcClient(
         override fun onTick(millisUntilFinished: Long) {}
         override fun onFinish() {
             Log.d("TEST","TIMER FINISH")
-            _status.value = WebRtcStatus.failed
+            sessionManagerScope.launch {
+                _status.emit(WebRtcStatus.failed)
+            }
         }
     }
 
@@ -147,7 +157,9 @@ class WebRtcClient(
     fun connecting(config: WebRtcConfig) {
         _config = config
         webRtcLog("Connecting!!!")
-        _status.value = WebRtcStatus.connecting
+        sessionManagerScope.launch {
+            _status.emit(WebRtcStatus.connecting)
+        }
         // Запускаем таймер на ожидание оффера
         timer.start()
         signalingClient.startConnection(config.wssUrl)
@@ -155,7 +167,9 @@ class WebRtcClient(
     }
 
     fun disconnect() {
-        _status.value = WebRtcStatus.disconnect
+        sessionManagerScope.launch {
+            _status.emit(WebRtcStatus.disconnect)
+        }
     }
 
     private fun destroy() {
@@ -184,22 +198,29 @@ class WebRtcClient(
                     channel = it
                 },
                 onIceConnectionStateChanged = { state ->
+                    Log.d("TEST","ICE CHANGED $state")
                     when (state) {
                         RTCIceConnectionState.completed,
                         RTCIceConnectionState.connected -> {
-                            _status.value = WebRtcStatus.connect
+                            sessionManagerScope.launch {
+                                _status.emit(WebRtcStatus.connect)
+                            }
                         }
 
                         RTCIceConnectionState.disconnected,
                         RTCIceConnectionState.failed -> {
-                            _status.value = WebRtcStatus.failed
+                            sessionManagerScope.launch {
+                                _status.emit(WebRtcStatus.failed)
+                            }
                         }
 
                         else -> {}
                     }
                 },
                 onIceCandidateRemoved = {
-                    _status.value = WebRtcStatus.failed
+                    sessionManagerScope.launch {
+                        _status.emit(WebRtcStatus.failed)
+                    }
                 },
                 onVideoTrack = { rtpTransceiver ->
                     rtpTransceiver.receiver?.track()?.let {
@@ -207,8 +228,8 @@ class WebRtcClient(
                             val videoTrack = it as VideoTrack
                             sessionManagerScope.launch {
                                 _remoteVideoSinkFlow.emit(videoTrack)
+                                _status.emit(WebRtcStatus.stream)
                             }
-                            _status.value = WebRtcStatus.stream
                         }
                     }
                 }
@@ -301,10 +322,14 @@ class WebRtcClient(
             peerConnection?.setLocalDescription(it)?.onSuccess { sdp ->
                 signalingClient.answer(sdp)
             }?.onFailure {
-                _status.value = WebRtcStatus.failed
+                sessionManagerScope.launch {
+                    _status.emit(WebRtcStatus.failed)
+                }
             }
         }?.onFailure {
-            _status.value = WebRtcStatus.failed
+            sessionManagerScope.launch {
+                _status.emit(WebRtcStatus.failed)
+            }
         }
     }
 

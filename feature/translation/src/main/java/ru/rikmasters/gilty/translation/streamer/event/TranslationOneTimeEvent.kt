@@ -11,7 +11,6 @@ sealed interface TranslationOneTimeEvent {
     object ShowSnackbar : TranslationOneTimeEvent
     object Reconnect : TranslationOneTimeEvent
     data class StartStreaming(val url: String) : TranslationOneTimeEvent
-    object StopStreaming : TranslationOneTimeEvent
     object DestroyRTMP : TranslationOneTimeEvent
 
 }

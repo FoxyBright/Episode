@@ -50,6 +50,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.bottoms.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
 import ru.rikmasters.gilty.translation.shared.components.NoConnection
+import ru.rikmasters.gilty.translation.shared.components.Paused
 import ru.rikmasters.gilty.translation.shared.components.Reconnecting
 import ru.rikmasters.gilty.translation.shared.components.TranslationDialogType
 import ru.rikmasters.gilty.translation.shared.components.TranslationStreamerDialog
@@ -68,6 +69,7 @@ fun TranslationViewerScreen(
     translationId: String
 ) {
     val asm = get<AppStateModel>()
+
     /**
      * Configurations, system, design
      */
@@ -187,6 +189,7 @@ fun TranslationViewerScreen(
                     }
 
                     is TranslationViewerOneTimeEvents.ConnectToStream -> {
+                        Log.d("TEST","COnnect to STREAM")
                         webRtcClient.connecting(WebRtcConfig(event.wsUrl))
                     }
 
@@ -208,7 +211,6 @@ fun TranslationViewerScreen(
     LaunchedEffect(Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             webRtcClient.status.collectLatest { status ->
-                Log.d("TEST","NEw STatus $status")
                 vm.onEvent(
                     TranslationViewerEvent.HandleWebRtcStatus(
                         status = status
@@ -220,7 +222,6 @@ fun TranslationViewerScreen(
     LaunchedEffect(Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             webRtcClient.webRtcAnswer.collectLatest { answer ->
-                Log.d("TEST","NEw Answer $answer")
                 vm.onEvent(
                     TranslationViewerEvent.HandleWebRtcAnswer(
                         answer = answer
@@ -246,7 +247,10 @@ fun TranslationViewerScreen(
                 searchValue = query,
                 onSearchValueChange = { vm.onEvent(TranslationViewerEvent.QueryChanged(it)) },
                 membersList = members,
-                onComplainClicked = { showComplainDialog = true },
+                onComplainClicked = {
+                    currentComplainUser = it
+                    showComplainDialog = true
+                },
                 onDeleteClicked = {},
                 onAppendDurationSave = {},
                 isOrganizer = false
@@ -323,36 +327,51 @@ fun TranslationViewerScreen(
             /**
              * Connection placeholders
              */
-            when (hudState) {
-                ViewerHUD.RECONNECTING -> {
-                    Reconnecting(
-                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            Modifier
-                                .fillMaxHeight()
-                                .width((configuration.screenWidthDp * 0.6).dp)
-                        } else {
-                            Modifier.fillMaxSize()
-                        }
-                    )
-                }
+            if (customHUDState == null) {
+                when (hudState) {
+                    ViewerHUD.RECONNECTING -> {
+                        Reconnecting(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
+                    }
 
-                ViewerHUD.RECONNECT_FAILED -> {
-                    NoConnection(
-                        onReconnectCLicked = {
-                            webRtcClient.retry = 0
-                            vm.onEvent(TranslationViewerEvent.Reconnect)
-                        },
-                        modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            Modifier
-                                .fillMaxHeight()
-                                .width((configuration.screenWidthDp * 0.6).dp)
-                        } else {
-                            Modifier.fillMaxSize()
-                        }
-                    )
-                }
+                    ViewerHUD.RECONNECT_FAILED -> {
+                        NoConnection(
+                            onReconnectCLicked = {
+                                Log.d("TEST","Clicked")
+                                webRtcClient.retry = 0
+                                vm.onEvent(TranslationViewerEvent.Reconnect)
+                            },
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
+                    }
 
-                else -> {}
+                    ViewerHUD.PAUSED -> {
+                        Paused(
+                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                Modifier
+                                    .fillMaxHeight()
+                                    .width((configuration.screenWidthDp * 0.6).dp)
+                            } else {
+                                Modifier.fillMaxSize()
+                            }
+                        )
+                    }
+
+                    else -> {}
+                }
             }
 
             /**

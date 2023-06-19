@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -84,7 +83,6 @@ class SignalingClient {
 
     fun destroy() {
         _isConnection.value = false
-        //signalingScope.cancel()
         ws?.cancel()
     }
 
@@ -130,18 +128,23 @@ class SignalingClient {
 
     private inner class SignalingWebSocketListener : WebSocketListener() {
         override fun onMessage(webSocket: WebSocket, text: String) {
+            Log.d("TEST","Message RECEIVED")
             handleSocketMessage(text)
         }
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            Log.d("TEST","OnClosed")
             destroy()
         }
         override fun onOpen(webSocket: WebSocket, response: Response) {
+            Log.d("TEST","OnOpen")
             connection()
         }
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            Log.d("TEST","OnClosing")
             destroy()
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            Log.d("TEST","OnFailure")
             destroy()
         }
     }

@@ -444,7 +444,7 @@
     <string name="translations_kicked">Трансляция для вас окончена</string>
     <string name="translations_kicked_text">Организатору не понравилось ваше поведение, поэтому он исключил вас из episode</string>
     <string name="translations_completed_text">Позже вы сможете оставить \nэмоции участникам episode</string>
-    <string name="translations_expired_time_append">Трансляция приостановлена, \nдля продолжения продлите время</string>
+    <string name="translations_expired_time_append">Трансляция приостановлена, \nдля продолжения продлите \nвремя</string>
     <string name="translations_expired_button_turn_on">Включить</string>
     <string name="translations_expired_button_continue">Продолжить</string>
     <string name="translations_expired_button_to_chat">Перейти в чат</string>

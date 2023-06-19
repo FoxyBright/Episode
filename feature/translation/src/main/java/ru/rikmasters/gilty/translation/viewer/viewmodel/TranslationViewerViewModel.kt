@@ -360,6 +360,11 @@ class TranslationViewerViewModel : ViewModel() {
         _translation.value?.let {
             loadTranslationInfo(it.id)
         }
+        coroutineScope.launch {
+            _translation.value?.webrtc?.let {
+                _oneTimeEvent.send(TranslationViewerOneTimeEvents.ConnectToStream(it))
+            }
+        }
     }
 
     private fun startPinging() {
