@@ -54,11 +54,12 @@ class CategoryViewModel: ViewModel() {
             saveInterests {
                 onSuccess()
             }
+        }else {
+            _categories.emit(newList)
+            phase.emit(1)
         }
-        _categories.emit(newList)
-        phase.emit(1)
     }
-    suspend fun saveInterests(onSuccess: () -> Unit){
+    private suspend fun saveInterests(onSuccess: () -> Unit){
         meetManager.setUserInterest(selected.value).on(
             success = {
                 regManager.updateUserCategories().on(
