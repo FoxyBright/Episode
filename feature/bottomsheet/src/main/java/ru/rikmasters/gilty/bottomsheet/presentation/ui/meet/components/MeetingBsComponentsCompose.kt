@@ -373,7 +373,7 @@ fun MeetingBsParticipants(
             val count = meet.membersCount
             val mState = meet.memberState
             if(
-                (mState == IS_ORGANIZER && count > 1) ||
+                (mState == IS_ORGANIZER && count >= 1) ||
                 (mState == IS_MEMBER && count > 3)
             ) Text(
                 text = stringResource(R.string.meeting_watch_all_members_in_meet),

@@ -73,7 +73,7 @@ fun MainScreen(vm: MainViewModel) {
         vm.getAllCategories()
         vm.getUserCategories()
         vm.getUnread()
-        vm.getMeets()
+        //vm.getMeets()
         vm.getLocation(activity)
         context.listenPreference("unread_messages", 0)
         { scope.launch { vm.setUnreadMessages(it > 0) } }

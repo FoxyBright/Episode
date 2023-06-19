@@ -74,6 +74,7 @@ fun ParticipantsList(
                     == IS_ORGANIZER,
             membersList = membersList,
             membersCount = meet.membersCount,
+            isOnline = meet.isOnline,
             callback = callback
         )
     }
@@ -84,6 +85,7 @@ private fun Content(
     isOrganizer: Boolean = false,
     membersList: LazyPagingItems<UserModel>,
     membersCount: Int,
+    isOnline: Boolean,
     callback: ParticipantsListCallback?,
 ) {
     LazyColumn(
@@ -125,6 +127,7 @@ private fun Content(
                                 shape = shape,
                                 state = state,
                                 callback = callback,
+                                isOnline = isOnline
                             )
                         }
                 }
@@ -142,6 +145,7 @@ private fun DragableRow(
     state: DragRowState,
     modifier: Modifier = Modifier,
     callback: ParticipantsListCallback?,
+    isOnline:Boolean = false,
 ) {
     var isBackgroundVisible by remember {
         mutableStateOf(false)
@@ -157,7 +161,8 @@ private fun DragableRow(
             .fillMaxWidth()
             .background(
                 color = if(isBackgroundVisible)
-                    colorScheme.primary
+                    if(isOnline) colorScheme.secondary
+                    else colorScheme.primary
                 else Transparent,
                 shape = shape
             )
