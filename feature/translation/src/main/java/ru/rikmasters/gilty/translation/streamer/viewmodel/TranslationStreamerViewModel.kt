@@ -184,7 +184,6 @@ class TranslationStreamerViewModel : ViewModel() {
 
     val messages = reloadChat.flatMapLatest {
         _translation.value?.id?.let {
-            Log.d("TEST","RELOAD")
             translationRepository.getMessages(
                 translationId = it
             )

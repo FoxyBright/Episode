@@ -58,11 +58,10 @@ fun MembersBottomSheet(
                     )
                 )
                 .padding(horizontal = 16.dp)
-        } else if (membersCount == 0) {
+        } else if (membersList?.itemSnapshotList?.items?.size == 0) {
             Modifier
                 .fillMaxWidth()
                 .height((configuration.screenHeightDp * 0.375).dp)
-                //.wrapContentWidth(unbounded = false)
                 .background(
                     color = ThemeExtra.colors.blackSeventy
                 )
@@ -71,7 +70,6 @@ fun MembersBottomSheet(
             Modifier
                 .fillMaxWidth()
                 .height((configuration.screenHeightDp * 0.75).dp)
-                //.wrapContentWidth(unbounded = false)
                 .background(
                     color = ThemeExtra.colors.blackSeventy
                 )
@@ -97,7 +95,7 @@ fun MembersBottomSheet(
                     width = 3.dp
                 )
             ) {
-                if (membersCount == 0 && membersList?.loadState?.refresh is LoadState.NotLoading) {
+                if (membersList?.itemSnapshotList?.items?.size == 0 && membersList.loadState.refresh is LoadState.NotLoading) {
                     Text(
                         text = stringResource(id = R.string.translations_members),
                         style = ThemeExtra.typography.TranslationTitlePreview,

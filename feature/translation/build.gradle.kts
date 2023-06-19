@@ -27,4 +27,5 @@ dependencies {
     implementation(project(":data:meetings"))
     implementation(project(":data:translations"))
     implementation(project(":feature:addmeet"))
+    implementation(project(":feature:bottomsheet"))
 }

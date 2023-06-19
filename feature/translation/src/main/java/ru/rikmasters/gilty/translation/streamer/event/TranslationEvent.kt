@@ -18,10 +18,6 @@ sealed interface TranslationEvent {
     object CompleteTranslation : TranslationEvent
     object ToggleCamera : TranslationEvent
     object ToggleMicrophone : TranslationEvent
-
-
-
-
     data class UserBottomSheetOpened(val isOpened: Boolean) : TranslationEvent
     data class ChatBottomSheetOpened(val isOpened: Boolean) : TranslationEvent
     data class UserBottomSheetQueryChanged(val newQuery: String) : TranslationEvent
@@ -29,7 +25,5 @@ sealed interface TranslationEvent {
     data class KickUser(val user: FullUserModel) : TranslationEvent
     data class AppendTranslation(val appendMinutes: Int) : TranslationEvent
     object ChangeFacing : TranslationEvent
-
-
 
 }

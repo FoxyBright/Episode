@@ -478,7 +478,7 @@ fun CommentPanel(
                     capitalization = KeyboardCapitalization.Sentences
                 ),
             ) {
-                if(messageText.isEmpty()) Text(
+                if (messageText.isEmpty()) Text(
                     stringResource(id = R.string.translations_chat_commentary), Modifier,
                     Color(0xFFCAC4D0), style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Normal
@@ -486,7 +486,7 @@ fun CommentPanel(
                 ); it()
             }
         }
-        if(messageText.isNotBlank()) SendButton(
+        if (messageText.isNotBlank()) SendButton(
             ThemeExtra.colors.mainDayGreen,
             Modifier
                 .align(Alignment.BottomEnd)
@@ -578,26 +578,32 @@ fun MemberItem(
     onDeleteClicked: () -> Unit,
 ) {
     var expandedPopUp by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.wrapContentSize()) {
-        Row {
-            GCachedImage(
-                url = user.avatar?.thumbnail?.url,
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
+    ) {
+        GCachedImage(
+            url = user.avatar?.thumbnail?.url,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(verticalArrangement = Arrangement.Center) {
+            Row(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Row(
-                    modifier = Modifier.padding(
+                    .fillMaxWidth()
+                    .padding(
                         top = 18.dp,
                         bottom = 18.dp,
-                        end = 18.dp,
+                        end = 8.dp,
                     ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row {
                     Text(
                         text = "${user.username}, ${user.age}",
                         color = ThemeExtra.colors.white,
@@ -614,45 +620,54 @@ fun MemberItem(
                             contentDescription = "Emoji"
                         )
                     }
+                }
+                Box {
                     IconButton(onClick = { expandedPopUp = true }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_kebab),
-                            contentDescription = "More"
+                            contentDescription = "More",
+                            tint = Color.White
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = expandedPopUp,
+                        onDismissRequest = { expandedPopUp = false },
+                        modifier = Modifier.background(
+                            color = ThemeExtra.colors.mainCard
+                        )
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.translations_members_complain),
+                                    color = ThemeExtra.colors.white,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            onClick = {
+                                expandedPopUp = false
+                                onComplainClicked()
+                            },
+                            contentPadding = PaddingValues(8.dp)
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.translations_members_delete),
+                                    color = ThemeExtra.colors.white,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            onClick = {
+                                expandedPopUp = false
+                                onDeleteClicked()
+                            }
                         )
                     }
                 }
-                Divider()
             }
+            Divider(color = Color(0xFF464649))
         }
-    }
-    DropdownMenu(
-        expanded = expandedPopUp,
-        onDismissRequest = { expandedPopUp = false },
-        modifier = Modifier.background(
-            color = ThemeExtra.colors.mainCard,
-            shape = RoundedCornerShape(14.dp)
-        )
-    ) {
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(id = R.string.translations_members_complain),
-                    color = ThemeExtra.colors.white,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            onClick = onComplainClicked
-        )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = stringResource(id = R.string.translations_members_delete),
-                    color = ThemeExtra.colors.white,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            onClick = onDeleteClicked
-        )
     }
 }
 

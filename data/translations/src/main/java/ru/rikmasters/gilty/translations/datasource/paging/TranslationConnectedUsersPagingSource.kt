@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translations.datasource.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
@@ -27,12 +28,14 @@ class TranslationConnectedUsersPagingSource(
 
         return paginateState(
             block = {
-                webSource.getConnectedUsers(
+                val users = webSource.getConnectedUsers(
                     translationId = translationId,
                     page = page,
                     perPage = loadSize,
                     query = q,
                 ).map(FullUserDTO::map)
+                Log.d("TEST","USERS $users")
+                users
             },
             loadSize = loadSize,
             page = page,

@@ -42,8 +42,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -76,6 +80,7 @@ fun TranslationStreamerScreen(
     translationId: String
 ) {
 
+    val asm = get<AppStateModel>()
     /**
      * Configurations, system, design
      */
@@ -519,6 +524,7 @@ fun TranslationStreamerScreen(
                 configuration = configuration
             )
 
+
             /**
              * Dialogs
              */
@@ -533,13 +539,26 @@ fun TranslationStreamerScreen(
                             )
                         )
                     }
+                    showKickDialog = false
                 },
                 dismiss = { showKickDialog = false }
             )
             TranslationStreamerDialog(
                 type = TranslationDialogType.COMPLAIN,
                 show = showComplainDialog,
-                onSuccess = {},
+                onSuccess = {
+                    showComplainDialog = false
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            BottomSheet(
+                                vm.scope,
+                                BsType.REPORTS,
+                                reportObject = currentComplainUser?.id,
+                                reportType = ReportObjectType.PROFILE
+                            )
+                        }
+                    }
+                },
                 dismiss = { showComplainDialog = false }
             )
             TranslationStreamerDialog(
