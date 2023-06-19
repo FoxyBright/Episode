@@ -3,9 +3,10 @@ package ru.rikmasters.gilty.core.app
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
@@ -49,6 +50,14 @@ fun AppEntrypoint(theme: AppTheme) {
         rememberSwipeableState(COLLAPSED)
     )
     
+    val asm = remember {
+        AppStateModel(
+            systemUi = systemUiController,
+            bottomSheet = bottomSheetState,
+            keyboard = keyboardController
+        )
+    }
+    
     val env = get<Environment>()
     
     val startDestination = remember(entrypointResolver) {
@@ -59,14 +68,6 @@ fun AppEntrypoint(theme: AppTheme) {
         NavState(
             navHostController = navController,
             startDestination = startDestination
-        )
-    }
-    
-    val asm = remember {
-        AppStateModel(
-            systemUi = systemUiController,
-            bottomSheet = bottomSheetState,
-            keyboard = keyboardController
         )
     }
     
@@ -97,6 +98,7 @@ fun AppEntrypoint(theme: AppTheme) {
         dynamicColor = false
     ) {
         Layout(
+            asm = asm,
             bottomSheet = asm.bottomSheet,
             navState = navState,
             background = colorScheme.background,
@@ -108,6 +110,7 @@ fun AppEntrypoint(theme: AppTheme) {
 
 @Composable
 private fun Layout(
+    asm: AppStateModel,
     bottomSheet: BottomSheetState,
     navState: NavState,
     background: Color,
@@ -121,6 +124,7 @@ private fun Layout(
             .navigationBarsPadding()
     ) {
         BottomSheetLayout(
+            asm = asm,
             state = bottomSheet,
             background = { BSContent(it) }
         ) {
@@ -142,18 +146,17 @@ private fun Layout(
 private fun BSContent(
     content: (@Composable () -> Unit)?,
 ) {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .background(
-                color = content?.let {
-                    colorScheme.background
-                } ?: Transparent,
-                shape = RoundedCornerShape(
-                    topStart = 20.dp,
-                    topEnd = 20.dp
-                )
-            )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = content?.let {
+                colorScheme.background
+            } ?: Transparent
+        ),
+        shape = shapes.extraLarge.copy(
+            bottomStart = CornerSize(0.dp),
+            bottomEnd = CornerSize(0.dp)
+        )
     ) { content?.let { it() } }
 }
 

@@ -331,7 +331,7 @@ private fun TodayToggle(
                 .width(afterWeight)
                 .offset(
                     y = animateDpAsState(
-                        if (today) -(3).dp
+                        if(today) -(3).dp
                         else 0.dp,
                         tween(tween)
                     ).value
@@ -356,21 +356,14 @@ private fun Content(
 ) {
     Box {
         if(meetings.size < 2) MeetCard(
-            modifier = modifier,
+            modifier = modifier.padding(horizontal = 1.dp),
             type = EMPTY,
             hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }
         )
-        //        if(state && meetings.isNotEmpty())
-        //            MeetingGridContent(
-        //                modifier = modifier.fillMaxSize(),
-        //                meetings = meetings
-        //            ) { callback?.onRespond(it) }
-        //        else
-        val states = meetings.map {
-            it to rememberSwipeableCardState()
-        }
+        val states =
+            meetings.map { it to rememberSwipeableCardState() }
         MeetingsListContent(
             states = states,
             modifier = modifier.padding(top = 24.dp),

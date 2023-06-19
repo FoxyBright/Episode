@@ -61,9 +61,10 @@ class MainActivity: ComponentActivity() {
                 .value.clearAddMeet()
         }
         
-        FireBaseService.sharedPref = getSharedPreferences(
-            "sharedPref", MODE_PRIVATE
-        )
+        FireBaseService.sharedPref =
+            getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
+            )
         
         var token = ""
         FirebaseMessaging
@@ -77,14 +78,16 @@ class MainActivity: ComponentActivity() {
         FirebaseMessaging
             .getInstance()
             .subscribeToTopic("all")
-
+        
         setContent {
             var errorState by remember {
                 mutableStateOf(false)
             }
             val corScope = rememberCoroutineScope()
-
-            var lastConnectionState by remember { mutableStateOf(false) }
+            
+            var lastConnectionState by remember {
+                mutableStateOf(false)
+            }
             
             AppEntrypoint(GiltyTheme)
             
@@ -102,7 +105,7 @@ class MainActivity: ComponentActivity() {
                     clearSelectChat(this)
                     authManager.savePushToken(token)
                     chatManager.connectWebSocket(userId)
-                }catch (e:Exception){
+                } catch(e: Exception) {
                     context.errorToast(message = e.message)
                 }
             }
