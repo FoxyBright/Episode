@@ -241,7 +241,7 @@ private fun PinedButton(
                 Modifier.padding(12.dp, 8.dp),
                 Start, CenterVertically
             ) {
-                if(type == TRANSLATION_AWAIT) Icon(
+                if(type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) Icon(
                     painterResource(ic_timer),
                     (null), Modifier
                         .padding(end = 4.dp)
