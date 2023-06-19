@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.streamer.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -10,7 +9,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -100,6 +98,9 @@ class TranslationStreamerViewModel : ViewModel() {
 
                 TranslationStatusModel.EXPIRED -> {
                     _customHUDState.value = StreamerCustomHUD.EXPIRED
+                    if (_camera.value) {
+                        _oneTimeEvent.send(TranslationOneTimeEvent.StopStreaming)
+                    }
                 }
 
                 COMPLETED -> {
@@ -257,14 +258,15 @@ class TranslationStreamerViewModel : ViewModel() {
                         } else {
                             coroutineScope.launch {
                                 _customHUDState.value = null
-                                _timerHighlighted.value = true
-                                delay(2000)
-                                _timerHighlighted.value = false
+                                _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(_translation.value?.webrtc ?: ""))
                                 _translation.update {
                                     it?.copy(
                                         completedAt = socketEvent.completedAt
                                     )
                                 }
+                                _timerHighlighted.value = true
+                                delay(2000)
+                                _timerHighlighted.value = false
                             }
                         }
                     }

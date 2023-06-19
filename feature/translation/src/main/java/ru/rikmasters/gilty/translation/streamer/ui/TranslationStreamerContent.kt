@@ -96,7 +96,7 @@ fun TranslationStreamerContent(
                     modifier = Modifier.matchParentSize()
                 )
             }
-            if (customHUDState == null || customHUDState == StreamerCustomHUD.EXPIRED) {
+            if (customHUDState == null) {
                 if (isPortrait) {
                     OnStreamTopBarPortrait(
                         meetingModel = meetingModel,
@@ -128,6 +128,10 @@ fun TranslationStreamerContent(
                         changeFacing = changeFacing
                     )
                 }
+
+            }
+            if (customHUDState == StreamerCustomHUD.EXPIRED) {
+                ExpiredPortrait(onToChatPressed = onToChatPressed)
             }
             if (customHUDState == StreamerCustomHUD.COMPLETED) {
                 CompletedPortrait(onToChatPressed = onToChatPressed)
@@ -144,6 +148,8 @@ fun TranslationStreamerContent(
         }
     }
 }
+
+
 
 @Composable
 fun CompletedPortrait(
@@ -248,6 +254,64 @@ fun BottomBarPortrait(
             ChangeFacingItem(
                 onClick = changeFacing
             )
+        }
+    }
+}
+
+@Composable
+fun ExpiredPortrait(
+    onToChatPressed: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_bad),
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                modifier = Modifier.padding(
+                    horizontal = 12.dp,
+                    vertical = 8.dp
+                ),
+                text = stringResource(id = R.string.translations_expired_time),
+                style = MaterialTheme.typography.bodyMedium,
+                color = ThemeExtra.colors.white
+            )
+            Spacer(modifier = Modifier.height(13.dp))
+            Text(
+                modifier = Modifier.padding(
+                    horizontal = 12.dp,
+                    vertical = 8.dp
+                ),
+                text = stringResource(id = R.string.translations_expired_time_append),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Normal
+                ),
+                color = ThemeExtra.colors.white
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            GradientButton(
+                text = stringResource(id = R.string.translations_expired_button_turn_on),
+                online = true,
+                onClick = onToChatPressed
+            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

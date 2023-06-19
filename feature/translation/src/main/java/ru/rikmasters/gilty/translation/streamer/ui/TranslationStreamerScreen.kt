@@ -62,6 +62,7 @@ import ru.rikmasters.gilty.translation.shared.utils.destroyRTMP
 import ru.rikmasters.gilty.translation.shared.utils.map
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
 import ru.rikmasters.gilty.translation.shared.utils.startBroadCast
+import ru.rikmasters.gilty.translation.shared.utils.stopBroadcast
 import ru.rikmasters.gilty.translation.shared.utils.toggleCamera
 import ru.rikmasters.gilty.translation.shared.utils.toggleMicrophone
 import ru.rikmasters.gilty.translation.streamer.event.TranslationEvent
@@ -246,6 +247,10 @@ fun TranslationStreamerScreen(
                             )
                         }
                     }
+
+                    TranslationOneTimeEvent.StopStreaming -> {
+                        stopBroadcast(camera)
+                    }
                 }
             }
         }
@@ -272,24 +277,6 @@ fun TranslationStreamerScreen(
             }
             override fun onDisconnectRtmp() {}
             override fun onNewBitrateRtmp(bitrate: Long) {
-                /*
-                if (customHUDState == null) {
-                    if (cameraState) {
-                        if (bitrate < 300_000 && bitrateCalc) {
-                            vm.onEvent(TranslationEvent.LowBitrate)
-                        } else {
-                            vm.onEvent(TranslationEvent.BitrateStabilized)
-                        }
-                    } else {
-                        if (bitrate < 30_000 && bitrateCalc) {
-                            vm.onEvent(TranslationEvent.LowBitrate)
-                        } else {
-                            vm.onEvent(TranslationEvent.BitrateStabilized)
-                        }
-                    }
-                }
-
-                 */
                 bitrateAdapter?.adaptBitrate(bitrate)
             }
         }
