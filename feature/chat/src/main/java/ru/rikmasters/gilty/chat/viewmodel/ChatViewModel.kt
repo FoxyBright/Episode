@@ -452,11 +452,6 @@ class ChatViewModel : ViewModel() {
             )
         }
     }
-
-    fun dispose() {
-        translationRepository.disconnectWebSocket()
-    }
-
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->

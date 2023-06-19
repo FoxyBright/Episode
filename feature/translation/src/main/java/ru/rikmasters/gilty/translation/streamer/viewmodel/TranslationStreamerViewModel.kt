@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.streamer.viewmodel
 
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -182,6 +184,7 @@ class TranslationStreamerViewModel : ViewModel() {
 
     val messages = reloadChat.flatMapLatest {
         _translation.value?.id?.let {
+            Log.d("TEST","RELOAD")
             translationRepository.getMessages(
                 translationId = it
             )
@@ -284,6 +287,7 @@ class TranslationStreamerViewModel : ViewModel() {
                     loadTranslationInfo(meetingId)
                     loadMeetDetails(meetingId)
                     connectSocket()
+                    connectToTranslationChat()
                     startPinging()
                 }
             }
@@ -292,6 +296,7 @@ class TranslationStreamerViewModel : ViewModel() {
                 disconnectSocket()
                 stopPinging()
                 stopDurationTimer()
+                disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
@@ -300,6 +305,7 @@ class TranslationStreamerViewModel : ViewModel() {
             TranslationEvent.EnterBackground -> {
                 disconnectSocket()
                 stopPinging()
+                connectToTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
@@ -307,6 +313,7 @@ class TranslationStreamerViewModel : ViewModel() {
 
             is TranslationEvent.EnterForeground -> {
                 loadTranslationInfo(event.meetingId)
+                disconnectFromTranslationChat()
                 connectSocket()
                 startPinging()
             }
@@ -335,21 +342,7 @@ class TranslationStreamerViewModel : ViewModel() {
             }
 
             is TranslationEvent.ChatBottomSheetOpened -> {
-                if (event.isOpened) {
-                    translation.value?.id?.let {
-                        coroutineScope.launch {
-                            translationRepository.connectToTranslationChat(
-                                translationId = it
-                            )
-                        }
-                        reloadChat.value = !reloadChat.value
-                    }
-                } else {
-                    coroutineScope.launch {
-                        translationRepository.disconnectFromTranslationChat()
-                    }
-                    reloadChat.value = !reloadChat.value
-                }
+                reloadChat.value = !reloadChat.value
             }
 
             is TranslationEvent.KickUser -> {
@@ -531,6 +524,22 @@ class TranslationStreamerViewModel : ViewModel() {
         }
     }
 
+    private fun connectToTranslationChat() {
+        _translation.value?.let {
+            coroutineScope.launch {
+                translationRepository.connectToTranslationChat(
+                    translationId = it.id
+                )
+            }
+        }
+    }
+
+    private fun disconnectFromTranslationChat() {
+        coroutineScope.launch {
+            translationRepository.disconnectFromTranslationChat()
+        }
+    }
+
     private fun loadTranslationInfo(
         meetingId: String
     ) {
@@ -539,7 +548,10 @@ class TranslationStreamerViewModel : ViewModel() {
                 translationId = meetingId
             ).on(
                 loading = {},
-                success = { translation -> _translation.value = translation },
+                success = {
+                        translation -> _translation.value = translation
+                        connectToTranslationChat()
+                          },
                 error = { cause ->
                     cause.serverMessage?.let {
                         _oneTimeEvent.send(

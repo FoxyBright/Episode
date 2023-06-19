@@ -14,6 +14,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,12 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -437,63 +443,80 @@ fun CameraOrientationRow(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentPanel(
     onSendMessage: (String) -> Unit,
     modifier: Modifier,
 ) {
     var messageText by remember { mutableStateOf("") }
-    Surface(
-        shape = RoundedCornerShape(48.dp),
-        color = ThemeExtra.colors.messageBar,
-        modifier = modifier
+    Box(
+        modifier
+            .fillMaxWidth()
+            .background(
+                ThemeExtra.colors.messageBar,
+                ThemeExtra.shapes.chatRoundedShape
+            )
     ) {
-        TextField(
-            value = messageText,
-            onValueChange = {
-                messageText = it
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = ThemeExtra.colors.white,
-                containerColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedLabelColor = Color.Transparent,
-                cursorColor = ThemeExtra.colors.white
-            ),
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.translations_chat_commentary),
-                    color = Color(0xFFCAC4D0),
-                    style = MaterialTheme.typography.bodyMedium.copy(
+        Box(
+            Modifier
+                .padding(vertical = 12.dp)
+                .padding(start = 16.dp, end = 50.dp)
+        ) {
+            BasicTextField(
+                messageText, { messageText = it },
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+                maxLines = 1,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = ThemeExtra.colors.white
+                ),
+                cursorBrush = SolidColor(ThemeExtra.colors.mainDayGreen),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+            ) {
+                if(messageText.isEmpty()) Text(
+                    stringResource(id = R.string.translations_chat_commentary), Modifier,
+                    Color(0xFFCAC4D0), style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Normal
                     )
-                )
-            },
-            singleLine = true,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Normal
-            ),
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_send_rounded),
-                    contentDescription = "send message",
-                    tint = Color.Unspecified,
-                    modifier = Modifier
-                        .requiredSize(36.dp)
-                        .clickable {
-                            onSendMessage(messageText)
-                            messageText = ""
-                        }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
+                ); it()
+            }
+        }
+        if(messageText.isNotBlank()) SendButton(
+            ThemeExtra.colors.mainDayGreen,
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(6.dp)
+        ) {
+            onSendMessage(messageText)
+            messageText = ""
+        }
+    }
+}
+
+@Composable
+private fun SendButton(
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier
+            .clip(CircleShape)
+            .background(color)
+            .clickable { onClick() },
+        Alignment.Center
+    ) {
+        Icon(
+            painterResource(R.drawable.ic_send),
+            (null), Modifier
+                .padding(vertical = 6.dp)
+                .padding(start = 8.dp, end = 4.dp)
+                .size(18.dp), Color.White
         )
     }
 }
@@ -636,9 +659,10 @@ fun MemberItem(
 @Composable
 fun MessageItem(
     messageModel: TranslationMessageModel,
+    modifier: Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         GCachedImage(
             url = messageModel.author.avatar?.thumbnail?.url,

@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translation.bottoms.chat
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
+import kotlinx.coroutines.delay
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.extentions.simpleVerticalScrollbar
 import ru.rikmasters.gilty.shared.model.translations.TranslationMessageModel
@@ -35,6 +38,7 @@ import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.shared.components.CommentPanel
 import ru.rikmasters.gilty.translation.shared.components.MessageItem
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun  ChatBottomSheet(
     configuration: Configuration,
@@ -42,6 +46,15 @@ fun  ChatBottomSheet(
     onSendMessage: (String) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+    LaunchedEffect(messagesList?.itemSnapshotList?.items) {
+        val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
+        if (messagesList?.itemCount!! > 0) {
+            if (firstVisibleItemIndex == 1) {
+                delay(2000)
+                scrollState.animateScrollToItem(scrollState.firstVisibleItemIndex)
+            }
+        }
+    }
     Box(
         modifier = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Modifier
@@ -121,10 +134,14 @@ fun  ChatBottomSheet(
                         reverseLayout = true
                     ) {
                         messagesList?.let {
-                            items(messagesList) { messageModel ->
+                            item {
+                                Spacer(modifier = Modifier.height(65.dp))
+                            }
+                            items(messagesList, key = { it.id }) { messageModel ->
                                 messageModel?.let {
                                     MessageItem(
-                                        messageModel = it
+                                        messageModel = it,
+                                        modifier = Modifier.animateItemPlacement()
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))

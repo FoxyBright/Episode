@@ -130,13 +130,6 @@ fun ChatScreen(
         vm.markAsReadMessage(chatId, all = true)
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            vm.dispose()
-        }
-    }
-
-
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {
             delay(3000)
@@ -213,7 +206,6 @@ fun ChatScreen(
                 override fun onAnswerClick(message: MessageModel) {
                     // навигации к сообщению при клике на ответ
                 }
-
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
                         when (type) {
@@ -222,7 +214,6 @@ fun ChatScreen(
                                     "translationviewer/viewer?id=${state.meet.id}"
                                 )
                             }
-
                             TRANSLATION_ORGANIZER -> {
                                 if (!permissionsState.allPermissionsGranted) {
                                     permissionsState.launchMultiplePermissionRequest()
@@ -247,12 +238,10 @@ fun ChatScreen(
                                     }
                                 }
                             }
-
                             MEET_FINISHED -> {
                                 vm.completeChat(chat)
                                 nav.navigate("main")
                             }
-
                             else -> {}
                         }
                     }
