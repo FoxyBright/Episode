@@ -181,13 +181,17 @@ fun MeetingStates(
                 )
                 if(iconState)
                     CategoriesListCard(
-                        Modifier.padding(top = 8.dp),
-                        meet, (false), iconsSize
+                        modifier = Modifier.padding(top = 8.dp),
+                        meeting = meet,
+                        border = (true),
+                        imageSize = iconsSize
                     )
             }
             if(!iconState) CategoriesListCard(
-                Modifier.padding(start = 4.dp),
-                meet, (false), iconsSize
+                modifier = Modifier.padding(start = 4.dp),
+                meeting = meet,
+                border = (true),
+                imageSize = iconsSize
             )
         }
     }

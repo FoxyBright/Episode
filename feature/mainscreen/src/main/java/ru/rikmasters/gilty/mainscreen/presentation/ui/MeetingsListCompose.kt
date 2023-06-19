@@ -27,18 +27,18 @@ fun MeetingsListContent(
         if (states.size <= 2) states
         else states - states.dropLast(2).toSet()
     }
-
-    list.forEachIndexed { index, state ->
-        EpisodeCard(
-            meeting = state.first,
-            state = state.second,
-            stack = index < states.lastIndex,
-            modifier = modifier,
-            notInteresting = notInteresting,
-            onSelect = onSelect,
-            onClick = onClick
-        )
-    }
+    if (list.isNotEmpty())
+        list.forEachIndexed { index, state ->
+            EpisodeCard(
+                meeting = state.first,
+                state = state.second,
+                stack = index < states.lastIndex,
+                modifier = modifier,
+                notInteresting = notInteresting,
+                onSelect = onSelect,
+                onClick = onClick
+            )
+        }
 }
 
 @Composable

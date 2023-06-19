@@ -85,13 +85,8 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
                     success = {
                         it },
                     loading = { false },
-                    error = {
-                        it.serverMessage == "errors.user.username.exists" ||
-                                it.serverMessage?.startsWith("The username has already been") == true
-                        false
-                    }
+                    error = { false }
                 )
-            //updateUsername()
             _occupied.emit(occupied)
         }
         .state(_username.value, Eagerly)
