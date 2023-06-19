@@ -7,7 +7,7 @@ import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.core.module.FeatureDefinition
 import ru.rikmasters.gilty.core.navigation.DeepNavGraphBuilder
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.translation.viewer.presentation.ui.logic.TranslationViewerScreenLogic
+import ru.rikmasters.gilty.translation.viewer.ui.TranslationViewerScreen
 import ru.rikmasters.gilty.translation.viewer.viewmodel.TranslationViewerViewModel
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 
@@ -23,7 +23,7 @@ object TranslationViewer : FeatureDefinition() {
                 )
             ) { vm, it ->
                 it.arguments?.getString("id")?.let { id ->
-                    TranslationViewerScreenLogic(
+                    TranslationViewerScreen(
                         vm = vm,
                         translationId = id
                     )

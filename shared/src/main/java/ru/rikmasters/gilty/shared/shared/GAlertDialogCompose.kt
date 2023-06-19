@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -190,6 +189,7 @@ fun GAlertDarkTheme(
     listItemSelect: ((Int) -> Unit)? = null,
     accentColors: Color = ThemeExtra.colors.mainDayGreen,
     content: (@Composable () -> Unit)? = null,
+    onlyDarkTheme: Boolean = true
 ) {
     if (show) AlertDialog(
         onDismissRequest ?: {},
@@ -199,7 +199,8 @@ fun GAlertDarkTheme(
                     .clickable(
                         MutableInteractionSource(), (null)
                     ) { success.second() },
-                accentColors,
+                if (onlyDarkTheme) ThemeExtra.colors.mainDayGreen else
+                    accentColors,
                 style = typography.labelSmall,
                 fontWeight = SemiBold
             )
@@ -212,7 +213,8 @@ fun GAlertDarkTheme(
                         .clickable(
                             MutableInteractionSource(), (null)
                         ) { it.second() },
-                    accentColors,
+                    if (onlyDarkTheme) ThemeExtra.colors.mainDayGreen else
+                        accentColors,
                     style = typography.labelSmall,
                     fontWeight = SemiBold
                 )
@@ -231,7 +233,8 @@ fun GAlertDarkTheme(
                 label?.let {
                     Text(
                         it, Modifier.padding(bottom = 16.dp),
-                        Color(0xFF98989F),
+                        if (onlyDarkTheme) Color(0xFF98989F) else
+                            colorScheme.tertiary,
                         style = typography.labelSmall,
                         fontWeight = SemiBold
                     )
@@ -245,7 +248,8 @@ fun GAlertDarkTheme(
                 }
             }
         },
-        containerColor = ThemeExtra.colors.mainCard
+        containerColor = if (onlyDarkTheme) ThemeExtra.colors.mainCard else
+            colorScheme.primaryContainer
     )
 }
 

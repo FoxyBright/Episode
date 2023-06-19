@@ -182,10 +182,6 @@ class MeetingWebSource: KtorSource() {
                 }
             }
     
-    // TODO: По мере возможности заменить используемый сейчас метод выше этим методом
-    suspend fun getDetailedMeetTest(meet: String) =
-        tryGet("http://$HOST$PREFIX_URL/meetings/$meet")
-    
     suspend fun getMeetMembers(
         meet: String,
         excludeMe: Int,
