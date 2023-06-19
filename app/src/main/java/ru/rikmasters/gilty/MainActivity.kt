@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
+import androidx.core.view.WindowCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
@@ -81,12 +82,14 @@ class MainActivity: ComponentActivity() {
         FirebaseMessaging
             .getInstance()
             .subscribeToTopic("all")
-        
+
         setContent {
             var errorState by remember {
                 mutableStateOf(false)
             }
             val corScope = rememberCoroutineScope()
+
+            var lastConnectionState by remember { mutableStateOf(false) }
             
             AppEntrypoint(
                 theme = GiltyTheme,
@@ -110,6 +113,7 @@ class MainActivity: ComponentActivity() {
                 while(true) {
                     delay(2000)
                     errorState = !internetCheck(context)
+                    lastConnectionState = internetCheck(context)
                 }
             }
             
@@ -123,7 +127,7 @@ class MainActivity: ComponentActivity() {
                 }
             }
             
-            LaunchedEffect(Unit) {
+            LaunchedEffect(Unit, lastConnectionState) {
                 env[ENV_BASE_URL] = "$HOST$PREFIX_URL"
                 if(internetCheck(context))
                     profileManager

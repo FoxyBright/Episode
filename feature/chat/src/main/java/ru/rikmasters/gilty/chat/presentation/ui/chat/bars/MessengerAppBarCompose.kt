@@ -241,7 +241,7 @@ private fun PinedButton(
                 Modifier.padding(12.dp, 8.dp),
                 Start, CenterVertically
             ) {
-                if(type == TRANSLATION_AWAIT) Icon(
+                if(type == TRANSLATION_AWAIT || type == TRANSLATION_ORGANIZER_AWAIT) Icon(
                     painterResource(ic_timer),
                     (null), Modifier
                         .padding(end = 4.dp)
@@ -251,9 +251,9 @@ private fun PinedButton(
                     when(type) {
                         MEET_FINISHED -> stringResource(R.string.chats_close_chat_pinned_bar_button)
                         TRANSLATION -> viewString
-                        TRANSLATION_AWAIT -> toTranslation ?: viewString
+                        TRANSLATION_AWAIT -> if (toTranslation.isNullOrBlank()) viewString else toTranslation
+                        TRANSLATION_ORGANIZER_AWAIT -> if (toTranslation.isNullOrBlank()) stringResource(R.string.chats_translation_organizer_btn_begin) else toTranslation
                         TRANSLATION_ORGANIZER -> stringResource(R.string.chats_translation_organizer_btn_begin)
-                        
                         else -> ""
                     }, Modifier.padding(), if(meetType)
                         if(isOnline) colorScheme.secondary
@@ -278,7 +278,7 @@ private fun PinedText(
             stringResource(
                 when(type) {
                     MEET_FINISHED -> R.string.chats_meet_ended_pinned_bar_label
-                    TRANSLATION_AWAIT -> R.string.chats_translation_await_pinned_bar_label
+                    TRANSLATION_AWAIT, TRANSLATION_ORGANIZER_AWAIT -> R.string.chats_translation_await_pinned_bar_label
                     TRANSLATION -> R.string.chats_translation_pinned_bar_label
                     TRANSLATION_ORGANIZER -> R.string.chats_translation_organizer_pinned_bar_label
                     else -> 0

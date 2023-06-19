@@ -3,37 +3,41 @@ package ru.rikmasters.gilty.translation.viewer.viewmodel
 import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.shared.common.extentions.Duration
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
-import ru.rikmasters.gilty.shared.model.meeting.UserModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
-import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
-import ru.rikmasters.gilty.translation.shared.model.ConnectionStatus
+import ru.rikmasters.gilty.translation.shared.utils.getAdditionalTimeString
+import ru.rikmasters.gilty.translation.shared.utils.getTimeDifferenceString
 import ru.rikmasters.gilty.translation.viewer.event.TranslationViewerEvent
 import ru.rikmasters.gilty.translation.viewer.event.TranslationViewerOneTimeEvents
-import ru.rikmasters.gilty.translation.viewer.model.TranslationViewerStatus
-import ru.rikmasters.gilty.translation.viewer.model.TranslationViewerUiState
+import ru.rikmasters.gilty.translation.viewer.model.ViewerCustomHUD
+import ru.rikmasters.gilty.translation.viewer.model.ViewerHUD
+import ru.rikmasters.gilty.translation.viewer.model.ViewerSnackbarState
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.repository.TranslationRepository
 import ru.rikmasters.gilty.translations.webrtc.model.WebRtcAnswer
 import ru.rikmasters.gilty.translations.webrtc.model.WebRtcStatus
+import java.time.ZonedDateTime
 import java.util.Timer
 import java.util.TimerTask
 
@@ -43,23 +47,94 @@ class TranslationViewerViewModel : ViewModel() {
     private val translationRepository: TranslationRepository by inject()
     private val meetingRepository: MeetingManager by inject()
 
+    private val _meeting = MutableStateFlow<FullMeetingModel?>(null)
+    val meeting = _meeting.asStateFlow()
+
+    private val _translation = MutableStateFlow<TranslationInfoModel?>(null)
+    val translation = _translation.onEach {
+        it?.let { translation ->
+            startDurationTimer()
+            _cameraState.value = translation.camera
+            _microphoneState.value = translation.microphone
+            _isStreaming.value = translation.isStreaming
+            _completedAt.value = translation.completedAt
+            _oneTimeEvent.send(TranslationViewerOneTimeEvents.ConnectToStream(translation.webrtc))
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
+    private val _completedAt = MutableStateFlow<ZonedDateTime?>(null)
+
+    private val _cameraState = MutableStateFlow(true)
+    val cameraState = _cameraState.asStateFlow()
+
+    private val _microphoneState = MutableStateFlow(true)
+    val microphoneState = _microphoneState.onEach {
+        if (!it) {
+            coroutineScope.launch {
+                _viewerSnackbarState.emit(ViewerSnackbarState.MICRO_OFF)
+            }
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), true)
+
+    private val _isStreaming = MutableStateFlow(true)
+    val isStreaming = _isStreaming.onEach {
+        if (!it) {
+            _hudState.value = ViewerHUD.PAUSED
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), true)
+
+    private val _remainTime = MutableStateFlow("")
+    val remainTime = _remainTime.asStateFlow()
+
+    private val _translationStatus = MutableStateFlow<TranslationStatusModel?>(null)
+    val translationStatus = _translationStatus.asStateFlow()
+
+    private val _hudState = MutableStateFlow<ViewerHUD?>(null)
+    val hudState = _hudState.asStateFlow()
+
+    private val _membersCount = MutableStateFlow(0)
+    val membersCount = _membersCount.asStateFlow()
+
+    private val _viewerSnackbarState =
+        MutableSharedFlow<ViewerSnackbarState?>(1, 0, BufferOverflow.DROP_OLDEST)
+    val viewerSnackbarState = _viewerSnackbarState
+        .onEach {
+            _oneTimeEvent.send(TranslationViewerOneTimeEvents.ShowSnackbar)
+        }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
+
+    private val _oneTimeEvent = Channel<TranslationViewerOneTimeEvents>()
+    val translationViewerOneTimeEvents = _oneTimeEvent.receiveAsFlow()
+
+    private val _customHUDState = MutableStateFlow<ViewerCustomHUD?>(null)
+    val customHUDState = _customHUDState.asStateFlow()
+
+    private val _additionalTime = MutableStateFlow("")
+    val additionalTime = _additionalTime.asStateFlow()
+
+    private val _timerHighlighted = MutableStateFlow(false)
+    val timerHighlighted = _timerHighlighted.asStateFlow()
+
+    val placeHolderVisible = combine(_hudState, _customHUDState) { hud, state ->
+        Pair(hud, state)
+    }.map { (hud, state) ->
+        when (state) {
+            null -> {
+                hud == null
+            }
+            else -> false
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
+
     private var pingTimer: Timer? = Timer()
     private var durationTimer: Timer? = Timer()
-
-    private val _translationViewerUiState = MutableStateFlow(TranslationViewerUiState())
-    val translationViewerUiState = _translationViewerUiState.asStateFlow()
-
-    private val _translationViewerOneTimeEvents = Channel<TranslationViewerOneTimeEvents>()
-    val translationViewerOneTimeEvents = _translationViewerOneTimeEvents.receiveAsFlow()
 
     private val reloadChat = MutableStateFlow(false)
     private val reloadMembers = MutableStateFlow(false)
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-
     val messages = reloadChat.flatMapLatest {
-        _translationViewerUiState.value.translationInfo?.id?.let {
+        _translation.value?.id?.let {
             translationRepository.getMessages(
                 translationId = it
             )
@@ -72,8 +147,7 @@ class TranslationViewerViewModel : ViewModel() {
     ) { reload, query ->
         Pair(reload, query)
     }.flatMapLatest { (_, query) ->
-        _translationViewerUiState.value.translationInfo?.id?.let {
-            Log.d("TEST","id $it")
+        _translation.value?.id?.let {
             translationRepository.getConnectedUsers(
                 translationId = it,
                 query = query
@@ -81,23 +155,16 @@ class TranslationViewerViewModel : ViewModel() {
         } ?: flow { }
     }.cachedIn(coroutineScope)
 
-    init {
-        coroutineScope.launch {
-            translationRepository.webSocketFlow.collectLatest { socketEvent ->
-                handleSocketEvents(socketEvent)
-            }
-        }
-    }
-
     fun onEvent(event: TranslationViewerEvent) {
         when (event) {
             is TranslationViewerEvent.Initialize -> {
                 event.meetingId.let { meetingId ->
                     loadTranslationInfo(meetingId)
                     loadMeetDetails(meetingId)
-                    connectSocket(meetingId)
+                    connectSocket()
                     startPinging()
                     startDurationTimer()
+                    connectToTranslationChat()
                 }
             }
 
@@ -105,131 +172,201 @@ class TranslationViewerViewModel : ViewModel() {
                 disconnectSocket()
                 stopPinging()
                 stopDurationTimer()
-                disconnectFromChat()
+                //disconnectFromTranslationChat()
+                coroutineScope.launch {
+                    _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
+                }
+            }
+
+            TranslationViewerEvent.EnterBackground -> {
+                disconnectSocket()
+                stopPinging()
+                disconnectFromTranslationChat()
+                coroutineScope.launch {
+                    _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
+                }
+            }
+
+            is TranslationViewerEvent.EnterForeground -> {
+                event.meetingId.let { meetingId ->
+                    loadTranslationInfo(meetingId)
+                    loadMeetDetails(meetingId)
+                    connectToTranslationChat()
+                    connectSocket()
+                    startPinging()
+                }
             }
 
             is TranslationViewerEvent.HandleWebRtcAnswer -> {
-                handleWebRtcAnswer(event.answer)
+                when (event.answer) {
+                    WebRtcAnswer.weakConnection -> {
+                        coroutineScope.launch {
+                            _viewerSnackbarState.emit(ViewerSnackbarState.WEAK_CONNECTION)
+                        }
+                    }
+                }
             }
 
             is TranslationViewerEvent.HandleWebRtcStatus -> {
-                handleWebRtcStatus(event.status)
+                if (_isStreaming.value) {
+                    when (event.status) {
+                        WebRtcStatus.connecting -> {
+                            _hudState.value = ViewerHUD.RECONNECTING
+                        }
+
+                        WebRtcStatus.connect, WebRtcStatus.stream -> {
+                            _hudState.value = null
+                        }
+
+                        WebRtcStatus.reconnectAttemptsOver -> {
+                            _hudState.value = ViewerHUD.RECONNECT_FAILED
+                        }
+
+                        WebRtcStatus.unknow, WebRtcStatus.disconnect, WebRtcStatus.failed -> {}
+                    }
+                }
             }
 
             is TranslationViewerEvent.MessageSent -> {
-                sendMessage(event.messageText)
+                _translation.value?.let { translation ->
+                    coroutineScope.launch {
+                        translationRepository.sendMessage(
+                            translationId = translation.id,
+                            text = event.messageText
+                        )
+                    }
+                }
             }
 
             is TranslationViewerEvent.QueryChanged -> {
-                changeQuery(event.newQuery)
+                _query.value = event.newQuery
             }
 
             TranslationViewerEvent.ConnectToChat -> {
-                connectToChat()
+                reloadChat.value = !reloadChat.value
             }
 
             TranslationViewerEvent.ReloadMembers -> {
-                Log.d("TEST","Reload members")
-                reloadMembers()
+                reloadMembers.value = !reloadMembers.value
             }
 
             TranslationViewerEvent.DisconnectFromChat -> {
-                disconnectFromChat()
+                reloadChat.value = !reloadChat.value
+            }
+
+            TranslationViewerEvent.Reconnect -> {
+                reconnect()
             }
         }
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private fun connectToChat() {
-        translationInfo { info ->
-            coroutineScope.launch {
-                translationRepository.connectToTranslationChat(
-                    translationId = info.id
-                )
-            }
-            reloadChat.value = !reloadChat.value
-        }
-    }
-
-    private fun disconnectFromChat() {
+    init {
         coroutineScope.launch {
-            translationRepository.disconnectFromTranslationChat()
-        }
-        reloadChat.value = !reloadChat.value
-    }
+            translationRepository.webSocketFlow.collectLatest { socketEvent ->
+                Log.d("TEST", "NEW WEb SOCKET EVENT $socketEvent")
+                when (socketEvent) {
+                    TranslationCallbackEvents.MessageReceived -> {
+                        reloadChat.value = !reloadChat.value
+                    }
 
-    private fun reloadMembers() {
-        reloadMembers.value = !reloadMembers.value
-    }
+                    is TranslationCallbackEvents.SignalReceived -> {
+                        when (socketEvent.signal.signal) {
+                            TranslationSignalTypeModel.MICROPHONE -> {
+                                _microphoneState.value = socketEvent.signal.value
+                            }
 
-    private fun changeQuery(query: String) {
-        _query.value = query
-    }
+                            TranslationSignalTypeModel.CAMERA -> {
+                                _cameraState.value = socketEvent.signal.value
+                            }
+                        }
+                    }
 
-    private fun sendMessage(messageText: String) {
-        translationInfo { info ->
-            coroutineScope.launch {
-                translationRepository.sendMessage(
-                    translationId = info.id,
-                    text = messageText
-                )
-            }
-        }
-    }
+                    TranslationCallbackEvents.TranslationCompleted -> {
+                        disconnectSocket()
+                        coroutineScope.launch {
+                            _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
+                        }
+                        _customHUDState.value = ViewerCustomHUD.COMPLETED
+                    }
 
-    private fun handleWebRtcAnswer(answer: WebRtcAnswer) {
-        when (answer) {
-            WebRtcAnswer.weakConnection -> {
-                coroutineScope.launch {
-                    _translationViewerOneTimeEvents.send(
-                        TranslationViewerOneTimeEvents.LowConnection
-                    )
+                    TranslationCallbackEvents.TranslationExpired -> {
+                        _hudState.value = ViewerHUD.PAUSED
+                    }
+
+                    is TranslationCallbackEvents.TranslationExtended -> {
+                        _hudState.value = null
+                        if (ZonedDateTime.now().isBefore(_completedAt.value)) {
+                            coroutineScope.launch {
+                                _additionalTime.value =
+                                    getAdditionalTimeString(socketEvent.duration)
+                                delay(2000)
+                                _additionalTime.value = ""
+                                _completedAt.value = socketEvent.completedAt
+                            }
+                        } else {
+                            coroutineScope.launch {
+                                _customHUDState.value = null
+                                _completedAt.value = socketEvent.completedAt
+                                _timerHighlighted.value = true
+                                delay(2000)
+                                _timerHighlighted.value = false
+                            }
+                        }
+                    }
+
+                    is TranslationCallbackEvents.UserConnected -> {
+                        _meeting.value?.let {
+                            if (socketEvent.user.id == it.organizer.id) {
+                                _isStreaming.value = true
+                                reconnect()
+                            }
+                        }
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.UserDisconnected -> {
+                        _meeting.value?.let {
+                            if (socketEvent.user.id == it.organizer.id) {
+                                _isStreaming.value = false
+                            }
+                        }
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.UserKicked -> {
+                        _translation.value?.let {
+                            if (socketEvent.user.id == it.userId) {
+                                disconnectSocket()
+                                coroutineScope.launch {
+                                    _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
+                                }
+                                _customHUDState.value = ViewerCustomHUD.KICKED
+                            }
+                        }
+                        reloadMembers.value = !reloadMembers.value
+                    }
+
+                    is TranslationCallbackEvents.MembersCountChanged -> {
+                        _membersCount.value = socketEvent.count
+                    }
+
+                    else -> {}
                 }
             }
         }
     }
 
-    private fun handleWebRtcStatus(status: WebRtcStatus) {
-        _translationViewerUiState.value.translationStatus?.let { trStatus ->
-            if (trStatus == TranslationViewerStatus.STREAM) {
-                when (status) {
-                    WebRtcStatus.reconnectAttemptsOver -> {
-                        _translationViewerUiState.update {
-                            it.copy(
-                                connectionStatus = ConnectionStatus.NO_CONNECTION
-                            )
-                        }
-                    }
-
-                    WebRtcStatus.connecting -> {
-                        _translationViewerUiState.update {
-                            it.copy(
-                                connectionStatus = ConnectionStatus.RECONNECTING
-                            )
-                        }
-                    }
-
-                    WebRtcStatus.connect, WebRtcStatus.stream -> {
-                        _translationViewerUiState.update {
-                            it.copy(
-                                connectionStatus = ConnectionStatus.SUCCESS
-                            )
-                        }
-                    }
-
-                    WebRtcStatus.failed, WebRtcStatus.disconnect, WebRtcStatus.unknow -> {}
-                }
+    private fun reconnect() {
+        _translation.value?.let {
+            loadTranslationInfo(it.id)
+        }
+        coroutineScope.launch {
+            _translation.value?.webrtc?.let {
+                _oneTimeEvent.send(TranslationViewerOneTimeEvents.ConnectToStream(it))
             }
         }
     }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-     PINGING
-     */
     private fun startPinging() {
         if (pingTimer == null) {
             pingTimer = Timer()
@@ -237,7 +374,7 @@ class TranslationViewerViewModel : ViewModel() {
         pingTimer?.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
-                    translationInfo { info ->
+                    _translation.value?.let { info ->
                         coroutineScope.launch {
                             translationRepository.ping(
                                 translationId = info.id
@@ -254,11 +391,6 @@ class TranslationViewerViewModel : ViewModel() {
         pingTimer = null
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      REMAIN TIME METHODS
-     */
     private fun startDurationTimer() {
         if (durationTimer == null) {
             durationTimer = Timer()
@@ -266,7 +398,9 @@ class TranslationViewerViewModel : ViewModel() {
         durationTimer?.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
-                    calculateTimeDiff()
+                    _completedAt.value?.let { time ->
+                        _remainTime.value = getTimeDifferenceString(time)
+                    }
                 }
             }, 0, 1000
         )
@@ -277,82 +411,6 @@ class TranslationViewerViewModel : ViewModel() {
         durationTimer = null
     }
 
-    private fun calculateTimeDiff() {
-        translationInfo { info ->
-            val current = LocalDateTime.nowZ()
-            val duration = Duration.between(
-                current, info.completedAt
-            )
-            val hours = (duration / 3600000)
-            val minutes = (duration - (hours * 3600000)) / 60000
-            val seconds = (duration - (hours * 3600000) - (minutes * 60000)) / 1000
-            val hourString = if (hours > 0) "$hours:" else ""
-            val minuteString = if (hours > 0) {
-                if (minutes < 10) {
-                    "0$minutes"
-                } else {
-                    "$minutes"
-                }
-            } else {
-                "$minutes"
-            }
-            val secondString = if (minutes > 0) {
-                if (seconds < 10) {
-                    "0$seconds"
-                } else {
-                    "$seconds"
-                }
-            } else {
-                "$seconds"
-            }
-            val diff = "$hourString$minuteString:$secondString"
-            _translationViewerUiState.update {
-                it.copy(
-                    remainTime = diff
-                )
-            }
-        }
-    }
-
-    private fun handleAppendTime(duration: Int? = null) {
-        duration?.let {
-            translationInfo { model ->
-                if (LocalDateTime.nowZ().isBefore(model.completedAt)) {
-                    val hour = (duration / 60).takeIf { it > 0 }
-                    val hourString = hour?.let { "$hour:" } ?: ""
-                    val minute = hour?.let { duration - 60 } ?: duration
-                    val minuteString = hour?.let {
-                        if (minute < 10) {
-                            "0$minute"
-                        } else {
-                            "$minute"
-                        }
-                    } ?: "$minute"
-                    coroutineScope.launch {
-                        _translationViewerOneTimeEvents.send(
-                            TranslationViewerOneTimeEvents.TranslationExtended(
-                                duration = "$hourString$minuteString:00"
-                            )
-                        )
-                    }
-                }
-            }
-        } ?: kotlin.run {
-            coroutineScope.launch {
-                _translationViewerOneTimeEvents.send(
-                    TranslationViewerOneTimeEvents.TranslationExtended(
-                        duration = null
-                    )
-                )
-            }
-        }
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      LOAD DETAILS METHODS
-     */
     private fun loadTranslationInfo(
         meetingId: String
     ) {
@@ -361,39 +419,16 @@ class TranslationViewerViewModel : ViewModel() {
                 translationId = meetingId
             ).on(
                 loading = {},
-                success = { translation ->
-                    _translationViewerUiState.update {
-                        it.copy(
-                            translationInfo = translation,
-                        )
-                    }
-                    if (translation.isStreaming) {
-                        if (_translationViewerUiState.value.translationStatus == TranslationViewerStatus.PAUSED) {
-                            _translationViewerOneTimeEvents.send(
-                                TranslationViewerOneTimeEvents.TranslationResumed
-                            )
-                        }
-                        _translationViewerUiState.update {
-                            it.copy(
-                                translationStatus = TranslationViewerStatus.STREAM,
-                            )
-                        }
-                    }
-                    _translationViewerOneTimeEvents.send(
-                        TranslationViewerOneTimeEvents.ConnectToStream(
-                            wsUrl = translation.webrtc
-                        )
-                    )
-                },
+                success = { translation -> _translation.value = translation },
                 error = { cause ->
                     cause.serverMessage?.let {
-                        _translationViewerOneTimeEvents.send(
+                        _oneTimeEvent.send(
                             TranslationViewerOneTimeEvents.OnError(
                                 message = it
                             )
                         )
                     } ?: cause.defaultMessage?.let {
-                        _translationViewerOneTimeEvents.send(
+                        _oneTimeEvent.send(
                             TranslationViewerOneTimeEvents.OnError(
                                 message = it
                             )
@@ -408,26 +443,23 @@ class TranslationViewerViewModel : ViewModel() {
         meetingId: String
     ) {
         coroutineScope.launch {
-            meetingRepository.getDetailedMeetTest(
+            meetingRepository.getDetailedMeet(
                 meetId = meetingId
             ).on(
                 loading = {},
                 success = { meetingModel ->
-                    _translationViewerUiState.update {
-                        it.copy(
-                            meetingModel = meetingModel
-                        )
-                    }
+                    _meeting.value = meetingModel
+                    connectToTranslationChat()
                 },
                 error = { cause ->
                     cause.serverMessage?.let {
-                        _translationViewerOneTimeEvents.send(
+                        _oneTimeEvent.send(
                             TranslationViewerOneTimeEvents.OnError(
                                 message = it
                             )
                         )
                     } ?: cause.defaultMessage?.let {
-                        _translationViewerOneTimeEvents.send(
+                        _oneTimeEvent.send(
                             TranslationViewerOneTimeEvents.OnError(
                                 message = it
                             )
@@ -438,21 +470,13 @@ class TranslationViewerViewModel : ViewModel() {
         }
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private fun reconnect() {}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-       SOCKET HANDLING
-     */
-    private fun connectSocket(meetingId: String) {
-        coroutineScope.launch {
-            translationRepository.connectToTranslation(
-                translationId = meetingId
-            )
+    private fun connectSocket() {
+        translation.value?.let {
+            coroutineScope.launch {
+                translationRepository.connectToTranslation(
+                    translationId = it.id
+                )
+            }
         }
     }
 
@@ -462,194 +486,19 @@ class TranslationViewerViewModel : ViewModel() {
         }
     }
 
-    private fun handleSocketEvents(socketEvent: TranslationCallbackEvents) {
-        when (socketEvent) {
-            TranslationCallbackEvents.MessageReceived -> {
-                handleMessageReceived()
-            }
-
-            is TranslationCallbackEvents.SignalReceived -> {
-                handleSignal(socketEvent.signal)
-            }
-
-            TranslationCallbackEvents.TranslationCompleted -> {
-                handleBroadcastCompletion()
-            }
-
-            TranslationCallbackEvents.TranslationExpired -> {
-                handleTranslationExpired()
-            }
-
-            is TranslationCallbackEvents.TranslationExtended -> {
-                handleTranslationAppended(
-                    socketEvent.completedAt, socketEvent.duration
+    private fun connectToTranslationChat() {
+        _translation.value?.let {
+            coroutineScope.launch {
+                translationRepository.connectToTranslationChat(
+                    translationId = it.id
                 )
             }
-
-            is TranslationCallbackEvents.UserConnected -> {
-                handleUserConnected(socketEvent.user)
-            }
-
-            is TranslationCallbackEvents.UserDisconnected -> {
-                handleUserDisconnected(socketEvent.user)
-            }
-
-            is TranslationCallbackEvents.UserKicked -> {
-                handleUserKicked(socketEvent.user)
-            }
-
-            is TranslationCallbackEvents.MembersCountChanged -> {
-                handleMembersCountChanged(socketEvent.count)
-            }
-
-            else -> {}
         }
     }
 
-    private fun handleMessageReceived() {
-        reloadChat.value = !reloadChat.value
-    }
-
-    private fun handleTranslationAppended(completedAt: LocalDateTime, duration: Int) {
-        handleAppendTime(duration)
-        _translationViewerUiState.update {
-            it.copy(
-                translationInfo = it.translationInfo?.copy(
-                    status = TranslationStatusModel.ACTIVE,
-                    completedAt = completedAt
-                )
-            )
-        }
-    }
-
-    private fun handleMembersCountChanged(count: Int) {
-        _translationViewerUiState.update {
-            it.copy(
-                membersCount = count
-            )
-        }
-    }
-
-    private fun handleUserKicked(user: UserModel) {
-        translationInfo { translation ->
-            if (user.id == translation.userId) {
-                _translationViewerUiState.update {
-                    it.copy(
-                        translationStatus = TranslationViewerStatus.KICKED
-                    )
-                }
-                coroutineScope.launch {
-                    _translationViewerOneTimeEvents.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
-                }
-            } else {
-                reloadMembers.value = !reloadMembers.value
-            }
-        }
-    }
-
-    private fun handleUserDisconnected(user: UserModel) {
-        meetingInfo { meet ->
-            if (user.id == meet.organizer.id) {
-                _translationViewerUiState.update {
-                    it.copy(
-                        translationStatus = TranslationViewerStatus.PAUSED
-                    )
-                }
-            }
-            reloadMembers.value = !reloadMembers.value
-        }
-    }
-
-    private fun handleUserConnected(user: UserModel) {
-        meetingInfo { meet ->
-            if (user.id == meet.organizer.id) {
-                if (_translationViewerUiState.value.translationStatus == TranslationViewerStatus.PAUSED) {
-                    coroutineScope.launch {
-                        _translationViewerOneTimeEvents.send(
-                            TranslationViewerOneTimeEvents.TranslationResumed
-                        )
-                    }
-                }
-                _translationViewerUiState.update {
-                    it.copy(
-                        translationStatus = TranslationViewerStatus.STREAM
-                    )
-                }
-                reconnect()
-            }
-            reloadMembers.value = !reloadMembers.value
-        }
-    }
-
-    private fun handleTranslationExpired() {
-        _translationViewerUiState.update {
-            it.copy(
-                translationStatus = TranslationViewerStatus.PAUSED
-            )
-        }
-    }
-
-    private fun handleSignal(signal: TranslationSignalModel) {
-        when (signal.signal) {
-            TranslationSignalTypeModel.MICROPHONE -> {
-                _translationViewerUiState.update {
-                    it.copy(
-                        translationInfo = it.translationInfo?.copy(
-                            microphone = signal.value
-                        )
-                    )
-                }
-                if (!signal.value) {
-                    coroutineScope.launch {
-                        _translationViewerOneTimeEvents.send(
-                            TranslationViewerOneTimeEvents.MicroOff
-                        )
-                    }
-                }
-            }
-
-            TranslationSignalTypeModel.CAMERA -> {
-                _translationViewerUiState.update {
-                    it.copy(
-                        translationInfo = it.translationInfo?.copy(
-                            camera = signal.value
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun handleBroadcastCompletion() {
-        disconnectSocket()
-        _translationViewerUiState.update {
-            it.copy(
-                translationStatus = TranslationViewerStatus.COMPLETED
-            )
-        }
+    private fun disconnectFromTranslationChat() {
         coroutineScope.launch {
-            _translationViewerOneTimeEvents.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
-        }
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-      UTILS
-     */
-    private fun translationInfo(
-        block: (TranslationInfoModel) -> Unit
-    ) {
-        _translationViewerUiState.value.translationInfo?.let { info ->
-            block(info)
-        }
-    }
-
-    private fun meetingInfo(
-        block: (FullMeetingModel) -> Unit
-    ) {
-        _translationViewerUiState.value.meetingModel?.let { info ->
-            block(info)
+            translationRepository.disconnectFromTranslationChat()
         }
     }
 }

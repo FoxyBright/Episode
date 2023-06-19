@@ -93,7 +93,7 @@ fun BaseExtension.baseConfig(name: String, project: Project) {
     }
     
     compileOptions {
-        isCoreLibraryDesugaringEnabled
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = Config.sourceCompatibility
         targetCompatibility = Config.targetCompatibility
     }

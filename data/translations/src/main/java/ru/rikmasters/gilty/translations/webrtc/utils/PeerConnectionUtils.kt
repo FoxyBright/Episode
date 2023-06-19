@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.translations.webrtc.utils
 
 import android.content.Context
+import android.media.AudioManager
 import android.os.Build
 import org.webrtc.AddIceObserver
 import org.webrtc.DefaultVideoDecoderFactory
@@ -57,7 +58,6 @@ fun createPeerConnectionFactory(context: Context, eglBaseContext: EglBase.Contex
         )
     }
     val videoEncoderFactory by lazy {
-        // TODO: Simulcast video encoder ( По всей видимости нет в используемой версии WebRTC )
         DefaultVideoEncoderFactory(eglBaseContext, true, true)
     }
     PeerConnectionFactory.initialize(
@@ -67,44 +67,6 @@ fun createPeerConnectionFactory(context: Context, eglBaseContext: EglBase.Contex
     return Pair(PeerConnectionFactory.builder()
         .setVideoDecoderFactory(videoDecoderFactory)
         .setVideoEncoderFactory(videoEncoderFactory)
-        .setAudioDeviceModule(
-            JavaAudioDeviceModule
-                .builder(context)
-                .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                .setAudioRecordErrorCallback(object :
-                    JavaAudioDeviceModule.AudioRecordErrorCallback {
-                    override fun onWebRtcAudioRecordInitError(p0: String?) {}
-                    override fun onWebRtcAudioRecordStartError(
-                        p0: JavaAudioDeviceModule.AudioRecordStartErrorCode?,
-                        p1: String?
-                    ) {}
-                    override fun onWebRtcAudioRecordError(p0: String?) {}
-                })
-                .setAudioTrackErrorCallback(object :
-                    JavaAudioDeviceModule.AudioTrackErrorCallback {
-                    override fun onWebRtcAudioTrackInitError(p0: String?) {}
-                    override fun onWebRtcAudioTrackStartError(
-                        p0: JavaAudioDeviceModule.AudioTrackStartErrorCode?,
-                        p1: String?
-                    ) {}
-                    override fun onWebRtcAudioTrackError(p0: String?) {}
-                })
-                .setAudioRecordStateCallback(object :
-                    JavaAudioDeviceModule.AudioRecordStateCallback {
-                    override fun onWebRtcAudioRecordStart() {}
-                    override fun onWebRtcAudioRecordStop() {}
-                })
-                .setAudioTrackStateCallback(object :
-                    JavaAudioDeviceModule.AudioTrackStateCallback {
-                    override fun onWebRtcAudioTrackStart() {}
-                    override fun onWebRtcAudioTrackStop() {}
-                })
-                .createAudioDeviceModule().also {
-                    it.setMicrophoneMute(false)
-                    it.setSpeakerMute(false)
-                }
-        )
         .createPeerConnectionFactory(), eglBaseContext)
 }
 

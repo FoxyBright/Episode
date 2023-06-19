@@ -136,16 +136,6 @@ class MeetingManager(
     suspend fun getDetailedMeet(meetId: String) =
         withContext(IO) { web.getDetailedMeet(meetId) }
     
-    // TODO: По мере возможности заменить
-    //  используемый сейчас метод выше этим методом
-    suspend fun getDetailedMeetTest(
-        meetId: String,
-    ) = web.getDetailedMeetTest(meetId).let {
-        coroutinesState({ it }) {
-            it.wrapped<FullMeetingModel>()
-        }
-    }
-    
     suspend fun getCategoriesList() =
         withContext(IO) { web.getCategoriesList() }
     

@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.meetings.MeetingsData
 import ru.rikmasters.gilty.profile.ProfileData
 import ru.rikmasters.gilty.profile.ProfileManager
+import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsViewModel
 
 object Chat: FeatureDefinition() {
     
@@ -47,6 +48,7 @@ object Chat: FeatureDefinition() {
         singleOf(::ChatListViewModel)
         singleOf(::GalleryViewModel)
         singleOf(::HiddenBsViewModel)
+        singleOf(::PreviewBsViewModel)
     }
     
     override fun include() = setOf(ChatData, ProfileData, MeetingsData)

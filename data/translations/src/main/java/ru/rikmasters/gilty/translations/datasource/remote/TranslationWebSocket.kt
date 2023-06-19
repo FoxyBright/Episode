@@ -1,20 +1,27 @@
 package ru.rikmasters.gilty.translations.datasource.remote
 
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.DataStateTest
 import ru.rikmasters.gilty.shared.model.ExceptionCause
 import ru.rikmasters.gilty.shared.model.translations.TranslationSignalModel
 import ru.rikmasters.gilty.shared.models.User
 import ru.rikmasters.gilty.shared.models.socket.SocketData
 import ru.rikmasters.gilty.shared.models.socket.SocketResponse
+import ru.rikmasters.gilty.shared.models.translations.AppendInfo
+import ru.rikmasters.gilty.shared.models.translations.TranslationUser
 import ru.rikmasters.gilty.shared.socket.WebSocket
 import ru.rikmasters.gilty.shared.socket.mapper
 import ru.rikmasters.gilty.translations.model.TranslationCallbackEvents
 import ru.rikmasters.gilty.translations.model.TranslationsSocketEvents
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 data class Count(val count: Int)
 class TranslationWebSocket : WebSocket() {
@@ -36,7 +43,7 @@ class TranslationWebSocket : WebSocket() {
             TranslationsSocketEvents.CONNECTION_ESTABLISHED -> {
                 socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
                 subscribe("private-translation.${_translationId.value}")
-                _answer.send(TranslationCallbackEvents.ConnectionEstablished)
+                _answer.emit(TranslationCallbackEvents.ConnectionEstablished)
             }
 
             TranslationsSocketEvents.SUBSCRIPTION_SUCCEEDED -> {
@@ -48,16 +55,16 @@ class TranslationWebSocket : WebSocket() {
 
             TranslationsSocketEvents.UNSUBSCRIBE -> {}
             TranslationsSocketEvents.TRANSLATION_STARTED -> {
-                _answer.send(TranslationCallbackEvents.TranslationStarted)
+                _answer.emit(TranslationCallbackEvents.TranslationStarted)
             }
 
             TranslationsSocketEvents.TRANSLATION_COMPLETED -> {
-                _answer.send(TranslationCallbackEvents.TranslationCompleted)
+                _answer.emit(TranslationCallbackEvents.TranslationCompleted)
             }
 
             TranslationsSocketEvents.SIGNAL -> {
                 val signal = mapper.readValue<TranslationSignalModel>(response.data)
-                _answer.send(
+                _answer.emit(
                     TranslationCallbackEvents.SignalReceived(
                         signal = signal,
                     ),
@@ -65,50 +72,50 @@ class TranslationWebSocket : WebSocket() {
             }
 
             TranslationsSocketEvents.APPEND_TIME -> {
-                data class AppendInfo(val completed_at: String, val duration: String)
-
                 val info = mapper.readValue<AppendInfo>(response.data)
-                _answer.send(
+                _answer.emit(
                     TranslationCallbackEvents.TranslationExtended(
-                        completedAt = LocalDateTime.of(info.completed_at),
+                        completedAt = ZonedDateTime.parse(info.completed_at).withZoneSameInstant(
+                            ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+                            ZoneId.systemDefault()),
                         duration = info.duration.toInt(),
-                    ),
+                    )
                 )
             }
 
             TranslationsSocketEvents.EXPIRED -> {
-                _answer.send(TranslationCallbackEvents.TranslationExpired)
+                _answer.emit(TranslationCallbackEvents.TranslationExpired)
             }
 
             TranslationsSocketEvents.USER_CONNECTED -> {
-                val user = mapper.readValue<User>(response.data)
-                _answer.send(
+                val user = mapper.readValue<TranslationUser>(response.data)
+                _answer.emit(
                     TranslationCallbackEvents.UserConnected(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }
 
             TranslationsSocketEvents.USER_DISCONNECTED -> {
-                val user = mapper.readValue<User>(response.data)
-                _answer.send(
+                val user = mapper.readValue<TranslationUser>(response.data)
+                _answer.emit(
                     TranslationCallbackEvents.UserDisconnected(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }
 
             TranslationsSocketEvents.USER_KICKED -> {
-                val user = mapper.readValue<User>(response.data)
-                _answer.send(
+                val user = mapper.readValue<TranslationUser>(response.data)
+                _answer.emit(
                     TranslationCallbackEvents.UserKicked(
-                        user = user.map()
+                        user = user.user.map()
                     ),
                 )
             }
 
             TranslationsSocketEvents.MESSAGE_SENT -> {
-                _answer.send(
+                _answer.emit(
                     TranslationCallbackEvents.MessageReceived
                 )
             }
@@ -120,7 +127,7 @@ class TranslationWebSocket : WebSocket() {
             || event == TranslationsSocketEvents.USER_KICKED
         ) {
             val count = mapper.readValue<Count>(response.data)
-            _answer.send(
+            _answer.emit(
                 TranslationCallbackEvents.MembersCountChanged(
                     count = count.count
                 )
@@ -130,11 +137,10 @@ class TranslationWebSocket : WebSocket() {
 
     private val _translationId = MutableStateFlow<String?>(null)
 
-    private val _answer = Channel<TranslationCallbackEvents>()
-    val answer = _answer.receiveAsFlow()
+    private val _answer = MutableSharedFlow<TranslationCallbackEvents>(1,0, BufferOverflow.DROP_OLDEST)
+    val answer = _answer.asSharedFlow()
 
     suspend fun connectToTranslation(id: String) {
-        disconnectFromTranslation()
         subscribe("private-translation.$id.${userId.value}") {
             if (it) _translationId.emit(id)
         }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
@@ -49,6 +50,9 @@ import ru.rikmasters.gilty.shared.shared.SwipeableRowBack
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Locale.getDefault
 
@@ -198,8 +202,9 @@ private fun ChatRowContent(
                 }
             }
             chat.lastMessage?.let {
+                val createdTime = ZonedDateTime.parse(it.createdAt).format(DateTimeFormatter.ofPattern("HH:mm"))
                 Text(
-                    it.createdAt.timeClock(),
+                    createdTime,
                     Modifier
                         .align(BottomEnd)
                         .padding(12.dp),
@@ -235,6 +240,8 @@ private fun Timer(
     isOnline: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val timeString = ZonedDateTime.parse(time).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+        ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))
     Box(
         modifier.background(
             linearGradient(
@@ -246,7 +253,7 @@ private fun Timer(
         )
     ) {
         Text(
-            time.timeClock(),
+            timeString,
             Modifier.padding(12.dp, 4.dp),
             White, style = typography.labelSmall
         )

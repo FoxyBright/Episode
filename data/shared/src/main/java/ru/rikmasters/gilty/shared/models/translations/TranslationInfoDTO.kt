@@ -1,8 +1,9 @@
 package ru.rikmasters.gilty.shared.models.translations
 
-import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
 import ru.rikmasters.gilty.shared.models.enumeration.TranslationStatusDTO
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 data class TranslationInfoDTO(
     val id: String,
@@ -27,12 +28,15 @@ data class TranslationInfoDTO(
     fun map() = TranslationInfoModel(
         id = id,
         userId = userId,
-        startedAt = startedAt?.let { LocalDateTime.of(it) },
+        startedAt = startedAt?.let { ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+            ZoneId.systemDefault()) },
         camera = camera ?: true,
         microphone = microphone ?: true,
         status = status.map(),
-        beginAt = LocalDateTime.of(beginAt),
-        completedAt = LocalDateTime.of(completedAt),
+        beginAt = ZonedDateTime.parse(beginAt).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+            ZoneId.systemDefault()),
+        completedAt = ZonedDateTime.parse(completedAt).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
+            ZoneId.systemDefault()),
         isStreaming = isStreaming,
         wasStreaming = wasStreaming,
         thumbnailHost = thumbnailHost,

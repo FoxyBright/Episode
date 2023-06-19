@@ -41,7 +41,6 @@ abstract class WebSocket: KtorSource() {
         channel: String,
         completion: (suspend (Boolean) -> Unit)? = null,
     ) {
-        Log.d("TranslationWeb", "Subscribing CHANNEL $channel")
         tryPost(
             "http://${BuildConfig.HOST}/broadcasting/auth",
         ) {
@@ -120,13 +119,11 @@ abstract class WebSocket: KtorSource() {
     suspend fun connect(userId: String) {
         try {
             connection(userId)
-            Log.d("TEST", "conn socck 5")
         } catch(e: Exception) {
             logV("WebSocket Exception: $e")
             logV("Reconnect...")
             disconnect()
             try {
-                Log.d("TEST", "conn socck 6")
                 connection(userId)
             } catch(e: Exception) {
                 logE("Bad reconnection")
@@ -139,30 +136,32 @@ abstract class WebSocket: KtorSource() {
         withContext(Dispatchers.IO) {
             this@WebSocket.userId.emit(userId)
             sessionHandlerJob = launch {
-                val session = wsSession(BuildConfig.HOST, port, socketUrl)
-                try {
-                    launch {
-                        while(true) {
-                            delay(pingInterval)
-                            doPing(session)
-                            Log.d("WebSoc", "PINGING WITH $port")
-                        }
-                    }
-                    _session.emit(session)
-                    while(true) {
-                        val response = session.incoming.receive()
-                        logV("Frame: ${String(response.data)}")
-                        
-                        val socketResponse = mapper
-                            .readValue<SocketResponse>(response.data)
-                        handleResponse(socketResponse)
-                    }
-                } catch(e: SocketException) {
-                    e.stackTraceToString()
-                } finally {
-                    logV("Closing session...")
-                    closeClient()
-                }
+                connect(this)
             }
         }
+
+    private suspend fun connect(coroutineScope: CoroutineScope) {
+        val session = wsSession(BuildConfig.HOST, port, socketUrl)
+        try {
+            coroutineScope.launch {
+                while(true) {
+                    delay(pingInterval)
+                    doPing(session)
+                    logV("Ping...port:$port")
+                }
+            }
+            _session.emit(session)
+            while(true) {
+                val response = session.incoming.receive()
+                logV("Frame: ${String(response.data)}")
+
+                val socketResponse = mapper
+                    .readValue<SocketResponse>(response.data)
+                handleResponse(socketResponse)
+            }
+        } catch(e: SocketException) {
+            connect(coroutineScope)
+            e.stackTraceToString()
+        }
+    }
 }
