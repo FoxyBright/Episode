@@ -3,14 +3,16 @@ package ru.rikmasters.gilty.core.app
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.get
@@ -22,87 +24,65 @@ import ru.rikmasters.gilty.core.app.ui.fork.rememberSwipeableState
 import ru.rikmasters.gilty.core.env.Environment
 import ru.rikmasters.gilty.core.navigation.DeepNavHost
 import ru.rikmasters.gilty.core.navigation.NavState
-import ru.rikmasters.gilty.core.util.composable.getOrNull
-import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
-import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait
+import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait.Companion.loader
+import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait.Companion.indicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppEntrypoint(
-    theme: AppTheme,
-    bottomSheetBackground: @Composable (@Composable () -> Unit) -> Unit,
-    snackbar: @Composable (SnackbarData) -> Unit,
-    loader: (@Composable (isLoading: Boolean, content: @Composable () -> Unit) -> Unit)? = null,
-    indicator: (@Composable (state: SwipeRefreshState, offset: Dp, trigger: Dp) -> Unit)? = null,
-) {
+fun AppEntrypoint(theme: AppTheme) {
+    val entrypointResolver =
+        get<EntrypointResolver>()
     
-    LoadingTrait.loader = loader
-    PullToRefreshTrait.indicator = indicator
+    val snackbarHostState =
+        remember { SnackbarHostState() }
     
-    val isSystemInDarkMode = isSystemInDarkTheme()
-    val systemUiController = rememberSystemUiController()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val bottomSheetSwipeableState =
+    val systemUiController =
+        rememberSystemUiController()
+    
+    val keyboardController =
+        rememberKeyboardController()
+    
+    val navController =
+        rememberNavController()
+    
+    val bottomSheetState = BottomSheetState(
         rememberSwipeableState(COLLAPSED)
-    val keyboardController = rememberKeyboardController()
+    )
+    
+    val env = get<Environment>()
+    
+    val startDestination = remember(entrypointResolver) {
+        runBlocking { entrypointResolver.resolve() }
+    }
+    
+    val navState = remember(startDestination) {
+        NavState(
+            navHostController = navController,
+            startDestination = startDestination
+        )
+    }
     
     val asm = remember {
         AppStateModel(
-            isSystemInDarkMode = isSystemInDarkMode,
             systemUi = systemUiController,
-            snackbar = snackbarHostState,
-            bottomSheet = BottomSheetState(bottomSheetSwipeableState),
+            bottomSheet = bottomSheetState,
             keyboard = keyboardController
         )
     }
     
-    val navController = rememberNavController()
-    val entrypointResolver = getOrNull<EntrypointResolver>()
-    val startDestination = remember(entrypointResolver) {
-        runBlocking { entrypointResolver?.resolve() ?: "entrypoint" }
+    loader = { isLoading, content ->
+        GLoader(
+            isLoading = isLoading,
+            content = content
+        )
     }
     
-    val navState = remember(startDestination) {
-        NavState(navController, startDestination)
-    }
-    
-    val env: Environment = get()
-    
-    theme.apply(
-        darkMode = asm.darkMode,
-        dynamicColor = asm.dynamicColor
-    ) {
-        
-        val backgroundColor = colorScheme.background
-        
-        LaunchedEffect(backgroundColor) {
-            asm.systemUi.setStatusBarColor(backgroundColor)
-        }
-        
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-        ) {
-            BottomSheetLayout(
-                state = asm.bottomSheet,
-                modifier = Modifier,
-                background = bottomSheetBackground,
-            ) {
-                Box(Modifier.background(backgroundColor)) {
-                    DeepNavHost(navState) {
-                        env.buildNavigation(this)
-                    }
-                }
-            }
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(BottomCenter),
-                snackbar = snackbar
-            )
-        }
+    indicator = { state, offset, trigger ->
+        LoadingIndicator(
+            swipeRefreshState = state,
+            offset = offset,
+            trigger = trigger
+        )
     }
     
     LaunchedEffect(env, asm) {
@@ -111,11 +91,75 @@ fun AppEntrypoint(
     LaunchedEffect(env, navState) {
         loadAsModule(env, navState)
     }
+    
+    theme.apply(
+        darkMode = isSystemInDarkTheme(),
+        dynamicColor = false
+    ) {
+        Layout(
+            bottomSheet = asm.bottomSheet,
+            navState = navState,
+            background = colorScheme.background,
+            env = env,
+            snack = snackbarHostState
+        )
+    }
 }
 
-private inline fun <reified T> loadAsModule(env: Environment, module: T) {
-    env.loadModules(
-        module { single { module } },
-        reason = T::class.simpleName
-    )
+@Composable
+private fun Layout(
+    bottomSheet: BottomSheetState,
+    navState: NavState,
+    background: Color,
+    env: Environment,
+    snack: SnackbarHostState,
+) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
+        BottomSheetLayout(
+            state = bottomSheet,
+            background = { BSContent(it) }
+        ) {
+            Box(Modifier.background(background)) {
+                DeepNavHost(navState) {
+                    env.buildNavigation(this)
+                }
+            }
+        }
+        SnackbarHost(
+            hostState = snack,
+            modifier = Modifier.align(BottomCenter),
+            snackbar = { GSnackbar(it) }
+        )
+    }
 }
+
+@Composable
+private fun BSContent(
+    content: (@Composable () -> Unit)?,
+) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(
+                color = content?.let {
+                    colorScheme.background
+                } ?: Transparent,
+                shape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    topEnd = 20.dp
+                )
+            )
+    ) { content?.let { it() } }
+}
+
+private inline fun <reified T> loadAsModule(
+    env: Environment, module: T,
+) = env.loadModules(
+    module { single { module } },
+    reason = T::class.simpleName
+)

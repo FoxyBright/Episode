@@ -1,4 +1,4 @@
-package ru.rikmasters.gilty.presentation.utils
+package ru.rikmasters.gilty.utils
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel

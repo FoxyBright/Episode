@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
-import androidx.core.view.WindowCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
@@ -30,17 +29,13 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.data.shared.BuildConfig.HOST
 import ru.rikmasters.gilty.data.shared.BuildConfig.PREFIX_URL
 import ru.rikmasters.gilty.meetings.MeetingManager
-import ru.rikmasters.gilty.presentation.utils.FireBaseService
 import ru.rikmasters.gilty.profile.ProfileManager
 import ru.rikmasters.gilty.shared.R.style.Theme_Gilty
 import ru.rikmasters.gilty.shared.common.ErrorConnection
 import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.clearSelectChat
-import ru.rikmasters.gilty.shared.shared.LoadingIndicator
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.ui.GBottomSheetBackground
-import ru.rikmasters.gilty.ui.GLoader
-import ru.rikmasters.gilty.ui.GSnackbar
+import ru.rikmasters.gilty.utils.FireBaseService
 
 @ExperimentalMaterial3Api
 class MainActivity: ComponentActivity() {
@@ -91,22 +86,7 @@ class MainActivity: ComponentActivity() {
 
             var lastConnectionState by remember { mutableStateOf(false) }
             
-            AppEntrypoint(
-                theme = GiltyTheme,
-                bottomSheetBackground = {
-                    GBottomSheetBackground(it)
-                },
-                snackbar = { GSnackbar(it) },
-                loader = { isLoading, content ->
-                    GLoader(
-                        isLoading = isLoading,
-                        content = content
-                    )
-                },
-                indicator = { state, offset, trigger ->
-                    LoadingIndicator(state, offset, trigger)
-                }
-            )
+            AppEntrypoint(GiltyTheme)
             
             GiltyTheme { if(errorState) ErrorConnection() }
             corScope.launch {
