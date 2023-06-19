@@ -576,6 +576,7 @@ fun MemberItem(
     user: FullUserModel,
     onComplainClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
+    isOrganizer: Boolean
 ) {
     var expandedPopUp by remember { mutableStateOf(false) }
     Row(
@@ -650,19 +651,21 @@ fun MemberItem(
                             },
                             contentPadding = PaddingValues(8.dp)
                         )
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = stringResource(id = R.string.translations_members_delete),
-                                    color = ThemeExtra.colors.white,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            },
-                            onClick = {
-                                expandedPopUp = false
-                                onDeleteClicked()
-                            }
-                        )
+                        if (isOrganizer) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = stringResource(id = R.string.translations_members_delete),
+                                        color = ThemeExtra.colors.white,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                onClick = {
+                                    expandedPopUp = false
+                                    onDeleteClicked()
+                                }
+                            )
+                        }
                     }
                 }
             }

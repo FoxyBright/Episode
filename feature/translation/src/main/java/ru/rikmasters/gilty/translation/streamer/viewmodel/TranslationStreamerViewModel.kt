@@ -304,7 +304,7 @@ class TranslationStreamerViewModel : ViewModel() {
             TranslationEvent.EnterBackground -> {
                 disconnectSocket()
                 stopPinging()
-                connectToTranslationChat()
+                disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
@@ -312,7 +312,7 @@ class TranslationStreamerViewModel : ViewModel() {
 
             is TranslationEvent.EnterForeground -> {
                 loadTranslationInfo(event.meetingId)
-                disconnectFromTranslationChat()
+                connectToTranslationChat()
                 connectSocket()
                 startPinging()
             }

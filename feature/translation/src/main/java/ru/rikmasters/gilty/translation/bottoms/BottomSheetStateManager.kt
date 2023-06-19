@@ -24,7 +24,8 @@ fun BottomSheetStateManager(
     membersList: LazyPagingItems<FullUserModel>?,
     onComplainClicked: (FullUserModel) -> Unit,
     onDeleteClicked: (FullUserModel) -> Unit,
-    onAppendDurationSave: (Int) -> Unit
+    onAppendDurationSave: (Int) -> Unit,
+    isOrganizer: Boolean
 ) {
     Box(
         modifier = modifier
@@ -45,7 +46,8 @@ fun BottomSheetStateManager(
                     onSearchValueChange = onSearchValueChange,
                     membersList = membersList,
                     onComplainClicked = onComplainClicked,
-                    onDeleteClicked = onDeleteClicked
+                    onDeleteClicked = onDeleteClicked,
+                    isOrganizer = isOrganizer
                 )
             }
             TranslationBottomSheetState.DURATION -> {

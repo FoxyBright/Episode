@@ -38,8 +38,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
+import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
+import ru.rikmasters.gilty.shared.model.report.ReportObjectType
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
 import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
@@ -63,7 +67,7 @@ fun TranslationViewerScreen(
     vm: TranslationViewerViewModel,
     translationId: String
 ) {
-
+    val asm = get<AppStateModel>()
     /**
      * Configurations, system, design
      */
@@ -244,7 +248,8 @@ fun TranslationViewerScreen(
                 membersList = members,
                 onComplainClicked = { showComplainDialog = true },
                 onDeleteClicked = {},
-                onAppendDurationSave = {}
+                onAppendDurationSave = {},
+                isOrganizer = false
             )
         },
         sheetPeekHeight = 0.dp,
@@ -372,7 +377,17 @@ fun TranslationViewerScreen(
                 type = TranslationDialogType.COMPLAIN,
                 show = showComplainDialog,
                 onSuccess = {
-                    //TODO: complain
+                    showComplainDialog = false
+                    scope.launch {
+                        asm.bottomSheet.expand {
+                            BottomSheet(
+                                vm.scope,
+                                BsType.REPORTS,
+                                reportObject = currentComplainUser?.id,
+                                reportType = ReportObjectType.PROFILE
+                            )
+                        }
+                    }
                 },
                 dismiss = { showComplainDialog = false }
             )

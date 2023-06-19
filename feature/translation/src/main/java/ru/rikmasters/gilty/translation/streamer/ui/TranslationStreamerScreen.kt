@@ -364,7 +364,8 @@ fun TranslationStreamerScreen(
                             )
                         )
                     }
-                }
+                },
+                isOrganizer = true
             )
         },
         sheetPeekHeight = 0.dp,

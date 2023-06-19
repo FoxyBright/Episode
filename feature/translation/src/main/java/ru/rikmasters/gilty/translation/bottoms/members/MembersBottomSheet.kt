@@ -43,7 +43,8 @@ fun MembersBottomSheet(
     onSearchValueChange: (String) -> Unit,
     membersList: LazyPagingItems<FullUserModel>?,
     onComplainClicked: (FullUserModel) -> Unit,
-    onDeleteClicked: (FullUserModel) -> Unit
+    onDeleteClicked: (FullUserModel) -> Unit,
+    isOrganizer: Boolean
 ) {
     val scrollState = rememberLazyListState()
     Box(
@@ -165,7 +166,8 @@ fun MembersBottomSheet(
                                     MemberItem(
                                         user = it,
                                         onComplainClicked = { onComplainClicked(it) },
-                                        onDeleteClicked = { onDeleteClicked(it) }
+                                        onDeleteClicked = { onDeleteClicked(it) },
+                                        isOrganizer = isOrganizer
                                     )
                                 }
                             }

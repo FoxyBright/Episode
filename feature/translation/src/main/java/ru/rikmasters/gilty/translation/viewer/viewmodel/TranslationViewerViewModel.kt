@@ -165,6 +165,7 @@ class TranslationViewerViewModel : ViewModel() {
                     connectSocket()
                     startPinging()
                     startDurationTimer()
+                    connectToTranslationChat()
                 }
             }
 
@@ -172,6 +173,7 @@ class TranslationViewerViewModel : ViewModel() {
                 disconnectSocket()
                 stopPinging()
                 stopDurationTimer()
+                disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
                 }
@@ -180,6 +182,7 @@ class TranslationViewerViewModel : ViewModel() {
             TranslationViewerEvent.EnterBackground -> {
                 disconnectSocket()
                 stopPinging()
+                disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
                 }
@@ -189,13 +192,14 @@ class TranslationViewerViewModel : ViewModel() {
                 event.meetingId.let { meetingId ->
                     loadTranslationInfo(meetingId)
                     loadMeetDetails(meetingId)
+                    connectToTranslationChat()
                     connectSocket()
                     startPinging()
                 }
             }
 
             is TranslationViewerEvent.HandleWebRtcAnswer -> {
-                when(event.answer) {
+                when (event.answer) {
                     WebRtcAnswer.weakConnection -> {
                         coroutineScope.launch {
                             _viewerSnackbarState.emit(ViewerSnackbarState.WEAK_CONNECTION)
@@ -206,16 +210,19 @@ class TranslationViewerViewModel : ViewModel() {
 
             is TranslationViewerEvent.HandleWebRtcStatus -> {
                 if (_isStreaming.value) {
-                    when(event.status) {
+                    when (event.status) {
                         WebRtcStatus.connecting -> {
                             _hudState.value = ViewerHUD.RECONNECTING
                         }
+
                         WebRtcStatus.connect, WebRtcStatus.stream -> {
                             _hudState.value = null
                         }
+
                         WebRtcStatus.reconnectAttemptsOver -> {
                             _hudState.value = ViewerHUD.RECONNECT_FAILED
                         }
+
                         WebRtcStatus.unknow, WebRtcStatus.disconnect, WebRtcStatus.failed -> {}
                     }
                 }
@@ -257,7 +264,7 @@ class TranslationViewerViewModel : ViewModel() {
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->
-                Log.d("TEST","NEW WEb SOCKET EVENT $socketEvent")
+                Log.d("TEST", "NEW WEb SOCKET EVENT $socketEvent")
                 when (socketEvent) {
                     TranslationCallbackEvents.MessageReceived -> {
                         reloadChat.value = !reloadChat.value
@@ -291,7 +298,8 @@ class TranslationViewerViewModel : ViewModel() {
                         _hudState.value = null
                         if (ZonedDateTime.now().isBefore(_completedAt.value)) {
                             coroutineScope.launch {
-                                _additionalTime.value = getAdditionalTimeString(socketEvent.duration)
+                                _additionalTime.value =
+                                    getAdditionalTimeString(socketEvent.duration)
                                 delay(2000)
                                 _additionalTime.value = ""
                                 _completedAt.value = socketEvent.completedAt
@@ -347,6 +355,7 @@ class TranslationViewerViewModel : ViewModel() {
             }
         }
     }
+
     private fun reconnect() {
         _translation.value?.let {
             loadTranslationInfo(it.id)
@@ -433,7 +442,10 @@ class TranslationViewerViewModel : ViewModel() {
                 meetId = meetingId
             ).on(
                 loading = {},
-                success = { meetingModel -> _meeting.value = meetingModel },
+                success = { meetingModel ->
+                    _meeting.value = meetingModel
+                    connectToTranslationChat()
+                },
                 error = { cause ->
                     cause.serverMessage?.let {
                         _oneTimeEvent.send(
@@ -452,6 +464,7 @@ class TranslationViewerViewModel : ViewModel() {
             )
         }
     }
+
     private fun connectSocket() {
         translation.value?.let {
             coroutineScope.launch {
@@ -465,6 +478,22 @@ class TranslationViewerViewModel : ViewModel() {
     private fun disconnectSocket() {
         coroutineScope.launch {
             translationRepository.disconnectFromTranslation()
+        }
+    }
+
+    private fun connectToTranslationChat() {
+        _translation.value?.let {
+            coroutineScope.launch {
+                translationRepository.connectToTranslationChat(
+                    translationId = it.id
+                )
+            }
+        }
+    }
+
+    private fun disconnectFromTranslationChat() {
+        coroutineScope.launch {
+            translationRepository.disconnectFromTranslationChat()
         }
     }
 }
