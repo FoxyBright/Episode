@@ -25,9 +25,9 @@ data class MessageModel(
         replied = null,
         notification = null,
         message = null,
-        otherRead = true,
-        isRead = true,
-        isDelivered = true,
+        otherRead = false,
+        isRead = false,
+        isDelivered = false,
         createdAt = NOW_DATE
     )
 }

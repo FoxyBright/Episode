@@ -62,7 +62,7 @@ class ChatWebSocket(
                     ),
                 )
                 chatRepository.chatUpdate(answer.value)
-                logD("Web Socket Message $response")
+                logD("INFO_MESSAGE $response")
             }
             
             MESSAGE_UPDATE -> {
@@ -74,14 +74,15 @@ class ChatWebSocket(
                         ).unreadCount,
                     ),
                 )
-                logD("Web Socket Message $response")
+                logD("INFO_MESSAGE $response")
+                messageRepository.messageUpdate(answer.value)
             }
             
             CHAT_COMPLETED -> {
                 answer.emit(
                     Pair(COMPLETED_CHAT, null),
                 )
-                logD("Web Socket Message $response")
+                logD("INFO_MESSAGE $response")
             }
             
             MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED -> {
@@ -100,7 +101,7 @@ class ChatWebSocket(
                         },
                     ),
                 )
-                logD("Web Socket Message $response")
+                logD("INFO_MESSAGE $response")
                 messageRepository.messageUpdate(answer.value)
             }
             
@@ -117,14 +118,17 @@ class ChatWebSocket(
                         )
                     }
                 }
-                logD("Web Socket Message $response")
+                logD("INFO_MESSAGE $response")
             }
             else -> Unit
         }
     }
     
-    private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
-    private val chatId = MutableStateFlow<String?>(null)
+    private val answer =
+        MutableStateFlow<Pair<AnswerType, Any?>?>(null)
+    private val chatId =
+        MutableStateFlow<String?>(null)
+    
     suspend fun connectToChat(id: String) {
         disconnectToChat()
         subscribe("private-chats.$id") {

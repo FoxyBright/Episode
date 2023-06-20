@@ -28,11 +28,12 @@ class MessageRepository(
     // поток пишущих
     fun writersFlow() = primarySource.listenAll(UserWs::class)
         .map { list -> list.map { Pair(it.id, it.thumbnail.map()) } }
-        
+    
     suspend fun getUser() = primarySource.find<Profile>()?.id
     
     // кто-то больше не пишет
-    suspend fun deleteWriter(id: String) = primarySource.deleteById<UserWs>(id)
+    suspend fun deleteWriter(id: String) =
+        primarySource.deleteById<UserWs>(id)
     
     // кто-то новый пишет
     suspend fun writersUpdate(user: UserWs) = primarySource.save(user)
@@ -43,11 +44,12 @@ class MessageRepository(
             data?.let { model ->
                 when(type) {
                     NEW_MESSAGE -> primarySource.save(model as Message)
-                    DELETE_MESSAGE -> primarySource.deleteById<Message>(model)
-                    else -> {}
-//                    else -> primarySource.findById<Message>(model)?.let {
-//                        primarySource.save(it.copy(isRead = true))
-//                    }
+                    DELETE_MESSAGE -> primarySource.deleteById<Message>(
+                        model
+                    )
+                    else -> primarySource.findById<Message>(model)?.let {
+                        primarySource.save(it.copy(otherRead = true))
+                    }
                 }
             }
             refresh()
@@ -56,6 +58,7 @@ class MessageRepository(
     private val refreshTrigger = MutableStateFlow(false)
     
     private fun refresh() {
+        logD("refresh TRIGGER")
         refreshTrigger.value = !refreshTrigger.value
     }
     

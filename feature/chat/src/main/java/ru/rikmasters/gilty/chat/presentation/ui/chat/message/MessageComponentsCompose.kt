@@ -563,9 +563,10 @@ private fun MessageStatus(
         )
         if(sender) Icon(
             painter = painterResource(
-                if(messageModel.isRead)
+                if(messageModel.otherRead)
                     R.drawable.ic_sms_read
-                else R.drawable.ic_sms_delivered
+                else
+                    R.drawable.ic_sms_delivered
             ),
             contentDescription = null,
             modifier = Modifier

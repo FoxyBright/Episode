@@ -58,19 +58,20 @@ fun ChatScreen(
     val cameraPermissions = rememberPermissionState(CAMERA)
     val focusManager = LocalFocusManager.current
     val storagePermissions = permissionState()
+    
     @Suppress("UNUSED_VARIABLE")
     val mediaPermissions = mediaPermissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-
+    
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(CAMERA, RECORD_AUDIO)
     )
-
+    
     vm.changeChatId(chatId)
-
+    
     // список сообщений чата
     val messages = vm.messages.collectAsLazyPagingItems()
     // состояние меню сообщения
@@ -103,37 +104,34 @@ fun ChatScreen(
     val remainTime by vm.remainTime.collectAsState()
     // Количество участников
     val membersCount by vm.membersCount.collectAsState()
-
+    
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
-
-
+    
+    
     val imeExpandOffset = WindowInsets.ime
         .getBottom(LocalDensity.current)
     LaunchedEffect(imeExpandOffset) {
-        if (imeExpandOffset > 0) asm.keyboard
+        if(imeExpandOffset > 0) asm.keyboard
             .setSoftInputMode(Nothing)
     }
-
+    
     LaunchedEffect(Unit) {
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
-        if (unreadCount > 0) try {
+        if(unreadCount > 0) try {
             listState.scrollToItem(unreadCount)
-        } catch (_: Exception) {
+        } catch(_: Exception) {
             listState.scrollToItem(messages.itemCount)
         }
     }
     
-    LaunchedEffect(chat) {
-//        chat?.let {
-//            if(it.userId != it.organizer.id)
-//                vm.markAsReadMessage(chatId, all = true)
-//        }
+    LaunchedEffect(messages.itemSnapshotList) {
+        vm.markAsReadMessage(chatId, all = true)
     }
-
+    
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {
             delay(3000)
@@ -150,10 +148,10 @@ fun ChatScreen(
         context, ("ru.rikmasters.gilty.provider"),
         File(context.filesDir, "my_images")
     )
-
+    
     val photographer =
         rememberLauncherForActivityResult(TakePicture()) { success ->
-            if (success) uri?.path?.let {
+            if(success) uri?.path?.let {
                 scope.launch {
                     val file = File(context.filesDir, "photo.jpg")
                     context.contentResolver
@@ -167,7 +165,7 @@ fun ChatScreen(
                 }
             }
         }
-
+    
     val state = meeting?.let { meet ->
         chat?.let { chat ->
             ChatState(
@@ -201,7 +199,7 @@ fun ChatScreen(
             )
         }
     }
-
+    
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->
             val callback = object: ChatCallback {
@@ -209,20 +207,17 @@ fun ChatScreen(
                 override fun onPhotoViewDismiss(state: Boolean) {
                     scope.launch { vm.changePhotoViewState(state) }
                 }
-
-                override fun onAnswerClick(message: MessageModel) {
-                    // навигация к сообщению при клике на ответ
-                }
+                
                 override fun onPinnedBarButtonClick() {
                     scope.launch {
-                        when (type) {
+                        when(type) {
                             TRANSLATION -> {
                                 nav.navigateAbsolute(
                                     "translationviewer/viewer?id=${state.meet.id}"
                                 )
                             }
                             TRANSLATION_ORGANIZER -> {
-                                if (!permissionsState.allPermissionsGranted) {
+                                if(!permissionsState.allPermissionsGranted) {
                                     permissionsState.launchMultiplePermissionRequest()
                                 } else {
                                     scope.launch {
@@ -237,7 +232,9 @@ fun ChatScreen(
                                                 startBroadcastClicked = {
                                                     scope.launch {
                                                         asm.bottomSheet.collapse()
-                                                        nav.navigateAbsolute("translations/streamer?id=${state.meet.id}")
+                                                        nav.navigateAbsolute(
+                                                            "translations/streamer?id=${state.meet.id}"
+                                                        )
                                                     }
                                                 }
                                             )
@@ -253,15 +250,15 @@ fun ChatScreen(
                         }
                     }
                 }
-
+                
                 override fun onImageMenuItemSelect(point: Int) {
-                    when (point) {
+                    when(point) {
                         1 -> cameraPermissions.let {
-                            if (it.hasPermission)
+                            if(it.hasPermission)
                                 photographer.launch(uri)
                             else it.launchPermissionRequest()
                         }
-
+                        
                         0 -> context.checkStoragePermission(
                             storagePermissions, scope, asm,
                         ) {
@@ -286,7 +283,7 @@ fun ChatScreen(
                             }
                     }
                 }
-
+                
                 override fun onImageClick(message: MessageModel) {
                     scope.launch {
                         message
@@ -302,12 +299,12 @@ fun ChatScreen(
                             }
                     }
                 }
-
+                
                 override fun onHiddenClick(message: MessageModel) {
                     val attach = message
                         .message?.attachments?.first()?.file
                     scope.launch {
-                        if (attach?.hasAccess == false) {
+                        if(attach?.hasAccess == false) {
                             vm.changePhotoViewType(LOAD)
                             vm.setPhotoViewSelected(attach)
                             vm.setPhotoViewImages(listOf(attach))
@@ -315,13 +312,13 @@ fun ChatScreen(
                         } else vm.onHiddenBlock()
                     }
                 }
-
+                
                 override fun onMessageMenuItemSelect(
                     point: Int,
                     message: MessageModel,
                 ) {
                     scope.launch {
-                        when (point) {
+                        when(point) {
                             0 -> vm.changeAnswer(message)
                             1 -> vm.deleteMessage(
                                 chatId = chatId,
@@ -331,7 +328,7 @@ fun ChatScreen(
                         vm.changeMessageMenuState(false)
                     }
                 }
-
+                
                 override fun onSend() {
                     scope.launch {
                         vm.onSendMessage(
@@ -342,11 +339,11 @@ fun ChatScreen(
                         listState.animateScrollToItem(0)
                     }
                 }
-
+                
                 override fun onMenuItemClick(point: Int) {
                     scope.launch {
                         vm.changeKebabMenuState(false)
-                        when (point) {
+                        when(point) {
                             0 -> vm.changeMeetOutAlert(true)
                             1 -> asm.bottomSheet.expand {
                                 BottomSheet(
@@ -359,7 +356,7 @@ fun ChatScreen(
                         }
                     }
                 }
-
+                
                 override fun onTopBarClick() {
                     scope.launch {
                         asm.bottomSheet.expand {
@@ -371,58 +368,58 @@ fun ChatScreen(
                         }
                     }
                 }
-
+                
                 override fun onDownButtonClick() {
                     scope.launch {
                         vm.changeUnreadCount(0)
                         listState.animateScrollToItem(0)
                     }
                 }
-
+                
                 override fun gallery() {
                     scope.launch {
                         focusManager.clearFocus()
                         vm.changeImageMenuState(true)
                     }
                 }
-
+                
                 override fun onMeetOut() {
                     scope.launch {
                         vm.changeMeetOutAlert(false)
                         nav.navigate("main")
                     }
                 }
-
+                
                 override fun onKebabClick() {
                     scope.launch {
                         vm.changeKebabMenuState(!kebabMenuState)
                     }
                 }
-
+                
                 override fun onListDown() {
                     scope.launch {
                         vm.changeUnreadCount((unreadCount - 1))
                     }
                 }
-
+                
                 override fun onMessageMenuDismiss() {
                     scope.launch {
                         vm.changeMessageMenuState(false)
                     }
                 }
-
+                
                 override fun onImageMenuDismiss() {
                     scope.launch {
                         vm.changeImageMenuState(false)
                     }
                 }
-
+                
                 override fun onMeetOutAlertDismiss() {
                     scope.launch {
                         vm.changeMeetOutAlert(false)
                     }
                 }
-
+                
                 override fun closeAlert() {
                     scope.launch {
                         vm.alertDismiss(false)
@@ -436,19 +433,19 @@ fun ChatScreen(
                         vm.changeAnswer(message)
                     }
                 }
-
+                
                 override fun textChange(text: String) {
                     scope.launch {
                         vm.changeMessage(text)
                     }
                 }
-
+                
                 override fun onCancelAnswer() {
                     scope.launch {
                         vm.changeAnswer(null)
                     }
                 }
-
+                
                 override fun onBack() {
                     nav.navigate("main")
                 }

@@ -31,34 +31,34 @@ import java.time.ZonedDateTime
 import java.util.Timer
 import java.util.TimerTask
 
-class ChatViewModel : ViewModel() {
-
+class ChatViewModel: ViewModel() {
+    
     private val meetManager by inject<MeetingManager>()
     private val messageManager by inject<MessageManager>()
     private val translationRepository by inject<TranslationRepository>()
-
+    
     val writingUsers by lazy {
         messageManager.writingFlow.state(emptyList())
     }
-
+    
     private val context = getKoin().get<Context>()
-
+    
     private val _chatId = MutableStateFlow("")
-
+    
     private val _chat =
         MutableStateFlow<ChatModel?>(null)
     val chat = _chat.asStateFlow()
-
+    
     private val _meet =
         MutableStateFlow<FullMeetingModel?>(null)
     val meet = _meet.asStateFlow()
-
+    
     private val _chatType = MutableStateFlow(MEET)
     val chatType = _chatType.asStateFlow()
-
+    
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
-
+    
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val messageDebounced = message
@@ -73,94 +73,94 @@ class ChatViewModel : ViewModel() {
             }
         }
         .state(_message.value, Eagerly)
-
+    
     private val _translationInfoModel =
         MutableStateFlow<TranslationInfoModel?>(null)
-
+    
     private val _answer = MutableStateFlow<MessageModel?>(null)
     val answer = _answer.asStateFlow()
-
+    
     private val _viewers = MutableStateFlow<Int?>(null)
     val viewers = _viewers.asStateFlow()
-
+    
     private val _unreadCount = MutableStateFlow(0)
     val unreadCount = _unreadCount.asStateFlow()
-
+    
     private val _alert = MutableStateFlow(false)
     val alert = _alert.asStateFlow()
-
+    
     private val _meetOutAlert = MutableStateFlow(false)
     val meetOutAlert = _meetOutAlert.asStateFlow()
-
+    
     private val _kebabMenuState = MutableStateFlow(false)
     val kebabMenuState = _kebabMenuState.asStateFlow()
-
+    
     private val _messageMenuState = MutableStateFlow(false)
     val messageMenuState = _messageMenuState.asStateFlow()
-
+    
     private val _imageMenuState = MutableStateFlow(false)
     val imageMenuState = _imageMenuState.asStateFlow()
-
+    
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
-
+    
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
-
+    
     private val _viewerType = MutableStateFlow(PHOTO)
     val viewerType = _viewerType.asStateFlow()
-
+    
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
     val viewerSelectImage = _viewerSelectImage.asStateFlow()
-
+    
     private var remainTimeTimer: Timer? = Timer()
-
+    
     private val _remainTime = MutableStateFlow("")
     val remainTime = _remainTime.asStateFlow()
-
+    
     private val _membersCount = MutableStateFlow(0)
     val membersCount = _membersCount.asStateFlow()
-
+    
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
     }
-
+    
     suspend fun changePhotoViewType(type: PhotoViewType) {
         _viewerType.emit(type)
     }
-
+    
     suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
         _viewerImages.emit(list)
     }
-
+    
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
         _viewerSelectImage.emit(photo)
     }
-
+    
     suspend fun changeMeetOutAlert(state: Boolean) {
         _meetOutAlert.emit(state)
     }
-
+    
     suspend fun changeKebabMenuState(state: Boolean) {
         _kebabMenuState.emit(state)
     }
-
+    
     suspend fun changeMessageMenuState(state: Boolean) {
         _messageMenuState.emit(state)
     }
-
+    
     suspend fun changeImageMenuState(state: Boolean) {
         _imageMenuState.emit(state)
     }
-
+    
     suspend fun alertDismiss(state: Boolean) {
         _alert.emit(state)
     }
-
+    
     suspend fun deleteWriter(id: String) {
         messageManager.deleteWriter(id)
     }
-
+    
     suspend fun markAsReadMessage(
         chatId: String,
         messageIds: List<String> = emptyList(),
@@ -178,7 +178,7 @@ class ChatViewModel : ViewModel() {
             }
         )
     }
-
+    
     @Suppress("unused")
     suspend fun madeScreenshot(chatId: String) {
         messageManager.madeScreenshot(chatId).on(
@@ -191,7 +191,7 @@ class ChatViewModel : ViewModel() {
             }
         )
     }
-
+    
     suspend fun completeChat(chat: ChatModel?) {
         chat?.let { c ->
             messageManager.completeChat(c.id).on(
@@ -211,25 +211,25 @@ class ChatViewModel : ViewModel() {
             )
         }
     }
-
+    
     fun changeChatId(chatId: String) {
         _chatId.value = chatId
     }
-
+    
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatId.flatMapLatest { chatId ->
         messageManager.messages(chatId)
     }.cachedIn(coroutineScope)
-
+    
     suspend fun changeAnswer(message: MessageModel?) {
         _answer.emit(message)
     }
-
+    
     suspend fun deleteMessage(
         chatId: String,
         message: MessageModel,
     ) = singleLoading {
-        if (message == answer.value)
+        if(message == answer.value)
             _answer.emit(null)
         chat.value?.let {
             messageManager.deleteMessage(
@@ -246,15 +246,15 @@ class ChatViewModel : ViewModel() {
             )
         }
     }
-
+    
     suspend fun changeUnreadCount(state: Int) {
         _unreadCount.emit(state)
     }
-
+    
     suspend fun onHiddenBlock() {
         makeToast("Скрытое фото больше недоступно к просмотру")
     }
-
+    
     suspend fun getChat(chatId: String) = singleLoading {
         messageManager.getChat(chatId).on(
             success = { res ->
@@ -262,8 +262,8 @@ class ChatViewModel : ViewModel() {
                 chat.value?.let { c ->
                     changeUnreadCount(c.unreadCount + 1)
                     _chatType.emit(
-                        if (c.organizer.id != c.userId)
-                            if (!c.isOnline) MEET
+                        if(c.organizer.id != c.userId)
+                            if(!c.isOnline) MEET
                             else getTranslationType(
                                 c.datetime, chatId, false
                             )
@@ -272,7 +272,7 @@ class ChatViewModel : ViewModel() {
                             c.isOnline -> getTranslationType(
                                 c.datetime, chatId, true
                             )
-
+                            
                             else -> MEET
                         }
                     )
@@ -286,22 +286,23 @@ class ChatViewModel : ViewModel() {
             }
         )
     }
-
+    
     private fun startDurationTimer() {
-        if (remainTimeTimer == null) {
+        if(remainTimeTimer == null) {
             remainTimeTimer = Timer()
         }
         remainTimeTimer?.scheduleAtFixedRate(
-            object : TimerTask() {
+            object: TimerTask() {
                 override fun run() {
                     _chat.value?.let {
                         val zdt =
-                            ZonedDateTime.parse(it.datetime).withZoneSameInstant(ZoneId.of("Europe/Moscow"))
+                            ZonedDateTime.parse(it.datetime)
+                                .withZoneSameInstant(ZoneId.of("Europe/Moscow"))
                                 .withZoneSameLocal(
                                     ZoneId.systemDefault()
                                 )
                         val difference = getTimeDifferenceString(zdt)
-                        if (difference == "00:00") {
+                        if(difference == "00:00") {
                             coroutineScope.launch {
                                 if(it.userId == it.organizer.id) {
                                     _chatType.value = TRANSLATION_ORGANIZER
@@ -311,37 +312,42 @@ class ChatViewModel : ViewModel() {
                                 stopDurationTimer()
                             }
                         } else {
-                            _remainTime.value = getTimeDifferenceString(zdt)
+                            _remainTime.value =
+                                getTimeDifferenceString(zdt)
                         }
                     }
                 }
             }, 0, 1000
         )
     }
-
+    
     private fun stopDurationTimer() {
         remainTimeTimer?.cancel()
         remainTimeTimer = null
     }
-
+    
     private suspend fun getTranslationType(
         date: String?,
         @Suppress("UNUSED_PARAMETER")
         chatId: String,
         isOrganizer: Boolean,
     ) = date?.let {
-        val start = ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Moscow"))
-            .withZoneSameLocal(
-                ZoneId.systemDefault()
-            ).toInstant().toEpochMilli()
+        val start =
+            ZonedDateTime.parse(it)
+                .withZoneSameInstant(ZoneId.of("Europe/Moscow"))
+                .withZoneSameLocal(
+                    ZoneId.systemDefault()
+                )
+                .toInstant()
+                .toEpochMilli()
         val now = ZonedDateTime.now().toInstant().toEpochMilli()
-
+        
         logD("Data --->>> $date")
         logD("Data --->>> ${ofZ(date)}")
         logD("Data --->>> ${nowZ()}")
         logD("Data --->>> ${ofZ(it).millis() - nowZ().millis()}")
         logD("Data --->>> ${(ofZ(it).millis() - nowZ().millis()) / 3600000}")
-
+        
         when {
             (now > start) -> {
                 _translationInfoModel.value?.id?.let { id ->
@@ -350,32 +356,32 @@ class ChatViewModel : ViewModel() {
                             .getTranslationViewersCount(id)
                     )
                 }
-                if (isOrganizer)
+                if(isOrganizer)
                     TRANSLATION_ORGANIZER
                 else TRANSLATION
             }
-
+            
             (start - now) < 1_800_000 -> {
                 startDurationTimer()
-                if (isOrganizer) {
+                if(isOrganizer) {
                     TRANSLATION_ORGANIZER_AWAIT
                 } else {
                     TRANSLATION_AWAIT
                 }
             }
-
+            
             else -> MEET
         }
     } ?: MEET
-
+    
     suspend fun changeMessage(text: String) {
         _message.emit(text)
     }
-
+    
     private suspend fun clearMessage() {
         _message.emit("")
     }
-
+    
     suspend fun sendImageMessage(
         chatId: String,
         photos: List<File>,
@@ -385,7 +391,7 @@ class ChatViewModel : ViewModel() {
             photos = photos
         )
     }
-
+    
     suspend fun sendHiddenMessage(
         chatId: String,
         attachment: List<AvatarModel>? = null,
@@ -395,7 +401,7 @@ class ChatViewModel : ViewModel() {
             attachment = attachment
         )
     }
-
+    
     suspend fun onSendMessage(
         chatId: String,
         replied: String? = null,
@@ -423,7 +429,7 @@ class ChatViewModel : ViewModel() {
             }
         )
     }
-
+    
     suspend fun getMeet(meetId: String?) = singleLoading {
         meetId?.let { meetId ->
             meetManager.getDetailedMeet(meetId).on(
@@ -450,6 +456,7 @@ class ChatViewModel : ViewModel() {
             )
         }
     }
+    
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->
@@ -465,5 +472,4 @@ class ChatViewModel : ViewModel() {
             }
         }
     }
-
 }
