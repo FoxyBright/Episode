@@ -66,8 +66,8 @@ fun ProfileScreen(vm: ProfileViewModel) {
     }
     
     LaunchedEffect(Unit) {
-            vm.getProfile()
-            errorText = ""
+        vm.getProfile()
+        errorText = ""
     }
     
     val profileState = ProfileState(

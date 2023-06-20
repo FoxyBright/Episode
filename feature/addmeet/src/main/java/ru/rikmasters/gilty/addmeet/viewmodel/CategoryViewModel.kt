@@ -30,8 +30,8 @@ class CategoryViewModel: ViewModel() {
     
     private val _categories = MutableStateFlow(emptyList<CategoryModel>())
     val categories = _categories.asStateFlow()
-    
-    init {
+
+    suspend fun init(){
         coroutineScope.launch {
             addMeet.collectLatest {
                 _online.emit(it?.isOnline ?: false)

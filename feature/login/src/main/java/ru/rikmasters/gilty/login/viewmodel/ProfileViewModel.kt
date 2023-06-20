@@ -54,11 +54,12 @@ class ProfileViewModel : ViewModel() {
     private val _profile = MutableStateFlow<ProfileModel?>(null)
     val profile = _profile.asStateFlow()
 
+
     suspend fun getProfile() = singleLoading {
 
         regManager.deleteHiddenPhotosAmount()
 
-        val profile = regManager.getProfile(true)
+        val profile = regManager.getProfile(_profile.value != null)
         _profile.emit(profile)
         if(username.value.isEmpty())
             _username.emit(profile.username ?: "")

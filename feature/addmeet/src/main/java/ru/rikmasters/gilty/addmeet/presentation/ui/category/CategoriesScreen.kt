@@ -20,7 +20,10 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    LaunchedEffect(Unit) { vm.getCategories() }
+    LaunchedEffect(Unit) {
+        vm.init()
+        vm.getCategories()
+    }
 
     BackHandler(!alert) {
         scope.launch { vm.alertDismiss(true) }
