@@ -193,7 +193,8 @@ private suspend fun <T> PhysicsFrameLayout.createElements(
     invisibleWidthSpace: Float,
 ) {
     this.physics.giveRandomImpulse()
-    data.chunked(rows)
+    val actualRow = if(rows >= 3) 3 else rows
+    data.chunked(actualRow)
         .forEachIndexed { columnIndex, elements ->
             elements.forEachIndexed { rowIndex, element ->
                 val view = createBubbleView(context, factory, element)
@@ -203,7 +204,7 @@ private suspend fun <T> PhysicsFrameLayout.createElements(
 
                 view.y = (rowIndex * (elementSize + ROW_SPACE_FACTOR * elementSize) +
                         (if(columnIndex % 2 == 0) 0f else ROW_OFFSET_FACTOR) * elementSize)
-                view.id = rows * columnIndex + rowIndex
+                view.id = actualRow * columnIndex + rowIndex
                 addView(view)
             }
         }

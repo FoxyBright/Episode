@@ -40,7 +40,7 @@ data class CategoriesState(
 )
 
 interface CategoriesCallback {
-    
+
     fun onCategoryClick(category: CategoryModel)
     fun onClose()
     fun onCloseAlert(state: Boolean)
@@ -53,7 +53,7 @@ fun CategoriesContent(
     state: CategoriesState,
     callback: CategoriesCallback? = null,
 ) {
-    var isAnimating by remember{ mutableStateOf(false) }
+    var isAnimating by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -74,37 +74,43 @@ fun CategoriesContent(
                     .fillMaxWidth()
                     .padding(bottom = 48.dp)
                     .padding(horizontal = 16.dp),
-                color = if(state.online)
+                color = if (state.online)
                     colorScheme.secondary
                 else colorScheme.primary
             )
         }
     ) {
-        if(LocalInspectionMode.current)
-            BubblesForPreview(state, callback)
-        else Bubbles(
-            data = state.categoryList,
-            elementSize = CATEGORY_ELEMENT_SIZE.dp,
+        Box(
             modifier = Modifier
-                .padding(it)
-                .padding(
-                    top = 30.dp,
-                    bottom = 10.dp
-                ),
-        ) { element ->
-            CategoryItem(
-                modifier = Modifier,
-                name = element.name,
-                icon = element.emoji,
-                color = element.color,
-                state = element == state.selectCategory,
-                isAnimating = isAnimating,
-            ) {
-                scope.launch {
-                    isAnimating = true
-                    callback?.onCategoryClick(element)
-                    delay(600L)
-                    isAnimating = false
+                .fillMaxSize()
+                .padding(it),
+            contentAlignment = Alignment.Center
+        ) {
+            if (LocalInspectionMode.current)
+                BubblesForPreview(state, callback)
+            else Bubbles(
+                data = state.categoryList,
+                elementSize = CATEGORY_ELEMENT_SIZE.dp,
+                modifier = Modifier
+                    .padding(
+                        top = 66.dp,
+                        bottom = 10.dp
+                    ),
+            ) { element ->
+                CategoryItem(
+                    modifier = Modifier,
+                    name = element.name,
+                    icon = element.emoji,
+                    color = element.color,
+                    state = element == state.selectCategory,
+                    isAnimating = isAnimating,
+                ) {
+                    scope.launch {
+                        isAnimating = true
+                        callback?.onCategoryClick(element)
+                        delay(600L)
+                        isAnimating = false
+                    }
                 }
             }
         }
@@ -130,11 +136,11 @@ private fun BubblesForPreview(
             Box(Modifier.fillMaxHeight()) {
                 Column(
                     Modifier.align(
-                        if(index % 3 != 0) Alignment.TopCenter
+                        if (index % 3 != 0) Alignment.TopCenter
                         else Alignment.BottomCenter
                     )
                 ) {
-                    for(element in item) CategoryItem(
+                    for (element in item) CategoryItem(
                         element.name, element.emoji, element.color,
                         (element == state.selectCategory)
                     ) { callback?.onCategoryClick(element) }

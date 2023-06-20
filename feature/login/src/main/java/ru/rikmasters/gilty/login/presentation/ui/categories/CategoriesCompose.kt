@@ -54,7 +54,7 @@ fun CategoriesContent(
                 data = state.categoryList,
                 elementSize = CATEGORY_ELEMENT_SIZE.dp,
                 modifier = Modifier.padding(
-                    top = 30.dp,
+                    top = 55.dp,
                     bottom = 10.dp
                 ),
             ) { element ->

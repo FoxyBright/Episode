@@ -43,7 +43,7 @@ data class SubcategoriesState(
     val online: Boolean,
     val alert: Boolean = false,
     val sleep: Boolean,
-    )
+)
 
 interface SubcategoriesCallback {
 
@@ -60,17 +60,18 @@ fun SubcategoriesContent(
     state: SubcategoriesState,
     callback: SubcategoriesCallback? = null,
 ) {
-    var isAnimating by remember{ mutableStateOf(false) }
+    var isAnimating by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        modifier,
+        modifier = modifier,
         topBar = {
             ClosableActionBar(
-                stringResource(R.string.add_meet_create_title),
-                Modifier,
-                stringResource(R.string.add_meet_create_correct_description),
-                { callback?.onCloseAlert(true) }, {
+                title = stringResource(R.string.add_meet_create_title),
+                modifier = Modifier,
+                details = stringResource(R.string.add_meet_create_correct_description),
+                onClose = { callback?.onCloseAlert(true) },
+                onBack = {
                     callback?.onBack()
                 }
             )
@@ -95,7 +96,10 @@ fun SubcategoriesContent(
                 CATEGORY_ELEMENT_SIZE.dp,
                 Modifier
                     .padding(it)
-                    .padding(top = 18.dp),
+                    .padding(
+                        top = 66.dp,
+                        bottom = 10.dp
+                    ),
             ) { element ->
                 CategoryItem(
                     element.name, element.emoji, element.color,

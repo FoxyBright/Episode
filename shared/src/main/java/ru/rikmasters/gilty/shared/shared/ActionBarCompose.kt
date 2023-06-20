@@ -3,7 +3,12 @@ package ru.rikmasters.gilty.shared.shared
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -14,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.res.painterResource
@@ -36,7 +42,7 @@ fun ActionBar(
     title: String,
     modifier: Modifier = Modifier,
     details: String? = null,
-    extra:String? = null,
+    extra: String? = null,
     titleStyle: TextStyle = typography.titleLarge,
     detailedStyle: TextStyle = typography.labelSmall,
     extraStyle: TextStyle = typography.bodyMedium.copy(fontWeight = FontWeight(600)),
@@ -55,8 +61,10 @@ fun ActionBar(
                 )
             }
         }
-        Row(Modifier.padding(start = 16.dp),
-            verticalAlignment = Alignment.Bottom){
+        Row(
+            Modifier.padding(start = 16.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
             Text(
                 title,
                 Modifier.alignByBaseline(),
@@ -66,7 +74,9 @@ fun ActionBar(
             extra?.let {
                 Text(
                     text = extra,
-                    Modifier.alignByBaseline().padding(start = 4.dp),//.padding(start = 4.dp, bottom = 3.dp),
+                    Modifier
+                        .alignByBaseline()
+                        .padding(start = 4.dp),//.padding(start = 4.dp, bottom = 3.dp),
                     colorScheme.onTertiary,
                     style = extraStyle
                 )
@@ -147,15 +157,15 @@ fun ClosableActionBar(
                 .fillMaxWidth()
                 .padding(top = 16.dp)
         ) {
-            onBack?.let {
-                IconButton(it) {
-                    Icon(
-                        painterResource(R.drawable.ic_back),
-                        stringResource(R.string.action_bar_button_back),
-                        Modifier.size(24.dp),
-                        colorScheme.tertiary
-                    )
-                }
+            IconButton(onClick = { onBack?.let { it() } }) {
+                Icon(
+                    painterResource(R.drawable.ic_back),
+                    stringResource(R.string.action_bar_button_back),
+                    Modifier
+                        .size(24.dp)
+                        .alpha(if (onBack != null) 1f else 0f),
+                    colorScheme.tertiary
+                )
             }
             Image(
                 painterResource(
