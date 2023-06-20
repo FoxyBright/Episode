@@ -48,6 +48,8 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     private val _description = MutableStateFlow<String?>(null)
     private val description = _description.asStateFlow()
 
+    @Suppress("unused")
+    @OptIn(FlowPreview::class)
     val desc = description
         .debounce(250)
         .onEach {

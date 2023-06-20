@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions.Companion.Default
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
@@ -76,9 +76,19 @@ fun MapBottomSheet(
     callback: MapCallback? = null,
 ) {
     Element(
-        FilterModel(stringResource(R.string.add_meet_detailed_meet_place)) {
-            Content(state, modifier, callback)
-        }, Modifier.padding(vertical = 28.dp)
+        item = FilterModel(
+            stringResource(
+                R.string.add_meet_detailed_meet_place
+            )
+        ) {
+            Content(
+                state = state,
+                modifier = modifier,
+                callback = callback
+            )
+        },
+        modifier = Modifier
+            .padding(vertical = 28.dp)
     )
 }
 
@@ -89,22 +99,37 @@ private fun Content(
     callback: MapCallback? = null,
 ) {
     Column(modifier.fillMaxSize()) {
-        Search(state.text, Modifier.padding(bottom = 20.dp),
-            state.online, { callback?.onChange(it) },
-            { callback?.onMapClick() })
-        { callback?.onBack() }
+        Search(
+            text = state.text,
+            modifier = Modifier
+                .padding(bottom = 20.dp),
+            online = state.online,
+            onChange = {
+                callback?.onChange(it)
+            },
+            onMapClick = {
+                callback?.onMapClick()
+            }
+        ) { callback?.onBack() }
         LazyColumn(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    colorScheme.primaryContainer,
-                    shapes.medium
+                    color = colorScheme
+                        .primaryContainer,
+                    shape = shapes.medium
                 )
         ) {
-            itemsIndexed(state.lastPlaces) { index, it ->
+            itemsIndexed(
+                items = state.lastPlaces
+            ) { index, it ->
                 Item(
-                    it, Modifier,
-                    lazyItemsShapes(index, state.lastPlaces.size)
+                    location = it,
+                    modifier = Modifier,
+                    shape = lazyItemsShapes(
+                        index = index,
+                        size = state.lastPlaces.size
+                    )
                 ) { callback?.onItemClick(it) }
                 if(index < state.lastPlaces.size.minus(1))
                     GDivider(Modifier.padding(start = 16.dp))
@@ -122,9 +147,14 @@ private fun Item(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick, modifier.fillMaxWidth(),
-        (true), shape,
-        cardColors(colorScheme.primaryContainer)
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth(),
+        enabled = true,
+        shape = shape,
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
         Row(
             Modifier
@@ -133,25 +163,24 @@ private fun Item(
             SpaceBetween, CenterVertically
         ) {
             Column {
-                if((location.address ?: "") != "") {
+                if((location.address ?: "") != "")
                     Text(
-                        location.address ?: "", Modifier,
-                        colorScheme.onTertiary,
+                        text = location.address ?: "",
+                        color = colorScheme.onTertiary,
                         style = typography.headlineSmall
                     )
-                }
-                if((location.place ?: "") != "") {
+                if((location.place ?: "") != "")
                     Text(
-                        location.place ?: "", Modifier,
-                        colorScheme.tertiary,
+                        text = location.place ?: "",
+                        color = colorScheme.tertiary,
                         style = typography.bodyMedium
                     )
-                }
             }
             Icon(
-                Icons.Filled.KeyboardArrowRight,
-                (null), Modifier.size(28.dp),
-                colorScheme.scrim
+                imageVector = Filled.KeyboardArrowRight,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                tint = colorScheme.scrim
             )
         }
     }
@@ -169,7 +198,9 @@ private fun Search(
     Card(
         modifier = modifier,
         shape = shapes.medium,
-        colors = cardColors(colorScheme.primaryContainer)
+        colors = cardColors(
+            colorScheme.primaryContainer
+        )
     ) {
         Row(
             Modifier
@@ -177,36 +208,47 @@ private fun Search(
                 .padding(horizontal = 20.dp),
             Start, CenterVertically
         ) {
-            val style = typography.bodyMedium.copy(
-                fontSize = 17.dp.toSp(),
-                fontWeight = Bold
-            )
+            val style =
+                typography.bodyMedium.copy(
+                    fontSize = 17.dp.toSp(),
+                    fontWeight = Bold
+                )
             Icon(
-                painterResource(
-                    if(text.isNotBlank()) R.drawable.ic_back
+                painter = painterResource(
+                    if(text.isNotBlank())
+                        R.drawable.ic_back
                     else R.drawable.magnifier
-                ), (null),
-                Modifier
+                ),
+                contentDescription = null,
+                modifier = Modifier
                     .size(20.dp)
                     .clickable {
-                        if (text.isNotBlank())
+                        if(text.isNotBlank())
                             onBack?.let { it() }
-                    }, colorScheme.onTertiary
+                    },
+                tint = colorScheme.onTertiary
             )
             GTextField(
-                text, { onChange?.let { text -> text(onNull(it)) } },
-                Modifier
+                value = text,
+                onValueChange = {
+                    onChange?.let { text ->
+                        text(onNull(it))
+                    }
+                },
+                modifier = Modifier
                     .weight(1f)
                     .padding(start = 12.dp),
                 shape = shapes.large,
                 colors = placeSearchColors(online),
                 keyboardOptions = Default.copy(
-                    imeAction = Done, keyboardType = Text,
+                    imeAction = Done,
+                    keyboardType = Text,
                     capitalization = Sentences
                 ),
                 singleLine = true,
                 placeholder = textFieldLabel(
-                    (false), stringResource(R.string.search_placeholder),
+                    label = false,
+                    text = stringResource(R.string.search_placeholder),
                     holderFont = style.copy(
                         colorScheme.onTertiary
                     )
@@ -214,12 +256,16 @@ private fun Search(
                 textStyle = style,
             )
             if(text.isBlank()) Icon(
-                painterResource(R.drawable.ic_map),
-                (null), Modifier
+                painter = painterResource(
+                    R.drawable.ic_map
+                ),
+                contentDescription = null,
+                modifier = Modifier
                     .size(24.dp)
                     .clickable {
                         onMapClick?.let { it() }
-                    }, colorScheme.onTertiary
+                    },
+                tint = colorScheme.onTertiary
             )
         }
     }
@@ -236,7 +282,8 @@ fun onNull(text: String): String =
 fun placeSearchColors(online: Boolean) =
     TextFieldDefaults.textFieldColors(
         textColor = colorScheme.tertiary,
-        cursorColor = if(online) colorScheme.secondary
+        cursorColor = if(online)
+            colorScheme.secondary
         else colorScheme.primary,
         containerColor = colorScheme.primaryContainer,
         unfocusedLabelColor = colorScheme.onTertiary,

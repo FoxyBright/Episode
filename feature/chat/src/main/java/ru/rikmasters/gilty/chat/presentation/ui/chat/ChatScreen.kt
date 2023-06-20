@@ -1,7 +1,7 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chat
 
-import android.Manifest
 import android.Manifest.permission.CAMERA
+import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
@@ -58,6 +58,7 @@ fun ChatScreen(
     val cameraPermissions = rememberPermissionState(CAMERA)
     val focusManager = LocalFocusManager.current
     val storagePermissions = permissionState()
+    @Suppress("UNUSED_VARIABLE")
     val mediaPermissions = mediaPermissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
@@ -65,10 +66,7 @@ fun ChatScreen(
     val nav = get<NavState>()
 
     val permissionsState = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        )
+        permissions = listOf(CAMERA, RECORD_AUDIO)
     )
 
     vm.changeChatId(chatId)
@@ -130,10 +128,10 @@ fun ChatScreen(
     }
     
     LaunchedEffect(chat) {
-        chat?.let {
-            if(it.userId != it.organizer.id)
-                vm.markAsReadMessage(chatId, all = true)
-        }
+//        chat?.let {
+//            if(it.userId != it.organizer.id)
+//                vm.markAsReadMessage(chatId, all = true)
+//        }
     }
 
     LaunchedEffect(writingUsers) {
@@ -203,8 +201,6 @@ fun ChatScreen(
             )
         }
     }
-
-
 
     Use<ChatViewModel>(LoadingTrait) {
         state?.let { state ->

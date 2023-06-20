@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -126,7 +125,7 @@ private fun Layout(
         BottomSheetLayout(
             asm = asm,
             state = bottomSheet,
-            background = { BSContent(it) }
+            background = { it?.let { BSContent(it) } }
         ) {
             Box(Modifier.background(background)) {
                 DeepNavHost(navState) {
@@ -143,21 +142,17 @@ private fun Layout(
 }
 
 @Composable
-private fun BSContent(
-    content: (@Composable () -> Unit)?,
-) {
+private fun BSContent(content: (@Composable () -> Unit)) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = content?.let {
-                colorScheme.background
-            } ?: Transparent
+            containerColor = colorScheme.background
         ),
         shape = shapes.extraLarge.copy(
             bottomStart = CornerSize(0.dp),
             bottomEnd = CornerSize(0.dp)
         )
-    ) { content?.let { it() } }
+    ) { content() }
 }
 
 private inline fun <reified T> loadAsModule(

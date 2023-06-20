@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chats.source.websocket
 
-import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.rikmasters.gilty.chats.models.chat.Chat
@@ -21,38 +20,37 @@ import ru.rikmasters.gilty.shared.socket.WebSocket
 class ChatWebSocket(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
-) : WebSocket() {
-
+): WebSocket() {
+    
     override val port: Int = 6001
     override val pingInterval: Long = 20_000L
-
+    
     override suspend fun handleResponse(response: SocketResponse) {
         val event = SocketEvents from response.event
         logV(event?.name.toString())
-        when (event) {
+        when(event) {
             CONNECTION_ESTABLISHED -> {
-                val socketID = mapper.readValue<SocketData>(response.data).socket_id
-                socketId.emit(mapper.readValue<SocketData>(response.data).socket_id)
-                Log.d("WebSoc","socketID chat $socketID")
-                Log.d("WebSoc","transId user ${userId.value}")
+                socketId.emit(
+                    mapper.readValue<SocketData>(
+                        response.data
+                    ).socket_id
+                )
                 subscribe("private-user.${userId.value}")
             }
-
-            SUBSCRIPTION_SUCCEEDED -> {
-                logV("$response")
-            }
-
+            
+            SUBSCRIPTION_SUCCEEDED -> Unit
+            
             PONG -> inPing = false
-
+            
             CHATS_UPDATED, CHATS_DELETED -> {
                 answer.emit(
                     Pair(
-                        if (event == CHATS_DELETED) {
+                        if(event == CHATS_DELETED) {
                             CHAT_DELETED
                         } else {
                             UPDATED_CHATS
                         },
-                        if (event == CHATS_DELETED) {
+                        if(event == CHATS_DELETED) {
                             mapper.readValue<ShortMessageWs>(
                                 response.data,
                             ).id
@@ -64,8 +62,9 @@ class ChatWebSocket(
                     ),
                 )
                 chatRepository.chatUpdate(answer.value)
+                logD("Web Socket Message $response")
             }
-
+            
             MESSAGE_UPDATE -> {
                 answer.emit(
                     Pair(
@@ -75,23 +74,25 @@ class ChatWebSocket(
                         ).unreadCount,
                     ),
                 )
+                logD("Web Socket Message $response")
             }
-
+            
             CHAT_COMPLETED -> {
                 answer.emit(
                     Pair(COMPLETED_CHAT, null),
                 )
+                logD("Web Socket Message $response")
             }
-
+            
             MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED -> {
                 answer.emit(
                     Pair(
-                        when (event) {
+                        when(event) {
                             MESSAGE_SENT -> NEW_MESSAGE
                             MESSAGE_READ -> READ_MESSAGE
                             else -> DELETE_MESSAGE
                         },
-                        if (event == MESSAGE_SENT) {
+                        if(event == MESSAGE_SENT) {
                             mapper.readValue<MessageWs>(response.data)
                                 .map(chatId.value)
                         } else {
@@ -99,13 +100,13 @@ class ChatWebSocket(
                         },
                     ),
                 )
-                logD("INFO MyMessage $response")
+                logD("Web Socket Message $response")
                 messageRepository.messageUpdate(answer.value)
             }
-
+            
             MESSAGE_TYPING -> {
                 mapper.readValue<User>(response.data).let { user ->
-                    if (user.id == messageRepository.getUser()) {
+                    if(user.id == messageRepository.getUser()) {
                         return
                     } else {
                         messageRepository.writersUpdate(
@@ -116,21 +117,21 @@ class ChatWebSocket(
                         )
                     }
                 }
-                logD("$response")
+                logD("Web Socket Message $response")
             }
-
-            else -> {}
+            else -> Unit
         }
     }
-
+    
     private val answer = MutableStateFlow<Pair<AnswerType, Any?>?>(null)
     private val chatId = MutableStateFlow<String?>(null)
     suspend fun connectToChat(id: String) {
         disconnectToChat()
         subscribe("private-chats.$id") {
-            if (it) chatId.emit(id)
+            if(it) chatId.emit(id)
         }
     }
+    
     private suspend fun disconnectToChat() {
         chatId.value?.let {
             send(

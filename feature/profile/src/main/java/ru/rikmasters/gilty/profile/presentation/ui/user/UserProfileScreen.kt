@@ -6,7 +6,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
@@ -14,7 +13,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.OBSERVERS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
@@ -105,19 +103,6 @@ fun UserProfileScreen(
         //        }
     }
     
-    var errorState by remember {
-        mutableStateOf(false)
-    }
-    
-    scope.launch {
-        while(true) {
-            delay(500)
-            internetCheck(context).let {
-                if(!it) errorState = true
-            }
-        }
-    }
-    
     ProfileContent(
         state = UserProfileState(
             profileState = ProfileState(
@@ -142,15 +127,12 @@ fun UserProfileScreen(
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
-            smthError = errorState,
+            smthError = false,
         ),
         callback = object: UserProfileCallback {
             
             override fun updateProfile() {
-                errorState = !internetCheck(context)
-                if(!errorState) scope.launch {
-                    vm.setUserDate(true)
-                }
+            
             }
             
             override fun onProfileImageRefresh() {

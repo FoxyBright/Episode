@@ -1,13 +1,10 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -25,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
@@ -167,7 +165,7 @@ data class MeetingBsState(
 )
 
 interface MeetingBsCallback {
-
+    
     fun onKebabClick(state: Boolean)
     fun onMenuItemClick(index: Int, meetId: String)
     fun onMeetPlaceClick(location: LocationModel?)
@@ -189,12 +187,11 @@ fun MeetingBsContent(
     state: MeetingBsState,
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback? = null,
-) {
-    val scope = rememberCoroutineScope()
-    val bsState =
+    bsState: BottomSheetScaffoldState =
         rememberBottomSheetScaffoldState(
             bottomSheetState = BottomSheetState(Collapsed)
-        )
+        ),
+) {
     BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)
@@ -204,37 +201,58 @@ fun MeetingBsContent(
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent
     ) {
-        Box(modifier = Modifier.padding(it)) {
-            MeetContent(
-                state = state,
-                modifier = modifier
-                    .align(Center)
-                    .padding(bottom =
-                    if (state.meet.memberState != IS_MEMBER && state.meet.memberState != IS_ORGANIZER) 42.dp
-                    else 0.dp),
-                callback = callback
-            )
-            Button(
-                memberState = state
-                    .meet.memberState,
-                isOnline = state
-                    .meet.isOnline,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .align(BottomCenter)
-            ) {
-                if (state.detailed)
-                    callback?.onRespond(state.meet.id)
-                else scope.launch {
-                    bsState.bottomSheetState.expand()
-                }
-            }
-        }
+        ContentContainer(
+            state = state,
+            paddings = it,
+            callback = callback,
+            bsState = bsState
+        )
     }
     MeetReaction(
         meet = state.meet,
         state = state.meetReaction
     ) { callback?.meetReactionDisable() }
+}
+
+@Composable
+private fun ContentContainer(
+    state: MeetingBsState,
+    paddings: PaddingValues,
+    modifier: Modifier = Modifier,
+    callback: MeetingBsCallback?,
+    bsState: BottomSheetScaffoldState,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    ms: MemberStateType? = state.meet.memberState,
+) {
+    Box(Modifier.padding(paddings)) {
+        MeetContent(
+            state = state,
+            modifier = modifier
+                .align(Center)
+                .padding(
+                    bottom = if(
+                        ms != IS_MEMBER
+                        && ms != IS_ORGANIZER
+                    ) 42.dp else 0.dp
+                ),
+            callback = callback
+        )
+        Button(
+            memberState = state
+                .meet.memberState,
+            isOnline = state
+                .meet.isOnline,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(BottomCenter)
+        ) {
+            if(state.detailed)
+                callback?.onRespond(state.meet.id)
+            else scope.launch {
+                bsState.bottomSheetState.expand()
+            }
+        }
+    }
 }
 
 @Composable
@@ -244,13 +262,13 @@ private fun Button(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    when (memberState) {
+    when(memberState) {
         IS_MEMBER, IS_ORGANIZER -> Unit
         RESPOND_SENT -> TextButton(
             modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(R.string.respond_to_meet)
         )
-
+        
         else -> GradientButton(
             modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(
@@ -290,8 +308,10 @@ private fun Additional(
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            stringResource(R.string.meeting_question_comment_or_assess),
-            Modifier.fillMaxWidth(),
+            text = stringResource(
+                R.string.meeting_question_comment_or_assess
+            ),
+            modifier = Modifier.fillMaxWidth(),
             style = typography.labelLarge,
             color = colorScheme.tertiary
         )
@@ -323,7 +343,7 @@ private fun MeetContent(
     callback: MeetingBsCallback?,
 ) {
     Column(
-        modifier = modifier
+        modifier
             .fillMaxSize()
             .background(
                 colorScheme.background
@@ -337,92 +357,94 @@ private fun MeetContent(
             onBack = { callback?.onBack() },
             onKebabClick = { callback?.onKebabClick(it) }
         ) { callback?.onMenuItemClick(it, state.meet.id) }
-        LazyColumn(modifier.fillMaxWidth()) {
-            itemSpacer(18.dp)
-            item {
-                MeetingBsTopBarCompose(
-                    state = MeetingBsTopBarState(
-                        meet = state.meet,
-                        lastRespond = state.lastRespond,
-                        description = state.detailed,
-                        backButton = state.backButton
-                    ),
-                    callback = callback
-                )
-            }
-            if (state.detailed) {
-                item {
-                    Text(
-                        text = stringResource(
-                            R.string.meeting_question_comment_or_assess
-                        ),
-                        modifier = Modifier.padding(top = 4.dp),
-                        style = typography.labelLarge
-                    )
-                }
-                item {
-                    MeetingBsComment(
-                        text = state.comment ?: "",
-                        online = state.meet.isOnline,
-                        onTextChange = { callback?.onCommentChange(it) },
-                        modifier = Modifier.padding(top = 22.dp)
-                    ) { callback?.onCommentTextClear() }
-                }
-                item {
-                    MeetingBsHidden(
-                        modifier = Modifier.padding(top = 8.dp),
-                        state = state.hidden ?: false,
-                        online = state.meet.isOnline
-                    ) { callback?.onHiddenPhotoActive(it) }
-                }
-            } else {
-                item {
-                    MeetingBsConditions(
-                        meet = state.meet.map(),
-                        modifier = Modifier.padding(
-                            top = if (state.meet.description.isNotBlank())
-                                32.dp else 0.dp
-                        )
-                    )
-                }
-                state.membersList?.let {
-                    item {
-                        MeetingBsParticipants(
-                            meet = state.meet,
-                            membersList = it,
-                            modifier = Modifier,
-                            onAllViewClick = {
-                                callback?.onAllMembersClick(
-                                    state.meet.id
-                                )
-                            },
-                            onMemberClick = {
-                                callback?.onMemberClick(it)
-                            }
-                        )
-                    }
-                }
-                if (state.meetDistance != null
-                    && !state.meet.isOnline
-                ) item {
-                    MeetingBsMap(
-                        meet = state.meet,
-                        distance = state.meetDistance,
-                        modifier = Modifier.padding(top = 28.dp),
-                        onClick = {
-                            callback?.onMeetPlaceClick(
-                                state.meet.location
-                            )
-                        }
-                    )
-                }
-            }
-            itemSpacer(80.dp)
+        Column(
+            Modifier.verticalScroll(rememberScrollState())
+        ) {
+            Spacer(Modifier.height(18.dp))
+            MeetingBsTopBarCompose(
+                state = MeetingBsTopBarState(
+                    meet = state.meet,
+                    lastRespond = state.lastRespond,
+                    description = state.detailed,
+                    backButton = state.backButton
+                ),
+                callback = callback
+            )
+            if(state.detailed)
+                Detailed(state, callback)
+            else
+                Content(state, callback)
+            Spacer(Modifier.height(80.dp))
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun Detailed(
+    state: MeetingBsState,
+    callback: MeetingBsCallback?,
+) {
+    Text(
+        text = stringResource(
+            R.string.meeting_question_comment_or_assess
+        ),
+        modifier = Modifier.padding(top = 4.dp),
+        style = typography.labelLarge
+    )
+    MeetingBsComment(
+        text = state.comment ?: "",
+        online = state.meet.isOnline,
+        onTextChange = { callback?.onCommentChange(it) },
+        modifier = Modifier.padding(top = 22.dp)
+    ) { callback?.onCommentTextClear() }
+    MeetingBsHidden(
+        modifier = Modifier.padding(top = 8.dp),
+        state = state.hidden ?: false,
+        online = state.meet.isOnline
+    ) { callback?.onHiddenPhotoActive(it) }
+}
+
+@Composable
+private fun Content(
+    state: MeetingBsState,
+    callback: MeetingBsCallback?,
+) {
+    MeetingBsConditions(
+        meet = state.meet.map(),
+        modifier = Modifier.padding(
+            top = if(state.meet.description.isNotBlank())
+                32.dp else 0.dp
+        )
+    )
+    state.membersList?.let {
+        MeetingBsParticipants(
+            meet = state.meet,
+            membersList = it,
+            modifier = Modifier,
+            onAllViewClick = {
+                callback?.onAllMembersClick(
+                    state.meet.id
+                )
+            },
+            onMemberClick = { member ->
+                callback?.onMemberClick(member)
+            }
+        )
+    }
+    if(state.meetDistance != null
+        && !state.meet.isOnline
+    ) MeetingBsMap(
+        meet = state.meet,
+        distance = state.meetDistance,
+        modifier = Modifier.padding(top = 28.dp),
+        onClick = {
+            callback?.onMeetPlaceClick(
+                state.meet.location
+            )
+        }
+    )
+}
+
 @Composable
 private fun TopBar(
     meet: FullMeetingModel,
@@ -442,43 +464,8 @@ private fun TopBar(
             Modifier.weight(1f),
             Start, CenterVertically
         ) {
-            if (backButton) IconButton(
-                { onBack() },
-                Modifier.padding(end = 16.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_back),
-                    contentDescription = stringResource(R.string.action_bar_button_back),
-                    tint = colorScheme.tertiary
-                )
-            }
-            Text(
-                text = meet.tags
-                    .joinToString(", ")
-                    { it.title },
-                modifier = Modifier.padding(end = 9.dp).basicMarquee(),
-                color = colorScheme.tertiary,
-                style = typography.labelLarge,
-                overflow = Ellipsis,
-                maxLines = 1
-            )
-            Text(
-                text = stringResource(
-                    when (meet.status) {
-                        CANCELED ->
-                            R.string.meetings_canceled
-
-                        COMPLETED ->
-                            R.string.meetings_finished
-
-                        else -> R.string.empty_String
-                    }
-                ),
-                modifier = Modifier,
-                style = typography.labelSmall,
-                overflow = Ellipsis,
-                maxLines = 1
-            )
+            TopBarBackButton(backButton, onBack)
+            meet.TopBarTitle()
         }
         Menu(
             menuState = menuState,
@@ -490,30 +477,81 @@ private fun TopBar(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun FullMeetingModel.TopBarTitle() {
+    Text(
+        text = tags.joinToString(", ")
+        { it.title },
+        modifier = Modifier
+            .padding(end = 9.dp)
+            .basicMarquee(),
+        color = colorScheme.tertiary,
+        style = typography.labelLarge,
+        overflow = Ellipsis,
+        maxLines = 1
+    )
+    Text(
+        text = stringResource(
+            when(status) {
+                CANCELED ->
+                    R.string.meetings_canceled
+                COMPLETED ->
+                    R.string.meetings_finished
+                else -> R.string.empty_String
+            }
+        ),
+        style = typography.labelSmall,
+        overflow = Ellipsis,
+        maxLines = 1
+    )
+}
+
+@Composable
+private fun TopBarBackButton(
+    backButton: Boolean,
+    onBack: () -> Unit,
+) {
+    if(backButton) IconButton(
+        onClick = { onBack() },
+        modifier = Modifier.padding(end = 16.dp)
+    ) {
+        Icon(
+            painter = painterResource(
+                R.drawable.ic_back
+            ),
+            contentDescription = stringResource(
+                R.string.action_bar_button_back
+            ),
+            tint = colorScheme.tertiary
+        )
+    }
+}
+
+@Composable
 private fun Menu(
     menuState: Boolean,
     meet: FullMeetingModel,
+    ms: MemberStateType? = meet.memberState,
     onDismiss: (Boolean) -> Unit,
     onItemSelect: (Int) -> Unit,
 ) {
-    val ms = meet.memberState
     val menuItems =
         arrayListOf<Pair<String, () -> Unit>>()
-    if (ms == IS_MEMBER || ms == IS_ORGANIZER)
+    if(ms == IS_MEMBER || ms == IS_ORGANIZER)
         menuItems.add(
             stringResource(R.string.meeting_shared_button) to
                     { onItemSelect(0) })
-    if (ms == IS_MEMBER)
+    if(ms == IS_MEMBER)
         menuItems.add(
             stringResource(R.string.exit_from_meet) to
                     { onItemSelect(1) })
     menuItems.add(
-        if (ms == IS_ORGANIZER)
+        if(ms == IS_ORGANIZER)
             stringResource(R.string.meeting_canceled) to
                     { onItemSelect(2) }
         else stringResource(R.string.meeting_complain) to
                 { onItemSelect(3) })
-    if (menuState && menuItems.size == 1) {
+    if(menuState && menuItems.size == 1) {
         onDismiss(false)
         menuItems.first().second()
     }

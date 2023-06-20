@@ -44,9 +44,10 @@ class MessageRepository(
                 when(type) {
                     NEW_MESSAGE -> primarySource.save(model as Message)
                     DELETE_MESSAGE -> primarySource.deleteById<Message>(model)
-                    else -> primarySource.findById<Message>(model)?.let {
-                        primarySource.save(it.copy(isRead = true))
-                    }
+                    else -> {}
+//                    else -> primarySource.findById<Message>(model)?.let {
+//                        primarySource.save(it.copy(isRead = true))
+//                    }
                 }
             }
             refresh()
