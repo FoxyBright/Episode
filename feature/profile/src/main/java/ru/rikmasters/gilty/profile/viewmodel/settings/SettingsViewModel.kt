@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.profile.viewmodel.settings
 
 import android.content.Context
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
@@ -48,7 +47,7 @@ class SettingsViewModel: ViewModel() {
     private val _orientations =
         MutableStateFlow<List<OrientationModel>?>(null)
     val orientations = _orientations.asStateFlow()
-
+    
     private val _selected = MutableStateFlow(emptyList<CategoryModel>())
     val selected = _selected.asStateFlow()
     suspend fun getInterest() = singleLoading {
@@ -64,6 +63,10 @@ class SettingsViewModel: ViewModel() {
             }
         )
     }
+    
+    suspend fun getUnread(clear: Boolean = false) =
+        chatManager.updateUnread(context, clear)
+    
     suspend fun changeOrientation(orientation: OrientationModel) =
         singleLoading {
             profileManager.userUpdateData(

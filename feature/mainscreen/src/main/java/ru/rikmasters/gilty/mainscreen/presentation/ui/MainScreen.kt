@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import android.annotation.SuppressLint
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
@@ -12,7 +13,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.SHORT_MEET
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
 import ru.rikmasters.gilty.core.app.ui.BottomSheetSwipeState.COLLAPSED
-import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.openBS
@@ -49,7 +49,9 @@ fun MainScreen(vm: MainViewModel) {
     val grid by vm.grid.collectAsState()
     val time by vm.time.collectAsState()
     
-    val navBar = remember {
+    val navBar = remember(
+        unreadNotifications, unreadMessages
+    ) {
         mutableListOf(
             ACTIVE, unreadNotifications,
             INACTIVE, unreadMessages, INACTIVE
@@ -72,13 +74,16 @@ fun MainScreen(vm: MainViewModel) {
     LaunchedEffect(Unit) {
         vm.getAllCategories()
         vm.getUserCategories()
-        vm.getUnread()
-        //vm.getMeets()
         vm.getLocation(activity)
-        context.listenPreference("unread_messages", 0)
-        { scope.launch { vm.setUnreadMessages(it > 0) } }
-        context.listenPreference("unread_notification", 0)
-        { scope.launch { vm.setUnreadNotifications(it > 0) } }
+        vm.getUnread()
+        val pref = context
+            .getSharedPreferences("sharedPref", MODE_PRIVATE)
+        pref.getInt("unread_messages", 0).let {
+            vm.setUnreadMessages(it > 0)
+        }
+        pref.getInt("unread_notification", 0).let {
+            vm.setUnreadNotifications(it > 0)
+        }
     }
     
     val bsState = rememberBottomSheetScaffoldState(

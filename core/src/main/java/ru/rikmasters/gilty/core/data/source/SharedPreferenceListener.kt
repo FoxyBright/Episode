@@ -1,9 +1,12 @@
+@file:Suppress("unused")
+
 package ru.rikmasters.gilty.core.data.source
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.util.Log
 
 class SharedPrefListener<T: Any>(
     private val sharedKey: String,
@@ -18,6 +21,7 @@ class SharedPrefListener<T: Any>(
             sharedPrefName: String = "sharedPref",
             block: (T) -> Unit,
         ) {
+            Log.d("","UNREAD -> start")
             @Suppress("UNUSED_VARIABLE")
             val preferenceManager = this.getSharedPreferences(
                 sharedPrefName, MODE_PRIVATE

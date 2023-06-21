@@ -80,7 +80,10 @@ class MainViewModel: ViewModel() {
                 if(reset) _meetings.emit(emptyList())
                 val meetings =
                     _meetings.value.toMutableList()
-                meetings.addAll(if(meetings.size != 0)meetings.size - 1 else 0, it.first.reversed())
+                meetings.addAll(
+                    if(meetings.size != 0) meetings.size - 1 else 0,
+                    it.first.reversed()
+                )
                 _meetings.emit(meetings)
                 _results.emit(it.second)
             },
@@ -109,6 +112,8 @@ class MainViewModel: ViewModel() {
         )
     }
     
+    
+    
     private val _unreadNotifications =
         MutableStateFlow(
             lazy {
@@ -127,30 +132,8 @@ class MainViewModel: ViewModel() {
         )
     }
     
-    suspend fun getUnread() {
-        chatManager.updateUnreadMessages().on(
-            success = {
-                context.getSharedPreferences(
-                    "sharedPref", MODE_PRIVATE
-                ).edit()
-                    .putInt(
-                        "unread_messages",
-                        it.unreadCount
-                    )
-                    .putInt(
-                        "unread_notification",
-                        it.notificationsUnread
-                    )
-                    .apply()
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-            }
-        )
-    }
+    suspend fun getUnread() = chatManager
+        .updateUnread(context)
     
     suspend fun getAllCategories() {
         meetManager.getCategoriesList().on(

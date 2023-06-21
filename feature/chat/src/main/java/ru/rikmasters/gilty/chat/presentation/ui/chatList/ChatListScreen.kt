@@ -1,17 +1,15 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import android.annotation.SuppressLint
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
-import ru.rikmasters.gilty.core.app.internetCheck
-import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.animateToLastPosition
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
@@ -38,8 +36,10 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val completed by vm.completed.collectAsState()
     val alert by vm.alert.collectAsState()
     val chatsCount by vm.chatsCount.collectAsState()
-
-    val navBar = remember {
+    
+    val navBar = remember(
+        unreadMessages, unreadNotifications
+    ) {
         mutableListOf(
             INACTIVE, unreadNotifications,
             INACTIVE, unreadMessages, INACTIVE
@@ -60,23 +60,14 @@ fun ChatListScreen(vm: ChatListViewModel) {
     }
     
     LaunchedEffect(Unit) {
-        context.listenPreference("unread_messages", 0)
-        { scope.launch { vm.setUnreadMessages(it > 0) } }
-        context.listenPreference("unread_notification", 0)
-        { scope.launch { vm.setUnreadNotifications(it > 0) } }
         vm.getUnread()
-    }
-    
-    var errorState by remember {
-        mutableStateOf(false)
-    }
-    
-    scope.launch {
-        while(true) {
-            delay(500)
-            internetCheck(context).let {
-                if(!it) errorState = true
-            }
+        val pref = context
+            .getSharedPreferences("sharedPref", MODE_PRIVATE)
+        pref.getInt("unread_messages", 0).let {
+            vm.setUnreadMessages(it > 0)
+        }
+        pref.getInt("unread_notification", 0).let {
+            vm.setUnreadNotifications(it > 0)
         }
     }
     
@@ -92,7 +83,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
             listState = listState,
             isSortOn = sortType != null,
             isArchiveOn = isArchiveOn,
-            smthError = errorState,
+            smthError = false,
             chatsCount = chatsCount
         ),
         callback = object: ChatListCallback {
@@ -146,10 +137,6 @@ fun ChatListScreen(vm: ChatListViewModel) {
             }
             
             override fun onListUpdate() {
-                errorState = !internetCheck(context)
-                if(!errorState) scope.launch {
-                    vm.forceRefresh()
-                }
             }
             
             override fun onListAlertSelect(index: Int) {

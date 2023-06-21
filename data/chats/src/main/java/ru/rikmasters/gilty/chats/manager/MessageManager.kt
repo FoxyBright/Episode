@@ -43,15 +43,25 @@ class MessageManager(
         chatId: String,
         query: String? = null,
         page: Int? = null, perPage: Int? = null,
-    ) = web.getTranslationViewers(chatId, query, page, perPage)
+    ) = web.getTranslationViewers(
+        chatId = chatId,
+        query = query,
+        page = page,
+        perPage = perPage
+    )
     
-    suspend fun getTranslationViewersCount(chatId: String) =
-        web.getTranslationViewers(chatId, (null), (null), (null))
-            .on(
-                success = { it.second.total },
-                loading = { 0 },
-                error = { 0 }
-            )
+    suspend fun getTranslationViewersCount(
+        chatId: String,
+    ) = web.getTranslationViewers(
+        chatId = chatId,
+        query = null,
+        page = null,
+        perPage = null
+    ).on(
+        success = { it.second.total },
+        loading = { 0 },
+        error = { 0 }
+    )
     
     suspend fun completeChat(chatId: String) =
         withContext(IO) { web.completeChat(chatId) }

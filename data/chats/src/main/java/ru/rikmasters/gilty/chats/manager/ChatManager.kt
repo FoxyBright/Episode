@@ -1,5 +1,8 @@
 package ru.rikmasters.gilty.chats.manager
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.activity.ComponentActivity.MODE_PRIVATE
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -22,8 +25,40 @@ class ChatManager(
     private val webSource: ChatWebSource,
 ): CoroutineController() {
     
-    suspend fun updateUnreadMessages() =
-        withContext(IO) { webSource.getChatsStatus() }
+    suspend fun updateUnread(
+        context: Context,
+        clear: Boolean = false,
+        mes: String = "unread_messages",
+        not: String = "unread_notification",
+        shared: SharedPreferences = context
+            .getSharedPreferences(
+                "sharedPref", MODE_PRIVATE
+            ),
+        empty: Triple<Int, Int, Int?> =
+            Triple(0, 0, null),
+    ) = withContext(IO) {
+        if(!clear) webSource.getChatsStatus().on(
+            success = { status ->
+                shared.edit()
+                    .putInt(not, status.notificationsUnread)
+                    .putInt(mes, status.unreadCount)
+                    .apply()
+                    .let {
+                        Triple(
+                            status.notificationsUnread,
+                            status.unreadCount,
+                            status.chatsCount
+                        )
+                    }
+            },
+            loading = { empty },
+            error = { empty }
+        ) else shared.edit()
+            .putInt(mes, 0)
+            .putInt(not, 0)
+            .apply()
+            .let { empty }
+    }
     
     fun getChats(
         sortTypeModel: SortTypeModel,

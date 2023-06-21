@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.annotation.SuppressLint
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -13,7 +14,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.MEET
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.OBSERVERS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.core.app.AppStateModel
-import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
@@ -58,7 +58,9 @@ fun UserProfileScreen(
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
     
-    val navBar = remember {
+    val navBar = remember(
+        unreadNotification, unreadMessages
+    ) {
         mutableListOf(
             INACTIVE, unreadNotification,
             INACTIVE, unreadMessages, ACTIVE
@@ -93,10 +95,15 @@ fun UserProfileScreen(
     LaunchedEffect(Unit) {
         vm.setUserDate(true)
         vm.forceRefresh()
-        context.listenPreference("unread_messages", 0)
-        { scope.launch { vm.setUnreadMessages(it > 0) } }
-        context.listenPreference("unread_notification", 0)
-        { scope.launch { vm.setUnreadNotification(it > 0) } }
+        vm.getUnread()
+        val pref = context
+            .getSharedPreferences("sharedPref", MODE_PRIVATE)
+        pref.getInt("unread_messages", 0).let {
+            vm.setUnreadMessages(it > 0)
+        }
+        pref.getInt("unread_notification", 0).let {
+            vm.setUnreadNotifications(it > 0)
+        }
         // TODO для DeepLink при нажатии на пуш с блокированным фото пользователя
         //        profile?.avatar?.blockedAt?.let{
         //            vm.photoAlertDismiss(true)

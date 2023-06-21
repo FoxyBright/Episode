@@ -26,66 +26,55 @@ class ChatWebSocket(
     override val pingInterval: Long = 20_000L
     
     override suspend fun handleResponse(response: SocketResponse) {
-        val event = SocketEvents from response.event
-        logV(event?.name.toString())
-        when(event) {
-            CONNECTION_ESTABLISHED -> {
-                socketId.emit(
-                    mapper.readValue<SocketData>(
-                        response.data
-                    ).socket_id
-                )
+        when(val event = SocketEvents from response.event) {
+            CONNECTION_ESTABLISHED -> socketId.emit(
+                mapper.readValue<SocketData>(
+                    response.data
+                ).socket_id
+            ).also {
                 subscribe("private-user.${userId.value}")
             }
-            
-            SUBSCRIPTION_SUCCEEDED -> Unit
             
             PONG -> inPing = false
             
             CHATS_UPDATED, CHATS_DELETED -> {
                 answer.emit(
                     Pair(
-                        if(event == CHATS_DELETED) {
-                            CHAT_DELETED
-                        } else {
-                            UPDATED_CHATS
-                        },
-                        if(event == CHATS_DELETED) {
+                        if(event == CHATS_DELETED)
+                            CHAT_DELETED else UPDATED_CHATS,
+                        if(event == CHATS_DELETED)
                             mapper.readValue<ShortMessageWs>(
                                 response.data,
                             ).id
-                        } else {
-                            mapper.readValue<Chat>(
-                                response.data,
-                            )
-                        },
-                    ),
-                )
-                chatRepository.chatUpdate(answer.value)
-                logD("INFO_MESSAGE $response")
-            }
-            
-            MESSAGE_UPDATE -> {
-                answer.emit(
-                    Pair(
-                        UPDATE_MESSAGE,
-                        mapper.readValue<ChatStatus>(
+                        else mapper.readValue<Chat>(
                             response.data,
-                        ).unreadCount,
-                    ),
-                )
-                logD("INFO_MESSAGE $response")
-                messageRepository.messageUpdate(answer.value)
+                        )
+                    
+                    )
+                ).also {
+                    chatRepository.chatUpdate(
+                        answer.value
+                    )
+                }
             }
             
-            CHAT_COMPLETED -> {
-                answer.emit(
-                    Pair(COMPLETED_CHAT, null),
+            MESSAGE_UPDATE -> answer.emit(
+                Pair(
+                    UPDATE_MESSAGE,
+                    mapper.readValue<ChatStatus>(
+                        response.data,
+                    ).unreadCount,
+                ),
+            ).also {
+                messageRepository.messageUpdate(
+                    answer.value
                 )
-                logD("INFO_MESSAGE $response")
             }
             
-            MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED -> {
+            CHAT_COMPLETED ->
+                answer.emit(Pair(COMPLETED_CHAT, null))
+            
+            MESSAGE_SENT, MESSAGE_READ, MESSAGE_DELETED ->
                 answer.emit(
                     Pair(
                         when(event) {
@@ -93,33 +82,32 @@ class ChatWebSocket(
                             MESSAGE_READ -> READ_MESSAGE
                             else -> DELETE_MESSAGE
                         },
-                        if(event == MESSAGE_SENT) {
-                            mapper.readValue<MessageWs>(response.data)
-                                .map(chatId.value)
-                        } else {
-                            mapper.readValue<ShortMessageWs>(response.data).id
-                        },
-                    ),
-                )
-                logD("INFO_MESSAGE $response")
-                messageRepository.messageUpdate(answer.value)
-            }
-            
-            MESSAGE_TYPING -> {
-                mapper.readValue<User>(response.data).let { user ->
-                    if(user.id == messageRepository.getUser()) {
-                        return
-                    } else {
-                        messageRepository.writersUpdate(
-                            UserWs(
-                                (user.id ?: ""),
-                                (user.avatar?.thumbnail ?: Thumbnail()),
-                            ),
-                        )
-                    }
+                        if(event == MESSAGE_SENT)
+                            mapper.readValue<MessageWs>(
+                                response.data
+                            ).map(chatId.value)
+                        else mapper.readValue<ShortMessageWs>(
+                            response.data
+                        ).id
+                    )
+                ).also {
+                    messageRepository.messageUpdate(
+                        answer.value
+                    )
                 }
-                logD("INFO_MESSAGE $response")
-            }
+            
+            MESSAGE_TYPING ->
+                mapper.readValue<User>(response.data).let { user ->
+                    if(user.id == messageRepository.getUser())
+                        return
+                    else messageRepository.writersUpdate(
+                        UserWs(
+                            id = user.id ?: "",
+                            thumbnail = user.avatar?.thumbnail
+                                ?: Thumbnail(),
+                        )
+                    )
+                }
             else -> Unit
         }
     }

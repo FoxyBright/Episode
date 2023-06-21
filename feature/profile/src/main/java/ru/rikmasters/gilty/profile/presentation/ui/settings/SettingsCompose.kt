@@ -84,7 +84,7 @@ interface SettingsCallback {
     fun onGenderClick()
     fun onAgeClick()
     fun onOrientationClick()
-    fun onPhoneClick()
+    fun onPhoneClick() {}
     fun onExit()
     fun onDelete()
     fun onExitDismiss()

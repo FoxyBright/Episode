@@ -38,8 +38,8 @@ class NotificationManager(
     }
     
     suspend fun markNotifyAsRead(
-        notifyIds: List<String> = emptyList(),
         readAll: Boolean = false,
+        notifyIds: List<String> = emptyList(),
     ) = withContext(IO) {
         web.markNotifiesAsRead(
             notifyIds = notifyIds,

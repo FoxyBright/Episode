@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
 import android.annotation.SuppressLint
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -13,7 +14,6 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.RESPONDS
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType.USER
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.app.internetCheck
-import ru.rikmasters.gilty.core.data.source.SharedPrefListener.Companion.listenPreference
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.notifications.viewmodel.NotificationViewModel
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
@@ -26,13 +26,13 @@ import ru.rikmasters.gilty.shared.model.notification.NotificationModel
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun NotificationsScreen(vm: NotificationViewModel) {
-
+    
     val listState = rememberLazyListScrollState("notifications")
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-
+    
     val splitNotifications by vm.splitMonthNotifications.collectAsState()
     val notifications = vm.notifications.collectAsLazyPagingItems()
     val participants = vm.participants.collectAsLazyPagingItems()
@@ -43,46 +43,52 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     val lastRespond by vm.lastRespond.collectAsState()
     val ratings by vm.ratings.collectAsState()
     val blur by vm.blur.collectAsState()
-
-    val navBar = remember {
+    
+    val navBar = remember(
+        unreadNotifications, unreadMessages
+    ) {
         mutableListOf(
             INACTIVE, unreadNotifications,
             INACTIVE, unreadMessages, INACTIVE
         )
     }
-
+    
     LaunchedEffect(Unit) {
-        vm.getUnread()
-        vm.getRatings()
         vm.getLastResponse()
-        context.listenPreference("unread_messages", 0)
-        { scope.launch { vm.setUnreadMessages(it > 0) } }
-        context.listenPreference("unread_notification", 0)
-        { scope.launch { vm.setUnreadNotifications(it > 0) } }
+        vm.getRatings()
+        vm.getUnread()
+        val pref = context
+            .getSharedPreferences("sharedPref", MODE_PRIVATE)
+        pref.getInt("unread_messages", 0).let {
+            vm.setUnreadMessages(it > 0)
+        }
+        pref.getInt("unread_notification", 0).let {
+            vm.setUnreadNotifications(it > 0)
+        }
     }
-
+    
     LaunchedEffect(notifications.itemSnapshotList.items) {
         scope.launch {
-
+            
             vm.splitByMonthSM(
                 notifications.itemSnapshotList.items
             )
         }
     }
-
+    
     var errorState by remember {
         mutableStateOf(false)
     }
-
+    
     scope.launch {
-        while (true) {
+        while(true) {
             delay(500)
             internetCheck(context).let {
-                if (!it) errorState = true
+                if(!it) errorState = true
             }
         }
     }
-
+    
     NotificationsContent(
         state = NotificationsState(
             notifications = notifications,
@@ -97,8 +103,8 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             ratings = ratings,
             smthError = errorState
         ),
-        callback = object : NotificationsCallback {
-
+        callback = object: NotificationsCallback {
+            
             override fun onEmojiClick(
                 notification: NotificationModel,
                 emoji: EmojiModel,
@@ -106,7 +112,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
             ) {
                 scope.launch {
                     selected?.let {
-                        if (notification.feedback?.ratings == null || !userId.isNullOrBlank()) {
+                        if(notification.feedback?.ratings == null || !userId.isNullOrBlank()) {
                             vm.emojiClick(
                                 emoji,
                                 notification.parent.meeting?.id ?: "",
@@ -123,7 +129,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-
+            
             override fun onMeetClick(meet: MeetingModel?) {
                 scope.launch {
                     meet?.let { m ->
@@ -133,7 +139,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-
+            
             override fun onUserClick(
                 user: UserModel?,
                 meet: MeetingModel?,
@@ -146,23 +152,23 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-
+            
             override fun onBlurClick() {
                 scope.launch {
                     vm.blur(false)
                     vm.clearSelectedNotification()
                 }
             }
-
+            
             override fun onNavBarSelect(point: Int) {
-                if (point == 1) return
+                if(point == 1) return
                 scope.launch {
                     nav.navigateAbsolute(
                         vm.navBarNavigate(point)
                     )
                 }
             }
-
+            
             override fun onRespondsClick() {
                 scope.launch {
                     asm.bottomSheet.expand {
@@ -170,20 +176,20 @@ fun NotificationsScreen(vm: NotificationViewModel) {
                     }
                 }
             }
-
+            
             override fun onSwiped(notification: NotificationModel) {
                 scope.launch {
                     vm.swipeToDeleteNotification(notification)
                 }
             }
-
+            
             override fun onParticipantClick(index: Int) {
                 scope.launch { vm.selectParticipants(index) }
             }
-
+            
             override fun onListUpdate() {
                 errorState = !internetCheck(context)
-                if (!errorState) scope.launch {
+                if(!errorState) scope.launch {
                     vm.forceRefresh()
                 }
             }
