@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.*
 import org.koin.androidx.compose.get
@@ -15,7 +14,6 @@ import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.login.viewmodel.ProfileViewModel
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.model.image.EmojiModel.Companion.getEmoji
@@ -25,13 +23,13 @@ import ru.rikmasters.gilty.shared.model.profile.RatingModel
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileScreen(vm: ProfileViewModel) {
-    
+
     val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
-    
+
     val description by vm.description.collectAsState()
     val profile by vm.profile.collectAsState()
     val occupied by vm.occupied.collectAsState()
@@ -42,18 +40,31 @@ fun ProfileScreen(vm: ProfileViewModel) {
     val shortUserNameError = username.length in 1 until 4
     var errorAvatar by remember { mutableStateOf(false) }
     val longUserNameError = username.length > 20
-    
-    val regexString =
-        stringResource(R.string.profile_username_error_regex)
-    val longUsernameString =
-        stringResource(R.string.profile_long_username)
-    val shortUsernameString =
-        stringResource(R.string.profile_short_username)
-    val usernameOccupiedString =
-        stringResource(R.string.profile_user_name_is_occupied)
-    
-    var errorText by remember(username, occupied, errorMessage) {
-        mutableStateOf(
+
+    /*    val regexString =
+            stringResource(R.string.profile_username_error_regex)
+        val longUsernameString =
+            stringResource(R.string.profile_long_username)
+        val shortUsernameString =
+            stringResource(R.string.profile_short_username)
+        val usernameOccupiedString =
+            stringResource(R.string.profile_user_name_is_occupied)
+
+        var errorText by remember(username, occupied, errorMessage) {
+            mutableStateOf(
+                when {
+                    regexError -> regexString
+                    longUserNameError -> longUsernameString
+                    shortUserNameError -> shortUsernameString
+                    occupied -> usernameOccupiedString
+                    errorMessage.isNotEmpty()-> errorMessage
+                    else -> ""
+                }
+            )
+        }*/
+    var errorText by remember(errorMessage) {
+        mutableStateOf(errorMessage)
+        /*mutableStateOf(
             when {
                 regexError -> regexString
                 longUserNameError -> longUsernameString
@@ -62,14 +73,14 @@ fun ProfileScreen(vm: ProfileViewModel) {
                 errorMessage.isNotEmpty()-> errorMessage
                 else -> ""
             }
-        )
+        )*/
     }
-    
+
     LaunchedEffect(Unit) {
         vm.getProfile()
         errorText = ""
     }
-    
+
     val profileState = ProfileState(
         ProfileModel().copy(
             username = username,
@@ -83,7 +94,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
         ), errorText = errorText,
         isError = errorAvatar
     )
-    
+
     val isActive = username.isNotBlank()
             && !occupied
             && !errorAvatar
@@ -150,7 +161,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
 
                 override fun onNext() {
                     scope.launch {
-                        vm.checkOnNext(onSuccess = {})
+                        vm.checkOnNext()
                         nav.navigate("personal")
                     }
                 }

@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
@@ -20,7 +21,13 @@ fun GenderBs(vm: GenderBsViewModel) {
     val select by vm.select.collectAsState()
     
     LaunchedEffect(Unit) { vm.getGenders() }
-    
+
+    BackHandler {
+        scope.launch {
+            asm.bottomSheet.collapse()
+        }
+    }
+
     SelectBottom(
         stringResource(R.string.sex),
         genders, select, online

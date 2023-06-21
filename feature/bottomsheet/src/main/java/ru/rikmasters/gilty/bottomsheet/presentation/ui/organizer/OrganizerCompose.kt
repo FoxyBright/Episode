@@ -1,9 +1,7 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +35,7 @@ import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
 import ru.rikmasters.gilty.shared.common.ProfileCallback
 import ru.rikmasters.gilty.shared.common.ProfileState
+import ru.rikmasters.gilty.shared.common.marquee
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.enumeration.ProfileType.ORGANIZER
 import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
@@ -237,7 +236,7 @@ private fun TopBar(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
@@ -250,17 +249,11 @@ private fun TopBar(
                         if (profileGroup != DEFAULT) {
                             Modifier
                                 .widthIn(min = 1.dp, max = badgeWidth.width.dp)
-                                .basicMarquee(
-                                    spacing = MarqueeSpacing(14.dp),
-                                    iterations = Int.MAX_VALUE
-                                )
+                                .marquee()
                         } else {
                             Modifier
                                 .width(IntrinsicSize.Max)
-                                .basicMarquee(
-                                    spacing = MarqueeSpacing(14.dp),
-                                    iterations = Int.MAX_VALUE
-                                )
+                                .marquee()
 
                         },
                     )

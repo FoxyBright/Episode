@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
@@ -20,7 +21,13 @@ fun OrientationBs(vm: OrientationBsViewModel) {
     val online by vm.online.collectAsState()
     
     LaunchedEffect(Unit) { vm.getOrientations() }
-    
+
+    BackHandler {
+        scope.launch {
+            asm.bottomSheet.collapse()
+        }
+    }
+
     SelectBottom(
         stringResource(R.string.orientation_title),
         orientations.map { it.name },

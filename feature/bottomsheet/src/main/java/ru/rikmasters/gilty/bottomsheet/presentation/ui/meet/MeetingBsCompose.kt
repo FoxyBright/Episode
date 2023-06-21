@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.marquee
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
@@ -185,6 +186,7 @@ interface MeetingBsCallback {
 @Composable
 fun MeetingBsContent(
     state: MeetingBsState,
+    @Suppress("unused")
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback? = null,
     bsState: BottomSheetScaffoldState =
@@ -484,7 +486,7 @@ private fun FullMeetingModel.TopBarTitle() {
         { it.title },
         modifier = Modifier
             .padding(end = 9.dp)
-            .basicMarquee(),
+            .marquee(),
         color = colorScheme.tertiary,
         style = typography.labelLarge,
         overflow = Ellipsis,

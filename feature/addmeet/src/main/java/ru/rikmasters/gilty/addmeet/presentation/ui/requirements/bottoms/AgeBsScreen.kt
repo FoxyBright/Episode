@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
@@ -17,7 +18,13 @@ fun AgeBs(vm: AgeBsViewModel) {
     val online by vm.online.collectAsState()
     val from by vm.from.collectAsState()
     val to by vm.to.collectAsState()
-    
+
+    BackHandler {
+        scope.launch {
+            asm.bottomSheet.collapse()
+        }
+    }
+
     AgeBottom(
         from, to, Modifier, online,
         { scope.launch { vm.changeFrom(it) } },

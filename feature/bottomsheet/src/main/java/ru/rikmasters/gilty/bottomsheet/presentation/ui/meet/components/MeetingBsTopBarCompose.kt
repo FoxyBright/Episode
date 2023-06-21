@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import ru.rikmasters.gilty.shared.common.CategoryItem
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
+import ru.rikmasters.gilty.shared.common.marquee
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.LastRespond.Companion.DemoLastRespond
@@ -300,6 +302,7 @@ private fun MeetDetails(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SubLabel(
     text: String,
@@ -318,14 +321,16 @@ private fun SubLabel(
         Text(
             text = text,
             modifier = Modifier
-                .padding(12.dp, 3.dp),
+                .padding(12.dp, 3.dp)
+                .marquee(spacing = 6.dp),
             style = typography
                 .labelSmall.copy(
                     fontSize = 14
                         .dp.toSp(),
                     color = White,
                     fontWeight = Bold,
-                )
+                ),
+            maxLines = 1
         )
     }
 }
