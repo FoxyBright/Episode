@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
@@ -71,7 +72,9 @@ fun MainScreen(vm: MainViewModel) {
             vm.resetMeets()
     }
     
+    val back = colorScheme.primaryContainer
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         vm.getAllCategories()
         vm.getUserCategories()
         vm.getLocation(activity)

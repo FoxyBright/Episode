@@ -1,14 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package ru.rikmasters.gilty.gallery.cropper
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
@@ -27,11 +27,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.core.util.composable.getDensity
 import ru.rikmasters.gilty.gallery.cropper.model.AspectRatio
-import ru.rikmasters.gilty.gallery.cropper.model.OutlineType
+import ru.rikmasters.gilty.gallery.cropper.model.OutlineType.RoundedRect
 import ru.rikmasters.gilty.gallery.cropper.model.RoundedCornerCropShape
 import ru.rikmasters.gilty.gallery.cropper.settings.*
+import ru.rikmasters.gilty.gallery.cropper.settings.CropType.Static
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.shared.GradientButton
+import ru.rikmasters.gilty.shared.theme.Colors.PreDark
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 @Preview
@@ -105,31 +107,34 @@ fun ImageCropper(
             Center
         ) {
             ImageCropper(
-                Modifier.fillMaxSize(),
-                state.image, (null), CropStyle(
+                modifier = Modifier.fillMaxSize(),
+                imageBitmap = state.image,
+                contentDescription = (null),
+                cropStyle = CropStyle(
                     drawOverlay = false,
                     drawGrid = false,
                     strokeWidth = 2.dp,
                     overlayColor = Color.Gray,
                     handleColor = White,
-                    backgroundColor = if(isSystemInDarkTheme())
-                        Color(0x99000000)
-                    else Color(0x99FFFFFF)
-                ), CropProperties(
-                    cropType = CropType.Static,
+                    backgroundColor = Color(0x80000000)
+                ),
+                cropProperties = CropProperties(
+                    cropType = Static,
                     handleSize = handleSize,
-                    contentScale = ContentScale.Fit,
+                    contentScale = Fit,
                     cropOutlineProperty = CropOutlineProperty(
-                        OutlineType.RoundedRect,
+                        RoundedRect,
                         RoundedCornerCropShape(0, "Rect")
-                    ), maxZoom = 10f,
+                    ),
+                    maxZoom = 10f,
                     aspectRatio = AspectRatio(3 / 5f),
                     overlayRatio = 0.5f,
                     pannable = true,
                     fling = false,
                     zoomable = true,
                     rotatable = false
-                ), crop = crop,
+                ),
+                crop = crop,
                 onCropStart = { isCropping = true }
             ) { img, rect ->
                 croppedImage = img
@@ -146,13 +151,6 @@ fun ImageCropper(
                 }
             }
             Frame()
-            /*if(isCropping) Box(Modifier, Center) {
-                AnimatedImage(
-                    R.raw.loaging,
-                    Modifier.size(24.dp),
-                    isPlaying = isCropping
-                )
-            }*/
         }
     }
 }
@@ -198,10 +196,7 @@ private fun TopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                colorScheme.primaryContainer
-            )
-            .padding(top = 16.dp),
+            .background(PreDark),
         Start, CenterVertically
     ) {
         IconButton(
@@ -215,7 +210,7 @@ private fun TopBar(
                 ),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = colorScheme.tertiary
+                tint = White
             )
         }
         Text(
@@ -224,7 +219,7 @@ private fun TopBar(
                 .padding(vertical = 18.dp)
                 .padding(start = 4.dp),
             style = typography.headlineLarge.copy(
-                color = colorScheme.tertiary,
+                color = White,
                 fontWeight = Medium
             ),
         )

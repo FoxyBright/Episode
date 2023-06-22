@@ -4,8 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
@@ -16,6 +19,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -144,18 +148,22 @@ private fun CountryLabel(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier,
-        Arrangement.Start,
+        modifier, Start,
         CenterVertically
     ) {
         Image(
-            flag, (null),
-            Modifier.size(24.dp)
+            bitmap = flag,
+            contentDescription = null,
+            modifier = Modifier
+                .size(20.dp, 14.dp)
+                .clip(RoundedCornerShape(4.dp))
         )
         Text(
-            name, Modifier.padding(start = 16.dp),
-            colorScheme.tertiary,
+            text = name,
+            modifier = Modifier
+                .padding(start = 16.dp),
             style = typography.bodyMedium
+                .copy(colorScheme.tertiary)
         )
     }
 }
@@ -166,21 +174,23 @@ private fun CountryDial(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier.width(IntrinsicSize.Max),
-        Arrangement.Start,
-        CenterVertically
+        modifier.width(Max),
+        Start, CenterVertically
     ) {
         Text(
-            dial, Modifier
+            text = dial,
+            modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp),
-            colorScheme.scrim,
             style = typography.bodyMedium
+                .copy(colorScheme.scrim)
         )
         Icon(
-            Filled.KeyboardArrowRight,
-            (null), Modifier.size(28.dp),
-            colorScheme.scrim
+            imageVector = Filled
+                .KeyboardArrowRight,
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
+            tint = colorScheme.scrim
         )
     }
 }

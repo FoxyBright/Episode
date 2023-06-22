@@ -291,16 +291,22 @@ private fun ConfirmationPolicy(
     modifier: Modifier = Modifier,
     callback: LoginCallback? = null,
 ) {
-    val textStyle = SpanStyle(colors.policyAgreeColor)
+    val textStyle = SpanStyle(
+        color = colors.policyAgreeColor,
+        fontSize = 13.dp.toSp()
+    )
     
     val linkStyle = SpanStyle(
-        colorScheme.tertiary,
+        color = colorScheme.tertiary,
+        fontSize = 13.dp.toSp(),
         textDecoration = Underline
     )
     
     val typography = typography
-        .labelSmall
-        .copy(fontWeight = SemiBold)
+        .labelSmall.copy(
+            fontWeight = SemiBold,
+            fontSize = 13.dp.toSp()
+        )
     
     val annotatedText = buildAnnotatedString {
         val terms = stringResource(R.string.terms)
@@ -336,7 +342,7 @@ private fun ConfirmationPolicy(
     ClickableText(
         annotatedText,
         modifier.padding(horizontal = 16.dp),
-        typography
+        typography.copy(fontSize = 13.dp.toSp())
     ) {
         annotatedText.getStringAnnotations(
             "terms", it, it

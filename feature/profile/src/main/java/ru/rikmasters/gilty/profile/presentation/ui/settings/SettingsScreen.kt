@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.settings
 import android.app.NotificationManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -58,8 +59,9 @@ fun SettingsScreen(vm: SettingsViewModel) {
             openNotificationSettings(context)
             checkNotification()
         }
-
+    val back = MaterialTheme.colorScheme.background
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         checkNotification()
         vm.getUserData()
         vm.getOrientations()

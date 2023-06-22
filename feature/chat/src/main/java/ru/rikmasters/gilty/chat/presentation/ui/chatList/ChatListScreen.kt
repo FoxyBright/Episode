@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -10,6 +11,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.CONFIRM
 import ru.rikmasters.gilty.chat.presentation.ui.chatList.alert.AlertState.LIST
 import ru.rikmasters.gilty.chat.viewmodel.ChatListViewModel
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.common.extentions.animateToLastPosition
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
@@ -23,6 +25,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     
     val listState = rememberLazyListScrollState("chat_list")
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
     val context = LocalContext.current
     val nav = get<NavState>()
     
@@ -34,8 +37,8 @@ fun ChatListScreen(vm: ChatListViewModel) {
     val sortType by vm.sortType.collectAsState()
     val alertState by vm.alertState.collectAsState()
     val completed by vm.completed.collectAsState()
-    val alert by vm.alert.collectAsState()
     val chatsCount by vm.chatsCount.collectAsState()
+    val alert by vm.alert.collectAsState()
     
     val navBar = remember(
         unreadMessages, unreadNotifications
@@ -59,7 +62,9 @@ fun ChatListScreen(vm: ChatListViewModel) {
         }
     }
     
+    val back = colorScheme.primaryContainer
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         vm.getUnread()
         val pref = context
             .getSharedPreferences("sharedPref", MODE_PRIVATE)

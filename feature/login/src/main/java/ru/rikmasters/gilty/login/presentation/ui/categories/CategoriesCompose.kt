@@ -22,12 +22,29 @@ import ru.rikmasters.gilty.shared.shared.ActionBar
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
+@Composable
+@ExperimentalMaterial3Api
+@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
+private fun CategoriesPreview() {
+    GiltyTheme {
+        CategoriesContent(
+            state = CategoriesState(
+                categoryList =
+                DemoCategoryModelList,
+                selectCategories = emptyList(),
+                hasParentCategory = false,
+                sleep = true
+            )
+        )
+    }
+}
+
 data class CategoriesState(
     val categoryList: List<CategoryModel>,
     val selectCategories: List<CategoryModel>,
     val hasParentCategory: Boolean,
     val sleep: Boolean,
-    )
+)
 
 interface CategoriesCallback {
     
@@ -45,12 +62,16 @@ fun CategoriesContent(
     Column(modifier.fillMaxSize()) {
         Column(Modifier.weight(1f)) {
             ActionBar(
-                title = stringResource(R.string.interested_you),
-                details = stringResource(R.string.interested_you_details),
+                title = stringResource(
+                    R.string.interested_you
+                ),
+                details = stringResource(
+                    R.string.interested_you_details
+                ),
             ) { callback?.onBack() }
             if(LocalInspectionMode.current)
                 BubblesForPreview(state, callback)
-            else if (state.sleep) Bubbles(
+            else if(state.sleep) Bubbles(
                 data = state.categoryList,
                 elementSize = CATEGORY_ELEMENT_SIZE.dp,
                 modifier = Modifier.padding(
@@ -62,17 +83,21 @@ fun CategoriesContent(
                     name = element.name,
                     icon = element.emoji,
                     color = element.color,
-                    state = state.selectCategories.contains(element),
+                    state = state.selectCategories
+                        .contains(element),
                 ) { callback?.onCategoryClick(element) }
             }
         }
         GradientButton(
-            Modifier
+            modifier = Modifier
                 .wrapContentHeight()
                 .padding(bottom = 48.dp)
                 .padding(horizontal = 16.dp),
-            if (state.hasParentCategory) stringResource(R.string.next_button)
-            else stringResource(R.string.save_button)
+            enabled = state.hasParentCategory ||
+                    state.selectCategories.isNotEmpty(),
+            text = if(state.hasParentCategory)
+                stringResource(R.string.next_button)
+            else stringResource(R.string.meeting_filter_complete_button)
         ) { callback?.onNext() }
     }
 }
@@ -104,22 +129,5 @@ private fun BubblesForPreview(
                 }
             }
         }
-    }
-}
-
-@Composable
-@ExperimentalMaterial3Api
-@Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
-private fun CategoriesPreview() {
-    GiltyTheme {
-        CategoriesContent(
-            Modifier,
-            CategoriesState(
-                DemoCategoryModelList,
-                emptyList(),
-                false,
-                true
-            )
-        )
     }
 }

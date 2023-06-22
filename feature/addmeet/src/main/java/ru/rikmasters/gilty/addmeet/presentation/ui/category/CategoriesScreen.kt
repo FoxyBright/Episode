@@ -1,11 +1,13 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 
@@ -13,6 +15,7 @@ import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 fun CategoriesScreen(vm: CategoryViewModel) {
     
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
     val nav = get<NavState>()
     
     val categories by vm.categories.collectAsState()
@@ -20,7 +23,9 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     val online by vm.online.collectAsState()
     val alert by vm.alert.collectAsState()
     
+    val back = colorScheme.background
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         vm.init()
         vm.getCategories()
     }

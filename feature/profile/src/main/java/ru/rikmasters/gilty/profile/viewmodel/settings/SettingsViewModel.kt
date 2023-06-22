@@ -166,6 +166,6 @@ class SettingsViewModel: ViewModel() {
         profileManager.clearProfile()
         chatManager.disconnectWebSocket()
         authManager.logout()
-        makeToast("До новых Meet!")
+        makeToast("До новых Episode!")
     }
 }

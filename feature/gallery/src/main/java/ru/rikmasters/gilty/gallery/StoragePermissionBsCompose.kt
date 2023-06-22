@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -92,12 +93,13 @@ fun StoragePermissionBs(
     Column(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.55f)
-            .padding(16.dp),
+            .fillMaxHeight(0.5f)
+            .padding(16.dp)
+            .padding(top = 12.dp),
         SpaceBetween
     ) {
         Text(
-            stringResource(R.string.profile_gallery_title),
+            text = stringResource(R.string.profile_gallery_title),
             style = typography.labelLarge
         )
         Column(
@@ -105,7 +107,9 @@ fun StoragePermissionBs(
             Top, CenterHorizontally
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_image_box),
+                painter = painterResource(
+                    R.drawable.ic_image_box
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(60.dp),
                 tint = colorScheme.primary
@@ -114,15 +118,22 @@ fun StoragePermissionBs(
                 text = stringResource(
                     R.string.permissions_settings_label
                 ),
-                modifier = Modifier
-                    .padding(top = 22.dp),
-                style = typography.labelLarge,
-                textAlign = Center
+                modifier = Modifier.padding(
+                    top = 18.dp,
+                    bottom = 45.dp
+                ),
+                style = typography.labelLarge.copy(
+                    textAlign = Center,
+                    fontWeight = Bold
+                )
             )
         }
         GradientButton(
-            Modifier.padding(bottom = 40.dp),
-            stringResource(R.string.permissions_settings_button)
+            modifier = Modifier
+                .padding(bottom = 31.dp),
+            text = stringResource(
+                R.string.permissions_settings_button
+            )
         ) { onSettingsClick?.let { it() } }
     }
 }

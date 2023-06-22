@@ -2,12 +2,14 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.auth.login.LoginMethod
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.core.viewmodel.connector.openBS
@@ -20,9 +22,10 @@ import ru.rikmasters.gilty.login.viewmodel.bottoms.CountryBsViewModel
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
-    val nav = get<NavState>()
     val scope = rememberCoroutineScope()
+    val asm = get<AppStateModel>()
     val context = LocalContext.current
+    val nav = get<NavState>()
     
     val phone by vm.phone.collectAsState()
     val country by vm.country.collectAsState()
@@ -38,7 +41,9 @@ fun LoginScreen(vm: LoginViewModel) {
     }
     
     val activity = getActivity()
+    val back = colorScheme.background
     LaunchedEffect(activity.intent) {
+        asm.systemUi.setNavigationBarColor(back)
         activity.intent?.data?.let {
             val handle = vm.handle(it)
             if(handle.first)

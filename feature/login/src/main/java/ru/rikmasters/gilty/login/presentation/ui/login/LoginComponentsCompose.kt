@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ fun PhoneField(
     modifier: Modifier = Modifier,
     phone: String,
     country: Country,
-    callback: LoginCallback? = null
+    callback: LoginCallback? = null,
 ) {
     Box(
         modifier.clip(shapes.extraSmall)
@@ -38,9 +39,11 @@ fun PhoneField(
                 stringResource(R.string.select_country),
                 Modifier
                     .padding(start = 10.dp)
-                    .size(20.dp)
-                    .clickable
-                    { callback?.changeCountry() }
+                    .size(20.dp, 14.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable {
+                        callback?.changeCountry()
+                    }
             )
             PhoneTextField(
                 phone, country,
@@ -56,7 +59,7 @@ fun PhoneField(
 fun NextButton(
     modifier: Modifier = Modifier,
     isActive: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     GradientButton(
         modifier.padding(top = 20.dp),

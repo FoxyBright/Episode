@@ -9,15 +9,17 @@ import ru.rikmasters.gilty.login.viewmodel.bottoms.AgeBsViewModel
 @Composable
 fun AgeBs(vm: AgeBsViewModel) {
     
-    val asm = get<AppStateModel>()
     val scope = rememberCoroutineScope()
-    
+    val asm = get<AppStateModel>()
     val age by vm.age.collectAsState()
-    val range = 17..99
     
-    AgeBottomSheetContent(age, range, {
-        scope.launch { vm.changeAge(it) }
-    }) {
+    AgeBottomSheetContent(
+        value = age,
+        range = 17..99,
+        onValueChange = {
+            scope.launch { vm.changeAge(it) }
+        }
+    ) {
         scope.launch {
             vm.save()
             asm.bottomSheet.collapse()

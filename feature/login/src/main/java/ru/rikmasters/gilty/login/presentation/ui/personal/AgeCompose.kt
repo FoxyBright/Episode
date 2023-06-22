@@ -26,12 +26,13 @@ fun AgeBottomSheetContent(
     Box(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.55f)
+            .fillMaxHeight(0.45f)
             .background(colorScheme.background)
             .padding(16.dp)
-            .padding(top = 10.dp)
+            .padding(top = 12.dp)
     ) {
-        val noMatter = stringResource(R.string.condition_no_matter)
+        val noMatter =
+            stringResource(R.string.condition_no_matter)
         Box(
             Modifier
                 .align(TopCenter)
@@ -40,20 +41,24 @@ fun AgeBottomSheetContent(
             ListItemPicker(
                 value = value ?: range.first,
                 list = range.toList(),
-                modifier = Modifier,
-                label = { if(it == 17) noMatter else "$it" },
+                modifier = Modifier
+                    .padding(horizontal = 20.dp),
+                label = {
+                    if(it == 17) noMatter
+                    else "$it"
+                },
             ) { onValueChange(it) }
         }
         Text(
-            stringResource(R.string.personal_info_age_placeholder),
-            Modifier, colorScheme.tertiary,
-            style = typography.labelLarge,
+            text = stringResource(R.string.personal_info_age_placeholder),
+            style = typography.labelLarge
+                .copy(colorScheme.tertiary),
         )
         GradientButton(
-            Modifier
+            modifier = Modifier
                 .align(BottomCenter)
                 .padding(bottom = 32.dp),
-            stringResource(R.string.save_button),
+            text = stringResource(R.string.save_button),
         ) { onSave() }
     }
 }

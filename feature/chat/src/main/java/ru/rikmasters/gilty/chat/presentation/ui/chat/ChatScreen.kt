@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
@@ -118,7 +119,9 @@ fun ChatScreen(
             .setSoftInputMode(Nothing)
     }
     
+    val back = colorScheme.primaryContainer
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         vm.getChat(chatId)
         vm.getMeet(chat?.meetingId)
         if(unreadCount > 0) try {

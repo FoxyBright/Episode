@@ -2,6 +2,7 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -95,7 +96,9 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
         )
     }
     
+    val back = colorScheme.primaryContainer
     LaunchedEffect(Unit) {
+        asm.systemUi.setNavigationBarColor(back)
         vm.setUserDate(true)
         vm.getUnread()
         val pref = context

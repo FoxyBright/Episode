@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
@@ -81,7 +81,7 @@ fun PersonalContent(
                         colorScheme.onTertiary
                     else colorScheme.tertiary,
                     style = typography.bodyMedium,
-                    fontWeight = Bold
+                    fontWeight = SemiBold
                 )
             }
             Text(

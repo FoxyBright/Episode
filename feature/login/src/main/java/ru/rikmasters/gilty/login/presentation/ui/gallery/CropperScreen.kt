@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package ru.rikmasters.gilty.login.presentation.ui.gallery
 
 import android.graphics.Bitmap
@@ -6,11 +8,14 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.ExifInterface.TAG_ORIENTATION
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.core.viewmodel.connector.Use
 import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
@@ -18,20 +23,19 @@ import ru.rikmasters.gilty.gallery.cropper.GImageCropperCallback
 import ru.rikmasters.gilty.gallery.cropper.GImageCropperState
 import ru.rikmasters.gilty.gallery.cropper.ImageCropper
 import ru.rikmasters.gilty.login.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.shared.theme.Colors.PreDark
 import java.io.File
 
 @Composable
 fun CropperScreen(vm: GalleryViewModel, image: String) {
     
     val scope = rememberCoroutineScope()
-    
+    val asm = get<AppStateModel>()
     val nav = get<NavState>()
+    
     val file = File(image)
     var bitmap = BitmapFactory
-        .decodeFile(
-            
-            file.absolutePath
-        )
+        .decodeFile(file.absolutePath)
     val orientation = ExifInterface(file.absolutePath)
         .getAttributeInt(TAG_ORIENTATION, (1))
     
@@ -53,6 +57,11 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
         )
     } catch(e: Exception) {
         e.printStackTrace()
+    }
+    
+    LaunchedEffect(Unit) {
+        asm.systemUi.setStatusBarColor(PreDark)
+        asm.systemUi.setNavigationBarColor(Black)
     }
     
     Use<GalleryViewModel>(LoadingTrait) {
