@@ -142,6 +142,7 @@ class MeetingBsViewModel : ViewModel() {
 
     suspend fun respondForMeet(
         meetId: String,
+        onSuccess: suspend ()->Unit,
     ) = singleLoading {
         meetManager.respondOfMeet(
             meetId = meetId,
@@ -149,7 +150,9 @@ class MeetingBsViewModel : ViewModel() {
                 .ifBlank { null },
             hidden = hidden.value
         ).on(
-            success = {},
+            success = {
+                      onSuccess()
+            },
             loading = {},
             error = {
                 context.errorToast(

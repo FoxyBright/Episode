@@ -561,7 +561,7 @@ private fun LinkText(
         "emoji" to InlineTextContent(
             Placeholder(18.dp.toSp(), 18.dp.toSp(), TextCenter)
         ) {
-            organizer?.emoji?.let {
+            organizer.emoji?.let {
                 GEmojiImage(it, Modifier.size(18.dp))
             }
         }
