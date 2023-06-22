@@ -15,6 +15,6 @@
 
     <color name="normalColor">#353A3E</color>
 
-    <color name="toast_day">#33000000</color>
+    <color name="toast_day">#66000000</color>
     <color name="toast_night">#B31C1C1D</color>
 </resources>
