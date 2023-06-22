@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -81,7 +82,7 @@ data class HiddenState(
     val viewerMenuState: Boolean = false,
     val viewerType: PhotoViewType = PhotoViewType.PHOTO,
     val alert: Boolean,
-    )
+)
 
 interface HiddenCallback {
 
@@ -94,8 +95,8 @@ interface HiddenCallback {
     fun onPhotoViewChangeMenuState(state: Boolean) = Unit
     fun onPhotoViewMenuItemClick(imageId: String) = Unit
     fun onPhotoMoved(from: ItemPosition, to: ItemPosition) = Unit
-    fun onIsDraggingChange(value:Boolean) = Unit
-    fun closeAlert(delete:Boolean = false)
+    fun onIsDraggingChange(value: Boolean) = Unit
+    fun closeAlert(delete: Boolean = false)
 
 }
 
@@ -182,8 +183,8 @@ fun HiddenContent(
                                     modifier = Modifier
                                         .aspectRatio(1f)
                                         .detectReorderAfterLongPress(stateDragable)
-                                        .clip(shapes.large)
-                                        .zIndex(if(isDragging) 1f else 2f)
+                                        .clip(shapes.small)
+                                        .zIndex(if (isDragging) 1f else 2f)
                                         .shadow(elevation.value),
                                     onSelect = { callback?.onSelectImage(img) },
                                     onDelete = { callback?.onDeleteImage(img) }
@@ -213,20 +214,24 @@ fun HiddenContent(
         title = stringResource(R.string.profile_hidden_images_delete_photos_title),
         onDismissRequest = { callback?.closeAlert() },
         label = stringResource(R.string.profile_hidden_images_delete_photos_label),
-        success = Pair(stringResource(R.string.profile_hidden_images_delete_photos_success)) { callback?.closeAlert(true) },
+        success = Pair(stringResource(R.string.profile_hidden_images_delete_photos_success)) {
+            callback?.closeAlert(
+                true
+            )
+        },
         cancel = Pair(
             stringResource(R.string.cancel)
         ) { callback?.closeAlert() }
     )
-/*    Box(Modifier.fillMaxSize()) {
-        GradientButton(
-            Modifier
-                .padding(bottom = 48.dp)
-                .padding(horizontal = 16.dp)
-                .align(Alignment.BottomCenter),
-            stringResource(R.string.next_button)
-        ) { callback?.onNext() }
-    }*/
+    /*    Box(Modifier.fillMaxSize()) {
+            GradientButton(
+                Modifier
+                    .padding(bottom = 48.dp)
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.BottomCenter),
+                stringResource(R.string.next_button)
+            ) { callback?.onNext() }
+        }*/
 }
 
 
@@ -237,8 +242,8 @@ private fun GalleryButton(modifier: Modifier = Modifier, callback: HiddenCallbac
         onClick = { callback?.openGallery() },
         modifier = modifier
             .size((screenWidth.dp - 72.dp) / 3)
-            .clip(shapes.large),
-        shape = shapes.large,
+            .clip(shapes.small),
+        shape = shapes.small,
         colors = cardColors(Transparent)
     ) {
         Box(
@@ -253,10 +258,12 @@ private fun GalleryButton(modifier: Modifier = Modifier, callback: HiddenCallbac
                     .background(Colors.AlmostRed)
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_image_box),
-                    (null), Modifier
-                        .padding(6.dp)
-                        .size(32.dp), White
+                    painter = painterResource(R.drawable.ic_image_box),
+                    contentDescription = (null),
+                    modifier = Modifier
+                        .size((((screenWidth - 72) / 3f) * (2f / 5f)).toInt().dp)
+                        .padding(10.dp),
+                    tint = White
                 )
             }
         }
@@ -273,7 +280,6 @@ private fun LazyItem(
 ) {
     Box(
         modifier
-            .size(130.dp)
             .clip(shapes.small)
             .clickable { onSelect(image) },
         TopEnd
@@ -293,13 +299,17 @@ private fun LazyItem(
             colors = cardColors(Transparent)
         ) {
             Box(Modifier, Center) {
-                Image(
-                    painterResource(R.drawable.transparency_circle),
-                    (null), Modifier.fillMaxSize()
+                Box(
+                    // painterResource(R.drawable.transparency_circle),
+                    Modifier
+                        .fillMaxSize()
+                        .background(if (isSystemInDarkTheme()) Colors.Black else Colors.White)
                 )
                 Icon(
-                    Filled.Close, (null),
-                    Modifier.size(16.dp), White
+                    imageVector = Filled.Close,
+                    contentDescription = (null),
+                    modifier = Modifier.size(16.dp),
+                    tint = if (isSystemInDarkTheme()) Colors.White else Colors.Black
                 )
             }
         }

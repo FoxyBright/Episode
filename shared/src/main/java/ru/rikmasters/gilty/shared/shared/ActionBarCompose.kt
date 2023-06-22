@@ -76,7 +76,7 @@ fun ActionBar(
                     text = extra,
                     Modifier
                         .alignByBaseline()
-                        .padding(start = 4.dp),//.padding(start = 4.dp, bottom = 3.dp),
+                        .padding(start = 6.dp),//.padding(start = 4.dp, bottom = 3.dp),
                     colorScheme.onTertiary,
                     style = extraStyle
                 )
