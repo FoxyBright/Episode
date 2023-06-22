@@ -16,6 +16,7 @@ import ru.rikmasters.gilty.shared.models.Profile
 class HiddenPhotosPagingSource(
     private val webSource: ProfileWebSource,
     private val localSource: DbSource,
+    private val albumId:String? = null,
 ): PagingSource<Int, AvatarModel>() {
     
     override fun getRefreshKey(state: PagingState<Int, AvatarModel>): Int? {
@@ -33,8 +34,8 @@ class HiddenPhotosPagingSource(
             webSource.getFilesPaging(
                 page = page,
                 perPage = params.loadSize,
-                albumId = localSource.find<Profile>()
-                    ?.albumPrivate?.id ?: ""
+                albumId = albumId ?: (localSource.find<Profile>()
+                    ?.albumPrivate?.id ?: "")
             ).on(
                 success = { it },
                 loading = { emptyList<Avatar>() to 0 },

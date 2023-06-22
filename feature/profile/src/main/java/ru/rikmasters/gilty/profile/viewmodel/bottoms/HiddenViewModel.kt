@@ -30,7 +30,6 @@ class HiddenViewModel : ViewModel() {
         ) { it }.flatMapLatest {
             profileManager.getHiddenPhotos()
         }.cachedIn(coroutineScope)
-
     }
 
     private val _photosAmount = MutableStateFlow(0)

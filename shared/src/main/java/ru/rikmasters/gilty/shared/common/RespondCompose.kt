@@ -110,9 +110,9 @@ fun LazyListScope.sentRespond(
                                     items(it) { photo ->
                                         photo?.let {
                                             HiddenImage(
-                                                photo,
-                                                Modifier.padding(6.dp),
-                                                !photo.hasAccess
+                                                image = photo,
+                                                modifier = Modifier.padding(6.dp),
+                                                hidden = !photo.hasAccess
                                             ) {
                                                 if (!photo.hasAccess) {
                                                     callback?.onImageClick(

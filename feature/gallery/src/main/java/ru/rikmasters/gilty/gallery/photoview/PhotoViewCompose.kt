@@ -93,7 +93,7 @@ fun PhotoView(
     menuState: Boolean,
     type: PhotoViewType,
     modifier: Modifier = Modifier,
-    loadSeconds: Int = 6000,
+    loadSeconds: Int = 7000,
     onMenuClick: ((Boolean) -> Unit)? = null,
     onMenuItemClick: ((String) -> Unit)? = null,
     onBack: (() -> Unit)? = null,
