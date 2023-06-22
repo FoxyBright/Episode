@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.profile
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
 import ru.rikmasters.gilty.bottomsheet.viewmodel.ObserverBsViewModel
@@ -125,7 +126,8 @@ object Profile: FeatureDefinition() {
         singleOf(::GenderBsViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
-        singleOf(::HiddenViewModel)
+        //singleOf(::HiddenViewModel)
+        factoryOf(::HiddenViewModel)
         singleOf(::AgeBsViewModel)
     }
     

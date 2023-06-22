@@ -3,6 +3,7 @@ package ru.rikmasters.gilty.login
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.singleOf
 import ru.rikmasters.gilty.auth.Auth
@@ -107,7 +108,7 @@ object Login: FeatureDefinition() {
         }
         
         scope<HiddenViewModel> {
-            scopedOf(::HiddenViewModel)
+            factoryOf(::HiddenViewModel)
         }
         
         scope<CodeViewModel> {
