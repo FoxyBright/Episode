@@ -44,21 +44,21 @@ fun BottomSheet(
     fullResponds: Boolean = false,
     user: UserModel? = UserModel(),
 ) {
-    
+
     val coroutineScope = rememberCoroutineScope()
     val nav = rememberNavController()
     val asm = get<AppStateModel>()
-    
+
     BackHandler {
-        if(asm.bottomSheet.current.value != COLLAPSED)
+        if (asm.bottomSheet.current.value != COLLAPSED)
             coroutineScope.launch {
                 asm.bottomSheet.collapse()
             }
         else nav.popBackStack()
     }
-    
+
     NavHost(
-        nav, when(type) {
+        nav, when (type) {
             MEET, SHORT_MEET -> "MEET?meet={meet}&detailed={detailed}"
             OBSERVERS -> "OBSERVERS?username={username}&emoji={emoji}"
             MAP -> "MAP?location={location}&category={category}"
@@ -69,7 +69,7 @@ fun BottomSheet(
             LOCATION -> "LOCATION"
         }
     ) {
-        
+
         composable(
             route = "OBSERVERS?username={username}&emoji={emoji}",
             arguments = listOf(
@@ -96,7 +96,7 @@ fun BottomSheet(
                 }
             }
         }
-        
+
         composable(
             route = "RESPONDS?meet={meet}&full={full}",
             arguments = listOf(
@@ -108,14 +108,17 @@ fun BottomSheet(
                 stack.GetBooleanArg("full") { full ->
                     Connector<RespondsBsViewModel>(scope) {
                         RespondsBs(
-                            full, if(meet != "null")
-                                meet else null, it, nav
+                            full = full,
+                            meetId = if (meet != "null")
+                                meet else null,
+                            vm = it,
+                            nav = nav
                         )
                     }
                 }
             }
         }
-        
+
         composable(
             route = "MAP?location={location}&category={category}",
             arguments = listOf(
@@ -123,28 +126,33 @@ fun BottomSheet(
                 setStringArg("category", ""),
             )
         ) { stack ->
-            
+
             LaunchedEffect(Unit) {
                 asm.bottomSheet.swipeableState
                     .currentScreenName.value = "Map"
             }
-            
+
             DisposableEffect(Unit) {
                 onDispose {
                     asm.bottomSheet.swipeableState
                         .currentScreenName.value = ""
                 }
             }
-            
+
             stack.GetStringArg("location") { location ->
                 stack.GetStringArg("category") { category ->
                     Connector<YandexMapViewModel>(scope) {
-                        YandexMapScreen(it, location, category, nav)
+                        YandexMapScreen(
+                            vm = it,
+                            location = location,
+                            categoryName = category,
+                            nav = nav
+                        )
                     }
                 }
             }
         }
-        
+
         composable(
             route = "MEET?meet={meet}&detailed={detailed}",
             arguments = listOf(
@@ -155,12 +163,12 @@ fun BottomSheet(
             stack.GetStringArg("meet") { meet ->
                 stack.GetBooleanArg("detailed") { detailed ->
                     Connector<MeetingBsViewModel>(scope) {
-                        MeetingBs(it, meet, detailed, nav)
+                        MeetingBs(vm = it, meetId = meet, detailed = detailed, nav = nav)
                     }
                 }
             }
         }
-        
+
         composable(
             route = "USER?user={user}&meet={meet}",
             arguments = listOf(
@@ -176,7 +184,7 @@ fun BottomSheet(
                 }
             }
         }
-        
+
         composable(
             route = "PARTICIPANTS?meet={meet}",
             arguments = listOf(
@@ -189,7 +197,7 @@ fun BottomSheet(
                 }
             }
         }
-        
+
         composable(
             route = "REPORTS?id={id}&type={type}",
             arguments = listOf(
@@ -210,7 +218,7 @@ fun BottomSheet(
                 }
             }
         }
-        
+
         composable("LOCATION") {
             category?.name?.let { name ->
                 Connector<MapBsViewModel>(scope) {

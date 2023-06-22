@@ -1,8 +1,10 @@
 package ru.rikmasters.gilty.addmeet.viewmodel
 
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
@@ -27,9 +29,12 @@ var Requirements = arrayListOf(
 var RequirementsType = 0
 
 class RequirementsViewModel: ViewModel() {
-    
-    private val manager by inject<MeetingManager>()
-    private val addMeet by lazy { manager.addMeetFlow }
+
+    @Suppress("unused")
+    private val context = getKoin().get<Context>()
+
+    private val meetManager by inject<MeetingManager>()
+    val addMeet by lazy { meetManager.addMeetFlow }
     
     val date = MutableStateFlow<String?>(null)
     
@@ -72,7 +77,9 @@ class RequirementsViewModel: ViewModel() {
     
     private val _meetType = MutableStateFlow(GROUP)
     val meetType = _meetType.asStateFlow()
-    
+
+
+
     init {
         coroutineScope.launch {
             addMeet.collectLatest { add ->
@@ -138,7 +145,7 @@ class RequirementsViewModel: ViewModel() {
     
     suspend fun limitMembers() {
         _limited.emit(!limited.value)
-        manager.update(memberLimited = limited.value)
+        meetManager.update(memberLimited = limited.value)
     }
     
     suspend fun changeTab(tab: Int) {
@@ -155,7 +162,7 @@ class RequirementsViewModel: ViewModel() {
     
     suspend fun withoutRespondChange() {
         _withoutRespond.emit(!withoutRespond.value)
-        manager.update(withoutResponds = withoutRespond.value)
+        meetManager.update(withoutResponds = withoutRespond.value)
     }
     
     suspend fun selectGender(gender: Int) {
@@ -211,7 +218,7 @@ class RequirementsViewModel: ViewModel() {
     
     suspend fun changePrivate() {
         _private.emit(!private.value)
-        manager.update(isPrivate = private.value)
+        meetManager.update(isPrivate = private.value)
     }
     
     suspend fun changeMemberCount(text: String) {
@@ -220,7 +227,7 @@ class RequirementsViewModel: ViewModel() {
         ) return
         
         _memberCount.emit(text)
-        manager.update(memberCount = text)
+        meetManager.update(memberCount = text)
         
         if(text.isBlank() || text.toInt() < 2) {
             _selectedTab.emit(0)
@@ -256,7 +263,7 @@ class RequirementsViewModel: ViewModel() {
     }
     
     suspend fun setRequirements() {
-        manager.update(
+        meetManager.update(
             requirementsType = if(RequirementsType == 0)
                 "ALL" else "EACH",
             requirements = Requirements,
@@ -264,12 +271,16 @@ class RequirementsViewModel: ViewModel() {
     }
     
     suspend fun clearAddMeet() {
-        manager.clearAddMeet()
+        meetManager.clearAddMeet()
     }
     
     suspend fun clearCount() {
         _memberCount.emit("")
-        manager.update(memberCount = "")
+        meetManager.update(memberCount = "")
         changeTab(0)
+    }
+
+    suspend fun addMeet() = singleLoading {
+        addMeet.first()?.let { meetManager.addMeet(it) }
     }
 }

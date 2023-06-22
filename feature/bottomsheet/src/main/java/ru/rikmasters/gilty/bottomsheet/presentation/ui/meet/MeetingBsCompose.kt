@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.MeetReaction
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components.*
 import ru.rikmasters.gilty.shared.R
+import ru.rikmasters.gilty.shared.common.marquee
 import ru.rikmasters.gilty.shared.common.pagingPreview
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
@@ -165,7 +166,7 @@ data class MeetingBsState(
 )
 
 interface MeetingBsCallback {
-    
+
     fun onKebabClick(state: Boolean)
     fun onMenuItemClick(index: Int, meetId: String)
     fun onMeetPlaceClick(location: LocationModel?)
@@ -185,6 +186,7 @@ interface MeetingBsCallback {
 @Composable
 fun MeetingBsContent(
     state: MeetingBsState,
+    @Suppress("unused")
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback? = null,
     bsState: BottomSheetScaffoldState =
@@ -230,7 +232,7 @@ private fun ContentContainer(
             modifier = modifier
                 .align(Center)
                 .padding(
-                    bottom = if(
+                    bottom = if (
                         ms != IS_MEMBER
                         && ms != IS_ORGANIZER
                     ) 42.dp else 0.dp
@@ -246,7 +248,7 @@ private fun ContentContainer(
                 .padding(horizontal = 16.dp)
                 .align(BottomCenter)
         ) {
-            if(state.detailed)
+            if (state.detailed)
                 callback?.onRespond(state.meet.id)
             else scope.launch {
                 bsState.bottomSheetState.expand()
@@ -262,13 +264,13 @@ private fun Button(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    when(memberState) {
+    when (memberState) {
         IS_MEMBER, IS_ORGANIZER -> Unit
         RESPOND_SENT -> TextButton(
             modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(R.string.respond_to_meet)
         )
-        
+
         else -> GradientButton(
             modifier = modifier.padding(bottom = 40.dp),
             text = stringResource(
@@ -307,24 +309,34 @@ private fun Additional(
                 )
         )
         Spacer(Modifier.height(16.dp))
+
         Text(
-            text = stringResource(
+            text = if(state.meet.withoutResponds) stringResource(
+                R.string.meeting_question_comment_or_assess_without_respond
+            ) else stringResource(
                 R.string.meeting_question_comment_or_assess
             ),
             modifier = Modifier.fillMaxWidth(),
             style = typography.labelLarge,
             color = colorScheme.tertiary
         )
-        MeetingBsComment(
-            comment, state.meet.isOnline,
-            { comment = it },
-            Modifier.padding(top = 22.dp)
-        ) { comment = "" }
+
+        if (!state.meet.withoutResponds)
+            MeetingBsComment(
+                text = comment,
+                online = state.meet.isOnline,
+                onTextChange = { comment = it },
+                modifier = Modifier.padding(top = 22.dp)
+            ) { comment = "" }
+
         MeetingBsHidden(
-            Modifier.padding(top = 8.dp),
-            hidden, state.meet.isOnline
+            modifier = Modifier.padding(top = if(state.meet.withoutResponds) 22.dp else 8.dp),
+            state = hidden,
+            online = state.meet.isOnline
         ) { hidden = it }
+
         Spacer(Modifier.height(28.dp))
+
         Button(
             state.meet.memberState,
             state.meet.isOnline,
@@ -365,15 +377,17 @@ private fun MeetContent(
                 state = MeetingBsTopBarState(
                     meet = state.meet,
                     lastRespond = state.lastRespond,
-                    description = state.detailed,
+                    detailed = state.detailed,
                     backButton = state.backButton
                 ),
                 callback = callback
             )
-            if(state.detailed)
-                Detailed(state, callback)
+
+            if (state.detailed)
+                Detailed(state = state, callback = callback)
             else
-                Content(state, callback)
+                Content(state = state, callback = callback)
+
             Spacer(Modifier.height(80.dp))
         }
     }
@@ -384,23 +398,28 @@ private fun Detailed(
     state: MeetingBsState,
     callback: MeetingBsCallback?,
 ) {
+
     Text(
-        text = stringResource(
-            R.string.meeting_question_comment_or_assess
-        ),
+        text = if (state.meet.withoutResponds)
+            stringResource(R.string.meeting_question_comment_or_assess_without_respond)
+        else
+            stringResource(R.string.meeting_question_comment_or_assess),
         modifier = Modifier.padding(top = 4.dp),
-        style = typography.labelLarge
+        style = typography.labelLarge,
     )
-    MeetingBsComment(
-        text = state.comment ?: "",
-        online = state.meet.isOnline,
-        onTextChange = { callback?.onCommentChange(it) },
-        modifier = Modifier.padding(top = 22.dp)
-    ) { callback?.onCommentTextClear() }
+
+    if (!state.meet.withoutResponds)
+        MeetingBsComment(
+            text = state.comment ?: "",
+            online = state.meet.isOnline,
+            onTextChange = { callback?.onCommentChange(it) },
+            modifier = Modifier.padding(top = 22.dp),
+        ) { callback?.onCommentTextClear() }
+
     MeetingBsHidden(
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = Modifier.padding(top = if (state.meet.withoutResponds) 22.dp else 8.dp),
         state = state.hidden ?: false,
-        online = state.meet.isOnline
+        online = state.meet.isOnline,
     ) { callback?.onHiddenPhotoActive(it) }
 }
 
@@ -412,10 +431,10 @@ private fun Content(
     MeetingBsConditions(
         meet = state.meet.map(),
         modifier = Modifier.padding(
-            top = if(state.meet.description.isNotBlank())
-                32.dp else 0.dp
+            top = if (state.meet.description.isNotBlank()) 32.dp else 0.dp
         )
     )
+
     state.membersList?.let {
         MeetingBsParticipants(
             meet = state.meet,
@@ -431,7 +450,8 @@ private fun Content(
             }
         )
     }
-    if(state.meetDistance != null
+
+    if (state.meetDistance != null
         && !state.meet.isOnline
     ) MeetingBsMap(
         meet = state.meet,
@@ -484,7 +504,7 @@ private fun FullMeetingModel.TopBarTitle() {
         { it.title },
         modifier = Modifier
             .padding(end = 9.dp)
-            .basicMarquee(),
+            .marquee(),
         color = colorScheme.tertiary,
         style = typography.labelLarge,
         overflow = Ellipsis,
@@ -492,11 +512,13 @@ private fun FullMeetingModel.TopBarTitle() {
     )
     Text(
         text = stringResource(
-            when(status) {
+            when (status) {
                 CANCELED ->
                     R.string.meetings_canceled
+
                 COMPLETED ->
                     R.string.meetings_finished
+
                 else -> R.string.empty_String
             }
         ),
@@ -511,7 +533,7 @@ private fun TopBarBackButton(
     backButton: Boolean,
     onBack: () -> Unit,
 ) {
-    if(backButton) IconButton(
+    if (backButton) IconButton(
         onClick = { onBack() },
         modifier = Modifier.padding(end = 16.dp)
     ) {
@@ -537,21 +559,21 @@ private fun Menu(
 ) {
     val menuItems =
         arrayListOf<Pair<String, () -> Unit>>()
-    if(ms == IS_MEMBER || ms == IS_ORGANIZER)
+    if (ms == IS_MEMBER || ms == IS_ORGANIZER)
         menuItems.add(
             stringResource(R.string.meeting_shared_button) to
                     { onItemSelect(0) })
-    if(ms == IS_MEMBER)
+    if (ms == IS_MEMBER)
         menuItems.add(
             stringResource(R.string.exit_from_meet) to
                     { onItemSelect(1) })
     menuItems.add(
-        if(ms == IS_ORGANIZER)
+        if (ms == IS_ORGANIZER)
             stringResource(R.string.meeting_canceled) to
                     { onItemSelect(2) }
         else stringResource(R.string.meeting_complain) to
                 { onItemSelect(3) })
-    if(menuState && menuItems.size == 1) {
+    if (menuState && menuItems.size == 1) {
         onDismiss(false)
         menuItems.first().second()
     }

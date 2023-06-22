@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.time
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
@@ -17,7 +18,13 @@ fun TimeBs(vm: TimeBsViewModel) {
     val minute by vm.minute.collectAsState()
     val hour by vm.hour.collectAsState()
     val date by vm.date.collectAsState()
-    
+
+    BackHandler {
+        scope.launch {
+            asm.bottomSheet.collapse()
+        }
+    }
+
     DateTimeBS(
         DateTimeBSState(
             date, hour, minute, online, vm.isActive()

@@ -35,35 +35,44 @@ fun CodeScreen(vm: CodeViewModel) {
 
     Use<CodeViewModel>(LoadingTrait) {
         CodeContent(
-            CodeState(code, focuses, timer, blur),
-            Modifier, object : CodeCallback {
+            state = CodeState(
+                code = code,
+                focuses = focuses,
+                sec = timer,
+                blurErrorMessage = blur),
+            modifier = Modifier, callback = object : CodeCallback {
 
                 override fun onCodeChange(index: Int, text: String) {
-                    if(blur || vm.loading.value) return
+                    if(blur != null || vm.loading.value) return
                     scope.launch {
                         vm.onCodeChange(index, text)
-
+                        /*badCode("Erororo")
+                        delay(2000L)*/
                         if (vm.code.value.length == vm.codeLength.value) try {
-                            if (vm.onOtpAuthentication(vm.code.value)) {
-
-                                vm.linkExternalToken()
+                            val errorMessageOnAuth = vm.onOtpAuthentication(vm.code.value)
+                            if (errorMessageOnAuth == null) {
+                                val linkExternalTokenError = vm.linkExternalToken()
+                                if(linkExternalTokenError != null) {
+                                    badCode(linkExternalTokenError)
+                                    return@launch
+                                }
 
                                 if (vm.profileCompleted())
                                     nav.clearStackNavigationAbsolute("main/meetings")
                                 else
                                     nav.navigate("profile")
-                            } else badCode()
+                            } else badCode(errorMessageOnAuth)
                         } catch (e: Exception) {
                             e.stackTraceToString()
-                            badCode()
+                            badCode(e.message.toString())
                         }
                     }
                 }
 
-                private suspend fun badCode() {
+                private suspend fun badCode(error:String) {
                     scope.launch {
                         asm.keyboard.hide()
-                        vm.onBlur(true)
+                        vm.onBlur(error)
                         vm.onCodeClear()
                     }
                 }
@@ -71,7 +80,7 @@ fun CodeScreen(vm: CodeViewModel) {
                 override fun onBlur() {
                     scope.launch {
                         vm.onCodeClear()
-                        vm.onBlur(false)
+                        vm.onBlur(null)
                     }
                 }
 

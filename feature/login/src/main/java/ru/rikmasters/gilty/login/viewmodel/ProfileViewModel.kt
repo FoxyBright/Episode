@@ -23,28 +23,29 @@ class ProfileViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow("")
     val errorMessage = _errorMessage.asStateFlow()
 
-
-
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val usernameDebounced = username
         .debounce(250)
         .onEach { name ->
-            val occupied =
+            if(_profile.value != null)
+                onUsernameSave()
+        /*    val occupied =
                 if (name == profile.value?.username) false
-                else if(name.isNotEmpty())regManager.isNameOccupied(name).on(
-                    success = { it },
-                    loading = { false },
-                    error = {
-                        if(it.serverMessage == "errors.user.username.exists") false
-                        else {
-                            _errorMessage.emit(it.serverMessage?:"")
-                            false
+                else if (name.isNotEmpty())
+                    regManager.isNameOccupied(name).on(
+                        success = { it },
+                        loading = { false },
+                        error = {
+                            if (it.serverMessage == "errors.user.username.exists") false
+                            else {
+                                _errorMessage.emit(it.serverMessage ?: "")
+                                false
+                            }
                         }
-                    }
-                )
+                    )
                 else false
-            _occupied.emit(occupied)
+            _occupied.emit(occupied)*/
         }
         .state(_username.value, Eagerly)
 
@@ -61,9 +62,9 @@ class ProfileViewModel : ViewModel() {
 
         val profile = regManager.getProfile(_profile.value != null)
         _profile.emit(profile)
-        if(username.value.isEmpty())
+        if (username.value.isEmpty())
             _username.emit(profile.username ?: "")
-        if(description.value.isEmpty())
+        if (description.value.isEmpty())
             _description.emit(profile.aboutMe ?: "")
     }
 
@@ -82,12 +83,12 @@ class ProfileViewModel : ViewModel() {
             _description.emit(text)
     }
 
-    private suspend fun onUsernameSave(onSuccess:()->Unit) {
+    private suspend fun onUsernameSave() {
         regManager.userUpdateData(
             username = username.value,
             aboutMe = description.value
         ).on(
-            success = {onSuccess()},
+            success = {},
             loading = {},
             error = {
                 _errorMessage.emit(it.serverMessage.toString())
@@ -95,12 +96,12 @@ class ProfileViewModel : ViewModel() {
         )
     }
 
-    suspend fun checkOnNext(onSuccess:()->Unit) = singleLoading {
+    suspend fun checkOnNext() = singleLoading {
         regManager
             .getProfile(true)
             .let {
                 if (it.username.isNullOrBlank())
-                    onUsernameSave(onSuccess = { onSuccess() })
+                    onUsernameSave()
             }
     }
 }

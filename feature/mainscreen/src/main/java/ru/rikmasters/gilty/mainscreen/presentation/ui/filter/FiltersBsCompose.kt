@@ -121,13 +121,13 @@ private fun TopBar(
     callback: MeetingFilterBottomCallback?,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    LazyRow(
         modifier
             .fillMaxWidth()
             .padding(top = 14.dp, bottom = 8.dp)
     ) {
-        Spacer(Modifier.width(16.dp))
-        state.interest.reversed().forEach {
+        item { Spacer(Modifier.width(16.dp)) }
+        items(state.interest.reversed()) {
             GChip(
                 modifier = Modifier
                     .padding(end = 8.dp),
@@ -136,7 +136,7 @@ private fun TopBar(
                     .contains(it)
             ) { callback?.onSubClick(it) }
         }
-        Spacer(Modifier.width(8.dp))
+        item { Spacer(Modifier.width(8.dp)) }
     }
 }
 

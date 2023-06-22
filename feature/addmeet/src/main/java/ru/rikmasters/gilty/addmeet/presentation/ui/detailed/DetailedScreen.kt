@@ -44,15 +44,22 @@ fun DetailedScreen(vm: DetailedViewModel) {
     
     DetailedContent(
         DetailedState(
-            duration, date.let {
+            time = duration,
+            date = date.let {
                 it.ifEmpty { return@let "" }
                 LocalDateTime.ofZ(it)
                     .minusMinute(offset / 6000)
                     .plusDay(1)
                     .format("d MMMM, HH:mm")
-            }, description, tags, place,
-            hide, alert, online, isActive
-        ), Modifier, object: DetailedCallback {
+            },
+            description = description,
+            tagList = tags,
+            meetPlace = place,
+            hideMeetPlace = hide,
+            alert = alert,
+            online = online,
+            isActive = isActive
+        ), modifier = Modifier,callback = object: DetailedCallback {
             
             override fun onDateClick() {
                 vm.scope.openBS<TimeBsViewModel>(scope) {

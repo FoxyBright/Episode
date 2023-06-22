@@ -48,7 +48,7 @@ private fun CodePreview() {
         CodeContent(
             CodeState(
                 ("736"), focuses,
-                (37), (false)
+                (37), (null)
             )
         )
     }
@@ -58,7 +58,7 @@ data class CodeState(
     val code: String,
     val focuses: List<FocusRequester>,
     val sec: Int,
-    val blur: Boolean,
+    val blurErrorMessage: String?,
 )
 
 interface CodeCallback {
@@ -112,17 +112,20 @@ fun CodeContent(
         }
     }
     
-    if(state.blur) {
+    if(state.blurErrorMessage != null) {
         LaunchedEffect(Unit) {
             delay(2000)
             callback?.onBlur()
         }
-        BadCode { callback?.onBlur() }
+        BadCode(state.blurErrorMessage) {
+            callback?.onBlur()
+        }
     }
 }
 
 @Composable
 private fun BadCode(
+    errorText: String = "",
     onClick: () -> Unit,
 ) {
     BackBlur(
@@ -142,9 +145,9 @@ private fun BadCode(
                 Modifier.size(40.dp)
             )
             Text(
-                stringResource(R.string.code_is_bad_code_notification),
-                Modifier.padding(top = 16.dp),
-                colorScheme.tertiary,
+                text = errorText, //stringResource(R.string.code_is_bad_code_notification),
+                modifier = Modifier.padding(top = 16.dp),
+                color = colorScheme.tertiary,
                 style = typography.bodyMedium,
                 fontWeight = SemiBold
             )

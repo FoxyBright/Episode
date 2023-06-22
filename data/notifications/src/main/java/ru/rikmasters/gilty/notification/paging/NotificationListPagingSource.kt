@@ -25,7 +25,7 @@ class NotificationListPagingSource(
         return try {
             webSource.getNotifications(
                 page = page,
-                perPage = params.loadSize
+                perPage = 15 //params.loadSize
             ).on(
                 success = { it },
                 loading = { emptyList() },
@@ -35,7 +35,7 @@ class NotificationListPagingSource(
                     data = list.map { it.map() },
                     prevKey = if(page == 1)
                         null else page - 1,
-                    nextKey = if(list.size < params.loadSize)
+                    nextKey = if(list.size < 15) // params.loadSize
                         null else page + 1
                 )
             }

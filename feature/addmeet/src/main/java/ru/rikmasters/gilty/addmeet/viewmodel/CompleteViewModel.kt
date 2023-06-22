@@ -9,7 +9,6 @@ import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.profile.ProfileManager
-import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.AddMeetModel
 import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.RequirementModel
@@ -37,7 +36,6 @@ class CompleteViewModel: ViewModel() {
             }
         }
     }
-    
     suspend fun updateUserData() {
         val meet = meet.value?.copy(
             organizer = getProfile(true)
@@ -45,21 +43,8 @@ class CompleteViewModel: ViewModel() {
         _meet.emit(meet)
     }
     
-    suspend fun addMeet(addMeet: AddMeetModel): Boolean {
-        meetManager.addMeet(addMeet).on(
-            success = {
-                _meet.emit(meet.value?.copy(it))
-                return true
-            },
-            loading = {},
-            error = {
-                context.errorToast(
-                    it.serverMessage
-                )
-                return false
-            }
-        )
-        return false
+    suspend fun addMeet(addMeet: AddMeetModel) = singleLoading {
+        meetManager.addMeet(addMeet)
     }
     
     suspend fun clearAddMeet() {

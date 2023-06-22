@@ -112,8 +112,8 @@ fun MapContent(
                 context.requestGeoPermissions()
                 
                 state.mapKit.userLocation(
-                    properties.map,
-                    state.userVisible
+                    map = properties.map,
+                    state = state.userVisible
                 )
                 
                 state.mapKit.onStart()

@@ -42,9 +42,11 @@ import ru.rikmasters.gilty.shared.shared.*
 private fun ObserveNotificationPreview() {
     ObserveNotification(
         ObserveNotificationState(
-            DemoNotificationMeetingOverModel,
-            pagingPreview(DemoUserModelList),
-            listOf(0), EmojiModel.list, EmojiModel.list,
+            notification = DemoNotificationMeetingOverModel,
+            participants = pagingPreview(DemoUserModelList),
+            participantsStates = listOf(0),
+            notificationEmojiList = EmojiModel.list,
+            emojiList = EmojiModel.list,
         )
     )
 }
@@ -64,8 +66,14 @@ fun ObserveNotification(
     callback: NotificationsCallback? = null,
 ) {
     Column(modifier) {
-        MyNotification(state, callback)
-        PagingParticipantsList(state, callback)
+        MyNotification(
+            state = state,
+            callback = callback
+        )
+        PagingParticipantsList(
+            state = state,
+            callback = callback
+        )
     }
 }
 
@@ -95,7 +103,7 @@ private fun PagingParticipantsList(
                     notification = state.notification,
                     callback = callback
                 )
-                if(load.append is Loading) loader(load)
+                if (load.append is Loading) loader(load)
                 takeEmotionLabel(itemCount)
                 itemSpacer(20.dp)
             }
@@ -138,7 +146,7 @@ private fun LazyListScope.takeEmotionLabel(
     count: Int,
 ) {
     item {
-        if(count != 0) Text(
+        if (count != 0) Text(
             text = stringResource(
                 R.string.notification_send_emotion
             ),
@@ -157,7 +165,7 @@ private fun MyNotification(
     callback: NotificationsCallback?,
     modifier: Modifier = Modifier,
 ) {
-    if(state.notification.parent.meeting?.memberState
+    if (state.notification.parent.meeting?.memberState
         != IS_ORGANIZER
     ) {
         NotificationItem(
@@ -214,7 +222,7 @@ private fun Participant(
 
 @Composable
 private fun Divide(index: Int, size: Int) {
-    if(index < size - 1) Row {
+    if (index < size - 1) Row {
         GDivider(
             modifier = Modifier.width(60.dp),
             color = colorScheme.primaryContainer
@@ -242,7 +250,7 @@ private fun Content(
         ) {
             BrieflyRow(
                 text = "${member.username}${
-                    if(member.age in 18..99) {
+                    if (member.age in 18..99) {
                         ", ${member.age}"
                     } else ""
                 }",
@@ -259,7 +267,7 @@ private fun Content(
                 )
             } ?: run {
                 Icon(
-                    imageVector = if(unwrap)
+                    imageVector = if (unwrap)
                         Filled.KeyboardArrowDown
                     else Filled.KeyboardArrowRight,
                     contentDescription = (null),
@@ -268,7 +276,7 @@ private fun Content(
                 )
             }
         }
-        if(unwrap && memberEmoji == null)
+        if (unwrap && memberEmoji == null)
             EmojiRow(
                 emojiList = emojiList,
                 modifier = Modifier.padding(

@@ -69,7 +69,6 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     
     LaunchedEffect(notifications.itemSnapshotList.items) {
         scope.launch {
-            
             vm.splitByMonthSM(
                 notifications.itemSnapshotList.items
             )
