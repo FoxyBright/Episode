@@ -128,10 +128,6 @@ class CodeViewModel(
             },
             error = {
                 logD("code_.  ERROR")
-                /*context.errorToast(
-                    context toMessError
-                            (it.serverMessage?:"")
-                )*/
                 it.serverMessage ?: ""
             }
         )

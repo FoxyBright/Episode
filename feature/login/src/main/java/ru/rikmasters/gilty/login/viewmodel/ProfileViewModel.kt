@@ -28,24 +28,9 @@ class ProfileViewModel : ViewModel() {
     val usernameDebounced = username
         .debounce(250)
         .onEach { name ->
-            if(_profile.value != null)
+            if(_profile.value != null && username.value.isNotEmpty()) {
                 onUsernameSave()
-        /*    val occupied =
-                if (name == profile.value?.username) false
-                else if (name.isNotEmpty())
-                    regManager.isNameOccupied(name).on(
-                        success = { it },
-                        loading = { false },
-                        error = {
-                            if (it.serverMessage == "errors.user.username.exists") false
-                            else {
-                                _errorMessage.emit(it.serverMessage ?: "")
-                                false
-                            }
-                        }
-                    )
-                else false
-            _occupied.emit(occupied)*/
+            }
         }
         .state(_username.value, Eagerly)
 

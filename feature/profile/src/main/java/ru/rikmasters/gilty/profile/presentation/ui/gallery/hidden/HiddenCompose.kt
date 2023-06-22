@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -153,8 +154,8 @@ fun HiddenBsContent(
                                     modifier = Modifier
                                         .aspectRatio(1f)
                                         .detectReorderAfterLongPress(stateDragable)
-                                        .clip(shapes.large)
-                                        .zIndex(if(isDragging) 1f else 2f)
+                                        .clip(shapes.small)
+                                        .zIndex(if (isDragging) 1f else 2f)
                                         .shadow(elevation.value),
                                     onSelect = { callback?.onSelectImage(img) },
                                     onDelete = { callback?.onDeleteImage(img) }
@@ -201,8 +202,8 @@ private fun GalleryButton(
         onClick = { callback?.openGallery() },
         modifier = modifier
             .size((screenWidth.dp - 72.dp) / 3)
-            .clip(shapes.large),
-        shape = shapes.large,
+            .clip(shapes.small),
+        shape = shapes.small,
         colors = cardColors(Transparent)
     ) {
         Box(
@@ -217,12 +218,12 @@ private fun GalleryButton(
                     .background(Colors.AlmostRed)
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_image_box),
-                    (null),
-                    Modifier
-                        .padding(8.dp)
-                        .size(32.dp),
-                    White
+                    painter = painterResource(R.drawable.ic_image_box),
+                    contentDescription = (null),
+                    modifier = Modifier
+                        .size((((screenWidth - 72) / 3f) * (2f/5f)).toInt().dp)
+                        .padding(10.dp),
+                    tint = White
                 )
             }
         }
@@ -240,7 +241,6 @@ private fun LazyItem(
     Box(
         modifier
             // .fillMaxSize()
-            .clip(shapes.large)
             .clickable { onSelect(image) },
         TopEnd
     ) {
@@ -259,16 +259,14 @@ private fun LazyItem(
             colors = cardColors(Transparent)
         ) {
             Box(Modifier, Center) {
-                Image(
-                    painterResource(R.drawable.transparency_circle),
-                    (null),
-                    Modifier.fillMaxSize()
+                Box(
+                   modifier = Modifier.fillMaxSize().background(if(isSystemInDarkTheme()) Colors.Black else Colors.White)
                 )
                 Icon(
-                    Icons.Filled.Close,
-                    (null),
-                    Modifier.size(16.dp),
-                    White
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = (null),
+                    modifier = Modifier.size(16.dp),
+                    tint = if(isSystemInDarkTheme()) Colors.White else Colors.Black
                 )
             }
         }
