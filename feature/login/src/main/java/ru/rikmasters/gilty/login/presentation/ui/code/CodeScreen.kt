@@ -46,8 +46,6 @@ fun CodeScreen(vm: CodeViewModel) {
                     if(blur != null || vm.loading.value) return
                     scope.launch {
                         vm.onCodeChange(index, text)
-                        /*badCode("Erororo")
-                        delay(2000L)*/
                         if (vm.code.value.length == vm.codeLength.value) try {
                             val errorMessageOnAuth = vm.onOtpAuthentication(vm.code.value)
                             if (errorMessageOnAuth == null) {
