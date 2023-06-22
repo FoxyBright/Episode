@@ -54,7 +54,7 @@ private fun MeetingBsDetailed() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = LastRespond.DemoLastRespond,
+                    lastRespond = LastRespond(),
                     detailed = true,
                     comment = "",
                     hidden = true,
@@ -80,7 +80,7 @@ private fun MeetingBsObserve() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = LastRespond.DemoLastRespond,
+                    lastRespond = LastRespond(),
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),
@@ -107,7 +107,7 @@ private fun MeetingBsShared() {
                 state = MeetingBsState(
                     menuState = false,
                     meet = DemoFullMeetingModel,
-                    lastRespond = LastRespond.DemoLastRespond,
+                    lastRespond = LastRespond(),
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),
@@ -138,7 +138,7 @@ private fun MeetingBsWhenUser() {
                         isPrivate = true,
                         isOnline = true
                     ),
-                    lastRespond = LastRespond.DemoLastRespond,
+                    lastRespond = LastRespond(),
                     membersList = pagingPreview(
                         DemoUserModelList
                     ),

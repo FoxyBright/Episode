@@ -29,13 +29,13 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview
 @Composable
 private fun RespondCardPreview() {
-    GiltyTheme { Responds(LastRespond.DemoLastRespond) }
+    GiltyTheme { Responds(LastRespond()) }
 }
 
 @Preview
 @Composable
 private fun RespondCardEmptyPreview() {
-    GiltyTheme { Responds(LastRespond.DemoLastRespond) }
+    GiltyTheme { Responds(LastRespond()) }
 }
 
 @Composable

@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
@@ -76,13 +75,13 @@ private fun ChatRowLastPreview() {
 private fun ChatRowActualPreview() {
     GiltyTheme {
         SwipeableChatRow(
-            DragRowState(100f),
-            DemoChatModel.copy(
+            state = DragRowState(100f),
+            chat = DemoChatModel.copy(
                 datetime = TOMORROW,
                 unreadCount = 10
             ),
-            shapes.medium,
-            Modifier.padding(16.dp),
+            shape = shapes.medium,
+            modifier = Modifier.padding(16.dp),
         )
     }
 }
@@ -92,13 +91,13 @@ private fun ChatRowActualPreview() {
 private fun ChatRowTodayPreview() {
     GiltyTheme {
         SwipeableChatRow(
-            DragRowState(100f),
-            DemoChatModel.copy(
+            state = DragRowState(100f),
+            chat = DemoChatModel.copy(
                 datetime = NOW_DATE,
                 unreadCount = 10
             ),
-            shapes.medium,
-            Modifier.padding(16.dp),
+            shape = shapes.medium,
+            modifier = Modifier.padding(16.dp),
         )
     }
 }
@@ -108,13 +107,13 @@ private fun ChatRowTodayPreview() {
 private fun ChatRowOnlinePreview() {
     GiltyTheme {
         SwipeableChatRow(
-            DragRowState(100f),
-            DemoChatModel.copy(
+            state = DragRowState(100f),
+            chat = DemoChatModel.copy(
                 datetime = NOW_DATE,
                 isOnline = true
             ),
-            shapes.medium,
-            Modifier.padding(16.dp),
+            shape = shapes.medium,
+            modifier = Modifier.padding(16.dp),
         )
     }
 }
@@ -202,7 +201,9 @@ private fun ChatRowContent(
                 }
             }
             chat.lastMessage?.let {
-                val createdTime = ZonedDateTime.parse(it.createdAt).format(DateTimeFormatter.ofPattern("HH:mm"))
+                val createdTime =
+                    ZonedDateTime.parse(it.createdAt)
+                        .format(DateTimeFormatter.ofPattern("HH:mm"))
                 Text(
                     createdTime,
                     Modifier
@@ -240,8 +241,13 @@ private fun Timer(
     isOnline: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val timeString = ZonedDateTime.parse(time).withZoneSameInstant(ZoneId.of("Europe/Moscow")).withZoneSameLocal(
-        ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))
+    val timeString =
+        ZonedDateTime.parse(time)
+            .withZoneSameInstant(ZoneId.of("Europe/Moscow"))
+            .withZoneSameLocal(
+                ZoneId.systemDefault()
+            )
+            .format(DateTimeFormatter.ofPattern("HH:mm"))
     Box(
         modifier.background(
             linearGradient(
@@ -371,26 +377,29 @@ private fun Avatar(
                 Modifier
                     .padding(2.dp)
                     .background(
-                        if(isConfirm)
-                            colors.chipGray
-                        else if(isOnline)
-                            colorScheme.secondary
-                        else colorScheme.primary,
+                        when{
+                            isConfirm-> colors.chipGray
+                            isOnline -> colorScheme.secondary
+                            else -> colorScheme.primary
+                        },
                         shapes.medium
                     )
             ) {
                 Text(
-                    unRead.counter(),
-                    Modifier.padding(
+                    text = unRead.counter(),
+                    modifier = Modifier.padding(
                         when("$unRead".length) {
                             1 -> 10.dp
                             2 -> 6.dp
                             else -> 2.dp
                         }, 2.dp
-                    ), if(isConfirm)
-                        colorScheme.onTertiary
-                    else White, fontWeight = SemiBold,
-                    style = typography.headlineSmall
+                    ),
+                    style = typography.headlineSmall.copy(
+                        color = if(isConfirm)
+                            colorScheme.onTertiary
+                        else White,
+                        fontWeight = SemiBold,
+                    )
                 )
             }
         }

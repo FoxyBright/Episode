@@ -19,44 +19,90 @@ import ru.rikmasters.gilty.profile.models.MeetingsType.HISTORY
 import ru.rikmasters.gilty.shared.model.LastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.NEW_INACTIVE
-import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.ProfileModel
 
 class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     private val regManager by inject<RegistrationManager>()
-    private val chatManager by inject<ChatManager>()
     private val profileManager by inject<ProfileManager>()
     private val meetManager by inject<MeetingManager>()
-    
+    private val chatManager by inject<ChatManager>()
     private val context = getKoin().get<Context>()
     
-    private val _occupied = MutableStateFlow(false)
-    val occupied = _occupied.asStateFlow()
+    private val _occupied =
+        MutableStateFlow(false)
+    val occupied =
+        _occupied.asStateFlow()
     
-    private val _photoAlertState = MutableStateFlow(false)
-    val photoAlertState = _photoAlertState.asStateFlow()
+    private val _photoAlertState =
+        MutableStateFlow(false)
+    val photoAlertState =
+        _photoAlertState.asStateFlow()
     
-    private val _menu = MutableStateFlow(false)
-    val menu = _menu.asStateFlow()
+    private val _menu =
+        MutableStateFlow(false)
+    val menu =
+        _menu.asStateFlow()
     
-    private val _historyState = MutableStateFlow(false)
-    val historyState = _historyState.asStateFlow()
+    private val _historyState =
+        MutableStateFlow(false)
+    val historyState =
+        _historyState.asStateFlow()
     
-    private val _profile = MutableStateFlow<ProfileModel?>(null)
-    val profile = _profile.asStateFlow()
+    private val _profile =
+        MutableStateFlow<ProfileModel?>(null)
+    val profile =
+        _profile.asStateFlow()
     
-    private val _description = MutableStateFlow<String?>(null)
-    private val description = _description.asStateFlow()
+    private val _description =
+        MutableStateFlow<String?>(null)
+    private val description =
+        _description.asStateFlow()
+    
+    private val _photoViewState =
+        MutableStateFlow(false)
+    val photoViewState =
+        _photoViewState.asStateFlow()
+    
+    private val _activeAlbumId =
+        MutableStateFlow<Int?>(null)
+    val activeAlbumId =
+        _activeAlbumId.asStateFlow()
+    
+    private val _viewerImages =
+        MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages =
+        _viewerImages.asStateFlow()
+    
+    private val _viewerSelectImage =
+        MutableStateFlow<AvatarModel?>(null)
+    val viewerSelectImage =
+        _viewerSelectImage.asStateFlow()
+    
+    private val refresh =
+        MutableStateFlow(false)
+    private val _username =
+        MutableStateFlow("")
+    val username =
+        _username.asStateFlow()
+    
+    private val _alert =
+        MutableStateFlow(false)
+    val alert =
+        _alert.asStateFlow()
+    
+    private val _lastRespond =
+        MutableStateFlow(LastRespond())
+    val lastRespond =
+        _lastRespond.asStateFlow()
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val desc = description
         .debounce(250)
-        .onEach {
-            updateDescription()
-        }
+        .onEach { updateDescription() }
         .state(_description.value, Eagerly)
     
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,10 +119,29 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         }.cachedIn(coroutineScope)
     }
     
-    private val refresh = MutableStateFlow(false)
+    private val _unreadMessages =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_messages", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadMessages =
+        _unreadMessages.asStateFlow()
     
-    private val _username = MutableStateFlow("")
-    val username = _username.asStateFlow()
+    private val _unreadNotification =
+        MutableStateFlow(
+            lazy {
+                val count = context.getSharedPreferences(
+                    "sharedPref", MODE_PRIVATE
+                ).getInt("unread_notification", 0)
+                if(count > 0) NEW_INACTIVE else INACTIVE
+            }.value
+        )
+    val unreadNotification =
+        _unreadNotification.asStateFlow()
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
@@ -96,18 +161,6 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         }
         .state(_username.value, Eagerly)
     
-    private val _photoViewState = MutableStateFlow(false)
-    val photoViewState = _photoViewState.asStateFlow()
-    
-    private val _activeAlbumId = MutableStateFlow<Int?>(null)
-    val activeAlbumId = _activeAlbumId.asStateFlow()
-    
-    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
-    val viewerImages = _viewerImages.asStateFlow()
-    
-    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
-    val viewerSelectImage = _viewerSelectImage.asStateFlow()
-    
     suspend fun changePhotoViewState(state: Boolean) {
         _photoViewState.emit(state)
     }
@@ -118,7 +171,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     
     suspend fun updateUserData() {
         _profile.emit(
-            profileManager.getProfile(true)
+            profileManager.getProfile(
+                forceWeb = true
+            )
         )
     }
     
@@ -139,47 +194,17 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             .on(
                 success = {},
                 loading = {},
-                error = { }
+                error = {}
             )
     }
     
     suspend fun changeUsername(name: String) {
-        if(name.length <= 21)
-            _username.emit(name)
+        if(name.length <= 21) _username.emit(name)
     }
     
-    private val _alert = MutableStateFlow(false)
-    val alert = _alert.asStateFlow()
-    
-    private val _lastRespond =
-        MutableStateFlow(LastRespond.DemoLastRespond)
-    val lastRespond = _lastRespond.asStateFlow()
-    
-    private val _unreadMessages = MutableStateFlow(
-        lazy {
-            val count = context.getSharedPreferences(
-                "sharedPref", MODE_PRIVATE
-            ).getInt("unread_messages", 0)
-            if(count > 0) NEW_INACTIVE else INACTIVE
-        }.value
-    )
-    val unreadMessages = _unreadMessages.asStateFlow()
     suspend fun setUnreadMessages(hasUnread: Boolean) {
         _unreadMessages.emit(if(hasUnread) NEW_INACTIVE else INACTIVE)
     }
-    
-    private val _unreadNotification =
-        MutableStateFlow(
-            lazy {
-                val count = context.getSharedPreferences(
-                    "sharedPref", MODE_PRIVATE
-                ).getInt("unread_notification", 0)
-                if(count > 0) NEW_INACTIVE else INACTIVE
-            }.value
-        )
-    
-    val unreadNotification =
-        _unreadNotification.asStateFlow()
     
     suspend fun setUnreadNotifications(hasUnread: Boolean) {
         _unreadNotification.emit(
@@ -226,44 +251,40 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         ).on(
             success = {},
             loading = {},
-            error = {
-                /*context.errorToast(
-                    it.serverMessage
-                )*/
-            }
+            error = {}
         )
     }
     
     suspend fun getUnread() = chatManager
         .updateUnread(context)
     
-    override suspend fun forceRefresh() {
-        setUserDate(true)
-        refresh.value = !refresh.value
-    }
+    override suspend fun forceRefresh() =
+        singleLoading {
+            setUserDate(true)
+            refresh.value = !refresh.value
+        }
     
     suspend fun setUserDate(
         forceWeb: Boolean,
     ) = singleLoading {
-        profileManager.getProfile(forceWeb)
-            .let { user ->
-                _username.emit(user.username ?: "")
-                _description.emit(user.aboutMe ?: "")
-                _lastRespond.emit(
-                    LastRespond(
-                        user.respondsImage?.url,
-                        user.isOnline ?: false,
-                        user.group ?: UserGroupTypeModel.DEFAULT,
-                        user.respondsCount ?: 0,
-                    )
-                )
-                _profile.emit(
-                    user.copy(
-                        username = username.value,
-                        aboutMe = description.value
-                    )
-                )
-            }
+        val user = profileManager
+            .getProfile(forceWeb)
+        _username.emit(user.username ?: "")
+        _description.emit(user.aboutMe ?: "")
+        _lastRespond.emit(
+            LastRespond(
+                image = user.respondsImage?.url,
+                isOnline = user.isOnline ?: false,
+                group = user.group ?: DEFAULT,
+                count = user.respondsCount ?: 0,
+            )
+        )
+        _profile.emit(
+            user.copy(
+                username = username.value,
+                aboutMe = description.value
+            )
+        )
     }
     
     suspend fun showHistory() {

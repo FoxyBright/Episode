@@ -36,7 +36,6 @@ import ru.rikmasters.gilty.shared.common.Responds
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.LastRespond
-import ru.rikmasters.gilty.shared.model.LastRespond.Companion.DemoLastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
@@ -65,7 +64,7 @@ private fun MeetingBsTopBarPreview() {
                             isPrivate = true,
                             description = "hello"
                         ),
-                    lastRespond = DemoLastRespond,
+                    lastRespond = LastRespond(),
                 )
             )
         }
@@ -87,7 +86,7 @@ private fun MeetingBsTopBarOnlinePreview() {
                     meet = DemoFullMeetingModel
                         .copy(isOnline = true),
                     backButton = true,
-                    lastRespond = DemoLastRespond,
+                    lastRespond = LastRespond(),
                 )
             )
         }

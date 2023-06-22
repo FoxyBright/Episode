@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.lazy.*
@@ -20,7 +21,6 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +39,6 @@ import ru.rikmasters.gilty.shared.R.drawable.ic_kebab
 import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.LastRespond
-import ru.rikmasters.gilty.shared.model.LastRespond.Companion.DemoLastRespond
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.INACTIVE
@@ -67,7 +66,7 @@ private fun ProfilePreview() {
                 meetingsHistory = pagingPreview(
                     DemoMeetingList
                 ),
-                lastRespond = DemoLastRespond,
+                lastRespond = LastRespond(),
                 historyState = (false),
                 stateList = listOf(
                     INACTIVE, INACTIVE,
@@ -134,59 +133,129 @@ fun ProfileContent(
             }
         }
     ) {
-        Box(Modifier.padding(it)) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Box(Modifier.padding(top = 10.dp)) {
-                    ProfileHeader(
-                        state = state.profileState,
-                        callback = callback
-                    )
-                    Box(
-                        Modifier.fillMaxWidth(),
-                        CenterEnd
-                    ) {
-                        IconButton(
-                            onClick = { callback?.menu(true) },
-                            modifier = Modifier.padding(top = 5.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(ic_kebab),
-                                contentDescription = null,
-                                tint = colorScheme.tertiary
-                            )
-                        }
-                    }
-                }
-                Use<UserProfileViewModel>(PullToRefreshTrait) {
-                    Content(state, Modifier, callback)
-                }
+        Profile(
+            state = state,
+            modifier = Modifier
+                .padding(it),
+            callback = callback
+        )
+    }
+    ViewPhotography(state, callback)
+    Alerts(state, callback)
+}
+
+@Composable
+private fun ViewPhotography(
+    state: UserProfileState,
+    callback: UserProfileCallback?,
+) = if(state.photoViewState) PhotoView(
+    images = state.viewerImages,
+    selected = state.viewerSelectImage,
+    menuState = state.viewerMenuState,
+    type = state.viewerType,
+    onMenuClick = {
+        callback?.onPhotoViewChangeMenuState(it)
+    },
+    onMenuItemClick = {
+        callback?.onPhotoViewMenuItemClick(it)
+    },
+    onBack = {
+        callback?.onPhotoViewDismiss(false)
+    },
+) else Unit
+
+@Composable
+private fun ProfileTopBar(
+    state: UserProfileState,
+    callback: UserProfileCallback?,
+) {
+    Box(Modifier.padding(top = 10.dp)) {
+        ProfileHeader(
+            state = state.profileState,
+            callback = callback
+        )
+        Box(
+            Modifier.fillMaxWidth(),
+            CenterEnd
+        ) { MenuKebab(callback) }
+    }
+}
+
+@Composable
+private fun MenuKebab(
+    callback: UserProfileCallback?,
+) {
+    IconButton(
+        onClick = { callback?.menu(true) },
+        modifier = Modifier.padding(top = 5.dp)
+    ) {
+        Icon(
+            painter = painterResource(ic_kebab),
+            contentDescription = null,
+            tint = colorScheme.tertiary
+        )
+    }
+}
+
+@Composable
+private fun Profile(
+    state: UserProfileState,
+    modifier: Modifier = Modifier,
+    callback: UserProfileCallback?,
+) {
+    Box(modifier) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            ProfileTopBar(
+                state = state,
+                callback = callback
+            )
+            Use<UserProfileViewModel>(
+                PullToRefreshTrait
+            ) {
+                Content(
+                    state = state,
+                    modifier = Modifier,
+                    callback = callback
+                )
             }
         }
     }
-    if(state.photoViewState) PhotoView(
-        images = state.viewerImages,
-        selected = state.viewerSelectImage,
-        menuState = state.viewerMenuState,
-        type = state.viewerType,
-        onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
-        onBack = { callback?.onPhotoViewDismiss(false) },
-    )
+}
+
+@Composable
+private fun Alerts(
+    state: UserProfileState,
+    callback: UserProfileCallback?,
+) {
     GAlert(
         show = state.alert,
-        title = stringResource(R.string.complaints_send_answer),
-        onDismissRequest = { callback?.closeAlert() },
-        label = stringResource(R.string.complaints_moderate_sen_answer),
-        success = Pair(stringResource(R.string.meeting_close_button)) { callback?.closeAlert() }
+        title = stringResource(
+            R.string.complaints_send_answer
+        ),
+        onDismissRequest = {
+            callback?.closeAlert()
+        },
+        label = stringResource(
+            R.string.complaints_moderate_sen_answer
+        ),
+        success = Pair(
+            stringResource(R.string.meeting_close_button)
+        ) { callback?.closeAlert() }
     )
     GAlert(
-        state.photoAlertState,
-        onDismissRequest = { callback?.closePhotoAlert() },
-        title = stringResource(R.string.profile_blocked_photo_alert),
-        success = Pair(stringResource(R.string.edit_button))
-        { callback?.onMenuItemClick(1) },
-        cancel = Pair(stringResource(R.string.notification_respond_cancel_button))
-        { callback?.closePhotoAlert() }
+        show = state.photoAlertState,
+        onDismissRequest = {
+            callback?.closePhotoAlert()
+        },
+        title = stringResource(
+            R.string.profile_blocked_photo_alert
+        ),
+        success = Pair(
+            stringResource(R.string.edit_button)
+        ) { callback?.onMenuItemClick(1) },
+        cancel = Pair(
+            stringResource(R.string.notification_respond_cancel_button)
+        ) { callback?.closePhotoAlert() }
     )
 }
 
@@ -200,83 +269,122 @@ private fun Content(
         modifier = modifier.fillMaxWidth(),
         state = state.listState
     ) {
-        item(key = 1) {
-            Box(Modifier.padding(top = 10.dp)) {
-                Profile(
-                    state = state.profileState,
-                    callback = callback,
-                    hasHeader = false
-                )
-            }
-        }
-        item(key = 2) {
-            Text(
-                text = stringResource(R.string.profile_actual_meetings_label),
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .padding(horizontal = 16.dp),
-                style = typography.labelLarge.copy(
-                    colorScheme.tertiary
-                )
+        profile(state.profileState, callback)
+        actualLabel()
+        responds(state.lastRespond, callback)
+        state.profileState.profile?.id?.let {
+            actualList(
+                userId = it,
+                meetings = state.currentMeetings,
+                callback = callback,
+            )
+            meetHistory(
+                userId = it,
+                historyState = state.historyState,
+                historyList = state.meetingsHistory,
+                callback = callback,
+                listState = state.listState,
             )
         }
-        item(key = 3) {
-            Box(Modifier.padding(16.dp, 12.dp)) {
-                Responds(
-                    state.lastRespond
-                ) { callback?.onRespondsClick() }
-            }
-        }
-        val userId = state.profileState.profile?.id ?: ""
-        if(state.currentMeetings
-                .itemSnapshotList
-                .items.isNotEmpty()
-        ) item(
-            key = 4
-        ) {
-            LazyRow(
-                state = rememberLazyListScrollState(
-                    "profile_meet"
-                )
-            ) {
-                item { Spacer(Modifier.width(8.dp)) }
-                items(state.currentMeetings) {
-                    MeetingCategoryCard(
-                        userId = userId,
-                        meeting = it!!,
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                    ) { callback?.onMeetingClick(it) }
-                }
-            }
-        }
-        if(state.meetingsHistory.itemSnapshotList.items.isNotEmpty())
-            item(5) {
-                val scope = rememberCoroutineScope()
-                MeetHistory(
-                    userId = userId,
-                    historyState = state.historyState,
-                    historyList = state.meetingsHistory,
-                    openHistory = {
-                        scope.launch {
-                            state.listState.animateScrollBy(
-                                value = 1000f,
-                                animationSpec = tween(600)
-                            )
-                        }
-                        callback?.onHistoryShow()
-                    }
-                ) { callback?.onHistoryClick(it) }
-            }
-        item(key = 6) {
-            Divider(
-                Modifier.fillMaxWidth(),
-                20.dp, Transparent
-            )
-            
+        itemSpacer(20.dp, key = 6)
+    }
+}
+
+private fun LazyListScope.profile(
+    profileState: ProfileState,
+    callback: UserProfileCallback?,
+    key: Any? = 1,
+) = item(key) {
+    Box(Modifier.padding(top = 10.dp)) {
+        Profile(
+            state = profileState,
+            callback = callback,
+            hasHeader = false
+        )
+    }
+}
+
+private fun LazyListScope.responds(
+    lastRespond: LastRespond,
+    callback: UserProfileCallback?,
+    key: Any? = 3,
+) = item(key) {
+    Box(Modifier.padding(16.dp, 12.dp)) {
+        Responds(lastRespond) {
+            callback?.onRespondsClick()
         }
     }
 }
+
+private fun LazyListScope.actualLabel(
+    key: Any? = 2,
+) = item(key) {
+    Text(
+        text = stringResource(
+            R.string.profile_actual_meetings_label
+        ),
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 16.dp),
+        style = typography.labelLarge.copy(
+            colorScheme.tertiary
+        )
+    )
+}
+
+private fun LazyListScope.meetHistory(
+    userId: String,
+    historyState: Boolean,
+    historyList: LazyPagingItems<MeetingModel>,
+    callback: UserProfileCallback?,
+    listState: LazyListState,
+    items: List<MeetingModel> =
+        historyList.itemSnapshotList.items,
+    key: Any? = 5,
+) = if(items.isNotEmpty()) item(key) {
+    val scope = rememberCoroutineScope()
+    MeetHistory(
+        userId = userId,
+        historyState = historyState,
+        historyList = historyList,
+        openHistory = {
+            scope.launch {
+                listState.animateScrollBy(
+                    value = 1000f,
+                    animationSpec = tween(600)
+                )
+            }
+            callback?.onHistoryShow()
+        }
+    ) { callback?.onHistoryClick(it) }
+} else Unit
+
+private fun LazyListScope.actualList(
+    userId: String,
+    meetings: LazyPagingItems<MeetingModel>,
+    callback: UserProfileCallback?,
+    key: Any? = 4,
+    items: List<MeetingModel> =
+        meetings.itemSnapshotList.items,
+) = if(items.isNotEmpty()) item(key) {
+    LazyRow(
+        state = rememberLazyListScrollState(
+            "profile_meet"
+        )
+    ) {
+        itemSpacer(8.dp, true)
+        items(meetings) {
+            it?.let {
+                MeetingCategoryCard(
+                    userId = userId,
+                    meeting = it,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                ) { callback?.onMeetingClick(it) }
+            }
+        }
+    }
+} else Unit
 
 @Composable
 private fun MeetHistory(
@@ -287,7 +395,8 @@ private fun MeetHistory(
     onSelect: (MeetingModel) -> Unit,
 ) {
     val openSize by animateDpAsState(
-        targetValue = if(historyState) 250.dp else 0.dp,
+        targetValue = if(historyState)
+            250.dp else 0.dp,
         animationSpec = tween(600)
     )
     Row(
@@ -296,7 +405,10 @@ private fun MeetHistory(
             .padding(top = 28.dp, bottom = 12.dp)
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
-            .clickable { openHistory() },
+            .clickable(
+                MutableInteractionSource(),
+                indication = null
+            ) { openHistory() },
         Start, CenterVertically
     ) {
         Text(
@@ -316,14 +428,13 @@ private fun MeetHistory(
             tint = colorScheme.tertiary
         )
     }
-    
     LazyRow(
         modifier = Modifier.height(openSize),
         state = rememberLazyListScrollState(
             "profile_history_meet"
         )
     ) {
-        item { Spacer(Modifier.width(8.dp)) }
+        itemSpacer(8.dp, true)
         items(historyList) {
             MeetingCategoryCard(
                 userId = userId,

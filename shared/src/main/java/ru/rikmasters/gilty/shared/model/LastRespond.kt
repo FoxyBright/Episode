@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.shared.model
 
 import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 
 
 data class LastRespond(
@@ -8,8 +9,12 @@ data class LastRespond(
     val isOnline: Boolean,
     val group: UserGroupTypeModel,
     val count: Int,
-){
-    companion object{
-        val DemoLastRespond = LastRespond("", false, UserGroupTypeModel.DEFAULT, 0)
-    }
+) {
+    
+    constructor(): this(
+        image = "",
+        isOnline = false,
+        group = DEFAULT,
+        count = 0
+    )
 }

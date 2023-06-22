@@ -9,8 +9,9 @@ import androidx.compose.ui.unit.dp
 fun LazyListScope.itemSpacer(
     thickness: Dp = 20.dp,
     horizontal: Boolean = false,
+    key: Any? = null
 ) {
-    item {
+    item(key) {
         Spacer(
             Modifier
                 .fillMaxWidth()

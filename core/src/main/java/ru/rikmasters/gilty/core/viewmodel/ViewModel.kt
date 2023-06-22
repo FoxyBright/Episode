@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import org.koin.core.component.createScope
 import org.koin.core.scope.Scope
 import org.koin.core.scope.ScopeCallback
 import ru.rikmasters.gilty.core.common.CoroutineController
@@ -17,7 +18,7 @@ abstract class ViewModel:
     ScopeCallback,
     LoadingTrait {
     
-    override lateinit var scope: Scope
+    override var scope: Scope = createScope()
     
     private val _events = MutableSharedFlow<Event>()
     internal val events = _events.asSharedFlow()
