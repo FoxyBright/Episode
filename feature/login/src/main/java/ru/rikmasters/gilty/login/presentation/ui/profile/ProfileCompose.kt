@@ -1,10 +1,8 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -28,7 +26,12 @@ import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 @Preview(backgroundColor = 0xFFE8E8E8, showBackground = true)
 @Composable
 private fun ProfilePreview() {
-    GiltyTheme { ProfileContent(ProfileState(profile = DemoProfileModel, ), (true)) }
+    GiltyTheme {
+        ProfileContent(
+            ProfileState(profile = DemoProfileModel),
+            (true)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +49,9 @@ fun ProfileContent(
                 title = stringResource(
                     R.string.create_profile_title
                 ),
+                modifier = Modifier.background(
+                    colorScheme.background
+                ),
                 titleStyle = typography
                     .titleLarge.copy(
                         fontSize = 28.dp.toSp()
@@ -53,27 +59,34 @@ fun ProfileContent(
             ) { callback?.onBack() }
         },
     ) {
-        Card(
-            modifier = Modifier
-                .padding(top = it.calculateTopPadding())
-                .offset(y = 24.dp)
-                .padding(horizontal = 32.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            shape = RoundedCornerShape(30.dp),
-            colors = cardColors(colorScheme.background),
-            border = BorderStroke(
-                width = 6.dp,
-                color = colorScheme.primaryContainer
+        Column(
+            Modifier.verticalScroll(
+                rememberScrollState(),
             )
         ) {
-            Profile(
-                state = state,
+            Spacer(Modifier.height(24.dp))
+            Card(
                 modifier = Modifier
-                    .fillMaxHeight(0.8f)
-                    .padding(top = 50.dp),
-                callback = callback
-            )
+                    .padding(top = it.calculateTopPadding())
+                    .padding(horizontal = 32.dp)
+                    .fillMaxWidth()
+                    .height(800.dp)
+                    .verticalScroll(rememberScrollState()),
+                shape = RoundedCornerShape(30.dp),
+                colors = cardColors(colorScheme.background),
+                border = BorderStroke(
+                    width = 6.dp,
+                    color = colorScheme.primaryContainer
+                )
+            ) {
+                Profile(
+                    state = state,
+                    modifier = Modifier
+                        .fillMaxHeight(0.8f)
+                        .padding(top = 50.dp),
+                    callback = callback
+                )
+            }
         }
     }
     Box(Modifier.fillMaxSize()) {
