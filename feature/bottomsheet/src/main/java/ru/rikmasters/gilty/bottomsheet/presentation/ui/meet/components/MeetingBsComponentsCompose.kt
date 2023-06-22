@@ -269,34 +269,38 @@ fun MeetingBsConditions(
 ) {
     Column(modifier) {
         Text(
-            stringResource(R.string.meeting_terms),
-            Modifier, colorScheme.tertiary,
+            text = stringResource(R.string.meeting_terms),
+            modifier = Modifier,
+            color = colorScheme.tertiary,
             style = typography.labelLarge
         )
         Card(
-            Modifier
+            modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth(),
-            shapes.extraSmall,
-            cardColors(
+            shape = shapes.extraSmall,
+            colors = cardColors(
                 colorScheme.primaryContainer
             )
         ) {
             Text(
-                meet.type.display, Modifier
+                text = meet.type.display,
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colorScheme.tertiary,
+                color = colorScheme.tertiary,
                 style = typography.bodyMedium
             )
             GDivider(Modifier.padding(start = 16.dp))
             Row(
-                Modifier.fillMaxWidth(),
-                SpaceBetween, CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = SpaceBetween,
+                verticalAlignment = CenterVertically
             ) {
                 Row(
-                    Modifier.padding(16.dp),
-                    Start, CenterVertically
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Start,
+                    verticalAlignment = CenterVertically
                 ) {
                     if(meet.condition == MEMBER_PAY)
                         Image(
@@ -306,15 +310,16 @@ fun MeetingBsConditions(
                                 .size(24.dp)
                         )
                     Text(
-                        meet.condition.display,
-                        Modifier, colorScheme.tertiary,
+                        text = meet.condition.display,
+                        modifier = Modifier,
+                        color = colorScheme.tertiary,
                         style = typography.bodyMedium
                     )
                 }
                 if(meet.condition == MEMBER_PAY) Text(
-                    "${meet.price ?: "0"} ₽",
-                    Modifier.padding(end = 16.dp),
-                    if(meet.isOnline) colorScheme.secondary
+                    text = "${meet.price ?: "0"} ₽",
+                    modifier = Modifier.padding(end = 16.dp),
+                    color = if(meet.isOnline) colorScheme.secondary
                     else colorScheme.primary,
                     style = typography.headlineLarge
                 )

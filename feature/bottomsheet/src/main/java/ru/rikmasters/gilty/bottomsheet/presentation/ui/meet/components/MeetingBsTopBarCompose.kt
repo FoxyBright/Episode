@@ -99,7 +99,7 @@ private fun MeetingBsTopBarOnlinePreview() {
 data class MeetingBsTopBarState(
     val meet: FullMeetingModel,
     val lastRespond: LastRespond?,
-    val description: Boolean = false,
+    val detailed: Boolean = false,
     val backButton: Boolean = false,
 )
 
