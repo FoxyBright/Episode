@@ -98,7 +98,9 @@ class ProfileStore(
             list
         }
     
-    fun getUserHiddenPaging() = Pager(
+    fun getUserHiddenPaging(
+            albumId:String? = null,
+        ) = Pager(
         config = PagingConfig(
             pageSize = 15,
             enablePlaceholders = false
@@ -106,7 +108,8 @@ class ProfileStore(
         pagingSourceFactory = {
             HiddenPhotosPagingSource(
                 webSource = webSource,
-                localSource = primarySource
+                localSource = primarySource,
+                albumId = albumId,
             )
         }
     ).flow

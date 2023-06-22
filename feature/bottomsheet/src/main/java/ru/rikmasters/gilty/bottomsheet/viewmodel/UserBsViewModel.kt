@@ -1,8 +1,12 @@
 package ru.rikmasters.gilty.bottomsheet.viewmodel
 
 import android.content.Context
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.inject
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.meetings.MeetingManager
@@ -39,27 +43,59 @@ class UserBsViewModel: ViewModel() {
     private val _userActualMeets = MutableStateFlow(listOf<MeetingModel>())
     val userActualMeets = _userActualMeets.asStateFlow()
     
-    private val _viewerState = MutableStateFlow(false)
-    val viewerState = _viewerState.asStateFlow()
+    private val _avatarViewerState = MutableStateFlow(false)
+    val avatarViewerState = _avatarViewerState.asStateFlow()
+
+    private val _hiddenViewerState = MutableStateFlow(false)
+    val hiddenViewerState = _hiddenViewerState.asStateFlow()
     
-    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
-    val viewerImages = _viewerImages.asStateFlow()
+    private val _avatarViewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val avatarViewerImages = _avatarViewerImages.asStateFlow()
+
+    private val _hiddenViewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val hiddenViewerImages = _hiddenViewerImages.asStateFlow()
     
-    private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
-    val viewerSelectImage = _viewerSelectImage.asStateFlow()
-    
-    suspend fun changePhotoViewState(state: Boolean) {
-        _viewerState.emit(state)
+    private val _avatarViewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val avatarViewerSelectImage = _avatarViewerSelectImage.asStateFlow()
+
+    private val _hiddenViewerSelectImage = MutableStateFlow<AvatarModel?>(null)
+    val hiddenViewerSelectImage = _hiddenViewerSelectImage.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val organizerHiddenImages by lazy {
+        combine(
+            _profile
+        ) { it }.flatMapLatest {
+            //if(hiddenViewerState.value)
+                profileManager.getHiddenPhotos(_profile.value.avatar?.albumId)
+            //else
+        }.cachedIn(coroutineScope)
+    }
+
+    suspend fun setPhotoViewState(state: Boolean) {
+        _avatarViewerState.emit(state)
     }
     
     suspend fun setPhotoViewImages(list: List<AvatarModel?>) {
-        _viewerImages.emit(list)
+        _avatarViewerImages.emit(list)
     }
     
     suspend fun setPhotoViewSelected(photo: AvatarModel?) {
-        _viewerSelectImage.emit(photo)
+        _avatarViewerSelectImage.emit(photo)
     }
-    
+
+    suspend fun setHiddenPhotoViewState(state: Boolean) {
+        _hiddenViewerState.emit(state)
+    }
+
+    suspend fun setHiddenPhotoViewImages(list: List<AvatarModel?>) {
+        _hiddenViewerImages.emit(list)
+    }
+
+    suspend fun setHiddenPhotoViewSelected(photo: AvatarModel?) {
+        _hiddenViewerSelectImage.emit(photo)
+    }
+
     suspend fun checkMyProfile(userId: String) {
         _isMyProfile.emit(
             profileManager

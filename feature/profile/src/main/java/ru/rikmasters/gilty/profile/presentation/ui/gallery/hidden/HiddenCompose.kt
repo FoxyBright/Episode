@@ -265,7 +265,7 @@ private fun LazyItem(
                 Icon(
                     imageVector = Icons.Filled.Close,
                     contentDescription = (null),
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(20.dp),
                     tint = if(isSystemInDarkTheme()) Colors.White else Colors.Black
                 )
             }

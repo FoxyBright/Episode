@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.organizer
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.Profile
@@ -73,6 +76,10 @@ data class UserState(
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
+    val hiddenPhotoViewState: Boolean = false,
+    val hiddenViewerImages: List<AvatarModel?> = emptyList(),
+    val hiddenViewerSelectImage: AvatarModel? = null,
+    val hiddenViewerMenuState: Boolean = false,
 )
 
 interface OrganizerCallback : ProfileCallback {
@@ -136,6 +143,15 @@ fun OrganizerContent(
                 itemSpacer(40.dp)
             }
         }
+        if (state.hiddenPhotoViewState) PhotoView(
+            images = state.hiddenViewerImages,
+            selected = state.hiddenViewerSelectImage,
+            menuState = state.hiddenViewerMenuState,
+            type = PhotoViewType.LOAD,
+            onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+            onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+            onBack = { callback?.onPhotoViewDismiss(false) },
+        )
         if (state.photoViewState) PhotoView(
             images = state.viewerImages,
             selected = state.viewerSelectImage,

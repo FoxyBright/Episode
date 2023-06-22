@@ -62,7 +62,9 @@ class ProfileManager(
         store.getProfile(forceWeb)
     }
 
-    fun getHiddenPhotos() = store.getUserHiddenPaging()
+    fun getHiddenPhotos(
+        albumId: String? = null,
+    ) = store.getUserHiddenPaging(albumId)
 
     suspend fun changeAlbumPosition(imageId: String, position: Int) =
         store.changeAlbumPosition(imageId, position)
