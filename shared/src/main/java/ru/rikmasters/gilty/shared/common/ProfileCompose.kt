@@ -122,7 +122,7 @@ data class ProfileState(
 )
 
 interface ProfileCallback {
-
+    
     fun onBack() {}
     fun onNext() {}
     fun onDisabledButtonClick() {}
@@ -146,6 +146,7 @@ fun Profile(
     callback: ProfileCallback? = null,
     hasHeader: Boolean = true,
     isMyProfile: Boolean = false,
+    onDescClick: ((Boolean) -> Unit)? = null,
     onChange: ((Boolean) -> Unit)? = null,
 ) {
     var menuState by remember {
@@ -162,11 +163,11 @@ fun Profile(
     val rating = profile?.rating?.average.toString()
     val hidden = profile?.hidden?.thumbnail?.url
     Column(modifier) {
-
-        if (hasHeader) {
+        
+        if(hasHeader) {
             ProfileHeader(state, callback)
         }
-
+        
         Row(Modifier.padding(horizontal = 16.dp)) {
             ProfileImageContent(
                 modifier = Modifier.weight(1f),
@@ -183,7 +184,7 @@ fun Profile(
                 },
                 onClick = { callback?.profileImage() },
                 usProfClick = {
-                    if (duplicateOpen) {
+                    if(duplicateOpen) {
                         menuState = true
                         vibrate(context)
                         offset = it
@@ -193,7 +194,7 @@ fun Profile(
             )
             Spacer(
                 Modifier.width(
-                    if (state.profileType == CREATE)
+                    if(state.profileType == CREATE)
                         14.dp else 16.dp
                 )
             )
@@ -207,7 +208,7 @@ fun Profile(
                 ) { callback?.onObserveClick() }
                 Spacer(
                     Modifier.height(
-                        if ((state.profileType == CREATE)) 14.dp else 18.dp
+                        if((state.profileType == CREATE)) 14.dp else 18.dp
                     )
                 )
                 HiddenContent(image = hidden,
@@ -215,11 +216,12 @@ fun Profile(
                     lockState = state.lockState,
                     onImageRefresh = {
                         callback?.onProfileImageRefresh()
-                    }) { callback?.hiddenImages() }
+                    }
+                ) { callback?.hiddenImages() }
             }
         }
         Spacer(Modifier.height(12.dp))
-        if (state.isAlbumVisible) AlbumPictures(picturesWithEmojis = listOf(
+        if(state.isAlbumVisible) AlbumPictures(picturesWithEmojis = listOf(
             AlbumPictureWithEmoji(
                 id = 1,
                 image = "https://media.npr.org/assets/img/2020/02/27/wide-use_hpromophoto_helenepambrun-72fdb64792139d94a06f18686d0bb3131a238a70-s1100-c50.jpg",
@@ -250,12 +252,13 @@ fun Profile(
             onAlbumLongClick = { id ->
                 callback?.onAlbumLongClick(id)
             })
-
+        
         AboutMe(
             modifier = Modifier.padding(horizontal = 16.dp),
             text = state.profile?.aboutMe,
             type = state.profileType,
-            callback = callback
+            callback = callback,
+            onDescClick = onDescClick
         )
         Spacer(Modifier.height(20.dp))
     }
@@ -294,26 +297,30 @@ private fun AboutMe(
     text: String?,
     type: ProfileType,
     callback: ProfileCallback?,
+    onDescClick: ((Boolean) -> Unit)? = null,
 ) {
-    @Composable
-    fun description() = Description(text = text ?: "",
+    if(
+        type == CREATE
+        || type == USERPROFILE
+        || !text.isNullOrBlank()
+    ) Description(text = text ?: "",
         profileType = type,
-        modifier = modifier.padding(top = 20.dp),
+        modifier = modifier
+            .padding(top = 20.dp),
+        onDescClick = onDescClick,
         onSaveDescription = {
             callback?.onSaveDescription()
-        }) { callback?.onDescriptionChange(it) }
-
-    when (type) {
-        CREATE, USERPROFILE -> description()
-        ORGANIZER, ANONYMOUS_ORGANIZER -> if (!text.isNullOrBlank()) description()
-    }
+        }
+    ) { callback?.onDescriptionChange(it) }
 }
 
 @Composable
 private fun ErrorLabel(errorText: String) {
     Text(
         text = errorText,
-        modifier = Modifier.offset(y = -(10).dp, x = 16.dp).height(10.dp),
+        modifier = Modifier
+            .offset(y = -(10).dp, x = 16.dp)
+            .height(10.dp),
         color = colorScheme.primary,
         style = typography.titleSmall.copy(
             fontSize = 10.dp.toSp()
@@ -334,23 +341,24 @@ private fun TopBar(
 ) {
     val focusManager = LocalFocusManager.current
     var focus by remember { mutableStateOf(false) }
-
+    
     val interactionSource = remember { MutableInteractionSource() }
     val colors = transparentTextFieldColors()
-
-    if (profileType != ORGANIZER && profileType != ANONYMOUS_ORGANIZER) Row(
+    
+    if(profileType != ORGANIZER && profileType != ANONYMOUS_ORGANIZER) Row(
         modifier = modifier
             .fillMaxWidth()
             .offset((-16).dp),
         verticalAlignment = CenterVertically,
     ) {
-
-        val mergedTextStyle = typography.headlineLarge.merge(TextStyle(color = colorScheme.tertiary))
-
+        
+        val mergedTextStyle =
+            typography.headlineLarge.merge(TextStyle(color = colorScheme.tertiary))
+        
         BasicTextField(
             value = userName,
             modifier =
-            if (profileGroup == UserGroupTypeModel.DEFAULT)
+            if(profileGroup == UserGroupTypeModel.DEFAULT)
                 Modifier
                     .fillMaxWidth()
                     .width(IntrinsicSize.Min)
@@ -362,7 +370,7 @@ private fun TopBar(
             textStyle = mergedTextStyle,
             visualTransformation = transformationOf(
                 mask = CharArray(userName.length) { '#' }.concatToString(),
-                endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""
+                endChar = if(userAge in 18..99 && !focus) ", $userAge" else ""
             ),
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
@@ -381,17 +389,21 @@ private fun TopBar(
                     value = userName,
                     visualTransformation = transformationOf(
                         mask = CharArray(userName.length) { '#' }.concatToString(),
-                        endChar = if (userAge in 18..99 && !focus) ", $userAge" else ""
+                        endChar = if(userAge in 18..99 && !focus) ", $userAge" else ""
                     ),
                     innerTextField = innerTextField,
                     placeholder = {
-                        Row(Modifier, Arrangement.Center, CenterVertically) {
+                        Row(
+                            Modifier,
+                            Arrangement.Center,
+                            CenterVertically
+                        ) {
                             Text(
                                 text = stringResource(R.string.user_name),
                                 modifier = Modifier.padding(end = 8.dp),
                                 color = colorScheme.onTertiary,
                                 style = typography.headlineLarge.copy(
-                                    fontSize = when (profileType) {
+                                    fontSize = when(profileType) {
                                         CREATE -> 22 // 23
                                         USERPROFILE -> 22 // 28
                                         else -> 20
@@ -411,8 +423,8 @@ private fun TopBar(
                     enabled = true,
                     interactionSource = interactionSource,
                     colors = colors,
-
-                )
+                    
+                    )
             }
         )
         ProfileBadge(
@@ -427,20 +439,21 @@ private fun Description(
     text: String,
     profileType: ProfileType,
     modifier: Modifier = Modifier,
+    onDescClick: ((Boolean) -> Unit)?,
     onSaveDescription: () -> Unit,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val style = typography.bodyMedium.copy(
-        fontSize = (if (profileType == CREATE) 12 else 16).dp.toSp()
+        fontSize = (if(profileType == CREATE) 12 else 16).dp.toSp()
     )
-
+    
     Column(modifier) {
         Text(
             text = stringResource(R.string.profile_about_me),
             style = typography.labelLarge.copy(
                 color = colorScheme.tertiary,
-                fontSize = if (profileType == CREATE) 17.dp.toSp() else 20.dp.toSp()
+                fontSize = if(profileType == CREATE) 17.dp.toSp() else 20.dp.toSp()
             )
         )
         Box(
@@ -457,11 +470,20 @@ private fun Description(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = if (profileType == CREATE) 12.dp else 14.dp,
-                        horizontal = if (profileType == CREATE) 16.dp else 14.dp,
-                    ),
-                onValueChange = { if (it.length <= 120) onTextChange(it) },
-                readOnly = when (profileType) {
+                        vertical = if(profileType == CREATE)
+                            12.dp else 14.dp,
+                        horizontal = if(profileType == CREATE)
+                            16.dp else 14.dp,
+                    )
+                    .onFocusChanged { foc ->
+                        onDescClick?.let { it(foc.isFocused) }
+                    },
+                onValueChange = {
+                    if(it.length <= 120) onTextChange(
+                        it
+                    )
+                },
+                readOnly = when(profileType) {
                     ORGANIZER, ANONYMOUS_ORGANIZER -> true
                     else -> false
                 },
@@ -515,7 +537,7 @@ fun AlbumPictures(
     val screenWidth by remember {
         mutableStateOf(configuration.screenWidthDp)
     }
-
+    
     @Composable
     fun album() {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
@@ -523,19 +545,19 @@ fun AlbumPictures(
                 Spacer(modifier = Modifier.width(16.dp))
             }
             itemsIndexed(picturesWithEmojis) { index, item ->
-                if (activeAlbumId == null || activeAlbumId == item.id) AlbumPictureItem(
+                if(activeAlbumId == null || activeAlbumId == item.id) AlbumPictureItem(
                     modifier = Modifier
                         .animateItemPlacement()
                         .size((screenWidth / 4).dp)
                         .clip(
                             lazyRowAlbumItemsShapes(
                                 index = index,
-                                size = if (activeAlbumId != null) 1 else picturesWithEmojis.size
+                                size = if(activeAlbumId != null) 1 else picturesWithEmojis.size
                             )
                         ),
                     albumPictureWithEmoji = item,
                     onClick = {
-                        if (activeAlbumId == null) onAlbumClick(item.id)
+                        if(activeAlbumId == null) onAlbumClick(item.id)
                         else onAlbumLongClick(null)
                     },
                     onLongClick = {
@@ -543,7 +565,7 @@ fun AlbumPictures(
                     })
             }
             item { Spacer(modifier = Modifier.width(16.dp)) }
-            if (activeAlbumId != null) {
+            if(activeAlbumId != null) {
                 item {
                     AlbumDescription(
                         modifier = Modifier
@@ -560,8 +582,8 @@ fun AlbumPictures(
             }
         }
     }
-
-    when (type) {
+    
+    when(type) {
         CREATE, USERPROFILE -> album()
         ORGANIZER, ANONYMOUS_ORGANIZER -> {}
     }
@@ -652,7 +674,7 @@ fun AlbumDescription(
                 content = {
                     Image(
                         painter = painterResource(
-                            if (isVisible) R.drawable.ic_open_eye
+                            if(isVisible) R.drawable.ic_open_eye
                             else R.drawable.ic_closed_eye
                         ), contentDescription = null, modifier = Modifier
                             .size(32.dp)
