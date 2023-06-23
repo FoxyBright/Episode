@@ -24,8 +24,8 @@ fun MeetingsListContent(
     onClick: ((MeetingModel) -> Unit)? = null,
 ) {
     val list = remember(states) {
-        if (states.size <= 2) states
-        else states - states.dropLast(2).toSet()
+        (if (states.size <= 2) states
+        else states - states.dropLast(2).toSet())
     }
 
     list.forEachIndexed { index, state ->

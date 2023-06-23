@@ -54,7 +54,8 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
     val username by vm.username.collectAsState()
     val menuState by vm.menu.collectAsState()
     val alert by vm.alert.collectAsState()
-    
+    val errorMessage by vm.errorMessage.collectAsState()
+
     val navBar = remember(
         unreadNotification, unreadMessages
     ) {
@@ -83,9 +84,12 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
         stringResource(R.string.profile_user_name_is_occupied)
     
     val errorText by remember(
-        username, occupied
+        errorMessage
+        //username, occupied
     ) {
-        mutableStateOf(
+        mutableStateOf(errorMessage)
+
+        /*mutableStateOf(
             when {
                 regexError -> regexString
                 longUserNameError -> longUsernameString
@@ -93,7 +97,7 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
                 occupied -> usernameOccupiedString
                 else -> ""
             }
-        )
+        )*/
     }
     
     val back = colorScheme.primaryContainer
