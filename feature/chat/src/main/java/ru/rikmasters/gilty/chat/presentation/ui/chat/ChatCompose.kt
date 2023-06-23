@@ -28,7 +28,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.BottomBarMenu
 import ru.rikmasters.gilty.chat.presentation.ui.chat.popUp.TopBarMenu
 import ru.rikmasters.gilty.gallery.photoview.PhotoView
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
-import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTOS
 import ru.rikmasters.gilty.shared.R.string.*
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.common.extentions.rememberDragRowState
@@ -94,12 +94,12 @@ data class ChatState(
     val listState: LazyListState,
     val unreadCount: Int,
     val writingUsers: List<Pair<String, ThumbnailModel>>,
-    
+
     val photoViewState: Boolean = false,
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
-    val viewerType: PhotoViewType = PHOTO,
+    val viewerType: PhotoViewType = PHOTOS,
 )
 
 interface ChatCallback:

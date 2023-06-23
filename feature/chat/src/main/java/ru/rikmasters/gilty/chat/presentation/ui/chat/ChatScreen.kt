@@ -37,7 +37,7 @@ import ru.rikmasters.gilty.core.viewmodel.trait.LoadingTrait
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
-import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTOS
 import ru.rikmasters.gilty.shared.common.extentions.*
 import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.blockNotify
 import ru.rikmasters.gilty.shared.common.extentions.ChatNotificationBlocker.clearSelectChat
@@ -295,7 +295,7 @@ fun ChatScreen(
                             ?.first()
                             ?.file
                             ?.let { attach ->
-                                vm.changePhotoViewType(PHOTO)
+                                vm.changePhotoViewType(PHOTOS)
                                 vm.setPhotoViewSelected(attach)
                                 vm.setPhotoViewImages(listOf(attach))
                                 vm.changePhotoViewState(true)

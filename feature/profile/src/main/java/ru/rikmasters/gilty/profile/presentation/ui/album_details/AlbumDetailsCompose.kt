@@ -146,7 +146,7 @@ private fun ActionBar(
                     R.drawable.ic_back
                 ),
                 stringResource(R.string.action_bar_button_back),
-                tint = Color(0xffE6E1E5)
+                tint = Colors.WhiteOnSurface
             )
         }
     }

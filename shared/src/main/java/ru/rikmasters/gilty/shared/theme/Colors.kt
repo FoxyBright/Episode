@@ -48,7 +48,8 @@ object Colors {
     val OrangeRed = Color(0xFFFF5E2B) // RedGradient1
     val FireRed = Color(0xFFFF002D) // RedGradient2
     val DimRed = Color(0xFFFF6462) // RedInactive
-    
+    val WhiteOnSurface = Color(0xFFE6E1E5) // Tint for Back Button
+
     /*     DAY COLORS    */
     val LightGray = Color(0xFFF6F6F6) // BackgroundDay
     val PreDark = Color(0xFF1C1B1F) // TextDay

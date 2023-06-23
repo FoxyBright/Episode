@@ -49,8 +49,9 @@ fun BottomSheet(
     val coroutineScope = rememberCoroutineScope()
     val nav = rememberNavController()
     val asm = get<AppStateModel>()
-    
+
     val back = colorScheme.background
+
     LaunchedEffect(Unit) {
         asm.systemUi.setNavigationBarColor(back)
     }

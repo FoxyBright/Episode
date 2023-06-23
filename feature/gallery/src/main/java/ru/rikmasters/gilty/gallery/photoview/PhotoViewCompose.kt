@@ -2,7 +2,7 @@ package ru.rikmasters.gilty.gallery.photoview
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.MutatePriority.PreventUserInput
@@ -37,15 +37,19 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
+import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
-import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTOS
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.model.profile.DemoAvatarModel
 import ru.rikmasters.gilty.shared.shared.*
+import ru.rikmasters.gilty.shared.theme.Colors
 import ru.rikmasters.gilty.shared.theme.Gradients.red
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
+import kotlin.collections.set
 import kotlin.math.*
 
 @Preview
@@ -60,7 +64,7 @@ private fun PhotoPreview() {
                 DemoAvatarModel,
             ),
             DemoAvatarModel,
-            (false), PHOTO
+            (false), PHOTOS
         )
     }
 }
@@ -82,7 +86,7 @@ private fun HiddenPhotoPreview() {
     }
 }
 
-enum class PhotoViewType { PHOTO, LOAD }
+enum class PhotoViewType { PHOTOS, PHOTO, LOAD }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,71 +97,119 @@ fun PhotoView(
     menuState: Boolean,
     type: PhotoViewType,
     modifier: Modifier = Modifier,
-    loadSeconds: Int = 7000,
+    loadSeconds: Int = 1000, // TODO 7000
     onMenuClick: ((Boolean) -> Unit)? = null,
     onMenuItemClick: ((String) -> Unit)? = null,
     onBack: (() -> Unit)? = null,
 ) {
-    if(selected == null && images.isEmpty()) return
+    if (selected == null && images.isEmpty()) return
     val selectedImage = selected ?: images.first()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var timer by remember {
         mutableStateOf(false)
     }
-    
+
+    var mapOfDownloadedImages by remember { mutableStateOf(mapOf<Int, Boolean>()) }
+
+    val select by remember { derivedStateOf { listState.firstVisibleItemIndex } }
+
+    val animateTimer = remember { Animatable(0f) }
+    val asm = get<AppStateModel>()
+    val back = colorScheme.primaryContainer
+
+    DisposableEffect(key1 = Unit, effect = {
+        onDispose {
+            asm.systemUi.setStatusBarColor(back)
+            asm.systemUi.setSystemBarsColor(back)
+        }
+    })
+
     LaunchedEffect(Unit) {
-        if(type == LOAD) timer = true
+
+        if (type == LOAD) timer = true
         images.forEach {
             it?.let {
-                if(it.id == selectedImage?.id)
+                if (it.id == selectedImage?.id)
                     listState.scrollToItem(
                         images.indexOf(it)
                     )
             }
         }
     }
-    
-    val select by remember {
-        derivedStateOf { listState.firstVisibleItemIndex }
-    }
-    
-    val animateTimer = animateFloatAsState(
-        if(timer) 1f else 0f, tween(loadSeconds),
-        label = ""
-    ) {
-        scope.launch {
-            if(select != images.lastIndex) {
-                listState.animateScrollToItem(select + 1)
-                // TODO - обновление таймера нужно сделать
-            } else onBack?.let { it() }
+
+    LaunchedEffect(key1 = select, key2 = mapOfDownloadedImages, block = {
+        if (!timer) return@LaunchedEffect
+        if (mapOfDownloadedImages[select] == true) {
+            scope.launch { animateTimer.animateTo(1f, tween(loadSeconds)) }
+        } else {
+            val map = mapOfDownloadedImages.toMutableMap()
+            map[select] = false
+            mapOfDownloadedImages = map
         }
-    }.value
-    
+    })
+
+    LaunchedEffect(key1 = animateTimer.value, block = {
+        if (!timer) return@LaunchedEffect
+        if (animateTimer.value + 0.001f >= 1f) {
+            scope.launch {
+                if (select != images.lastIndex) {
+                    animateTimer.snapTo(0f)
+                    listState.animateScrollToItem(select + 1)
+                } else onBack?.let { it() }
+            }
+        }
+    })
+
     val counter = "${select + 1}/${images.size}"
-    
+
     val screenWidth = METRICS.widthPixels / METRICS.density
-    
+
     Popup {
+
         BackHandler { onBack?.let { it() } }
+
         Scaffold(
-            modifier.background(
-                colorScheme.background
-            ), {
-                when(type) {
-                    PHOTO -> PhotoAppBar(
-                        counter, Modifier,
-                        { onBack?.let { it() } }
-                    )
-                    
-                    LOAD -> HiddenPhotoAppBar(animateTimer)
-                    { onBack?.let { it() } }
-                    
+            modifier = modifier.background(
+                Colors.Black
+            ), topBar = {
+                when (type) {
+                    PHOTOS -> {
+                        asm.systemUi.setStatusBarColor(Colors.Black)
+                        asm.systemUi.setSystemBarsColor(Colors.Black)
+                        PhotosAppBar(
+                            text = counter,
+                            modifier = Modifier,
+                            { onBack?.let { it() } }
+                        )
+                    }
+
+                    PhotoViewType.PHOTO -> {
+                        asm.systemUi.setStatusBarColor(Colors.PreDark)
+                        asm.systemUi.setSystemBarsColor(Colors.PreDark)
+                        PhotoAppBar(
+                            //text = counter,
+                            modifier = Modifier,
+                            { onBack?.let { it() } }
+                        )
+                    }
+
+                    LOAD -> {
+                        asm.systemUi.setStatusBarColor(Colors.Black)
+                        asm.systemUi.setSystemBarsColor(Colors.Black)
+                        HiddenPhotoAppBar(
+                            load = animateTimer.value,
+                            counter = counter
+                        ) { onBack?.let { it() } }
+
+                    }
+
                 }
                 GDropMenu(
-                    menuState, { onMenuClick?.let { it(false) } },
-                    DpOffset((screenWidth - 160).dp, -(100).dp),
-                    listOf(
+                    menuState = menuState,
+                    collapse = { onMenuClick?.let { it(false) } },
+                    offset = DpOffset((screenWidth - 160).dp, -(100).dp),
+                    menuItem = listOf(
                         Pair(stringResource(R.string.edit_button)) {
                             onMenuItemClick?.let {
                                 it(images[select]?.id!!)
@@ -172,26 +224,36 @@ fun PhotoView(
                     listState.firstVisibleItemScrollOffset
                 }
             }.value
-            
-            if(!listState.isScrollInProgress)
+
+            if (!listState.isScrollInProgress)
                 scope.scrollBasic(listState, offset <= 250)
-            
+
             var scrollState by remember {
                 mutableStateOf(true)
             }
             LazyRow(
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Red),
-                listState,
-                userScrollEnabled = scrollState
+                state = listState,
+                userScrollEnabled = if (type == LOAD) false else scrollState
             ) {
-                items(images) { photo ->
+                itemsIndexed(images) { index, photo ->
                     ZoomableAsyncImage(
-                        photo?.url, Modifier
+                        model = photo?.thumbnail?.url,
+                        modifier = Modifier
                             .width(screenWidth.dp)
-                            .fillMaxHeight()
-                    ) { scrollState = it }
+                            .fillMaxHeight(),
+                        backgroundColor = Colors.Black,
+                        scrollDisable = {
+                            scrollState = it
+                        },
+                        onImageLoaded = {
+                            val map = mapOfDownloadedImages.toMutableMap()
+                            map[index] = true
+                            mapOfDownloadedImages = map
+                        }
+                    )
                 }
             }
         }
@@ -204,30 +266,31 @@ private fun CoroutineScope.scrollBasic(
 ) {
     launch {
         listState.animateScrollToItem(
-            if(left) listState.firstVisibleItemIndex
+            if (left) listState.firstVisibleItemIndex
             else listState.firstVisibleItemIndex + 1
         )
     }
 }
 
 @Composable
-private fun PhotoAppBar(
+private fun PhotosAppBar(
     text: String,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onMenuClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(colorScheme.primaryContainer),
         SpaceBetween, CenterVertically
     ) {
         Row(Modifier, Start, CenterVertically) {
-            Back(Modifier.padding(16.dp), onBack)
+            Back(Modifier.padding(16.dp), tint = Colors.White, onBack)
             Text(
-                text, Modifier.padding(),
-                colorScheme.tertiary,
+                text = text,
+                modifier = Modifier.padding(),
+                //color = Colors.White, colorScheme.tertiary,
                 style = typography.headlineLarge
             )
         }
@@ -240,15 +303,53 @@ private fun PhotoAppBar(
 }
 
 @Composable
+private fun PhotoAppBar(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+    onMenuClick: (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            //    .background(colorScheme.primaryContainer)
+            .background(Colors.PreDark),
+        SpaceBetween, CenterVertically
+    ) {
+        Row(Modifier, Start, CenterVertically) {
+            Back(modifier = Modifier.padding(16.dp), tint = Colors.WhiteOnSurface, onBack)
+        }
+
+        onMenuClick?.let {
+            GKebabButton(
+                Modifier.padding(16.dp)
+            ) { it() }
+        }
+    }
+}
+
+@Composable
 private fun HiddenPhotoAppBar(
     load: Float,
     modifier: Modifier = Modifier,
+    counter: String,
     onBack: () -> Unit,
 ) {
     Column(modifier) {
-        Back(Modifier.padding(top = 24.dp), onBack)
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+            Back(modifier = Modifier.padding(top = 24.dp), tint = Colors.White, onClick = onBack)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
+                contentAlignment = Center
+            ) {
+                Text(
+                    text = counter, color = Colors.White, style = typography.headlineLarge
+                )
+            }
+        }
         Loader(
-            load, Modifier.padding(horizontal = 16.dp)
+            load = load, modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
         )
     }
 }
@@ -256,12 +357,13 @@ private fun HiddenPhotoAppBar(
 @Composable
 private fun Back(
     modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
     onClick: () -> Unit,
 ) {
     IconButton(onClick, modifier) {
         Icon(
             painterResource(ic_back),
-            (null), Modifier.size(24.dp)
+            (null), Modifier.size(24.dp), tint = tint
         )
     }
 }
@@ -307,6 +409,7 @@ fun ZoomableAsyncImage(
     isZoomable: Boolean = true,
     scrollState: ScrollableState? = null,
     scrollDisable: (Boolean) -> Unit,
+    onImageLoaded: () -> Unit,
 ) {
     val scope =
         rememberCoroutineScope()
@@ -330,7 +433,7 @@ fun ZoomableAsyncImage(
                 MutableInteractionSource(),
                 (null), onClick = {},
                 onDoubleClick = {
-                    if(scale >= 2f) {
+                    if (scale >= 2f) {
                         scale = 1f
                         offsetX = 1f
                         offsetY = 1f
@@ -338,14 +441,14 @@ fun ZoomableAsyncImage(
                 },
             )
             .pointerInput(Unit) {
-                if(isZoomable) {
+                if (isZoomable) {
                     forEachGesture {
                         awaitPointerEventScope {
                             awaitFirstDown()
                             do {
                                 val event = awaitPointerEvent()
                                 scale *= event.calculateZoom()
-                                if(scale > 1) {
+                                if (scale > 1) {
                                     scrollDisable(false)
                                     scrollState?.run {
                                         scope.launch {
@@ -369,7 +472,7 @@ fun ZoomableAsyncImage(
                                     offsetY = 1f
                                     scrollDisable(true)
                                 }
-                            } while(event.changes.any
+                            } while (event.changes.any
                                 { it.pressed }
                             )
                         }
@@ -383,7 +486,7 @@ fun ZoomableAsyncImage(
         Box(
             Modifier
                 .fillMaxSize()
-                .background(colorScheme.background),
+                .background(backgroundColor),
             Center
         ) {
             AsyncImage(
@@ -391,7 +494,7 @@ fun ZoomableAsyncImage(
                 modifier
                     .align(imageAlign)
                     .graphicsLayer {
-                        if(isZoomable) {
+                        if (isZoomable) {
                             scaleX = maxOf(
                                 maxScale, minOf(
                                     minScale, scale
@@ -402,7 +505,7 @@ fun ZoomableAsyncImage(
                                     minScale, scale
                                 )
                             )
-                            if(isRotation)
+                            if (isRotation)
                                 rotationZ = rotationState
                             translationX = offsetX
                             translationY = offsetY
@@ -410,9 +513,12 @@ fun ZoomableAsyncImage(
                     },
                 contentScale = contentScale,
                 onLoading = { placeholder = true },
-                onSuccess = { placeholder = false },
+                onSuccess = {
+                    placeholder = false
+                    onImageLoaded()
+                },
             )
-            if(placeholder) AnimatedImage(R.raw.loaging)
+            if (placeholder) AnimatedImage(R.raw.loaging)
         }
     }
 }
@@ -421,7 +527,7 @@ suspend fun ScrollableState.setScrolling(
     value: Boolean,
 ) {
     scroll(PreventUserInput) {
-        if(value) Unit
+        if (value) Unit
         else awaitCancellation()
     }
 }

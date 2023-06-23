@@ -10,7 +10,7 @@ import ru.rikmasters.gilty.chat.presentation.ui.chat.bars.PinnedBarType.*
 import ru.rikmasters.gilty.chats.manager.MessageManager
 import ru.rikmasters.gilty.core.viewmodel.ViewModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType
-import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTOS
 import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.common.compressor.compress
 import ru.rikmasters.gilty.shared.common.errorToast
@@ -107,7 +107,7 @@ class ChatViewModel: ViewModel() {
     private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
     val viewerImages = _viewerImages.asStateFlow()
     
-    private val _viewerType = MutableStateFlow(PHOTO)
+    private val _viewerType = MutableStateFlow(PHOTOS)
     val viewerType = _viewerType.asStateFlow()
     
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)

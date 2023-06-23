@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.responds
 
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
@@ -60,10 +59,6 @@ fun RespondsBs(
 
     LaunchedEffect(key1 = receivedResponds.itemSnapshotList.items, block = {
         vm.setLocalReceivedResponds(sentResponds.itemSnapshotList.items)
-    })
-
-    LaunchedEffect(key1 = tabs, block = {
-        Log.d("Hello", "$tabs tab")
     })
 
     Use<RespondsBsViewModel>(LoadingTrait) {

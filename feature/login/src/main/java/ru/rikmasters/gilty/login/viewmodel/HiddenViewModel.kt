@@ -45,7 +45,7 @@ class HiddenViewModel : ViewModel() {
     private val _isDragging = MutableStateFlow(false)
     val isDragging = _isDragging.asStateFlow()
 
-    private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
+    private val _viewerType = MutableStateFlow(PhotoViewType.PHOTOS)
     val viewerType = _viewerType.asStateFlow()
 
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)

@@ -55,7 +55,7 @@ fun OrganizerBs(
 
     LaunchedEffect(key1 = organizerHiddenImages.itemSnapshotList.items, block = {
         vm.setHiddenPhotoViewImages(organizerHiddenImages.itemSnapshotList.items)
-        if(organizerHiddenImages.itemSnapshotList.items.isNotEmpty())
+        if (organizerHiddenImages.itemSnapshotList.items.isNotEmpty())
             vm.setHiddenPhotoViewSelected(organizerHiddenImages.itemSnapshotList.items[0])
     })
 
@@ -118,14 +118,7 @@ fun OrganizerBs(
                 }
 
                 override fun hiddenImages() {
-                    scope.launch {
-                        vm.setHiddenPhotoViewState(true)
-                        /*    vm.setPhotoViewSelected(image)
-                    vm.setPhotoViewImages(listOf(image))
-                    vm.changePhotoViewState(true)*/
-                        //vm.setPhotoViewState(true)
-                    }
-
+                    scope.launch { vm.setHiddenPhotoViewState(true) }
                 }
 
                 override fun onBack() {

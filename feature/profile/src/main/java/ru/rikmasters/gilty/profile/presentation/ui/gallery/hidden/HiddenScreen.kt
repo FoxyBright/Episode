@@ -65,7 +65,7 @@ fun HiddenBsScreen(
 
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {
-                    vm.changePhotoViewType(PhotoViewType.PHOTO)
+                    vm.changePhotoViewType(PhotoViewType.PHOTOS)
                     vm.setPhotoViewSelected(image)
                     vm.changePhotoViewState(true)
                 }

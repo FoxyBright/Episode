@@ -1,7 +1,6 @@
 package ru.rikmasters.gilty.login.presentation.ui.hidden
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -80,7 +79,7 @@ data class HiddenState(
     val viewerImages: List<AvatarModel?> = emptyList(),
     val viewerSelectImage: AvatarModel? = null,
     val viewerMenuState: Boolean = false,
-    val viewerType: PhotoViewType = PhotoViewType.PHOTO,
+    val viewerType: PhotoViewType = PhotoViewType.PHOTOS,
     val alert: Boolean,
 )
 

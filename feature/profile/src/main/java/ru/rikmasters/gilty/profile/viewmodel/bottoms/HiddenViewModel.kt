@@ -41,7 +41,7 @@ class HiddenViewModel : ViewModel() {
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
 
-    private val _viewerType = MutableStateFlow(PhotoViewType.PHOTO)
+    private val _viewerType = MutableStateFlow(PhotoViewType.PHOTOS)
     val viewerType = _viewerType.asStateFlow()
 
     private val _viewerSelectImage = MutableStateFlow<AvatarModel?>(null)
