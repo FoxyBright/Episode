@@ -97,12 +97,17 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         MutableStateFlow(LastRespond())
     val lastRespond =
         _lastRespond.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
     
     @Suppress("unused")
     @OptIn(FlowPreview::class)
     val desc = description
         .debounce(250)
-        .onEach { updateDescription() }
+        .onEach {
+            //updateDescription()
+        }
         .state(_description.value, Eagerly)
     
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -148,7 +153,10 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     val usernameDebounced = username
         .debounce(250)
         .onEach { name ->
-            val occupied =
+            if(_profile.value != null && username.value != _profile.value!!.username && username.value.isNotEmpty()) {
+                updateUsername()
+            }
+           /* val occupied =
                 if(name == profile.value?.username) false
                 else regManager.isNameOccupied(name).on(
                     success = {
@@ -157,7 +165,7 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
                     loading = { false },
                     error = { false }
                 )
-            _occupied.emit(occupied)
+            _occupied.emit(occupied)*/
         }
         .state(_username.value, Eagerly)
     
@@ -186,7 +194,8 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
     }
     
     suspend fun updateUsername() {
-        if(!occupied.value) regManager
+        //if(!occupied.value)
+        regManager
             .userUpdateData(
                 username = username.value,
                 aboutMe = description.value
@@ -194,11 +203,14 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
             .on(
                 success = {},
                 loading = {},
-                error = {}
+                error = {
+                    _errorMessage.emit(it.serverMessage.toString())
+                }
             )
     }
     
     suspend fun changeUsername(name: String) {
+        _errorMessage.emit("")
         if(name.length <= 21) _username.emit(name)
     }
     
@@ -251,7 +263,9 @@ class UserProfileViewModel: ViewModel(), PullToRefreshTrait {
         ).on(
             success = {},
             loading = {},
-            error = {}
+            error = {
+                _errorMessage.emit(it.serverMessage.toString())
+            }
         )
     }
     

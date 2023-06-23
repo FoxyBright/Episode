@@ -358,6 +358,7 @@ private fun Content(
         if(meetings.size < 2) MeetCard(
             modifier = modifier.padding(horizontal = 1.dp),
             type = EMPTY,
+            stack = false,
             hasFilters = hasFilters,
             onMoreClick = { callback?.onMeetMoreClick() },
             onRepeatClick = { callback?.onResetMeets() }

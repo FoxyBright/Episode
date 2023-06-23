@@ -296,7 +296,7 @@ fun MeetCard(
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
     onSelect: ((DirectionType) -> Unit)? = null,
-) {
+){
     Box(modifier) {
         if(type == MEET)
             Image(
@@ -310,7 +310,7 @@ fun MeetCard(
                     .align(BottomCenter)
                     .offset(
                         y = animateDpAsState(
-                            if(stack) 16.dp
+                            if (stack && offset == 0.0f) 16.dp
                             else 0.dp,
                             tween(800)
                         ).value

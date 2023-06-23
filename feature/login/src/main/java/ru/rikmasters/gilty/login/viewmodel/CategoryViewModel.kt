@@ -37,6 +37,7 @@ class CategoryViewModel: ViewModel() {
         )
     }
     suspend fun setUserInterest(onSuccess: () -> Unit) = singleLoading {
+        // Updates categories
         val newList = selected.value.toMutableList()
         var updateList = true
         selected.value.forEach { cat ->
@@ -49,15 +50,28 @@ class CategoryViewModel: ViewModel() {
                 }
             }
         }
-        //
+        // Deletes subcategories from selected if parent is not selected
+        if(phase.value == 0) {
+            categories.value.forEachIndexed { index, categoryModel ->
+                if(categoryModel.children?.isNotEmpty() == true && !newList.contains(categoryModel)){
+                    categoryModel.children!!.forEachIndexed { childIndex, childCategoryModel ->
+                        val ind  = newList.firstOrNull { it.name == childCategoryModel.name  }
+                        if(ind != null){
+                            newList.remove(ind)
+                        }
+                    }
+                }
+            }
+        }
+        // saves interests if it is needed
         if (phase.value == 1 || updateList) {
             saveInterests {
                 onSuccess()
             }
-        }else {
-            _categories.emit(newList)
-            phase.emit(1)
         }
+        // transition to 1st phase
+        _categories.emit(newList)
+        phase.emit(1)
     }
     private suspend fun saveInterests(onSuccess: () -> Unit){
         meetManager.setUserInterest(selected.value).on(

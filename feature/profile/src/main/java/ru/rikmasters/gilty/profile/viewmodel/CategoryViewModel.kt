@@ -43,6 +43,7 @@ class CategoryViewModel : ViewModel() {
     }
 
     suspend fun setUserInterest(onSuccess: () -> Unit) = singleLoading {
+        // Updates categories
         val newList = selected.value.toMutableList()
         var updateList = true
         selected.value.forEach { cat ->
@@ -55,17 +56,26 @@ class CategoryViewModel : ViewModel() {
                 }
             }
         }
-        //
+        // Deletes subcategories from selected if parent is not selected
+        if(phase.value == 0) {
+            categories.value.forEachIndexed { index, categoryModel ->
+                if(categoryModel.children?.isNotEmpty() == true && !newList.contains(categoryModel)){
+                    categoryModel.children!!.forEachIndexed { childIndex, childCategoryModel ->
+                        val ind  = newList.firstOrNull { it.name == childCategoryModel.name  }
+                        if(ind != null){
+                            newList.remove(ind)
+                        }
+                    }
+                }
+            }
+        }
+        // saves interests if it is needed
         if (phase.value == 1 || updateList) {
             saveInterests {
                 onSuccess()
             }
         }
-        /*else {
-            saveInterests{
-
-            }
-        }*/
+        // transition to 1st phase
         _categories.emit(newList)
         phase.emit(1)
     }
@@ -116,7 +126,7 @@ class CategoryViewModel : ViewModel() {
             success = {
                 val categories = _categories.value.toMutableList()
                 it.forEach { parent ->
-                    if(categories.none{it.id == parent.id}) {
+                    if(categories.none{ it.id == parent.id }) {
                         categories.add(parent)
                     }
                 }
