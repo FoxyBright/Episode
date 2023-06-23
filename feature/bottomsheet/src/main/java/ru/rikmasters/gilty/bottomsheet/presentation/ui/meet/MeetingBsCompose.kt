@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -166,7 +165,7 @@ data class MeetingBsState(
 )
 
 interface MeetingBsCallback {
-
+    
     fun onKebabClick(state: Boolean)
     fun onMenuItemClick(index: Int, meetId: String)
     fun onMeetPlaceClick(location: LocationModel?)
@@ -186,7 +185,6 @@ interface MeetingBsCallback {
 @Composable
 fun MeetingBsContent(
     state: MeetingBsState,
-    @Suppress("unused")
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback? = null,
     bsState: BottomSheetScaffoldState =
@@ -194,7 +192,9 @@ fun MeetingBsContent(
             bottomSheetState = BottomSheetState(Collapsed)
         ),
 ) {
-    BottomSheetScaffold(
+    if(state.detailed) ContentContainer(
+        state, modifier, callback,
+    ) else BottomSheetScaffold(
         sheetContent = {
             Additional(state, callback)
         },
@@ -206,6 +206,7 @@ fun MeetingBsContent(
         ContentContainer(
             state = state,
             paddings = it,
+            modifier = modifier.height(IntrinsicSize.Min),
             callback = callback,
             bsState = bsState
         )
@@ -219,41 +220,32 @@ fun MeetingBsContent(
 @Composable
 private fun ContentContainer(
     state: MeetingBsState,
-    paddings: PaddingValues,
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback?,
-    bsState: BottomSheetScaffoldState,
+    paddings: PaddingValues? = null,
+    bsState: BottomSheetScaffoldState? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
     ms: MemberStateType? = state.meet.memberState,
 ) {
-    Box(Modifier.padding(paddings)) {
+    Box(
+        modifier.padding(
+            paddingValues = paddings
+                ?: PaddingValues(0.dp)
+        )
+    ) {
         MeetContent(
             state = state,
-            modifier = modifier
+            bsState = bsState,
+            modifier = Modifier
                 .align(Center)
                 .padding(
-                    bottom = if (
+                    bottom = if(
                         ms != IS_MEMBER
                         && ms != IS_ORGANIZER
                     ) 42.dp else 0.dp
                 ),
             callback = callback
         )
-        Button(
-            memberState = state
-                .meet.memberState,
-            isOnline = state
-                .meet.isOnline,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .align(BottomCenter)
-        ) {
-            if (state.detailed)
-                callback?.onRespond(state.meet.id)
-            else scope.launch {
-                bsState.bottomSheetState.expand()
-            }
-        }
     }
 }
 
@@ -264,15 +256,15 @@ private fun Button(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    when (memberState) {
+    when(memberState) {
         IS_MEMBER, IS_ORGANIZER -> Unit
         RESPOND_SENT -> TextButton(
-            modifier = modifier.padding(bottom = 40.dp),
+            modifier = modifier.padding(bottom = 20.dp),
             text = stringResource(R.string.respond_to_meet)
         )
-
+        
         else -> GradientButton(
-            modifier = modifier.padding(bottom = 40.dp),
+            modifier = modifier.padding(bottom = 20.dp),
             text = stringResource(
                 R.string.meeting_join_button_name
             ),
@@ -309,7 +301,7 @@ private fun Additional(
                 )
         )
         Spacer(Modifier.height(16.dp))
-
+        
         Text(
             text = if(state.meet.withoutResponds) stringResource(
                 R.string.meeting_question_comment_or_assess_without_respond
@@ -320,23 +312,26 @@ private fun Additional(
             style = typography.labelLarge,
             color = colorScheme.tertiary
         )
-
-        if (!state.meet.withoutResponds)
+        
+        if(!state.meet.withoutResponds)
             MeetingBsComment(
                 text = comment,
                 online = state.meet.isOnline,
                 onTextChange = { comment = it },
                 modifier = Modifier.padding(top = 22.dp)
             ) { comment = "" }
-
+        
         MeetingBsHidden(
-            modifier = Modifier.padding(top = if(state.meet.withoutResponds) 22.dp else 8.dp),
+            modifier = Modifier.padding(
+                top = if(state.meet.withoutResponds)
+                    22.dp else 8.dp
+            ),
             state = hidden,
             online = state.meet.isOnline
         ) { hidden = it }
-
+        
         Spacer(Modifier.height(28.dp))
-
+        
         Button(
             state.meet.memberState,
             state.meet.isOnline,
@@ -345,21 +340,20 @@ private fun Additional(
             callback?.onHiddenPhotoActive(hidden)
             callback?.onRespond(state.meet.id)
         }
+        Spacer(Modifier.height(20.dp))
     }
 }
 
 @Composable
 private fun MeetContent(
     state: MeetingBsState,
+    bsState: BottomSheetScaffoldState?,
     modifier: Modifier = Modifier,
     callback: MeetingBsCallback?,
 ) {
     Column(
         modifier
-            .fillMaxSize()
-            .background(
-                colorScheme.background
-            )
+            .background(colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
         TopBar(
@@ -382,13 +376,23 @@ private fun MeetContent(
                 ),
                 callback = callback
             )
-
-            if (state.detailed)
+            
+            if(state.detailed)
                 Detailed(state = state, callback = callback)
             else
                 Content(state = state, callback = callback)
-
-            Spacer(Modifier.height(80.dp))
+            val scope = rememberCoroutineScope()
+            Spacer(Modifier.height(28.dp))
+            Button(
+                memberState = state.meet.memberState,
+                isOnline = state.meet.isOnline,
+            ) {
+                if(state.detailed)
+                    callback?.onRespond(state.meet.id)
+                else scope.launch {
+                    bsState?.bottomSheetState?.expand()
+                }
+            }
         }
     }
 }
@@ -398,26 +402,32 @@ private fun Detailed(
     state: MeetingBsState,
     callback: MeetingBsCallback?,
 ) {
-
     Text(
-        text = if (state.meet.withoutResponds)
+        text = if(state.meet.withoutResponds)
             stringResource(R.string.meeting_question_comment_or_assess_without_respond)
-        else
-            stringResource(R.string.meeting_question_comment_or_assess),
+        else stringResource(
+            R.string.meeting_question_comment_or_assess
+        ),
         modifier = Modifier.padding(top = 4.dp),
         style = typography.labelLarge,
     )
-
-    if (!state.meet.withoutResponds)
+    
+    if(!state.meet.withoutResponds)
         MeetingBsComment(
             text = state.comment ?: "",
             online = state.meet.isOnline,
-            onTextChange = { callback?.onCommentChange(it) },
-            modifier = Modifier.padding(top = 22.dp),
+            onTextChange = {
+                callback?.onCommentChange(it)
+            },
+            modifier = Modifier
+                .padding(top = 22.dp),
         ) { callback?.onCommentTextClear() }
-
+    
     MeetingBsHidden(
-        modifier = Modifier.padding(top = if (state.meet.withoutResponds) 22.dp else 8.dp),
+        modifier = Modifier.padding(
+            top = if(state.meet.withoutResponds)
+                22.dp else 8.dp
+        ),
         state = state.hidden ?: false,
         online = state.meet.isOnline,
     ) { callback?.onHiddenPhotoActive(it) }
@@ -431,10 +441,10 @@ private fun Content(
     MeetingBsConditions(
         meet = state.meet.map(),
         modifier = Modifier.padding(
-            top = if (state.meet.description.isNotBlank()) 32.dp else 0.dp
+            top = if(state.meet.description.isNotBlank()) 32.dp else 0.dp
         )
     )
-
+    
     state.membersList?.let {
         MeetingBsParticipants(
             meet = state.meet,
@@ -450,8 +460,8 @@ private fun Content(
             }
         )
     }
-
-    if (state.meetDistance != null
+    
+    if(state.meetDistance != null
         && !state.meet.isOnline
     ) MeetingBsMap(
         meet = state.meet,
@@ -497,7 +507,6 @@ private fun TopBar(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun FullMeetingModel.TopBarTitle() {
     Text(
         text = tags.joinToString(", ")
@@ -512,13 +521,13 @@ private fun FullMeetingModel.TopBarTitle() {
     )
     Text(
         text = stringResource(
-            when (status) {
+            when(status) {
                 CANCELED ->
                     R.string.meetings_canceled
-
+                
                 COMPLETED ->
                     R.string.meetings_finished
-
+                
                 else -> R.string.empty_String
             }
         ),
@@ -533,7 +542,7 @@ private fun TopBarBackButton(
     backButton: Boolean,
     onBack: () -> Unit,
 ) {
-    if (backButton) IconButton(
+    if(backButton) IconButton(
         onClick = { onBack() },
         modifier = Modifier.padding(end = 16.dp)
     ) {
@@ -559,21 +568,21 @@ private fun Menu(
 ) {
     val menuItems =
         arrayListOf<Pair<String, () -> Unit>>()
-    if (ms == IS_MEMBER || ms == IS_ORGANIZER)
+    if(ms == IS_MEMBER || ms == IS_ORGANIZER)
         menuItems.add(
             stringResource(R.string.meeting_shared_button) to
                     { onItemSelect(0) })
-    if (ms == IS_MEMBER)
+    if(ms == IS_MEMBER)
         menuItems.add(
             stringResource(R.string.exit_from_meet) to
                     { onItemSelect(1) })
     menuItems.add(
-        if (ms == IS_ORGANIZER)
+        if(ms == IS_ORGANIZER)
             stringResource(R.string.meeting_canceled) to
                     { onItemSelect(2) }
         else stringResource(R.string.meeting_complain) to
                 { onItemSelect(3) })
-    if (menuState && menuItems.size == 1) {
+    if(menuState && menuItems.size == 1) {
         onDismiss(false)
         menuItems.first().second()
     }

@@ -31,18 +31,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBsCallback
 import ru.rikmasters.gilty.shared.R
-import ru.rikmasters.gilty.shared.common.CategoryItem
-import ru.rikmasters.gilty.shared.common.GCachedImage
-import ru.rikmasters.gilty.shared.common.Responds
+import ru.rikmasters.gilty.shared.common.*
 import ru.rikmasters.gilty.shared.common.extentions.*
-import ru.rikmasters.gilty.shared.common.marquee
 import ru.rikmasters.gilty.shared.common.profileBadges.ProfileBadge
 import ru.rikmasters.gilty.shared.model.LastRespond
-import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType
+import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.CANCELED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetStatusType.COMPLETED
 import ru.rikmasters.gilty.shared.model.enumeration.MeetType.ANONYMOUS
 import ru.rikmasters.gilty.shared.model.enumeration.MemberStateType.IS_ORGANIZER
-import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
+import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel.DEFAULT
 import ru.rikmasters.gilty.shared.model.meeting.DemoFullMeetingModel
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.shared.BrieflyRow
@@ -117,8 +114,8 @@ fun MeetingBsTopBarCompose(
             && (last?.count ?: 0) > 0
         ) last?.let {
             Responds(
-                it,
-                Modifier.padding(bottom = 12.dp)
+                lastRespond = it,
+                modifier = Modifier.padding(bottom = 12.dp)
             ) { callback?.onRespondsClick(state.meet) }
         }
         Row(Modifier.height(Max)) {
@@ -139,6 +136,8 @@ fun MeetingBsTopBarCompose(
                 modifier = Modifier.weight(1f)
             )
         }
+        val isNotBlankDescription =
+            state.meet.description.isNotBlank()
         Row(
             Modifier.padding(
                 top = 10.dp,
@@ -151,23 +150,22 @@ fun MeetingBsTopBarCompose(
                         ", ${org.age}"
                     } else ""
                 }",
+                modifier = Modifier.padding(
+                    bottom = if(isNotBlankDescription)
+                        0.dp else 20.dp
+                ),
                 emoji = org.emoji,
-                
-                group = org.group ?: UserGroupTypeModel.DEFAULT
+                group = org.group ?: DEFAULT
             )
             
             ProfileBadge(
                 group = state.meet.organizer.group
-                    ?: UserGroupTypeModel.DEFAULT,
+                    ?: DEFAULT,
                 modifier = Modifier
                     .padding(start = 6.dp),
                 labelSize = 8,
-                textPadding = PaddingValues(
-                    horizontal = 8.dp,
-                    vertical = 3.dp
-                )
+                textPadding = PaddingValues(8.dp, 3.dp)
             )
-            
             Text(
                 modifier = Modifier
                     .padding(start = 6.dp),
@@ -176,7 +174,7 @@ fun MeetingBsTopBarCompose(
                 style = typography.labelSmall
             )
         }
-        if(state.meet.description.isNotBlank())
+        if(isNotBlankDescription)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -278,7 +276,7 @@ private fun MeetDetails(
                 text = meet.datetime.format("HH:mm"),
                 color = when {
                     meet.status == COMPLETED
-                            || meet.status == MeetStatusType.CANCELED ->
+                            || meet.status == CANCELED ->
                         colorScheme.onTertiary
                     meet.isOnline ->
                         colorScheme.secondary
@@ -292,7 +290,7 @@ private fun MeetDetails(
                     .weight(1f)
                     .padding(start = 5.dp),
                 color = if(meet.status == COMPLETED
-                    || meet.status == MeetStatusType.CANCELED
+                    || meet.status == CANCELED
                 ) colorScheme.onTertiary
                 else colorScheme.outlineVariant,
                 shape = 6.dp

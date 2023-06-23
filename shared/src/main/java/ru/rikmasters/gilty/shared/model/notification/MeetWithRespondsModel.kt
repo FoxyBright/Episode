@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.shared.model.notification
 
-import android.util.Log
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import ru.rikmasters.gilty.shared.model.meeting.*
@@ -13,39 +12,35 @@ data class MeetWithRespondsModel(
     val is_online: Boolean,
     val organizer: UserModel,
     val responds_count: Int,
-    val responds: List<RespondModel>
+    val responds: List<RespondModel>,
 ) {
-
+    
     fun map(
-        photoPaging: (String) -> Flow<PagingData<AvatarModel>>
-    ): MeetWithRespondsModelWithPhotos {
-        return MeetWithRespondsModelWithPhotos(
-            id,
-            tags,
-            is_online,
-            organizer,
-            responds_count,
-            responds.map {
-                if (it.photoAccess) {
-                    RespondWithPhotos(
-                        id = it.id,
-                        author = it.author,
-                        comment = it.comment,
-                        photoAccess = true,
-                        photos = photoPaging(it.albumId)
-                    )
-                } else {
-                    RespondWithPhotos(
-                        id = it.id,
-                        author = it.author,
-                        comment = it.comment,
-                        photoAccess = true, // TODO change to false?
-                        photos = null
-                    )
-                }
-            }
-        )
-    }
+        photoPaging: (String) -> Flow<PagingData<AvatarModel>>,
+    ) = MeetWithRespondsModelWithPhotos(
+        id = id,
+        tags = tags,
+        is_online = is_online,
+        organizer = organizer,
+        responds_count = responds_count,
+        responds = responds.map {
+            if(it.photoAccess)
+                RespondWithPhotos(
+                    id = it.id,
+                    author = it.author,
+                    comment = it.comment,
+                    photoAccess = true,
+                    photos = photoPaging(it.albumId)
+                )
+            else RespondWithPhotos(
+                id = it.id,
+                author = it.author,
+                comment = it.comment,
+                photoAccess = false,
+                photos = null
+            )
+        }
+    )
 }
 
 data class MeetWithRespondsModelWithPhotos(
@@ -54,9 +49,10 @@ data class MeetWithRespondsModelWithPhotos(
     val is_online: Boolean,
     val organizer: UserModel,
     val responds_count: Int,
-    val responds: List<RespondWithPhotos>
+    val responds: List<RespondWithPhotos>,
 )
 
+@Suppress("unused")
 val DemoMeetWithRespondsModel = MeetWithRespondsModel(
     UUID.randomUUID().toString(),
     DemoTagList,

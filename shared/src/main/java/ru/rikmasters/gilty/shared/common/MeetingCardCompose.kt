@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -34,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.MeetCardType.MEET
+import ru.rikmasters.gilty.shared.common.extentions.toSp
 import ru.rikmasters.gilty.shared.common.extentions.todayControl
 import ru.rikmasters.gilty.shared.model.enumeration.ConditionType.MEMBER_PAY
 import ru.rikmasters.gilty.shared.model.enumeration.DirectionType
@@ -48,7 +48,6 @@ import ru.rikmasters.gilty.shared.model.profile.AvatarModel
 import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.DateTimeCard
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
-import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra.colors
 
 private val meeting = DemoMeetingModel
@@ -65,8 +64,12 @@ private fun MeetingCardPreview() {
                 )
         ) {
             MeetCard(
-                Modifier.padding(16.dp),
-                MEET, (true), meeting, (0f), (true)
+                modifier = Modifier.padding(16.dp),
+                type = MEET,
+                stack = true,
+                meet = meeting,
+                offset = 0f,
+                hasFilters = true
             )
         }
     }
@@ -91,9 +94,10 @@ private fun EmptyMeetCardPreview() {
 private fun CardButtonPreview() {
     GiltyTheme {
         CardButton(
-            Modifier.width(150.dp),
-            stringResource(R.string.meeting_respond),
-            meeting.category.color, R.drawable.ic_heart
+            modifier = Modifier.width(150.dp),
+            text = stringResource(R.string.meeting_respond),
+            color = meeting.category.color,
+            icon = R.drawable.ic_heart
         )
     }
 }
@@ -102,9 +106,7 @@ private fun CardButtonPreview() {
 @Composable
 private fun MeetingStatesPreview() {
     GiltyTheme {
-        MeetingStates(
-            Modifier, meeting
-        )
+        MeetingStates(Modifier, meeting)
     }
 }
 
@@ -119,27 +121,31 @@ fun CardButton(
     onClick: (() -> Unit)? = null,
 ) {
     Card(
-        { onClick?.let { it() } },
-        modifier, (true),
-        shapes.extraLarge,
-        cardColors(background)
+        onClick = { onClick?.let { it() } },
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        colors = cardColors(background)
     ) {
         Box(Modifier.fillMaxWidth(), Center) {
             Row(
-                Modifier.padding(10.dp),
+                Modifier.padding(10.dp, 6.dp),
                 Start, CenterVertically
             ) {
                 icon?.let {
                     Image(
-                        painterResource(it), (null),
-                        Modifier.padding(end = 6.dp),
+                        painter = painterResource(it),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 6.dp),
                         colorFilter = tint(color)
                     )
                 }
                 Text(
-                    text, Modifier, color,
-                    style = typography.labelSmall,
-                    fontWeight = SemiBold
+                    text = text,
+                    style = typography.labelSmall.copy(
+                        fontWeight = SemiBold,
+                        color = color
+                    ),
                 )
             }
         }
@@ -204,8 +210,9 @@ fun EmptyCard(
     onRepeatClick: (() -> Unit)? = null,
 ) {
     Card(
-        modifier, shapes.large,
-        cardColors(Transparent)
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        colors = cardColors(Transparent)
     ) {
         Box {
             AnimatedImage(
@@ -216,8 +223,8 @@ fun EmptyCard(
                     .fillMaxWidth()
                     .fillMaxHeight(0.94f)
                     .background(
-                        colorScheme.primaryContainer,
-                        shapes.large
+                        color = colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(14.dp)
                     ),
                 contentScale = Fit
             )
@@ -229,17 +236,19 @@ fun EmptyCard(
             ) {
                 ShadowBack(Modifier.offset(y = (-30).dp))
                 Card(
-                    Modifier,
-                    shapes.large,
-                    cardColors(colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = cardColors(colorScheme.primaryContainer),
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(
-                            stringResource(R.string.meeting_empty_meet_label),
-                            Modifier.fillMaxWidth(),
-                            colorScheme.tertiary,
-                            textAlign = TextAlign.Center,
-                            style = typography.labelLarge
+                            text = stringResource(
+                                R.string.meeting_empty_meet_label
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            style = typography.labelLarge.copy(
+                                color = colorScheme.tertiary,
+                                textAlign = TextAlign.Center
+                            )
                         )
                         Row(
                             Modifier
@@ -319,7 +328,7 @@ fun MeetCard(
         Column(
             Modifier
                 .fillMaxSize()
-                .clip(shapes.large)
+                .clip(RoundedCornerShape(14.dp))
         ) {
             if(type == MEET)
                 MeetCard(
@@ -347,7 +356,6 @@ private fun MeetCard(
             MeetTop(
                 avatar = it.organizer?.avatar,
                 modifier = Modifier
-                    .clip(ThemeExtra.shapes.bigTopShapes)
                     .fillMaxSize()
                     .offset(y = (-24).dp)
             )
@@ -402,14 +410,14 @@ private fun MeetBottom(
         modifier
             .background(
                 colorScheme.primaryContainer,
-                ThemeExtra.shapes.bigShapes
+                RoundedCornerShape(14.dp)
             )
     ) {
         Column(
             Modifier.padding(16.dp),
             Arrangement.SpaceBetween
         ) {
-            MeetInfo(meet)
+            meet.Info()
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -463,8 +471,7 @@ private fun EmptyCard(
 @Composable
 private fun EmptyTop(
     modifier: Modifier,
-    shape: Shape = ThemeExtra
-        .shapes.bigTopShapes,
+    shape: Shape = RoundedCornerShape(14.dp),
 ) {
     Box(
         modifier.background(
@@ -497,7 +504,7 @@ private fun EmptyBottom(
         Box(
             Modifier.background(
                 colorScheme.primaryContainer,
-                ThemeExtra.shapes.bigShapes
+                RoundedCornerShape(14.dp)
             )
         ) {
             Column(
@@ -505,11 +512,14 @@ private fun EmptyBottom(
                 Arrangement.SpaceBetween
             ) {
                 Text(
-                    stringResource(R.string.meeting_empty_meet_label),
-                    Modifier.fillMaxWidth(),
-                    colorScheme.tertiary,
-                    textAlign = TextAlign.Center,
-                    style = typography.labelLarge
+                    text = stringResource(
+                        R.string.meeting_empty_meet_label
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    style = typography.labelLarge.copy(
+                        color = colorScheme.tertiary,
+                        textAlign = TextAlign.Center,
+                    )
                 )
                 Row(
                     Modifier
@@ -517,16 +527,16 @@ private fun EmptyBottom(
                         .padding(top = 22.dp)
                 ) {
                     CardButton(
-                        Modifier
+                        modifier = Modifier
                             .weight(1f)
                             .padding(end = 8.dp),
-                        stringResource(R.string.meeting_repeat_button),
-                        colorScheme.primary
+                        text = stringResource(R.string.meeting_repeat_button),
+                        color = colorScheme.primary
                     ) { onRepeatClick?.let { it() } }
                     if(hasFilters) CardButton(
-                        Modifier.weight(1f),
-                        stringResource(R.string.meeting_get_more_button),
-                        colorScheme.primary
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.meeting_get_more_button),
+                        color = colorScheme.primary
                     ) { onMoreClick?.let { it() } }
                 }
             }
@@ -535,18 +545,22 @@ private fun EmptyBottom(
 }
 
 @Composable
-private fun MeetInfo(meet: MeetingModel) {
+private fun MeetingModel.Info() {
     Row(
         Modifier.fillMaxWidth(),
         SpaceBetween
     ) {
         Text(
-            meet.title, Modifier.weight(1f),
-            colorScheme.tertiary,
+            text = title,
+            modifier = Modifier.weight(1f),
             style = typography.labelLarge.copy(
-                lineHeight = 30.sp
+                color = colorScheme.tertiary,
+                lineHeight = 23.dp.toSp()
             )
         )
-        MeetingStates(Modifier.weight(1f), meet)
+        MeetingStates(
+            modifier = Modifier.weight(1f),
+            meet = this@Info
+        )
     }
 }
