@@ -206,8 +206,7 @@ fun PhotoView(
                         PhotoAppBar(
                             modifier = Modifier,
                             onBack = { onBack?.let { it() } },
-                            onMenuClick = onMenuClick.let { { it?.let { it1 -> it1(true) } } }
-                                ?: run { null }
+                            onMenuClick = onMenuClick?.let { { it(true) } }
                         )
                     }
 

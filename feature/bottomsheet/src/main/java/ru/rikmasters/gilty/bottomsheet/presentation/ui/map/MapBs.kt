@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.bottomsheet.viewmodel.MapBsViewModel
 import ru.rikmasters.gilty.core.app.AppStateModel
+import ru.rikmasters.gilty.core.util.composable.getActivity
 import ru.rikmasters.gilty.meetings.mapper
 import ru.rikmasters.gilty.shared.model.meeting.LocationModel
 
@@ -22,9 +23,14 @@ fun MapBs(
     
     val last by vm.searchResult.collectAsState()
     val placeSearch by vm.search.collectAsState()
-    
-    LaunchedEffect(Unit) { vm.getLastPlaces() }
-    
+    val activity = getActivity()
+
+    LaunchedEffect(Unit) {
+        vm.getLastPlaces()
+        vm.getLocation(activity)
+    }
+
+
     MapBottomSheet(
         MapState(last, placeSearch, (false)),
         

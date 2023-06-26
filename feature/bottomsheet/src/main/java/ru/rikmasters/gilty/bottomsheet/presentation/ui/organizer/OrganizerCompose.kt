@@ -145,6 +145,7 @@ fun OrganizerContent(
             menuState = state.hiddenViewerMenuState,
             type = PhotoViewType.LOAD,
             onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+            back = colorScheme.background,
             onBack = { callback?.onPhotoViewDismiss(false) },
         )
         if (state.photoViewState) PhotoView(
@@ -152,7 +153,7 @@ fun OrganizerContent(
             selected = state.viewerSelectImage,
             menuState = state.viewerMenuState,
             type = PhotoViewType.PHOTO,
-            onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
+            back = colorScheme.background,
             onBack = { callback?.onPhotoViewDismiss(false) },
         )
     }
