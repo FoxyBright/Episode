@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,7 +89,14 @@ fun HiddenBsContent(
         menuState = state.viewerMenuState,
         type = state.viewerType,
         onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        menuItems = listOf(
+            Pair(stringResource(R.string.profile_delete_hidden_photo)) {
+                it?.let {
+                    callback?.onDeleteImage(it)
+                }
+            },
+        ),
+        back = colorScheme.background,
         onBack = { callback?.onPhotoViewDismiss(false) },
     )
 

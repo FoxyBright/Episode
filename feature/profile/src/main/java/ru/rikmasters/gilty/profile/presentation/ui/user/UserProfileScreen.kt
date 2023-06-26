@@ -5,7 +5,6 @@ import android.content.Context.MODE_PRIVATE
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
@@ -19,7 +18,6 @@ import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.gallery.checkStoragePermission
 import ru.rikmasters.gilty.gallery.permissionState
 import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
-import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.ProfileState
 import ru.rikmasters.gilty.shared.common.extentions.rememberLazyListScrollState
 import ru.rikmasters.gilty.shared.model.enumeration.NavIconState.ACTIVE
@@ -30,7 +28,7 @@ import ru.rikmasters.gilty.shared.model.meeting.MeetingModel
 @Composable
 @OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
-fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
+fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean, closePopUp: Boolean) {
     val listState = rememberLazyListScrollState("profile")
     val storagePermissions = permissionState()
     val scope = rememberCoroutineScope()
@@ -43,6 +41,7 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
     val unreadNotification by vm.unreadNotification.collectAsState()
     val viewerSelectImage by vm.viewerSelectImage.collectAsState()
     val viewerImages by vm.viewerImages.collectAsState()
+    val viewerMenuState by vm.viewerMenuState.collectAsState()
     val unreadMessages by vm.unreadMessages.collectAsState()
     val photoAlertState by vm.photoAlertState.collectAsState()
     val photoViewState by vm.photoViewState.collectAsState()
@@ -52,7 +51,7 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
     val profile by vm.profile.collectAsState()
     val username by vm.username.collectAsState()
     val description by vm.description.collectAsState()
-    val menuState by vm.menu.collectAsState()
+    val menuState by vm.menuState.collectAsState()
     val alert by vm.alert.collectAsState()
     val errorMessage by vm.errorMessage.collectAsState()
 
@@ -72,9 +71,16 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
     }
 
     val back = colorScheme.primaryContainer
+
     LaunchedEffect(Unit) {
         asm.systemUi.setNavigationBarColor(back)
-        vm.setUserDate(true)
+
+        if(closePopUp){
+            vm.changePhotoViewState(false)
+            vm.setViewerMenuState(false)
+        }
+
+        vm.setUserDate(update)
         vm.getUnread()
         val pref = context
             .getSharedPreferences("sharedPref", MODE_PRIVATE)
@@ -233,6 +239,10 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
         override fun menu(state: Boolean) {
             nav.navigate("settings")
         }
+
+        override fun onPhotoViewChangeMenuState(state: Boolean) {
+            scope.launch { vm.setViewerMenuState(state) }
+        }
     }
 
     ProfileContent(
@@ -260,6 +270,7 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean) {
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
+            viewerMenuState = viewerMenuState,
             smthError = false,
         ), callback = callback
     )

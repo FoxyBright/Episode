@@ -36,10 +36,10 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     val photoAlertState =
         _photoAlertState.asStateFlow()
 
-    private val _menu =
+    private val _menuState =
         MutableStateFlow(false)
-    val menu =
-        _menu.asStateFlow()
+    val menuState =
+        _menuState.asStateFlow()
 
     private val _historyState =
         MutableStateFlow(false)
@@ -66,10 +66,11 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     val activeAlbumId =
         _activeAlbumId.asStateFlow()
 
-    private val _viewerImages =
-        MutableStateFlow(emptyList<AvatarModel?>())
-    val viewerImages =
-        _viewerImages.asStateFlow()
+    private val _viewerImages = MutableStateFlow(emptyList<AvatarModel?>())
+    val viewerImages = _viewerImages.asStateFlow()
+
+    private val _viewerMenuState = MutableStateFlow(false)
+    val viewerMenuState = _viewerMenuState.asStateFlow()
 
     private val _viewerSelectImage =
         MutableStateFlow<AvatarModel?>(null)
@@ -293,6 +294,9 @@ class UserProfileViewModel : ViewModel(), PullToRefreshTrait {
     }
 
     suspend fun menuDispose(state: Boolean) {
-        _menu.emit(state)
+        _menuState.emit(state)
+    }
+    suspend fun setViewerMenuState(state: Boolean) {
+        _viewerMenuState.emit(state)
     }
 }

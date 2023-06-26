@@ -8,17 +8,17 @@ import ru.rikmasters.gilty.core.util.extension.slash
 
 @Stable
 class NavState(
-    
+
     internal val navHostController: NavHostController,
-    
+
     val startDestination: String,
-    
-    ): Loggable {
-    
+
+    ) : Loggable {
+
     internal val routeOptions: MutableMap<String, NavOptions> = HashMap()
-    
+
     private val navController = navHostController
-    
+
     /**
      * Перейти по относительному пути (внутри текущего nested)
      *
@@ -30,19 +30,19 @@ class NavState(
         val path = try {
             navHostController.currentDestination!!.route!!
                 .run {
-                    if(contains('/'))
+                    if (contains('/'))
                         substringBeforeLast('/')
                     else ""
                 }
-        } catch(e: RuntimeException) {
+        } catch (e: RuntimeException) {
             throw IllegalStateException(
                 "Не удалось получить получить текущую позицию", e
             )
         }
-        
+
         navigateAbsolute(path slash dest)
     }
-    
+
     /**
      * Перейти по абсолютному пути
      *
@@ -52,7 +52,7 @@ class NavState(
         // TODO Fast clicks
         navHostController.navigate(dest, routeOptions[dest])
     }
-    
+
     /**
      * Очистка стека
      *
@@ -63,21 +63,37 @@ class NavState(
             popUpTo(0)
         }
     }
-    
+
     fun clearStackNavigationAbsolute(route: String) {
         navHostController.navigate(route) {
             popUpTo(0)
         }
     }
-    
+
     /**
      * путь назад по графу
      */
-    fun navigationBack() {
+    fun navigationBack(
+        stringArguments: Map<String, String> = mapOf(),
+        booleanArguments: Map<String, Boolean> = mapOf(),
+        intArguments: Map<String, Int> = mapOf()
+    ) {
+        stringArguments.forEach { t, u ->
+            navController.previousBackStackEntry
+                ?.savedStateHandle?.set(t, u)
+        }
+        booleanArguments.forEach { t, u ->
+            navController.previousBackStackEntry
+                ?.savedStateHandle?.set(t, u)
+        }
+        intArguments.forEach { t, u ->
+            navController.previousBackStackEntry
+                ?.savedStateHandle?.set(t, u)
+        }
         navController.popBackStack()
     }
 
-    fun clearNavigationOptions(){
+    fun clearNavigationOptions() {
         routeOptions.clear()
     }
 }

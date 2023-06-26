@@ -29,6 +29,7 @@ fun GalleryScreen(
     vm: GalleryViewModel,
     multiple: Boolean,
     onBackDest: String,
+    closePopUp:Boolean = false,
 ) {
     
     val scope = rememberCoroutineScope()
@@ -48,7 +49,11 @@ fun GalleryScreen(
     val selected by vm.selected.collectAsState()
     val menuState by vm.menuState.collectAsState()
     val filters by vm.filters.collectAsState()
-    
+
+    LaunchedEffect(key1 = Unit, block = {
+        if(closePopUp) nav.navigationBack(booleanArguments = mapOf("closePopUp" to true, "update" to true))
+    })
+
     LaunchedEffect(permission.hasPermission) {
         permission.launchPermissionRequest()
         if(permission.hasPermission) {

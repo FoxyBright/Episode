@@ -188,7 +188,6 @@ fun ChatContent(
         menuState = state.viewerMenuState,
         type = state.viewerType,
         onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
         onBack = { callback?.onPhotoViewDismiss(false) },
     )
     

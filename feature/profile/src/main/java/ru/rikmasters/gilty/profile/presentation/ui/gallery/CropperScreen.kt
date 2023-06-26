@@ -76,7 +76,7 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
                 ) {
                     scope.launch {
                         vm.setImage(file, list)
-                        nav.navigate("main?update=${true}")
+                        nav.navigationBack(booleanArguments = mapOf("closePopUp" to true))
                     }
                 }
                 

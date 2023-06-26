@@ -16,33 +16,31 @@ import ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden.HiddenBsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.SettingsScreen
 import ru.rikmasters.gilty.profile.presentation.ui.settings.categories.CategoriesScreen
 import ru.rikmasters.gilty.profile.presentation.ui.user.UserProfileScreen
-import ru.rikmasters.gilty.profile.viewmodel.*
+import ru.rikmasters.gilty.profile.viewmodel.AlbumDetailsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.CategoryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.GalleryViewModel
+import ru.rikmasters.gilty.profile.viewmodel.UserProfileViewModel
 import ru.rikmasters.gilty.profile.viewmodel.bottoms.HiddenViewModel
 import ru.rikmasters.gilty.profile.viewmodel.settings.SettingsViewModel
-import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.*
+import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.AgeBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.GenderBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.IconsBsViewModel
+import ru.rikmasters.gilty.profile.viewmodel.settings.bottoms.OrientationBsViewModel
 
-object Profile: FeatureDefinition() {
-    
+object Profile : FeatureDefinition() {
+
     override fun DeepNavGraphBuilder.navigation() {
-        
+
         nested("profile", "main") {
-            
+
             screen<UserProfileViewModel>(
-                route = "main?update={update}",
-                arguments = listOf(
-                    navArgument("update") {
-                        type = NavType.BoolType
-                        defaultValue = false
-                    }
-                )
+                route = "main",
             ) { vm, it ->
-                it.arguments
-                    ?.getBoolean("update")
-                    ?.let { update ->
-                        UserProfileScreen(vm, update)
-                    }
+                val closePopUp = it.savedStateHandle.get<Boolean>("closePopUp") ?: false
+                val update = it.savedStateHandle.get<Boolean>("update") ?: false
+                UserProfileScreen(vm, update, closePopUp)
             }
-            
+
             screen<AlbumDetailsViewModel>(
                 route = "album?id={albumId}",
                 arguments = listOf(
@@ -56,11 +54,11 @@ object Profile: FeatureDefinition() {
                     ?.getInt("albumId")
                     ?.let { AlbumDetailsScreen(vm, it) }
             }
-            
+
             screen<SettingsViewModel>("settings") { vm, _ ->
                 SettingsScreen(vm)
             }
-            
+
             screen<GalleryViewModel>(
                 route = "cropper?image={image}",
                 arguments = listOf(navArgument("image") {
@@ -71,7 +69,7 @@ object Profile: FeatureDefinition() {
                     ?.getString("image")
                     ?.let { CropperScreen(vm, it) }
             }
-            
+
             screen<GalleryViewModel>(
                 route = "gallery?multi={multi}&dest={dest}",
                 arguments = listOf(
@@ -85,20 +83,21 @@ object Profile: FeatureDefinition() {
                     }
                 )
             ) { vm, backStack ->
+                val closePopUp = backStack.savedStateHandle.get<Boolean>("closePopUp") ?: false
                 val arg = backStack.arguments
                 arg?.getBoolean("multi")
                     ?.let { multi ->
                         arg.getString("dest")
                             ?.let { dest ->
-                                GalleryScreen(vm, multi, dest)
+                                GalleryScreen(vm, multi, dest, closePopUp)
                             }
                     }
             }
-            
+
             screen<CategoryViewModel>("categories") { vm, _ ->
                 CategoriesScreen(vm)
             }
-            
+
             screen<HiddenViewModel>(
                 route = "hidden?update={update}",
                 arguments = listOf(
@@ -115,7 +114,7 @@ object Profile: FeatureDefinition() {
             }
         }
     }
-    
+
     override fun Module.koin() {
         singleOf(::OrientationBsViewModel)
         singleOf(::AlbumDetailsViewModel)
@@ -126,11 +125,10 @@ object Profile: FeatureDefinition() {
         singleOf(::GenderBsViewModel)
         singleOf(::IconsBsViewModel)
         singleOf(::GalleryViewModel)
-        //singleOf(::HiddenViewModel)
         factoryOf(::HiddenViewModel)
         singleOf(::AgeBsViewModel)
     }
-    
+
     override fun include() = setOf(
         ProfileData, Auth
     )

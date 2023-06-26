@@ -26,7 +26,7 @@ fun GDropMenu(
         .current.screenWidthDp.let {
             DpOffset((it - 200).dp, 0.dp)
         },
-    menuItem: List<Pair<String, () -> Unit>>,
+    menuItems: List<Pair<String, () -> Unit>>,
 ) {
     MaterialTheme(
         colorScheme = colorScheme.switch()
@@ -43,7 +43,7 @@ fun GDropMenu(
             ),
             offset = offset,
         ) {
-            menuItem.forEach {
+            menuItems.forEach {
                 DropdownMenuItem(
                     text = { MenuItem(it.first) },
                     onClick = { it.second.invoke() },

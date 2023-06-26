@@ -29,7 +29,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ContentScale.Companion.Fit
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
@@ -41,6 +40,7 @@ import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.LOAD
 import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTOS
+import ru.rikmasters.gilty.gallery.photoview.PhotoViewType.PHOTO
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.R.drawable.ic_back
 import ru.rikmasters.gilty.shared.model.profile.AvatarModel
@@ -97,18 +97,17 @@ fun PhotoView(
     menuState: Boolean,
     type: PhotoViewType,
     modifier: Modifier = Modifier,
-    loadSeconds: Int = 1000, // TODO 7000
+    loadSeconds: Int = 7000,
     onMenuClick: ((Boolean) -> Unit)? = null,
-    onMenuItemClick: ((String) -> Unit)? = null,
+    menuItems: List<Pair<String, (AvatarModel?) -> Unit>> = listOf(),
+    back: Color = colorScheme.primaryContainer,
     onBack: (() -> Unit)? = null,
 ) {
     if (selected == null && images.isEmpty()) return
     val selectedImage = selected ?: images.first()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var timer by remember {
-        mutableStateOf(false)
-    }
+    var timer by remember { mutableStateOf(false) }
 
     var mapOfDownloadedImages by remember { mutableStateOf(mapOf<Int, Boolean>()) }
 
@@ -116,18 +115,18 @@ fun PhotoView(
 
     val animateTimer = remember { Animatable(0f) }
     val asm = get<AppStateModel>()
-    val back = colorScheme.primaryContainer
 
     DisposableEffect(key1 = Unit, effect = {
         onDispose {
             asm.systemUi.setStatusBarColor(back)
             asm.systemUi.setSystemBarsColor(back)
+            asm.systemUi.setNavigationBarColor(back)
         }
     })
 
     LaunchedEffect(Unit) {
-
         if (type == LOAD) timer = true
+
         images.forEach {
             it?.let {
                 if (it.id == selectedImage?.id)
@@ -169,28 +168,46 @@ fun PhotoView(
 
         BackHandler { onBack?.let { it() } }
 
+        GDropMenu(
+            menuState = menuState,
+            collapse = { onMenuClick?.let { it(false) } },
+            offset = DpOffset(
+                x = (screenWidth - 160).dp,
+                y = -(100).dp
+            ),
+            menuItems = menuItems.map {
+                it.first to {
+                    it.second.invoke(images[select])
+                }
+            },
+        )
+
         Scaffold(
             modifier = modifier.background(
                 Colors.Black
             ), topBar = {
+
                 when (type) {
                     PHOTOS -> {
-                        asm.systemUi.setStatusBarColor(Colors.Black)
-                        asm.systemUi.setSystemBarsColor(Colors.Black)
+                        asm.systemUi.setStatusBarColor(Colors.PreDark)
+                        asm.systemUi.setSystemBarsColor(Colors.PreDark)
                         PhotosAppBar(
                             text = counter,
                             modifier = Modifier,
-                            { onBack?.let { it() } }
+                            onBack = { onBack?.let { it() } },
+                            onMenuClick = onMenuClick.let { { it?.let { it1 -> it1(true) } } }
+                                ?: run { null }
                         )
                     }
 
-                    PhotoViewType.PHOTO -> {
+                    PHOTO -> {
                         asm.systemUi.setStatusBarColor(Colors.PreDark)
                         asm.systemUi.setSystemBarsColor(Colors.PreDark)
                         PhotoAppBar(
-                            //text = counter,
                             modifier = Modifier,
-                            { onBack?.let { it() } }
+                            onBack = { onBack?.let { it() } },
+                            onMenuClick = onMenuClick.let { { it?.let { it1 -> it1(true) } } }
+                                ?: run { null }
                         )
                     }
 
@@ -199,24 +216,11 @@ fun PhotoView(
                         asm.systemUi.setSystemBarsColor(Colors.Black)
                         HiddenPhotoAppBar(
                             load = animateTimer.value,
-                            counter = counter
+                            counter = counter,
                         ) { onBack?.let { it() } }
 
                     }
-
                 }
-                GDropMenu(
-                    menuState = menuState,
-                    collapse = { onMenuClick?.let { it(false) } },
-                    offset = DpOffset((screenWidth - 160).dp, -(100).dp),
-                    menuItem = listOf(
-                        Pair(stringResource(R.string.edit_button)) {
-                            onMenuItemClick?.let {
-                                it(images[select]?.id!!)
-                            }
-                        },
-                    )
-                )
             }
         ) {
             val offset = remember {
@@ -282,14 +286,16 @@ private fun PhotosAppBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.primaryContainer),
+            .background(Colors.PreDark),
+        //.background(colorScheme.primaryContainer),
         SpaceBetween, CenterVertically
     ) {
         Row(Modifier, Start, CenterVertically) {
-            Back(Modifier.padding(16.dp), tint = Colors.White, onBack)
+            Back(Modifier.padding(16.dp), tint = Colors.WhiteOnSurface, onBack)
             Text(
                 text = text,
                 modifier = Modifier.padding(),
+                color = Colors.WhiteOnSurface,
                 //color = Colors.White, colorScheme.tertiary,
                 style = typography.headlineLarge
             )
@@ -300,6 +306,7 @@ private fun PhotosAppBar(
             ) { it() }
         }
     }
+
 }
 
 @Composable
@@ -335,7 +342,10 @@ private fun HiddenPhotoAppBar(
     onBack: () -> Unit,
 ) {
     Column(modifier) {
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
+        ) {
             Back(modifier = Modifier.padding(top = 24.dp), tint = Colors.White, onClick = onBack)
             Box(
                 modifier = Modifier

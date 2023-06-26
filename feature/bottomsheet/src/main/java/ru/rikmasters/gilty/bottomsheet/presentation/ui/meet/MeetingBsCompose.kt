@@ -589,6 +589,6 @@ private fun Menu(
     GDropMenu(
         menuState = menuState,
         collapse = { onDismiss(false) },
-        menuItem = menuItems.toList()
+        menuItems = menuItems.toList()
     )
 }

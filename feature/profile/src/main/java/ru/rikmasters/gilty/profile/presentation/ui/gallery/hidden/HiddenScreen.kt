@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.profile.presentation.ui.gallery.hidden
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -33,6 +34,7 @@ fun HiddenBsScreen(
     val viewerImages by vm.photos.collectAsState()
     val photoViewType by vm.viewerType.collectAsState()
     val photoViewState by vm.viewerState.collectAsState()
+    val menuPhotoViewState by vm.menuViewerState.collectAsState()
     val isDragging by vm.isDragging.collectAsState()
     val alert by vm.alert.collectAsState()
 
@@ -50,6 +52,10 @@ fun HiddenBsScreen(
         vm.getHiddenPhotosAmount()
     })
 
+    BackHandler {
+        nav.navigationBack(booleanArguments = mapOf("update" to true))
+    }
+
     HiddenBsContent(
         state = HiddenBsState(
             photoList = photoList,
@@ -57,7 +63,7 @@ fun HiddenBsScreen(
             photoViewState = photoViewState,
             viewerImages = viewerImages,
             viewerSelectImage = viewerSelectImage,
-            viewerMenuState = false,
+            viewerMenuState = menuPhotoViewState,
             viewerType = photoViewType,
             alert = alert,
         ),
@@ -107,7 +113,7 @@ fun HiddenBsScreen(
             }
 
             override fun onBack() {
-                nav.navigationBack()
+                nav.navigationBack(booleanArguments = mapOf("update" to true))
             }
 
             override fun onPhotoViewDismiss(state: Boolean) {
@@ -116,6 +122,10 @@ fun HiddenBsScreen(
 
             override fun onIsDraggingChange(value: Boolean) {
                 scope.launch { vm.onIsDraggingChange(value) }
+            }
+
+            override fun onPhotoViewChangeMenuState(state: Boolean) {
+                scope.launch { vm.changeMenuPhotoViewState(state) }
             }
         }
     )

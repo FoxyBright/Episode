@@ -111,7 +111,13 @@ fun HiddenContent(
         menuState = state.viewerMenuState,
         type = state.viewerType,
         onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
+        menuItems = listOf(
+            Pair(stringResource(R.string.profile_delete_hidden_photo)) {
+                it?.let {
+                    callback?.onDeleteImage(it)
+                }
+            },
+        ),
         onBack = { callback?.onPhotoViewDismiss(false) },
     )
 

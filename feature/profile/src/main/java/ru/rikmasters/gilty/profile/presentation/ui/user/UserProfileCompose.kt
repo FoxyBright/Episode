@@ -156,12 +156,16 @@ private fun ViewPhotography(
     onMenuClick = {
         callback?.onPhotoViewChangeMenuState(it)
     },
-    onMenuItemClick = {
-        callback?.onPhotoViewMenuItemClick(it)
-    },
     onBack = {
         callback?.onPhotoViewDismiss(false)
     },
+    menuItems = listOf(
+        Pair(stringResource(R.string.edit_button)) {
+            it?.let {
+                callback?.profileImage(1)
+            }
+        },
+    ),
 ) else Unit
 
 @Composable

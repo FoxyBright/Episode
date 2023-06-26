@@ -154,7 +154,6 @@ fun RespondsList(
         menuState = state.viewerMenuState,
         type = LOAD,
         onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-        onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
         onBack = { callback?.onPhotoViewDismiss(false) },
     )
 }

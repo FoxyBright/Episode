@@ -43,6 +43,7 @@
     <string name="user_name">Имя пользователя</string>
     <string name="profile_user_photo">Фото профиля</string>
     <string name="profile_hidden_photo">Скрытые фото</string>
+    <string name="profile_delete_hidden_photo">Удалить</string>
     <string name="profile_hidden_photo_amount">%s фото</string>
     <string name="profile_hidden_photo_label">Другие пользователи не видят фотографии\nбез вашего согласия</string>
     <string name="profile_hidden_images_delete_photos_title">Удалить фото</string>

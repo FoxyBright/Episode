@@ -41,6 +41,9 @@ class HiddenViewModel : ViewModel() {
     private val _viewerState = MutableStateFlow(false)
     val viewerState = _viewerState.asStateFlow()
 
+    private val _menuViewerState = MutableStateFlow(false)
+    val menuViewerState = _menuViewerState.asStateFlow()
+
     private val _viewerType = MutableStateFlow(PhotoViewType.PHOTOS)
     val viewerType = _viewerType.asStateFlow()
 
@@ -108,6 +111,9 @@ class HiddenViewModel : ViewModel() {
 
     suspend fun changePhotoViewState(state: Boolean) {
         _viewerState.emit(state)
+    }
+    suspend fun changeMenuPhotoViewState(state: Boolean) {
+        _menuViewerState.emit(state)
     }
 
     suspend fun changePhotoViewType(type: PhotoViewType) {

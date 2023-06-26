@@ -145,7 +145,6 @@ fun OrganizerContent(
             menuState = state.hiddenViewerMenuState,
             type = PhotoViewType.LOAD,
             onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-            onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
             onBack = { callback?.onPhotoViewDismiss(false) },
         )
         if (state.photoViewState) PhotoView(
@@ -154,7 +153,6 @@ fun OrganizerContent(
             menuState = state.viewerMenuState,
             type = PhotoViewType.PHOTO,
             onMenuClick = { callback?.onPhotoViewChangeMenuState(it) },
-            onMenuItemClick = { callback?.onPhotoViewMenuItemClick(it) },
             onBack = { callback?.onPhotoViewDismiss(false) },
         )
     }
@@ -286,7 +284,7 @@ private fun TopBar(
                 GDropMenu(
                     menuState = menuState,
                     collapse = { onKebabClick(false) },
-                    menuItem = listOf(
+                    menuItems = listOf(
                         stringResource(R.string.complaints_title) to
                                 { onMenuItemSelect(0) })
                 )
