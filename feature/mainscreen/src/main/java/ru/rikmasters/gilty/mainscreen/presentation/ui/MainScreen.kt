@@ -90,7 +90,7 @@ fun MainScreen(vm: MainViewModel) {
     }
     
     val bsState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+        bottomSheetState = BottomSheetState(BottomSheetValue.HalfExpanded)
     )
     
     LaunchedEffect(location) { vm.getMeets() }

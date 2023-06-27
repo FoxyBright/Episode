@@ -104,7 +104,7 @@ fun GridMainContentPreview() {
 }
 
 interface MainContentCallback {
-    
+
     fun onTodayChange(today: Boolean)
     fun onTimeFilterClick()
     fun onStyleChange()
@@ -119,7 +119,7 @@ interface MainContentCallback {
         meet: MeetingModel,
         state: SwipeableCardState,
     )
-    
+
     fun updateMainScreen()
 }
 
@@ -279,7 +279,7 @@ private fun TodayToggle(
     var afterWeight by remember {
         mutableStateOf(52.dp)
     }
-    
+
     LaunchedEffect(today) {
         launch {
             listOf(72f, 110f)
@@ -306,7 +306,7 @@ private fun TodayToggle(
                 }
         }
     }
-    
+
     Row(modifier, Start, Bottom) {
         Icon(
             painter = painterResource(
@@ -409,7 +409,8 @@ private fun Filters(
         scaffoldState = state.bsState,
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent,
-        sheetPeekHeight = 126.dp
+        sheetPeekHeight = 90.dp,
+        sheetExtraHeight = 36.dp
     ) { content.invoke() }
 }
 

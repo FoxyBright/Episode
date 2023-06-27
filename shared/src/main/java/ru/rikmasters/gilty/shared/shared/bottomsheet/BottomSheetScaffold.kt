@@ -31,14 +31,15 @@ import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.core.util.composable.getDensity
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue.Collapsed
 import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue.Expanded
+import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetValue.HalfExpanded
 import ru.rikmasters.gilty.shared.shared.bottomsheet.DrawerDefaults.Elevation
 import ru.rikmasters.gilty.shared.shared.bottomsheet.SwipeableDefaults.AnimationSpec
 import kotlin.math.roundToInt
 
 @Stable
 enum class BottomSheetValue {
-    
-    Collapsed, Expanded
+
+    Collapsed, Expanded, HalfExpanded
 }
 
 @Stable
@@ -46,19 +47,21 @@ class BottomSheetState(
     initialValue: BottomSheetValue,
     animationSpec: AnimationSpec<Float> = AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true },
-): SwipeableState<BottomSheetValue>(
+) : SwipeableState<BottomSheetValue>(
     initialValue = initialValue,
     animationSpec = animationSpec,
     confirmStateChange = confirmStateChange
 ) {
-    
+
     val isCollapsed get() = currentValue == Collapsed
     val isExpanded get() = currentValue == Expanded
+    val isHalfExpanded get() = currentValue == HalfExpanded
     suspend fun expand() = animateTo(Expanded)
     suspend fun collapse() = animateTo(Collapsed)
-    
+    suspend fun halfExpand() = animateTo(HalfExpanded)
+
     companion object {
-        
+
         fun saver(
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (BottomSheetValue) -> Boolean,
@@ -73,7 +76,7 @@ class BottomSheetState(
             }
         )
     }
-    
+
     internal val nestedScrollConnection =
         this.PreUpPostDownNestedScrollConnection
 }
@@ -134,6 +137,7 @@ fun BottomSheetScaffold(
     sheetBackgroundColor: Color = colorScheme.surface,
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
     sheetPeekHeight: Dp = 56.dp,
+    sheetExtraHeight: Dp? = null,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     drawerGesturesEnabled: Boolean = true,
     drawerShape: Shape = shapes.large,
@@ -147,29 +151,44 @@ fun BottomSheetScaffold(
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
         val peekHeightPx = with(getDensity()) { sheetPeekHeight.toPx() }
+        val extraHeightPx = with(getDensity()) { sheetExtraHeight?.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
         val bsState = scaffoldState.bottomSheetState
         val mod = Modifier
             .nestedScroll(bsState.nestedScrollConnection)
             .swipeable(
                 state = bsState,
-                anchors = mapOf(
-                    fullHeight - peekHeightPx to Collapsed,
-                    fullHeight - bottomSheetHeight to Expanded,
-                ),
+                anchors =
+                if (extraHeightPx == null) {
+                    mapOf(
+                        fullHeight - peekHeightPx to Collapsed,
+                        fullHeight - bottomSheetHeight to Expanded,
+                    )
+                } else {
+                    mapOf(
+                        fullHeight - peekHeightPx to Collapsed,
+                        fullHeight - (peekHeightPx + extraHeightPx) to HalfExpanded,
+                        fullHeight - bottomSheetHeight to Expanded,
+                    )
+                },
                 orientation = Vertical,
                 enabled = sheetGesturesEnabled,
                 resistance = null
             )
             .semantics {
-                if(peekHeightPx != bottomSheetHeight) when {
+                if (peekHeightPx != bottomSheetHeight) when {
                     bsState.isCollapsed -> expand {
-                        if(scaffoldState set Expanded)
+                        if (scaffoldState set Expanded)
                             scope.launch { bsState.expand() }
                         true
                     }
+                    bsState.isHalfExpanded -> expand {
+                        if(scaffoldState set HalfExpanded)
+                            scope.launch { bsState.halfExpand() }
+                        true
+                    }
                     else -> collapse {
-                        if(scaffoldState set Collapsed)
+                        if (scaffoldState set Collapsed)
                             scope.launch { bsState.collapse() }
                         true
                     }
@@ -181,7 +200,7 @@ fun BottomSheetScaffold(
                 bottomSheetHeight =
                     it.size.height.toFloat()
             }
-        
+
         val child = child(
             modifier = mod,
             sheetShape = sheetShape,
@@ -194,7 +213,7 @@ fun BottomSheetScaffold(
             scaffoldState = scaffoldState,
             floatingActionButtonPosition = floatingActionButtonPosition
         )
-        
+
         drawerContent?.let {
             ModalDrawer(
                 drawerContent = drawerContent,
@@ -319,7 +338,7 @@ private fun PlacementScope.layoutSettings(
     floatingActionButtonPosition: FabPosition,
 ) {
     placeable.placeRelative(0, 0)
-    
+
     val (
         sheetPlaceable,
         fabPlaceable,
@@ -332,7 +351,7 @@ private fun PlacementScope.layoutSettings(
             )
         )
     }
-    
+
     bottomSheetOffset
         .value
         .roundToInt()
@@ -382,7 +401,7 @@ private fun getFabOffset(
     floatingActionButtonPosition: FabPosition,
     placeable: Placeable,
     fabPlaceable: Placeable,
-) = when(floatingActionButtonPosition) {
+) = when (floatingActionButtonPosition) {
     Center -> (placeable.width - fabPlaceable.width) / 2
     else -> placeable.width - fabPlaceable.width - 16
 }
