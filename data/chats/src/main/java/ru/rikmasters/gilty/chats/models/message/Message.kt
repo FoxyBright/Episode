@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.chats.models.message
 
 import ru.rikmasters.gilty.chats.models.chat.ChatNotification
+import ru.rikmasters.gilty.chats.paging.messages.entity.DBMessage
+import ru.rikmasters.gilty.chats.paging.messages.objToJSON
 import ru.rikmasters.gilty.core.data.entity.interfaces.DomainEntity
 import ru.rikmasters.gilty.shared.common.extentions.LocalDateTime.Companion.of
 import ru.rikmasters.gilty.shared.model.chat.MessageModel
@@ -14,10 +16,21 @@ data class Message(
     val message: MemberMessage? = null,
     val otherRead: Boolean,
     val isRead: Boolean,
-    val isDelivered: Boolean? = null,
     val createdAt: String,
     val chatId: String? = null,
 ): DomainEntity {
+    
+    fun mapToBase() = DBMessage(
+        id = id,
+        type = type,
+        replied = objToJSON(replied),
+        notification = objToJSON(notification),
+        message = objToJSON(message),
+        otherRead = otherRead,
+        isRead = isRead,
+        createdAt = createdAt,
+        chatId = chatId,
+    )
     
     fun map(): MessageModel = MessageModel(
         id = id,
@@ -27,7 +40,6 @@ data class Message(
         message = message?.map(),
         otherRead = otherRead,
         isRead = isRead,
-        isDelivered = isDelivered == true,
         createdAt = of(createdAt).toString()
     )
     

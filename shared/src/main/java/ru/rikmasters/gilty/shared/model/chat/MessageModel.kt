@@ -15,7 +15,6 @@ data class MessageModel(
     val message: MemberMessageModel? = null,
     val otherRead: Boolean,
     val isRead: Boolean,
-    val isDelivered: Boolean,
     val createdAt: String,
 ) {
     
@@ -27,7 +26,6 @@ data class MessageModel(
         message = null,
         otherRead = false,
         isRead = false,
-        isDelivered = false,
         createdAt = NOW_DATE
     )
 }
@@ -40,7 +38,6 @@ val DemoMessageModel = MessageModel(
     message = DemoMemberMessageModel,
     otherRead = true,
     isRead = true,
-    isDelivered = true,
     createdAt = "2022-10-17T08:35:54.140Z"
 )
 

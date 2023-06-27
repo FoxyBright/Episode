@@ -161,6 +161,7 @@ class ChatViewModel: ViewModel() {
         messageManager.deleteWriter(id)
     }
     
+    @Suppress("unused")
     suspend fun markAsReadMessage(
         chatId: String,
         messageIds: List<String> = emptyList(),
@@ -217,9 +218,10 @@ class ChatViewModel: ViewModel() {
     }
     
     @OptIn(ExperimentalCoroutinesApi::class)
-    val messages = _chatId.flatMapLatest { chatId ->
-        messageManager.messages(chatId)
-    }.cachedIn(coroutineScope)
+    val messages =
+        _chatId.flatMapLatest { chatId ->
+            messageManager.messages(chatId)
+        }.cachedIn(coroutineScope)
     
     suspend fun changeAnswer(message: MessageModel?) {
         _answer.emit(message)

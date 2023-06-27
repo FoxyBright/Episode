@@ -154,7 +154,7 @@ class ChatWebSource: KtorSource() {
     }.let {
         coroutinesState({ it }) {
             it.paginateWrapped<List<Message>>()
-                .let { it.first to it.second.currentPage }
+                .let { it.first to it.second }
         }
     }
     

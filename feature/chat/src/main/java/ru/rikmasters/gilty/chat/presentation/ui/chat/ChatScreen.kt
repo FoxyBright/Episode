@@ -131,9 +131,9 @@ fun ChatScreen(
         }
     }
     
-    LaunchedEffect(messages.itemSnapshotList) {
-        vm.markAsReadMessage(chatId, all = true)
-    }
+//    LaunchedEffect(messages.itemSnapshotList) {
+//        vm.markAsReadMessage(chatId, all = true)
+//    }
     
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {

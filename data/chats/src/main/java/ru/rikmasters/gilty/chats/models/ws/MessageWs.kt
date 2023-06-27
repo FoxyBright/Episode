@@ -21,7 +21,6 @@ data class MessageWs(
         message,
         otherRead = false,
         isRead = false,
-        isDelivered = true,
         createdAt = createdAt,
         chatId = chatId
     )

@@ -105,8 +105,13 @@ fun DependencyHandlerScope.koin() = implementation(
     "io.insert-koin:koin-core:$koinVer",
 )
 
+
+const val roomVersion = "2.4.3"
 fun DependencyHandlerScope.dataBase() =
     realm() and ktor() and implementation(
+        "androidx.room:room-runtime:$roomVersion",
+        "androidx.room:room-ktx:$roomVersion",
+        "androidx.room:room-paging:$roomVersion",
         project(":data:realm"),
         project(":data:ktor")
     )

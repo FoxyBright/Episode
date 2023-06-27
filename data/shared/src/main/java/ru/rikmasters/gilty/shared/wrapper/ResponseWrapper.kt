@@ -63,20 +63,13 @@ data class ResponseWrapper<T: Any?>(
     val paginator: Paginator? = null,
 ) {
     
-    @Suppress("unused")
     class Paginator(
         val type: String,
         val total: Int,
         val perPage: Int,
         val currentPage: Int,
         val last_page: Int,
-    ) {
-        
-        constructor(): this(
-            (""), (0), (0),
-            (0), (0)
-        )
-    }
+    )
     
     data class Error(
         val code: String? = null,
@@ -119,8 +112,6 @@ suspend inline fun <reified T> HttpResponse.paginateWrapped(
 suspend inline fun HttpResponse.errorWrapped() =
     body<ErrorResponseWrapper>()
 
-// По неизвестным причинам не приходит status
-@Suppress("unused")
 suspend inline fun <reified T> HttpResponse.wrappedTest(): T
         where T: Any? = body<ResponseWrapperTest<T>>().data
 
@@ -284,10 +275,6 @@ fun <T: Any> flowState(
 // TODO: Заменять Exception()
 //  на Exception(нужное в UI сообщение)
 //  в случае необходимости
-/**
- * [paginateState] превращает запрос в LoadResult
- */
-@Suppress("unused")
 suspend fun <T: Any> paginateState(
     block: suspend () -> List<T>,
     loadSize: Int,
