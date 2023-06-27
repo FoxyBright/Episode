@@ -109,9 +109,11 @@ fun BottomSheetLayout(
     val density = getDensity()
     
     val offset = swipeState.offset.value.roundToInt()
-    val enabled = remember {
+
+    val enabled = remember(swipeState.currentScreenName.value) {
         swipeState.currentScreenName.value != "Map"
     }
+
     val connection = remember {
         swipeState.PreUpPostDownNestedScrollConnection
     }

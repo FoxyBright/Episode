@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.yandexmap.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import com.yandex.mapkit.MapKitFactory
@@ -40,12 +41,14 @@ fun YandexMapScreen(
         location, LocationModel::class.java
     )
     var placeNameChangeJob: Job? = null
+
     
     LaunchedEffect(Unit) {
         vm.setMapKit(
             MapKitFactory
                 .getInstance()
         )
+
         vm.changeMeetPlace(
             MeetPlaceModel(
                 lat = loc.lat,
@@ -77,6 +80,14 @@ fun YandexMapScreen(
     }
     
     mapKit?.let { map ->
+
+        BackHandler {
+            scope.launch {
+                map.onStop()
+                nav.popBackStack()
+            }
+        }
+
         YandexMapContent(
             state = YandexMapState(
                 mapKit = map,

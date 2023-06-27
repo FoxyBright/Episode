@@ -44,8 +44,11 @@ fun MapBs(
                     val location = mapper
                         .writeValueAsString(
                             LocationModel(
-                                (false), (55.112020),
-                                (36.586459), (""), ("")
+                                hide = (false),
+                                lat = (55.112020),
+                                lng = (36.586459),
+                                place = (""),
+                                address = ("")
                             )
                         )
                     nav.navigate(

@@ -46,9 +46,9 @@ fun MapContent(
     val currentPointerImage = remember {
         mutableStateOf(ic_not_selected_pointer)
     }
-    
+
     LaunchedEffect(state.isSearching) {
-        if(state.isSearching && offsetY.value == 0f) {
+        if (state.isSearching && offsetY.value == 0f) {
             callback?.subBsExpandState(false)
             currentPointerImage.value = ic_not_selected_pointer
             offsetY.animateTo(
@@ -58,7 +58,7 @@ fun MapContent(
                     delayMillis = 0
                 )
             )
-        } else if(!state.isSearching) {
+        } else if (!state.isSearching) {
             offsetY.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
@@ -70,7 +70,7 @@ fun MapContent(
             callback?.subBsExpandState(true)
         }
     }
-    
+
     Box(modifier) {
         AndroidView(
             factory = { context ->
@@ -79,12 +79,12 @@ fun MapContent(
                     .inflate(map_layout, (null), (false))
                     .findViewById<MapView>(mapview)
                     .getProperties(state)
-                
+
                 properties.map.moveCamera(properties.point)
-                
+
                 val obj = properties.obj
                 val point = properties.point
-                
+
                 when {
                     !state.categoryName.isNullOrBlank() -> {
                         @Suppress("unused_variable") // для stronglink
@@ -92,15 +92,15 @@ fun MapContent(
                             context, properties, callback
                         )
                     }
-                    
+
                     state.location?.hide != false -> {
                         obj.addMapCircle(point)
                         @Suppress("unused_variable") // для stronglink
                         val camListener =
                             properties camListener callback
                     }
-                    
-                    
+
+
                     else -> {
                         obj.addMarker(point, context, ic_location)
                         @Suppress("unused_variable") // для stronglink
@@ -108,14 +108,14 @@ fun MapContent(
                             properties camListener callback
                     }
                 }
-                
+
                 context.requestGeoPermissions()
-                
+
                 state.mapKit.userLocation(
                     map = properties.map,
                     state = state.userVisible
                 )
-                
+
                 state.mapKit.onStart()
                 properties.map
             },
@@ -137,7 +137,7 @@ private fun Cursor(
     modifier: Modifier,
     offset: Int,
 ) {
-    if(state) Box(modifier.height(80.dp)) {
+    if (state) Box(modifier.height(80.dp)) {
         Image(
             painter = painterResource(icon),
             contentDescription = null,
@@ -160,20 +160,21 @@ private fun MapProperties.getPoints(
     properties: MapProperties,
     callback: YandexMapCallback?,
 ) = map.map.addCameraListener { map, position, _, finished ->
+
     callback?.onCameraChange(position.target)
-    
+
     search(map, position, callback) { points ->
         val nearest by mutableStateOf(
             position.target near points.map { it.first }
         )
-        
+
         points.forEach { (p, it) ->
             val marker = obj.addMarkerWithListener(
                 this.map, p, it, context, callback
             )
-            if(p equally nearest) {
+            if (p equally nearest) {
                 marker.setView(context.getMarkerView(true))
-                if(finished) properties.map.moveCamera(p)
+                if (finished) properties.map.moveCamera(p)
                 callback?.onMarkerClick((getMeetPlace(marker, it)))
             } else marker.setView(context.getMarkerView(false))
         }
@@ -186,12 +187,12 @@ private fun MapProperties.search(
     onUpdate: (List<Pair<Point, Item>>) -> Unit,
 ) {
     val list = mutableListOf<Pair<Point, Item>>()
-    
+
     searchManager.submit(
         Point(
             position.target.latitude,
             position.target.longitude
-        ), null, SearchOptions(), object: SearchListener {
+        ), null, SearchOptions(), object : SearchListener {
             override fun onSearchResponse(p0: Response) {
                 callback?.onMarkerClick(
                     MeetPlaceModel(
@@ -204,12 +205,12 @@ private fun MapProperties.search(
                     )
                 )
             }
-            
+
             override fun onSearchError(p0: Error) {}
         }
     )
-    
-    val searchListener = object: SearchListener {
+
+    val searchListener = object : SearchListener {
         override fun onSearchResponse(res: Response) {
             obj.clear()
             list.clear()
@@ -221,12 +222,12 @@ private fun MapProperties.search(
             }
             onUpdate(list)
         }
-        
+
         override fun onSearchError(err: Error) {
             log.d(err.toString())
         }
     }
-    
+
     searchManager.submit(
         searchText, toPolygon(camMap.visibleRegion(position)),
         SearchOptions(), searchListener
