@@ -49,19 +49,17 @@ class MessageRepository(
         answer?.let { (type, data) ->
             data?.let { model ->
                 when(type) {
-                    NEW_MESSAGE -> messageDao.addMessage((model as Message).mapToBase())
-                    DELETE_MESSAGE -> primarySource.deleteById<Message>(
-                        model
-                    )
-                    else -> primarySource.findById<Message>(
-                        model
-                    )?.let {
-                        primarySource.save(
-                            it.copy(
-                                otherRead = true
+                    NEW_MESSAGE -> messageDao
+                        .addMessage((model as Message).mapToBase())
+                    DELETE_MESSAGE -> primarySource
+                        .deleteById<Message>(model)
+                    else -> primarySource
+                        .findById<Message>(model)
+                        ?.let {
+                            primarySource.save(
+                                it.copy(otherRead = true)
                             )
-                        )
-                    }
+                        }
                 }
             }
             refresh()

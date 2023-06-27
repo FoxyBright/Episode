@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -131,9 +132,9 @@ fun ChatScreen(
         }
     }
     
-//    LaunchedEffect(messages.itemSnapshotList) {
-//        vm.markAsReadMessage(chatId, all = true)
-//    }
+    //    LaunchedEffect(messages.itemSnapshotList) {
+    //        vm.markAsReadMessage(chatId, all = true)
+    //    }
     
     LaunchedEffect(writingUsers) {
         writingUsers.forEach {
@@ -169,295 +170,250 @@ fun ChatScreen(
             }
         }
     
-    val state = meeting?.let { meet ->
-        chat?.let { chat ->
-            ChatState(
-                topState = ChatAppBarState(
-                    name = chat.title,
-                    avatar = meet.organizer.avatar,
-                    memberCount = membersCount,
-                    chatType = type,
-                    viewer = viewers,
-                    toTranslation = remainTime,
-                    isOnline = meet.isOnline,
-                    isOrganizer = meet.organizer.id == chat.userId
-                ),
-                answer = answer,
-                meet = meet.map(),
-                messageText = message,
-                messageList = messages,
-                userId = chat.userId,
-                alert = alert,
-                meetAlert = meetOutAlert,
-                kebabMenuState = kebabMenuState,
-                messageMenuState = messageMenuState,
-                imageMenuState = imageMenuState,
-                listState = listState,
-                unreadCount = unreadCount,
-                writingUsers = writingUsers,
-                photoViewState = photoViewState,
-                viewerImages = viewerImages,
-                viewerSelectImage = viewerSelectImage,
-                viewerType = photoViewType
+    
+    val state = if(
+        meeting != null && chat != null
+    ) ChatState(
+        topState = ChatAppBarState(
+            name = chat!!.title,
+            avatar = meeting!!.organizer.avatar,
+            memberCount = membersCount,
+            chatType = type,
+            viewer = viewers,
+            toTranslation = remainTime,
+            isOnline = meeting!!.isOnline,
+            isOrganizer = meeting!!.organizer.id == chat!!.userId
+        ),
+        answer = answer,
+        meet = meeting!!.map(),
+        messageText = message,
+        messageList = messages,
+        userId = chat!!.userId,
+        alert = alert,
+        meetAlert = meetOutAlert,
+        kebabMenuState = kebabMenuState,
+        messageMenuState = messageMenuState,
+        imageMenuState = imageMenuState,
+        listState = listState,
+        unreadCount = unreadCount,
+        writingUsers = writingUsers,
+        photoViewState = photoViewState,
+        viewerImages = viewerImages,
+        viewerSelectImage = viewerSelectImage,
+        viewerType = photoViewType
+    ) else null
+    
+    @Composable
+    fun openPreview() {
+        if(state == null) return else PreviewBsScreen(
+            vm = PreviewBsViewModel(),
+            closeClicked = { scope.launch { asm.bottomSheet.collapse() } },
+            startBroadcastClicked = {
+                scope.launch {
+                    asm.bottomSheet.collapse()
+                    nav.navigateAbsolute(
+                        "translations/streamer?id=${state.meet.id}"
+                    )
+                }
+            }
+        )
+    }
+    
+    suspend fun pinnedBarClick() {
+        if(state == null) return else when(type) {
+            TRANSLATION -> nav.navigateAbsolute(
+                "translationviewer/viewer?id=${state.meet.id}"
             )
+            TRANSLATION_ORGANIZER -> {
+                if(!permissionsState.allPermissionsGranted)
+                    permissionsState.launchMultiplePermissionRequest()
+                else scope.launch {
+                    asm.bottomSheet.expand { openPreview() }
+                }
+            }
+            MEET_FINISHED -> {
+                vm.completeChat(chat)
+                nav.navigate("main")
+            }
+            else -> Unit
         }
     }
     
-    Use<ChatViewModel>(LoadingTrait) {
-        state?.let { state ->
-            val callback = object: ChatCallback {
-                
-                override fun onPhotoViewDismiss(state: Boolean) {
-                    scope.launch { vm.changePhotoViewState(state) }
-                }
-                
-                override fun onPinnedBarButtonClick() {
-                    scope.launch {
-                        when(type) {
-                            TRANSLATION -> {
-                                nav.navigateAbsolute(
-                                    "translationviewer/viewer?id=${state.meet.id}"
-                                )
-                            }
-                            TRANSLATION_ORGANIZER -> {
-                                if(!permissionsState.allPermissionsGranted) {
-                                    permissionsState.launchMultiplePermissionRequest()
-                                } else {
-                                    scope.launch {
-                                        asm.bottomSheet.expand {
-                                            PreviewBsScreen(
-                                                vm = PreviewBsViewModel(),
-                                                closeClicked = {
-                                                    scope.launch {
-                                                        asm.bottomSheet.collapse()
-                                                    }
-                                                },
-                                                startBroadcastClicked = {
-                                                    scope.launch {
-                                                        asm.bottomSheet.collapse()
-                                                        nav.navigateAbsolute(
-                                                            "translations/streamer?id=${state.meet.id}"
-                                                        )
-                                                    }
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            MEET_FINISHED -> {
-                                vm.completeChat(chat)
-                                nav.navigate("main")
-                            }
-                            else -> {}
+    val callback = if(state != null)
+        object: ChatCallback {
+            
+            override fun onPhotoViewDismiss(state: Boolean) {
+                scope.launch { vm.changePhotoViewState(state) }
+            }
+            
+            override fun onPinnedBarButtonClick() {
+                scope.launch { pinnedBarClick() }
+            }
+            
+            override fun onImageMenuItemSelect(point: Int) {
+                when(point) {
+                    1 -> cameraPermissions.let {
+                        if(it.hasPermission)
+                            photographer.launch(uri)
+                        else it.launchPermissionRequest()
+                    }
+                    
+                    0 -> context.checkStoragePermission(
+                        storagePermissions, scope, asm,
+                    ) {
+                        vm.scope.openBS<GalleryViewModel>(scope) {
+                            GalleryBs(
+                                vm = it,
+                                isOnline = chat?.isOnline
+                                    ?: false,
+                                chatId = chat?.id ?: ""
+                            )
                         }
                     }
-                }
-                
-                override fun onImageMenuItemSelect(point: Int) {
-                    when(point) {
-                        1 -> cameraPermissions.let {
-                            if(it.hasPermission)
-                                photographer.launch(uri)
-                            else it.launchPermissionRequest()
-                        }
-                        
-                        0 -> context.checkStoragePermission(
-                            storagePermissions, scope, asm,
-                        ) {
-                            vm.scope
-                                .openBS<GalleryViewModel>(scope) {
-                                    GalleryBs(
-                                        vm = it,
-                                        isOnline = chat?.isOnline
-                                            ?: false,
-                                        chatId = chat?.id ?: ""
-                                    )
-                                }
-                        }
-                        2 -> vm.scope
-                            .openBS<HiddenBsViewModel>(scope) {
-                                HiddenBs(
-                                    vm = it,
-                                    isOnline = chat?.isOnline
-                                        ?: false,
-                                    chatId = chat?.id ?: ""
-                                )
-                            }
+                    2 -> vm.scope.openBS<HiddenBsViewModel>(scope) {
+                        HiddenBs(
+                            vm = it,
+                            isOnline = chat?.isOnline
+                                ?: false,
+                            chatId = chat?.id ?: ""
+                        )
                     }
                 }
-                
-                override fun onImageClick(message: MessageModel) {
-                    scope.launch {
-                        message
-                            .message
-                            ?.attachments
-                            ?.first()
-                            ?.file
-                            ?.let { attach ->
-                                vm.changePhotoViewType(PHOTOS)
-                                vm.setPhotoViewSelected(attach)
-                                vm.setPhotoViewImages(listOf(attach))
-                                vm.changePhotoViewState(true)
-                            }
-                    }
-                }
-                
-                override fun onHiddenClick(message: MessageModel) {
-                    val attach = message
-                        .message?.attachments?.first()?.file
-                    scope.launch {
-                        if(attach?.hasAccess == false) {
-                            vm.changePhotoViewType(LOAD)
+            }
+            
+            override fun onImageClick(message: MessageModel) {
+                scope.launch {
+                    message.message
+                        ?.attachments
+                        ?.first()
+                        ?.file
+                        ?.let { attach ->
+                            vm.changePhotoViewType(PHOTOS)
                             vm.setPhotoViewSelected(attach)
                             vm.setPhotoViewImages(listOf(attach))
                             vm.changePhotoViewState(true)
-                        } else vm.onHiddenBlock()
-                    }
-                }
-                
-                override fun onMessageMenuItemSelect(
-                    point: Int,
-                    message: MessageModel,
-                ) {
-                    scope.launch {
-                        when(point) {
-                            0 -> vm.changeAnswer(message)
-                            1 -> vm.deleteMessage(
-                                chatId = chatId,
-                                message = message
-                            )
                         }
-                        vm.changeMessageMenuState(false)
-                    }
                 }
-                
-                override fun onSend() {
-                    scope.launch {
-                        vm.onSendMessage(
-                            chatId = chatId,
-                            replied = answer?.id,
-                            text = message
-                        )
-                        listState.animateScrollToItem(0)
-                    }
+            }
+            
+            override fun onHiddenClick(message: MessageModel) {
+                val attach = message
+                    .message?.attachments?.first()?.file
+                scope.launch {
+                    if(attach?.hasAccess == false) {
+                        vm.changePhotoViewType(LOAD)
+                        vm.setPhotoViewSelected(attach)
+                        vm.setPhotoViewImages(listOf(attach))
+                        vm.changePhotoViewState(true)
+                    } else vm.onHiddenBlock()
                 }
-                
-                override fun onMenuItemClick(point: Int) {
-                    scope.launch {
-                        vm.changeKebabMenuState(false)
-                        when(point) {
-                            0 -> vm.changeMeetOutAlert(true)
-                            1 -> asm.bottomSheet.expand {
-                                BottomSheet(
-                                    scope = vm.scope,
-                                    type = REPORTS,
-                                    reportObject = state.meet.id,
-                                    reportType = MEETING
-                                )
-                            }
-                        }
-                    }
+            }
+            
+            override fun onMessageMenuItemSelect(
+                point: Int,
+                message: MessageModel,
+            ) {
+                scope.launch {
+                    if(point == 0) vm.changeAnswer(message)
+                    else vm.deleteMessage(chatId, message)
+                    vm.changeMessageMenuState(false)
                 }
-                
-                override fun onTopBarClick() {
-                    scope.launch {
-                        asm.bottomSheet.expand {
+            }
+            
+            override fun onSend() {
+                scope.launch {
+                    vm.onSendMessage(chatId, answer?.id, message)
+                    listState.animateScrollToItem(0)
+                }
+            }
+            
+            override fun onMenuItemClick(point: Int) {
+                scope.launch {
+                    vm.changeKebabMenuState(false)
+                    when(point) {
+                        0 -> vm.changeMeetOutAlert(true)
+                        1 -> asm.bottomSheet.expand {
                             BottomSheet(
-                                scope = vm.scope,
-                                type = MEET,
-                                meetId = state.meet.id
+                                vm.scope, REPORTS,
+                                reportObject = state.meet.id,
+                                reportType = MEETING
                             )
                         }
                     }
                 }
-                
-                override fun onDownButtonClick() {
-                    scope.launch {
-                        vm.changeUnreadCount(0)
-                        listState.animateScrollToItem(0)
+            }
+            
+            override fun onTopBarClick() {
+                scope.launch {
+                    asm.bottomSheet.expand {
+                        BottomSheet(vm.scope, MEET, state.meet.id)
                     }
                 }
-                
-                override fun gallery() {
-                    scope.launch {
-                        focusManager.clearFocus()
-                        vm.changeImageMenuState(true)
-                    }
+            }
+            
+            override fun onDownButtonClick() {
+                scope.launch {
+                    vm.changeUnreadCount(0)
+                    listState.animateScrollToItem(0)
                 }
-                
-                override fun onMeetOut() {
-                    scope.launch {
-                        vm.changeMeetOutAlert(false)
-                        nav.navigate("main")
-                    }
+            }
+            
+            override fun gallery() {
+                scope.launch {
+                    focusManager.clearFocus()
+                    vm.changeImageMenuState(true)
                 }
-                
-                override fun onKebabClick() {
-                    scope.launch {
-                        vm.changeKebabMenuState(!kebabMenuState)
-                    }
-                }
-                
-                override fun onListDown() {
-                    scope.launch {
-                        vm.changeUnreadCount((unreadCount - 1))
-                    }
-                }
-                
-                override fun onMessageMenuDismiss() {
-                    scope.launch {
-                        vm.changeMessageMenuState(false)
-                    }
-                }
-                
-                override fun onImageMenuDismiss() {
-                    scope.launch {
-                        vm.changeImageMenuState(false)
-                    }
-                }
-                
-                override fun onMeetOutAlertDismiss() {
-                    scope.launch {
-                        vm.changeMeetOutAlert(false)
-                    }
-                }
-                
-                override fun closeAlert() {
-                    scope.launch {
-                        vm.alertDismiss(false)
-                    }
-                }
-                
-                override fun onSwipe(
-                    message: MessageModel,
-                ) {
-                    scope.launch {
-                        vm.changeAnswer(message)
-                    }
-                }
-                
-                override fun textChange(text: String) {
-                    scope.launch {
-                        vm.changeMessage(text)
-                    }
-                }
-                
-                override fun onCancelAnswer() {
-                    scope.launch {
-                        vm.changeAnswer(null)
-                    }
-                }
-                
-                override fun onBack() {
+            }
+            
+            override fun onMeetOut() {
+                scope.launch {
+                    vm.changeMeetOutAlert(false)
                     nav.navigate("main")
                 }
             }
             
-            ChatContent(
-                state = state,
-                callback = callback
-            )
-        }
+            override fun onKebabClick() {
+                scope.launch { vm.changeKebabMenuState(!kebabMenuState) }
+            }
+            
+            override fun onListDown() {
+                scope.launch { vm.changeUnreadCount((unreadCount - 1)) }
+            }
+            
+            override fun onMessageMenuDismiss() {
+                scope.launch { vm.changeMessageMenuState(false) }
+            }
+            
+            override fun onImageMenuDismiss() {
+                scope.launch { vm.changeImageMenuState(false) }
+            }
+            
+            override fun onMeetOutAlertDismiss() {
+                scope.launch { vm.changeMeetOutAlert(false) }
+            }
+            
+            override fun closeAlert() {
+                scope.launch { vm.alertDismiss(false) }
+            }
+            
+            override fun onSwipe(message: MessageModel) {
+                scope.launch { vm.changeAnswer(message) }
+            }
+            
+            override fun textChange(text: String) {
+                scope.launch { vm.changeMessage(text) }
+            }
+            
+            override fun onCancelAnswer() {
+                scope.launch { vm.changeAnswer(null) }
+            }
+            
+            override fun onBack() {
+                nav.navigate("main")
+            }
+        } else null
+    
+    Use<ChatViewModel>(LoadingTrait) {
+        state?.let { ChatContent(it, Modifier, callback) }
     }
 }
