@@ -42,7 +42,7 @@ class TimeBsViewModel(
     suspend fun minutesChange(minute: String) {
         _minutes.emit(
             minute
-                .replace("start", "59")
+                .replace("start", "55")
                 .replace("end", "00")
         )
     }

@@ -70,11 +70,14 @@ fun TimeBsContent(
             .padding(top = 10.dp)
     ) {
         ScrollTimePicker(
-            Modifier
+            modifier = Modifier
                 .fillMaxHeight(0.8f)
                 .align(Alignment.TopCenter),
-            state.minutes, state.hours,
-            { callback?.onHourChange(it) }
+            minutes = state.minutes,
+            hours = state.hours,
+            onHourChange = {
+                callback?.onHourChange(it)
+            }
         ) { callback?.onMinuteChange(it) }
         TopBar(
             isNotEmpty = state.selectedTime
@@ -95,10 +98,7 @@ private fun TopBar(
     modifier: Modifier = Modifier,
     onClear: () -> Unit,
 ) {
-    Row(
-        modifier.fillMaxWidth(),
-        SpaceBetween
-    ) {
+    Row(modifier.fillMaxWidth(), SpaceBetween) {
         Text(
             text = stringResource(R.string.meeting_meet_time_label),
             color = colorScheme.tertiary,
@@ -107,7 +107,8 @@ private fun TopBar(
         if(isNotEmpty) Text(
             text = stringResource(R.string.meeting_filter_clear),
             modifier = Modifier.clickable(
-                MutableInteractionSource(), (null)
+                MutableInteractionSource(),
+                indication = null
             ) { onClear() },
             style = typography.bodyMedium.copy(
                 color = colorScheme.primary,

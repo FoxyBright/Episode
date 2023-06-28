@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
 
 private const val TIMES_START = "00"
-private const val MINUTES_END = "59"
+private const val MINUTES_END = "55"
 private const val HOURS_END = "23"
 
 @Preview
@@ -22,9 +22,7 @@ private const val HOURS_END = "23"
 private fun ScrollTimePickerPreview() {
     GiltyTheme {
         Box(
-            Modifier.background(
-                colorScheme.background
-            )
+            Modifier.background(colorScheme.background)
         ) {
             ScrollTimePicker(
                 Modifier.width(200.dp),
@@ -54,19 +52,21 @@ fun ScrollTimePicker(
                 fontSize = 25.sp
             )
             ListItemPicker(
-                timeReplacer(hours, HOURS_END),
-                getTimesList(0..HOURS_END.toInt()),
-                Modifier.weight(1f),
-                { timeReplacer(it, HOURS_END) },
-                colorScheme.outline, style
+                label = { timeReplacer(it, HOURS_END) },
+                value = timeReplacer(hours, HOURS_END),
+                dividersColor = colorScheme.outline,
+                modifier = Modifier.weight(1f),
+                list = timesList.first,
+                textStyle = style
             ) { onHourChange(it) }
             Spacer(Modifier.width(16.dp))
             ListItemPicker(
-                timeReplacer(minutes, MINUTES_END),
-                getTimesList(0..MINUTES_END.toInt()),
-                Modifier.weight(1f),
-                { timeReplacer(it, MINUTES_END) },
-                colorScheme.outline, style
+                value = timeReplacer(minutes, MINUTES_END),
+                label = { timeReplacer(it, MINUTES_END) },
+                dividersColor = colorScheme.outline,
+                modifier = Modifier.weight(1f),
+                list = timesList.second,
+                textStyle = style
             ) { onMinuteChange(it) }
         }
     }
@@ -80,13 +80,20 @@ private fun timeReplacer(it: String, end: String): String {
     }
 }
 
-private fun getTimesList(range: Iterable<Int>): List<String> {
-    val list = arrayListOf<String>()
-    list.add("start")
-    range.forEach {
-        if(it.toString().length != 1) list.add(it.toString())
-        else list.add("0${it}")
-    }
-    list.add("end")
-    return list
+private val timesList by lazy {
+    val (hours, minutes) = 0..23 to 0..55
+    (ArrayList<String>(25) to ArrayList<String>(14))
+        .let { (listHours, listMin) ->
+            listHours.add("start")
+            listMin.add("start")
+            minutes.forEach {
+                if(it in hours) listHours
+                    .add("%02d".format(it))
+                if(it % 5 == 0) listMin
+                    .add("%02d".format(it))
+            }
+            listHours.add("end")
+            listMin.add("end")
+            listHours to listMin
+        }
 }
