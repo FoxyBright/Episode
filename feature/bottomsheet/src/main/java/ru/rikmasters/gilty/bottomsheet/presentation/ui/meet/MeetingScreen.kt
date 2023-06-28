@@ -100,11 +100,7 @@ fun MeetingBs(
                     
                     override fun onRespond(meetId: String) {
                         scope.launch {
-                            vm.respondForMeet(meetId) {
-                                vm.meetReactionDisable(true)
-                                vm.clearComment()
-                                vm.changeHidden(hidden)
-                            }
+                            vm.respondForMeet(meetId)
                         }
                     }
                     

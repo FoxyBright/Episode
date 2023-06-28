@@ -81,7 +81,7 @@ class MeetingWebSource: KtorSource() {
     ) = tryPost(
         "http://$HOST$PREFIX_URL/meetings/$meetId/responds"
     ) { setBody(Respond(comment, hidden)) }
-        .let { coroutinesState({ it }) {} }
+        .let { coroutinesState({ it }, 201) { } }
     
     suspend fun leaveMeet(meetId: String) =
         tryPatch("http://$HOST$PREFIX_URL/meetings/$meetId/leave")

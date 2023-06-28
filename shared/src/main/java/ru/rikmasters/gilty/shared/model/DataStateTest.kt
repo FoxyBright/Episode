@@ -16,6 +16,7 @@ sealed class DataStateTest<out T: Any> {
             @Suppress("unused")
             SHORT,
             MEDIUM,
+            
             @Suppress("unused")
             LONG
         }
@@ -38,19 +39,14 @@ sealed class DataStateTest<out T: Any> {
         success: (T) -> E,
         loading: (Loading.Type) -> E,
         error: (ExceptionCause) -> E,
-    ): E {
-        return when(this) {
-            is Success -> success(data)
-            is Loading -> loading(type)
-            is Error -> error(cause)
-        }
+    ) = when(this) {
+        is Success -> success(data)
+        is Loading -> loading(type)
+        is Error -> error(cause)
     }
     
-    fun <E: Any?> on(
-        success: E,
-        loading: E,
-        error: E,
-    ): E = on({ success }, { loading }, { error })
+    fun <E: Any?> on(success: E, loading: E, error: E) =
+        on({ success }, { loading }, { error })
     
     inline fun <E: Any?> onSuccess(
         block: (T) -> E,

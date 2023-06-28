@@ -12,8 +12,6 @@ import ru.rikmasters.gilty.shared.model.enumeration.MeetType
 import ru.rikmasters.gilty.shared.model.meeting.*
 import ru.rikmasters.gilty.shared.models.*
 import ru.rikmasters.gilty.shared.models.meets.*
-import ru.rikmasters.gilty.shared.wrapper.coroutinesState
-import ru.rikmasters.gilty.shared.wrapper.wrapped
 
 class MeetingManager(
     private val storage: AddMeetStorage,
@@ -178,9 +176,8 @@ class MeetingManager(
     ) = withContext(IO) {
         web.respondOfMeet(
             meetId = meetId,
-            comment = comment?.let {
-                it.ifBlank { null }
-            },
+            comment = comment
+                ?.ifBlank { null },
             hidden = hidden
         )
     }
