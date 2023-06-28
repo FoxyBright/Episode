@@ -61,23 +61,20 @@ fun <T> ListItemPicker(
     val context = LocalContext.current
     
     val height = 80.dp
-    val verticalMargin = 8.dp
+    val verticalMargin = 4.dp
     val halfHeight = height / 2
     val halfHeightPx = with(LocalDensity.current) {
         halfHeight.toPx()
     }
-    val animatedOffset = remember {
-        Animatable(0f)
-    }.apply {
-        list.indexOf(value).let { index ->
-            remember(value, list) {
-                -((list.count() - 1) - index) * halfHeightPx to
-                        index * halfHeightPx
-            }
-        }.let { (lower, upper) ->
-            updateBounds(lower, upper)
+    val animatedOffset =
+        remember { Animatable(0f) }.apply {
+            list.indexOf(value).let { index ->
+                remember(value, list) {
+                    -((list.count() - 1) - index) * halfHeightPx to
+                            index * halfHeightPx
+                }
+            }.let { updateBounds(it.first, it.second) }
         }
-    }
     val coercedAnimatedOffset = animatedOffset.value % halfHeightPx
     val intOffset = coercedAnimatedOffset.roundToInt()
     val indexOfElement = getItemIndexForOffset(
@@ -111,14 +108,14 @@ fun <T> ListItemPicker(
                 modifier = lModifier.offset(y = -halfHeight),
                 textStyle = textStyle.copy(fontWeight = fontWeight),
                 minAlpha = 0.2f,
-                maxAlpha = (coercedAnimatedOffset / (halfHeightPx / 2))
+                maxAlpha = coercedAnimatedOffset / (halfHeightPx / 2)
             )
             Label(
                 text = label(list.elementAt(indexOfElement)),
                 modifier = lModifier,
                 textStyle = textStyle.copy(fontWeight = W700),
                 minAlpha = 0.3f,
-                maxAlpha = (1 - abs(coercedAnimatedOffset) / halfHeightPx)
+                maxAlpha = 1 - abs(coercedAnimatedOffset) / halfHeightPx
             )
             if(indexOfElement < list.count() - 1)
                 Label(
@@ -126,7 +123,7 @@ fun <T> ListItemPicker(
                     modifier = lModifier.offset(y = halfHeight),
                     textStyle = textStyle.copy(fontWeight = fontWeight),
                     minAlpha = 0.2f,
-                    maxAlpha = (-coercedAnimatedOffset / (halfHeightPx / 2))
+                    maxAlpha = -coercedAnimatedOffset / (halfHeightPx / 2)
                 )
             if(indexOfElement < list.count() - 2)
                 Label(
@@ -222,17 +219,21 @@ private suspend fun <T> onDragStopped(
     onValueChange: (T) -> Unit,
 ) {
     val endValue = animatedOffset.fling(
-        velocity, exponentialDecay((20f)), { target ->
-            (listOf(-halfHeightPx, 0f, halfHeightPx).minByOrNull {
-                abs(it - target % halfHeightPx)
-            } ?: 0f) + halfHeightPx * (target / halfHeightPx).toInt()
+        initialVelocity = velocity,
+        animationSpec = exponentialDecay((20f)),
+        adjustTarget = { target ->
+            (listOf(-halfHeightPx, 0f, halfHeightPx)
+                .minByOrNull { abs(it - target % halfHeightPx) }
+                ?: 0f) + halfHeightPx * (target / halfHeightPx).toInt()
         }
     ).endState.value
     onValueChange(
         list.elementAt(
             getItemIndexForOffset(
-                list, value,
-                endValue, halfHeightPx
+                range = list,
+                value = value,
+                offset = endValue,
+                halfHeightPx = halfHeightPx
             )
         )
     )

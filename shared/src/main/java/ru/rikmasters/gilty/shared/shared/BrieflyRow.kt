@@ -1,10 +1,7 @@
 package ru.rikmasters.gilty.shared.shared
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -33,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.rikmasters.gilty.shared.common.GCachedImage
-import ru.rikmasters.gilty.shared.common.profileBadges.getBorderColor
+import ru.rikmasters.gilty.shared.common.profileBadges.borderColor
 import ru.rikmasters.gilty.shared.model.enumeration.UserGroupTypeModel
 import ru.rikmasters.gilty.shared.model.image.EmojiModel
 import ru.rikmasters.gilty.shared.model.profile.DemoProfileModel
@@ -127,7 +124,7 @@ fun UserAvatar(
                 .clip(CircleShape)
                 .border(
                     if(hasGroup) 2.dp else 0.dp,
-                    (group ?: UserGroupTypeModel.DEFAULT).getBorderColor(isSystemInDarkTheme()),
+                    (group ?: UserGroupTypeModel.DEFAULT).borderColor(isSystemInDarkTheme()),
                     CircleShape
                 )
                 .border(

@@ -206,7 +206,7 @@ fun MeetingBsContent(
         ContentContainer(
             state = state,
             paddings = it,
-            modifier = modifier.height(IntrinsicSize.Min),
+            modifier = modifier,
             callback = callback,
             bsState = bsState
         )
@@ -376,13 +376,10 @@ private fun MeetContent(
                 ),
                 callback = callback
             )
-            
-            if(state.detailed)
-                Detailed(state = state, callback = callback)
-            else
-                Content(state = state, callback = callback)
-            val scope = rememberCoroutineScope()
+            if(state.detailed) Detailed(state, callback)
+            else Content(state, callback)
             Spacer(Modifier.height(28.dp))
+            val scope = rememberCoroutineScope()
             Button(
                 memberState = state.meet.memberState,
                 isOnline = state.meet.isOnline,

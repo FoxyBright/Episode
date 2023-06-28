@@ -65,7 +65,7 @@ fun TimeBsContent(
     Box(
         modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.55f)
+            .fillMaxHeight(0.48f)
             .padding(16.dp)
             .padding(top = 10.dp)
     ) {
@@ -79,10 +79,9 @@ fun TimeBsContent(
                 callback?.onHourChange(it)
             }
         ) { callback?.onMinuteChange(it) }
-        TopBar(
-            isNotEmpty = state.selectedTime
-                .isNotBlank()
-        ) { callback?.onClear() }
+        TopBar(state.selectedTime.isNotBlank()) {
+            callback?.onClear()
+        }
         GradientButton(
             Modifier
                 .align(BottomCenter)

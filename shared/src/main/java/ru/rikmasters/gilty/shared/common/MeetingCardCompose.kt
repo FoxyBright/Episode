@@ -305,7 +305,7 @@ fun MeetCard(
     onMoreClick: (() -> Unit)? = null,
     onRepeatClick: (() -> Unit)? = null,
     onSelect: ((DirectionType) -> Unit)? = null,
-){
+) {
     Box(modifier) {
         if(type == MEET)
             Image(
@@ -319,7 +319,7 @@ fun MeetCard(
                     .align(BottomCenter)
                     .offset(
                         y = animateDpAsState(
-                            if (stack && offset == 0.0f) 16.dp
+                            if(stack && offset == 0.0f) 16.dp
                             else 0.dp,
                             tween(800)
                         ).value
@@ -527,14 +527,14 @@ private fun EmptyBottom(
                         .padding(top = 22.dp)
                 ) {
                     CardButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp),
+                        modifier = Modifier.weight(1f),
                         text = stringResource(R.string.meeting_repeat_button),
                         color = colorScheme.primary
                     ) { onRepeatClick?.let { it() } }
                     if(hasFilters) CardButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp),
                         text = stringResource(R.string.meeting_get_more_button),
                         color = colorScheme.primary
                     ) { onMoreClick?.let { it() } }

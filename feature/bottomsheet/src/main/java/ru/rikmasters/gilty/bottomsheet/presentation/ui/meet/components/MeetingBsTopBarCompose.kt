@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,8 +15,8 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.meet.MeetingBsCallback
 import ru.rikmasters.gilty.shared.R
@@ -141,8 +141,9 @@ fun MeetingBsTopBarCompose(
         Row(
             Modifier.padding(
                 top = 10.dp,
-                bottom = 12.dp
-            ), Start, CenterVertically
+                bottom = if(isNotBlankDescription)
+                    0.dp else 20.dp
+            ), Start, Alignment.Top
         ) {
             BrieflyRow(
                 text = "${org.username}${
@@ -150,10 +151,6 @@ fun MeetingBsTopBarCompose(
                         ", ${org.age}"
                     } else ""
                 }",
-                modifier = Modifier.padding(
-                    bottom = if(isNotBlankDescription)
-                        0.dp else 20.dp
-                ),
                 emoji = org.emoji,
                 group = org.group ?: DEFAULT
             )
@@ -161,40 +158,43 @@ fun MeetingBsTopBarCompose(
             ProfileBadge(
                 group = state.meet.organizer.group
                     ?: DEFAULT,
-                modifier = Modifier
-                    .padding(start = 6.dp),
+                modifier = Modifier.padding(
+                    start = 6.dp,
+                    top = 2.dp
+                ),
                 labelSize = 8,
                 textPadding = PaddingValues(8.dp, 3.dp)
             )
             Text(
-                modifier = Modifier
-                    .padding(start = 6.dp),
+                modifier = Modifier.padding(
+                    start = 6.dp,
+                    top = 2.dp
+                ),
                 text = state.meet.display(),
                 color = colorScheme.onTertiary,
                 style = typography.labelSmall
             )
         }
-        if(isNotBlankDescription)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = colorScheme
-                            .primaryContainer,
-                        shape = shapes.large
-                    )
-            ) {
-                Text(
-                    text = state.meet
-                        .description,
-                    modifier = Modifier
-                        .padding(14.dp),
+        if(isNotBlankDescription) Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
                     color = colorScheme
-                        .tertiary,
-                    style = typography
-                        .bodyMedium
+                        .primaryContainer,
+                    shape = shapes.large
                 )
-            }
+        ) {
+            Text(
+                text = state.meet
+                    .description,
+                modifier = Modifier
+                    .padding(14.dp),
+                color = colorScheme
+                    .tertiary,
+                style = typography
+                    .bodyMedium
+            )
+        }
     }
 }
 
@@ -299,7 +299,6 @@ private fun MeetDetails(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SubLabel(
     text: String,
@@ -312,13 +311,14 @@ private fun SubLabel(
             .background(
                 color = color,
                 shape = RoundedCornerShape(shape)
-            ),
+            )
+            .padding(12.dp, 4.dp),
         contentAlignment = Center
     ) {
         Text(
             text = text,
             modifier = Modifier
-                .padding(12.dp, 3.dp)
+                .offset { IntOffset(x = 0, y = -4) }
                 .marquee(spacing = 6.dp),
             style = typography
                 .labelSmall.copy(

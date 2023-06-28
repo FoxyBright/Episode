@@ -471,43 +471,35 @@ fun MeetingBsComment(
     modifier: Modifier = Modifier,
     onTextClear: () -> Unit,
 ) {
-    Column(modifier) {
-        GTextField(
-            value = text,
-            onValueChange = {
-                if(it.length <= 120)
-                    onTextChange(it)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = shapes.medium,
-            colors = descriptionColors(online),
-            label = if(text.isNotEmpty())
-                textFieldLabel(
-                    label = true,
-                    text = stringResource(
-                        R.string.meeting_comment_text_holder
-                    )
-                ) else null,
-            keyboardOptions = Default.copy(
-                imeAction = Done,
-                keyboardType = Text,
-                capitalization = Sentences
-            ),
-            placeholder = textFieldLabel(
-                label = false,
-                text = stringResource(R.string.meeting_comment_text_holder),
-                holderFont = typography.bodyMedium
-            ),
-            textStyle = typography.bodyMedium,
-            clear = onTextClear
-        )
-        BoxLabel(
-            text = "${text.length}/120",
-            modifier = Modifier
-                .padding(top = 4.dp),
-            align = TextAlign.End
-        )
-    }
+    GTextField(
+        value = text,
+        onValueChange = {
+            if(it.length <= 120)
+                onTextChange(it)
+        },
+        modifier = modifier.fillMaxWidth(),
+        shape = shapes.medium,
+        colors = descriptionColors(online),
+        label = if(text.isNotEmpty())
+            textFieldLabel(
+                label = true,
+                text = stringResource(
+                    R.string.meeting_comment_text_holder
+                )
+            ) else null,
+        keyboardOptions = Default.copy(
+            imeAction = Done,
+            keyboardType = Text,
+            capitalization = Sentences
+        ),
+        placeholder = textFieldLabel(
+            label = false,
+            text = stringResource(R.string.meeting_comment_text_holder),
+            holderFont = typography.bodyMedium
+        ),
+        textStyle = typography.bodyMedium,
+        clear = onTextClear
+    )
 }
 
 @Composable
