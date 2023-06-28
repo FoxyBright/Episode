@@ -410,7 +410,8 @@ private fun Filters(
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent,
         sheetPeekHeight = 90.dp,
-        sheetExtraHeight = 36.dp
+        sheetExtraHeight = 36.dp,
+        modifier = Modifier.systemBarsPadding()
     ) { content.invoke() }
 }
 

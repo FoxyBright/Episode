@@ -2,9 +2,12 @@ package ru.rikmasters.gilty.mainscreen.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -109,6 +112,7 @@ fun MainScreen(vm: MainViewModel) {
     }
     
     MainContent(
+        modifier = Modifier.systemBarsPadding(),
         state = MainContentState(
             grid = grid,
             today = today,

@@ -1,16 +1,20 @@
 package ru.rikmasters.gilty.translation.viewer.ui
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -25,7 +29,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -42,10 +45,9 @@ import ru.rikmasters.gilty.bottomsheet.presentation.ui.BottomSheet
 import ru.rikmasters.gilty.bottomsheet.presentation.ui.BsType
 import ru.rikmasters.gilty.core.app.AppStateModel
 import ru.rikmasters.gilty.core.navigation.NavState
+import ru.rikmasters.gilty.shared.common.errorToast
 import ru.rikmasters.gilty.shared.model.meeting.FullUserModel
 import ru.rikmasters.gilty.shared.model.report.ReportObjectType
-import ru.rikmasters.gilty.shared.shared.bottomsheet.BottomSheetScaffold
-import ru.rikmasters.gilty.shared.shared.bottomsheet.rememberBottomSheetScaffoldState
 import ru.rikmasters.gilty.shared.theme.base.ThemeExtra
 import ru.rikmasters.gilty.translation.bottoms.BottomSheetStateManager
 import ru.rikmasters.gilty.translation.bottoms.TranslationBottomSheetState
@@ -62,7 +64,7 @@ import ru.rikmasters.gilty.translation.viewer.viewmodel.TranslationViewerViewMod
 import ru.rikmasters.gilty.translations.webrtc.WebRtcClient
 import ru.rikmasters.gilty.translations.webrtc.model.WebRtcConfig
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranslationViewerScreen(
     vm: TranslationViewerViewModel,
@@ -82,7 +84,6 @@ fun TranslationViewerScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
-    val scaffoldState = rememberBottomSheetScaffoldState()
     val nav = get<NavState>()
 
     /**
@@ -90,6 +91,7 @@ fun TranslationViewerScreen(
      */
     val webRtcClient = remember { WebRtcClient(context) }
     val remoteVideoTrackState by webRtcClient.remoteVideoSinkFlow.collectAsState(null)
+    //val audioLevel by webRtcClient.audioLevel.collectAsState(initial = 0.0)
 
     /**
      * States from vm
@@ -107,6 +109,7 @@ fun TranslationViewerScreen(
     val messages = vm.messages.collectAsLazyPagingItems()
     val members = vm.members.collectAsLazyPagingItems()
     val query by vm.query.collectAsState()
+    val inactiveBg by vm.inactiveBg.collectAsState()
 
     /**
      * Time
@@ -131,6 +134,10 @@ fun TranslationViewerScreen(
      * BottomSheetState
      */
     var bottomSheetState by remember { mutableStateOf(TranslationBottomSheetState.CHAT) }
+    val modalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
 
     /**
      * Orientation
@@ -139,6 +146,8 @@ fun TranslationViewerScreen(
     LaunchedEffect(key1 = configuration) {
         snapshotFlow { configuration.orientation }
             .collect {
+                asm.systemUiInsets.isSystemBarsVisible = it == Configuration.ORIENTATION_PORTRAIT
+                asm.systemUi.setSystemBarsColor(newBackgroundColor, darkIcons = false)
                 orientation = it
             }
     }
@@ -151,11 +160,9 @@ fun TranslationViewerScreen(
             Lifecycle.Event.ON_RESUME -> {
                 vm.onEvent(TranslationViewerEvent.EnterForeground(translationId))
             }
-
             Lifecycle.Event.ON_PAUSE -> {
                 vm.onEvent(TranslationViewerEvent.EnterBackground)
             }
-
             else -> {}
         }
     }
@@ -165,14 +172,14 @@ fun TranslationViewerScreen(
      */
     DisposableEffect(Unit) {
         vm.onEvent(TranslationViewerEvent.Initialize(translationId))
-        systemUiController.setSystemBarsColor(color = newBackgroundColor, darkIcons = false)
+        asm.systemUi.setSystemBarsColor(newBackgroundColor, darkIcons = false)
         onDispose {
             webRtcClient.disconnect()
             vm.onEvent(TranslationViewerEvent.Dismiss)
             if (isInDarkTheme) {
-                systemUiController.setSystemBarsColor(color = backgroundColor, darkIcons = false)
+                asm.systemUi.setSystemBarsColor(backgroundColor, darkIcons = false)
             } else {
-                systemUiController.setSystemBarsColor(color = backgroundColor, darkIcons = true)
+                asm.systemUi.setSystemBarsColor(backgroundColor, darkIcons = true)
             }
         }
     }
@@ -185,17 +192,16 @@ fun TranslationViewerScreen(
             vm.translationViewerOneTimeEvents.collectLatest { event ->
                 when (event) {
                     is TranslationViewerOneTimeEvents.OnError -> {
-                        //TODO: onError
+                        context.errorToast(
+                            event.message
+                        )
                     }
-
                     is TranslationViewerOneTimeEvents.ConnectToStream -> {
                         webRtcClient.connecting(WebRtcConfig(event.wsUrl))
                     }
-
                     TranslationViewerOneTimeEvents.DisconnectWebRtc -> {
                         webRtcClient.disconnect()
                     }
-
                     TranslationViewerOneTimeEvents.ShowSnackbar -> {
                         scope.launch {
                             isShowSnackbar = true
@@ -234,7 +240,16 @@ fun TranslationViewerScreen(
         showExitDialog = true
     }
 
-    BottomSheetScaffold(
+    ModalBottomSheetLayout(
+        modifier = if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Modifier
+                .systemBarsPadding()
+                .navigationBarsPadding()
+                .background(color = Color.Transparent)
+        } else {
+            Modifier
+                .background(color = Color.Transparent)
+        },
         sheetContent = {
             BottomSheetStateManager(
                 modifier = Modifier.align(Alignment.End),
@@ -252,11 +267,13 @@ fun TranslationViewerScreen(
                 },
                 onDeleteClicked = {},
                 onAppendDurationSave = {},
-                isOrganizer = false
+                isOrganizer = false,
+                query = query,
+                userId = translation?.userId
             )
         },
-        sheetPeekHeight = 0.dp,
-        scaffoldState = scaffoldState,
+        sheetState = modalBottomSheetState,
+        scrimColor = Color.Transparent,
         sheetBackgroundColor = Color.Transparent,
         sheetShape = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             RoundedCornerShape(
@@ -268,17 +285,8 @@ fun TranslationViewerScreen(
                 topEnd = 24.dp
             )
         },
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    scope.launch {
-                        if (!scaffoldState.bottomSheetState.isCollapsed) {
-                            scaffoldState.bottomSheetState.collapse()
-                        }
-                    }
-                }
-            }
+        sheetContentColor = Color.Transparent,
+        sheetElevation = 0.dp
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -292,25 +300,14 @@ fun TranslationViewerScreen(
                 remainTime = remainTime,
                 onChatClicked = {
                     scope.launch {
-                        if (scaffoldState.bottomSheetState.isCollapsed) {
-                            vm.onEvent(TranslationViewerEvent.ConnectToChat)
-                            bottomSheetState = TranslationBottomSheetState.CHAT
-                            scaffoldState.bottomSheetState.expand()
-                        } else {
-                            vm.onEvent(TranslationViewerEvent.DisconnectFromChat)
-                            scaffoldState.bottomSheetState.collapse()
-                        }
+                        bottomSheetState = TranslationBottomSheetState.CHAT
+                        modalBottomSheetState.show()
                     }
                 },
                 onMembersCountClicked = {
                     scope.launch {
-                        if (scaffoldState.bottomSheetState.isCollapsed) {
-                            vm.onEvent(TranslationViewerEvent.ReloadMembers)
-                            bottomSheetState = TranslationBottomSheetState.USERS
-                            scaffoldState.bottomSheetState.expand()
-                        } else {
-                            scaffoldState.bottomSheetState.collapse()
-                        }
+                        bottomSheetState = TranslationBottomSheetState.USERS
+                        modalBottomSheetState.show()
                     }
                 },
                 onCloseClicked = { showExitDialog = true },
@@ -318,19 +315,17 @@ fun TranslationViewerScreen(
                 addTimerString = additionalTime,
                 onToChatPressed = { nav.navigationBack() },
                 isPortrait = orientation == Configuration.ORIENTATION_PORTRAIT,
-                initialize = {
-                    //TODO: WHY
-                }
+                inactiveBg = inactiveBg
             )
 
             /**
              * Connection placeholders
              */
-            if (customHUDState == null) {
+            if (customHUDState == null && !inactiveBg) {
                 when (hudState) {
                     ViewerHUD.RECONNECTING -> {
                         Reconnecting(
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            modifier = if (modalBottomSheetState.isVisible && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 Modifier
                                     .fillMaxHeight()
                                     .width((configuration.screenWidthDp * 0.6).dp)
@@ -339,14 +334,13 @@ fun TranslationViewerScreen(
                             }
                         )
                     }
-
                     ViewerHUD.RECONNECT_FAILED -> {
                         NoConnection(
                             onReconnectCLicked = {
                                 webRtcClient.retry = 0
                                 vm.onEvent(TranslationViewerEvent.Reconnect)
                             },
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            modifier = if (modalBottomSheetState.isVisible && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 Modifier
                                     .fillMaxHeight()
                                     .width((configuration.screenWidthDp * 0.6).dp)
@@ -355,10 +349,9 @@ fun TranslationViewerScreen(
                             }
                         )
                     }
-
                     ViewerHUD.PAUSED -> {
                         Paused(
-                            modifier = if (scaffoldState.bottomSheetState.isExpanded && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            modifier = if (modalBottomSheetState.isVisible && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 Modifier
                                     .fillMaxHeight()
                                     .width((configuration.screenWidthDp * 0.6).dp)
@@ -367,7 +360,6 @@ fun TranslationViewerScreen(
                             }
                         )
                     }
-
                     else -> {}
                 }
             }
@@ -377,7 +369,7 @@ fun TranslationViewerScreen(
              */
             OnTopSnackbarsPlacehodlers(
                 orientation = orientation,
-                bsOpened = !scaffoldState.bottomSheetState.isCollapsed,
+                bsOpened = modalBottomSheetState.isVisible,
                 isShowPlacehodlers = isShowPlaceholder,
                 isShowSnackbar = isShowSnackbar,
                 cameraState = cameraState,
@@ -385,7 +377,8 @@ fun TranslationViewerScreen(
                 meeting = meeting,
                 snackbarState = snackbarState,
                 configuration = configuration,
-                hudState = hudState
+                hudState = hudState,
+                context = context
             )
 
             /**

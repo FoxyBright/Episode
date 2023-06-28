@@ -57,7 +57,6 @@ class AudioSwitchHandler constructor(private val context: Context) : AudioHandle
     }
 
     companion object {
-        private const val TAG = "Call:AudioSwitchHandler"
         private val defaultOnAudioFocusChangeListener by lazy(LazyThreadSafetyMode.NONE) {
             DefaultOnAudioFocusChangeListener()
         }
@@ -67,7 +66,7 @@ class AudioSwitchHandler constructor(private val context: Context) : AudioHandle
                     audioDevices: List<AudioDevice>,
                     selectedAudioDevice: AudioDevice?
                 ) {
-                    Log.d(TAG,"[onAudioDeviceChange] selectedAudioDevice: $selectedAudioDevice")
+                    Log.d("AUDIOHANDLER","[onAudioDeviceChange] selectedAudioDevice: $selectedAudioDevice")
                 }
             }
         }
@@ -92,7 +91,7 @@ class AudioSwitchHandler constructor(private val context: Context) : AudioHandle
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK"
                     else -> "AUDIOFOCUS_INVALID"
                 }
-                Log.d(TAG,"[onAudioFocusChange] focusChange: $typeOfChange")
+                Log.d("AUDIOHANDLER","[onAudioFocusChange] focusChange: $typeOfChange")
             }
         }
     }

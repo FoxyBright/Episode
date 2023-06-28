@@ -41,16 +41,16 @@ enum class BottomSheetSwipeState { EXPANDED, COLLAPSED }
 class BottomSheetState(
     val swipeableState: SwipeableState<BottomSheetSwipeState>,
 ) {
-    
+
     internal var content: (@Composable () -> Unit)?
             by mutableStateOf(null)
-    
+
     suspend fun expand() = animateTo(EXPANDED)
     suspend fun collapse() = animateTo(COLLAPSED)
-    
+
     suspend fun expand(content: @Composable () -> Unit) =
         animateTo(content, EXPANDED)
-    
+
     private suspend fun animateTo(
         content: @Composable () -> Unit,
         swipeState: BottomSheetSwipeState,
@@ -58,7 +58,7 @@ class BottomSheetState(
         this.content = content
         animateTo(swipeState)
     }
-    
+
     private suspend fun animateTo(
         swipeState: BottomSheetSwipeState,
     ) {
@@ -68,19 +68,19 @@ class BottomSheetState(
             )
         swipeableState.animateTo(swipeState, tween())
     }
-    
+
     @Suppress("PropertyName")
     internal val _current =
         MutableStateFlow(COLLAPSED)
     val current =
         _current.asStateFlow()
-    
+
     val colors: @Composable () -> Color = {
         if(isSystemInDarkTheme())
             Color(0xFF767373)
         else Color(0xFFC9C5CA)
     }
-    
+
     var gripLightColor: @Composable () -> Color
             by mutableStateOf(colors)
     var gripDarkColor: @Composable () -> Color
@@ -107,7 +107,7 @@ fun BottomSheetLayout(
         mutableStateOf<Float?>(null)
     }
     val density = getDensity()
-    
+
     val offset = swipeState.offset.value.roundToInt()
 
     val enabled = remember(swipeState.currentScreenName.value) {
@@ -117,14 +117,14 @@ fun BottomSheetLayout(
     val connection = remember {
         swipeState.PreUpPostDownNestedScrollConnection
     }
-    
+
     BoxWithConstraints(modifier) {
         LaunchedEffect(swipeState.targetValue) {
             asm.systemUi.setSystemBarsColor(statusColor)
             asm.systemUi.setNavigationBarColor(navColor)
         }
         content()
-        
+
         Scrim(
             isDark = isSystemInDarkTheme(),
             state = state,
@@ -197,6 +197,8 @@ private fun Scrim(
         if(scrimColor != Transparent) Box(
             Modifier
                 .fillMaxSize()
+                .systemBarsPadding()
+                .navigationBarsPadding()
                 .background(scrimColor)
                 .clickable {
                     scope.launch {
@@ -302,11 +304,15 @@ private fun BottomSheetContent(
             Modifier
                 .offset(y = 21.dp)
                 .fillMaxWidth()
+                .systemBarsPadding()
+                .navigationBarsPadding()
         ) { background(it) }
         Grip(
             modifier = modifier
                 .offset(y = gripOffset)
-                .padding(top = 8.dp),
+                .padding(top = 8.dp)
+                .systemBarsPadding()
+                .navigationBarsPadding(),
             color = gripColor
         )
     }

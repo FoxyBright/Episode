@@ -7,12 +7,15 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.ExifInterface.TAG_ORIENTATION
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.app.AppStateModel
@@ -66,6 +69,7 @@ fun CropperScreen(vm: GalleryViewModel, image: String) {
     
     Use<GalleryViewModel>(LoadingTrait) {
         ImageCropper(
+            modifier = Modifier.systemBarsPadding(),
             state = GImageCropperState(
                 image = bitmap.asImageBitmap()
             ),

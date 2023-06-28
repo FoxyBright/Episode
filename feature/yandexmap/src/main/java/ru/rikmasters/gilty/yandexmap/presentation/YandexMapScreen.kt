@@ -2,7 +2,9 @@ package ru.rikmasters.gilty.yandexmap.presentation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.google.accompanist.insets.statusBarsPadding
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.Job
@@ -89,6 +91,7 @@ fun YandexMapScreen(
         }
 
         YandexMapContent(
+            modifier = Modifier.statusBarsPadding(),
             state = YandexMapState(
                 mapKit = map,
                 location = loc,

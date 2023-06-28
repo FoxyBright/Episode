@@ -281,7 +281,7 @@ fun TimerItem(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_timer_clock),
                         contentDescription = "timer",
-                        tint = ThemeExtra.colors.white
+                        tint = if (isHighlight) ThemeExtra.colors.mainDayGreen else ThemeExtra.colors.white
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     AnimatedVisibility(
@@ -467,7 +467,7 @@ fun CommentPanel(
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterStart),
-                maxLines = 1,
+                maxLines = 5,
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal,
                     color = ThemeExtra.colors.white
@@ -521,53 +521,59 @@ private fun SendButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     onSearchValueChanged: (String) -> Unit,
     searchValue: String,
 ) {
-    Surface(
-        color = ThemeExtra.colors.mainCard,
-        shape = RoundedCornerShape(12.dp)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(
+                ThemeExtra.colors.mainCard,
+                RoundedCornerShape(12.dp)
+            )
     ) {
-        Row(
-            modifier = Modifier.padding(
-                horizontal = 16.dp
-            ),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            Modifier
+                .padding(bottom = 12.dp, top = 12.dp, start = 64.dp, end = 16.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.magnifier),
-                contentDescription = "search",
-                tint = ThemeExtra.colors.zirkon
-            )
-            Spacer(modifier = Modifier.width(24.dp))
-            TextField(
-                value = searchValue,
-                onValueChange = {
-                    onSearchValueChanged(it)
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = ThemeExtra.colors.white,
-                    containerColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    errorIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedLabelColor = Color.Transparent,
-                    cursorColor = ThemeExtra.colors.white
+            BasicTextField(
+                searchValue, { onSearchValueChanged(it) },
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+                maxLines = 1,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = ThemeExtra.colors.white
                 ),
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.search_placeholder),
-                        color = ThemeExtra.colors.zirkon,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                },
-                singleLine = true
-            )
+                cursorBrush = SolidColor(ThemeExtra.colors.mainDayGreen),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+            ) {
+                if (searchValue.isEmpty()) Text(
+                    stringResource(id = R.string.search_placeholder), Modifier,
+                    ThemeExtra.colors.zirkon, style = MaterialTheme.typography.bodyLarge
+                ); it()
+            }
         }
+        Icon(
+            painter = if (searchValue.isBlank())
+            painterResource(id = R.drawable.magnifier) else painterResource(id = R.drawable.ic_back),
+            contentDescription = "search",
+            tint = ThemeExtra.colors.zirkon,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+                .clickable {
+                    if (searchValue.isNotBlank()) {
+                        onSearchValueChanged("")
+                    }
+                }
+        )
     }
 }
 
@@ -597,8 +603,8 @@ fun MemberItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        top = 18.dp,
-                        bottom = 18.dp,
+                        top = 16.dp,
+                        bottom = 8.dp,
                         end = 8.dp,
                     ),
                 horizontalArrangement = Arrangement.SpaceBetween,

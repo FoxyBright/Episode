@@ -1,9 +1,11 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.category
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.CategoryViewModel
@@ -35,7 +37,8 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     }
 
     CategoriesContent(
-        Modifier, CategoriesState(
+        Modifier.systemBarsPadding(),
+        CategoriesState(
             categories, selected, online, alert
         ), object: CategoriesCallback {
             

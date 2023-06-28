@@ -3,26 +3,29 @@ package ru.rikmasters.gilty.translation.viewer.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import org.webrtc.EglBase
+import org.webrtc.RendererCommon
 import org.webrtc.RendererCommon.RendererEvents
+import org.webrtc.SurfaceViewRenderer
 import org.webrtc.VideoTrack
+
 
 @Composable
 fun VideoRenderer(
     videoTrack: VideoTrack,
     modifier: Modifier = Modifier,
     eglBaseContext: EglBase.Context,
-    initialize: (VideoTextureViewRenderer) -> Unit
+    initialize: (SurfaceViewRenderer) -> Unit
 ) {
 
     val trackState: MutableState<VideoTrack?> = remember { mutableStateOf(null) }
-    var view: VideoTextureViewRenderer? by remember { mutableStateOf(null) }
+    var view: SurfaceViewRenderer? by remember { mutableStateOf(null) }
 
 
     DisposableEffect(videoTrack) {
@@ -33,14 +36,19 @@ fun VideoRenderer(
 
     AndroidView(
         factory = { context ->
-            VideoTextureViewRenderer(context).apply {
+            SurfaceViewRenderer(context).apply {
                 keepScreenOn = true
+                setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
                 init(
                     eglBaseContext,
                     object : RendererEvents {
-                        override fun onFirstFrameRendered() = Unit
+                        override fun onFirstFrameRendered() {}
 
-                        override fun onFrameResolutionChanged(p0: Int, p1: Int, p2: Int) = Unit
+                        override fun onFrameResolutionChanged(
+                            videoWidth: Int,
+                            videoHeight: Int,
+                            rotation: Int
+                        ) {}
                     }
                 )
                 setupVideo(trackState, videoTrack, this)
@@ -56,7 +64,7 @@ fun VideoRenderer(
 }
 
 private fun cleanTrack(
-    view: VideoTextureViewRenderer?,
+    view: SurfaceViewRenderer?,
     trackState: MutableState<VideoTrack?>
 ) {
     view?.let { trackState.value?.removeSink(it) }
@@ -66,7 +74,7 @@ private fun cleanTrack(
 private fun setupVideo(
     trackState: MutableState<VideoTrack?>,
     track: VideoTrack,
-    renderer: VideoTextureViewRenderer
+    renderer: SurfaceViewRenderer
 ) {
     if (trackState.value == track) {
         return
@@ -76,4 +84,5 @@ private fun setupVideo(
 
     trackState.value = track
     track.addSink(renderer)
+    track.setEnabled(true)
 }

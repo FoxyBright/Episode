@@ -1,9 +1,12 @@
 package ru.rikmasters.gilty.login.presentation.ui.hidden
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -60,7 +63,7 @@ fun HiddenScreen(vm: HiddenViewModel) {
             viewerType = photoViewType,
             alert = alert,
         ),
-        modifier = Modifier, object: HiddenCallback {
+        modifier = Modifier.systemBarsPadding(), object: HiddenCallback {
 
             override fun onSelectImage(image: AvatarModel) {
                 scope.launch {

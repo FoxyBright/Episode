@@ -1,7 +1,10 @@
 package ru.rikmasters.gilty.login.presentation.ui.personal
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
@@ -20,7 +23,7 @@ fun PersonalScreen(vm: PersonalViewModel) {
     
     PersonalContent(
         PersonalState(age, gender),
-        Modifier, object: PersonalCallback {
+        Modifier.systemBarsPadding(), object: PersonalCallback {
             
             override fun onAgeClick() {
                 vm.scope.openBS<AgeBsViewModel>(scope){

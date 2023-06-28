@@ -11,7 +11,7 @@ import ru.rikmasters.gilty.translations.datasource.remote.TranslationWebSource
 class TranslationConnectedUsersPagingSource(
     private val webSource: TranslationWebSource,
     private val translationId: String,
-    private val query: String?,
+    private val query: String,
 ) : PagingSource<Int, FullUserModel>() {
 
     override fun getRefreshKey(state: PagingState<Int, FullUserModel>): Int? {
@@ -34,7 +34,6 @@ class TranslationConnectedUsersPagingSource(
                     perPage = loadSize,
                     query = q,
                 ).map(FullUserDTO::map)
-                Log.d("TEST","USERS $users")
                 users
             },
             loadSize = loadSize,

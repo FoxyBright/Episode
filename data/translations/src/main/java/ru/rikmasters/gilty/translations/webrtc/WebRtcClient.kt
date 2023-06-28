@@ -2,7 +2,6 @@ package ru.rikmasters.gilty.translations.webrtc
 
 import android.content.Context
 import android.os.CountDownTimer
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,7 +44,6 @@ class WebRtcClient(
     private val context: Context
 ) {
 
-    // Коллект сокетов только когда клиент активен
     private val doCollectSocket = MutableStateFlow(false)
     private val sessionManagerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val eglBaseContext: EglBase.Context = EglBase.create().eglBaseContext
@@ -58,10 +56,7 @@ class WebRtcClient(
                     signalingClient.signalingEventFlow.collectLatest { event ->
                         when (event) {
                             is WebRTCClientEvent.OfferSent -> {
-                                // Отключаем таймер на ожидание офера
                                 timer.cancel()
-                                Log.d("TEST","TIMER CANCEL")
-                                Log.d("TEST", "OFFER SENT")
                                 val realOffer = event.offer.mapToRealOffer()
                                 setIceServer(
                                     iceServers = realOffer.iceServers
@@ -79,8 +74,8 @@ class WebRtcClient(
                                     _status.emit(WebRtcStatus.failed)
                                 }
                             }
+
                             is WebRTCClientEvent.Connection -> {
-                                Log.d("TEST","RECEIVED CONNECTION ${event.isConnected}")
                                 if (!event.isConnected) {
                                     _status.emit(WebRtcStatus.failed)
                                 }
@@ -94,18 +89,15 @@ class WebRtcClient(
 
     private val _status = MutableSharedFlow<WebRtcStatus>(1, 0, BufferOverflow.DROP_OLDEST)
     val status = _status.onEach {
-        Log.d("TEST","NEW STATUS $it")
         when (it) {
             WebRtcStatus.connect -> retry = 0
             WebRtcStatus.failed -> {
                 destroy()
                 _config?.let { config ->
-                    Log.d("TEST","FAILED")
                     if (config.retryEnable && retry < config.retryCount) {
                         _status.emit(WebRtcStatus.connecting)
                         retry += 1
                         connecting(config)
-                        Log.d("TEST","AFTER RECONNECT")
                     } else {
                         _status.emit(WebRtcStatus.reconnectAttemptsOver)
                     }
@@ -115,6 +107,7 @@ class WebRtcClient(
             WebRtcStatus.disconnect -> {
                 destroy()
             }
+
             else -> {}
         }
     }.stateIn(sessionManagerScope, SharingStarted.Eagerly, WebRtcStatus.unknow)
@@ -130,7 +123,6 @@ class WebRtcClient(
     ) {
         override fun onTick(millisUntilFinished: Long) {}
         override fun onFinish() {
-            Log.d("TEST","TIMER FINISH")
             sessionManagerScope.launch {
                 _status.emit(WebRtcStatus.failed)
             }
@@ -138,11 +130,8 @@ class WebRtcClient(
     }
 
     private val signalingClient = SignalingClient()
-
     private var bitrateTimer: Timer? = Timer()
-
     private var audioLevelTimer: Timer? = Timer()
-
     private var previousStats: RTCStats? = null
 
     private val _remoteVideoSinkFlow = MutableSharedFlow<VideoTrack?>()
@@ -160,7 +149,6 @@ class WebRtcClient(
         sessionManagerScope.launch {
             _status.emit(WebRtcStatus.connecting)
         }
-        // Запускаем таймер на ожидание оффера
         timer.start()
         signalingClient.startConnection(config.wssUrl)
         doCollectSocket.value = true
@@ -173,10 +161,10 @@ class WebRtcClient(
     }
 
     private fun destroy() {
+      //  audioHandler.stop()
         signalingClient.destroy()
         peerConnection?.close()
         peerConnection = null
-
         bitrateTimer?.cancel()
         bitrateTimer = null
         audioLevelTimer?.cancel()
@@ -198,7 +186,6 @@ class WebRtcClient(
                     channel = it
                 },
                 onIceConnectionStateChanged = { state ->
-                    Log.d("TEST","ICE CHANGED $state")
                     when (state) {
                         RTCIceConnectionState.completed,
                         RTCIceConnectionState.connected -> {
@@ -206,12 +193,14 @@ class WebRtcClient(
                                 _status.emit(WebRtcStatus.connect)
                             }
                         }
+
                         RTCIceConnectionState.disconnected,
                         RTCIceConnectionState.failed -> {
                             sessionManagerScope.launch {
                                 _status.emit(WebRtcStatus.failed)
                             }
                         }
+
                         else -> {}
                     }
                 },
@@ -271,7 +260,6 @@ class WebRtcClient(
     private fun processLowInternetConnection(report: RTCStatsReport) {
         report.statsMap.forEach { statMap ->
             if (statMap.value.type == "inbound-rtp" && (statMap.value.members["mediaType"] as? String) == "video") {
-                webRtcLog("[LOW CONNECTION] ${statMap.value}")
                 previousStats?.let { prevStat ->
                     val seconds = (statMap.value.timestampUs - prevStat.timestampUs) / 1_000_000
                     val currentBytes = (statMap.value.members["bytesReceived"] as? Int) ?: 0
@@ -330,6 +318,5 @@ class WebRtcClient(
             }
         }
     }
-
 
 }

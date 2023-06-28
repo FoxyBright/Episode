@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import ru.rikmasters.gilty.shared.R
@@ -44,7 +43,9 @@ fun MembersBottomSheet(
     membersList: LazyPagingItems<FullUserModel>?,
     onComplainClicked: (FullUserModel) -> Unit,
     onDeleteClicked: (FullUserModel) -> Unit,
-    isOrganizer: Boolean
+    isOrganizer: Boolean,
+    query: String,
+    userId: String?
 ) {
     val scrollState = rememberLazyListState()
     Box(
@@ -53,18 +54,18 @@ fun MembersBottomSheet(
                 .width((configuration.screenWidthDp * 0.4).dp)
                 .fillMaxHeight()
                 .background(
-                    color = ThemeExtra.colors.blackSeventy,
+                    color = ThemeExtra.colors.black,
                     shape = RoundedCornerShape(
                         topStart = 24.dp
                     )
                 )
                 .padding(horizontal = 16.dp)
-        } else if (membersList?.itemSnapshotList?.items?.size == 0) {
+        } else if (membersCount == 0 && query.isBlank()) {
             Modifier
                 .fillMaxWidth()
                 .height((configuration.screenHeightDp * 0.375).dp)
                 .background(
-                    color = ThemeExtra.colors.blackSeventy
+                    color = ThemeExtra.colors.black
                 )
                 .padding(horizontal = 16.dp)
         } else {
@@ -72,7 +73,7 @@ fun MembersBottomSheet(
                 .fillMaxWidth()
                 .height((configuration.screenHeightDp * 0.75).dp)
                 .background(
-                    color = ThemeExtra.colors.blackSeventy
+                    color = ThemeExtra.colors.black
                 )
                 .padding(horizontal = 16.dp)
         }
@@ -96,7 +97,7 @@ fun MembersBottomSheet(
                     width = 3.dp
                 )
             ) {
-                if (membersList?.itemSnapshotList?.items?.size == 0 && membersList.loadState.refresh is LoadState.NotLoading) {
+                if (membersCount == 0 && query.isBlank()) {
                     Text(
                         text = stringResource(id = R.string.translations_members),
                         style = ThemeExtra.typography.TranslationTitlePreview,
@@ -163,12 +164,14 @@ fun MembersBottomSheet(
                         membersList?.let {
                             items(membersList) { fullUserModel ->
                                 fullUserModel?.let {
-                                    MemberItem(
-                                        user = it,
-                                        onComplainClicked = { onComplainClicked(it) },
-                                        onDeleteClicked = { onDeleteClicked(it) },
-                                        isOrganizer = isOrganizer
-                                    )
+                                    if (it.id != userId) {
+                                        MemberItem(
+                                            user = it,
+                                            onComplainClicked = { onComplainClicked(it) },
+                                            onDeleteClicked = { onDeleteClicked(it) },
+                                            isOrganizer = isOrganizer
+                                        )
+                                    }
                                 }
                             }
                         }

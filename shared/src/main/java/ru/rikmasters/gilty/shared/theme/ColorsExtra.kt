@@ -100,6 +100,7 @@ data class ExtraColors(
     val preDarkColor: Color = Unspecified,
     val zirkon: Color = Unspecified,
     val messageBar: Color = Unspecified,
+    val black: Color = Unspecified
     )
 
 @Deprecated(
@@ -164,7 +165,8 @@ val LightExtraColors = ExtraColors(
     textField = RottenPlum,
     preDarkColor = PreDark,
     zirkon = Zircon,
-    messageBar = textField
+    messageBar = textField,
+    black = Black
 )
 
 @Deprecated(
@@ -230,6 +232,6 @@ val DarkExtraColors = ExtraColors(
     textField = RottenPlum,
     preDarkColor = PreDark,
     zirkon = Zircon,
-    messageBar = textField
-
+    messageBar = textField,
+    black = Black
 )

@@ -1,9 +1,12 @@
 package ru.rikmasters.gilty.login.presentation.ui.profile
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.*
 import org.koin.androidx.compose.get
@@ -103,7 +106,7 @@ fun ProfileScreen(vm: ProfileViewModel) {
         ?.thumbnail?.url.isNullOrBlank()
     Use<ProfileViewModel>(LoadingTrait) {
         ProfileContent(
-            profileState, isActive, Modifier,
+            profileState, isActive, Modifier.systemBarsPadding(),
             object : ProfileCallback {
 
                 override fun onDisabledButtonClick() {

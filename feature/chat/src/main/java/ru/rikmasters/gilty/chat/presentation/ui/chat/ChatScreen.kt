@@ -3,15 +3,19 @@ package ru.rikmasters.gilty.chat.presentation.ui.chat
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.*
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
@@ -46,6 +50,7 @@ import ru.rikmasters.gilty.shared.model.report.ReportObjectType.MEETING
 import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsScreen
 import ru.rikmasters.gilty.translation.bottoms.preview.PreviewBsViewModel
 import ru.rikmasters.gilty.translation.shared.utils.mediaPermissionState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 import java.io.File
 
 @SuppressLint("Recycle")
@@ -233,11 +238,10 @@ fun ChatScreen(
                                                     }
                                                 },
                                                 startBroadcastClicked = {
+                                                    val facingString = if (it == StreamerFacing.FRONT) "front" else "back"
                                                     scope.launch {
                                                         asm.bottomSheet.collapse()
-                                                        nav.navigateAbsolute(
-                                                            "translations/streamer?id=${state.meet.id}"
-                                                        )
+                                                        nav.navigateAbsolute("translations/streamer?id=${state.meet.id},facing=${facingString}")
                                                     }
                                                 }
                                             )
@@ -455,6 +459,7 @@ fun ChatScreen(
             }
             
             ChatContent(
+                modifier = Modifier.systemBarsPadding(),
                 state = state,
                 callback = callback
             )

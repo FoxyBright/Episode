@@ -61,7 +61,7 @@ fun  ChatBottomSheet(
                 .width((configuration.screenWidthDp * 0.4).dp)
                 .fillMaxHeight()
                 .background(
-                    color = ThemeExtra.colors.blackSeventy,
+                    color = ThemeExtra.colors.black,
                     shape = RoundedCornerShape(
                         topStart = 24.dp
                     )
@@ -73,7 +73,7 @@ fun  ChatBottomSheet(
                 .height((configuration.screenHeightDp * 0.375).dp)
                 .wrapContentWidth(unbounded = false)
                 .background(
-                    color = ThemeExtra.colors.blackSeventy
+                    color = ThemeExtra.colors.black
                 )
                 .padding(horizontal = 16.dp)
         },

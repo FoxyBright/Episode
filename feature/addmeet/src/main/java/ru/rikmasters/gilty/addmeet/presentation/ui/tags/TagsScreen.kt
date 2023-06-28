@@ -1,6 +1,9 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.tags
 
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
@@ -36,6 +39,7 @@ fun TagsScreen(vm: TagsViewModel) {
             add = true,
             alpha = 0f
         ),
+        modifier = Modifier.systemBarsPadding(),
         callback = object: TagsCallback {
             
             override fun onTagClick(tag: TagModel) {

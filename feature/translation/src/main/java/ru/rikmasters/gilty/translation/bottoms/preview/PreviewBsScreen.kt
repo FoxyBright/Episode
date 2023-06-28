@@ -14,12 +14,13 @@ import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import ru.rikmasters.gilty.translation.shared.utils.map
 import ru.rikmasters.gilty.translation.shared.utils.restartPreview
 import ru.rikmasters.gilty.translation.shared.utils.stopPreview
+import ru.rikmasters.gilty.translation.streamer.model.StreamerFacing
 
 @Composable
 fun PreviewBsScreen(
     vm: PreviewBsViewModel,
     closeClicked: () -> Unit,
-    startBroadcastClicked: () -> Unit
+    startBroadcastClicked: (StreamerFacing) -> Unit
 ) {
     val context = LocalContext.current
     val facing by vm.selectedFacing.collectAsState()
@@ -61,6 +62,6 @@ fun PreviewBsScreen(
         onCloseClicked = closeClicked,
         changeFacing = { vm.onEvent(PreviewEvent.ToggleFacing(it)) },
         selectedStreamerFacing = facing,
-        startBroadCast = startBroadcastClicked
+        startBroadCast = { startBroadcastClicked(facing) }
     )
 }

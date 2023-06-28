@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.streamer.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -26,6 +25,7 @@ import ru.rikmasters.gilty.meetings.MeetingManager
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel.CAMERA
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationSignalTypeModel.MICROPHONE
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel
+import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel.ACTIVE
 import ru.rikmasters.gilty.shared.model.enumeration.TranslationStatusModel.COMPLETED
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
 import ru.rikmasters.gilty.shared.model.translations.TranslationInfoModel
@@ -41,6 +41,7 @@ import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD
 import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD.RECONNECTING
 import ru.rikmasters.gilty.translation.streamer.model.StreamerHUD.RECONNECT_FAILED
 import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState
+import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.BROADCAST_EXTENDED
 import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.MICRO_OFF
 import ru.rikmasters.gilty.translation.streamer.model.StreamerSnackbarState.WEAK_CONNECTION
 import ru.rikmasters.gilty.translation.streamer.model.SurfaceState
@@ -83,8 +84,10 @@ class TranslationStreamerViewModel : ViewModel() {
                 _translationStatus.value = translation.status
                 _microphone.value = translation.microphone
                 _camera.value = translation.camera
-                it.rtmp?.let { url ->
-                    _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(url))
+                if (it.status == ACTIVE) {
+                    it.rtmp?.let { url ->
+                        _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(url))
+                    }
                 }
             }
         }
@@ -97,15 +100,14 @@ class TranslationStreamerViewModel : ViewModel() {
     val translationStatus = _translationStatus.onEach {
         it?.let { translationStatus ->
             when (translationStatus) {
-                TranslationStatusModel.ACTIVE -> {
+                ACTIVE -> {
                     _hudState.value = null
+                    _customHUDState.value = null
                 }
 
                 TranslationStatusModel.EXPIRED -> {
                     _customHUDState.value = StreamerCustomHUD.EXPIRED
-                    if (_camera.value) {
-                        _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
-                    }
+                    _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
 
                 COMPLETED -> {
@@ -122,7 +124,6 @@ class TranslationStreamerViewModel : ViewModel() {
 
     private val _microphone = MutableStateFlow(true)
     val microphone = _microphone.onEach { value ->
-        _oneTimeEvent.send(TranslationOneTimeEvent.ToggleMicrophone(value))
         _translation.value?.id?.let {
             translationRepository.sendSignal(it, MICROPHONE, value)
         }
@@ -130,7 +131,6 @@ class TranslationStreamerViewModel : ViewModel() {
 
     private val _camera = MutableStateFlow(true)
     val camera = _camera.onEach { value ->
-        _oneTimeEvent.send(TranslationOneTimeEvent.ToggleCamera(value))
         _translation.value?.id?.let {
             translationRepository.sendSignal(it, CAMERA, value)
         }
@@ -188,8 +188,13 @@ class TranslationStreamerViewModel : ViewModel() {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    val messages = reloadChat.flatMapLatest {
-        _translation.value?.id?.let {
+    val messages = combine(
+        _translation,
+        reloadChat
+    ) { translation, reload ->
+        Pair(translation, reload)
+    }.flatMapLatest { (translation, _) ->
+        translation?.id?.let {
             translationRepository.getMessages(
                 translationId = it
             )
@@ -198,11 +203,12 @@ class TranslationStreamerViewModel : ViewModel() {
 
     val members = combine(
         reloadMembers,
-        _query
-    ) { reload, query ->
-        Pair(reload, query)
-    }.flatMapLatest { (_, query) ->
-        _translation.value?.id?.let {
+        _query,
+        _translation
+    ) { reload, query, translation ->
+        Triple(reload, query, translation)
+    }.flatMapLatest { (_, query, translation) ->
+        translation?.id?.let {
             translationRepository.getConnectedUsers(
                 translationId = it,
                 query = query
@@ -217,19 +223,15 @@ class TranslationStreamerViewModel : ViewModel() {
                     TranslationCallbackEvents.MessageReceived -> {
                         reloadChat.value = !reloadChat.value
                     }
-
                     TranslationCallbackEvents.TranslationCompleted -> {
                         _translationStatus.value = COMPLETED
                     }
-
                     TranslationCallbackEvents.TranslationExpired -> {
                         _translationStatus.value = TranslationStatusModel.EXPIRED
                     }
-
                     is TranslationCallbackEvents.UserConnected -> {
                         reloadMembers.value = !reloadMembers.value
                     }
-
                     is TranslationCallbackEvents.SignalReceived -> {
                         if (socketEvent.signal.signal == MICROPHONE) {
                             if (!socketEvent.signal.value) {
@@ -239,20 +241,18 @@ class TranslationStreamerViewModel : ViewModel() {
                             }
                         }
                     }
-
                     is TranslationCallbackEvents.UserDisconnected -> {
                         reloadMembers.value = !reloadMembers.value
                     }
-
                     is TranslationCallbackEvents.UserKicked -> {
                         reloadMembers.value = !reloadMembers.value
                     }
-
                     is TranslationCallbackEvents.TranslationExtended -> {
                         updTr.value = false
                         if (_customHUDState.value != StreamerCustomHUD.EXPIRED) {
                             coroutineScope.launch {
-                                _additionalTime.value = getAdditionalTimeString(socketEvent.duration)
+                                _additionalTime.value =
+                                    getAdditionalTimeString(socketEvent.duration)
                                 delay(2000)
                                 _additionalTime.value = ""
                                 _translation.update {
@@ -264,12 +264,12 @@ class TranslationStreamerViewModel : ViewModel() {
                         } else {
                             coroutineScope.launch {
                                 _customHUDState.value = null
-                                _oneTimeEvent.send(TranslationOneTimeEvent.StartStreaming(_translation.value?.webrtc ?: ""))
                                 _translation.update {
                                     it?.copy(
                                         completedAt = socketEvent.completedAt
                                     )
                                 }
+                                _streamerSnackbarState.emit(BROADCAST_EXTENDED)
                                 _timerHighlighted.value = true
                                 delay(2000)
                                 _timerHighlighted.value = false
@@ -277,11 +277,9 @@ class TranslationStreamerViewModel : ViewModel() {
                         }
                         updTr.value = true
                     }
-
                     is TranslationCallbackEvents.MembersCountChanged -> {
                         _membersCount.value = socketEvent.count
                     }
-
                     else -> {}
                 }
             }
@@ -297,9 +295,9 @@ class TranslationStreamerViewModel : ViewModel() {
                     connectSocket()
                     connectToTranslationChat()
                     startPinging()
+                    _facing.value = event.facing
                 }
             }
-
             TranslationEvent.Dismiss -> {
                 disconnectSocket()
                 stopPinging()
@@ -309,16 +307,13 @@ class TranslationStreamerViewModel : ViewModel() {
                     _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
             }
-
             TranslationEvent.EnterBackground -> {
                 disconnectSocket()
                 stopPinging()
-                //disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.DestroyRTMP)
                 }
             }
-
             is TranslationEvent.EnterForeground -> {
                 loadTranslationInfo(event.meetingId)
                 loadMeetDetails(event.meetingId)
@@ -326,11 +321,9 @@ class TranslationStreamerViewModel : ViewModel() {
                 connectSocket()
                 startPinging()
             }
-
             TranslationEvent.ChangeFacing -> {
                 _facing.value = if (_facing.value == FRONT) BACK else FRONT
             }
-
             is TranslationEvent.AppendTranslation -> {
                 _translation.value?.let { info ->
                     extendTranslation(
@@ -339,7 +332,6 @@ class TranslationStreamerViewModel : ViewModel() {
                     )
                 }
             }
-
             TranslationEvent.CompleteTranslation -> {
                 _translation.value?.let { info ->
                     coroutineScope.launch {
@@ -349,11 +341,9 @@ class TranslationStreamerViewModel : ViewModel() {
                     }
                 }
             }
-
             is TranslationEvent.ChatBottomSheetOpened -> {
                 reloadChat.value = !reloadChat.value
             }
-
             is TranslationEvent.KickUser -> {
                 _translation.value?.let { translation ->
                     coroutineScope.launch {
@@ -368,14 +358,13 @@ class TranslationStreamerViewModel : ViewModel() {
             }
             TranslationEvent.Reconnect -> {
                 _retryCount.value = 8
-                _translation.value?.id?.let {
+                _meeting.value?.id?.let {
                     loadTranslationInfo(it)
                 }
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationOneTimeEvent.Reconnect)
                 }
             }
-
             is TranslationEvent.SendMessage -> {
                 _translation.value?.let { translation ->
                     coroutineScope.launch {
@@ -386,30 +375,26 @@ class TranslationStreamerViewModel : ViewModel() {
                     }
                 }
             }
-
             is TranslationEvent.UserBottomSheetOpened -> {
                 if (event.isOpened) {
                     reloadMembers.value = !reloadMembers.value
                 }
             }
-
             is TranslationEvent.UserBottomSheetQueryChanged -> {
                 _query.value = event.newQuery
             }
-
             TranslationEvent.ToggleCamera -> {
                 _camera.value = !_camera.value
             }
-
             TranslationEvent.ToggleMicrophone -> {
                 _microphone.value = !_microphone.value
             }
-
             is TranslationEvent.ProcessRTMPStatus -> {
-                Log.d("TEST","PROCESS STATUS ${event.status}")
                 when (event.status) {
                     RTMPStatus.CONNECTED -> {
                         _hudState.value = null
+                        connectSocket()
+                        connectToTranslationChat()
                     }
                     RTMPStatus.FAILED -> {
                         if (_retryCount.value > 0) {
@@ -430,18 +415,18 @@ class TranslationStreamerViewModel : ViewModel() {
                 }
             }
 
-            TranslationEvent.BitrateStabilized -> {
-                coroutineScope.launch {
-                    _streamerSnackbarState.emit(null)
-                }
-            }
-
             TranslationEvent.DecreaseRetryCount -> {
                 _retryCount.value = _retryCount.value - 1
             }
 
             is TranslationEvent.ChangeSurfaceState -> {
                 _surfaceState.value = event.state
+            }
+
+            TranslationEvent.ClearSnackbarState -> {
+                coroutineScope.launch {
+                    _streamerSnackbarState.emit(null)
+                }
             }
         }
     }
@@ -502,9 +487,11 @@ class TranslationStreamerViewModel : ViewModel() {
                 override fun run() {
                     _translation.value?.let { info ->
                         coroutineScope.launch {
-                            translationRepository.ping(
-                                translationId = info.id
-                            )
+                            try {
+                                translationRepository.ping(
+                                    translationId = info.id
+                                )
+                            } catch (e: Exception) { }
                         }
                     }
                 }
@@ -554,30 +541,26 @@ class TranslationStreamerViewModel : ViewModel() {
         meetingId: String
     ) {
         coroutineScope.launch {
-            translationRepository.getTranslationInfo(
-                translationId = meetingId
-            ).on(
-                loading = {},
-                success = {
-                        translation -> _translation.value = translation
+            try {
+                translationRepository.getTranslationInfo(
+                    translationId = meetingId
+                ).on(
+                    loading = {},
+                    success = { translation ->
+                        _translation.value = translation
                         connectToTranslationChat()
-                          },
-                error = { cause ->
-                    cause.serverMessage?.let {
-                        _oneTimeEvent.send(
-                            TranslationOneTimeEvent.OnError(
-                                message = it
+                    },
+                    error = { cause ->
+                        cause.serverMessage?.let {
+                            _oneTimeEvent.send(
+                                TranslationOneTimeEvent.OnError(
+                                    message = it
+                                )
                             )
-                        )
-                    } ?: cause.defaultMessage?.let {
-                        _oneTimeEvent.send(
-                            TranslationOneTimeEvent.OnError(
-                                message = it
-                            )
-                        )
+                        }
                     }
-                }
-            )
+                )
+            } catch (e: Exception) {}
         }
     }
 
@@ -589,15 +572,12 @@ class TranslationStreamerViewModel : ViewModel() {
                 meetId = meetingId
             ).on(
                 loading = {},
-                success = { meetingModel -> _meeting.value = meetingModel },
+                success = { meetingModel ->
+                    _meeting.value = meetingModel
+                    _membersCount.value = meetingModel.membersCount
+                },
                 error = { cause ->
                     cause.serverMessage?.let {
-                        _oneTimeEvent.send(
-                            TranslationOneTimeEvent.OnError(
-                                message = it
-                            )
-                        )
-                    } ?: cause.defaultMessage?.let {
                         _oneTimeEvent.send(
                             TranslationOneTimeEvent.OnError(
                                 message = it

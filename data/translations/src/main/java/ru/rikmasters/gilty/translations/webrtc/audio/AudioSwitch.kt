@@ -15,7 +15,7 @@ class AudioSwitch internal constructor(
     )
 ) {
 
-    private fun audioSwitchLog(message: String) { Log.d("Call:AudioSwitch", message) }
+    private fun audioSwitchLog(message: String) { Log.d("AUDIOHANDLER","SWITCH $message") }
 
     private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null

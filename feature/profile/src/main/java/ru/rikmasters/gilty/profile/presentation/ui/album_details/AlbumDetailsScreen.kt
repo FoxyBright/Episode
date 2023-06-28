@@ -1,9 +1,13 @@
 package ru.rikmasters.gilty.profile.presentation.ui.album_details
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.core.navigation.NavState
 import ru.rikmasters.gilty.profile.viewmodel.AlbumDetailsViewModel
@@ -21,8 +25,9 @@ fun AlbumDetailsScreen(vm: AlbumDetailsViewModel, albumId: Int) {
     })
 
     AlbumDetailsContent(
-        AlbumDetailsState(image, emoji),
-        object : AlbumDetailsCallback {
+        modifier = Modifier.systemBarsPadding(),
+        state = AlbumDetailsState(image, emoji),
+        callback = object : AlbumDetailsCallback {
             override fun onBack() {
                 nav.navigationBack()
             }

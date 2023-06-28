@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,7 +56,7 @@ fun TranslationViewerContent(
     onCloseClicked: () -> Unit,
     onToChatPressed: () -> Unit,
     isPortrait: Boolean,
-    initialize: (VideoTextureViewRenderer) -> Unit
+    inactiveBg: Boolean
 ) {
     Box {
         Column(
@@ -77,12 +75,35 @@ fun TranslationViewerContent(
                 modifier = if (customHUDState == null) Modifier.weight(1f) else Modifier.fillMaxSize()
             ) {
                 Camera(
-                    shape = if (customHUDState == null) RoundedCornerShape(14.dp) else RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp),
+                    shape = if (customHUDState == null) RoundedCornerShape(14.dp) else RoundedCornerShape(
+                        topStart = 14.dp,
+                        bottomStart = 14.dp
+                    ),
                     videoTrack = videoTrack,
                     eglBaseContext = eglBaseContext,
-                    modifier = Modifier.matchParentSize(),
-                    initialize = initialize
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.Center)
                 )
+                if (inactiveBg) {
+                    Column(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .align(Alignment.Center),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.bg_viewer),
+                            contentDescription = ""
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.translation_viewer_inactive),
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
                 if (customHUDState == null) {
                     if (isPortrait) {
                         OnCameraTopBarPortrait(
@@ -128,21 +149,18 @@ fun Camera(
     shape: Shape,
     videoTrack: VideoTrack?,
     eglBaseContext: EglBase.Context,
-    modifier: Modifier,
-    initialize: (VideoTextureViewRenderer) -> Unit
+    modifier: Modifier
 ) {
-    Surface(
-        shape = shape,
-        color = ThemeExtra.colors.preDarkColor,
+    Box(
         modifier = modifier
+            .background(ThemeExtra.colors.preDarkColor, shape)
     ) {
         videoTrack?.let {
             VideoRenderer(
                 videoTrack = it,
                 eglBaseContext = eglBaseContext,
-                initialize = initialize,
-                modifier = Modifier.fillMaxWidth()
-                    .wrapContentHeight()
+                initialize = { },
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }

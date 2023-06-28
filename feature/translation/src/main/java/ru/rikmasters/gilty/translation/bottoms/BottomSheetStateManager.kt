@@ -25,7 +25,9 @@ fun BottomSheetStateManager(
     onComplainClicked: (FullUserModel) -> Unit,
     onDeleteClicked: (FullUserModel) -> Unit,
     onAppendDurationSave: (Int) -> Unit,
-    isOrganizer: Boolean
+    isOrganizer: Boolean,
+    query: String,
+    userId: String?
 ) {
     Box(
         modifier = modifier
@@ -47,7 +49,9 @@ fun BottomSheetStateManager(
                     membersList = membersList,
                     onComplainClicked = onComplainClicked,
                     onDeleteClicked = onDeleteClicked,
-                    isOrganizer = isOrganizer
+                    isOrganizer = isOrganizer,
+                    query = query,
+                    userId = userId
                 )
             }
             TranslationBottomSheetState.DURATION -> {

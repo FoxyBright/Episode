@@ -7,6 +7,7 @@ import ru.rikmasters.gilty.core.app.ui.BottomSheetState
 @Stable
 class AppStateModel(
     val systemUi: SystemUiController,
+    val systemUiInsets: SystemUiVisibilityController,
     val bottomSheet: BottomSheetState,
-    val keyboard: KeyboardController,
+    val keyboard: KeyboardController
 )
