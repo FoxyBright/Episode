@@ -3,12 +3,13 @@ package ru.rikmasters.gilty.shared.shared.tag
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.model.meeting.CategoryModel
 import ru.rikmasters.gilty.shared.model.meeting.TagModel
+import ru.rikmasters.gilty.shared.shared.AnimatedImage
 import ru.rikmasters.gilty.shared.shared.GradientButton
 import ru.rikmasters.gilty.shared.shared.itemSpacer
 import ru.rikmasters.gilty.shared.theme.base.GiltyTheme
@@ -45,7 +47,7 @@ private fun TagSearchPreview() {
                         "Лобби", "Lorem", "Lolly"
                     ).map { TagModel(it, it) },
                     (""), allTags, (true), (null),
-                    (false), 0f,
+                    (false), 0f, (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -66,7 +68,7 @@ private fun TagSearchListPreview() {
                     listOf(allTags.first()),
                     emptyList(), ("love"),
                     allTags, (false), (null),
-                    (false), 0f,
+                    (false), 0f, (false)
                 ), Modifier.padding(16.dp)
             )
         }
@@ -82,6 +84,7 @@ data class TagsState(
     val category: CategoryModel?,
     val add: Boolean = false,
     val alpha: Float,
+    val listLoaderState: Boolean,
 )
 
 interface TagsCallback {
@@ -174,7 +177,7 @@ private fun Content(
     ) Box(Modifier.fillMaxSize()) {
         Text(
             stringResource(R.string.meeting_filter_tags_placeholder),
-            Modifier.align(Alignment.Center),
+            Modifier.align(Center),
             style = typography.bodyMedium,
             fontWeight = SemiBold,
             color = colorScheme.scrim
@@ -201,16 +204,16 @@ private fun Content(
                         category = state.category
                     ) { tag -> callback?.onTagClick(tag) }
                 }
-                if(state.selected.isNotEmpty())
-                    item {
-                        SelectTags(
-                            state.selected,
-                            Modifier.padding(top = 28.dp),
-                            state.isOnline,
-                        ) { callback?.onDeleteTag(it) }
-                    }
+                if(state.selected.isNotEmpty()) item {
+                    SelectTags(
+                        tags = state.selected,
+                        modifier = Modifier.padding(top = 28.dp),
+                        isOnline = state.isOnline,
+                    ) { callback?.onDeleteTag(it) }
+                }
             }
-            if(state.search.isNotBlank())
+            if(state.search.isNotBlank()) {
+                loader(state.listLoaderState)
                 itemsIndexed(state.searchResult) { i, item ->
                     AllTagItem(
                         item = item,
@@ -218,7 +221,19 @@ private fun Content(
                         size = state.searchResult.size,
                     ) { tag -> callback?.onTagClick(tag) }
                 }
+            }
             itemSpacer(40.dp)
         }
     }
 }
+
+private fun LazyListScope.loader(
+    state: Boolean,
+) = if(state) item {
+    Box(Modifier.fillMaxWidth(), Center) {
+        AnimatedImage(
+            resource = R.raw.loaging,
+            modifier = Modifier.size(48.dp)
+        )
+    }
+} else Unit

@@ -3,7 +3,6 @@ package ru.rikmasters.gilty.addmeet.presentation.ui.tags
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.TagsViewModel
@@ -19,12 +18,14 @@ fun TagsScreen(vm: TagsViewModel) {
     val scope = rememberCoroutineScope()
     val nav = get<NavState>()
     
+    val listLoaderState by vm.listLoaderState.collectAsState()
     val selected by vm.selected.collectAsState()
     val category by vm.category.collectAsState()
     val popular by vm.popular.collectAsState()
     val tags by vm.tags.collectAsState()
     val online by vm.online.collectAsState()
     val search by vm.search.collectAsState()
+    
     
     LaunchedEffect(Unit) { vm.getPopular() }
     
@@ -37,7 +38,8 @@ fun TagsScreen(vm: TagsViewModel) {
             isOnline = online,
             category = category,
             add = true,
-            alpha = 0f
+            alpha = 0f,
+            listLoaderState = listLoaderState
         ),
         modifier = Modifier.systemBarsPadding(),
         callback = object: TagsCallback {
@@ -50,7 +52,9 @@ fun TagsScreen(vm: TagsViewModel) {
             }
             
             override fun onSearchChange(text: String) {
-                scope.launch { vm.searchChange(text) }
+                scope.launch {
+                    vm.changeLoaderState(true)
+                    vm.searchChange(text) }
             }
             
             override fun onCreateTag(tagName: String) {

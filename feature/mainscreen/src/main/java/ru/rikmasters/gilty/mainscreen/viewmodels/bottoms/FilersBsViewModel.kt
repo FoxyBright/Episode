@@ -338,14 +338,30 @@ class FiltersBsViewModel(
     private val _searchResult =
         MutableStateFlow(emptyList<TagModel>())
     
+    private val _listLoaderState =
+        MutableStateFlow(false)
+    val listLoaderState =
+        _listLoaderState.asStateFlow()
+    
+    suspend fun changeLoaderState(state: Boolean = false) {
+        _listLoaderState.emit(state)
+    }
+    
     val searchResult = _searchResult
         .combine(tagSearch.debounce(250)) { _, current ->
             if(current.isNotBlank())
                 meetManager.searchTags(current)
                     .on(
-                        success = { it },
-                        loading = { emptyList() },
+                        success = {
+                            changeLoaderState()
+                            it
+                        },
+                        loading = {
+                            changeLoaderState()
+                            emptyList()
+                        },
                         error = {
+                            changeLoaderState()
                             context.errorToast(
                                 it.serverMessage
                             )

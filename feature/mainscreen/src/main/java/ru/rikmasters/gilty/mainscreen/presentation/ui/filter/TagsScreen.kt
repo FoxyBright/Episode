@@ -17,8 +17,9 @@ fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
     val scope = rememberCoroutineScope()
     val asm = get<AppStateModel>()
     
-    val searchResult by vm.searchResult.collectAsState()
+    val listLoaderState by vm.listLoaderState.collectAsState()
     val selected by vm.additionallyTags.collectAsState()
+    val searchResult by vm.searchResult.collectAsState()
     val popular by vm.popularTags.collectAsState()
     val isOnline by vm.isOnline.collectAsState()
     val search by vm.tagSearch.collectAsState()
@@ -42,7 +43,8 @@ fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
             isOnline = isOnline,
             category = null,
             add = false,
-            alpha = alpha
+            alpha = alpha,
+            listLoaderState = listLoaderState
         ),
         callback = object: TagsCallback {
             
@@ -73,7 +75,10 @@ fun TagSearchScreen(vm: FiltersBsViewModel, alpha: Float) {
             }
             
             override fun onSearchChange(text: String) {
-                scope.launch { vm.searchTags(text) }
+                scope.launch {
+                    vm.changeLoaderState(true)
+                    vm.searchTags(text)
+                }
             }
             
             override fun onBack() {

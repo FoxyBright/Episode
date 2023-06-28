@@ -30,7 +30,7 @@ class TagsViewModel: ViewModel() {
     private val _search =
         MutableStateFlow("")
     val search = _search.asStateFlow()
-
+    
     private val _category =
         MutableStateFlow<CategoryModel?>(null)
     val category = _category.asStateFlow()
@@ -42,14 +42,30 @@ class TagsViewModel: ViewModel() {
     private val _tags =
         MutableStateFlow(emptyList<TagModel>())
     
+    private val _listLoaderState =
+        MutableStateFlow(false)
+    val listLoaderState =
+        _listLoaderState.asStateFlow()
+    
+    suspend fun changeLoaderState(state: Boolean = false) {
+        _listLoaderState.emit(state)
+    }
+    
     @OptIn(FlowPreview::class)
     val tags = _search
         .combine(search.debounce(250)) { _, current ->
             if(current.isNotBlank())
                 manager.searchTags(current).on(
-                    success = { it },
-                    loading = { emptyList() },
+                    success = {
+                        changeLoaderState()
+                        it
+                    },
+                    loading = {
+                        changeLoaderState()
+                        emptyList()
+                    },
                     error = {
+                        changeLoaderState()
                         context.errorToast(
                             it.serverMessage
                         )
