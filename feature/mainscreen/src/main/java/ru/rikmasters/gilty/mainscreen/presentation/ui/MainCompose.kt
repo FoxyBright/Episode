@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
@@ -402,6 +403,8 @@ private fun Filters(
                 isCollapsed = (state.bsState
                     .bottomSheetState
                     .offset.value > screenHeight / 2),
+                isHalfExpand = state.bsState
+                    .bottomSheetState.isCollapsed,
                 alpha = alpha,
                 scope = state.vmScope
             )
@@ -409,8 +412,8 @@ private fun Filters(
         scaffoldState = state.bsState,
         sheetShape = shapes.bigTopShapes,
         sheetBackgroundColor = Transparent,
-        sheetPeekHeight = 90.dp,
-        sheetExtraHeight = 36.dp,
+        sheetPeekHeight = 86.dp,
+        sheetExtraHeight = 40.dp,
         modifier = Modifier.systemBarsPadding()
     ) { content.invoke() }
 }
@@ -418,15 +421,19 @@ private fun Filters(
 @Composable
 private fun Filters(
     isCollapsed: Boolean,
+    isHalfExpand: Boolean,
     alpha: Float,
     scope: Scope?,
 ) {
     scope?.let {
+
+        val animatableShape by animateDpAsState(if (isHalfExpand) 14.dp else 24.dp)
+
         Box {
             Box(
                 Modifier
                     .offset(y = gripOffset(isCollapsed))
-                    .clip(shapes.bigTopShapes)
+                    .clip( RoundedCornerShape(topStart = animatableShape, topEnd = animatableShape)) //shapes.bigTopShapes
             ) {
                 Connector<FiltersBsViewModel>(scope) {
                     FiltersBs(it, alpha, isCollapsed)

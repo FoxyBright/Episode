@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.yandex.mapkit.GeoObjectCollection.Item
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.VisibleRegionUtils.toPolygon
@@ -25,6 +26,7 @@ import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.Session.SearchListener
 import com.yandex.runtime.Error
+import kotlinx.coroutines.launch
 import ru.rikmasters.gilty.core.log.log
 import ru.rikmasters.gilty.feature.yandexmap.R.id.mapview
 import ru.rikmasters.gilty.feature.yandexmap.R.layout.map_layout
@@ -35,6 +37,14 @@ import ru.rikmasters.gilty.yandexmap.presentation.YandexMapCallback
 import ru.rikmasters.gilty.yandexmap.presentation.YandexMapState
 import kotlin.math.roundToInt
 
+
+fun MapProperties.cameraListener(callback: YandexMapCallback? = null) {
+    val cameraListener1 = CameraListener { map, position, _, finished ->
+        callback?.onCameraChange(position.target)
+    }
+    this.map.map.addCameraListener(cameraListener1)
+}
+
 @Composable
 fun MapContent(
     state: YandexMapState,
@@ -43,6 +53,7 @@ fun MapContent(
 ) {
     val offsetY: Animatable<Float, AnimationVector1D> =
         remember { Animatable(0f) }
+
     val currentPointerImage = remember {
         mutableStateOf(ic_not_selected_pointer)
     }
@@ -187,7 +198,6 @@ private fun MapProperties.search(
     onUpdate: (List<Pair<Point, Item>>) -> Unit,
 ) {
     val list = mutableListOf<Pair<Point, Item>>()
-
     searchManager.submit(
         Point(
             position.target.latitude,
