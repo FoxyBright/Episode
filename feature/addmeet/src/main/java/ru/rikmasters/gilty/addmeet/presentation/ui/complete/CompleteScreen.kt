@@ -1,12 +1,14 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.complete
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.CompleteViewModel
@@ -35,7 +37,7 @@ fun CompleteScreen(vm: CompleteViewModel) {
 
     meet?.let {
         Use<CompleteViewModel>(LoadingTrait) {
-            CompleteContent(it, online, Modifier,
+            CompleteContent(it, online, Modifier.systemBarsPadding(),
                 object : CompleteCallBack {
                     override fun onShare() {
                         scope.launch { shareMeet(it.id, context) }

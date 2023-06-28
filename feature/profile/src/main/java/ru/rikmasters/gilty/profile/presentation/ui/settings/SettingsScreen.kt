@@ -3,9 +3,12 @@ package ru.rikmasters.gilty.profile.presentation.ui.settings
 import android.app.NotificationManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.firebase.messaging.FirebaseMessagingService
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -167,7 +170,8 @@ fun SettingsScreen(vm: SettingsViewModel) {
                 override fun onBack() {
                     nav.navigationBack()
                 }
-            }
+            },
+            modifier = Modifier.systemBarsPadding()
         )
     }
 }

@@ -2,10 +2,12 @@ package ru.rikmasters.gilty.login.presentation.ui.login
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.auth.login.LoginMethod
@@ -115,6 +117,6 @@ fun LoginScreen(vm: LoginViewModel) {
             phone, isNextActive,
             country, methods.toList(),
             externalLogin, loginMethod
-        ), Modifier, callback
+        ), Modifier.systemBarsPadding(), callback
     )
 }

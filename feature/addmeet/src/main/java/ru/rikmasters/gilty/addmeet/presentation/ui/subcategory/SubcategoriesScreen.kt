@@ -1,6 +1,8 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.subcategory
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -10,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -47,7 +50,8 @@ fun SubcategoriesScreen(vm: SubcategoryViewModel) {
     }
 
     SubcategoriesContent(
-        Modifier, SubcategoriesState(
+        Modifier.systemBarsPadding(),
+        SubcategoriesState(
             subcategoryList = subcategories,
             selectCategory = selected,
             online = online,

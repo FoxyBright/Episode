@@ -1,5 +1,6 @@
 package ru.rikmasters.gilty.translation.viewer.ui
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
@@ -40,7 +41,8 @@ fun OnTopSnackbarsPlacehodlers(
     meeting: FullMeetingModel?,
     snackbarState: ViewerSnackbarState?,
     configuration: Configuration,
-    hudState: ViewerHUD?
+    hudState: ViewerHUD?,
+    context: Context
 ) {
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         Box(
@@ -54,9 +56,9 @@ fun OnTopSnackbarsPlacehodlers(
                 ) {
                     if (!cameraState) {
                         ProfileAvatar(meetingModel = meeting, modifier = Modifier)
+                        Spacer(modifier = Modifier.height(8.dp))
                         if (!microphoneState) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            MicroWave(meetingModel = meeting, modifier = Modifier)
+                            MicroWave()
                         }
                     }
                 }
@@ -109,9 +111,9 @@ fun OnTopSnackbarsPlacehodlers(
                 ) {
                     if (!cameraState) {
                         ProfileAvatar(meetingModel = meeting, modifier = Modifier)
+                        Spacer(modifier = Modifier.height(8.dp))
                         if (!microphoneState) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            MicroWave(meetingModel = meeting, modifier = Modifier)
+                            MicroWave()
                         }
                     }
                 }

@@ -1,6 +1,5 @@
 package ru.rikmasters.gilty.translation.viewer.viewmodel
 
-import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -58,9 +57,21 @@ class TranslationViewerViewModel : ViewModel() {
             _microphoneState.value = translation.microphone
             _isStreaming.value = translation.isStreaming
             _completedAt.value = translation.completedAt
+            when(translation.status) {
+                TranslationStatusModel.EXPIRED -> _hudState.value = ViewerHUD.PAUSED
+                TranslationStatusModel.COMPLETED -> _customHUDState.value = ViewerCustomHUD.COMPLETED
+                TranslationStatusModel.ACTIVE -> {
+                    _customHUDState.value = null
+                    _inactiveBg.value = false
+                }
+                TranslationStatusModel.INACTIVE -> _inactiveBg.value = true
+            }
             _oneTimeEvent.send(TranslationViewerOneTimeEvents.ConnectToStream(translation.webrtc))
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
+
+    private val _inactiveBg = MutableStateFlow(false)
+    val inactiveBg = _inactiveBg.asStateFlow()
 
     private val _completedAt = MutableStateFlow<ZonedDateTime?>(null)
 
@@ -133,8 +144,13 @@ class TranslationViewerViewModel : ViewModel() {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    val messages = reloadChat.flatMapLatest {
-        _translation.value?.id?.let {
+    val messages = combine(
+        _translation,
+        reloadChat
+    ) { translation, reload ->
+        Pair(translation, reload)
+    }.flatMapLatest { (translation, _) ->
+        translation?.id?.let {
             translationRepository.getMessages(
                 translationId = it
             )
@@ -143,11 +159,12 @@ class TranslationViewerViewModel : ViewModel() {
 
     val members = combine(
         reloadMembers,
-        _query
-    ) { reload, query ->
-        Pair(reload, query)
-    }.flatMapLatest { (_, query) ->
-        _translation.value?.id?.let {
+        _query,
+        _translation
+    ) { reload, query, translation ->
+        Triple(reload, query, translation)
+    }.flatMapLatest { (_, query, translation) ->
+        translation?.id?.let {
             translationRepository.getConnectedUsers(
                 translationId = it,
                 query = query
@@ -170,9 +187,9 @@ class TranslationViewerViewModel : ViewModel() {
 
             TranslationViewerEvent.Dismiss -> {
                 disconnectSocket()
+                disconnectFromTranslationChat()
                 stopPinging()
                 stopDurationTimer()
-                //disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
                 }
@@ -181,7 +198,6 @@ class TranslationViewerViewModel : ViewModel() {
             TranslationViewerEvent.EnterBackground -> {
                 disconnectSocket()
                 stopPinging()
-                disconnectFromTranslationChat()
                 coroutineScope.launch {
                     _oneTimeEvent.send(TranslationViewerOneTimeEvents.DisconnectWebRtc)
                 }
@@ -216,6 +232,8 @@ class TranslationViewerViewModel : ViewModel() {
 
                         WebRtcStatus.connect, WebRtcStatus.stream -> {
                             _hudState.value = null
+                            connectSocket()
+                            connectToTranslationChat()
                         }
 
                         WebRtcStatus.reconnectAttemptsOver -> {
@@ -242,18 +260,6 @@ class TranslationViewerViewModel : ViewModel() {
                 _query.value = event.newQuery
             }
 
-            TranslationViewerEvent.ConnectToChat -> {
-                reloadChat.value = !reloadChat.value
-            }
-
-            TranslationViewerEvent.ReloadMembers -> {
-                reloadMembers.value = !reloadMembers.value
-            }
-
-            TranslationViewerEvent.DisconnectFromChat -> {
-                reloadChat.value = !reloadChat.value
-            }
-
             TranslationViewerEvent.Reconnect -> {
                 reconnect()
             }
@@ -263,7 +269,6 @@ class TranslationViewerViewModel : ViewModel() {
     init {
         coroutineScope.launch {
             translationRepository.webSocketFlow.collectLatest { socketEvent ->
-                Log.d("TEST", "NEW WEb SOCKET EVENT $socketEvent")
                 when (socketEvent) {
                     TranslationCallbackEvents.MessageReceived -> {
                         reloadChat.value = !reloadChat.value
@@ -297,6 +302,7 @@ class TranslationViewerViewModel : ViewModel() {
                         _hudState.value = null
                         if (ZonedDateTime.now().isBefore(_completedAt.value)) {
                             coroutineScope.launch {
+                                _viewerSnackbarState.emit(ViewerSnackbarState.BROADCAST_EXTENDED)
                                 _additionalTime.value =
                                     getAdditionalTimeString(socketEvent.duration)
                                 delay(2000)
@@ -305,6 +311,7 @@ class TranslationViewerViewModel : ViewModel() {
                             }
                         } else {
                             coroutineScope.launch {
+                                _viewerSnackbarState.emit(ViewerSnackbarState.BROADCAST_RESUMED)
                                 _customHUDState.value = null
                                 _completedAt.value = socketEvent.completedAt
                                 _timerHighlighted.value = true
@@ -357,7 +364,7 @@ class TranslationViewerViewModel : ViewModel() {
     }
 
     private fun reconnect() {
-        _translation.value?.let {
+        _meeting.value?.let {
             loadTranslationInfo(it.id)
         }
         coroutineScope.launch {
@@ -427,12 +434,6 @@ class TranslationViewerViewModel : ViewModel() {
                                 message = it
                             )
                         )
-                    } ?: cause.defaultMessage?.let {
-                        _oneTimeEvent.send(
-                            TranslationViewerOneTimeEvents.OnError(
-                                message = it
-                            )
-                        )
                     }
                 }
             )
@@ -449,16 +450,11 @@ class TranslationViewerViewModel : ViewModel() {
                 loading = {},
                 success = { meetingModel ->
                     _meeting.value = meetingModel
+                    _membersCount.value = meetingModel.membersCount
                     connectToTranslationChat()
                 },
                 error = { cause ->
                     cause.serverMessage?.let {
-                        _oneTimeEvent.send(
-                            TranslationViewerOneTimeEvents.OnError(
-                                message = it
-                            )
-                        )
-                    } ?: cause.defaultMessage?.let {
                         _oneTimeEvent.send(
                             TranslationViewerOneTimeEvents.OnError(
                                 message = it

@@ -1,7 +1,10 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.conditions
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.viewmodel.ConditionViewModel
@@ -35,7 +38,7 @@ fun ConditionsScreen(vm: ConditionViewModel) {
         ConditionState(
             online, hidden, meetType, condition,
             forbidden, price, alert, isActive
-        ), Modifier, object: ConditionsCallback {
+        ), Modifier.systemBarsPadding(), object: ConditionsCallback {
             
             override fun onClose() {
                 scope.launch {

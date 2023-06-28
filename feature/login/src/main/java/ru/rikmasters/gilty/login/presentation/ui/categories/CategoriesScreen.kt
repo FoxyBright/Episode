@@ -1,8 +1,11 @@
 package ru.rikmasters.gilty.login.presentation.ui.categories
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,7 +67,7 @@ fun CategoriesScreen(vm: CategoryViewModel) {
     }
 
     CategoriesContent(
-        modifier = Modifier,
+        modifier = Modifier.systemBarsPadding(),
         state = CategoriesState(
             categoryList = categories,
             selectCategories = selected,

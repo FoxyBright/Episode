@@ -2,8 +2,10 @@ package ru.rikmasters.gilty.chat.presentation.ui.chatList
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
@@ -77,6 +79,7 @@ fun ChatListScreen(vm: ChatListViewModel) {
     }
     
     ChatListContent(
+        modifier = Modifier.systemBarsPadding(),
         state = ChatListState(
             stateList = navBar,
             chats = chats,

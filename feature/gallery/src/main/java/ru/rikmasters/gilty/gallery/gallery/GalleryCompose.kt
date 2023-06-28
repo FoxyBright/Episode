@@ -2,7 +2,9 @@ package ru.rikmasters.gilty.gallery.gallery
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -47,7 +49,9 @@ fun GalleryContent(
     modifier: Modifier = Modifier,
     callback: GalleryCallback? = null,
 ) {
-    Scaffold(modifier, {
+    Scaffold(
+        modifier.systemBarsPadding()
+            .navigationBarsPadding(), {
         GalleryDropMenu(
             state = state.menuState,
             menuList = state.menuItems,

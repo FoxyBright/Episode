@@ -2,9 +2,12 @@ package ru.rikmasters.gilty.notifications.presentation.ui.notification
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -89,6 +92,7 @@ fun NotificationsScreen(vm: NotificationViewModel) {
     }
     
     NotificationsContent(
+        modifier = Modifier.systemBarsPadding(),
         state = NotificationsState(
             notifications = notifications,
             splitNotifications = splitNotifications,

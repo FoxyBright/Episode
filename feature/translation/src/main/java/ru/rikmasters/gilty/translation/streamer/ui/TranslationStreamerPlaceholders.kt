@@ -47,7 +47,7 @@ fun OnTopSnackbarsPlacehodlers(
         ) {
             if (isShowPlacehodlers) {
                 val alignment = if (isShowSnackbar) Alignment.TopCenter else Alignment.Center
-                val topPadding = if (isShowSnackbar) 77.dp else 0.dp
+                val topPadding = if (isShowSnackbar) 90.dp else 0.dp
                 Column(
                     modifier = Modifier.animatePlacement().align(alignment).padding(top = topPadding)
                 ) {
@@ -55,7 +55,7 @@ fun OnTopSnackbarsPlacehodlers(
                         ProfileAvatar(meetingModel = meeting, modifier = Modifier)
                         if (!microphoneState) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            MicroWave(meetingModel = meeting, modifier = Modifier)
+                       //     MicroWave(meetingModel = meeting, modifier = Modifier)
                         }
                     }
                 }
@@ -107,7 +107,7 @@ fun OnTopSnackbarsPlacehodlers(
                         ProfileAvatar(meetingModel = meeting, modifier = Modifier)
                         if (!microphoneState) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            MicroWave(meetingModel = meeting, modifier = Modifier)
+                           // MicroWave(meetingModel = meeting, modifier = Modifier)
                         }
                     }
                 }

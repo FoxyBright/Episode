@@ -26,11 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pedro.rtplibrary.view.OpenGlView
 import ru.rikmasters.gilty.shared.R
@@ -47,20 +47,6 @@ import ru.rikmasters.gilty.translation.shared.components.MicrophoneItem
 import ru.rikmasters.gilty.translation.shared.components.StreamerItem
 import ru.rikmasters.gilty.translation.shared.components.TimerItem
 import ru.rikmasters.gilty.translation.streamer.model.StreamerCustomHUD
-
-@Composable
-@Preview
-fun F() {
-    ExpiredPortrait(
-        onTimerClicked = {},
-        meetingModel = null,
-        remainTime = "00:00",
-        isHighlightTimer = false,
-        timerAddTime = "",
-        onCloseClicked = {},
-        membersCount = 1
-    )
-}
 
 @Composable
 fun TranslationStreamerContent(
@@ -100,14 +86,16 @@ fun TranslationStreamerContent(
         Box(
             modifier = Modifier
                 .background(
-                    color = ThemeExtra.colors.preDarkColor
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            ThemeExtra.colors.preDarkColor,
+                            Color(0xFF070707)
+                        )
+                    )
                 )
                 .weight(1f)
         ) {
-            Surface(shape = if (isPortrait) RoundedCornerShape(14.dp) else RoundedCornerShape(
-                topStart = 14.dp,
-                topEnd = 14.dp
-            )) {
+            Surface(shape = if (isPortrait) RoundedCornerShape(14.dp) else RectangleShape) {
                 CameraView(
                     initCamera = initCamera,
                     surfaceHolderCallback = surfaceHolderCallback,
@@ -306,8 +294,7 @@ fun ExpiredPortrait(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 16.dp),
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(14.dp))

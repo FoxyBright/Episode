@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.requirements
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.requirements.bottoms.AgeBs
@@ -101,7 +103,7 @@ fun RequirementsScreen(vm: RequirementsViewModel) {
                 isActive = isActive,
                 withoutRespond = withoutRespond,
                 memberLimited = memberLimited
-            ), Modifier, object : RequirementsCallback {
+            ), Modifier.systemBarsPadding(), object : RequirementsCallback {
 
                 override fun onGenderClick() {
                     vm.scope.openBS<GenderBsViewModel>(scope) {

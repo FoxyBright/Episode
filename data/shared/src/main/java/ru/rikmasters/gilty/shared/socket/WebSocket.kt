@@ -126,6 +126,7 @@ abstract class WebSocket: KtorSource() {
             try {
                 connection(userId)
             } catch(e: Exception) {
+                connect(userId)
                 logE("Bad reconnection")
                 logE("$e")
             }

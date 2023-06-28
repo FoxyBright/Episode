@@ -32,51 +32,55 @@ import ru.rikmasters.gilty.core.viewmodel.trait.PullToRefreshTrait.Companion.ind
 fun AppEntrypoint(theme: AppTheme) {
     val entrypointResolver =
         get<EntrypointResolver>()
-    
+
     val snackbarHostState =
         remember { SnackbarHostState() }
-    
+
     val systemUiController =
         rememberSystemUiController()
-    
+
+    val systemUiVisibilityController =
+        rememberSystemUiVisibilityController()
+
     val keyboardController =
         rememberKeyboardController()
-    
+
     val navController =
         rememberNavController()
-    
+
     val bottomSheetState = BottomSheetState(
         rememberSwipeableState(COLLAPSED)
     )
-    
+
     val asm = remember {
         AppStateModel(
             systemUi = systemUiController,
             bottomSheet = bottomSheetState,
-            keyboard = keyboardController
+            keyboard = keyboardController,
+            systemUiInsets = systemUiVisibilityController
         )
     }
-    
+
     val env = get<Environment>()
-    
+
     val startDestination = remember(entrypointResolver) {
         runBlocking { entrypointResolver.resolve() }
     }
-    
+
     val navState = remember(startDestination) {
         NavState(
             navHostController = navController,
             startDestination = startDestination
         )
     }
-    
+
     loader = { isLoading, content ->
         GLoader(
             isLoading = isLoading,
             content = content
         )
     }
-    
+
     indicator = { state, offset, trigger ->
         LoadingIndicator(
             swipeRefreshState = state,
@@ -84,14 +88,14 @@ fun AppEntrypoint(theme: AppTheme) {
             trigger = trigger
         )
     }
-    
+
     LaunchedEffect(env, asm) {
         loadAsModule(env, asm)
     }
     LaunchedEffect(env, navState) {
         loadAsModule(env, navState)
     }
-    
+
     theme.apply(
         darkMode = isSystemInDarkTheme(),
         dynamicColor = false
@@ -119,7 +123,6 @@ private fun Layout(
     Box(
         Modifier
             .fillMaxWidth()
-            .statusBarsPadding()
             .navigationBarsPadding()
     ) {
         BottomSheetLayout(
@@ -144,7 +147,8 @@ private fun Layout(
 @Composable
 private fun BSContent(content: (@Composable () -> Unit)) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.background
         ),

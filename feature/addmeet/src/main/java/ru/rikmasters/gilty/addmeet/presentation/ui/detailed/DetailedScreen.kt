@@ -1,7 +1,10 @@
 package ru.rikmasters.gilty.addmeet.presentation.ui.detailed
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import ru.rikmasters.gilty.addmeet.presentation.ui.detailed.bottom.duration.DurationBs
@@ -59,7 +62,7 @@ fun DetailedScreen(vm: DetailedViewModel) {
             alert = alert,
             online = online,
             isActive = isActive
-        ), modifier = Modifier,callback = object: DetailedCallback {
+        ), modifier = Modifier.systemBarsPadding(),callback = object: DetailedCallback {
             
             override fun onDateClick() {
                 vm.scope.openBS<TimeBsViewModel>(scope) {

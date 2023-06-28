@@ -1,6 +1,7 @@
 package ru.rikmasters.gilty.chat.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.paging.cachedIn
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -435,6 +436,7 @@ class ChatViewModel: ViewModel() {
             meetManager.getDetailedMeet(meetId).on(
                 success = { meeting ->
                     _meet.emit(meeting)
+                    _membersCount.value = meeting.membersCount
                     coroutineScope.launch {
                         translationRepository.getTranslationInfo(
                             translationId = meetId

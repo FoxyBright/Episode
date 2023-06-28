@@ -8,6 +8,7 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import android.util.Log
 import android.view.PixelCopy
 import com.pedro.rtplibrary.view.OpenGlView
 
@@ -26,6 +27,8 @@ fun OpenGlView.getBitmap(callback: (Bitmap?) -> Unit) {
             { copyResult ->
                 if (copyResult == PixelCopy.SUCCESS){
                     callback(bitmap)
+                } else {
+                    callback(null)
                 }
                 handlerThread.quitSafely()
             },

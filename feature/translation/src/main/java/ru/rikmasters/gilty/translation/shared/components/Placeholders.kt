@@ -1,8 +1,10 @@
 package ru.rikmasters.gilty.translation.shared.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.visualizer.amplitude.AudioRecordView
 import ru.rikmasters.gilty.shared.R
 import ru.rikmasters.gilty.shared.common.GCachedImage
 import ru.rikmasters.gilty.shared.model.meeting.FullMeetingModel
@@ -228,10 +232,7 @@ fun Paused(
 }
 
 @Composable
-fun MicroWave(
-    meetingModel: FullMeetingModel?,
-    modifier: Modifier
-) {
+fun MicroWave() {
     Icon(
         painter = painterResource(id = R.drawable.ic_microphone_off_voice),
         contentDescription = "Microphone off",

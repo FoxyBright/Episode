@@ -4,9 +4,12 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.NotificationManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -54,7 +57,7 @@ fun PermissionsScreen(vm: PermissionViewModel) {
         PermissionsState(
             locationPermissionState.hasPermission,
             notification
-        ), Modifier, object: PermissionsCallback {
+        ), Modifier.systemBarsPadding(), object: PermissionsCallback {
             
             override fun onBack() {
                 nav.navigationBack()

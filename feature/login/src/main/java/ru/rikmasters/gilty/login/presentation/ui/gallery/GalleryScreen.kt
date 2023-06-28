@@ -4,10 +4,12 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.TIRAMISU
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
@@ -78,7 +80,7 @@ fun GalleryScreen(
                 isOnline = (false),
                 buttonLabel = stringResource(R.string.add_button),
                 buttonEnabled = selected.isNotEmpty(),
-            ), modifier = Modifier, callback = object: GalleryCallback {
+            ), modifier = Modifier.systemBarsPadding(), callback = object: GalleryCallback {
                 
                 override fun onImageClick(image: String) {
                     scope.launch {

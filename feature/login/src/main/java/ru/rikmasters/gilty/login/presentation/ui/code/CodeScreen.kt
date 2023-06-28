@@ -1,8 +1,11 @@
 package ru.rikmasters.gilty.login.presentation.ui.code
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -40,7 +43,7 @@ fun CodeScreen(vm: CodeViewModel) {
                 focuses = focuses,
                 sec = timer,
                 blurErrorMessage = blur),
-            modifier = Modifier, callback = object : CodeCallback {
+            modifier = Modifier.systemBarsPadding(), callback = object : CodeCallback {
 
                 override fun onCodeChange(index: Int, text: String) {
                     if(blur != null || vm.loading.value) return

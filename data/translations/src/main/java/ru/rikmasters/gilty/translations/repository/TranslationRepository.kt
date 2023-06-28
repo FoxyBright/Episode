@@ -118,7 +118,7 @@ class TranslationRepository(
     
     fun getConnectedUsers(
         translationId: String,
-        query: String?,
+        query: String,
     ): Flow<PagingData<FullUserModel>> =
         Pager(
             config = PagingConfig(

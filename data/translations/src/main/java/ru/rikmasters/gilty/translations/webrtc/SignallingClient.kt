@@ -31,6 +31,10 @@ import ru.rikmasters.gilty.translations.webrtc.utils.toMap
 
 class SignalingClient {
 
+    // signaling commands to send commands to value pairs to the subscribers
+    private val _signalingEventFlow = MutableSharedFlow<WebRTCClientEvent>()
+    val signalingEventFlow: SharedFlow<WebRTCClientEvent> = _signalingEventFlow
+
     private val signalingScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val client = OkHttpClient()
 
@@ -55,10 +59,6 @@ class SignalingClient {
             .build()
         ws = client.newWebSocket(request!!, SignalingWebSocketListener())
     }
-
-    // signaling commands to send commands to value pairs to the subscribers
-    private val _signalingEventFlow = MutableSharedFlow<WebRTCClientEvent>()
-    val signalingEventFlow: SharedFlow<WebRTCClientEvent> = _signalingEventFlow
 
     // Send command to webSocket
     private fun sendCommand(message: AnswerMessage) {

@@ -2,10 +2,13 @@ package ru.rikmasters.gilty.profile.presentation.ui.user
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -246,6 +249,7 @@ fun UserProfileScreen(vm: UserProfileViewModel, update: Boolean, closePopUp: Boo
     }
 
     ProfileContent(
+        modifier = Modifier.systemBarsPadding(),
         state = UserProfileState(
             profileState = ProfileState(
                 profile = profile?.copy(
