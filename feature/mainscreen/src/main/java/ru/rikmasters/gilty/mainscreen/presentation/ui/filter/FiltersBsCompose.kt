@@ -88,6 +88,7 @@ fun MeetingFilterBottom(
     state: FilterListState,
     callback: MeetingFilterBottomCallback? = null,
 ) {
+
     val mod = Modifier
         .alpha(state.alpha)
         .let {
